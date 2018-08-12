@@ -1,3 +1,4 @@
+'''Logger'''
 import logging
 
 # create logger
@@ -13,7 +14,8 @@ fh = logging.FileHandler('coolqbot.log')
 fh.setLevel(logging.WARNING)
 
 # create formatter
-formatter = logging.Formatter('%(asctime)s - %(filename)s - %(lineno)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s - %(filename)s - %(lineno)s - %(levelname)s - %(message)s')
 
 # add formatter to handler
 ch.setFormatter(formatter)
