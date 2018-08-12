@@ -1,6 +1,5 @@
-# coding:utf-8
+'''天气插件'''
 import json
-import logging
 import re
 import urllib
 
@@ -30,14 +29,10 @@ def weather_old(city):
     '''百度天气'''
     try:
         city_name = urllib.parse.quote(city.encode('utf-8'))
-        url_str = "http://api.map.baidu.com/telematics/v3/weather?location={city}&ak={key}&output=json".format(
-            city=city_name,
-            key=KEY1
-        )
+        url_str = f"http://api.map.baidu.com/telematics/v3/weather?location={city_name}&ak={KEY1}&output=json"
         response = requests.get(url_str)
         data = response.content.decode('utf-8')
         json_result = json.loads(data)['results'][0]
-
         str_data = ''
         str_data += json_result['currentCity'] + \
             " PM:" + json_result['pm25'] + "\n"
@@ -55,7 +50,7 @@ def weather_old(city):
 
         return str_data
     except Exception as e:
-        logging.exception(e)
+        logger.exception(e)
         return None
 
 
@@ -75,10 +70,7 @@ def weather_extend(city):
     '''
     try:
         city_name = urllib.parse.quote(city.encode('utf-8'))
-        url_str = "https://free-api.heweather.com/s6/weather?location={city}&key={key}".format(
-            city=city_name,
-            key=KEY2
-        )
+        url_str = f"https://free-api.heweather.com/s6/weather?location={city_name}&key={KEY2}"
         response = requests.get(url_str)
         data = response.content.decode('utf-8')
         weather_result = json.loads(data)['HeWeather6'][0]
@@ -89,5 +81,5 @@ def weather_extend(city):
 
         return str_data
     except Exception as e:
-        logging.exception(e)
+        logger.exception(e)
         return None
