@@ -31,7 +31,7 @@ def is_repeat(recorder, msg):
         return False
 
     rand = randint(1, 100)
-    print(rand)
+    logger.info(rand)
     if rand > 15:
         return False
 
