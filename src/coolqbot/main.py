@@ -5,7 +5,7 @@ from coolqbot.logger import logger
 from coolqbot.bot import bot, plugin_manager
 
 
-def main_loop(debug=False):
+def main(debug=False):
     if debug:
         logger.setLevel(logging.DEBUG)
     logger.info('Initializing...')
@@ -23,7 +23,7 @@ def run():
         help='Switch to DEBUG mode for better view of message.'
     )
     args = parser.parse_args()
-    main_loop(**vars(args))
+    main(**vars(args))
 
 
 if __name__ == '__main__':

@@ -46,7 +46,6 @@ def is_repeat(recorder, msg):
 @bot.on_message('group')
 async def repeat(context):
     global recorder
-    logger.debug(context)
     if is_repeat(recorder, context):
         return {'reply': context['message'], 'at_sender': False}
 

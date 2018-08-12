@@ -12,10 +12,10 @@ class PluginManager(object):
         return f'{self._plugin_prefix}.{name}'
 
     def load_plugin(self):
-        for plugin_name in os.listdir('plugins'):
-            pathname = os.path.join('plugins', plugin_name)
+        for filename in os.listdir('plugins'):
+            pathname = os.path.join('plugins', filename)
             if os.path.isfile(pathname):
-                plugin_name = plugin_name.split('.')[0]
+                plugin_name = filename.split('.')[0]
                 try:
                     __import__(self._get_plugin_name(plugin_name))
                     logger.info(f'Plugin [{plugin_name}] loaded.')
