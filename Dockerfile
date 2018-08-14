@@ -5,10 +5,11 @@ ENV CQHTTP_POST_URL=http://127.0.0.1:8080/ \
 # RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak
 # COPY sources.list /etc/apt/sources.list
 #安装python3.6和pip
-RUN add-apt-repository ppa:jonathonf/python-3.6; \
-    apt-get update; \
-    apt-get install -y python3.6; \
-    curl https://bootstrap.pypa.io/get-pip.py | python3.6;
+RUN add-apt-repository ppa:jonathonf/python-3.6 \
+    && apt-get update \
+    && apt-get install -y python3.6 \
+    && apt-get clean \
+    && curl https://bootstrap.pypa.io/get-pip.py | python3.6
 #安装依赖
 COPY requirements.txt /home/user/coolqbot/requirements.txt
 # RUN pip3.6 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r /home/user/coolqbot/requirements.txt
