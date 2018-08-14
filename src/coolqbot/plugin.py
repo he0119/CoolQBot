@@ -2,6 +2,7 @@ import os
 
 from coolqbot.logger import logger
 
+PATH = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), 'plugins')
 
 class PluginManager(object):
 
@@ -12,8 +13,8 @@ class PluginManager(object):
         return f'{self._plugin_prefix}.{name}'
 
     def load_plugin(self):
-        for filename in os.listdir('plugins'):
-            pathname = os.path.join('plugins', filename)
+        for filename in os.listdir(PATH):
+            pathname = os.path.join(PATH, filename)
             if os.path.isfile(pathname):
                 plugin_name = filename.split('.')[0]
                 try:

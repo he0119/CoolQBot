@@ -1,13 +1,19 @@
 FROM richardchien/cqhttp:latest
-ENV CQHTTP_POST_URL=http://127.0.0.1:8080 \
+ENV CQHTTP_POST_URL=http://127.0.0.1:8080/ \
     CQHTTP_SERVE_DATA_FILES=yes
+#设置清华源
+# RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak
+# COPY sources.list /etc/apt/sources.list
+#安装python3.6和pip
+RUN add-apt-repository ppa:jonathonf/python-3.6; \
+    apt-get update; \
+    apt-get install -y python3.6; \
+    curl https://bootstrap.pypa.io/get-pip.py | python3.6;
+#安装依赖
+COPY requirements.txt /home/user/coolqbot/requirements.txt
+# RUN pip3.6 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r /home/user/coolqbot/requirements.txt
+RUN pip3.6 install -r /home/user/coolqbot/requirements.txt
+#复制CoolQBot并运行
 COPY src /home/user/coolqbot
-RUN apt-get update; \
-    apt-get install -y git build-essential libreadline-dev libsqlite3-dev libbz2-dev libssl-dev zlib1g-dev; \
-    git clone https://github.com/pyenv/pyenv.git ~/.pyenv; \
-    echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc; \
-    echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc; \
-    echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc; \
-    exec $SHELL; \
-    pyenv install 3.6.6; \
-    cd /home/user/coolqbot && pyenv local 3.6.6 && python run.py
+RUN chown user:user /home/user/coolqbot/run.py
+RUN echo "\n\nsudo -E -Hu user /usr/bin/python3.6 /home/user/coolqbot/run.py &" >> /etc/cont-init.d/110-get-coolq

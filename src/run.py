@@ -1,8 +1,5 @@
 from coolqbot.main import run
-from coolqbot.logger import logger
 
-try:
+
+if __name__ == '__main__':
     run()
-except KeyboardInterrupt:
-    logger.info("User stop. exit.")
-    exit(0)
