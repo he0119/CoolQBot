@@ -44,6 +44,17 @@ def is_repeat(recorder, msg):
 
 @bot.on_message('group')
 async def repeat(context):
+    '''人类本质'''
     global recorder
     if is_repeat(recorder, context):
         return {'reply': context['message'], 'at_sender': False}
+
+
+@bot.on_message('group')
+async def repeat_sign(context):
+    '''复读签到(电脑上没法看手机签到内容)'''
+    if context['group_id'] == 438789224:
+        match = re.match(r'^\[CQ:sign(.+)\]$', context['message'])
+        if match:
+            title = re.findall(r'title=(\w+\s?\w+)', context['message'])
+            return {'reply': f'今天的运势是{title[0]}'}

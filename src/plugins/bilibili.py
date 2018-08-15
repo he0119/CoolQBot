@@ -8,7 +8,7 @@ from coolqbot.bot import bot
 from coolqbot.logger import logger
 
 
-@bot.on_message('group')
+@bot.on_message('group', 'private')
 async def bilibili_today(context):
     match = re.match(r'^\/bilibili', context['message'])
     if match:

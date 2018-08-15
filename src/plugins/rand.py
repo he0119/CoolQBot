@@ -6,7 +6,7 @@ from coolqbot.bot import bot
 from coolqbot.logger import logger
 
 
-@bot.on_message('group')
+@bot.on_message('group', 'private')
 async def rand(context):
     match = re.match(r'^\/rand ?(\w*)?', context['message'])
     if match:
