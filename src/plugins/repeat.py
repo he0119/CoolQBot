@@ -19,6 +19,10 @@ def is_repeat(recorder, msg):
     if msg['group_id'] != 438789224:
         return False
 
+    # 不要复读过长的文字
+    if len(msg['message']) > 28:
+        return False
+
     # 不要复读图片，签到，分享
     match = re.match(r'^\[CQ:(image|sign|share).+\]', msg['message'])
     if match:
