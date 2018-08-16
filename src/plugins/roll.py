@@ -14,19 +14,21 @@ async def roll(context):
         return {'reply': str_data, 'at_sender': False}
 
 
-def roll_dices(raw_string):
+def roll_dices(input_str):
     '''掷骰子'''
-    match = re.match(r'^([\dd+\s]+?)$', raw_string)
+    match = re.match(r'^([\dd+\s]+?)$', input_str)
     if not match:
         return '请输入正确的参数~>_<~'
     r = ''
     add = 0
-    s1 = '+' + raw_string
-    dices = re.findall(r'(\+)(\d{0,10})(?:(d)(\d{1,10}))?', s1)
+    input_str = '+' + input_str
+    dices = re.findall(r'(\+)(\d{0,10})(?:(d)(\d{1,10}))?', input_str)
+    raw_str = ''
     for dice in dices:
         dice_str, add = roll_single(dice, add)
         r += dice_str
-    return f'{raw_string}={r}={add}'.replace('=+', '=')
+        raw_str += f'{dice[0]}{dice[1]}{dice[2]}{dice[3]}'
+    return f'{raw_str}={r}={add}'[1:].replace('=+', '=')
 
 
 def roll_single(args, add):
