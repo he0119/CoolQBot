@@ -13,7 +13,7 @@ if platform.system() == 'Linux':
     fh = logging.FileHandler('/home/user/coolq/coolqbot.log')
 else:
     fh = logging.FileHandler('coolqbot.log')
-fh.setLevel(logging.WARNING)
+fh.setLevel(logging.DEBUG)
 
 # create formatter
 formatter = logging.Formatter(
