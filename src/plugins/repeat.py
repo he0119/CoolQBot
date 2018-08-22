@@ -89,5 +89,5 @@ async def repeat_sign(context):
     if context['group_id'] == 438789224:
         match = re.match(r'^\[CQ:sign(.+)\]$', context['message'])
         if match:
-            title = re.match(r'title=(\w+\s?\w+)', context['message'])
-            return {'reply': f'今天的运势是{title.group(1)}'}
+            title = re.findall(r'title=(\w+\s?\w+)', context['message'])
+            return {'reply': f'今天的运势是{title[0]}'}
