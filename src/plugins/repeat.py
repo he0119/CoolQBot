@@ -12,21 +12,19 @@ class Recorder(object):
         self.last_message_on = datetime.utcnow()
         self.msg_send_time = []
 
+    def message_number(self, x):
+        '''返回x分钟内的消息条数，并清除之前的消息记录'''
+        times = self.msg_send_time
+        now = datetime.utcnow()
+        for i in range(len(times)):
+            if times[i] > now - timedelta(minutes=x):
+                self.msg_send_time = self.msg_send_time[i:]
+                logger.debug(len(self.msg_send_time))
+                return len(self.msg_send_time)
+        logger.debug(len(self.msg_send_time))
+        return len(self.msg_send_time)
 
 recorder = Recorder()
-
-
-def message_number(recorder, x):
-    '''返回x分钟内的消息条数，并清除之前的消息记录'''
-    times = recorder.msg_send_time
-    now = datetime.utcnow()
-    for i in range(len(times)):
-        if times[i] > now - timedelta(minutes=x):
-            recorder.msg_send_time = recorder.msg_send_time[i:]
-            logger.debug(len(recorder.msg_send_time))
-            return len(recorder.msg_send_time)
-    logger.debug(len(recorder.msg_send_time))
-    return len(recorder.msg_send_time)
 
 
 def is_repeat(recorder, msg):
@@ -58,8 +56,8 @@ def is_repeat(recorder, msg):
         return False
 
     repeat_rate = 15
-    # 当8分钟内发送消息数量大于30条时，降低复读概率
-    if message_number(recorder, 8) > 30:
+    # 当10分钟内发送消息数量大于30条时，降低复读概率
+    if recorder.message_number(10) > 30:
         logger.debug('Repeat rate changed!')
         repeat_rate = 5
 
