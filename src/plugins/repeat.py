@@ -32,6 +32,11 @@ def is_repeat(recorder, msg):
     if msg['group_id'] != 438789224:
         return False
 
+    # 不要复读指令
+    match = re.match(r'^\/|!', msg['message'])
+    if match:
+        return False
+
     # 记录群内发送消息数量和时间
     now = datetime.utcnow()
     recorder.msg_send_time.append(now)
@@ -45,10 +50,6 @@ def is_repeat(recorder, msg):
     if match:
         return False
 
-    # 不要复读指令
-    match = re.match(r'^\/|!', msg['message'])
-    if match:
-        return False
 
     # 复读之后1分钟之内不再复读
     time = recorder.last_message_on
