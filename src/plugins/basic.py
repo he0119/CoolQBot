@@ -1,8 +1,28 @@
 '''基础插件'''
 import re
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 from coolqbot.bot import bot
 from coolqbot.logger import logger
+
+scheduler = AsyncIOScheduler()
+
+
+async def coolq_status():
+    '''检查酷Q状态'''
+    try:
+        msg = await bot.get_status()
+        if not msg['good']:
+            await bot.set_restart()
+            logger.info(msg)
+            logger.info('重启酷Q')
+    except:
+        logger.error('无法获取酷Q状态')
+
+# 每五分钟检查一次
+job = scheduler.add_job(coolq_status, 'interval', minutes=5)
+scheduler.start()
 
 
 @bot.on_message('group')
