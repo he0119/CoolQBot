@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from random import randint
 
 from coolqbot.bot import bot
-from coolqbot.config import GROUP_NUMBER
+from coolqbot.config import GROUP_ID
 from coolqbot.recorder import recorder
 
 
@@ -39,7 +39,7 @@ def is_repeat(recorder, msg):
     repeat_rate = 15
     # 当10分钟内发送消息数量大于30条时，降低复读概率
     if recorder.message_number(10) > 30:
-        bot.logger.debug('Repeat rate changed!')
+        bot.logger.info('Repeat rate changed!')
         repeat_rate = 5
 
     # 按照设定概率复读
