@@ -6,7 +6,6 @@ import urllib
 import requests
 
 from coolqbot.bot import bot
-from coolqbot.logger import logger
 
 
 @bot.on_message('group', 'private')
@@ -50,7 +49,7 @@ def weather_old(city):
 
         return str_data
     except Exception as e:
-        logger.warning(e)
+        bot.logger.warning(e)
         return None
 
 
@@ -93,5 +92,5 @@ def weather_extend(city):
 
         return str_data
     except Exception as e:
-        logger.exception(e)
+        bot.logger.exception(e)
         return None

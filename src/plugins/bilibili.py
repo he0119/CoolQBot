@@ -5,7 +5,6 @@ import re
 import requests
 
 from coolqbot.bot import bot
-from coolqbot.logger import logger
 
 
 @bot.on_message('group', 'private')

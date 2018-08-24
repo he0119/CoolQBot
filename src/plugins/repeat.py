@@ -4,27 +4,7 @@ from datetime import datetime, timedelta
 from random import randint
 
 from coolqbot.bot import bot
-from coolqbot.logger import logger
-
-
-class Recorder(object):
-    def __init__(self):
-        self.last_message_on = datetime.utcnow()
-        self.msg_send_time = []
-
-    def message_number(self, x):
-        '''返回x分钟内的消息条数，并清除之前的消息记录'''
-        times = self.msg_send_time
-        now = datetime.utcnow()
-        for i in range(len(times)):
-            if times[i] > now - timedelta(minutes=x):
-                self.msg_send_time = self.msg_send_time[i:]
-                logger.debug(len(self.msg_send_time))
-                return len(self.msg_send_time)
-        logger.debug(len(self.msg_send_time))
-        return len(self.msg_send_time)
-
-recorder = Recorder()
+from coolqbot.recorder import recorder
 
 
 def is_repeat(recorder, msg):
@@ -50,7 +30,6 @@ def is_repeat(recorder, msg):
     if match:
         return False
 
-
     # 复读之后1分钟之内不再复读
     time = recorder.last_message_on
     if datetime.utcnow() < time + timedelta(minutes=1):
@@ -59,17 +38,20 @@ def is_repeat(recorder, msg):
     repeat_rate = 15
     # 当10分钟内发送消息数量大于30条时，降低复读概率
     if recorder.message_number(10) > 30:
-        logger.debug('Repeat rate changed!')
+        bot.logger.debug('Repeat rate changed!')
         repeat_rate = 5
 
     # 按照设定概率复读
     rand = randint(1, 100)
-    logger.info(rand)
+    bot.logger.info(rand)
     if rand > repeat_rate:
         return False
 
     # 记录复读时间
     recorder.last_message_on = now
+
+    #记录复读次数
+    recorder.add_to_repeat_list(msg['user_id'])
 
     return True
 

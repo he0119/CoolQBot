@@ -3,7 +3,6 @@ import re
 from random import randint
 
 from coolqbot.bot import bot
-from coolqbot.logger import logger
 
 
 @bot.on_message('group', 'private')

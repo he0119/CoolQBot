@@ -2,14 +2,13 @@
 import re
 
 from coolqbot.bot import bot
-from coolqbot.logger import logger
+from coolqbot.recorder import recorder
 
-from plugins.repeat import recorder
 
 #TODO:统计复读数据
 @bot.on_message('group', 'private')
 async def status(context):
     match = re.match(r'^\/(status|状态)', context['message'])
     if match:
-        str_data = f'十分钟内发送消息的数量为{recorder.message_number(10)}'
+        str_data = f'近十分钟群内聊天数量是{recorder.message_number(10)}'
         return {'reply': str_data}

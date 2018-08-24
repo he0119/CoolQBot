@@ -1,16 +1,18 @@
 import argparse
 import logging
 
-from coolqbot.logger import logger
-from coolqbot.bot import bot, plugin_manager
+from coolqbot.bot import bot
+from coolqbot.config import init_logger
+from coolqbot.utils import plugin_manager, scheduler
 
 
 def main(debug=False):
+    init_logger(bot.logger)
     if debug:
-        logger.setLevel(logging.DEBUG)
-    logger.info('Initializing...')
+        bot.logger.setLevel(logging.DEBUG)
+    bot.logger.info('Initializing...')
     plugin_manager.load_plugin()
-
+    scheduler.start()
     bot.run(host='127.0.0.1', port=8080)
 
 
