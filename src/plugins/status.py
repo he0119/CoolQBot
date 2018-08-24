@@ -5,7 +5,6 @@ from coolqbot.bot import bot
 from coolqbot.recorder import recorder
 
 
-#TODO:统计复读数据
 @bot.on_message('group', 'private')
 async def status(context):
     match = re.match(r'^\/(status|状态)', context['message'])

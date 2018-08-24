@@ -1,8 +1,10 @@
 '''复读排行'''
-import re
 import collections
+import re
 from operator import itemgetter
+
 from coolqbot.bot import bot
+from coolqbot.config import GROUP_ID
 from coolqbot.recorder import recorder
 
 
@@ -17,15 +19,17 @@ async def rank(context):
             str_data = await get_ranking(recorder.repeat_list, 3)
         if not str_data:
             str_data = '暂时还没有人被复读( ´∀`)σ)Д`)'
-        return {'reply': str_data}
+        return {'reply': str_data, 'at_sender': False}
+
 
 async def get_ranking(repeat_list, x):
-    od = collections.OrderedDict(sorted(repeat_list.items(), key=itemgetter(1), reverse=True))
+    od = collections.OrderedDict(
+        sorted(repeat_list.items(), key=itemgetter(1), reverse=True))
     i = 1
-    str_data = ''
+    str_data = '复读排行榜'
     for k, v in od.items():
-        msg = await bot.get_stranger_info(user_id=k)
-        str_data += f'\n{msg["nickname"]}: {v}'
+        msg = await bot.get_group_member_info(group_id=GROUP_ID,user_id=k, no_cache=True)
+        str_data += f'\n{msg["card"]}: {v}次'
         i += 1
         if i > x:
             break

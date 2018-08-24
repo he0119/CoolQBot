@@ -14,7 +14,6 @@ async def coolq_status():
         if not msg['good']:
             await bot.set_restart()
             bot.logger.info('重启酷Q')
-        bot.logger.info(msg)
     except:
         bot.logger.error('无法获取酷Q状态')
 
@@ -40,4 +39,4 @@ async def nick_call(context):
 
 @bot.on_message()
 async def on_message(context):
-    bot.logger.debug(context)
+    bot.logger.info(context)

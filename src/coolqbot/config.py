@@ -1,6 +1,7 @@
 '''配置文件，不同平台设置不同'''
-import platform
 import logging
+import os
+import platform
 
 if platform.system() == 'Linux':
     LOG_FILE_PATH = '/home/user/coolq/coolqbot.log'
@@ -9,9 +10,12 @@ else:
     LOG_FILE_PATH = 'coolqbot.log'
     RECORDER_FILE_PATH = 'recorder.pickle'
 
+PLUGINS_PATH = os.path.join(os.path.abspath(
+    os.path.dirname(os.path.dirname(__file__))), 'plugins')
+
+GROUP_ID = 438789224
 
 def init_logger(logger):
-    # create logger
     logger.setLevel(logging.INFO)
 
     # create file handler and set level to debug

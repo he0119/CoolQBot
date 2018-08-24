@@ -4,12 +4,13 @@ from datetime import datetime, timedelta
 from random import randint
 
 from coolqbot.bot import bot
+from coolqbot.config import GROUP_NUMBER
 from coolqbot.recorder import recorder
 
 
 def is_repeat(recorder, msg):
     # 只复读特定群内消息
-    if msg['group_id'] != 438789224:
+    if msg['group_id'] != GROUP_ID:
         return False
 
     # 不要复读指令

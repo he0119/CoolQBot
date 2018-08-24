@@ -2,24 +2,26 @@
 import pickle
 from datetime import datetime, timedelta
 
-from coolqbot.utils import scheduler
 from coolqbot.bot import bot
 from coolqbot.config import RECORDER_FILE_PATH
+from coolqbot.utils import scheduler
+
 
 def save():
     try:
         with open(RECORDER_FILE_PATH, 'wb') as f:
             pickle.dump(recorder, f)
-            bot.logger.info('记录保存成功')
+            bot.logger.debug('记录保存成功')
     except Exception as e:
         bot.logger.error(f'记录保存失败，原因是{e}')
+
 
 def load():
     global recorder
     try:
         with open(RECORDER_FILE_PATH, 'rb') as f:
             recorder = pickle.load(f)
-            bot.logger.info('记录加载成功')
+            bot.logger.debug('记录加载成功')
     except Exception as e:
         bot.logger.error(f'记录加载失败，原因是{e}')
 
@@ -47,6 +49,7 @@ class Recorder(object):
             self.repeat_list[qq] += 1
         except KeyError:
             self.repeat_list[qq] = 1
+
 
 recorder = Recorder()
 load()
