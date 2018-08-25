@@ -1,4 +1,4 @@
 '''Bot'''
 from aiocqhttp import CQHttp
 
-bot = CQHttp(enable_http_post=False)
+bot = CQHttp(api_root='http://127.0.0.1:5700/')

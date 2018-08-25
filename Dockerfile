@@ -15,9 +15,7 @@ RUN pip3.6 install -i https://pypi.tuna.tsinghua.edu.cn/simple -r /home/user/coo
 # RUN pip3.6 install -r /home/user/coolqbot/requirements.txt
 #设置环境变量
 ENV CQHTTP_SERVE_DATA_FILES=yes \
-    CQHTTP_USE_WS_REVERSE=true \
-    CQHTTP_WS_REVERSE_EVENT_URL=ws://127.0.0.1:8080/ws/event/ \
-    CQHTTP_WS_REVERSE_API_URL=ws://127.0.0.1:8080/ws/api/
+    CQHTTP_POST_URL=http://127.0.0.1:8080/
 #复制CoolQBot并运行
 COPY src /home/user/coolqbot
 RUN chown user:user /home/user/coolqbot/run.py
