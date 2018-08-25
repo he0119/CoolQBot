@@ -17,7 +17,7 @@ async def rank(context):
             str_data = await get_ranking(recorder.repeat_list, int(args))
         else:
             str_data = await get_ranking(recorder.repeat_list, 3)
-        if not str_data:
+        if str_data == '复读排行榜':
             str_data = '暂时还没有人被复读( ´∀`)σ)Д`)'
         return {'reply': str_data, 'at_sender': False}
 
@@ -29,7 +29,11 @@ async def get_ranking(repeat_list, x):
     str_data = '复读排行榜'
     for k, v in od.items():
         msg = await bot.get_group_member_info(group_id=GROUP_ID,user_id=k, no_cache=True)
-        str_data += f'\n{msg["card"]}: {v}次'
+        if msg['card']:
+            name = msg['card']
+        else:
+            name = msg['nickname']
+        str_data += f'\n{name}: {v}次'
         i += 1
         if i > x:
             break
