@@ -53,7 +53,7 @@ async def get_repeat_rate_ranking(record_list, x):
     str_data = 'Love Love Ranking'
     for k, v in od.items():
         name = await get_name(k)
-        str_data += f'\n{name}: {v:.2f}%'
+        str_data += f'\n{name}: {v*100:.2f}%'
         i += 1
         if i > x:
             break
