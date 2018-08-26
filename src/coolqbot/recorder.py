@@ -31,6 +31,7 @@ class Recorder(object):
         self.last_message_on = datetime.utcnow()
         self.msg_send_time = []
         self.repeat_list = {}
+        self.msg_number_list = {}
 
     def message_number(self, x):
         '''返回x分钟内的消息条数，并清除之前的消息记录'''
@@ -44,12 +45,11 @@ class Recorder(object):
         bot.logger.debug(len(self.msg_send_time))
         return len(self.msg_send_time)
 
-    def add_to_repeat_list(self, qq):
+    def add_to_list(self, recrod_list, qq):
         try:
-            self.repeat_list[qq] += 1
+            recrod_list[qq] += 1
         except KeyError:
-            self.repeat_list[qq] = 1
-
+            recrod_list[qq] = 1
 
 recorder = Recorder()
 load()

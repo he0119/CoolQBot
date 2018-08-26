@@ -13,28 +13,64 @@ async def rank(context):
     match = re.match(r'^\/rank ?(\d*)?', context['message'])
     if match:
         args = match.group(1)
+        repeat_list = recorder.repeat_list
+        msg_number_list = recorder.msg_number_list
+        repeat_rate = get_repeat_rate(repeat_list, msg_number_list)
+        str_data = ''
         if args:
-            str_data = await get_ranking(recorder.repeat_list, int(args))
+            repeat_rate_ranking = await get_repeat_rate_ranking(repeat_rate, int(args))
+            repeat_number_ranking = await get_repeat_number_ranking(repeat_list, int(args))
         else:
-            str_data = await get_ranking(recorder.repeat_list, 3)
-        if str_data == '复读排行榜':
-            str_data = '暂时还没有人被复读( ´∀`)σ)Д`)'
+            repeat_rate_ranking = await get_repeat_rate_ranking(repeat_rate, 3)
+            repeat_number_ranking = await get_repeat_number_ranking(repeat_list, 3)
+        if repeat_rate_ranking and repeat_rate_ranking:
+            str_data = repeat_rate_ranking + '\n\n' + repeat_number_ranking
+        if not str_data:
+            str_data = '暂时还没有数据~>_<~'
         return {'reply': str_data, 'at_sender': False}
 
 
-async def get_ranking(repeat_list, x):
+async def get_repeat_number_ranking(record_list, x):
     od = collections.OrderedDict(
-        sorted(repeat_list.items(), key=itemgetter(1), reverse=True))
+        sorted(record_list.items(), key=itemgetter(1), reverse=True))
     i = 1
-    str_data = '复读排行榜'
+    str_data = '复读次数排行榜'
     for k, v in od.items():
-        msg = await bot.get_group_member_info(group_id=GROUP_ID,user_id=k, no_cache=True)
-        if msg['card']:
-            name = msg['card']
-        else:
-            name = msg['nickname']
+        name = await get_name(k)
         str_data += f'\n{name}: {v}次'
         i += 1
         if i > x:
             break
+    if str_data == '复读次数排行榜':
+        return None
     return str_data
+
+
+async def get_repeat_rate_ranking(record_list, x):
+    od = collections.OrderedDict(
+        sorted(record_list.items(), key=itemgetter(1), reverse=True))
+    i = 1
+    str_data = 'Love Love Ranking'
+    for k, v in od.items():
+        name = await get_name(k)
+        str_data += f'\n{name}: {v:.2f}%'
+        i += 1
+        if i > x:
+            break
+    if str_data == 'Love Love Ranking':
+        return None
+    return str_data
+
+
+def get_repeat_rate(repeat_list, msg_number_list):
+    repeat_rate = {}
+    for k, v in repeat_list.items():
+        repeat_rate[k] = v / msg_number_list[k]
+    return repeat_rate
+
+
+async def get_name(user_id):
+    msg = await bot.get_group_member_info(group_id=GROUP_ID, user_id=user_id, no_cache=True)
+    if msg['card']:
+        return msg['card']
+    return msg['nickname']

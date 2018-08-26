@@ -42,6 +42,9 @@ def is_repeat(recorder, msg):
         bot.logger.info('Repeat rate changed!')
         repeat_rate = 5
 
+    # 记录每个人发送消息数量
+    recorder.add_to_list(recorder.msg_number_list, msg['user_id'])
+
     # 按照设定概率复读
     rand = randint(1, 100)
     bot.logger.info(rand)
@@ -52,7 +55,7 @@ def is_repeat(recorder, msg):
     recorder.last_message_on = now
 
     #记录复读次数
-    recorder.add_to_repeat_list(msg['user_id'])
+    recorder.add_to_list(recorder.repeat_list, msg['user_id'])
 
     return True
 
