@@ -123,4 +123,4 @@ pip-selfcheck.json
 
 
 # End of https://www.gitignore.io/api/python
-*.pickle
+*.pkl

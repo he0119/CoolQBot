@@ -17,7 +17,7 @@ async def weather(context):
         if not str_data:
             str_data = weather_extend(city)
         if not str_data:
-            str_data = '我才不是因为不知道才不告诉你{}的天气呢'.format(city)
+            str_data = f'我才不是因为不知道才不告诉你{city}的天气呢'
         return {'reply': str_data, 'at_sender': False}
 
 

@@ -5,15 +5,17 @@ import platform
 
 if platform.system() == 'Linux':
     LOG_FILE_PATH = '/home/user/coolq/coolqbot.log'
-    RECORDER_FILE_PATH = '/home/user/coolq/recorder.pickle'
+    RECORDER_FILE_PATH = '/home/user/coolq/recorder.pkl'
 else:
     LOG_FILE_PATH = 'coolqbot.log'
-    RECORDER_FILE_PATH = 'recorder.pickle'
+    RECORDER_FILE_PATH = 'recorder.pkl'
 
 PLUGINS_PATH = os.path.join(os.path.abspath(
     os.path.dirname(os.path.dirname(__file__))), 'plugins')
 
 GROUP_ID = 438789224
+
+IS_COOLQ_PRO = bool(os.getenv('IS_COOLQ_PRO'))
 
 def init_logger(logger):
     logger.setLevel(logging.INFO)

@@ -6,4 +6,6 @@ sudo docker run -d --restart always --name cqhttp
   -e VNC_PASSWD=12345687 \ # noVNC 的密码（官方说不能超过 8 个字符，但实测可以超过）
   he0119/coolqbot:latest
 
-# docker run -ti --rm --name cqhttp-test
+# docker run -ti --rm --name cqhttp-test \
+#   -e COOLQ_URL=http://dlsec.cqp.me/cqp-tuling \ #专业版
+#   -e IS_COOLQ_PRO=1 \ # 是否是PRO版本(如果是则需要加上这个环境变量，如果不是则不需要)

@@ -4,17 +4,22 @@ from datetime import datetime, timedelta
 from random import randint
 
 from coolqbot.bot import bot
-from coolqbot.config import GROUP_ID
+from coolqbot.config import GROUP_ID, IS_COOLQ_PRO
 from coolqbot.recorder import recorder
 
 
-def is_repeat(recorder, msg):
+def is_repeat(msg):
     # 只复读特定群内消息
     if msg['group_id'] != GROUP_ID:
         return False
 
     # 不要复读指令
-    match = re.match(r'^\/|!', msg['message'])
+    match = re.match(r'^\/', msg['message'])
+    if match:
+        return False
+
+    # 不要复读@机器人的消息
+    match = re.match(r'\[CQ:at,qq=2062765419\]', msg['message'])
     if match:
         return False
 
@@ -22,13 +27,19 @@ def is_repeat(recorder, msg):
     now = datetime.utcnow()
     recorder.msg_send_time.append(now)
 
-    # 不要复读过长的文字
-    if len(msg['message']) > 28:
+    # 如果不是PRO版本则不复读纯图片
+    match = re.match(r'^\[CQ:image.+\]$', msg['message'])
+    if match and not IS_COOLQ_PRO:
         return False
 
-    # 不要复读图片，签到，分享
-    match = re.match(r'^\[CQ:(image|sign|share).+\]', msg['message'])
+    # 不要复读签到，分享
+    match = re.match(r'^\[CQ:(sign|share).+\]', msg['message'])
     if match:
+        return False
+
+    # 不要复读过长的文字
+    new_msg = re.sub(r'\[CQ:.+\]', '',msg['raw_message'])
+    if len(new_msg) > 28:
         return False
 
     # 复读之后1分钟之内不再复读
@@ -63,8 +74,7 @@ def is_repeat(recorder, msg):
 @bot.on_message('group')
 async def repeat(context):
     '''人类本质'''
-    global recorder
-    if is_repeat(recorder, context):
+    if is_repeat(context):
         return {'reply': context['message'], 'at_sender': False}
 
 
