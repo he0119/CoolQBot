@@ -1,7 +1,7 @@
 '''复读插件'''
 import re
+import secrets
 from datetime import datetime, timedelta
-from random import randint
 
 from coolqbot.bot import bot
 from coolqbot.config import GROUP_ID, IS_COOLQ_PRO
@@ -38,7 +38,7 @@ def is_repeat(msg):
         return False
 
     # 不要复读过长的文字
-    new_msg = re.sub(r'\[CQ:.+\]', '',msg['raw_message'])
+    new_msg = re.sub(r'\[CQ:.+\]', '', msg['raw_message'])
     if len(new_msg) > 28:
         return False
 
@@ -47,17 +47,19 @@ def is_repeat(msg):
     if datetime.utcnow() < time + timedelta(minutes=1):
         return False
 
-    repeat_rate = 15
+    repeat_rate = 10
     # 当10分钟内发送消息数量大于30条时，降低复读概率
-    if recorder.message_number(10) > 30:
-        bot.logger.info('Repeat rate changed!')
-        repeat_rate = 5
+    # 因为排行榜需要固定概率来展示欧非，暂时取消
+    # if recorder.message_number(10) > 30:
+    #     bot.logger.info('Repeat rate changed!')
+    #     repeat_rate = 5
 
     # 记录每个人发送消息数量
     recorder.add_to_list(recorder.msg_number_list, msg['user_id'])
 
     # 按照设定概率复读
-    rand = randint(1, 100)
+    random = secrets.SystemRandom()
+    rand = random.randint(1, 100)
     bot.logger.info(rand)
     if rand > repeat_rate:
         return False
@@ -65,7 +67,7 @@ def is_repeat(msg):
     # 记录复读时间
     recorder.last_message_on = now
 
-    #记录复读次数
+    # 记录复读次数
     recorder.add_to_list(recorder.repeat_list, msg['user_id'])
 
     return True
