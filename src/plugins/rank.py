@@ -92,7 +92,12 @@ def get_repeat_rate(repeat_list, msg_number_list):
 
 async def get_name(user_id):
     '''输入QQ号，返回群昵称，如果群昵称为空则返回QQ昵称'''
-    msg = await bot.get_group_member_info(group_id=GROUP_ID, user_id=user_id, no_cache=True)
-    if msg['card']:
-        return msg['card']
-    return msg['nickname']
+    try:
+        msg = await bot.get_group_member_info(group_id=GROUP_ID, user_id=user_id, no_cache=True)
+        if msg['card']:
+            return msg['card']
+        return msg['nickname']
+    except:
+        # 如果不在群里的话(因为有可能会退群)
+        msg = await bot.get_stranger_info(user_id=user_id)
+        return msg["nickname"]
