@@ -84,9 +84,7 @@ async def get_repeat_rate_ranking(repeat_list, msg_number_list, x, msg_number, d
 
 def get_repeat_rate(repeat_list, msg_number_list):
     '''获取复读概率表'''
-    repeat_rate = {}
-    for k, v in repeat_list.items():
-        repeat_rate[k] = v / msg_number_list[k]
+    repeat_rate = {k: v / msg_number_list[k] for k, v in repeat_list.items()}
     return repeat_rate
 
 
