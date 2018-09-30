@@ -1,3 +1,4 @@
 requests==2.19.1
 aiocqhttp==0.6.3
 apscheduler==3.5.3
+hypercorn==0.2.4
