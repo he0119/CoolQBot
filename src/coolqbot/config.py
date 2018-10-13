@@ -7,11 +7,13 @@ from pathlib import Path, PurePosixPath
 if platform.system() == 'Linux':
     LOG_FILE_PATH = PurePosixPath('/home/user/coolq/coolqbot.log')
     RECORDER_FILE_PATH = PurePosixPath('/home/user/coolq/recorder.pkl')
+    HISTORY_DIR_PATH = PurePosixPath('/home/user/coolq/history')
 else:
     LOG_FILE_PATH = Path('coolqbot.log')
     RECORDER_FILE_PATH = Path('recorder.pkl')
+    HISTORY_DIR_PATH = Path(__file__).parents[1] / 'history'
 
-PLUGINS_PATH = Path(__file__).parents[1] / 'plugins'
+PLUGINS_DIR_PATH = Path(__file__).parents[1] / 'plugins'
 
 GROUP_ID = 438789224
 

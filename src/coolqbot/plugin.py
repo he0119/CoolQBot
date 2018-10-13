@@ -1,7 +1,7 @@
 import os
 
 from coolqbot.bot import bot
-from coolqbot.config import PLUGINS_PATH
+from coolqbot.config import PLUGINS_DIR_PATH
 
 
 class PluginManager(object):
@@ -13,7 +13,7 @@ class PluginManager(object):
         return f'{self._plugin_prefix}.{name}'
 
     def load_plugin(self):
-        filenames = [x.stem for x in PLUGINS_PATH.iterdir() if x.is_file()]
+        filenames = [x.stem for x in PLUGINS_DIR_PATH.iterdir() if x.is_file()]
         for plugin_name in filenames:
             try:
                 __import__(self._get_plugin_name(plugin_name))

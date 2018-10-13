@@ -3,7 +3,7 @@ import pickle
 from datetime import datetime, timedelta
 
 from coolqbot.bot import bot
-from coolqbot.config import RECORDER_FILE_PATH
+from coolqbot.config import RECORDER_FILE_PATH, HISTORY_DIR_PATH
 from coolqbot.utils import scheduler
 
 
@@ -37,10 +37,16 @@ class Recorder(object):
         if path.exists():
             data = self.load_pkl(path)
         if data:
-            self.last_message_on = data['last_message_on']
-            self.msg_send_time = data['msg_send_time']
-            self.repeat_list = data['repeat_list']
-            self.msg_number_list = data['msg_number_list']
+            try:
+                self.last_message_on = data['last_message_on']
+                self.msg_send_time = data['msg_send_time']
+                self.repeat_list = data['repeat_list']
+                self.msg_number_list = data['msg_number_list']
+            except TypeError:
+                self.last_message_on = data.last_message_on
+                self.msg_send_time = data.msg_send_time
+                self.repeat_list = data.repeat_list
+                self.msg_number_list = data.msg_number_list
 
     def save_pkl(self, path):
         data = self.get_data()
@@ -67,12 +73,27 @@ class Recorder(object):
                 'repeat_list': self.repeat_list,
                 'msg_number_list': self.msg_number_list}
 
+    def clear_data(self):
+        self.msg_send_time = []
+        self.repeat_list = {}
+        self.msg_number_list = {}
+
 recorder = Recorder()
 
 recorder.load_data(RECORDER_FILE_PATH)
 
 # TODO:增加每月1日清除上约数据功能
 #      增加查询历史记录功能(/history)
+
+
+@scheduler.scheduled_job('cron', day='last', hour=23, minute=59, second=59)
+async def clear_data():
+    # 保存数据到历史文件夹
+    date = datetime.now().strftime('%Y-%m')
+    recorder.save_pkl(HISTORY_DIR_PATH / f'{date}.pkl')
+    # 清除现有数据
+    recorder.clear_data()
+    bot.logger.debug('记录清除完成')
 
 
 @scheduler.scheduled_job('interval', minutes=1)

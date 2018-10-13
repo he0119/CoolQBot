@@ -71,7 +71,7 @@ async def get_repeat_rate_ranking(repeat_list, msg_number_list, x, msg_number, d
             continue
         name = await get_name(k)
         if display_total_number:
-            str_data += f'\n{name}({recorder.msg_number_list[k]}): {v*100:.2f}%'
+            str_data += f'\n{name}({msg_number_list[k]}): {v*100:.2f}%'
         else:
             str_data += f'\n{name}: {v*100:.2f}%'
         i += 1
