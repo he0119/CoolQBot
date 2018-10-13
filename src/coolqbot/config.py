@@ -2,16 +2,16 @@
 import logging
 import os
 import platform
+from pathlib import Path, PurePosixPath
 
 if platform.system() == 'Linux':
-    LOG_FILE_PATH = '/home/user/coolq/coolqbot.log'
-    RECORDER_FILE_PATH = '/home/user/coolq/recorder.pkl'
+    LOG_FILE_PATH = PurePosixPath('/home/user/coolq/coolqbot.log')
+    RECORDER_FILE_PATH = PurePosixPath('/home/user/coolq/recorder.pkl')
 else:
-    LOG_FILE_PATH = 'coolqbot.log'
-    RECORDER_FILE_PATH = 'recorder.pkl'
+    LOG_FILE_PATH = Path('coolqbot.log')
+    RECORDER_FILE_PATH = Path('recorder.pkl')
 
-PLUGINS_PATH = os.path.join(os.path.abspath(
-    os.path.dirname(os.path.dirname(__file__))), 'plugins')
+PLUGINS_PATH = Path(__file__).parents[1] / 'plugins'
 
 GROUP_ID = 438789224
 
@@ -21,7 +21,7 @@ def init_logger(logger):
     logger.setLevel(logging.INFO)
 
     # create file handler and set level to debug
-    fh = logging.FileHandler(LOG_FILE_PATH)
+    fh = logging.FileHandler(LOG_FILE_PATH, encoding='UTF-8')
     fh.setLevel(logging.DEBUG)
 
     # create formatter

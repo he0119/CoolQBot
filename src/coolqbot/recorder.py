@@ -7,25 +7,6 @@ from coolqbot.config import RECORDER_FILE_PATH
 from coolqbot.utils import scheduler
 
 
-def save():
-    try:
-        with open(RECORDER_FILE_PATH, 'wb') as f:
-            pickle.dump(recorder, f)
-            bot.logger.debug('记录保存成功')
-    except Exception as e:
-        bot.logger.error(f'记录保存失败，原因是{e}')
-
-
-def load():
-    global recorder
-    try:
-        with open(RECORDER_FILE_PATH, 'rb') as f:
-            recorder = pickle.load(f)
-            bot.logger.debug('记录加载成功')
-    except Exception as e:
-        bot.logger.error(f'记录加载失败，原因是{e}')
-
-
 class Recorder(object):
     def __init__(self):
         self.last_message_on = datetime.utcnow()
@@ -51,11 +32,50 @@ class Recorder(object):
         except KeyError:
             recrod_list[qq] = 1
 
+    def load_data(self, path):
+        data = None
+        if path.exists():
+            data = self.load_pkl(path)
+        if data:
+            self.last_message_on = data['last_message_on']
+            self.msg_send_time = data['msg_send_time']
+            self.repeat_list = data['repeat_list']
+            self.msg_number_list = data['msg_number_list']
+
+    def save_pkl(self, path):
+        data = self.get_data()
+        try:
+            with path.open(mode='wb') as f:
+                pickle.dump(data, f)
+                bot.logger.debug('记录保存成功')
+        except Exception as e:
+            bot.logger.error(f'记录保存失败，原因是{e}')
+
+    def load_pkl(self, path):
+        try:
+            with path.open('rb') as f:
+                data = pickle.load(f)
+                bot.logger.debug('记录加载成功')
+                return data
+        except Exception as e:
+            bot.logger.error(f'记录加载失败，原因是{e}')
+            return None
+
+    def get_data(self):
+        return {'last_message_on': self.last_message_on,
+                'msg_send_time': self.msg_send_time,
+                'repeat_list': self.repeat_list,
+                'msg_number_list': self.msg_number_list}
+
 recorder = Recorder()
-load()
+
+recorder.load_data(RECORDER_FILE_PATH)
+
+# TODO:增加每月1日清除上约数据功能
+#      增加查询历史记录功能(/history)
 
 
 @scheduler.scheduled_job('interval', minutes=1)
 async def save_recorder():
     '''每隔一分钟保存一次数据'''
-    save()
+    recorder.save_pkl(RECORDER_FILE_PATH)
