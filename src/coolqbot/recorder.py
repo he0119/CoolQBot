@@ -8,11 +8,13 @@ from coolqbot.utils import scheduler
 
 
 class Recorder(object):
-    def __init__(self):
+    def __init__(self, path=None):
         self.last_message_on = datetime.utcnow()
         self.msg_send_time = []
         self.repeat_list = {}
         self.msg_number_list = {}
+        if path:
+            self.load_data(path)
 
     def message_number(self, x):
         '''返回x分钟内的消息条数，并清除之前的消息记录'''
@@ -21,8 +23,13 @@ class Recorder(object):
         for i in range(len(times)):
             if times[i] > now - timedelta(minutes=x):
                 self.msg_send_time = self.msg_send_time[i:]
+                bot.logger.debug(self.msg_send_time)
                 bot.logger.debug(len(self.msg_send_time))
                 return len(self.msg_send_time)
+
+        # 如果没有满足条件的消息，则清除记录
+        self.msg_send_time = []
+        bot.logger.debug(self.msg_send_time)
         bot.logger.debug(len(self.msg_send_time))
         return len(self.msg_send_time)
 
@@ -59,7 +66,7 @@ class Recorder(object):
 
     def load_pkl(self, path):
         try:
-            with path.open('rb') as f:
+            with path.open(mode='rb') as f:
                 data = pickle.load(f)
                 bot.logger.debug('记录加载成功')
                 return data
@@ -78,22 +85,19 @@ class Recorder(object):
         self.repeat_list = {}
         self.msg_number_list = {}
 
-recorder = Recorder()
 
-recorder.load_data(RECORDER_FILE_PATH)
-
-# TODO:增加每月1日清除上约数据功能
-#      增加查询历史记录功能(/history)
+recorder = Recorder(RECORDER_FILE_PATH)
 
 
 @scheduler.scheduled_job('cron', day='last', hour=23, minute=59, second=59)
 async def clear_data():
+    '''每个月最后一分钟保存记录于历史记录文件夹，并重置记录'''
     # 保存数据到历史文件夹
     date = datetime.now().strftime('%Y-%m')
     recorder.save_pkl(HISTORY_DIR_PATH / f'{date}.pkl')
     # 清除现有数据
     recorder.clear_data()
-    bot.logger.debug('记录清除完成')
+    bot.logger.info('记录清除完成')
 
 
 @scheduler.scheduled_job('interval', minutes=1)
