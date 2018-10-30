@@ -1,5 +1,4 @@
-requests==2.19.1
-aiocqhttp==0.6.3
+requests==2.20.0
+aiocqhttp==0.6.4
 apscheduler==3.5.3
-hypercorn==0.2.4
-python-dateutil==2.7.3
+python-dateutil==2.7.5
