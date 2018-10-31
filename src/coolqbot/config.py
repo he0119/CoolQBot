@@ -19,6 +19,8 @@ GROUP_ID = 438789224
 
 IS_COOLQ_PRO = bool(os.getenv('IS_COOLQ_PRO'))
 
+TIMEZONE = 8
+
 def init_logger(logger):
     logger.setLevel(logging.INFO)
 

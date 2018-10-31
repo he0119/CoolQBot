@@ -88,8 +88,8 @@ class Recorder(object):
 
 recorder = Recorder(RECORDER_FILE_PATH)
 
-
-@scheduler.scheduled_job('cron', day='last', hour=23, minute=59, second=59)
+# UTC 16:00清除数据(北京时间24点)
+@scheduler.scheduled_job('cron', day='last', hour=16, minute=0, second=0)
 async def clear_data():
     '''每个月最后一分钟保存记录于历史记录文件夹，并重置记录'''
     # 保存数据到历史文件夹
