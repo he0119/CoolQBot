@@ -3,8 +3,8 @@ import pickle
 from datetime import datetime, timedelta
 
 from coolqbot.bot import bot
-from coolqbot.config import RECORDER_FILE_PATH, HISTORY_DIR_PATH
-from coolqbot.utils import scheduler
+from coolqbot.config import HISTORY_DIR_PATH, RECORDER_FILE_PATH
+from coolqbot.utils import get_history_pkl_name, scheduler
 
 
 class Recorder(object):
@@ -88,13 +88,13 @@ class Recorder(object):
 
 recorder = Recorder(RECORDER_FILE_PATH)
 
-# UTC 16:00清除数据(北京时间24点)
-@scheduler.scheduled_job('cron', day='last', hour=16, minute=0, second=0)
+
+@scheduler.scheduled_job('cron', day=1, hour=0, minute=0, second=0)
 async def clear_data():
     '''每个月最后一分钟保存记录于历史记录文件夹，并重置记录'''
     # 保存数据到历史文件夹
-    date = datetime.now().strftime('%Y-%m')
-    recorder.save_pkl(HISTORY_DIR_PATH / f'{date}.pkl')
+    date = datetime.now() - timedelta(hours=1)
+    recorder.save_pkl(HISTORY_DIR_PATH / f'{get_history_pkl_name(date)}.pkl')
     # 清除现有数据
     recorder.clear_data()
     bot.logger.info('记录清除完成')

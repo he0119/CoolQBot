@@ -12,7 +12,10 @@ async def status(context):
         str_data = f'近十分钟群内聊天数量是{recorder.message_number(10)}条'
         repeat_num = get_total_number(recorder.repeat_list)
         msg_num = get_total_number(recorder.msg_number_list)
-        repeat_rate = repeat_num / msg_num
+        if msg_num:
+            repeat_rate = repeat_num / msg_num
+        else:
+            repeat_rate = 0
         str_data += f'\n现在的群内聊天总数是{msg_num}条'
         str_data += f'\n复读概率是{repeat_rate*100:.2f}%'
         return {'reply': str_data, 'at_sender': False}
