@@ -5,7 +5,7 @@ COPY sources.list /etc/apt/sources.list
 #安装python3.6和pip
 RUN add-apt-repository ppa:jonathonf/python-3.6 \
     && apt-get update \
-    && apt-get install -y python3.6 \
+    && apt-get install -y python3.6 vim \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists \
     && curl https://bootstrap.pypa.io/get-pip.py | python3.6
