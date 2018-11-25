@@ -1,16 +1,20 @@
 '''历史记录插件'''
 import re
 from datetime import datetime, timedelta
+
 from dateutil.relativedelta import relativedelta
 
 from coolqbot.bot import bot
+from coolqbot.config import HISTORY_DIR_PATH
 from coolqbot.recorder import Recorder
-from coolqbot.config import HISTORY_DIR_PATH, TIMEZONE
-from plugins.rank import get_repeat_rate_ranking, get_repeat_number_ranking
+from coolqbot.utils import get_history_pkl_name
+from plugins.rank import get_repeat_number_ranking, get_repeat_rate_ranking
+
 
 @bot.on_message('group', 'private')
 async def history(context):
-    match = re.match(r'^\/history ?(\d+)\-?(\d+)?|^\/history', context['message'])
+    match = re.match(r'^\/history ?(\d+)\-?(\d+)?|^\/history',
+                     context['message'])
     if match:
         str_data = ''
 
@@ -34,9 +38,9 @@ async def history(context):
                 return {'reply': str_data, 'at_sender': False}
             date = datetime(year=year, month=month, day=1)
         else:
-            date = datetime.now() + timedelta(hours=TIMEZONE) - relativedelta(months=1)
+            date = datetime.now() - relativedelta(months=1)
 
-        history_file = HISTORY_DIR_PATH / f'{date.strftime("%Y-%m")}.pkl'
+        history_file = HISTORY_DIR_PATH / f'{get_history_pkl_name(date)}.pkl'
         bot.logger.debug(history_file)
 
         if not history_file.exists():
