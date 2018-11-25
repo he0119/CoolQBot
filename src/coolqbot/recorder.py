@@ -91,7 +91,7 @@ recorder = Recorder(RECORDER_FILE_PATH)
 
 @scheduler.scheduled_job('cron', day=1, hour=0, minute=0, second=0)
 async def clear_data():
-    '''每个月最后一分钟保存记录于历史记录文件夹，并重置记录'''
+    '''每个月最后24点(下月0点)保存记录于历史记录文件夹，并重置记录'''
     # 保存数据到历史文件夹
     date = datetime.now() - timedelta(hours=1)
     recorder.save_pkl(HISTORY_DIR_PATH / f'{get_history_pkl_name(date)}.pkl')
