@@ -15,7 +15,9 @@ else:
 
 PLUGINS_DIR_PATH = Path(__file__).parents[1] / 'plugins'
 
-GROUP_ID = 438789224
+GROUP_ID = []
+GROUP_ID.append(438789224)#圆神群
+GROUP_ID.append(852435740)#测试群
 
 IS_COOLQ_PRO = bool(os.getenv('IS_COOLQ_PRO'))
 
