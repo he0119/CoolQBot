@@ -22,7 +22,7 @@ async def gate(context):
         args = match.group(1)
 
         door_number = 2
-        if args:
+        if args=='3':
             door_number = 3
 
         text_index = randint(0, len(TEXTS)-1)
