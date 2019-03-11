@@ -34,9 +34,9 @@ async def nick_call(context):
                 return {'reply': f'\n你所在群：{group["group_name"]}\n你所在地区：{msg["area"]}'}
 
     elif '/你是谁' == context['message']:
-        msg = await bot.get_group_member_info(user_id = context['self_id'],group_id = context['group_id'])
-        return {'reply': f'我是{msg["card"]}!'}
-        # return {'reply': '我是可爱的小誓约!'}
+        # msg = await bot.get_group_member_info(user_id = context['self_id'],group_id = context['group_id'])
+        # return {'reply': f'我是{msg["card"]}!'}
+        return {'reply': '我是可爱的小誓约!'}
 
     elif context['message'] in ('/我在干什么', '/我在做什么'):
         return {'reply': '你在调戏我!!'}
