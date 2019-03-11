@@ -13,7 +13,7 @@ variables:
   imageName: 'coolqbot'
 
 steps:
-- script: docker build -f Dockerfile -t $(imageName) .
+- script: docker build -f Dockerfile -t $(dockerId)/$(imageName) .
   displayName: 'docker build'
 
 - script: |
