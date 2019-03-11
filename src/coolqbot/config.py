@@ -1,4 +1,5 @@
 '''配置文件，不同平台设置不同'''
+import configparser
 import logging
 import os
 import platform
@@ -8,18 +9,24 @@ if platform.system() == 'Linux':
     LOG_FILE_PATH = Path('/home/user/coolq/coolqbot.log')
     RECORDER_FILE_PATH = Path('/home/user/coolq/recorder.pkl')
     HISTORY_DIR_PATH = Path('/home/user/coolq/history')
+    CONFIG_PATH = Path('/home/user/coolq/coolq.conf')
 else:
     LOG_FILE_PATH = Path('coolqbot.log')
     RECORDER_FILE_PATH = Path('recorder.pkl')
     HISTORY_DIR_PATH = Path(__file__).parents[1] / 'history'
+    CONFIG_PATH = Path('coolq.conf')
 
 PLUGINS_DIR_PATH = Path(__file__).parents[1] / 'plugins'
 
-GROUP_ID = []
-GROUP_ID.append(438789224)#圆神群
-GROUP_ID.append(852435740)#测试群
+# 读取配置文件
+config = configparser.ConfigParser()
+config.read(CONFIG_PATH)
 
-IS_COOLQ_PRO = bool(os.getenv('IS_COOLQ_PRO'))
+# 复读群号
+GROUP_ID = int(config.get('bot', 'group_id'))
+
+# 是否是酷Q专业版
+IS_COOLQ_PRO = int(config.get('bot', 'is_coolq_pro'))
 
 
 def init_logger(logger):

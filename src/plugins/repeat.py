@@ -9,8 +9,8 @@ from coolqbot.recorder import recorder
 
 
 def is_repeat(msg):
-    # 只复读特定群内消息
-    if msg['group_id'] not in GROUP_ID:
+    # 只复读指定群内消息
+    if msg['group_id'] != GROUP_ID:
         return False
 
     # 不要复读指令
