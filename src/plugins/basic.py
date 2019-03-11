@@ -23,15 +23,23 @@ from coolqbot.utils import scheduler
 async def nick_call(context):
     if '/我是谁' == context['message']:
         # msg = await bot.get_stranger_info(user_id=context['user_id'])
-        cardName = context['sender']['card']
-        return {'reply': f'你是{cardName}!'}
+        msg = await bot.get_group_member_info(user_id=context['user_id'],group_id=context['group_id'],no_cache=True)
+        if msg['card']:
+            outName = msg['card']
+        else:
+            outName = msg['nickname']
+        return {'reply': f'你是{outName}!'}
 
     elif '/我在哪' == context['message']:
         group_list = await bot.get_group_list()
-        msg = await bot.get_group_member_info(user_id = context['user_id'],group_id = context['group_id'])
+        msg = await bot.get_group_member_info(user_id = context['user_id'],group_id = context['group_id'],no_cache=True)
+        if msg['area']:
+            country = msg['area']
+        else:
+            country = '不知道不关心'
         for group in group_list:
             if group['group_id'] == context['group_id']:
-                return {'reply': f'\n你所在群：{group["group_name"]}\n你所在地区：{msg["area"]}'}
+                return {'reply': f'\n你所在群：{group["group_name"]}\n你所在地区：{country}'}
 
     elif '/你是谁' == context['message']:
         # msg = await bot.get_group_member_info(user_id = context['self_id'],group_id = context['group_id'])
