@@ -32,6 +32,10 @@ def is_repeat(msg):
     if match and not IS_COOLQ_PRO:
         return False
 
+    # 不要复读应用消息
+    if msg['sender']['user_id'] == 1000000:
+        return False
+
     # 不要复读签到，分享
     match = re.match(r'^\[CQ:(sign|share).+\]', msg['message'])
     if match:
