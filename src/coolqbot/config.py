@@ -5,18 +5,22 @@ import os
 import platform
 from pathlib import Path
 
-if platform.system() == 'Linux':
-    LOG_FILE_PATH = Path('/home/user/coolq/coolqbot.log')
-    RECORDER_FILE_PATH = Path('/home/user/coolq/recorder.pkl')
-    HISTORY_DIR_PATH = Path('/home/user/coolq/history')
-    CONFIG_PATH = Path('/home/user/coolq/coolq.conf')
-else:
-    LOG_FILE_PATH = Path('coolqbot.log')
-    RECORDER_FILE_PATH = Path('recorder.pkl')
-    HISTORY_DIR_PATH = Path(__file__).parents[1] / 'history'
-    CONFIG_PATH = Path('coolq.conf')
+HOME_DIR_PATH = Path(__file__).parents[1]
 
-PLUGINS_DIR_PATH = Path(__file__).parents[1] / 'plugins'
+if platform.system() == 'Linux':
+    CONFIG_PATH = Path('/home/user/coolq/bot/bot.conf')
+    LOG_FILE_PATH = Path('/home/user/coolq/bot/bot.log')
+    RECORDER_FILE_PATH = Path('/home/user/coolq/bot/recorder.pkl')
+    HISTORY_DIR_PATH = Path('/home/user/coolq/bot/history')
+    DATA_DIR_PATH = Path('/home/user/coolq/bot/data')
+else:
+    CONFIG_PATH = Path('bot.conf')
+    LOG_FILE_PATH = Path('bot.log')
+    RECORDER_FILE_PATH = Path('recorder.pkl')
+    HISTORY_DIR_PATH = HOME_DIR_PATH / 'history'
+    DATA_DIR_PATH = HOME_DIR_PATH / 'data'
+
+PLUGINS_DIR_PATH = HOME_DIR_PATH / 'plugins'
 
 # 读取配置文件
 config = configparser.ConfigParser()
