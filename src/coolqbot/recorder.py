@@ -1,4 +1,5 @@
-'''记录数据'''
+""" 记录数据
+"""
 import pickle
 from datetime import datetime, timedelta
 
@@ -17,7 +18,8 @@ class Recorder:
             self.load_data(path)
 
     def message_number(self, x):
-        '''返回x分钟内的消息条数，并清除之前的消息记录'''
+        """ 返回x分钟内的消息条数，并清除之前的消息记录
+        """
         times = self.msg_send_time
         now = datetime.utcnow()
         for i in range(len(times)):
@@ -91,7 +93,8 @@ recorder = Recorder(RECORDER_FILE_PATH)
 
 @scheduler.scheduled_job('cron', day=1, hour=0, minute=0, second=0)
 async def clear_data():
-    '''每个月最后24点(下月0点)保存记录于历史记录文件夹，并重置记录'''
+    """ 每个月最后24点(下月0点)保存记录于历史记录文件夹，并重置记录
+    """
     # 保存数据到历史文件夹
     date = datetime.now() - timedelta(hours=1)
     recorder.save_pkl(HISTORY_DIR_PATH / f'{get_history_pkl_name(date)}.pkl')
@@ -102,6 +105,6 @@ async def clear_data():
 
 @scheduler.scheduled_job('interval', minutes=1)
 async def save_recorder():
-    '''每隔一分钟保存一次数据'''
+    """ 每隔一分钟保存一次数据
+    """
     recorder.save_pkl(RECORDER_FILE_PATH)
-

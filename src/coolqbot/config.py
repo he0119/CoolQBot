@@ -1,4 +1,5 @@
-'''配置文件，不同平台设置不同'''
+""" 配置文件，不同平台设置不同
+"""
 import configparser
 import logging
 import os

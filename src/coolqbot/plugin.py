@@ -7,7 +7,7 @@ from coolqbot.bot import bot
 from coolqbot.config import DATA_DIR_PATH, PLUGINS_DIR_PATH
 
 
-class PluginManager(object):
+class PluginManager:
 
     def __init__(self):
         self._plugin_prefix = 'plugins'
