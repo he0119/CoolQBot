@@ -11,9 +11,11 @@ def main(debug=False):
     init_logger(bot.logger)
     if debug:
         bot.logger.setLevel(logging.DEBUG)
-    bot.logger.info('Initializing...')
+    bot.logger.debug('Initializing...')
+
     plugin_manager.load_plugin()
     scheduler.start()
+
     bot.run(host='127.0.0.1', port=8080, loop=asyncio.get_event_loop())
 
 

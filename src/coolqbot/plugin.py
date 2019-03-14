@@ -20,7 +20,7 @@ class PluginManager:
         for plugin_name in filenames:
             try:
                 __import__(self._get_plugin_name(plugin_name))
-                bot.logger.info(f'Plugin [{plugin_name}] loaded.')
+                bot.logger.debug(f'Plugin [{plugin_name}] loaded.')
             except ImportError as e:
                 bot.logger.error(
                     f'Import error: can not import [{plugin_name}], because {e}'
