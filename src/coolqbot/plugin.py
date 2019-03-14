@@ -26,27 +26,30 @@ class PluginManager:
                     f'Import error: can not import [{plugin_name}], because {e}'
                 )
 
-
 class PluginData:
+    """ TODO:一个插件应该只能访问`data`文件夹下面一个的文件夹，用来存放各种各样的配置和文件
+
+    这个应该由插件自己管理，插件也只能通过这个类来访问和修改属于自己的数据(配置或者文件)
+    一个插件不一定需要配置文件，也不一定需要数据文件，这个由插件自己决定。
+    """
     def __init__(self, name):
+        # 插件名，用来确定插件的文件夹位置
         self._name = name
-        self._data_path = DATA_DIR_PATH / name
-        self.data = {}
 
-        self.load_pkl()
+    def save_pkl(self, data, path):
+        with path.open(mode='wb') as f:
+            pickle.dump(data, f)
 
-    def save_pkl(self):
-        try:
-            with self._data_path.open(mode='wb') as f:
-                pickle.dump(self.data, f)
-                bot.logger.debug(f'插件{self._name}：数据保存成功')
-        except Exception as e:
-            bot.logger.error(f'插件{self._name}：数据保存失败，原因是{e}')
+    def load_pkl(self, path):
+        with path.open(mode='rb') as f:
+            data = pickle.load(f)
+        return data
 
-    def load_pkl(self):
-        try:
-            with self._data_path.open(mode='rb') as f:
-                self.data = pickle.load(f)
-                bot.logger.debug(f'插件{self._name}：数据加载成功')
-        except Exception as e:
-            bot.logger.error(f'插件{self._name}：数据加载失败，原因是{e}')
+    def load_config(self):
+        pass
+
+    def save_config(self):
+        pass
+
+    def open(self, path):
+        pass
