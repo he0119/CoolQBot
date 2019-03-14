@@ -21,6 +21,7 @@ class PluginData:
         self._name = name
         self._data_path = DATA_DIR_PATH / name
         self.data = {}
+
         self.load_pkl()
 
     def save_pkl(self):
@@ -29,12 +30,12 @@ class PluginData:
                 pickle.dump(self.data, f)
                 bot.logger.debug(f'插件{self._name}：数据保存成功')
         except Exception as e:
-            bot.logger.error(f'插件{self._name}：保存失败，原因是{e}')
+            bot.logger.error(f'插件{self._name}：数据保存失败，原因是{e}')
 
     def load_pkl(self):
         try:
             with self._data_path.open(mode='rb') as f:
                 self.data = pickle.load(f)
-                bot.logger.debug(f'插件{self._name}：加载成功')
+                bot.logger.debug(f'插件{self._name}：数据加载成功')
         except Exception as e:
-            bot.logger.error(f'插件{self._name}：加载失败，原因是{e}')
+            bot.logger.error(f'插件{self._name}：数据加载失败，原因是{e}')

@@ -7,7 +7,7 @@ from coolqbot.config import HISTORY_DIR_PATH, RECORDER_FILE_PATH
 from coolqbot.utils import get_history_pkl_name, scheduler
 
 
-class Recorder(object):
+class Recorder:
     def __init__(self, path=None):
         self.last_message_on = datetime.utcnow()
         self.msg_send_time = []
