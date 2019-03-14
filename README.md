@@ -1,4 +1,6 @@
 # 聊天机器人
+[![Build Status](https://dev.azure.com/he0119/CoolQBot/_apis/build/status/he0119.CoolQBot?branchName=master)](https://dev.azure.com/he0119/CoolQBot/_build/latest?definitionId=5&branchName=master)
+
 该机器人利用了
 [酷Q](https://cqp.cc/)
 、
