@@ -14,7 +14,7 @@
 ## 运行
 1. 新建一个`coolq`文件夹，并在`/coolq/bot/`文件夹下复制并重命名`bot.conf.example`为`bot.conf`填入对应配置。
 
-2. 提供了`Docker Image`，使用下图命令即可运行。
+2. 提供了`Docker Image`，使用以下命令即可运行。
 ```shell
 sudo docker pull he0119/coolqbot:latest && \
 sudo docker run -d --restart always --name cqhttp
