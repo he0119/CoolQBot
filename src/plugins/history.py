@@ -70,7 +70,7 @@ async def history(context):
         msg_number_list = history_data['msg_number_list']
 
         repeat_rate_ranking = await get_repeat_rate_ranking(repeat_list, msg_number_list, display_number, minimal_msg_number, display_total_number)
-        repeat_number_ranking = await get_repeat_number_ranking(repeat_list, display_number)
+        repeat_number_ranking = await get_repeat_number_ranking(repeat_list, msg_number_list, display_number, display_total_number)
 
         if repeat_rate_ranking and repeat_rate_ranking:
             str_data = f'{date.year}年{date.month}月数据\n'
