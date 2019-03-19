@@ -6,17 +6,37 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'Ubuntu-16.04'
+jobs:
+- job: 'TestBuild'
+  condition: eq(variables['Build.Reason'], 'PullRequest')
+  pool:
+    vmImage: 'Ubuntu-16.04'
 
-variables:
-  imageName: 'coolqbot'
+  variables:
+    imageName: 'coolqbot:test'
 
-steps:
-- script: docker build -f Dockerfile -t $(dockerId)/$(imageName) .
-  displayName: 'docker build'
+  steps:
+  - script: docker build -f Dockerfile -t $(dockerId)/$(imageName) .
+    displayName: 'docker build'
 
-- script: |
-    docker login -u $(dockerId) -p $(pswd)
-    docker push $(dockerId)/$(imageName)
-  displayName: 'docker push'
+  - script: |
+      docker login -u $(dockerId) -p $(pswd)
+      docker push $(dockerId)/$(imageName)
+    displayName: 'docker push'
+
+- job: 'DeployBuild'
+  condition: ne(variables['Build.Reason'], 'PullRequest')
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  variables:
+    imageName: 'coolqbot'
+
+  steps:
+  - script: docker build -f Dockerfile -t $(dockerId)/$(imageName) .
+    displayName: 'docker build'
+
+  - script: |
+      docker login -u $(dockerId) -p $(pswd)
+      docker push $(dockerId)/$(imageName)
+    displayName: 'docker push'

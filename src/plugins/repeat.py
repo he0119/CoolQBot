@@ -1,11 +1,12 @@
-'''复读插件'''
+""" 复读插件
+"""
 import re
 import secrets
 from datetime import datetime, timedelta
 
 from coolqbot.bot import bot
 from coolqbot.config import GROUP_ID, IS_COOLQ_PRO
-from coolqbot.recorder import recorder
+from plugins.recorder import recorder
 
 
 def is_repeat(msg):
@@ -79,15 +80,17 @@ def is_repeat(msg):
 
 @bot.on_message('group')
 async def repeat(context):
-    '''人类本质'''
+    """ 人类本质
+    """
     if is_repeat(context):
         return {'reply': context['message'], 'at_sender': False}
 
 
 @bot.on_message('group')
 async def repeat_sign(context):
-    '''复读签到(电脑上没法看手机签到内容)'''
-    if context['group_id'] == 438789224:
+    """ 复读签到(电脑上没法看手机签到内容)
+    """
+    if context['group_id'] == GROUP_ID:
         match = re.match(r'^\[CQ:sign(.+)\]$', context['message'])
         if match:
             title = re.findall(r'title=(\w+\s?\w+)', context['message'])

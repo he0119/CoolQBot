@@ -1,8 +1,9 @@
-'''运行状态插件'''
+""" 运行状态插件
+"""
 import re
 
 from coolqbot.bot import bot
-from coolqbot.recorder import recorder
+from plugins.recorder import recorder
 
 
 @bot.on_message('group', 'private')

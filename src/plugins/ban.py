@@ -1,4 +1,5 @@
-""" 自主禁言插件 """
+""" 自主禁言插件
+"""
 import re
 
 from coolqbot.bot import bot
