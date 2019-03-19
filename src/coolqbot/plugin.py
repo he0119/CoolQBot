@@ -1,5 +1,6 @@
 """ 插件相关
 """
+import configparser
 import os
 import pickle
 
@@ -32,24 +33,38 @@ class PluginData:
     这个应该由插件自己管理，插件也只能通过这个类来访问和修改属于自己的数据(配置或者文件)
     一个插件不一定需要配置文件，也不一定需要数据文件，这个由插件自己决定。
     """
-    def __init__(self, name):
+    def __init__(self, name, config=False):
         # 插件名，用来确定插件的文件夹位置
         self._name = name
+        self._base_path = DATA_DIR_PATH / f'plugin-{name}'
+        # 如果文件夹不存在则自动新建
+        if not DATA_DIR_PATH.exists():
+            DATA_DIR_PATH.mkdir()
+        if not self._base_path.exists():
+            self._base_path.mkdir()
+        # 如果需要则初始化并加载配置
+        if config:
+            self.config = configparser.ConfigParser()
+            self._load_config()
 
-    def save_pkl(self, data, path):
-        with path.open(mode='wb') as f:
+    def save_pkl(self, data, filename):
+        with self.open(f'{filename}.pkl', 'wb') as f:
             pickle.dump(data, f)
 
-    def load_pkl(self, path):
-        with path.open(mode='rb') as f:
+    def load_pkl(self, filename):
+        with self.open(f'{filename}.pkl', 'rb') as f:
             data = pickle.load(f)
         return data
 
-    def load_config(self):
-        pass
+    def _load_config(self):
+        path = self._base_path / f'{self._name}.conf'
+        self.config.read(path)
 
-    def save_config(self):
-        pass
+    def _save_config(self):
+        filename = f'{self._name}.conf'
+        with self.open(filename, 'w') as configfile:
+            self.config.write(configfile)
 
-    def open(self, path):
-        pass
+    def open(self, filename, open_mode='r'):
+        path = self._base_path / filename
+        return open(path, open_mode)

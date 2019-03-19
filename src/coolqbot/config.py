@@ -39,7 +39,7 @@ def init_logger(logger):
 
     # create file handler and set level to debug
     fh = logging.FileHandler(LOG_FILE_PATH, encoding='UTF-8')
-    fh.setLevel(logging.DEBUG)
+    fh.setLevel(logging.INFO)
 
     # create formatter
     formatter = logging.Formatter(
