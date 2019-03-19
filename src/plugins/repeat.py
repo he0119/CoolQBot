@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from coolqbot.bot import bot
 from coolqbot.config import GROUP_ID, IS_COOLQ_PRO
-from coolqbot.recorder import recorder
+from plugins.recorder import recorder
 
 
 def is_repeat(msg):

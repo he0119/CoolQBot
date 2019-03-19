@@ -9,6 +9,8 @@ from coolqbot.config import DATA_DIR_PATH, PLUGINS_DIR_PATH
 
 
 class PluginManager:
+    """ 插件管理器
+    """
 
     def __init__(self):
         self._plugin_prefix = 'plugins'
@@ -27,12 +29,14 @@ class PluginManager:
                     f'Import error: can not import [{plugin_name}], because {e}'
                 )
 
+
 class PluginData:
     """ TODO:一个插件应该只能访问`data`文件夹下面一个的文件夹，用来存放各种各样的配置和文件
 
     这个应该由插件自己管理，插件也只能通过这个类来访问和修改属于自己的数据(配置或者文件)
     一个插件不一定需要配置文件，也不一定需要数据文件，这个由插件自己决定。
     """
+
     def __init__(self, name, config=False):
         # 插件名，用来确定插件的文件夹位置
         self._name = name
@@ -48,11 +52,11 @@ class PluginData:
             self._load_config()
 
     def save_pkl(self, data, filename):
-        with self.open(f'{filename}.pkl', 'wb') as f:
+        with self.open(filename, 'wb') as f:
             pickle.dump(data, f)
 
     def load_pkl(self, filename):
-        with self.open(f'{filename}.pkl', 'rb') as f:
+        with self.open(filename, 'rb') as f:
             data = pickle.load(f)
         return data
 
@@ -68,3 +72,9 @@ class PluginData:
     def open(self, filename, open_mode='r'):
         path = self._base_path / filename
         return open(path, open_mode)
+
+    def exists(self, filename):
+        """ 判断文件是否存在
+        """
+        path = self._base_path / filename
+        return path.exists()
