@@ -1,4 +1,5 @@
-'''历史记录插件'''
+""" 历史记录插件
+"""
 import re
 from datetime import datetime, timedelta
 

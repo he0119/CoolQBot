@@ -1,8 +1,10 @@
-'''掷骰子'''
+""" 掷骰子
+"""
 import re
 from random import randint
 
 from coolqbot.bot import bot
+
 
 @bot.on_message('group', 'private')
 async def rand(context):

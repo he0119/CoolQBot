@@ -1,4 +1,5 @@
-'''复读排行榜'''
+""" 复读排行榜
+"""
 import collections
 import re
 from operator import itemgetter
@@ -43,7 +44,8 @@ async def rank(context):
 
 
 async def get_repeat_number_ranking(repeat_number_list, msg_number_list, x, display_total_number):
-    '''获取次数排行榜'''
+    """ 获取次数排行榜
+    """
     od = collections.OrderedDict(
         sorted(repeat_number_list.items(), key=itemgetter(1), reverse=True))
     i = 1
@@ -63,7 +65,8 @@ async def get_repeat_number_ranking(repeat_number_list, msg_number_list, x, disp
 
 
 async def get_repeat_rate_ranking(repeat_list, msg_number_list, x, msg_number, display_total_number):
-    '''获取复读概率排行榜'''
+    """ 获取复读概率排行榜
+    """
     repeat_rate = get_repeat_rate(repeat_list, msg_number_list)
     od = collections.OrderedDict(
         sorted(repeat_rate.items(), key=itemgetter(1), reverse=True))
@@ -86,13 +89,15 @@ async def get_repeat_rate_ranking(repeat_list, msg_number_list, x, msg_number, d
 
 
 def get_repeat_rate(repeat_list, msg_number_list):
-    '''获取复读概率表'''
+    """ 获取复读概率表
+    """
     repeat_rate = {k: v / msg_number_list[k] for k, v in repeat_list.items()}
     return repeat_rate
 
 
 async def get_name(user_id):
-    '''输入QQ号，返回群昵称，如果群昵称为空则返回QQ昵称'''
+    """ 输入QQ号，返回群昵称，如果群昵称为空则返回QQ昵称
+    """
     try:
         msg = await bot.get_group_member_info(group_id=GROUP_ID, user_id=user_id, no_cache=True)
         if msg['card']:

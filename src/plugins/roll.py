@@ -1,4 +1,5 @@
-'''NGA风格ROLL点插件'''
+""" NGA风格ROLL点插件
+"""
 import re
 from random import randint
 
@@ -14,7 +15,8 @@ async def roll(context):
 
 
 def roll_dices(input_str):
-    '''掷骰子'''
+    """ 掷骰子
+    """
     match = re.match(r'^([\dd+\s]+?)$', input_str)
     if not match:
         return '请输入正确的参数~>_<~'
@@ -31,7 +33,8 @@ def roll_dices(input_str):
 
 
 def roll_single(args, add):
-    '''掷一次'''
+    """ 掷一次
+    """
     s1 = args[1]
     s2 = args[2]
     if s1:

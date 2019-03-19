@@ -1,4 +1,5 @@
-'''藏宝选门'''
+""" 藏宝选门
+"""
 import re
 from random import randint
 
@@ -22,7 +23,7 @@ async def gate(context):
         args = match.group(1)
 
         door_number = 2
-        if args=='3':
+        if args == '3':
             door_number = 3
 
         text_index = randint(0, len(TEXTS)-1)

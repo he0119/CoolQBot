@@ -1,4 +1,5 @@
-'''天气插件'''
+""" 天气插件
+"""
 import json
 import re
 import urllib
@@ -25,7 +26,8 @@ KEY1 = '31662bc776555612e3639dbca1ad1fd5'
 
 
 def weather_old(city):
-    '''百度天气'''
+    """ 百度天气
+    """
     try:
         city_name = urllib.parse.quote(city.encode('utf-8'))
         url_str = f'http://api.map.baidu.com/telematics/v3/weather?location={city_name}&ak={KEY1}&output=json'
@@ -47,7 +49,7 @@ def weather_old(city):
             str_data += data['temperature']
             str_data += '\n'
 
-        return str_data
+        return str_data[:-1]
     except Exception as e:
         bot.logger.warning(e)
         return None
@@ -57,15 +59,14 @@ KEY2 = '6ff5a040195245328b3cdc693d1c0bb2'
 
 
 def weather_extend(city):
-    '''
-    和风天气API
+    """和风天气API
+
     日本 东京
     当前温度：25(体感温度：29)
     2018-08-13 中雨 降水概率：0 温度：26~32℃
     2018-08-14 小雨 降水概率：13 温度：26~33℃
     2018-08-15 小雨 降水概率：11 温度：25~32℃
-
-    '''
+    """
     try:
         city_name = urllib.parse.quote(city.encode('utf-8'))
         url_str = f'https://free-api.heweather.com/s6/weather?location={city_name}&key={KEY2}'
@@ -90,7 +91,7 @@ def weather_extend(city):
                 cond_text = f'{forecast["cond_txt_d"]}转{forecast["cond_txt_n"]}'
             str_data += f'{forecast["date"]} {cond_text} 降水概率：{forecast["pop"]} 温度：{forecast["tmp_min"]}~{forecast["tmp_max"]}℃\n'
 
-        return str_data
+        return str_data[:-1]
     except Exception as e:
         bot.logger.exception(e)
         return None

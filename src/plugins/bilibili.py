@@ -1,4 +1,5 @@
-'''获取B站番剧的今日更新'''
+""" 获取B站番剧的今日更新
+"""
 import json
 import re
 
@@ -14,13 +15,15 @@ async def bilibili_today(context):
         try:
             output = ''
             response = requests.get(
-                "https://bangumi.bilibili.com/web_api/timeline_global")
+                'https://bangumi.bilibili.com/web_api/timeline_global')
             data = response.content.decode('utf-8')
             rjson = json.loads(data)
             for day in rjson['result']:
                 if(day['is_today'] == 1):
                     for item in day['seasons']:
-                        output += item['pub_time'] + " : " + item['title'] + "\n"
-            return {'reply': output, 'at_sender': False}
+                        output += f'{item["pub_time"]} : {item["title"]}\n'
+
+            # 去掉最后一个\n
+            return {'reply': output[:-1], 'at_sender': False}
         except:
             return {'reply': "获取番剧信息失败了~>_<~", 'at_sender': False}
