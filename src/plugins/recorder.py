@@ -44,7 +44,11 @@ class Recorder:
             recrod_list[qq] = 1
 
     def _load_data(self):
-        data = self._data.load_pkl(self._name) or None
+        data = None
+        try:
+            data = self._data.load_pkl(self._name)
+        except FileNotFoundError:
+            bot.logger.error('recorder.pkl does not exist!')
         if data:
             self.last_message_on = data['last_message_on']
             self.msg_send_time = data['msg_send_time']

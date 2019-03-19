@@ -13,7 +13,6 @@ async def coolq_status():
     每分钟检查一次酷Q状态
     如果状态不好自动重启
     """
-    # FIXME: 检查状态的时候会出错(似乎是插件的问题，只能暂时等一等，先用着以前的docker image吧)
     try:
         msg = await bot.get_status()
         bot.logger.debug(msg)
