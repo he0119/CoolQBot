@@ -56,7 +56,7 @@ async def history(context):
             date = datetime.now() - relativedelta(months=1)
 
         # 尝试读取历史数据
-        history_filename = f'{get_history_pkl_name(date)}.pkl'
+        history_filename = get_history_pkl_name(date)
         if not historydata.exists(history_filename):
             str_data = f'{date.year}年{date.month}月数据不存在，请换试试吧0.0'
             return {'reply': str_data, 'at_sender': False}

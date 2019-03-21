@@ -50,7 +50,7 @@ def get_total_number(record_list):
     return num
 
 
-@scheduler.scheduled_job('interval', seconds=20)
+@scheduler.scheduled_job('interval', seconds=5)
 async def check_status():
     """ 检测是否需要发送问好信息
     """
