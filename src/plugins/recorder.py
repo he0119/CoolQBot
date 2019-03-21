@@ -14,6 +14,7 @@ class Recorder:
         self.msg_send_time = []
         self.repeat_list = {}
         self.msg_number_list = {}
+        self.send_hello = False
         # 初始化插件数据管理
         self._data = PluginData('recorder')
 
