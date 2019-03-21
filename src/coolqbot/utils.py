@@ -9,4 +9,5 @@ scheduler = AsyncIOScheduler()
 
 
 def get_history_pkl_name(dt):
-    return dt.strftime('%Y-%m')
+    time_str = dt.strftime('%Y-%m')
+    return f'{time_str}.pkl'
