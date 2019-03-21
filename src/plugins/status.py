@@ -26,7 +26,7 @@ async def status(context):
         str_data += f'\n复读概率是{repeat_rate*100:.2f}%'
 
         # 距离第一次启动之后经过的时间
-        rdate = relativedelta(datetime.now(), recorder.start_time)
+        rdate = relativedelta(datetime.utcnow(), recorder.start_time)
         str_data += f'\n已在线'
         if rdate.years:
             str_data += f'{rdate.years}年'

@@ -18,7 +18,7 @@ class Recorder:
         self.msg_number_list = {}
 
         # 酷Q状态
-        self.start_time = datetime.now()
+        self.start_time = datetime.utcnow()
         self.coolq_status = False
         # 是否需要发送问好
         self.send_hello = False
