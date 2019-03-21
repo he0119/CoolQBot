@@ -19,19 +19,30 @@ async def coolq_status():
     try:
         msg = await bot.get_status()
         bot.logger.debug(msg)
+        # 检测是否需要发送问好信息
         if msg['good'] and not recorder.send_hello:
-            hello_str = start_message()
+            hello_str = get_message(self.is_restart)
             await bot.send_msg(message_type='group', group_id=GROUP_ID, message=hello_str)
             recorder.send_hello = True
             bot.logger.info('发送问好信息')
+        # 检测是否需要重启
         if not msg['good']:
             await bot.set_restart()
+            recorder.is_restart = True
             recorder.send_hello = False
             bot.logger.info('重启酷Q')
     except:
         bot.logger.error('无法获取酷Q状态')
 
-def start_message():
+def get_message(is_restart):
+    """ 获得消息
+
+    第一次启动和重启后的消息应该不一样
+    """
+    if is_restart:
+        recorder.is_restart = False
+        return '我又回来了！'
+
     return '早上好呀！'
 
 @bot.on_message('group')

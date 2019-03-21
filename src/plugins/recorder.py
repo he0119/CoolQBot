@@ -10,11 +10,17 @@ from coolqbot.utils import get_history_pkl_name, scheduler
 class Recorder:
     def __init__(self):
         self._name = 'recorder.pkl'
+
+        # 运行数据
         self.last_message_on = datetime.utcnow()
         self.msg_send_time = []
         self.repeat_list = {}
         self.msg_number_list = {}
+
+        # 记录启动问候情况
         self.send_hello = False
+        self.is_restart = False
+
         # 初始化插件数据管理
         self._data = PluginData('recorder')
 
