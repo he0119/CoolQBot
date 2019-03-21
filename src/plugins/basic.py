@@ -4,6 +4,7 @@ import re
 
 from coolqbot.bot import bot
 from coolqbot.utils import scheduler
+from plugins.recorder import recorder
 
 
 @scheduler.scheduled_job('interval', minutes=1)
@@ -16,9 +17,15 @@ async def coolq_status():
     try:
         msg = await bot.get_status()
         bot.logger.debug(msg)
+        # 检测是否需要重启
         if not msg['good']:
             await bot.set_restart()
+            recorder.coolq_status = False
+            recorder.is_restart = True
+            recorder.send_hello = False
             bot.logger.info('重启酷Q')
+        else:
+            recorder.coolq_status = True
     except:
         bot.logger.error('无法获取酷Q状态')
 
