@@ -17,7 +17,9 @@ class Recorder:
         self.repeat_list = {}
         self.msg_number_list = {}
 
-        # 记录启动问候情况
+        # 酷Q状态
+        self.coolq_status = False
+        # 是否需要发送问好
         self.send_hello = False
         self.is_restart = False
 

@@ -3,6 +3,8 @@
 import re
 
 from coolqbot.bot import bot
+from coolqbot.config import GROUP_ID
+from coolqbot.utils import scheduler
 from plugins.recorder import recorder
 
 
@@ -27,3 +29,24 @@ def get_total_number(record_list):
     for dummy, v in record_list.items():
         num += v
     return num
+
+@scheduler.scheduled_job('interval', seconds=20)
+async def check_status():
+    """ 检测是否需要发送问好信息
+    """
+    if recorder.coolq_status and not recorder.send_hello:
+        hello_str = get_message(recorder.is_restart)
+        await bot.send_msg(message_type='group', group_id=GROUP_ID, message=hello_str)
+        recorder.send_hello = True
+        bot.logger.info('发送问好信息')
+
+def get_message(is_restart):
+    """ 获得消息
+
+    第一次启动和重启后的消息应该不一样
+    """
+    if is_restart:
+        recorder.is_restart = False
+        return '我又回来了！'
+
+    return '早上好呀！'

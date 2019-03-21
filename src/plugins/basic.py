@@ -3,7 +3,6 @@
 import re
 
 from coolqbot.bot import bot
-from coolqbot.config import GROUP_ID
 from coolqbot.utils import scheduler
 from plugins.recorder import recorder
 
@@ -14,36 +13,22 @@ async def coolq_status():
 
     每分钟检查一次酷Q状态
     如果状态不好自动重启
-    如果第一次启动，并且酷Q状态良好，向群里发送问好信息
     """
     try:
         msg = await bot.get_status()
         bot.logger.debug(msg)
-        # 检测是否需要发送问好信息
-        if msg['good'] and not recorder.send_hello:
-            hello_str = get_message(self.is_restart)
-            await bot.send_msg(message_type='group', group_id=GROUP_ID, message=hello_str)
-            recorder.send_hello = True
-            bot.logger.info('发送问好信息')
         # 检测是否需要重启
         if not msg['good']:
             await bot.set_restart()
+            recorder.coolq_status = False
             recorder.is_restart = True
             recorder.send_hello = False
             bot.logger.info('重启酷Q')
+        else:
+            recorder.coolq_status = True
     except:
         bot.logger.error('无法获取酷Q状态')
 
-def get_message(is_restart):
-    """ 获得消息
-
-    第一次启动和重启后的消息应该不一样
-    """
-    if is_restart:
-        recorder.is_restart = False
-        return '我又回来了！'
-
-    return '早上好呀！'
 
 @bot.on_message('group')
 async def nick_call(context):
