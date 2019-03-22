@@ -6,7 +6,14 @@ from datetime import datetime, timedelta
 
 from coolqbot.bot import bot
 from coolqbot.config import GROUP_ID, IS_COOLQ_PRO
+from coolqbot.plugin import PluginData
 from plugins.recorder import recorder
+
+DATA = PluginData('repeat', config=True)
+# 复读概率
+REPEAT_RATE = int(DATA.config_get('bot', 'repeat_rate', fallback='10'))
+# 复读间隔
+REPEAT_INTERVAL = int(DATA.config_get('bot', 'repeat_interval', fallback='1'))
 
 
 def is_repeat(msg):
@@ -15,12 +22,12 @@ def is_repeat(msg):
         return False
 
     # 不要复读指令
-    match = re.match(r'^\/', msg['message'])
+    match = re.match(r'\/', msg['message'])
     if match:
         return False
 
     # 不要复读@机器人的消息
-    match = re.match(r'\[CQ:at,qq=2062765419\]', msg['message'])
+    match = re.search(fr'\[CQ:at,qq={msg["self_id"]}\]', msg['message'])
     if match:
         return False
 
@@ -29,7 +36,7 @@ def is_repeat(msg):
     recorder.msg_send_time.append(now)
 
     # 如果不是PRO版本则不复读纯图片
-    match = re.match(r'^\[CQ:image.+\]$', msg['message'])
+    match = re.search(r'^\[CQ:image[^\]]+\]$', msg['message'])
     if match and not IS_COOLQ_PRO:
         return False
 
@@ -38,21 +45,21 @@ def is_repeat(msg):
         return False
 
     # 不要复读签到，分享
-    match = re.match(r'^\[CQ:(sign|share).+\]', msg['message'])
+    match = re.match(r'\[CQ:(sign|share).+\]', msg['message'])
     if match:
         return False
 
     # 不要复读过长的文字
-    new_msg = re.sub(r'\[CQ:.+\]', '', msg['raw_message'])
+    new_msg = re.sub(r'\[CQ:[^\]]+\]', '', msg['raw_message'])
     if len(new_msg) > 28:
         return False
 
     # 复读之后1分钟之内不再复读
     time = recorder.last_message_on
-    if datetime.utcnow() < time + timedelta(minutes=1):
+    if datetime.utcnow() < time + timedelta(minutes=REPEAT_INTERVAL):
         return False
 
-    repeat_rate = 10
+    repeat_rate = REPEAT_RATE
     # 当10分钟内发送消息数量大于30条时，降低复读概率
     # 因为排行榜需要固定概率来展示欧非，暂时取消
     # if recorder.message_number(10) > 30:
