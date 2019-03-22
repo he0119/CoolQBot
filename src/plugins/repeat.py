@@ -15,6 +15,7 @@ REPEAT_RATE = int(DATA.config_get('bot', 'repeat_rate', fallback='10'))
 # 复读间隔
 REPEAT_INTERVAL = int(DATA.config_get('bot', 'repeat_interval', fallback='1'))
 
+
 def is_repeat(msg):
     # 只复读指定群内消息
     if msg['group_id'] != GROUP_ID:
@@ -26,7 +27,8 @@ def is_repeat(msg):
         return False
 
     # 不要复读@机器人的消息
-    match = re.search(r'\[CQ:at,qq=2062765419\]', msg['message'])
+    pattern = f'\\[CQ:at,qq={msg["self_id"]}\\]'
+    match = re.search(pattern, msg['message'])
     if match:
         return False
 
