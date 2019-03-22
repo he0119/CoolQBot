@@ -41,15 +41,21 @@ class PluginData:
         # 插件名，用来确定插件的文件夹位置
         self._name = name
         self._base_path = DATA_DIR_PATH / f'plugin-{name}'
+
         # 如果文件夹不存在则自动新建
         if not DATA_DIR_PATH.exists():
             DATA_DIR_PATH.mkdir()
         if not self._base_path.exists():
             self._base_path.mkdir()
+
         # 如果需要则初始化并加载配置
+        self._config_path = self._base_path / f'{self._name}.conf'
         if config:
             self.config = configparser.ConfigParser()
-            self._load_config()
+            if self._config_path.exists():
+                self._load_config()
+            else:
+                self._save_config()
 
     def save_pkl(self, data, filename):
         with self.open(filename, 'wb') as f:
@@ -60,13 +66,41 @@ class PluginData:
             data = pickle.load(f)
         return data
 
+    def config_get(self, section, option, fallback=None):
+        """ 获得配置
+
+        如果配置不存在则使用`fallback`并保存
+        """
+        try:
+            value = self.config.get(section, option)
+        except (configparser.NoSectionError, KeyError):
+            if not fallback:
+                raise
+            value = fallback
+            # 保存默认配置
+            if section not in self.config.sections():
+                self.config[section] = {}
+            self.config.set(section, option, fallback)
+            self._save_config()
+        return value
+
+    def config_set(self, section, option, value):
+        """ 设置配置
+        """
+        if section not in self.config.sections():
+                self.config[section] = {}
+        self.config.set(section, option, value)
+        self._save_config()
+
     def _load_config(self):
-        path = self._base_path / f'{self._name}.conf'
-        self.config.read(path)
+        """ 读取配置
+        """
+        self.config.read(self._config_path)
 
     def _save_config(self):
-        filename = f'{self._name}.conf'
-        with self.open(filename, 'w') as configfile:
+        """ 保存配置
+        """
+        with self.open(self._config_path, 'w') as configfile:
             self.config.write(configfile)
 
     def open(self, filename, open_mode='r'):
