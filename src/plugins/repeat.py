@@ -6,7 +6,12 @@ from datetime import datetime, timedelta
 
 from coolqbot.bot import bot
 from coolqbot.config import GROUP_ID, IS_COOLQ_PRO
+from coolqbot.plugin import PluginData
 from plugins.recorder import recorder
+
+DATA = PluginData('repeat', config=True)
+# 复读概率
+REPEAT_RATE = int(DATA.config_get('bot', 'repeat_rate', fallback='10'))
 
 
 def is_repeat(msg):
@@ -52,7 +57,7 @@ def is_repeat(msg):
     if datetime.utcnow() < time + timedelta(minutes=1):
         return False
 
-    repeat_rate = 10
+    repeat_rate = REPEAT_RATE
     # 当10分钟内发送消息数量大于30条时，降低复读概率
     # 因为排行榜需要固定概率来展示欧非，暂时取消
     # if recorder.message_number(10) > 30:

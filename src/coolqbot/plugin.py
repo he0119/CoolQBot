@@ -88,7 +88,7 @@ class PluginData:
         """ 设置配置
         """
         if section not in self.config.sections():
-                self.config[section] = {}
+            self.config[section] = {}
         self.config.set(section, option, value)
         self._save_config()
 
