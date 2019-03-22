@@ -73,7 +73,7 @@ class PluginData:
         """
         try:
             value = self.config.get(section, option)
-        except (configparser.NoSectionError, KeyError):
+        except (configparser.NoSectionError, configparser.NoOptionError, KeyError):
             if not fallback:
                 raise
             value = fallback
