@@ -12,7 +12,8 @@ from plugins.recorder import recorder
 DATA = PluginData('repeat', config=True)
 # 复读概率
 REPEAT_RATE = int(DATA.config_get('bot', 'repeat_rate', fallback='10'))
-
+# 复读间隔
+REPEAT_INTERVAL = int(DATA.config_get('bot', 'repeat_interval', fallback='1'))
 
 def is_repeat(msg):
     # 只复读指定群内消息
@@ -54,7 +55,7 @@ def is_repeat(msg):
 
     # 复读之后1分钟之内不再复读
     time = recorder.last_message_on
-    if datetime.utcnow() < time + timedelta(minutes=1):
+    if datetime.utcnow() < time + timedelta(minutes=REPEAT_INTERVAL):
         return False
 
     repeat_rate = REPEAT_RATE
