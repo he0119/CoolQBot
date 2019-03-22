@@ -27,8 +27,7 @@ def is_repeat(msg):
         return False
 
     # 不要复读@机器人的消息
-    pattern = f'\\[CQ:at,qq={msg["self_id"]}\\]'
-    match = re.search(pattern, msg['message'])
+    match = re.search(fr'\[CQ:at,qq={msg["self_id"]}\]', msg['message'])
     if match:
         return False
 
