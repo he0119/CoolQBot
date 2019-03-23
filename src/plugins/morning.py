@@ -7,10 +7,17 @@ import requests
 
 from coolqbot.bot import bot
 from coolqbot.config import GROUP_ID
+from coolqbot.plugin import PluginData
 from coolqbot.utils import scheduler
 
+DATA = PluginData('morning', config=True)
 
-@scheduler.scheduled_job('cron', hour=8, minute=0, second=0)
+HOUR = int(DATA.config_get('morning', 'hour', fallback='7'))
+MINUTE = int(DATA.config_get('morning', 'minute', fallback='30'))
+SECOND = int(DATA.config_get('morning', 'second', fallback='0'))
+
+
+@scheduler.scheduled_job('cron', hour=HOUR, minute=MINUTE, second=SECOND, id='morning')
 async def morning():
     """ 早安
     """

@@ -83,7 +83,7 @@ class Recorder:
 recorder = Recorder()
 
 
-@scheduler.scheduled_job('interval', minutes=1)
+@scheduler.scheduled_job('interval', minutes=1, id='save_recorder')
 async def save_recorder():
     """ 每隔一分钟保存一次数据
     """
