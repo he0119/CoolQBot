@@ -106,4 +106,4 @@ async def get_name(user_id):
     except:
         # 如果不在群里的话(因为有可能会退群)
         msg = await bot.get_stranger_info(user_id=user_id)
-        return msg["nickname"]
+        return msg['nickname']

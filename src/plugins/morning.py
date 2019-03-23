@@ -47,7 +47,7 @@ def get_message():
     str_data = f'{TEXTS[text_index]}\n'
 
     if res['code'] == 0:
-        str_data += res["tts"]
+        str_data += res['tts']
     else:
         str_data += '好像没法获得节假日信息了，嘤嘤嘤'
 
