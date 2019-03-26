@@ -33,7 +33,7 @@ class PluginManager:
 class PluginData:
     """ 插件数据管理
 
-    将插件数据保存在对应的`data`文件夹下。
+    将插件数据保存在 `data` 文件夹对应的目录下。
     提供保存和读取文件/数据的方法。
     """
 
@@ -49,8 +49,8 @@ class PluginData:
             self._base_path.mkdir()
 
         # 如果需要则初始化并加载配置
-        self._config_path = self._base_path / f'{self._name}.conf'
         if config:
+            self._config_path = self._base_path / f'{self._name}.conf'
             self.config = configparser.ConfigParser()
             if self._config_path.exists():
                 self._load_config()
@@ -73,7 +73,7 @@ class PluginData:
         """
         try:
             value = self.config.get(section, option)
-        except (configparser.NoSectionError, configparser.NoOptionError, KeyError):
+        except (configparser.NoSectionError, configparser.NoOptionError):
             if not fallback:
                 raise
             value = fallback
