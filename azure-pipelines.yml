@@ -19,29 +19,29 @@ jobs:
     imageName: 'coolqbot'
 
   steps:
-  - script: echo '##vso[task.setvariable variable=imageTag]test'
+  - bash: echo '##vso[task.setvariable variable=imageTag]test'
     condition: eq(variables['Build.Reason'], 'PullRequest')
     displayName: 'set imageTag to test'
 
-  - script: echo '##vso[task.setvariable variable=imageTag]latest'
+  - bash: echo '##vso[task.setvariable variable=imageTag]latest'
     condition: contains(variables['Build.SourceBranch'], 'master')
     displayName: 'set imageTag to latest'
 
-  - script: |
+  - bash: |
       tag=`echo $(Build.SourceBranch) | grep -P 'v([0-9.]+)' -o`
       echo '##vso[task.setvariable variable=imageTag]'$tag
     condition: contains(variables['Build.SourceBranch'], 'tags')
     displayName: 'set imageTag to tags'
 
-  - script: docker build -f Dockerfile -t $(dockerId)/$(imageName):$(imageTag) .
+  - bash: docker build -f Dockerfile -t $(dockerId)/$(imageName):$(imageTag) .
     displayName: 'docker build'
 
-  - script: |
+  - bash: |
       docker login -u $(dockerId) -p $(pswd)
       docker push $(dockerId)/$(imageName):$(imageTag)
     displayName: 'docker push'
 
-  - script: |
+  - bash: |
       echo $(Build.SourceBranch)
       echo $(Build.Reason)
       echo $(imageTag)
