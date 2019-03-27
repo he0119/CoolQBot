@@ -2,6 +2,8 @@
 一个简单的更新笔记。
 
 ## [Unreleased]
+
+## [0.6.0] - 2019-03-27
 ### Added
 - 添加了更新笔记。
 - 为 `morning` 插件添加了配置。
@@ -98,7 +100,8 @@
 ### Added
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.5.2...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/he0119/CoolQBot/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/he0119/CoolQBot/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/he0119/CoolQBot/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/he0119/CoolQBot/compare/v0.4.4...v0.5.0
