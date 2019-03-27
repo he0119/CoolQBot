@@ -3,7 +3,7 @@
 # Add steps that use Docker Compose, tag images, push to a registry, run an image, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
-# master 分支和所有的 tags都能触发
+# master 分支和所有的 tags 都能触发
 trigger:
   branches:
     include:
@@ -19,13 +19,19 @@ jobs:
     imageName: 'coolqbot'
 
   steps:
-  - script: echo $(Build.SourceBranch)
-
   - script: echo '##vso[task.setvariable variable=imageTag]test'
     condition: eq(variables['Build.Reason'], 'PullRequest')
+    displayName: 'set imageTag to test'
 
   - script: echo '##vso[task.setvariable variable=imageTag]latest'
-    condition: ne(variables['Build.Reason'], 'PullRequest')
+    condition: contains(variables['Build.SourceBranch'], 'master')
+    displayName: 'set imageTag to latest'
+
+  - script: |
+      tag=`echo $(Build.SourceBranch) | grep -P 'v([0-9.]+)' -o`
+      echo '##vso[task.setvariable variable=imageTag]'$tag
+    condition: contains(variables['Build.SourceBranch'], 'tags')
+    displayName: 'set imageTag to tags'
 
   - script: docker build -f Dockerfile -t $(dockerId)/$(imageName):$(imageTag) .
     displayName: 'docker build'
@@ -34,3 +40,9 @@ jobs:
       docker login -u $(dockerId) -p $(pswd)
       docker push $(dockerId)/$(imageName):$(imageTag)
     displayName: 'docker push'
+
+  - script: |
+      echo $(Build.SourceBranch)
+      echo $(Build.Reason)
+      echo $(imageTag)
+    displayName: 'print some variables'
