@@ -3,29 +3,15 @@
 # Add steps that use Docker Compose, tag images, push to a registry, run an image, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
+# master 分支和所有的 tags 都能触发
 trigger:
-- master
+  branches:
+    include:
+    - master
+    - refs/tags/*
 
 jobs:
-- job: 'TestBuild'
-  condition: eq(variables['Build.Reason'], 'PullRequest')
-  pool:
-    vmImage: 'Ubuntu-16.04'
-
-  variables:
-    imageName: 'coolqbot:test'
-
-  steps:
-  - script: docker build -f Dockerfile -t $(dockerId)/$(imageName) .
-    displayName: 'docker build'
-
-  - script: |
-      docker login -u $(dockerId) -p $(pswd)
-      docker push $(dockerId)/$(imageName)
-    displayName: 'docker push'
-
-- job: 'DeployBuild'
-  condition: ne(variables['Build.Reason'], 'PullRequest')
+- job: 'Build'
   pool:
     vmImage: 'Ubuntu-16.04'
 
@@ -33,10 +19,30 @@ jobs:
     imageName: 'coolqbot'
 
   steps:
-  - script: docker build -f Dockerfile -t $(dockerId)/$(imageName) .
+  - bash: echo '##vso[task.setvariable variable=imageTag]test'
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    displayName: 'set imageTag to test'
+
+  - bash: echo '##vso[task.setvariable variable=imageTag]latest'
+    condition: contains(variables['Build.SourceBranch'], 'master')
+    displayName: 'set imageTag to latest'
+
+  - bash: |
+      tag=`echo $(Build.SourceBranch) | grep -P 'v([0-9.]+)' -o`
+      echo '##vso[task.setvariable variable=imageTag]'$tag
+    condition: contains(variables['Build.SourceBranch'], 'tags')
+    displayName: 'set imageTag to tags'
+
+  - bash: docker build -f Dockerfile -t $(dockerId)/$(imageName):$(imageTag) .
     displayName: 'docker build'
 
-  - script: |
+  - bash: |
       docker login -u $(dockerId) -p $(pswd)
-      docker push $(dockerId)/$(imageName)
+      docker push $(dockerId)/$(imageName):$(imageTag)
     displayName: 'docker push'
+
+  - bash: |
+      echo $(Build.SourceBranch)
+      echo $(Build.Reason)
+      echo $(imageTag)
+    displayName: 'print some variables'
