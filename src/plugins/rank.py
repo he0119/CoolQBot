@@ -33,7 +33,7 @@ async def rank(context):
 
         str_data = ''
         repeat_rate_ranking = await get_repeat_rate_ranking(repeat_list, msg_number_list, display_number, minimal_msg_number, display_total_number)
-        repeat_number_ranking = await get_repeat_number_ranking(repeat_list, msg_number_list, display_number, display_total_number)
+        repeat_number_ranking = await get_repeat_number_ranking(repeat_list, msg_number_list, display_number, minimal_msg_number, display_total_number)
 
         if repeat_rate_ranking and repeat_rate_ranking:
             str_data = repeat_rate_ranking + '\n\n' + repeat_number_ranking
@@ -43,7 +43,7 @@ async def rank(context):
         return {'reply': str_data, 'at_sender': False}
 
 
-async def get_repeat_number_ranking(repeat_number_list, msg_number_list, x, display_total_number):
+async def get_repeat_number_ranking(repeat_number_list, msg_number_list, x, msg_number, display_total_number):
     """ 获取次数排行榜
     """
     od = collections.OrderedDict(
@@ -51,6 +51,8 @@ async def get_repeat_number_ranking(repeat_number_list, msg_number_list, x, disp
     i = 1
     str_data = '复读次数排行榜'
     for k, v in od.items():
+        if msg_number_list[k] < msg_number:
+            continue
         name = await get_name(k)
         if display_total_number:
             str_data += f'\n{name}({msg_number_list[k]}): {v}次'
