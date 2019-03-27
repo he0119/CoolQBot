@@ -44,5 +44,11 @@ jobs:
   - bash: |
       echo $(Build.SourceBranch)
       echo $(Build.Reason)
-      echo $(imageTag)
+      echo imageTag=$(imageTag) > imageTag
     displayName: 'print some variables'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/imageTag'
+      artifactName: 'imageTag'
+    displayName: 'save imageTag'
