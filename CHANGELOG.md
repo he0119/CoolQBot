@@ -3,6 +3,13 @@
 
 ## [Unreleased]
 
+## [0.6.1] - 2019-03-28
+### Changed
+- 使用 `ini` 作为配置文件后缀
+
+### Fixed
+- 修复了 `history` 插件查询历史时的错误
+
 ## [0.6.0] - 2019-03-27
 ### Added
 - 添加了更新笔记。
@@ -100,7 +107,8 @@
 ### Added
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/he0119/CoolQBot/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/he0119/CoolQBot/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/he0119/CoolQBot/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/he0119/CoolQBot/compare/v0.5.0...v0.5.1
