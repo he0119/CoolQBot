@@ -50,7 +50,7 @@ class PluginData:
 
         # 如果需要则初始化并加载配置
         if config:
-            self._config_path = self._base_path / f'{self._name}.conf'
+            self._config_path = self._base_path / f'{self._name}.ini'
             self.config = configparser.ConfigParser()
             if self._config_path.exists():
                 self._load_config()
@@ -58,11 +58,11 @@ class PluginData:
                 self._save_config()
 
     def save_pkl(self, data, filename):
-        with self.open(filename, 'wb') as f:
+        with self.open(f'{filename}.pkl', 'wb') as f:
             pickle.dump(data, f)
 
     def load_pkl(self, filename):
-        with self.open(filename, 'rb') as f:
+        with self.open(f'{filename}.pkl', 'rb') as f:
             data = pickle.load(f)
         return data
 

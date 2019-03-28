@@ -9,7 +9,7 @@ from coolqbot.utils import get_history_pkl_name, scheduler
 
 class Recorder:
     def __init__(self):
-        self._name = 'recorder.pkl'
+        self._name = 'recorder'
 
         # 运行数据
         self.last_message_on = datetime.utcnow()

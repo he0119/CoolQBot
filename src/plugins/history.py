@@ -57,7 +57,7 @@ async def history(context):
 
         # 尝试读取历史数据
         history_filename = get_history_pkl_name(date)
-        if not DATA.exists(history_filename):
+        if not DATA.exists(f'{history_filename}.pkl'):
             str_data = f'{date.year}年{date.month}月数据不存在，请换试试吧0.0'
             return {'reply': str_data, 'at_sender': False}
 
@@ -71,7 +71,7 @@ async def history(context):
         msg_number_list = history_data['msg_number_list']
 
         repeat_rate_ranking = await get_repeat_rate_ranking(repeat_list, msg_number_list, display_number, minimal_msg_number, display_total_number)
-        repeat_number_ranking = await get_repeat_number_ranking(repeat_list, msg_number_list, display_number, display_total_number)
+        repeat_number_ranking = await get_repeat_number_ranking(repeat_list, msg_number_list, display_number, minimal_msg_number, display_total_number)
 
         if repeat_rate_ranking and repeat_rate_ranking:
             str_data = f'{date.year}年{date.month}月数据\n'

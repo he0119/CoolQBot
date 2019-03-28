@@ -1,4 +1,4 @@
 requests==2.21.0
 aiocqhttp==0.6.7
-apscheduler==3.5.3
-python-dateutil==2.7.5
+apscheduler==3.6.0
+python-dateutil==2.8.0

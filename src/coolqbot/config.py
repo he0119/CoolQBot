@@ -9,11 +9,11 @@ from pathlib import Path
 HOME_DIR_PATH = Path(__file__).parents[1]
 
 if platform.system() == 'Linux':
-    CONFIG_PATH = Path('/home/user/coolq/bot/bot.conf')
+    CONFIG_PATH = Path('/home/user/coolq/bot/bot.ini')
     LOG_FILE_PATH = Path('/home/user/coolq/bot/bot.log')
     DATA_DIR_PATH = Path('/home/user/coolq/bot/data')
 else:
-    CONFIG_PATH = Path('bot.conf')
+    CONFIG_PATH = Path('bot.ini')
     LOG_FILE_PATH = Path('bot.log')
     DATA_DIR_PATH = HOME_DIR_PATH / 'data'
 

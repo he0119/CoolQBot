@@ -1,5 +1,4 @@
 import argparse
-import asyncio
 import logging
 
 from coolqbot.bot import bot
@@ -16,7 +15,7 @@ def main(debug=False):
     plugin_manager.load_plugin()
     scheduler.start()
 
-    bot.run(host='127.0.0.1', port=8080, loop=asyncio.get_event_loop())
+    bot.run(host='127.0.0.1', port=8080)
 
 
 def run():
