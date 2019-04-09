@@ -22,7 +22,6 @@ class Recorder:
         self.coolq_status = False
         # 是否需要发送问好
         self.send_hello = False
-        self.is_restart = False
 
         # 初始化插件数据管理
         self._data = PluginData('recorder')

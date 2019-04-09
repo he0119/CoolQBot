@@ -55,19 +55,18 @@ async def check_status():
     """ 检测是否需要发送问好信息
     """
     if recorder.coolq_status and not recorder.send_hello:
-        hello_str = get_message(recorder.is_restart)
-        await bot.send_msg(message_type='group', group_id=GROUP_ID, message=hello_str)
+        hello_str = get_message()
+        await bot.send_msg(message_type='group',
+                           group_id=GROUP_ID,
+                           message=hello_str)
         recorder.send_hello = True
         bot.logger.info('发送问好信息')
 
 
-def get_message(is_restart):
+def get_message():
     """ 获得消息
 
-    第一次启动和重启后的消息应该不一样
+    TODO: 每次启动时问好词根据时间不同而不同
     """
-    if is_restart:
-        recorder.is_restart = False
-        return '我又回来了！'
 
     return '早上好呀！'

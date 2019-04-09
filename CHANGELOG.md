@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- 移除了检测状态并重启 `酷Q` 的功能
+- 升级 `CoolQBot-env` 到 `v0.2.1`
+
 ## [0.6.1] - 2019-03-28
 
 ### Changed
