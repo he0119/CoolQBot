@@ -11,7 +11,7 @@ from plugins.recorder import recorder
 
 @bot.on_message('group', 'private')
 async def rank(context):
-    match = re.match(r'^\/rank(?: (?:(\d+))?(?:n(\d+))?)?', context['message'])
+    match = re.match(r'\/rank(?: (?:(\d+))?(?:n(\d+))?)?', context['message'])
     if match:
         display_number = match.group(1)
         minimal_msg_number = match.group(2)

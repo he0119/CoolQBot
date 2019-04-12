@@ -8,7 +8,7 @@ from coolqbot.bot import bot
 
 @bot.on_message('group', 'private')
 async def roll(context):
-    match = re.match(r'^\/roll ?(.*)?$', context['message'])
+    match = re.match(r'\/roll(?: (.*))?', context['message'])
     if match:
         str_data = roll_dices(match.group(1))
         return {'reply': str_data, 'at_sender': False}

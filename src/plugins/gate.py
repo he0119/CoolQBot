@@ -18,7 +18,7 @@ TEXTS = ['掐指一算，你应该走[direction]！',
 
 @bot.on_message('group', 'private')
 async def gate(context):
-    match = re.match(r'^\/gate ?(\w*)?', context['message'])
+    match = re.match(r'\/gate(?: (\w*))?', context['message'])
     if match:
         args = match.group(1)
 

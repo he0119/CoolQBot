@@ -8,7 +8,7 @@ from coolqbot.bot import bot
 
 @bot.on_message('group', 'private')
 async def rand(context):
-    match = re.match(r'^\/rand ?(\w*)?', context['message'])
+    match = re.match(r'\/rand(?: (\w*))?', context['message'])
     if match:
         args = match.group(1)
         str_data = ''

@@ -13,7 +13,7 @@ from plugins.recorder import recorder
 
 @bot.on_message('group', 'private')
 async def status(context):
-    match = re.match(r'^\/(status|状态)', context['message'])
+    match = re.match(r'\/(status|状态)', context['message'])
     if match:
         str_data = f'近十分钟群内聊天数量是{recorder.message_number(10)}条'
         repeat_num = get_total_number(recorder.repeat_list)
