@@ -22,7 +22,7 @@ def is_repeat(msg):
         return False
 
     # 不要复读指令
-    match = re.match(r'\/', msg['message'])
+    match = re.match(r'^\/', msg['message'])
     if match:
         return False
 
@@ -45,7 +45,7 @@ def is_repeat(msg):
         return False
 
     # 不要复读签到，分享
-    match = re.match(r'\[CQ:(sign|share).+\]', msg['message'])
+    match = re.match(r'^\[CQ:(sign|share).+\]', msg['message'])
     if match:
         return False
 

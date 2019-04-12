@@ -14,7 +14,12 @@ from plugins.recorder import Recorder, recorder
 DATA = PluginData('history')
 
 
-@scheduler.scheduled_job('cron', day=1, hour=0, minute=0, second=0, id='clear_data')
+@scheduler.scheduled_job('cron',
+                         day=1,
+                         hour=0,
+                         minute=0,
+                         second=0,
+                         id='clear_data')
 async def clear_data():
     """ 每个月最后24点(下月0点)保存记录于历史记录文件夹，并重置记录
     """
@@ -28,7 +33,7 @@ async def clear_data():
 
 @bot.on_message('group', 'private')
 async def history(context):
-    match = re.match(r'\/history(?: (\d+)\-(\d+))?|\/history',
+    match = re.match(r'^\/history(?: (\d+)\-(\d+))?$|\/history$',
                      context['message'])
     if match:
         str_data = ''
@@ -70,8 +75,12 @@ async def history(context):
         repeat_list = history_data['repeat_list']
         msg_number_list = history_data['msg_number_list']
 
-        repeat_rate_ranking = await get_repeat_rate_ranking(repeat_list, msg_number_list, display_number, minimal_msg_number, display_total_number)
-        repeat_number_ranking = await get_repeat_number_ranking(repeat_list, msg_number_list, display_number, minimal_msg_number, display_total_number)
+        repeat_rate_ranking = await get_repeat_rate_ranking(
+            repeat_list, msg_number_list, display_number, minimal_msg_number,
+            display_total_number)
+        repeat_number_ranking = await get_repeat_number_ranking(
+            repeat_list, msg_number_list, display_number, minimal_msg_number,
+            display_total_number)
 
         if repeat_rate_ranking and repeat_rate_ranking:
             str_data = f'{date.year}年{date.month}月数据\n'

@@ -8,7 +8,7 @@ from coolqbot.bot import bot
 
 @bot.on_message('group', 'private')
 async def roll(context):
-    match = re.match(r'\/roll(?: (.*))?', context['message'])
+    match = re.match(r'^\/roll(?: (.*))?$', context['message'])
     if match:
         args = match.group(1)
 
@@ -35,7 +35,7 @@ def roll_dices(input_str):
         dice_str, add = roll_single(dice, add)
         r += dice_str
         raw_str += f'{dice[0]}{dice[1]}{dice[2]}{dice[3]}'
-    return f'{raw_str}={r}={add}'[1:].replace('=+', '=')
+    return f'{raw_str}={r}={add}' [1:].replace('=+', '=')
 
 
 def roll_single(args, add):

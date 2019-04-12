@@ -68,10 +68,12 @@ class Recorder:
         self._data.save_pkl(self.get_data(), self._name)
 
     def get_data(self):
-        return {'last_message_on': self.last_message_on,
-                'msg_send_time': self.msg_send_time,
-                'repeat_list': self.repeat_list,
-                'msg_number_list': self.msg_number_list}
+        return {
+            'last_message_on': self.last_message_on,
+            'msg_send_time': self.msg_send_time,
+            'repeat_list': self.repeat_list,
+            'msg_number_list': self.msg_number_list
+        }
 
     def clear_data(self):
         self.msg_send_time = []

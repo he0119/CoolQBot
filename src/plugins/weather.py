@@ -11,7 +11,7 @@ from coolqbot.bot import bot
 
 @bot.on_message('group', 'private')
 async def weather(context):
-    match = re.match(r'\/天气(?: ?(\w*))?', context['message'])
+    match = re.match(r'^\/(?:天气|weather)(?: (\w*))?$', context['message'])
     if match:
         city = match.group(1)
         str_data = weather_old(city)

@@ -8,7 +8,7 @@ from coolqbot.bot import bot
 
 @bot.on_message('group', 'private')
 async def rand(context):
-    match = re.match(r'\/rand(?: (.*)?)?', context['message'])
+    match = re.match(r'^\/rand(?: (.*)?)?$', context['message'])
     if match:
         text = match.group(1)
         str_data = ''
@@ -16,7 +16,7 @@ async def rand(context):
         if not text:
             text = ''
 
-        probability = re.match(r'.+(可能性|几率|概率)$', text)
+        probability = re.match(r'^.+(可能性|几率|概率)$', text)
         if probability:
             str_data += text
             str_data += '是 '

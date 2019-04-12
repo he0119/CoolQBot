@@ -8,7 +8,7 @@ from coolqbot.config import GROUP_ID
 
 @bot.on_message('group', 'private')
 async def ban(context):
-    match = re.match(r'\/ban(?: (\d*))?', context['message'])
+    match = re.match(r'^\/ban(?: (\d*))?$', context['message'])
     if match:
         args = match.group(1)
 
