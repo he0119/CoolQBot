@@ -10,7 +10,13 @@ from coolqbot.bot import bot
 async def roll(context):
     match = re.match(r'\/roll(?: (.*))?', context['message'])
     if match:
-        str_data = roll_dices(match.group(1))
+        args = match.group(1)
+
+        if args:
+            str_data = roll_dices(args)
+        else:
+            str_data = '欢迎使用 NGA 风格 ROLL 点插件\n你可以 /roll d100\n也可以 /roll 2d100+2d50'
+
         return {'reply': str_data, 'at_sender': False}
 
 
