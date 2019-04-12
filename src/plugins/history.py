@@ -33,7 +33,7 @@ async def clear_data():
 
 @bot.on_message('group', 'private')
 async def history(context):
-    match = re.match(r'^\/history(?: (\d+)\-(\d+))?$|\/history (0)$',
+    match = re.match(r'^\/history(?: (\d+)\-(\d+))?$|\/history (\d+)$',
                      context['message'])
     if match:
         str_data = ''
