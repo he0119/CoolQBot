@@ -13,7 +13,7 @@ async def rand(context):
         args = match.group(1)
         str_data = ''
 
-        probability = re.match(r'.+(可能性|几率|概率)$', args)
+        probability = re.match(r'.+(可能性|几率|概率)$', args if args else '')
         if probability:
             str_data += args
             str_data += '是 '
