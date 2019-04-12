@@ -33,7 +33,7 @@ async def clear_data():
 
 @bot.on_message('group', 'private')
 async def history(context):
-    match = re.match(r'^\/history(?: (\d+)\-(\d+))?$|\/history (1)$',
+    match = re.match(r'^\/history(?: (\d+)\-(\d+))?$|\/history (0)$',
                      context['message'])
     if match:
         str_data = ''
@@ -46,19 +46,24 @@ async def history(context):
             month = int(month)
 
         if not year:
-            str_data = '欢迎查询历史记录\n如需查询上月数据请输入/history 1\n如需查询指定月份请输入/history year-month(如2018-01)'
+            str_data = '欢迎查询历史记录\n如需查询上月数据请输入/history 0\n如需查询指定月份请输入/history year-month(如2018-01)'
             return {'reply': str_data, 'at_sender': False}
 
-        if year and month:
+        if not month:
+            if year == 0:
+                date = datetime.now() - relativedelta(months=1)
+            else:
+                str_data = '请输入月份，只有年份我也不知道查什么呀！'
+                return {'reply': str_data, 'at_sender': False}
+
+        if month and year:
             if year < 1 or year > 9999:
-                str_data = '请输入1到9999的年份，超过了我就不能查惹'
+                str_data = '请输入1到9999的年份，超过了我就不能查惹！'
                 return {'reply': str_data, 'at_sender': False}
             if month > 12:
-                str_data = '请输入正确的月份，众所周知，一年只有12个月'
+                str_data = '请输入正确的月份，众所周知，一年只有12个月！'
                 return {'reply': str_data, 'at_sender': False}
             date = datetime(year=year, month=month, day=1)
-        else:
-            date = datetime.now() - relativedelta(months=1)
 
         # 尝试读取历史数据
         history_filename = get_history_pkl_name(date)
