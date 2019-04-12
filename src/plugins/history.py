@@ -33,8 +33,7 @@ async def clear_data():
 
 @bot.on_message('group', 'private')
 async def history(context):
-    match = re.match(r'^\/history(?: (\d+)\-(\d+))?$|\/history (\d+)$',
-                     context['message'])
+    match = re.match(r'^\/history(?: (\d+)(?:\-(\d+))?)?$', context['message'])
     if match:
         str_data = ''
 
@@ -45,7 +44,7 @@ async def history(context):
         if month:
             month = int(month)
 
-        if not year:
+        if not year and year != 0:
             str_data = '欢迎查询历史记录\n如需查询上月数据请输入/history 0\n如需查询指定月份请输入/history year-month(如2018-01)'
             return {'reply': str_data, 'at_sender': False}
 
