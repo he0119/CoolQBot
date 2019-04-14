@@ -22,7 +22,7 @@ def is_repeat(msg):
         return False
 
     # 不要复读指令
-    match = re.match(r'\/', msg['message'])
+    match = re.match(r'^\/', msg['message'])
     if match:
         return False
 
@@ -36,7 +36,7 @@ def is_repeat(msg):
     recorder.msg_send_time.append(now)
 
     # 如果不是PRO版本则不复读纯图片
-    match = re.search(r'^\[CQ:image[^\]]+\]$', msg['message'])
+    match = re.search(r'\[CQ:image[^\]]+\]$', msg['message'])
     if match and not IS_COOLQ_PRO:
         return False
 
@@ -45,7 +45,7 @@ def is_repeat(msg):
         return False
 
     # 不要复读签到，分享
-    match = re.match(r'\[CQ:(sign|share).+\]', msg['message'])
+    match = re.match(r'^\[CQ:(sign|share).+\]', msg['message'])
     if match:
         return False
 

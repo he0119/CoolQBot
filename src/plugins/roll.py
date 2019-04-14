@@ -8,9 +8,15 @@ from coolqbot.bot import bot
 
 @bot.on_message('group', 'private')
 async def roll(context):
-    match = re.match(r'^\/roll ?(.*)?$', context['message'])
+    match = re.match(r'^\/roll(?: (.*))?$', context['message'])
     if match:
-        str_data = roll_dices(match.group(1))
+        args = match.group(1)
+
+        if args:
+            str_data = roll_dices(args)
+        else:
+            str_data = '欢迎使用 NGA 风格 ROLL 点插件\n你可以 /roll d100\n也可以 /roll 2d100+2d50'
+
         return {'reply': str_data, 'at_sender': False}
 
 
@@ -29,7 +35,7 @@ def roll_dices(input_str):
         dice_str, add = roll_single(dice, add)
         r += dice_str
         raw_str += f'{dice[0]}{dice[1]}{dice[2]}{dice[3]}'
-    return f'{raw_str}={r}={add}'[1:].replace('=+', '=')
+    return f'{raw_str}={r}={add}' [1:].replace('=+', '=')
 
 
 def roll_single(args, add):

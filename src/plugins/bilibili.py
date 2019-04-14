@@ -10,7 +10,7 @@ from coolqbot.bot import bot
 
 @bot.on_message('group', 'private')
 async def bilibili_today(context):
-    match = re.match(r'^\/bilibili', context['message'])
+    match = re.match(r'^\/bilibili$', context['message'])
     if match:
         try:
             output = ''

@@ -4,10 +4,15 @@
 
 ## [Unreleased]
 
+## [0.6.2] - 2019-04-14
+
 ### Changed
 
 - 移除了检测状态并重启 `酷Q` 的功能
 - 升级 `CoolQBot-env` 到 `v0.2.1`
+- 改进了 `rank` 插件的正则表达式，现在可以使用 `/rank n100`
+- 改进了所有差价的正则表达式，现在命令与参数之间必须要有空格
+- `ban` 插件的参数调整为禁言分钟数
 
 ## [0.6.1] - 2019-03-28
 
@@ -153,7 +158,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/he0119/CoolQBot/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/he0119/CoolQBot/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/he0119/CoolQBot/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/he0119/CoolQBot/compare/v0.5.1...v0.5.2
