@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.6.2] - 2019-04-14
+
 ### Changed
 
 - 移除了检测状态并重启 `酷Q` 的功能
@@ -156,7 +158,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/he0119/CoolQBot/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/he0119/CoolQBot/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/he0119/CoolQBot/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/he0119/CoolQBot/compare/v0.5.1...v0.5.2
