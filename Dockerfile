@@ -1,4 +1,4 @@
-FROM he0119/coolqbot-env:v0.2.1
+FROM he0119/coolqbot-env:v0.2.2
 
 # 安装依赖
 COPY requirements.txt /home/user/coolqbot/requirements.txt

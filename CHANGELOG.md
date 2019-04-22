@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- - 升级 `CoolQBot-env` 到 `v0.2.2`
+
 ## [0.6.2] - 2019-04-14
 
 ### Changed
