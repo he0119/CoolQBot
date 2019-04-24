@@ -11,7 +11,8 @@ from plugins.recorder import recorder
 
 @bot.on_message('group', 'private')
 async def rank(context):
-    match = re.match(r'^\/rank(?: (?:(\d+))?(?:n(\d+))?)?$', context['message'])
+    match = re.match(r'^\/rank(?: (?:(\d+))?(?:n(\d+))?)?$',
+                     context['message'])
     if match:
         display_number = match.group(1)
         minimal_msg_number = match.group(2)
@@ -28,67 +29,83 @@ async def rank(context):
         else:
             minimal_msg_number = 30
 
-        repeat_list = recorder.repeat_list
-        msg_number_list = recorder.msg_number_list
+        ranking = Ranking(display_number, minimal_msg_number,
+                          display_total_number)
+        str_data = await ranking.ranking()
 
-        repeat_rate_ranking = await get_repeat_rate_ranking(repeat_list, msg_number_list, display_number, minimal_msg_number, display_total_number)
-        repeat_number_ranking = await get_repeat_number_ranking(repeat_list, msg_number_list, display_number, minimal_msg_number, display_total_number)
-
-        if repeat_rate_ranking and repeat_rate_ranking:
-            str_data = repeat_rate_ranking + '\n\n' + repeat_number_ranking
-        else:
+        if not str_data:
             str_data = '暂时还没有满足条件的数据~>_<~'
 
         return {'reply': str_data, 'at_sender': False}
 
 
-async def get_repeat_number_ranking(repeat_number_list, msg_number_list, display_number, msg_number, display_total_number):
-    """ 获取次数排行榜
+class Ranking:
+    """ 排行榜
     """
-    od = collections.OrderedDict(
-        sorted(repeat_number_list.items(), key=itemgetter(1), reverse=True))
 
-    str_data = await get_ranking_str(od, 'number', msg_number_list, display_number, display_total_number, msg_number)
+    def __init__(self, display_number, minimal_msg_number,
+                 display_total_number):
+        self.display_number = display_number
+        self.minimal_msg_number = minimal_msg_number
+        self.display_total_number = display_total_number
+        self.repeat_list = recorder.repeat_list
+        self.msg_number_list = recorder.msg_number_list
 
-    if str_data:
-        return f'复读次数排行榜{str_data}'
-    else:
-        return None
+    async def ranking(self):
+        """ 合并两个排行榜
+        """
+        repeat_rate_ranking = await self.repeat_rate_ranking()
+        repeat_number_ranking = await self.repeat_number_ranking()
 
-
-async def get_repeat_rate_ranking(repeat_list, msg_number_list, display_number, msg_number, display_total_number):
-    """ 获取复读概率排行榜
-    """
-    repeat_rate = get_repeat_rate(repeat_list, msg_number_list)
-    od = collections.OrderedDict(
-        sorted(repeat_rate.items(), key=itemgetter(1), reverse=True))
-
-    str_data = await get_ranking_str(od, 'rate', msg_number_list, display_number, display_total_number, msg_number)
-
-    if str_data:
-        return f'Love Love Ranking{str_data}'
-    else:
-        return None
+        if repeat_rate_ranking and repeat_rate_ranking:
+            return repeat_rate_ranking + '\n\n' + repeat_number_ranking
 
 
-async def get_ranking_str(sorted_list, list_type, msg_number_list, display_number, display_total_number, msg_number):
-    """ 获取排行榜文字
-    """
-    i = 0
-    str_data = ''
-    for k, v in sorted_list.items():
-        if i < display_number:
-            if msg_number_list[k] >= msg_number:
-                name = await get_name(k)
-                if display_total_number:
-                    str_data += f'\n{name}({msg_number_list[k]})：'
-                else:
-                    str_data += f'\n{name}：'
-                str_data += f'{v*100:.2f}%' if list_type == 'rate' else f'{v}次'
-                i += 1
+    async def repeat_number_ranking(self):
+        """ 获取次数排行榜
+        """
+        od = collections.OrderedDict(
+            sorted(self.repeat_list.items(), key=itemgetter(1), reverse=True))
+
+        str_data = await self.ranking_str(od, 'number')
+
+        if str_data:
+            return f'复读次数排行榜{str_data}'
         else:
-            return str_data
-    return str_data
+            return None
+
+    async def repeat_rate_ranking(self):
+        """ 获取复读概率排行榜
+        """
+        repeat_rate = get_repeat_rate(self.repeat_list, self.msg_number_list)
+        od = collections.OrderedDict(
+            sorted(repeat_rate.items(), key=itemgetter(1), reverse=True))
+
+        str_data = await self.ranking_str(od, 'rate')
+
+        if str_data:
+            return f'Love Love Ranking{str_data}'
+        else:
+            return None
+
+    async def ranking_str(self, sorted_list, list_type):
+        """ 获取排行榜文字
+        """
+        i = 0
+        str_data = ''
+        for user_id, v in sorted_list.items():
+            if i < self.display_number:
+                if self.msg_number_list[user_id] >= self.minimal_msg_number:
+                    name = await nikcname(user_id)
+                    if self.display_total_number:
+                        str_data += f'\n{name}({self.msg_number_list[user_id]})：'
+                    else:
+                        str_data += f'\n{name}：'
+                    str_data += f'{v*100:.2f}%' if list_type == 'rate' else f'{v}次'
+                    i += 1
+            else:
+                return str_data
+        return str_data
 
 
 def get_repeat_rate(repeat_list, msg_number_list):
@@ -98,11 +115,13 @@ def get_repeat_rate(repeat_list, msg_number_list):
     return repeat_rate
 
 
-async def get_name(user_id):
+async def nikcname(user_id):
     """ 输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称
     """
     try:
-        msg = await bot.get_group_member_info(group_id=GROUP_ID, user_id=user_id, no_cache=True)
+        msg = await bot.get_group_member_info(group_id=GROUP_ID,
+                                              user_id=user_id,
+                                              no_cache=True)
         if msg['card']:
             return msg['card']
         return msg['nickname']
