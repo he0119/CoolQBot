@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from coolqbot.bot import bot
 from coolqbot.plugin import PluginData
 from coolqbot.utils import get_history_pkl_name, scheduler
-from plugins.rank import get_repeat_number_ranking, get_repeat_rate_ranking
+from plugins.rank import Ranking
 from plugins.recorder import Recorder, recorder
 
 DATA = PluginData('history')
@@ -79,16 +79,13 @@ async def history(context):
         repeat_list = history_data['repeat_list']
         msg_number_list = history_data['msg_number_list']
 
-        repeat_rate_ranking = await get_repeat_rate_ranking(
-            repeat_list, msg_number_list, display_number, minimal_msg_number,
-            display_total_number)
-        repeat_number_ranking = await get_repeat_number_ranking(
-            repeat_list, msg_number_list, display_number, minimal_msg_number,
-            display_total_number)
+        ranking_str = Ranking(display_number, minimal_msg_number,
+                              display_total_number, repeat_list,
+                              msg_number_list)
 
-        if repeat_rate_ranking and repeat_rate_ranking:
+        if ranking_str:
             str_data = f'{date.year}年{date.month}月数据\n'
-            str_data += repeat_rate_ranking + '\n\n' + repeat_number_ranking
+            str_data += ranking_str
 
         if not str_data:
             str_data = '暂时还没有满足条件的数据~>_<~'

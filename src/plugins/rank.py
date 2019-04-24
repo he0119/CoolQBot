@@ -29,8 +29,11 @@ async def rank(context):
         else:
             minimal_msg_number = 30
 
+        repeat_list = recorder.repeat_list
+        msg_number_list = recorder.msg_number_list
+
         ranking = Ranking(display_number, minimal_msg_number,
-                          display_total_number)
+                          display_total_number, repeat_list, msg_number_list)
         str_data = await ranking.ranking()
 
         if not str_data:
@@ -44,12 +47,12 @@ class Ranking:
     """
 
     def __init__(self, display_number, minimal_msg_number,
-                 display_total_number):
+                 display_total_number, repeat_list, msg_number_list):
         self.display_number = display_number
         self.minimal_msg_number = minimal_msg_number
         self.display_total_number = display_total_number
-        self.repeat_list = recorder.repeat_list
-        self.msg_number_list = recorder.msg_number_list
+        self.repeat_list = repeat_list
+        self.msg_number_list = msg_number_list
 
     async def ranking(self):
         """ 合并两个排行榜
@@ -59,7 +62,6 @@ class Ranking:
 
         if repeat_rate_ranking and repeat_rate_ranking:
             return repeat_rate_ranking + '\n\n' + repeat_number_ranking
-
 
     async def repeat_number_ranking(self):
         """ 获取次数排行榜
