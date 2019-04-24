@@ -29,7 +29,7 @@ class Recorder:
         self._load_data()
 
     def message_number(self, x):
-        """ 返回x分钟内的消息条数，并清除之前的消息记录
+        """ 返回 x 分钟内的消息条数，并清除之前的消息记录
         """
         times = self.msg_send_time
         now = datetime.utcnow()
@@ -88,4 +88,7 @@ recorder = Recorder()
 async def save_recorder():
     """ 每隔一分钟保存一次数据
     """
+    # 保存数据前先清理 msg_number_list
+    recorder.message_number(10)
+
     recorder.save_data()
