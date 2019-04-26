@@ -88,7 +88,7 @@ recorder = Recorder()
 async def save_recorder():
     """ 每隔一分钟保存一次数据
     """
-    # 保存数据前先清理 msg_number_list
+    # 保存数据前先清理 msg_send_time 列表
     recorder.message_number(10)
 
     recorder.save_data()
