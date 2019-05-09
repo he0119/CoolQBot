@@ -28,9 +28,9 @@ def heweather(city):
 
     日本 东京
     当前温度：25(体感温度：29)
-    2018-08-13 中雨 降水概率：0 温度：26~32℃
-    2018-08-14 小雨 降水概率：13 温度：26~33℃
-    2018-08-15 小雨 降水概率：11 温度：25~32℃
+    2018-08-13 中雨 降水概率：0% 温度：32~26℃
+    2018-08-14 小雨 降水概率：13% 温度：33~26℃
+    2018-08-15 小雨 降水概率：11% 温度：32~25℃
     """
     try:
         city_name = urllib.parse.quote(city.encode('utf-8'))
@@ -50,8 +50,8 @@ def heweather(city):
 
         # {forecast[""]}
         for forecast in weather_forecast:
-            if forecast["cond_txt_d"] == forecast["cond_txt_n"]:
-                cond_text = forecast["cond_txt_d"]
+            if forecast['cond_txt_d'] == forecast['cond_txt_n']:
+                cond_text = forecast['cond_txt_d']
             else:
                 cond_text = f'{forecast["cond_txt_d"]}转{forecast["cond_txt_n"]}'
             str_data += f'{forecast["date"]} {cond_text} 降水概率：{forecast["pop"]}% 温度：{forecast["tmp_max"]}~{forecast["tmp_min"]}℃\n'
