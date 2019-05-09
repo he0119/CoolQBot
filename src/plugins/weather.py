@@ -54,7 +54,7 @@ def heweather(city):
                 cond_text = forecast["cond_txt_d"]
             else:
                 cond_text = f'{forecast["cond_txt_d"]}转{forecast["cond_txt_n"]}'
-            str_data += f'{forecast["date"]} {cond_text} 降水概率：{forecast["pop"]} 温度：{forecast["tmp_min"]}~{forecast["tmp_max"]}℃\n'
+            str_data += f'{forecast["date"]} {cond_text} 降水概率：{forecast["pop"]}% 温度：{forecast["tmp_min"]}~{forecast["tmp_max"]}℃\n'
 
         return str_data[:-1]
     except Exception as e:
