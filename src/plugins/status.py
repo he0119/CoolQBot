@@ -16,13 +16,16 @@ async def status(context):
     match = re.match(r'^\/(status|状态)$', context['message'])
     if match:
         str_data = f'近十分钟群内聊天数量是{recorder.message_number(10)}条'
-        repeat_num = get_total_number(recorder.repeat_list)
-        msg_num = get_total_number(recorder.msg_number_list)
+        repeat_num = get_total_number(recorder.get_repeat_list())
+        msg_num = get_total_number(recorder.get_msg_number_list())
+        today_msg_num = get_total_number(
+            recorder.get_msg_number_list_by_day(datetime.utcnow().day))
         if msg_num:
             repeat_rate = repeat_num / msg_num
         else:
             repeat_rate = 0
-        str_data += f'\n现在的群内聊天总数是{msg_num}条'
+        str_data += f'\n今天群内聊天总数是{today_msg_num}条'
+        str_data += f'\n本月群内聊天总数是{msg_num}条'
         str_data += f'\n复读概率是{repeat_rate*100:.2f}%'
 
         # 距离第一次启动之后经过的时间

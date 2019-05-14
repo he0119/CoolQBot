@@ -21,11 +21,11 @@ DATA = PluginData('history')
                          second=0,
                          id='clear_data')
 async def clear_data():
-    """ 每个月最后24点(下月0点)保存记录于历史记录文件夹，并重置记录
+    """ 每个月最后一天 24 点（下月 0 点）保存记录于历史记录文件夹，并重置记录
     """
     # 保存数据到历史文件夹
     date = datetime.now() - timedelta(hours=1)
-    DATA.save_pkl(recorder.get_data(), get_history_pkl_name(date))
+    DATA.save_pkl(recorder.get_data(history=True), get_history_pkl_name(date))
     # 清除现有数据
     recorder.clear_data()
     bot.logger.info('记录清除完成')

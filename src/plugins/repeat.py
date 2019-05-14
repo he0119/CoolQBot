@@ -33,7 +33,7 @@ def is_repeat(msg):
 
     # 记录群内发送消息数量和时间
     now = datetime.utcnow()
-    recorder.msg_send_time.append(now)
+    recorder.add_msg_send_time(now)
 
     # 如果不是PRO版本则不复读纯图片
     match = re.search(r'\[CQ:image[^\]]+\]$', msg['message'])
@@ -67,7 +67,7 @@ def is_repeat(msg):
     #     repeat_rate = 5
 
     # 记录每个人发送消息数量
-    recorder.add_to_list(recorder.msg_number_list, msg['user_id'])
+    recorder.add_msg_number_list(msg['user_id'])
 
     # 按照设定概率复读
     random = secrets.SystemRandom()
@@ -80,7 +80,7 @@ def is_repeat(msg):
     recorder.last_message_on = now
 
     # 记录复读次数
-    recorder.add_to_list(recorder.repeat_list, msg['user_id'])
+    recorder.add_repeat_list(msg['user_id'])
 
     return True
 
