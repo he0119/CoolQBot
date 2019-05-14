@@ -70,7 +70,7 @@ async def history(context):
             if month > 12:
                 str_data = '众所周知，一年只有 12 个月！'
                 return {'reply': str_data, 'at_sender': False}
-            if year == now.year and month > now.month:
+            if year > now.year or (year == now.year and month > now.month):
                 str_data = '抱歉，小誓约不能穿越时空呢！'
                 return {'reply': str_data, 'at_sender': False}
             date = datetime(year=year, month=month, day=1)
@@ -87,16 +87,15 @@ async def history(context):
         # 尝试读取历史数据
         # 如果是本月就直接从 recorder 中获取数据
         # 不是则从历史记录中获取
-
         if year == now.year and month == now.month:
             history_data = recorder
         else:
             history_filename = get_history_pkl_name(date)
             if not DATA.exists(f'{history_filename}.pkl'):
                 if day:
-                    str_data = f'找不到 {date.year} 年 {date.month} 月 {day} 日的数据，请换个试试吧 ~>_<~'
+                    str_data = f'找不到 {year} 年 {month} 月 {day} 日的数据，请换个试试吧 ~>_<~'
                 else:
-                    str_data = f'{date.year} 年 {date.month} 月的数据不存在，请换个试试吧 0.0'
+                    str_data = f'{year} 年 {month} 月的数据不存在，请换个试试吧 0.0'
                 return {'reply': str_data, 'at_sender': False}
             data = DATA.load_pkl(history_filename)
             history_data = Recorder(data)
@@ -118,10 +117,13 @@ async def history(context):
         ranking_str = await ranking.ranking()
 
         if ranking_str:
-            str_data = f'{date.year}年{date.month}月数据\n'
+            if day:
+                str_data = f'{year} 年 {month} 月 {day} 日数据\n'
+            else:
+                str_data = f'{year} 年 {month} 月数据\n'
             str_data += ranking_str
 
         if not str_data:
-            str_data = '暂时还没有满足条件的数据~>_<~'
+            str_data = '找不到满足条件的数据 ~>_<~'
 
         return {'reply': str_data, 'at_sender': False}
