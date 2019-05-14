@@ -38,7 +38,7 @@ async def history(context):
                      context['message'])
     if match:
         str_data = ''
-        now = datetime.utcnow()
+        now = datetime.now()
 
         year = match.group(1)
         month = match.group(2)

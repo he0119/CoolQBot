@@ -32,7 +32,7 @@ def is_repeat(msg):
         return False
 
     # 记录群内发送消息数量和时间
-    now = datetime.utcnow()
+    now = datetime.now()
     recorder.add_msg_send_time(now)
 
     # 如果不是PRO版本则不复读纯图片
@@ -56,7 +56,7 @@ def is_repeat(msg):
 
     # 复读之后1分钟之内不再复读
     time = recorder.last_message_on
-    if datetime.utcnow() < time + timedelta(minutes=REPEAT_INTERVAL):
+    if datetime.now() < time + timedelta(minutes=REPEAT_INTERVAL):
         return False
 
     repeat_rate = REPEAT_RATE

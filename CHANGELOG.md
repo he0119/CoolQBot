@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [0.7.1] - 2019-05-15
+
+### Fixed
+
+- 使用本地时间替换之前的 `UTC` 时间
+
 ## [0.7.0] - 2019-05-14
 
 ### Added
@@ -174,7 +180,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.7.1...HEAD
+[0.7.0]: https://github.com/he0119/CoolQBot/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/he0119/CoolQBot/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/he0119/CoolQBot/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/he0119/CoolQBot/compare/v0.6.0...v0.6.1

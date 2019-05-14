@@ -14,13 +14,13 @@ class Recorder:
         self._name = 'recorder'
 
         # 运行数据
-        self.last_message_on = datetime.utcnow()
+        self.last_message_on = datetime.now()
         self._msg_send_time = []
         self._repeat_list = {}
         self._msg_number_list = {}
 
         # 酷Q 状态
-        self.start_time = datetime.utcnow()
+        self.start_time = datetime.now()
         self.coolq_status = False
         # 是否需要发送问好
         self.send_hello = False
@@ -31,7 +31,7 @@ class Recorder:
         """ 返回 x 分钟内的消息条数，并清除之前的消息记录
         """
         times = self._msg_send_time
-        now = datetime.utcnow()
+        now = datetime.now()
         for i in range(len(times)):
             if times[i] > now - timedelta(minutes=x):
                 self._msg_send_time = self._msg_send_time[i:]
@@ -87,7 +87,7 @@ class Recorder:
     def _add_to_list(self, recrod_list, qq):
         """ 添加数据进列表
         """
-        day = datetime.utcnow().day
+        day = datetime.now().day
         if day not in recrod_list:
             recrod_list[day] = {}
         try:

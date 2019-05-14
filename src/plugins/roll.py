@@ -25,7 +25,7 @@ def roll_dices(input_str):
     """
     match = re.match(r'^([\dd+\s]+?)$', input_str)
     if not match:
-        return '请输入正确的参数~>_<~'
+        return '请输入正确的参数 ~>_<~'
     r = ''
     add = 0
     input_str = '+' + input_str
