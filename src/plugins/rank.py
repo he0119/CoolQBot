@@ -29,8 +29,8 @@ async def rank(context):
         else:
             minimal_msg_number = 30
 
-        repeat_list = recorder.repeat_list
-        msg_number_list = recorder.msg_number_list
+        repeat_list = recorder.get_repeat_list
+        msg_number_list = recorder.get_msg_number_list
 
         ranking = Ranking(display_number, minimal_msg_number,
                           display_total_number, repeat_list, msg_number_list)

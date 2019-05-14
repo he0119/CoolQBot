@@ -51,6 +51,11 @@ class Recorder:
         """
         return self._merge_list(self._repeat_list)
 
+    def get_msg_number_list(self):
+        """ 获取整个月的消息数量记录
+        """
+        return self._merge_list(self._msg_number_list)
+
     def get_repeat_list_by_day(self, day):
         """ 获取某一天的复读记录
         """
@@ -58,20 +63,15 @@ class Recorder:
             return self._repeat_list[day]
         return None
 
-    def get_msg_number_list(self):
-        """ 获取整个月的消息数量记录
-        """
-        return self._merge_list(self._msg_number_list)
-
     def get_msg_number_list_by_day(self, day):
-        """ 获取某一天的复读记录
+        """ 获取某一天的消息数量记录
         """
         if day in self._msg_number_list:
             return self._msg_number_list[day]
         return None
 
     def add_repeat_list(self, qq):
-        """ 该 QQ 号的复读列表记录，加一
+        """ 该 QQ 号的复读记录，加一
         """
         self._add_to_list(self._repeat_list, qq)
 

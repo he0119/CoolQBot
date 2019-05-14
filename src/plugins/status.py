@@ -16,6 +16,7 @@ async def status(context):
     match = re.match(r'^\/(status|状态)$', context['message'])
     if match:
         str_data = f'近十分钟群内聊天数量是{recorder.message_number(10)}条'
+        # FIXME: 如果本月或者今天没人说话的话，就会报错。
         repeat_num = get_total_number(recorder.get_repeat_list())
         msg_num = get_total_number(recorder.get_msg_number_list())
         today_msg_num = get_total_number(
