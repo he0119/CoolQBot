@@ -4,10 +4,12 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2019-05-14
+
 ### Added
 
 - 保存每天的复读和发送消息数量
-- `history` 插件支持按天查询的数据
+- `history` 插件支持按天查询数据
 
 ### Changed
 
@@ -172,7 +174,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/he0119/CoolQBot/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/he0119/CoolQBot/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/he0119/CoolQBot/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/he0119/CoolQBot/compare/v0.5.2...v0.6.0
