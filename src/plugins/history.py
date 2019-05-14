@@ -1,6 +1,7 @@
 """ 历史记录插件
 """
 import re
+from calendar import monthrange
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
@@ -33,19 +34,26 @@ async def clear_data():
 
 @bot.on_message('group', 'private')
 async def history(context):
-    match = re.match(r'^\/history(?: (\d+)(?:\-(\d+))?)?$', context['message'])
+    match = re.match(r'^\/history(?: (\d+)(?:\-(\d+)(?:\-(\d+))?)?)?$',
+                     context['message'])
     if match:
         str_data = ''
+        now = datetime.utcnow()
 
         year = match.group(1)
         month = match.group(2)
+        day = match.group(3)
+
         if year:
             year = int(year)
         if month:
             month = int(month)
+        if day:
+            day = int(day)
 
+        # 确认输入是否合法
         if not year and year != 0:
-            str_data = '欢迎查询历史记录\n如需查询上月数据请输入/history 0\n如需查询指定月份请输入/history year-month(如2018-01)'
+            str_data = '欢迎查询历史记录\n如需查询上月数据请输入/history 0\n如需查询指定月份请输入/history year-month（如 2018-01）\n如需查询指定日期请输入/history year-month-day（如 2018-01-01）'
             return {'reply': str_data, 'at_sender': False}
 
         if not month:
@@ -57,27 +65,53 @@ async def history(context):
 
         if month and year:
             if year < 1 or year > 9999:
-                str_data = '请输入1到9999的年份，超过了我就不能查惹！'
+                str_data = '请输入 1 到 9999 的年份，超过了我就不能查惹！'
                 return {'reply': str_data, 'at_sender': False}
             if month > 12:
-                str_data = '请输入正确的月份，众所周知，一年只有12个月！'
+                str_data = '众所周知，一年只有 12 个月！'
+                return {'reply': str_data, 'at_sender': False}
+            if year == now.year and month > now.month:
+                str_data = '抱歉，小誓约不能穿越时空呢！'
                 return {'reply': str_data, 'at_sender': False}
             date = datetime(year=year, month=month, day=1)
 
-        # 尝试读取历史数据
-        history_filename = get_history_pkl_name(date)
-        if not DATA.exists(f'{history_filename}.pkl'):
-            str_data = f'{date.year}年{date.month}月数据不存在，请换试试吧0.0'
-            return {'reply': str_data, 'at_sender': False}
+        if day:
+            valid_day = monthrange(year, month)[1]
+            if day > valid_day:
+                str_data = f'哼，别以为我不知道 {year} 年 {month} 月只有 {valid_day} 天！'
+                return {'reply': str_data, 'at_sender': False}
+            if year == now.year and month == now.month and day > now.day:
+                str_data = '抱歉，小誓约不能穿越时空呢！'
+                return {'reply': str_data, 'at_sender': False}
 
-        # 如无其他情况，开始获取历史记录，并输出排行榜
-        history_data = DATA.load_pkl(history_filename)
+        # 尝试读取历史数据
+        # 如果是本月就直接从 recorder 中获取数据
+        # 不是则从历史记录中获取
+
+        if year == now.year and month == now.month:
+            history_data = recorder
+        else:
+            history_filename = get_history_pkl_name(date)
+            if not DATA.exists(f'{history_filename}.pkl'):
+                if day:
+                    str_data = f'找不到 {date.year} 年 {date.month} 月 {day} 日的数据，请换个试试吧 ~>_<~'
+                else:
+                    str_data = f'{date.year} 年 {date.month} 月的数据不存在，请换个试试吧 0.0'
+                return {'reply': str_data, 'at_sender': False}
+            data = DATA.load_pkl(history_filename)
+            history_data = Recorder(data)
+
+        if day:
+            repeat_list = history_data.get_repeat_list_by_day(day)
+            msg_number_list = history_data.get_msg_number_list_by_day(day)
+        else:
+            repeat_list = history_data.get_repeat_list()
+            msg_number_list = history_data.get_msg_number_list()
+
+        # 如无其他情况，并输出排行榜
         display_number = 10000
         minimal_msg_number = 0
         display_total_number = True
-
-        repeat_list = history_data['repeat_list']
-        msg_number_list = history_data['msg_number_list']
 
         ranking = Ranking(display_number, minimal_msg_number,
                           display_total_number, repeat_list, msg_number_list)

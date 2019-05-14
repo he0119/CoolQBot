@@ -6,9 +6,11 @@ from coolqbot.bot import bot
 from coolqbot.plugin import PluginData
 from coolqbot.utils import get_history_pkl_name, scheduler
 
+DATA = PluginData('recorder')
+
 
 class Recorder:
-    def __init__(self):
+    def __init__(self, data=None):
         self._name = 'recorder'
 
         # 运行数据
@@ -23,10 +25,7 @@ class Recorder:
         # 是否需要发送问好
         self.send_hello = False
 
-        # 初始化插件数据管理
-        self._data = PluginData('recorder')
-
-        self._load_data()
+        self._load_data(data)
 
     def message_number(self, x):
         """ 返回 x 分钟内的消息条数，并清除之前的消息记录
@@ -61,14 +60,14 @@ class Recorder:
         """
         if day in self._repeat_list:
             return self._repeat_list[day]
-        return None
+        return {}
 
     def get_msg_number_list_by_day(self, day):
         """ 获取某一天的消息数量记录
         """
         if day in self._msg_number_list:
             return self._msg_number_list[day]
-        return None
+        return {}
 
     def add_repeat_list(self, qq):
         """ 该 QQ 号的复读记录，加一
@@ -108,14 +107,14 @@ class Recorder:
                     new_list[qq] = recrod_list[day_list][qq]
         return new_list
 
-    def _load_data(self):
+    def _load_data(self, data):
         """ 加载数据
         """
-        data = None
-        try:
-            data = self._data.load_pkl(self._name)
-        except FileNotFoundError:
-            bot.logger.error('recorder.pkl does not exist!')
+        if not data:
+            try:
+                data = DATA.load_pkl(self._name)
+            except FileNotFoundError:
+                bot.logger.error('recorder.pkl does not exist!')
         if data:
             self.last_message_on = data['last_message_on']
             self._msg_send_time = data['msg_send_time']
@@ -123,7 +122,9 @@ class Recorder:
             self._msg_number_list = data['msg_number_list']
 
     def save_data(self):
-        self._data.save_pkl(self.get_data(), self._name)
+        """ 保存数据
+        """
+        DATA.save_pkl(self.get_data(), self._name)
 
     def get_data(self, history=False):
         """ 如果是 `history` 插件需要的话，不保存一些数据
