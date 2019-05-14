@@ -4,11 +4,18 @@
 
 ## [Unreleased]
 
+### Added
+
+- 保存每天的复读和发送消息数量
+
 ### Changed
 
-- 升级 `CoolQBot-env` 到 `v0.2.2`
-- 每次保存 `Recorder` 数据时，先清理 `msg_send_time` 列表
+- 升级 `CoolQBot-env` 到 `v0.2.3`
 - 删除了天气插件中的百度 API
+
+### Fixed
+
+- 每次保存 `Recorder` 数据时，先清理 `msg_send_time` 列表
 
 ## [0.6.2] - 2019-04-14
 
