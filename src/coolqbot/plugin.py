@@ -1,11 +1,36 @@
 """ 插件相关
 """
 import configparser
-import os
 import pickle
+import re
+from enum import Enum
 
 from coolqbot.bot import bot
 from coolqbot.config import DATA_DIR_PATH, PLUGINS_DIR_PATH
+
+
+class Plugin:
+    def __init__(self, name, *events, config=False):
+        self.name = name
+        self._events = events
+        self.data = PluginData(self.name, config)
+
+    async def on_message(self, context):
+        raise NotImplementedError
+
+    def enable(self):
+        for event in self._events:
+            bot.subscribe(event, self.on_message)
+
+    def disable(self):
+        for event in self._events:
+            bot.unsubscribe(event, self.on_message)
+
+    def reload(self):
+        raise NotImplementedError
+
+    def status(self):
+        raise NotImplementedError
 
 
 class PluginManager:
@@ -14,11 +39,14 @@ class PluginManager:
 
     def __init__(self):
         self._plugin_prefix = 'plugins'
+        self._plugin_list = {}
 
     def _get_plugin_name(self, name):
         return f'{self._plugin_prefix}.{name}'
 
     def load_plugin(self):
+        """ 加载插件
+        """
         filenames = [x.stem for x in PLUGINS_DIR_PATH.iterdir() if x.is_file()]
         for plugin_name in filenames:
             try:
@@ -28,6 +56,56 @@ class PluginManager:
                 bot.logger.error(
                     f'Import error: can not import [{plugin_name}], because {e}'
                 )
+
+    def enable_all(self):
+        """ 启用所有插件
+        """
+        for plugin in self._plugin_list:
+            self._plugin_list[plugin].enable()
+
+    def disable_all(self):
+        """ 禁用所有插件
+        """
+        for plugin in self._plugin_list:
+            self._plugin_list[plugin].disable()
+
+    def enable(self, name):
+        """ 启用插件
+        """
+        if name in self._plugin_list:
+            self._plugin_list[name].enable()
+            return True
+        return False
+
+    def disable(self, name):
+        """ 禁用插件
+        """
+        if name in self._plugin_list:
+            self._plugin_list[name].disable()
+            return True
+        return False
+
+    def reload(self, name):
+        """ 重载插件
+        """
+        if name in self._plugin_list:
+            self._plugin_list[name].reload()
+            return True
+        return False
+
+    def status(self, name):
+        """ 插件状态
+        """
+        if name in self._plugin_list:
+            return self._plugin_list[name].status()
+        return None
+
+    def register(self, plugin):
+        """ 注册插件
+        """
+        if plugin.name in self._plugin_list:
+            raise Exception('Plugin name already registered.')
+        self._plugin_list[plugin.name] = plugin
 
 
 class PluginData:
