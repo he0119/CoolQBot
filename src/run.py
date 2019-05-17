@@ -1,4 +1,4 @@
-from coolqbot.main import run
+from coolqbot import run
 
 
 if __name__ == '__main__':
