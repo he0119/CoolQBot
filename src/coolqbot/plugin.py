@@ -6,7 +6,7 @@ import re
 from enum import Enum
 
 from .bot import bot
-from .config import DATA_DIR_PATH, PLUGINS_DIR_PATH
+from .config import DATA_DIR_PATH, PLUGINS_DIR_PATH, ADMIN_LIST
 
 
 class MessageType(Enum):
@@ -16,8 +16,8 @@ class MessageType(Enum):
 
 
 class Plugin:
-    def __init__(self, name, *events, config=False):
-        self.name = name
+    def __init__(self, *events, config=False):
+        self.name = self.__class__.__name__.lower()
         self._events = events
         self.data = PluginData(self.name, config)
 

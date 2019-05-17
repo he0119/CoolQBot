@@ -14,6 +14,7 @@ def main(debug=False):
     bot.logger.debug('Initializing...')
 
     plugin_manager.load_plugin()
+    plugin_manager.enable_all()
     scheduler.start()
 
     bot.run(host='127.0.0.1', port=8080)

@@ -4,8 +4,7 @@
 """
 import re
 
-from coolqbot.bot import bot
-from coolqbot.utils import plugin_manager
+from coolqbot import bot, plugin_manager
 
 
 @bot.on_message('group', 'private')

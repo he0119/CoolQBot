@@ -29,6 +29,9 @@ GROUP_ID = int(config.get('bot', 'group_id'))
 # 是否是酷Q专业版
 IS_COOLQ_PRO = int(config.get('bot', 'is_coolq_pro'))
 
+# 超级管理员
+ADMIN_LIST = config.get('bot', 'admin').split(',')
+
 
 def init_logger(logger):
     logger.setLevel(logging.INFO)
@@ -39,7 +42,8 @@ def init_logger(logger):
 
     # create formatter
     formatter = logging.Formatter(
-        '%(asctime)s - %(filename)s - %(lineno)s - %(levelname)s - %(message)s')
+        '%(asctime)s - %(filename)s - %(lineno)s - %(levelname)s - %(message)s'
+    )
 
     # add formatter to handler
     fh.setFormatter(formatter)
