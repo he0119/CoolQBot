@@ -4,9 +4,11 @@ import platform
 from pathlib import Path
 
 from aiocqhttp import CQHttp
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from .config import Config
-
+from .logger import init_logger
+from .plugin import PluginManager
 
 class CoolQBot(CQHttp):
     def __init__(self,
@@ -50,6 +52,25 @@ class CoolQBot(CQHttp):
 
         # 机器人的配置信息
         self.config = Config(default_config)
+
+        # 任务调度
+        self.scheduler = AsyncIOScheduler()
+
+        # 插件管理器
+        self.plugin_manager = PluginManager(self)
+
+    def init_bot(self):
+        if bot.config['CONFIG_FILE_PATH'].exists():
+            bot.config.from_file(bot.config['CONFIG_FILE_PATH'])
+
+        init_logger(self)
+        bot.logger.debug('Initializing...')
+
+        self.plugin_manager.load_plugin()
+        self.plugin_manager.enable_all()
+        self.scheduler.start()
+
+        bot.run(host='127.0.0.1', port=8080)
 
 
 bot = CoolQBot(enable_http_post=False)

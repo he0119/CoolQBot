@@ -1,5 +1,5 @@
-from coolqbot import run
+from coolqbot import bot
 
 
 if __name__ == '__main__':
-    run()
+    bot.init_bot()

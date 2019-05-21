@@ -5,7 +5,7 @@ import re
 
 import requests
 
-from coolqbot import MessageType, Plugin, plugin_manager
+from coolqbot import MessageType, Plugin, bot
 
 
 class Bilibili(Plugin):
@@ -29,5 +29,5 @@ class Bilibili(Plugin):
                 return {'reply': "获取番剧信息失败了~>_<~", 'at_sender': False}
 
 
-plugin_manager.register(
-    Bilibili(MessageType.Group, MessageType.Private))
+bot.plugin_manager.register(
+    Bilibili(bot, MessageType.Group, MessageType.Private))

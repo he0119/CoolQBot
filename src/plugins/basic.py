@@ -3,11 +3,10 @@
 import re
 
 from coolqbot.bot import bot
-from coolqbot.utils import scheduler
 from plugins.recorder import recorder
 
 
-@scheduler.scheduled_job('interval', seconds=5, id='coolq_status')
+@bot.scheduler.scheduled_job('interval', seconds=5, id='coolq_status')
 async def coolq_status():
     """ 检查酷Q状态
 

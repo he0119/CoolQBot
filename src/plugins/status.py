@@ -6,7 +6,6 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from coolqbot.bot import bot
-from coolqbot.utils import scheduler
 from plugins.recorder import recorder
 
 
@@ -57,7 +56,7 @@ def get_total_number(record_list):
     return num
 
 
-@scheduler.scheduled_job('interval', seconds=5, id='check_status')
+@bot.scheduler.scheduled_job('interval', seconds=5, id='check_status')
 async def check_status():
     """ 检测是否需要发送问好信息
     """

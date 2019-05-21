@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 
 from coolqbot.bot import bot
 from coolqbot.plugin import PluginData
-from coolqbot.utils import get_history_pkl_name, scheduler
+from .utils import get_history_pkl_name
 
-DATA = PluginData('recorder')
+DATA = PluginData('recorder', bot.config['DATA_DIR_PATH'])
 
 
 class Recorder:
@@ -152,7 +152,7 @@ class Recorder:
 recorder = Recorder()
 
 
-@scheduler.scheduled_job('interval', minutes=1, id='save_recorder')
+@bot.scheduler.scheduled_job('interval', minutes=1, id='save_recorder')
 async def save_recorder():
     """ 每隔一分钟保存一次数据
     """

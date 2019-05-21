@@ -8,7 +8,7 @@ from coolqbot.bot import bot
 from coolqbot.plugin import PluginData
 from plugins.recorder import recorder
 
-DATA = PluginData('repeat', config=True)
+DATA = PluginData('repeat', bot.config['DATA_DIR_PATH'], config=True)
 # 复读概率
 REPEAT_RATE = int(DATA.config_get('bot', 'repeat_rate', fallback='10'))
 # 复读间隔

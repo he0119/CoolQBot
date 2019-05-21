@@ -5,8 +5,8 @@ import pickle
 import re
 from enum import Enum
 
-from .bot import bot
 from .exceptions import PluginNotExistError
+
 
 class MessageType(Enum):
     All = 'message'
@@ -15,21 +15,25 @@ class MessageType(Enum):
 
 
 class Plugin:
-    def __init__(self, *events, config=False):
+    def __init__(self, bot, *events, config=False):
         self.name = self.__class__.__name__.lower()
+        self._bot = bot
         self._events = events
-        self.data = PluginData(self.name, config)
+
+        self.data = PluginData(self.name,
+                               self._bot.config['DATA_DIR_PATH'],
+                               config=config)
 
     async def on_message(self, context):
         raise NotImplementedError
 
     def enable(self):
         for event in self._events:
-            bot.subscribe(event.value, self.on_message)
+            self._bot.subscribe(event.value, self.on_message)
 
     def disable(self):
         for event in self._events:
-            bot.unsubscribe(event.value, self.on_message)
+            self._bot.unsubscribe(event.value, self.on_message)
 
     def reload(self):
         raise NotImplementedError
@@ -45,15 +49,15 @@ class PluginData:
     提供保存和读取文件/数据的方法。
     """
 
-    def __init__(self, name, config=False):
+    def __init__(self, name, data_dir_path, config=False):
         # 插件名，用来确定插件的文件夹位置
         self._name = name
-        self._base_path = bot.config['DATA_DIR_PATH'] / f'plugin-{name}'
+        self._base_path = data_dir_path / f'plugin-{name}'
 
         # TODO: 如果第一次调用的时候不存在再创建，如没有调用则不创建
         # 如果文件夹不存在则自动新建
-        if not bot.config['DATA_DIR_PATH'].exists():
-            bot.config['DATA_DIR_PATH'].mkdir()
+        if not data_dir_path.exists():
+            data_dir_path.mkdir()
         if not self._base_path.exists():
             self._base_path.mkdir()
 
@@ -135,9 +139,10 @@ class PluginManager:
     """ 插件管理器
     """
 
-    def __init__(self):
+    def __init__(self, bot):
         self._plugin_prefix = 'plugins'
         self._plugin_list = {}
+        self._bot = bot
 
     def _get_plugin_name(self, name):
         return f'{self._plugin_prefix}.{name}'
@@ -146,15 +151,15 @@ class PluginManager:
         """ 加载插件
         """
         filenames = [
-            x.stem for x in bot.config['PLUGINS_DIR_PATH'].iterdir()
+            x.stem for x in self._bot.config['PLUGINS_DIR_PATH'].iterdir()
             if x.is_file()
         ]
         for plugin_name in filenames:
             try:
                 __import__(self._get_plugin_name(plugin_name))
-                bot.logger.debug(f'Plugin [{plugin_name}] loaded.')
+                self._bot.logger.debug(f'Plugin [{plugin_name}] loaded.')
             except ImportError as e:
-                bot.logger.error(
+                self._bot.logger.error(
                     f'Import error: can not import [{plugin_name}], because {e}'
                 )
 
@@ -175,7 +180,7 @@ class PluginManager:
         """
         if name in self._plugin_list:
             self._plugin_list[name].enable()
-            bot.logger.info(f'已启用 {name}')
+            self._bot.logger.info(f'已启用 {name}')
         else:
             raise PluginNotExistError()
 
@@ -184,7 +189,7 @@ class PluginManager:
         """
         if name in self._plugin_list:
             self._plugin_list[name].disable()
-            bot.logger.info(f'已禁用 {name}')
+            self._bot.logger.info(f'已禁用 {name}')
         else:
             raise PluginNotExistError()
 
@@ -193,7 +198,7 @@ class PluginManager:
         """
         if name in self._plugin_list:
             self._plugin_list[name].reload()
-            bot.logger.info(f'已重载 {name}')
+            self._bot.logger.info(f'已重载 {name}')
         else:
             raise PluginNotExistError()
 
@@ -213,6 +218,3 @@ class PluginManager:
         if plugin.name in self._plugin_list:
             raise Exception('Plugin name already registered.')
         self._plugin_list[plugin.name] = plugin
-
-
-plugin_manager = PluginManager()

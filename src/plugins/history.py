@@ -8,14 +8,14 @@ from dateutil.relativedelta import relativedelta
 
 from coolqbot.bot import bot
 from coolqbot.plugin import PluginData
-from coolqbot.utils import get_history_pkl_name, scheduler
+from .utils import get_history_pkl_name
 from plugins.rank import Ranking
 from plugins.recorder import Recorder, recorder
 
-DATA = PluginData('history')
+DATA = PluginData('history', bot.config['DATA_DIR_PATH'])
 
 
-@scheduler.scheduled_job('cron',
+@bot.scheduler.scheduled_job('cron',
                          day=1,
                          hour=0,
                          minute=0,
