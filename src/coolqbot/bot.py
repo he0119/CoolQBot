@@ -1,11 +1,11 @@
 """ Bot
 """
+import platform
 from pathlib import Path
 
 from aiocqhttp import CQHttp
 
 from .config import Config
-import platform
 
 
 class CoolQBot(CQHttp):
@@ -30,17 +30,19 @@ class CoolQBot(CQHttp):
             config_file_path = Path('/home/user/coolq/bot/bot.ini')
             log_file_path = Path('/home/user/coolq/bot/bot.log')
             data_dir_path = Path('/home/user/coolq/bot/data')
+            plugins_dir_path = Path('/home/user/coolqbot/plugins')
         else:
             config_file_path = Path('bot/bot.ini')
             log_file_path = Path('bot/bot.log')
             data_dir_path = Path('bot/data')
+            plugins_dir_path = Path('plugins')
 
         default_config = {
             'GROUP_ID': None,
             'IS_COOLQ_PRO': False,
             'ADMIN': None,
             'DEBUG': False,
-            'PLUGINS_DIR_PATH': Path('plugins'),
+            'PLUGINS_DIR_PATH': plugins_dir_path,
             'CONFIG_FILE_PATH': config_file_path,
             'LOG_FILE_PATH': log_file_path,
             'DATA_DIR_PATH': data_dir_path

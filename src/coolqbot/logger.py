@@ -10,7 +10,7 @@ def init_logger(bot):
 
     # create file handler and set level to debug
     fh = logging.FileHandler(bot.config['LOG_FILE_PATH'], encoding='UTF-8')
-    fh.setLevel(logging.INFO)
+    fh.setLevel(logging.DEBUG)
 
     # create formatter
     formatter = logging.Formatter(
