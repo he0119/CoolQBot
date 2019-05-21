@@ -5,7 +5,6 @@ import secrets
 from datetime import datetime, timedelta
 
 from coolqbot.bot import bot
-from coolqbot.config import GROUP_ID, IS_COOLQ_PRO
 from coolqbot.plugin import PluginData
 from plugins.recorder import recorder
 
@@ -18,7 +17,7 @@ REPEAT_INTERVAL = int(DATA.config_get('bot', 'repeat_interval', fallback='1'))
 
 def is_repeat(msg):
     # 只复读指定群内消息
-    if msg['group_id'] != GROUP_ID:
+    if msg['group_id'] != bot.config['GROUP_ID']:
         return False
 
     # 不要复读指令
@@ -37,7 +36,7 @@ def is_repeat(msg):
 
     # 如果不是PRO版本则不复读纯图片
     match = re.search(r'\[CQ:image[^\]]+\]$', msg['message'])
-    if match and not IS_COOLQ_PRO:
+    if match and not bot.config['IS_COOLQ_PRO']:
         return False
 
     # 不要复读应用消息
@@ -97,7 +96,7 @@ async def repeat(context):
 async def repeat_sign(context):
     """ 复读签到(电脑上没法看手机签到内容)
     """
-    if context['group_id'] == GROUP_ID:
+    if context['group_id'] == bot.config['GROUP_ID']:
         match = re.match(r'^\[CQ:sign(.+)\]$', context['message'])
         if match:
             title = re.findall(r'title=(\w+\s?\w+)', context['message'])

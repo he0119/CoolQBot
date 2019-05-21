@@ -6,7 +6,6 @@ from random import randint
 import requests
 
 from coolqbot.bot import bot
-from coolqbot.config import GROUP_ID
 from coolqbot.plugin import PluginData
 from coolqbot.utils import scheduler
 
@@ -27,7 +26,7 @@ async def morning():
     """
     hello_str = get_message()
     await bot.send_msg(message_type='group',
-                       group_id=GROUP_ID,
+                       group_id=bot.config['GROUP_ID'],
                        message=hello_str)
     bot.logger.info('发送问好信息')
 

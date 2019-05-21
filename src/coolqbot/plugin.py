@@ -6,8 +6,7 @@ import re
 from enum import Enum
 
 from .bot import bot
-from .config import DATA_DIR_PATH, PLUGINS_DIR_PATH, ADMIN_LIST
-
+from .exceptions import PluginNotExistError
 
 class MessageType(Enum):
     All = 'message'
@@ -33,10 +32,10 @@ class Plugin:
             bot.unsubscribe(event.value, self.on_message)
 
     def reload(self):
-        pass
+        raise NotImplementedError
 
     def status(self):
-        pass
+        raise NotImplementedError
 
 
 class PluginData:
@@ -49,11 +48,12 @@ class PluginData:
     def __init__(self, name, config=False):
         # 插件名，用来确定插件的文件夹位置
         self._name = name
-        self._base_path = DATA_DIR_PATH / f'plugin-{name}'
+        self._base_path = bot.config['DATA_DIR_PATH'] / f'plugin-{name}'
 
+        # TODO: 如果第一次调用的时候不存在再创建，如没有调用则不创建
         # 如果文件夹不存在则自动新建
-        if not DATA_DIR_PATH.exists():
-            DATA_DIR_PATH.mkdir()
+        if not bot.config['DATA_DIR_PATH'].exists():
+            bot.config['DATA_DIR_PATH'].mkdir()
         if not self._base_path.exists():
             self._base_path.mkdir()
 
@@ -67,10 +67,14 @@ class PluginData:
                 self._save_config()
 
     def save_pkl(self, data, filename):
+        """ 保存到 `pkl` 文件
+        """
         with self.open(f'{filename}.pkl', 'wb') as f:
             pickle.dump(data, f)
 
     def load_pkl(self, filename):
+        """ 加载 `pkl` 文件
+        """
         with self.open(f'{filename}.pkl', 'rb') as f:
             data = pickle.load(f)
         return data
@@ -113,6 +117,10 @@ class PluginData:
             self.config.write(configfile)
 
     def open(self, filename, open_mode='r'):
+        """ 打开文件
+
+        默认只读模式
+        """
         path = self._base_path / filename
         return open(path, open_mode)
 
@@ -137,7 +145,10 @@ class PluginManager:
     def load_plugin(self):
         """ 加载插件
         """
-        filenames = [x.stem for x in PLUGINS_DIR_PATH.iterdir() if x.is_file()]
+        filenames = [
+            x.stem for x in bot.config['PLUGINS_DIR_PATH'].iterdir()
+            if x.is_file()
+        ]
         for plugin_name in filenames:
             try:
                 __import__(self._get_plugin_name(plugin_name))
@@ -165,8 +176,8 @@ class PluginManager:
         if name in self._plugin_list:
             self._plugin_list[name].enable()
             bot.logger.info(f'已启用 {name}')
-            return True
-        return False
+        else:
+            raise PluginNotExistError()
 
     def disable(self, name):
         """ 禁用插件
@@ -174,8 +185,8 @@ class PluginManager:
         if name in self._plugin_list:
             self._plugin_list[name].disable()
             bot.logger.info(f'已禁用 {name}')
-            return True
-        return False
+        else:
+            raise PluginNotExistError()
 
     def reload(self, name):
         """ 重载插件
@@ -183,15 +194,16 @@ class PluginManager:
         if name in self._plugin_list:
             self._plugin_list[name].reload()
             bot.logger.info(f'已重载 {name}')
-            return True
-        return False
+        else:
+            raise PluginNotExistError()
 
     def status(self, name):
         """ 插件状态
         """
         if name in self._plugin_list:
             return self._plugin_list[name].status()
-        return None
+        else:
+            raise PluginNotExistError()
 
     def register(self, plugin):
         """ 注册插件

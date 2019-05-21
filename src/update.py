@@ -24,11 +24,17 @@ for f in home.iterdir():
     if f.suffix == '.pkl':
         data = load_pkl(f)
         data['msg_send_time'] = []
-        tmp = data['repeat_list']
-        data['repeat_list'] = {}
-        data['repeat_list'][0] = tmp
-        tmp = data['msg_number_list']
-        data['msg_number_list'] = {}
-        data['msg_number_list'][0] = tmp
+
+        # 已经升级的数据无需升级
+        if 0 not in data['repeat_list']:
+            tmp = data['repeat_list']
+            data['repeat_list'] = {}
+            data['repeat_list'][0] = tmp
+
+        if 0 not in data['msg_number_list']:
+            tmp = data['msg_number_list']
+            data['msg_number_list'] = {}
+            data['msg_number_list'][0] = tmp
+
         save_pkl(data, f)
         print(data)

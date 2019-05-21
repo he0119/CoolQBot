@@ -1,52 +1,30 @@
 """ 配置文件，不同平台设置不同
 """
 import configparser
-import logging
-import os
-import platform
-from pathlib import Path
-
-HOME_DIR_PATH = Path(__file__).parents[1]
-
-if platform.system() == 'Linux':
-    CONFIG_PATH = Path('/home/user/coolq/bot/bot.ini')
-    LOG_FILE_PATH = Path('/home/user/coolq/bot/bot.log')
-    DATA_DIR_PATH = Path('/home/user/coolq/bot/data')
-else:
-    CONFIG_PATH = Path('bot.ini')
-    LOG_FILE_PATH = Path('bot.log')
-    DATA_DIR_PATH = HOME_DIR_PATH / 'data'
-
-PLUGINS_DIR_PATH = HOME_DIR_PATH / 'plugins'
-
-# 读取配置文件
-config = configparser.ConfigParser()
-config.read(CONFIG_PATH)
-
-# 复读群号
-GROUP_ID = int(config.get('bot', 'group_id'))
-
-# 是否是酷Q专业版
-IS_COOLQ_PRO = int(config.get('bot', 'is_coolq_pro'))
-
-# 超级管理员
-ADMIN_LIST = config.get('bot', 'admin').split(',')
 
 
-def init_logger(logger):
-    logger.setLevel(logging.INFO)
+class Config(dict):
+    def __init__(self, defaults=None):
+        super().__init__(defaults or {})
 
-    # create file handler and set level to debug
-    fh = logging.FileHandler(LOG_FILE_PATH, encoding='UTF-8')
-    fh.setLevel(logging.INFO)
+    def from_object(self, obj):
+        """ 从对象中获取配置
+        """
+        for key in dir(obj):
+            if key.isupper():
+                self[key] = getattr(obj, key)
 
-    # create formatter
-    formatter = logging.Formatter(
-        '%(asctime)s - %(filename)s - %(lineno)s - %(levelname)s - %(message)s'
-    )
+    def from_file(self, path):
+        """ 从配置文件中获取配置
 
-    # add formatter to handler
-    fh.setFormatter(formatter)
+        `ini` 格式，`bot` 下的值
+        """
+        # 读取配置文件
+        config = configparser.ConfigParser()
+        config.read(path)
 
-    # add ch to logger
-    logger.addHandler(fh)
+        if 'bot' not in config:
+            return
+
+        for key in config['bot']:
+            self[key.upper()] = config['bot'][key]

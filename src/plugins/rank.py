@@ -5,7 +5,6 @@ import re
 from operator import itemgetter
 
 from coolqbot.bot import bot
-from coolqbot.config import GROUP_ID
 from plugins.recorder import recorder
 
 
@@ -121,7 +120,7 @@ async def nikcname(user_id):
     """ 输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称
     """
     try:
-        msg = await bot.get_group_member_info(group_id=GROUP_ID,
+        msg = await bot.get_group_member_info(group_id=bot.config['GROUP_ID'],
                                               user_id=user_id,
                                               no_cache=True)
         if msg['card']:

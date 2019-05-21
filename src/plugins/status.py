@@ -6,7 +6,6 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from coolqbot.bot import bot
-from coolqbot.config import GROUP_ID
 from coolqbot.utils import scheduler
 from plugins.recorder import recorder
 
@@ -65,7 +64,7 @@ async def check_status():
     if recorder.coolq_status and not recorder.send_hello:
         hello_str = get_message()
         await bot.send_msg(message_type='group',
-                           group_id=GROUP_ID,
+                           group_id=bot.config['GROUP_ID'],
                            message=hello_str)
         recorder.send_hello = True
         bot.logger.info('发送问好信息')
