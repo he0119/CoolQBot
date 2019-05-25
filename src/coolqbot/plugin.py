@@ -9,6 +9,8 @@ from .exceptions import PluginNotExistError
 
 
 class MessageType(Enum):
+    """ 消息种类
+    """
     All = 'message'
     Group = 'message.group'
     Private = 'message.private'

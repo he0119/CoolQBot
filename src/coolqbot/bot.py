@@ -1,4 +1,4 @@
-""" Bot
+""" CoolQBot 类
 """
 import platform
 from pathlib import Path
@@ -8,9 +8,13 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from .config import Config
 from .logger import init_logger
-from .plugin import PluginManager
+from .plugin import Plugin, PluginManager
+
 
 class CoolQBot(CQHttp):
+    # Plugin 类，所有插件都应该是这个类
+    Plugin = Plugin
+
     def __init__(self,
                  api_root=None,
                  access_token=None,
@@ -27,7 +31,7 @@ class CoolQBot(CQHttp):
                          *args,
                          **kwargs)
 
-        # 如果在 Docker 中
+        # 根据运行的系统，配置不同的设置
         if platform.system() == 'Linux':
             config_file_path = Path('/home/user/coolq/bot/bot.ini')
             log_file_path = Path('/home/user/coolq/bot/bot.log')
@@ -41,8 +45,8 @@ class CoolQBot(CQHttp):
 
         default_config = {
             'GROUP_ID': None,
-            'IS_COOLQ_PRO': False,
             'ADMIN': None,
+            'IS_COOLQ_PRO': False,
             'DEBUG': False,
             'PLUGINS_DIR_PATH': plugins_dir_path,
             'CONFIG_FILE_PATH': config_file_path,
@@ -59,18 +63,20 @@ class CoolQBot(CQHttp):
         # 插件管理器
         self.plugin_manager = PluginManager(self)
 
-    def init_bot(self):
-        if bot.config['CONFIG_FILE_PATH'].exists():
-            bot.config.from_file(bot.config['CONFIG_FILE_PATH'])
+    def run(self, host=None, port=None, *args, **kwargs):
+        # 如果机器人配置文件存在则先读取配置
+        if self.config['CONFIG_FILE_PATH'].exists():
+            self.config.from_file(self.config['CONFIG_FILE_PATH'])
 
+        # 初始化日志
         init_logger(self)
-        bot.logger.debug('Initializing...')
+        self.logger.debug('CoolQBot 启动中...')
 
+        # 加载并启用所有的插件
+        # TODO: 记录插件的启用/禁用情况，恢复上次记录的状态
         self.plugin_manager.load_plugin()
         self.plugin_manager.enable_all()
+        # 启动计划任务
         self.scheduler.start()
 
-        bot.run(host='127.0.0.1', port=8080)
-
-
-bot = CoolQBot(enable_http_post=False)
+        super().run(host=host, port=port, *args, **kwargs)
