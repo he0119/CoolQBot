@@ -74,12 +74,12 @@ class History(bot.Plugin):
                 history_filename = get_history_pkl_name(date)
                 if not self.data.exists(f'{history_filename}.pkl'):
                     if day:
-                        str_data = f'找不到 {year} 年 {month} 月 {day} 日的数据，请换个试试吧 ~>_<~'
+                        str_data = f'找不到 {date.year} 年 {date.month} 月 {day} 日的数据，请换个试试吧 ~>_<~'
                     else:
-                        str_data = f'{year} 年 {month} 月的数据不存在，请换个试试吧 0.0'
+                        str_data = f'{date.year} 年 {date.month} 月的数据不存在，请换个试试吧 0.0'
                     return {'reply': str_data, 'at_sender': False}
                 data = self.data.load_pkl(history_filename)
-                history_data = Recorder(data)
+                history_data = Recorder(self._bot, data)
 
             if day:
                 repeat_list = history_data.get_repeat_list_by_day(day)
