@@ -4,41 +4,46 @@ import collections
 import re
 from operator import itemgetter
 
-from coolqbot.bot import bot
-from plugins.recorder import recorder
+from coolqbot import MessageType, bot
+
+from .recorder import recorder
 
 
-@bot.on_message('group', 'private')
-async def rank(context):
-    match = re.match(r'^\/rank(?: (?:(\d+))?(?:n(\d+))?)?$',
-                     context['message'])
-    if match:
-        display_number = match.group(1)
-        minimal_msg_number = match.group(2)
-        display_total_number = False
+class Rank(bot.Plugin):
+    async def on_message(self, context):
+        match = re.match(r'^\/rank(?: (?:(\d+))?(?:n(\d+))?)?$',
+                         context['message'])
+        if match:
+            display_number = match.group(1)
+            minimal_msg_number = match.group(2)
+            display_total_number = False
 
-        if display_number:
-            display_number = int(display_number)
-        else:
-            display_number = 3
+            if display_number:
+                display_number = int(display_number)
+            else:
+                display_number = 3
 
-        if minimal_msg_number:
-            minimal_msg_number = int(minimal_msg_number)
-            display_total_number = True
-        else:
-            minimal_msg_number = 30
+            if minimal_msg_number:
+                minimal_msg_number = int(minimal_msg_number)
+                display_total_number = True
+            else:
+                minimal_msg_number = 30
 
-        repeat_list = recorder.get_repeat_list()
-        msg_number_list = recorder.get_msg_number_list()
+            repeat_list = recorder.get_repeat_list()
+            msg_number_list = recorder.get_msg_number_list()
 
-        ranking = Ranking(display_number, minimal_msg_number,
-                          display_total_number, repeat_list, msg_number_list)
-        str_data = await ranking.ranking()
+            ranking = Ranking(display_number, minimal_msg_number,
+                              display_total_number, repeat_list,
+                              msg_number_list)
+            str_data = await ranking.ranking()
 
-        if not str_data:
-            str_data = '暂时还没有满足条件的数据~>_<~'
+            if not str_data:
+                str_data = '暂时还没有满足条件的数据~>_<~'
 
-        return {'reply': str_data, 'at_sender': False}
+            return {'reply': str_data, 'at_sender': False}
+
+
+bot.plugin_manager.register(Rank(bot, MessageType.Group, MessageType.Private))
 
 
 class Ranking:

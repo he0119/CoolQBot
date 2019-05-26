@@ -2,16 +2,14 @@
 """
 from datetime import datetime, timedelta
 
-from coolqbot.bot import bot
-from coolqbot.plugin import PluginData
+from coolqbot import bot
+
 from .utils import get_history_pkl_name
 
-DATA = PluginData('recorder', bot.config['DATA_DIR_PATH'])
 
-
-class Recorder:
-    def __init__(self, data=None):
-        self._name = 'recorder'
+class Recorder(bot.Plugin):
+    def __init__(self, bot, *events, data=None, config=False):
+        super().__init__(bot, *events, config=config)
 
         # 运行数据
         self.last_message_on = datetime.now()
@@ -112,7 +110,7 @@ class Recorder:
         """
         if not data:
             try:
-                data = DATA.load_pkl(self._name)
+                data = self.data.load_pkl(self.name)
             except FileNotFoundError:
                 bot.logger.error('recorder.pkl does not exist!')
         if data:
@@ -124,7 +122,7 @@ class Recorder:
     def save_data(self):
         """ 保存数据
         """
-        DATA.save_pkl(self.get_data(), self._name)
+        self.data.save_pkl(self.get_data(), self.name)
 
     def get_data(self, history=False):
         """ 如果是 `history` 插件需要的话，不保存一些数据
@@ -149,7 +147,7 @@ class Recorder:
         self._msg_number_list = {}
 
 
-recorder = Recorder()
+recorder = Recorder(bot)
 
 
 @bot.scheduler.scheduled_job('interval', minutes=1, id='save_recorder')

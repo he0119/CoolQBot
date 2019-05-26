@@ -5,10 +5,10 @@ import re
 
 import requests
 
-from coolqbot import MessageType, Plugin, bot
+from coolqbot import MessageType, bot
 
 
-class Bilibili(Plugin):
+class Bilibili(bot.Plugin):
     async def on_message(self, context):
         match = re.match(r'^\/bilibili$', context['message'])
         if match:

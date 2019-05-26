@@ -2,19 +2,24 @@
 """
 import re
 
-from coolqbot.bot import bot
+from coolqbot import MessageType, bot
 
 
-@bot.on_message('group', 'private')
-async def ban(context):
-    match = re.match(r'^\/ban(?: (\d*))?$', context['message'])
-    if match:
-        args = match.group(1)
+class Ban(bot.Plugin):
+    async def on_message(self, context):
+        match = re.match(r'^\/ban(?: (\d*))?$', context['message'])
+        if match:
+            args = match.group(1)
 
-        if args:
-            duration = int(args) * 60
-        else:
-            # 默认10分钟
-            duration = 10 * 60
+            if args:
+                duration = int(args) * 60
+            else:
+                # 默认10分钟
+                duration = 10 * 60
 
-        await bot.set_group_ban(group_id=bot.config['GROUP_ID'], user_id=context['user_id'], duration=duration)
+            await bot.set_group_ban(group_id=bot.config['GROUP_ID'],
+                                    user_id=context['user_id'],
+                                    duration=duration)
+
+
+bot.plugin_manager.register(Ban(bot, MessageType.Group, MessageType.Private))

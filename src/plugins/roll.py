@@ -3,21 +3,24 @@
 import re
 from random import randint
 
-from coolqbot.bot import bot
+from coolqbot import MessageType, bot
 
 
-@bot.on_message('group', 'private')
-async def roll(context):
-    match = re.match(r'^\/roll(?: (.*))?$', context['message'])
-    if match:
-        args = match.group(1)
+class Roll(bot.Plugin):
+    async def on_message(self, context):
+        match = re.match(r'^\/roll(?: (.*))?$', context['message'])
+        if match:
+            args = match.group(1)
 
-        if args:
-            str_data = roll_dices(args)
-        else:
-            str_data = '欢迎使用 NGA 风格 ROLL 点插件\n你可以 /roll d100\n也可以 /roll 2d100+2d50'
+            if args:
+                str_data = roll_dices(args)
+            else:
+                str_data = '欢迎使用 NGA 风格 ROLL 点插件\n你可以 /roll d100\n也可以 /roll 2d100+2d50'
 
-        return {'reply': str_data, 'at_sender': False}
+            return {'reply': str_data, 'at_sender': False}
+
+
+bot.plugin_manager.register(Roll(bot, MessageType.Group, MessageType.Private))
 
 
 def roll_dices(input_str):

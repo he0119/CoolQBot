@@ -6,19 +6,22 @@ import urllib
 
 import requests
 
-from coolqbot.bot import bot
+from coolqbot import MessageType, bot
 
 
-@bot.on_message('group', 'private')
-async def weather(context):
-    match = re.match(r'^\/(?:天气|weather)(?: (\w*))?$', context['message'])
-    if match:
-        city = match.group(1)
-        str_data = heweather(city)
-        if not str_data:
-            str_data = f'我才不是因为不知道才不告诉你{city}的天气呢'
-        return {'reply': str_data, 'at_sender': False}
+class Weather(bot.Plugin):
+    async def on_message(self, context):
+        match = re.match(r'^\/(?:天气|weather)(?: (\w*))?$', context['message'])
+        if match:
+            city = match.group(1)
+            str_data = heweather(city)
+            if not str_data:
+                str_data = f'我才不是因为不知道才不告诉你{city}的天气呢'
+            return {'reply': str_data, 'at_sender': False}
 
+
+bot.plugin_manager.register(
+    Weather(bot, MessageType.Group, MessageType.Private))
 
 KEY = '6ff5a040195245328b3cdc693d1c0bb2'
 

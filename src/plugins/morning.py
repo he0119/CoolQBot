@@ -5,14 +5,19 @@ from random import randint
 
 import requests
 
-from coolqbot.bot import bot
-from coolqbot.plugin import PluginData
+from coolqbot import MessageType, bot
 
-DATA = PluginData('morning', bot.config['DATA_DIR_PATH'], config=True)
 
-HOUR = int(DATA.config_get('morning', 'hour', fallback='7'))
-MINUTE = int(DATA.config_get('morning', 'minute', fallback='30'))
-SECOND = int(DATA.config_get('morning', 'second', fallback='0'))
+class Morning(bot.Plugin):
+    pass
+
+
+morning_plugin = Morning(bot, config=True)
+
+HOUR = int(morning_plugin.data.config_get('morning', 'hour', fallback='7'))
+MINUTE = int(morning_plugin.data.config_get('morning', 'minute',
+                                            fallback='30'))
+SECOND = int(morning_plugin.data.config_get('morning', 'second', fallback='0'))
 
 
 @bot.scheduler.scheduled_job('cron',

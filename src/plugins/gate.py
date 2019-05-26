@@ -3,7 +3,7 @@
 import re
 from random import randint
 
-from coolqbot.bot import bot
+from coolqbot import MessageType, bot
 
 TEXTS = [
     '掐指一算，你应该走[direction]！',
@@ -18,21 +18,26 @@ TEXTS = [
 ]
 
 
-@bot.on_message('group', 'private')
-async def gate(context):
-    match = re.match(r'^\/gate(?: (\d*))?$', context['message'])
-    if match:
-        args = match.group(1)
+class Gate(bot.Plugin):
+    async def on_message(self, context):
+        match = re.match(r'^\/gate(?: (\d*))?$', context['message'])
+        if match:
+            args = match.group(1)
 
-        door_number = 2
-        if args == '3':
-            door_number = 3
+            door_number = 2
+            if args == '3':
+                door_number = 3
 
-        text_index = randint(0, len(TEXTS) - 1)
+            text_index = randint(0, len(TEXTS) - 1)
 
-        direction = get_direction(door_number)
+            direction = get_direction(door_number)
 
-        return {'reply': TEXTS[text_index].replace('[direction]', direction)}
+            return {
+                'reply': TEXTS[text_index].replace('[direction]', direction)
+            }
+
+
+bot.plugin_manager.register(Gate(bot, MessageType.Group, MessageType.Private))
 
 
 def get_direction(door_number):
