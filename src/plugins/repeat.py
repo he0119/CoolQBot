@@ -8,6 +8,8 @@ from coolqbot import MessageType, bot
 
 from .recorder import recorder
 
+GROUP_ID = int(bot.config['GROUP_ID'])
+
 
 class Repeat(bot.Plugin):
     def __init__(self, bot, *events):
@@ -27,7 +29,7 @@ class Repeat(bot.Plugin):
 
     def _is_repeat(self, context):
         # 只复读指定群内消息
-        if context['group_id'] != bot.config['GROUP_ID']:
+        if context['group_id'] != GROUP_ID:
             return False
 
         # 不要复读指令
@@ -102,7 +104,7 @@ class RepeatSign(bot.Plugin):
     async def on_message(self, context):
         """ 复读签到(电脑上没法看手机签到内容)
         """
-        if context['group_id'] == bot.config['GROUP_ID']:
+        if context['group_id'] == GROUP_ID:
             match = re.match(r'^\[CQ:sign(.+)\]$', context['message'])
             if match:
                 title = re.findall(r'title=(\w+\s?\w+)', context['message'])
