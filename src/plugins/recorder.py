@@ -8,8 +8,8 @@ from .utils import get_history_pkl_name
 
 
 class Recorder(bot.Plugin):
-    def __init__(self, bot, *events, data=None, config=False):
-        super().__init__(bot, *events, config=config)
+    def __init__(self, bot, *events, init_data=None, data=False, config=False):
+        super().__init__(bot, *events, data=data, config=config)
 
         # 运行数据
         self.last_message_on = datetime.now()
@@ -23,7 +23,7 @@ class Recorder(bot.Plugin):
         # 是否需要发送问好
         self.send_hello = False
 
-        self._load_data(data)
+        self._load_data(init_data)
 
     def message_number(self, x):
         """ 返回 x 分钟内的消息条数，并清除之前的消息记录
@@ -147,7 +147,7 @@ class Recorder(bot.Plugin):
         self._msg_number_list = {}
 
 
-recorder = Recorder(bot)
+recorder = Recorder(bot, data=True)
 
 
 @bot.scheduler.scheduled_job('interval', minutes=1, id='save_recorder')

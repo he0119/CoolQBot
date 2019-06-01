@@ -111,7 +111,10 @@ class History(bot.Plugin):
             return {'reply': str_data, 'at_sender': False}
 
 
-history_plugin = History(bot, MessageType.Group, MessageType.Private)
+history_plugin = History(bot,
+                         MessageType.Group,
+                         MessageType.Private,
+                         data=True)
 bot.plugin_manager.register(history_plugin)
 
 

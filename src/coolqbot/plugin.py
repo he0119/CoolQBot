@@ -17,14 +17,16 @@ class MessageType(Enum):
 
 
 class Plugin:
-    def __init__(self, bot, *events, config=False):
+    def __init__(self, bot, *events, data=False, config=False):
         self.name = self.__class__.__name__.lower()
         self._bot = bot
         self._events = events
 
-        self.data = PluginData(self.name,
-                               self._bot.config['DATA_DIR_PATH'],
-                               config=config)
+        # 只有当插件需要保存数据时，才初始化 `data` 管理工具
+        if data or config:
+            self.data = PluginData(self.name,
+                                self._bot.config['DATA_DIR_PATH'],
+                                config=config)
 
     async def on_message(self, context):
         raise NotImplementedError
@@ -56,7 +58,6 @@ class PluginData:
         self._name = name
         self._base_path = data_dir_path / f'plugin-{name}'
 
-        # TODO: 如果第一次调用的时候不存在再创建，如没有调用则不创建
         # 如果文件夹不存在则自动新建
         if not data_dir_path.exists():
             data_dir_path.mkdir()
