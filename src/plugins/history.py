@@ -79,7 +79,7 @@ class History(bot.Plugin):
                         str_data = f'{date.year} 年 {date.month} 月的数据不存在，请换个试试吧 0.0'
                     return {'reply': str_data, 'at_sender': False}
                 data = self.data.load_pkl(history_filename)
-                history_data = Recorder(self._bot, data)
+                history_data = Recorder(self._bot, data=data)
 
             if day:
                 repeat_list = history_data.get_repeat_list_by_day(day)
