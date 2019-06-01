@@ -189,7 +189,7 @@
 - 正常工作的版本。
 
 [Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.7.1...HEAD
-[0.7.0]: https://github.com/he0119/CoolQBot/compare/v0.7.0...v0.7.1
+[0.7.1]: https://github.com/he0119/CoolQBot/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/he0119/CoolQBot/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/he0119/CoolQBot/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/he0119/CoolQBot/compare/v0.6.0...v0.6.1
