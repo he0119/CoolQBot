@@ -1,4 +1,4 @@
-""" 天气插件
+""" 根据城市名获取天气数据
 """
 import json
 import re
@@ -6,18 +6,14 @@ import urllib
 
 import requests
 
-from coolqbot.bot import bot
 
-
-@bot.on_message('group', 'private')
-async def weather(context):
-    match = re.match(r'^\/(?:天气|weather)(?: (\w*))?$', context['message'])
-    if match:
-        city = match.group(1)
-        str_data = heweather(city)
-        if not str_data:
-            str_data = f'我才不是因为不知道才不告诉你{city}的天气呢'
-        return {'reply': str_data, 'at_sender': False}
+async def get_weather_of_city(city):
+    """ 获取天气数据
+    """
+    str_data = heweather(city)
+    if not str_data:
+        str_data = f'我才不是因为不知道才不告诉你{city}的天气呢'
+    return str_data
 
 
 KEY = '6ff5a040195245328b3cdc693d1c0bb2'
@@ -57,6 +53,5 @@ def heweather(city):
             str_data += f'{forecast["date"]} {cond_text} 降水概率：{forecast["pop"]}% 温度：{forecast["tmp_max"]}~{forecast["tmp_min"]}℃\n'
 
         return str_data[:-1]
-    except Exception as e:
-        bot.logger.exception(e)
+    except:
         return None
