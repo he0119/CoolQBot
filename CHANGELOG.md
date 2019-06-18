@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [0.8.1] - 2019-06-18
+
+### Fixed
+
+- 不复读图片的问题
+
 ## [0.8.0] - 2019-06-18
 
 ## Added
@@ -191,7 +197,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/he0119/CoolQBot/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/he0119/CoolQBot/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/he0119/CoolQBot/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/he0119/CoolQBot/compare/v0.6.2...v0.7.0
