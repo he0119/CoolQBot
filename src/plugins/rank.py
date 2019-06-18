@@ -9,19 +9,22 @@ from nonebot import CommandSession, on_command
 from coolqbot import bot
 
 from .recorder import recorder
+from .tools import to_number
 
 
 @on_command('rank', aliases={'排名'}, only_to_me=False)
 async def rank(session: CommandSession):
-    display_number = session.get('display_number', prompt='请输入想显示排行条数')
-    minimal_msg_number = session.get('minimal_msg_number', prompt='请输入最小消息数量')
+    display_number = session.get('display_number', prompt='请输入想显示的排行条数')
+    minimal_msg_number = session.get('minimal_msg_number',
+                                     prompt='请输入进入排行，最少需要发送多少消息')
+    display_total_number = session.get('display_total_number',
+                                       prompt='是否显示每个人发送的消息总数')
 
     repeat_list = recorder.get_repeat_list()
     msg_number_list = recorder.get_msg_number_list()
 
-    ranking = Ranking(display_number, minimal_msg_number,
-                      session.state['display_total_number'], repeat_list,
-                      msg_number_list)
+    ranking = Ranking(display_number, minimal_msg_number, display_total_number,
+                      repeat_list, msg_number_list)
     str_data = await ranking.ranking()
 
     if not str_data:
@@ -58,7 +61,7 @@ async def _(session: CommandSession):
     if not stripped_arg:
         session.pause('你什么都不输入我怎么知道呢！')
 
-    session.state[session.current_key] = int(stripped_arg)
+    session.state[session.current_key] = to_number(stripped_arg, session)
 
 
 class Ranking:

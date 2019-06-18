@@ -10,7 +10,7 @@ from nonebot import CommandSession, on_command
 async def roll(session: CommandSession):
     args = session.get(
         'args',
-        prompt='欢迎使用 NGA 风格 ROLL 点插件\n请输入你的 ROLL 点方式\n你可以 d100\n也可以 2d100+2d50'
+        prompt='欢迎使用 NGA 风格 ROLL 点插件\n请输入你的 ROLL 点方式\n你可以输入 d100\n也可以输入 2d100+2d50'
     )
     str_data = roll_dices(args)
 

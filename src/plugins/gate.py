@@ -41,6 +41,7 @@ async def _(session: CommandSession):
 
     if not stripped_arg:
         session.pause('你什么都不输入我怎么知道呢，请告诉我有几个门！')
+
     if stripped_arg not in ['2', '3']:
         session.pause('暂时只支持两个门或者三个门的情况，请重新输入吧。')
 

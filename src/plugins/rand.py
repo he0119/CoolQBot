@@ -8,7 +8,7 @@ from nonebot import CommandSession, on_command
 
 @on_command('rand', only_to_me=False)
 async def rand(session: CommandSession):
-    text = session.get('text', prompt='请问你想知道什么的概率？')
+    text = session.state['text']
 
     str_data = ''
     probability = re.match(r'^.+(可能性|几率|概率)$', text)
@@ -21,7 +21,7 @@ async def rand(session: CommandSession):
         str_data += ' 你的点数是 '
         str_data += str(randint(0, 100))
 
-    await session.send(str_data)
+    await session.send(str_data, at_sender=True)
 
 
 @rand.args_parser

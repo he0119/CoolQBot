@@ -4,14 +4,16 @@
 
 ## [Unreleased]
 
+## [0.8.0] - 2019-06-18
+
 ## Added
 
 - 支持自然语言处理
 - 支持权限管理
 
-## Fixed
+## Changed
 
-- 修复了 `history` 插件查询上月数据时，显示的错误标题。
+- 使用 `NoneBot` 机器人框架
 
 ## [0.7.1] - 2019-05-15
 
@@ -189,7 +191,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/he0119/CoolQBot/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/he0119/CoolQBot/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/he0119/CoolQBot/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/he0119/CoolQBot/compare/v0.6.1...v0.6.2

@@ -93,7 +93,7 @@ async def repeat(session: CommandSession):
 
 @on_command('repeat_sign')
 async def repeat_sign(session: CommandSession):
-    """ 复读签到(电脑上没法看手机签到内容)
+    """ 复读签到（电脑上没法看手机签到内容）
     """
     if session.ctx['group_id'] == session.bot.config.GROUP_ID:
         title = re.findall(r'title=(\w+\s?\w+)', session.state.get('message'))

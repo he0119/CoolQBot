@@ -11,6 +11,7 @@ from coolqbot import PluginData, bot
 
 from .rank import Ranking
 from .recorder import Recorder, get_history_pkl_name, recorder
+from .tools import to_number
 
 DATA = PluginData('history')
 
@@ -34,12 +35,12 @@ async def clear_data():
 
 @on_command('history', aliases={'历史'}, only_to_me=False)
 async def history(session: CommandSession):
-    str_data = ''
-    now = datetime.now()
     year = session.get('year', prompt='你请输入你要查询的年份')
     month = session.get('month', prompt='你请输入你要查询的月份')
     day = session.get('day', prompt='你请输入你要查询的日期（如查询整月排名请输入 0）')
 
+    str_data = ''
+    now = datetime.now()
     is_valid, message = is_valid_date(year, month, day, now)
     if not is_valid:
         return await session.send(message)
@@ -54,7 +55,7 @@ async def history(session: CommandSession):
         history_filename = get_history_pkl_name(date)
         if not DATA.exists(f'{history_filename}.pkl'):
             if day:
-                str_data = f'找不到 {date.year} 年 {date.month} 月 {date.day} 日的数据，请换个试试吧 ~>_<~'
+                str_data = f'{date.year} 年 {date.month} 月 {day} 日的数据不存在，请换个试试吧 ~>_<~'
             else:
                 str_data = f'{date.year} 年 {date.month} 月的数据不存在，请换个试试吧 0.0'
             return await session.send(str_data)
@@ -79,7 +80,7 @@ async def history(session: CommandSession):
 
     if ranking_str:
         if day:
-            str_data = f'{date.year} 年 {date.month} 月 {date.day} 日数据\n'
+            str_data = f'{date.year} 年 {date.month} 月 {day} 日数据\n'
         else:
             str_data = f'{date.year} 年 {date.month} 月数据\n'
         str_data += ranking_str
@@ -113,7 +114,8 @@ async def _(session: CommandSession):
     if not stripped_arg:
         session.pause('你什么都不输入我怎么知道呢！')
 
-    session.state[session.current_key] = int(stripped_arg)
+    # 检查输入参数是不是数字
+    session.state[session.current_key] = to_number(stripped_arg, session)
 
 
 def is_valid_date(year, month, day, now):
