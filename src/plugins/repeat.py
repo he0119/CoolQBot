@@ -4,10 +4,12 @@ import re
 import secrets
 from datetime import datetime, timedelta
 
-from coolqbot.bot import bot
-from coolqbot.config import GROUP_ID, IS_COOLQ_PRO
-from coolqbot.plugin import PluginData
-from plugins.recorder import recorder
+from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
+                     on_notice, on_natural_language)
+
+from coolqbot import PluginData
+
+from .recorder import recorder
 
 DATA = PluginData('repeat', config=True)
 # 复读概率
@@ -16,18 +18,18 @@ REPEAT_RATE = int(DATA.config_get('bot', 'repeat_rate', fallback='10'))
 REPEAT_INTERVAL = int(DATA.config_get('bot', 'repeat_interval', fallback='1'))
 
 
-def is_repeat(msg):
+def is_repeat(session: CommandSession, message):
     # 只复读指定群内消息
-    if msg['group_id'] != GROUP_ID:
+    if session.ctx['group_id'] != session.bot.config.GROUP_ID:
         return False
 
     # 不要复读指令
-    match = re.match(r'^\/', msg['message'])
+    match = re.match(r'^\/', message)
     if match:
         return False
 
     # 不要复读@机器人的消息
-    match = re.search(fr'\[CQ:at,qq={msg["self_id"]}\]', msg['message'])
+    match = re.search(fr'\[CQ:at,qq={session.self_id}\]', message)
     if match:
         return False
 
@@ -36,22 +38,17 @@ def is_repeat(msg):
     recorder.add_msg_send_time(now)
 
     # 如果不是PRO版本则不复读纯图片
-    match = re.search(r'\[CQ:image[^\]]+\]$', msg['message'])
-    if match and not IS_COOLQ_PRO:
+    match = re.search(r'\[CQ:image[^\]]+\]$', message)
+    if match and not session.bot.config.IS_COOLQ_PRO:
         return False
 
     # 不要复读应用消息
-    if msg['sender']['user_id'] == 1000000:
+    if session.ctx['sender']['user_id'] == 1000000:
         return False
 
     # 不要复读签到，分享
-    match = re.match(r'^\[CQ:(sign|share).+\]', msg['message'])
+    match = re.match(r'^\[CQ:(sign|share).+\]', message)
     if match:
-        return False
-
-    # 不要复读过长的文字
-    new_msg = re.sub(r'\[CQ:[^\]]+\]', '', msg['raw_message'])
-    if len(new_msg) > 28:
         return False
 
     # 复读之后1分钟之内不再复读
@@ -67,12 +64,12 @@ def is_repeat(msg):
     #     repeat_rate = 5
 
     # 记录每个人发送消息数量
-    recorder.add_msg_number_list(msg['user_id'])
+    recorder.add_msg_number_list(session.ctx['sender']['user_id'])
 
     # 按照设定概率复读
     random = secrets.SystemRandom()
     rand = random.randint(1, 100)
-    bot.logger.info(rand)
+    session.bot.logger.info(rand)
     if rand > repeat_rate:
         return False
 
@@ -80,25 +77,40 @@ def is_repeat(msg):
     recorder.last_message_on = now
 
     # 记录复读次数
-    recorder.add_repeat_list(msg['user_id'])
+    recorder.add_repeat_list(session.ctx['sender']['user_id'])
 
     return True
 
 
-@bot.on_message('group')
-async def repeat(context):
+@on_command('repeat')
+async def repeat(session: CommandSession):
     """ 人类本质
     """
-    if is_repeat(context):
-        return {'reply': context['message'], 'at_sender': False}
+    message = session.state.get('message')
+    if is_repeat(session, message):
+        await session.send(message)
 
 
-@bot.on_message('group')
-async def repeat_sign(context):
+@on_command('repeat_sign')
+async def repeat_sign(session: CommandSession):
     """ 复读签到(电脑上没法看手机签到内容)
     """
-    if context['group_id'] == GROUP_ID:
-        match = re.match(r'^\[CQ:sign(.+)\]$', context['message'])
-        if match:
-            title = re.findall(r'title=(\w+\s?\w+)', context['message'])
-            return {'reply': f'今天的运势是{title[0]}'}
+    if session.ctx['group_id'] == session.bot.config.GROUP_ID:
+        title = re.findall(r'title=(\w+\s?\w+)', session.state.get('message'))
+        await session.send(f'今天的运势是{title[0]}', at_sender=True)
+
+
+@on_natural_language(only_to_me=False, only_short_message=True)
+async def _(session: NLPSession):
+    # 以置信度 60.0 返回 repeat 命令
+    # 确保任何消息都在且仅在其它自然语言处理器无法理解的时候使用 repeat 命令
+    return IntentCommand(60.0, 'repeat', args={'message': session.msg_text})
+
+
+@on_natural_language(only_to_me=False)
+async def _(session: NLPSession):
+    match = re.match(r'^\[CQ:sign(.+)\]$', session.msg)
+    if match:
+        return IntentCommand(90.0,
+                             'repeat_sign',
+                             args={'message': session.msg})
