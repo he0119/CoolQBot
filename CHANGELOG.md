@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+## [0.8.0] - 2019-06-18
+
+## Added
+
+- 支持自然语言处理
+- 支持权限管理
+
+## Changed
+
+- 使用 `NoneBot` 机器人框架
+
 ## [0.7.1] - 2019-05-15
 
 ### Fixed
@@ -72,7 +83,7 @@
 
 ### Fixed
 
-- 修复了@机器人时，意外复读的问题。
+- 修复了 @机器人时，意外复读的问题。
 
 ## [0.5.1] - 2019-03-21
 
@@ -87,7 +98,7 @@
 
 - 新增了一个 `PluginData` 类，用来管理插件配置和数据。
 - 新增了自主禁言插件。
-- 将检查酷Q插件状态的函数添加了回来。
+- 将检查酷 Q 插件状态的函数添加了回来。
 
 ### Changed
 
@@ -101,7 +112,7 @@
 
 ### Removed
 
-- 删除了检查酷Q状态的函数。
+- 删除了检查酷 Q 状态的函数。
 
 ## [0.4.3] - 2018-11-25
 
@@ -139,7 +150,7 @@
 ### Added
 
 - 增加了每月底自动清除复读记录的功能。
-- 增加了查看上月复读排行榜的功能(`/history`)。
+- 增加了查看上月复读排行榜的功能 (`/history`)。
 
 ## [0.3.0] - 2018-09-30
 
@@ -151,7 +162,7 @@
 
 ### Added
 
-- 增加了复读排行榜插件(`/rank`)。
+- 增加了复读排行榜插件 (`/rank`)。
 
 ### Changed
 
@@ -162,7 +173,7 @@
 
 ### Added
 
-- 增加了 NGA 风格的 ROLL 点插件(`/roll`)。
+- 增加了 NGA 风格的 ROLL 点插件 (`/roll`)。
 
 ## [0.1.1] - 2018-08-15
 
@@ -180,8 +191,9 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.7.1...HEAD
-[0.7.0]: https://github.com/he0119/CoolQBot/compare/v0.7.0...v0.7.1
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/he0119/CoolQBot/compare/v0.7.1...v0.8.0
+[0.7.1]: https://github.com/he0119/CoolQBot/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/he0119/CoolQBot/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/he0119/CoolQBot/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/he0119/CoolQBot/compare/v0.6.0...v0.6.1

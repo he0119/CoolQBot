@@ -3,7 +3,7 @@
 import re
 from random import randint
 
-from coolqbot.bot import bot
+from nonebot import CommandSession, on_command
 
 TEXTS = [
     '掐指一算，你应该走[direction]！',
@@ -18,21 +18,34 @@ TEXTS = [
 ]
 
 
-@bot.on_message('group', 'private')
-async def gate(context):
-    match = re.match(r'^\/gate(?: (\d*))?$', context['message'])
-    if match:
-        args = match.group(1)
+@on_command('gate', only_to_me=False)
+async def gate(session: CommandSession):
+    door_number = session.get('door_number', prompt='总共有多少个门呢？')
 
-        door_number = 2
-        if args == '3':
-            door_number = 3
+    text_index = randint(0, len(TEXTS) - 1)
 
-        text_index = randint(0, len(TEXTS) - 1)
+    direction = get_direction(int(door_number))
 
-        direction = get_direction(door_number)
+    await session.send(TEXTS[text_index].replace('[direction]', direction),
+                       at_sender=True)
 
-        return {'reply': TEXTS[text_index].replace('[direction]', direction)}
+
+@gate.args_parser
+async def _(session: CommandSession):
+    stripped_arg = session.current_arg_text.strip()
+
+    if session.is_first_run:
+        if stripped_arg:
+            session.state['door_number'] = stripped_arg
+        return
+
+    if not stripped_arg:
+        session.pause('你什么都不输入我怎么知道呢，请告诉我有几个门！')
+
+    if stripped_arg not in ['2', '3']:
+        session.pause('暂时只支持两个门或者三个门的情况，请重新输入吧。')
+
+    session.state[session.current_key] = stripped_arg
 
 
 def get_direction(door_number):

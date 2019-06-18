@@ -2,9 +2,13 @@
 """
 from datetime import datetime, timedelta
 
-from coolqbot.bot import bot
-from coolqbot.plugin import PluginData
-from coolqbot.utils import get_history_pkl_name, scheduler
+from coolqbot import PluginData, bot
+
+
+def get_history_pkl_name(dt):
+    time_str = dt.strftime('%Y-%m')
+    return time_str
+
 
 DATA = PluginData('recorder')
 
@@ -35,14 +39,10 @@ class Recorder:
         for i in range(len(times)):
             if times[i] > now - timedelta(minutes=x):
                 self._msg_send_time = self._msg_send_time[i:]
-                bot.logger.debug(self._msg_send_time)
-                bot.logger.debug(len(self._msg_send_time))
                 return len(self._msg_send_time)
 
         # 如果没有满足条件的消息，则清除记录
         self._msg_send_time = []
-        bot.logger.debug(self._msg_send_time)
-        bot.logger.debug(len(self._msg_send_time))
         return len(self._msg_send_time)
 
     def get_repeat_list(self):
@@ -152,7 +152,7 @@ class Recorder:
 recorder = Recorder()
 
 
-@scheduler.scheduled_job('interval', minutes=1, id='save_recorder')
+@bot.scheduler.scheduled_job('interval', minutes=1, id='save_recorder')
 async def save_recorder():
     """ 每隔一分钟保存一次数据
     """

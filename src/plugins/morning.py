@@ -4,11 +4,9 @@ import re
 from random import randint
 
 import requests
+from nonebot import CommandSession, on_command
 
-from coolqbot.bot import bot
-from coolqbot.config import GROUP_ID
-from coolqbot.plugin import PluginData
-from coolqbot.utils import scheduler
+from coolqbot import PluginData, bot
 
 DATA = PluginData('morning', config=True)
 
@@ -17,19 +15,19 @@ MINUTE = int(DATA.config_get('morning', 'minute', fallback='30'))
 SECOND = int(DATA.config_get('morning', 'second', fallback='0'))
 
 
-@scheduler.scheduled_job('cron',
-                         hour=HOUR,
-                         minute=MINUTE,
-                         second=SECOND,
-                         id='morning')
+@bot.scheduler.scheduled_job('cron',
+                             hour=HOUR,
+                             minute=MINUTE,
+                             second=SECOND,
+                             id='morning')
 async def morning():
     """ 早安
     """
     hello_str = get_message()
-    await bot.send_msg(message_type='group',
-                       group_id=GROUP_ID,
-                       message=hello_str)
-    bot.logger.info('发送问好信息')
+    await bot.get_bot().send_msg(message_type='group',
+                                 group_id=bot.get_bot().config.GROUP_ID,
+                                 message=hello_str)
+    bot.logger.info('发送早安信息')
 
 
 TEXTS = ['早上好呀~>_<~', '大家早上好呀！', '朋友们早上好！', '圆神的信徒们早上好~']

@@ -1,33 +1,9 @@
 """ 插件相关
 """
 import configparser
-import os
 import pickle
 
-from coolqbot.bot import bot
-from coolqbot.config import DATA_DIR_PATH, PLUGINS_DIR_PATH
-
-
-class PluginManager:
-    """ 插件管理器
-    """
-
-    def __init__(self):
-        self._plugin_prefix = 'plugins'
-
-    def _get_plugin_name(self, name):
-        return f'{self._plugin_prefix}.{name}'
-
-    def load_plugin(self):
-        filenames = [x.stem for x in PLUGINS_DIR_PATH.iterdir() if x.is_file()]
-        for plugin_name in filenames:
-            try:
-                __import__(self._get_plugin_name(plugin_name))
-                bot.logger.debug(f'Plugin [{plugin_name}] loaded.')
-            except ImportError as e:
-                bot.logger.error(
-                    f'Import error: can not import [{plugin_name}], because {e}'
-                )
+from .config import DATA_DIR_PATH
 
 
 class PluginData:
