@@ -25,6 +25,7 @@ config.read(CONFIG_FILE_PATH, encoding='UTF-8')
 SUPERUSERS = config['bot']['admin'].split(',')
 NICKNAME = config['bot']['nickname'].split(',')
 SHORT_MESSAGE_MAX_LENGTH = 28
+COMMAND_START = {'/'}
 
 GROUP_ID = config.getint('bot', 'group_id')
 IS_COOLQ_PRO = config.getboolean('bot', 'is_coolq_pro')
