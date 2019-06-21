@@ -1,6 +1,7 @@
 """ 基础插件
 """
-from nonebot import CommandSession, on_command
+from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
+                     on_natural_language)
 
 from coolqbot import bot
 
@@ -61,3 +62,23 @@ async def whoareyou(session: CommandSession):
 @on_command('whatiamdoing', aliases={'我在干什么', '我在做什么'}, only_to_me=False)
 async def whatiamdoing(session: CommandSession):
     await session.send('你在调戏我！！')
+
+
+@on_natural_language(keywords={'我是谁'})
+async def _(session: NLPSession):
+    return IntentCommand(90.0, 'whoami')
+
+
+@on_natural_language(keywords={'我在哪'})
+async def _(session: NLPSession):
+    return IntentCommand(90.0, 'whereami')
+
+
+@on_natural_language(keywords={'你是谁'})
+async def _(session: NLPSession):
+    return IntentCommand(90.0, 'whoareyou')
+
+
+@on_natural_language(keywords={'我在干什么', '我在做什么'})
+async def _(session: NLPSession):
+    return IntentCommand(90.0, 'whatiamdoing')
