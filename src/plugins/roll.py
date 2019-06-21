@@ -1,4 +1,4 @@
-""" NGA风格ROLL点插件
+""" NGA 风格 ROLL 点插件
 """
 import re
 from random import randint
@@ -10,8 +10,8 @@ from nonebot import CommandSession, on_command
 async def roll(session: CommandSession):
     args = session.get(
         'args',
-        prompt='欢迎使用 NGA 风格 ROLL 点插件\n请输入你的 ROLL 点方式\n你可以输入 d100\n也可以输入 2d100+2d50'
-    )
+        prompt=
+        '欢迎使用 NGA 风格 ROLL 点插件\n请问你想怎么 ROLL 点\n你可以输入 d100\n也可以输入 2d100+2d50')
     str_data = roll_dices(args)
 
     await session.send(str_data)
@@ -21,23 +21,25 @@ async def roll(session: CommandSession):
 async def _(session: CommandSession):
     stripped_arg = session.current_arg_text.strip()
 
+    # 检查是否符合规则
+    match = re.match(r'^([\dd+\s]+?)$', stripped_arg)
+
     if session.is_first_run:
-        if stripped_arg:
+        if stripped_arg and match:
             session.state['args'] = stripped_arg
         return
 
     if not stripped_arg:
         session.pause('ROLL 点方式不能为空呢，请重新输入')
 
+    if not match:
+        session.pause('请输入正确的参数 ~>_<~')
     session.state[session.current_key] = stripped_arg
 
 
 def roll_dices(input_str):
     """ 掷骰子
     """
-    match = re.match(r'^([\dd+\s]+?)$', input_str)
-    if not match:
-        return '请输入正确的参数 ~>_<~'
     r = ''
     add = 0
     input_str = '+' + input_str

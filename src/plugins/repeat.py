@@ -5,9 +5,9 @@ import secrets
 from datetime import datetime, timedelta
 
 from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
-                     on_notice, on_natural_language)
+                     on_natural_language, on_notice)
 
-from coolqbot import PluginData
+from coolqbot import PluginData, bot
 
 from .recorder import recorder
 
@@ -25,11 +25,6 @@ def is_repeat(session: CommandSession, message):
 
     # 不要复读指令
     match = re.match(r'^\/', message)
-    if match:
-        return False
-
-    # 不要复读@机器人的消息
-    match = re.search(fr'\[CQ:at,qq={session.self_id}\]', message)
     if match:
         return False
 
@@ -69,7 +64,7 @@ def is_repeat(session: CommandSession, message):
     # 按照设定概率复读
     random = secrets.SystemRandom()
     rand = random.randint(1, 100)
-    session.bot.logger.info(rand)
+    bot.logger.info(f'repeat: {rand}')
     if rand > repeat_rate:
         return False
 
@@ -100,11 +95,13 @@ async def repeat_sign(session: CommandSession):
         await session.send(f'今天的运势是{title[0]}', at_sender=True)
 
 
-@on_natural_language(only_to_me=False, only_short_message=True)
+@on_natural_language(only_to_me=False)
 async def _(session: NLPSession):
-    # 以置信度 60.0 返回 repeat 命令
-    # 确保任何消息都在且仅在其它自然语言处理器无法理解的时候使用 repeat 命令
-    return IntentCommand(60.0, 'repeat', args={'message': session.msg})
+    # 只复读群消息，与没有对机器人说的话
+    if session.ctx['message_type'] == 'group' and not session.ctx['to_me']:
+        # 以置信度 60.0 返回 repeat 命令
+        # 确保任何消息都在且仅在其它自然语言处理器无法理解的时候使用 repeat 命令
+        return IntentCommand(60.0, 'repeat', args={'message': session.msg})
 
 
 @on_natural_language(only_to_me=False)
