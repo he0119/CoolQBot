@@ -1,4 +1,4 @@
-""" 天气插件
+""" 音乐插件
 """
 from nonebot import on_command, CommandSession
 from nonebot import on_natural_language, NLPSession, IntentCommand
@@ -37,8 +37,7 @@ async def _(session: CommandSession):
 
 @on_natural_language(keywords={'点歌'})
 async def _(session: NLPSession):
-    # 去掉消息首尾的空白符
-    stripped_msg = session.msg_text.replace('点歌', '').strip()
+    # 去掉消息首尾的空白符以及开头的点歌两字
+    stripped_msg = session.msg_text.strip()[2:].strip()
 
-    # 返回意图命令，前两个参数必填，分别表示置信度和意图命令名
     return IntentCommand(90.0, 'music', current_arg=stripped_msg or '')

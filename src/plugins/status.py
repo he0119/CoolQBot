@@ -11,7 +11,7 @@ from coolqbot import bot
 from .recorder import recorder
 
 
-@on_command('status', only_to_me=False)
+@on_command('status', aliases={'状态'}, only_to_me=False)
 async def status(session: CommandSession):
     str_data = f'近十分钟群内聊天数量是 {recorder.message_number(10)} 条'
 

@@ -26,12 +26,7 @@ async def _(session: CommandSession):
     if not stripped_arg:
         session.pause('要查询的城市名称不能为空呢，请重新输入！')
 
-    # 从回答中提取地名
-    city = get_city(stripped_arg)
-    if not city:
-        session.pause('请输入正确的地名！')
-
-    session.state[session.current_key] = city
+    session.state[session.current_key] = stripped_arg
 
 
 # on_natural_language 装饰器将函数声明为一个自然语言处理器
@@ -46,6 +41,7 @@ async def _(session: NLPSession):
 
     # 返回意图命令，前两个参数必填，分别表示置信度和意图命令名
     return IntentCommand(90.0, 'weather', current_arg=city or '')
+
 
 def get_city(msg):
     """ 提取消息中的地名

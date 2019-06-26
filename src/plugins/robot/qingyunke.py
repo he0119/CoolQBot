@@ -33,7 +33,8 @@ async def call_qingyunke_api(session: CommandSession,
                     return None
 
                 return resp_payload['content'].replace('{br}', '\n').replace(
-                    '菲菲翻译', '小誓约翻译')
+                    '菲菲翻译', '小誓约翻译').replace('&lt;p&gt;　　',
+                                             '').replace('&lt;/p&gt;', '')
     except (aiohttp.ClientError, json.JSONDecodeError, KeyError):
         # 抛出上面任何异常，说明调用失败
         return None
