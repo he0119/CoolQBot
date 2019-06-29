@@ -5,21 +5,6 @@ from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
 
 from coolqbot import bot
 
-from .recorder import recorder
-
-
-@bot.scheduler.scheduled_job('interval', seconds=5, id='coolq_status')
-async def coolq_status():
-    """ 检查酷Q状态
-
-    每5秒检查一次状态，并记录
-    """
-    try:
-        msg = await bot.get_bot().get_status()
-        recorder.coolq_status = msg['good']
-    except:
-        bot.logger.error('无法获取酷Q状态')
-
 
 @on_command('whoami',
             aliases={'我是谁'},

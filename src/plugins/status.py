@@ -56,7 +56,20 @@ def get_total_number(record_list):
     return num
 
 
-@bot.scheduler.scheduled_job('interval', seconds=5, id='check_status')
+@bot.scheduler.scheduled_job('interval', seconds=5, id='coolq_status')
+async def coolq_status():
+    """ 检查酷Q状态
+
+    每5秒检查一次状态，并记录
+    """
+    try:
+        msg = await bot.get_bot().get_status()
+        recorder.coolq_status = msg['good']
+    except:
+        bot.logger.debug('当前无法获取酷Q状态')
+
+
+@bot.scheduler.scheduled_job('interval', seconds=5, id='start_message')
 async def check_status():
     """ 检测是否需要发送问好信息
     """
@@ -70,9 +83,17 @@ async def check_status():
 
 
 def get_message():
-    """ 获得消息
-
-    TODO: 每次启动时问好词根据时间不同而不同
+    """ 根据当前时间返回对应消息
     """
+    hour = datetime.now().hour
+
+    if hour > 18 or hour < 6:
+        return '晚上好呀！'
+
+    if hour > 13:
+        return '下午好呀！'
+
+    if hour > 11:
+        return '中午好呀！'
 
     return '早上好呀！'
