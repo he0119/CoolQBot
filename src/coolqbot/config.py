@@ -2,23 +2,24 @@
 """
 import configparser
 import platform
+import shutil
 from pathlib import Path
 
 from nonebot.default_config import *
 
-# 根据运行的系统，配置不同的设置
-if platform.system() == 'Linux':
-    HOME_DIR = Path('/home/user/coolq/bot')
-    PLUGINS_DIR_PATH = Path('/home/user/coolqbot/plugins')
-else:
-    HOME_DIR = Path(__file__).resolve().parents[1] / 'bot'
-    PLUGINS_DIR_PATH = HOME_DIR.parent / 'plugins'
+HOME_DIR = Path(__file__).resolve().parents[1]
+PLUGINS_DIR_PATH = HOME_DIR / 'plugins'
 
-CONFIG_FILE_PATH = HOME_DIR / 'bot.ini'
-LOG_FILE_PATH = HOME_DIR / 'bot.log'
-DATA_DIR_PATH = HOME_DIR / 'data'
+DATA_DIR = HOME_DIR / 'bot'
+CONFIG_FILE_PATH = DATA_DIR / 'bot.ini'
+LOG_FILE_PATH = DATA_DIR / 'bot.log'
+DATA_DIR_PATH = DATA_DIR / 'data'
 
-# 读取配置文件
+# 读取配置文件，如不存在就使用默认配置
+EXAMPLE_CONFIG_FILE_PATH = HOME_DIR / 'bot.ini.example'
+if not CONFIG_FILE_PATH.exists():
+    shutil.copy(EXAMPLE_CONFIG_FILE_PATH, CONFIG_FILE_PATH)
+
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH, encoding='UTF-8')
 
