@@ -19,8 +19,10 @@ REPEAT_INTERVAL = int(DATA.config_get('bot', 'repeat_interval', fallback='1'))
 
 
 def is_repeat(session: CommandSession, message):
+    group_id = session.ctx['group_id']
+    user_id = session.ctx['sender']['user_id']
     # 只复读指定群内消息
-    if session.ctx['group_id'] != session.bot.config.GROUP_ID:
+    if group_id not in session.bot.config.GROUP_ID:
         return False
 
     # 不要复读指令
@@ -30,7 +32,7 @@ def is_repeat(session: CommandSession, message):
 
     # 记录群内发送消息数量和时间
     now = datetime.now()
-    recorder.add_msg_send_time(now)
+    recorder.add_msg_send_time(now, group_id)
 
     # 如果不是PRO版本则不复读纯图片
     match = re.search(r'\[CQ:image[^\]]+\]$', message)
@@ -38,7 +40,7 @@ def is_repeat(session: CommandSession, message):
         return False
 
     # 不要复读应用消息
-    if session.ctx['sender']['user_id'] == 1000000:
+    if user_id == 1000000:
         return False
 
     # 不要复读签到，分享
@@ -47,7 +49,7 @@ def is_repeat(session: CommandSession, message):
         return False
 
     # 复读之后1分钟之内不再复读
-    time = recorder.last_message_on
+    time = recorder.get_last_message_on(group_id)
     if datetime.now() < time + timedelta(minutes=REPEAT_INTERVAL):
         return False
 
@@ -59,7 +61,7 @@ def is_repeat(session: CommandSession, message):
     #     repeat_rate = 5
 
     # 记录每个人发送消息数量
-    recorder.add_msg_number_list(session.ctx['sender']['user_id'])
+    recorder.add_msg_number_list(user_id, group_id)
 
     # 按照设定概率复读
     random = secrets.SystemRandom()
@@ -69,10 +71,10 @@ def is_repeat(session: CommandSession, message):
         return False
 
     # 记录复读时间
-    recorder.last_message_on = now
+    recorder.reset_last_message_on(group_id)
 
     # 记录复读次数
-    recorder.add_repeat_list(session.ctx['sender']['user_id'])
+    recorder.add_repeat_list(user_id, group_id)
 
     return True
 
@@ -90,7 +92,7 @@ async def repeat(session: CommandSession):
 async def repeat_sign(session: CommandSession):
     """ 复读签到（电脑上没法看手机签到内容）
     """
-    if session.ctx['group_id'] == session.bot.config.GROUP_ID:
+    if session.ctx['group_id'] in session.bot.config.GROUP_ID:
         title = re.findall(r'title=(\w+\s?\w+)', session.state.get('message'))
         await session.send(f'今天的运势是{title[0]}', at_sender=True)
 

@@ -5,7 +5,7 @@ from calendar import monthrange
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
-from nonebot import CommandSession, on_command
+from nonebot import CommandSession, on_command, permission
 
 from coolqbot import PluginData, bot
 
@@ -33,7 +33,10 @@ async def clear_data():
     bot.logger.info('记录清除完成')
 
 
-@on_command('history', aliases={'历史'}, only_to_me=False)
+@on_command('history',
+            aliases={'历史'},
+            only_to_me=False,
+            permission=permission.GROUP)
 async def history(session: CommandSession):
     year = session.get('year', prompt='你请输入你要查询的年份')
     month = session.get('month', prompt='你请输入你要查询的月份')
@@ -46,6 +49,7 @@ async def history(session: CommandSession):
         return await session.send(message)
     date = datetime(year=year, month=month, day=1)
 
+    group_id = session.ctx['group_id']
     # 尝试读取历史数据
     # 如果是本月就直接从 recorder 中获取数据
     # 不是则从历史记录中获取
@@ -63,11 +67,11 @@ async def history(session: CommandSession):
         history_data = Recorder(data)
 
     if day:
-        repeat_list = history_data.get_repeat_list_by_day(day)
-        msg_number_list = history_data.get_msg_number_list_by_day(day)
+        repeat_list = history_data.get_repeat_list_by_day(day, group_id)
+        msg_number_list = history_data.get_msg_number_list_by_day(day, group_id)
     else:
-        repeat_list = history_data.get_repeat_list()
-        msg_number_list = history_data.get_msg_number_list()
+        repeat_list = history_data.get_repeat_list(group_id)
+        msg_number_list = history_data.get_msg_number_list(group_id)
 
     # 如无其他情况，并输出排行榜
     display_number = 10000

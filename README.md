@@ -35,4 +35,28 @@
   #   -e COOLQ_URL=http://dlsec.cqp.me/cqp-tuling \ # 专业版
   ```
 
+  或者使用 Docker-Compose 运行
+
+  创建 `docker-compose.yml` 文件并填入一下内容
+
+  ```yaml
+  version: "3.7"
+  services:
+
+    coolqbot:
+      image: he0119/coolqbot:latest
+      container_name: coolqbot
+      restart: always
+      ports:
+        - "9000:9000"
+      environment:
+        - VNC_PASSWD=12345687
+        - COOLQ_ACCOUNT=2062765419
+      volumes:
+        - ./coolq:/home/user/coolq
+        - ./bot:/home/user/coolqbot/bot
+  ```
+
+  运行 `sudo docker-compose up -d` 即可启动你的机器人。
+
 - 所有配置数据都在 `/bot/` 下。

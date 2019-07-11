@@ -23,10 +23,10 @@ if not CONFIG_FILE_PATH.exists():
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH, encoding='UTF-8')
 
-SUPERUSERS = config['bot']['admin'].split(',')
-NICKNAME = config['bot']['nickname'].split(',')
+SUPERUSERS = set(map(int, config['bot']['admin'].split()))
+NICKNAME = config['bot']['nickname'].split()
 SHORT_MESSAGE_MAX_LENGTH = 28
 COMMAND_START = {'/'}
 
-GROUP_ID = config.getint('bot', 'group_id')
+GROUP_ID = set(map(int, config['bot']['group_id'].split()))
 IS_COOLQ_PRO = config.getboolean('bot', 'is_coolq_pro')

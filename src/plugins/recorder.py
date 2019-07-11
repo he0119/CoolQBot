@@ -18,8 +18,11 @@ class Recorder:
         self._name = 'recorder'
 
         # 运行数据
-        self.last_message_on = datetime.now()
-        self._msg_send_time = []
+        self._last_message_on = {
+            group_id: datetime.now()
+            for group_id in bot.get_bot().config.GROUP_ID
+        }
+        self._msg_send_time = {}
         self._repeat_list = {}
         self._msg_number_list = {}
 
@@ -31,69 +34,90 @@ class Recorder:
 
         self._load_data(data)
 
-    def message_number(self, x):
+    def message_number(self, x: int, group_id: int):
         """ 返回 x 分钟内的消息条数，并清除之前的消息记录
         """
-        times = self._msg_send_time
+        times = self._msg_send_time[group_id]
         now = datetime.now()
         for i in range(len(times)):
             if times[i] > now - timedelta(minutes=x):
-                self._msg_send_time = self._msg_send_time[i:]
-                return len(self._msg_send_time)
+                times = times[i:]
+                return len(times)
 
         # 如果没有满足条件的消息，则清除记录
-        self._msg_send_time = []
-        return len(self._msg_send_time)
+        times = []
+        return len(times)
 
-    def get_repeat_list(self):
-        """ 获取整个月的复读记录
+    def get_repeat_list(self, group_id: int):
+        """ 获取指定群整个月的复读记录
         """
-        return self._merge_list(self._repeat_list)
+        if group_id not in self._repeat_list:
+            return {}
+        return self._merge_list(self._repeat_list[group_id])
 
-    def get_msg_number_list(self):
-        """ 获取整个月的消息数量记录
+    def get_msg_number_list(self, group_id: int):
+        """ 获取指定群整个月的消息数量记录
         """
-        return self._merge_list(self._msg_number_list)
+        if group_id not in self._msg_number_list:
+            return {}
+        return self._merge_list(self._msg_number_list[group_id])
 
-    def get_repeat_list_by_day(self, day):
-        """ 获取某一天的复读记录
+    def get_repeat_list_by_day(self, day, group_id: int):
+        """ 获取指定群某一天的复读记录
         """
-        if day in self._repeat_list:
-            return self._repeat_list[day]
+        if group_id not in self._repeat_list:
+            return {}
+        if day in self._repeat_list[group_id]:
+            return self._repeat_list[group_id][day]
         return {}
 
-    def get_msg_number_list_by_day(self, day):
-        """ 获取某一天的消息数量记录
+    def get_msg_number_list_by_day(self, day, group_id: int):
+        """ 获取指定群某一天的消息数量记录
         """
-        if day in self._msg_number_list:
-            return self._msg_number_list[day]
+        if group_id not in self._msg_number_list:
+            return {}
+        if day in self._msg_number_list[group_id]:
+            return self._msg_number_list[group_id][day]
         return {}
 
-    def add_repeat_list(self, qq):
-        """ 该 QQ 号的复读记录，加一
+    def add_repeat_list(self, qq, group_id: int):
+        """ 该 QQ 号在指定群的复读记录，加一
         """
-        self._add_to_list(self._repeat_list, qq)
+        self._add_to_list(self._repeat_list, qq, group_id)
 
-    def add_msg_number_list(self, qq):
-        """ 该 QQ 号的消息数量记录，加一
+    def add_msg_number_list(self, qq, group_id: int):
+        """ 该 QQ 号在指定群的消息数量记录，加一
         """
-        self._add_to_list(self._msg_number_list, qq)
+        self._add_to_list(self._msg_number_list, qq, group_id)
 
-    def add_msg_send_time(self, time):
-        """ 将这个时间加入到消息发送时间列表中
+    def add_msg_send_time(self, time, group_id: int):
+        """ 将这个时间加入到指定群的消息发送时间列表中
         """
-        self._msg_send_time.append(time)
+        if group_id not in self._msg_send_time:
+            self._msg_send_time[group_id] = []
+        self._msg_send_time[group_id].append(time)
 
-    def _add_to_list(self, recrod_list, qq):
+    def get_last_message_on(self, group_id: int):
+        if group_id not in self._last_message_on:
+            return datetime.now()
+        return self._last_message_on[group_id]
+
+    def reset_last_message_on(self, group_id: int):
+        self._last_message_on[group_id] = datetime.now()
+
+    def _add_to_list(self, recrod_list, qq, group_id: int):
         """ 添加数据进列表
         """
+        if group_id not in recrod_list:
+            recrod_list[group_id] = {}
+
         day = datetime.now().day
-        if day not in recrod_list:
-            recrod_list[day] = {}
+        if day not in recrod_list[group_id]:
+            recrod_list[group_id][day] = {}
         try:
-            recrod_list[day][qq] += 1
+            recrod_list[group_id][day][qq] += 1
         except KeyError:
-            recrod_list[day][qq] = 1
+            recrod_list[group_id][day][qq] = 1
 
     def _merge_list(self, recrod_list):
         """ 合并词典中按天数存储的数据
@@ -144,7 +168,7 @@ class Recorder:
         }
 
     def clear_data(self):
-        self._msg_send_time = []
+        self._msg_send_time = {}
         self._repeat_list = {}
         self._msg_number_list = {}
 
@@ -157,6 +181,7 @@ async def save_recorder():
     """ 每隔一分钟保存一次数据
     """
     # 保存数据前先清理 msg_send_time 列表
-    recorder.message_number(10)
+    for group_id in bot.get_bot().config.GROUP_ID:
+        recorder.message_number(10, group_id)
 
     recorder.save_data()

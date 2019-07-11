@@ -10,12 +10,22 @@ from .tools import to_number
 @on_command('ban', aliases=('禁言'), only_to_me=False)
 async def ban(session: CommandSession):
     duration = session.get('duration', prompt='你想被禁言多少分钟呢？')
-
     duration = duration * 60
 
-    await session.bot.set_group_ban(group_id=session.bot.config.GROUP_ID,
-                                    user_id=session.ctx['sender']['user_id'],
-                                    duration=duration)
+    # 如果在群里发送，则在当前群禁言/解除
+    if session.ctx['message_type'] == 'group':
+        await session.bot.set_group_ban(
+            group_id=session.ctx['group_id'],
+            user_id=session.ctx['sender']['user_id'],
+            duration=duration)
+
+    # 如果私聊的话，则在所有小誓约支持的群禁言/解除
+    elif session.ctx['message_type'] == 'private':
+        for group_id in session.bot.config.GROUP_ID:
+            await session.bot.set_group_ban(
+                group_id=group_id,
+                user_id=session.ctx['sender']['user_id'],
+                duration=duration)
 
 
 @ban.args_parser
