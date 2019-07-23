@@ -10,6 +10,73 @@ VERSION = '1'
 DATA = PluginData('recorder')
 
 
+def get_history_pkl_name(dt):
+    time_str = dt.strftime('%Y-%m')
+    return time_str
+
+
+def update(data: list, group_id: int):
+    """ 升级脚本
+
+    升级 0.8.1 及以前版本的 recorder 数据。
+    """
+    # 判断是那种类型的数据
+    if isinstance(list(data.values())[0], int):
+        return update_old_1(data, group_id)
+    else:
+        return update_old_2(data, group_id)
+
+
+def update_old_1(data: list, group_id: int):
+    """ 升级 0.7.0 之前版本的数据
+    """
+    new_data = {}
+    # 添加版本信息
+    new_data['version'] = VERSION
+
+    # 升级 last_message_on
+    new_data['last_message_on'] = {}
+    new_data['last_message_on'][group_id] = data['last_message_on']
+
+    # 升级 msg_send_time
+    new_data['msg_send_time'] = {}
+    new_data['msg_send_time'][group_id] = []
+
+    # 升级 repeat_list
+    new_data['repeat_list'] = {}
+    new_data['repeat_list'][group_id] = data['repeat_list']
+
+    # 升级 msg_number_list
+    new_data['msg_number_list'] = {}
+    new_data['msg_number_list'][group_id] = data['msg_number_list']
+    return new_data
+
+
+def update_old_2(data: list, group_id: int):
+    """ 升级 0.7.0-0.8.1 版本的 recorder 数据
+    """
+    new_data = {}
+    # 添加版本信息
+    new_data['version'] = VERSION
+
+    # 升级 last_message_on
+    new_data['last_message_on'] = {}
+    new_data['last_message_on'][group_id] = data['last_message_on']
+
+    # 升级 msg_send_time
+    new_data['msg_send_time'] = {}
+    new_data['msg_send_time'][group_id] = []
+
+    # 升级 repeat_list
+    new_data['repeat_list'] = {}
+    new_data['repeat_list'][group_id] = data['repeat_list']
+
+    # 升级 msg_number_list
+    new_data['msg_number_list'] = {}
+    new_data['msg_number_list'][group_id] = data['msg_number_list']
+    return new_data
+
+
 class Recorder:
     def __init__(self, name: str, data: PluginData):
         self._name = name
@@ -124,7 +191,7 @@ class Recorder:
         if 'version' not in data or data['version'] != VERSION:
             bot.logger.info('发现旧版本数据，正在升级数据')
             data = update(data, bot.get_bot().config.GROUP_ID[0])
-            self._data.save_pkl(self._name)
+            self._data.save_pkl(data, self._name)
             bot.logger.info('升级数据成功')
 
         # 加载数据
@@ -198,70 +265,3 @@ async def save_recorder():
         recorder.message_number(10, group_id)
 
     recorder.save_data()
-
-
-def get_history_pkl_name(dt):
-    time_str = dt.strftime('%Y-%m')
-    return time_str
-
-
-def update(data: list, group_id: int):
-    """ 升级脚本
-
-    升级 0.8.1 及以前版本的 recorder 数据。
-    """
-    # 判断是那种类型的数据
-    if isinstance(list(data.values())[0], int):
-        return update_old_1(data, group_id)
-    else:
-        return update_old_2(data, group_id)
-
-
-def update_old_1(data: list, group_id: int):
-    """ 升级 0.7.0 之前版本的数据
-    """
-    new_data = {}
-    # 添加版本信息
-    new_data['version'] = VERSION
-
-    # 升级 last_message_on
-    new_data['last_message_on'] = {}
-    new_data['last_message_on'][group_id] = data['last_message_on']
-
-    # 升级 msg_send_time
-    new_data['msg_send_time'] = {}
-    new_data['msg_send_time'][group_id] = []
-
-    # 升级 repeat_list
-    new_data['repeat_list'] = {}
-    new_data['repeat_list'][group_id] = data['repeat_list']
-
-    # 升级 msg_number_list
-    new_data['msg_number_list'] = {}
-    new_data['msg_number_list'][group_id] = data['msg_number_list']
-    return new_data
-
-
-def update_old_2(data: list, group_id: int):
-    """ 升级 0.7.0-0.8.1 版本的 recorder 数据
-    """
-    new_data = {}
-    # 添加版本信息
-    new_data['version'] = VERSION
-
-    # 升级 last_message_on
-    new_data['last_message_on'] = {}
-    new_data['last_message_on'][group_id] = data['last_message_on']
-
-    # 升级 msg_send_time
-    new_data['msg_send_time'] = {}
-    new_data['msg_send_time'][group_id] = []
-
-    # 升级 repeat_list
-    new_data['repeat_list'] = {}
-    new_data['repeat_list'][group_id] = data['repeat_list']
-
-    # 升级 msg_number_list
-    new_data['msg_number_list'] = {}
-    new_data['msg_number_list'][group_id] = data['msg_number_list']
-    return new_data

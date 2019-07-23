@@ -28,5 +28,5 @@ NICKNAME = config['bot']['nickname'].split()
 SHORT_MESSAGE_MAX_LENGTH = 28
 COMMAND_START = {'/'}
 
-GROUP_ID = set(map(int, config['bot']['group_id'].split()))
+GROUP_ID = list(map(int, config['bot']['group_id'].split()))
 IS_COOLQ_PRO = config.getboolean('bot', 'is_coolq_pro')

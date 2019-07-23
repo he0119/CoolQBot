@@ -27,7 +27,7 @@ async def clear_data():
     """
     # 保存数据到历史文件夹
     date = datetime.now() - timedelta(hours=1)
-    DATA.save_pkl(recorder.get_data(history=True), get_history_pkl_name(date))
+    DATA.save_pkl(recorder.get_data(), get_history_pkl_name(date))
     # 清除现有数据
     recorder.init_data()
     bot.logger.info('记录清除完成')
@@ -63,8 +63,7 @@ async def history(session: CommandSession):
             else:
                 str_data = f'{date.year} 年 {date.month} 月的数据不存在，请换个试试吧 0.0'
             return await session.send(str_data)
-        data = DATA.load_pkl(history_filename)
-        history_data = Recorder(data)
+        history_data = Recorder(history_filename, DATA)
 
     if day:
         repeat_list = history_data.repeat_list_by_day(day, group_id)
