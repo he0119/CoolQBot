@@ -9,4 +9,3 @@ def to_number(arg: str, session: CommandSession):
         return int(arg)
     else:
         session.pause('请输入数字，不然我没法理解呢！')
-

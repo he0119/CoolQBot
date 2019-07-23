@@ -29,7 +29,7 @@ async def clear_data():
     date = datetime.now() - timedelta(hours=1)
     DATA.save_pkl(recorder.get_data(history=True), get_history_pkl_name(date))
     # 清除现有数据
-    recorder.clear_data()
+    recorder.init_data()
     bot.logger.info('记录清除完成')
 
 
@@ -67,11 +67,11 @@ async def history(session: CommandSession):
         history_data = Recorder(data)
 
     if day:
-        repeat_list = history_data.get_repeat_list_by_day(day, group_id)
-        msg_number_list = history_data.get_msg_number_list_by_day(day, group_id)
+        repeat_list = history_data.repeat_list_by_day(day, group_id)
+        msg_number_list = history_data.msg_number_list_by_day(day, group_id)
     else:
-        repeat_list = history_data.get_repeat_list(group_id)
-        msg_number_list = history_data.get_msg_number_list(group_id)
+        repeat_list = history_data.repeat_list(group_id)
+        msg_number_list = history_data.msg_number_list(group_id)
 
     # 如无其他情况，并输出排行榜
     display_number = 10000

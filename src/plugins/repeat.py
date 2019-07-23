@@ -49,8 +49,8 @@ def is_repeat(session: CommandSession, message):
         return False
 
     # 复读之后1分钟之内不再复读
-    time = recorder.get_last_message_on(group_id)
-    if datetime.now() < time + timedelta(minutes=REPEAT_INTERVAL):
+    time = recorder.last_message_on(group_id)
+    if now < time + timedelta(minutes=REPEAT_INTERVAL):
         return False
 
     repeat_rate = REPEAT_RATE
