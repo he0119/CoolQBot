@@ -19,6 +19,12 @@ jobs:
     imageName: 'coolqbot'
 
   steps:
+  - task: CacheBeta@0
+    inputs:
+      key: $(Build.SourcesDirectory)/Dockerfile
+      path: $(Pipeline.Workspace)/var/lib/docker
+    displayName: Cache docker
+
   - bash: echo '##vso[task.setvariable variable=imageTag]test'
     condition: eq(variables['Build.Reason'], 'PullRequest')
     displayName: 'set imageTag to test'
