@@ -5,8 +5,7 @@ from nonebot import CommandSession
 def to_number(arg: str, session: CommandSession):
     """ 转换成数字
     """
-    try:
+    if arg.isdigit():
         return int(arg)
-    except:
+    else:
         session.pause('请输入数字，不然我没法理解呢！')
-

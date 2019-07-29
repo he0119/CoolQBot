@@ -4,6 +4,25 @@
 
 ## [Unreleased]
 
+## [0.9.0] - 2019-07-29
+
+### Added
+
+- 支持多个群的复读，排行榜和历史记录
+- 可以自动升级旧版本 `recorder` 插件保存的数据
+- 青云客智能聊天机器人
+- 音乐插件（当前仅支持网易云音乐）
+- 天气插件支持查询 `最终幻想XIV` 中的天气
+
+### Changed
+
+- 启动时会根据当前时间发送不同消息
+- 统一配置文件位置
+
+### Fixed
+
+- 修复了管理员配置出错的问题
+
 ## [0.8.1] - 2019-06-18
 
 ### Fixed
@@ -197,7 +216,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/he0119/CoolQBot/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/he0119/CoolQBot/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/he0119/CoolQBot/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/he0119/CoolQBot/compare/v0.7.0...v0.7.1

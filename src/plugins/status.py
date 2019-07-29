@@ -4,21 +4,25 @@ import re
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
-from nonebot import CommandSession, on_command
+from nonebot import CommandSession, on_command, permission
 
 from coolqbot import bot
 
 from .recorder import recorder
 
 
-@on_command('status', only_to_me=False)
+@on_command('status',
+            aliases={'状态'},
+            only_to_me=False,
+            permission=permission.GROUP)
 async def status(session: CommandSession):
-    str_data = f'近十分钟群内聊天数量是 {recorder.message_number(10)} 条'
+    group_id = session.ctx['group_id']
+    str_data = f'近十分钟群内聊天数量是 {recorder.message_number(10, group_id)} 条'
 
-    repeat_num = get_total_number(recorder.get_repeat_list())
-    msg_num = get_total_number(recorder.get_msg_number_list())
+    repeat_num = get_total_number(recorder.repeat_list(group_id))
+    msg_num = get_total_number(recorder.msg_number_list(group_id))
     today_msg_num = get_total_number(
-        recorder.get_msg_number_list_by_day(datetime.now().day))
+        recorder.msg_number_list_by_day(datetime.now().day, group_id))
 
     if msg_num:
         repeat_rate = repeat_num / msg_num
@@ -56,23 +60,45 @@ def get_total_number(record_list):
     return num
 
 
-@bot.scheduler.scheduled_job('interval', seconds=5, id='check_status')
+@bot.scheduler.scheduled_job('interval', seconds=5, id='coolq_status')
+async def coolq_status():
+    """ 检查酷Q状态
+
+    每5秒检查一次状态，并记录
+    """
+    try:
+        msg = await bot.get_bot().get_status()
+        recorder.coolq_status = msg['good']
+    except:
+        bot.logger.debug('当前无法获取酷Q状态')
+
+
+@bot.scheduler.scheduled_job('interval', seconds=5, id='start_message')
 async def check_status():
     """ 检测是否需要发送问好信息
     """
     if recorder.coolq_status and not recorder.send_hello:
         hello_str = get_message()
-        await bot.get_bot().send_msg(message_type='group',
-                                     group_id=bot.get_bot().config.GROUP_ID,
-                                     message=hello_str)
+        for group_id in bot.get_bot().config.GROUP_ID:
+            await bot.get_bot().send_msg(message_type='group',
+                                         group_id=group_id,
+                                         message=hello_str)
         recorder.send_hello = True
         bot.logger.info('发送首次启动的问好信息')
 
 
 def get_message():
-    """ 获得消息
-
-    TODO: 每次启动时问好词根据时间不同而不同
+    """ 根据当前时间返回对应消息
     """
+    hour = datetime.now().hour
+
+    if hour > 18 or hour < 6:
+        return '晚上好呀！'
+
+    if hour > 13:
+        return '下午好呀！'
+
+    if hour > 11:
+        return '中午好呀！'
 
     return '早上好呀！'

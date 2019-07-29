@@ -1,10 +1,11 @@
 """ 天气插件
 """
-from nonebot import on_command, CommandSession
-from nonebot import on_natural_language, NLPSession, IntentCommand
 from jieba import posseg
+from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
+                     on_natural_language)
 
-from .data_source import get_weather_of_city
+from .eorzean import eorzean_weather
+from .heweather import heweather
 
 
 @on_command('weather', aliases=('天气', '天气预报', '查天气'), only_to_me=False)
@@ -24,7 +25,7 @@ async def _(session: CommandSession):
         return
 
     if not stripped_arg:
-        session.pause('要查询的城市名称不能为空呢，请重新输入')
+        session.pause('要查询的城市名称不能为空呢，请重新输入！')
 
     session.state[session.current_key] = stripped_arg
 
@@ -36,16 +37,35 @@ async def _(session: CommandSession):
 async def _(session: NLPSession):
     # 去掉消息首尾的空白符
     stripped_msg = session.msg_text.strip()
-    # 对消息进行分词和词性标注
-    words = posseg.lcut(stripped_msg)
 
-    city = None
+    city = get_city(stripped_msg)
+
+    # 返回意图命令，前两个参数必填，分别表示置信度和意图命令名
+    return IntentCommand(90.0, 'weather', current_arg=city or '')
+
+
+async def get_weather_of_city(city):
+    """ 根据城市名获取天气数据
+    """
+    # 艾欧泽亚的天气
+    str_data = eorzean_weather(city)
+    if not str_data:
+        str_data = heweather(city)
+    if not str_data:
+        str_data = f'我才不是因为不知道才不告诉你{city}的天气呢'
+    return str_data
+
+
+def get_city(msg):
+    """ 提取消息中的地名
+    """
+    # 对消息进行分词和词性标注
+    words = posseg.lcut(msg)
     # 遍历 posseg.lcut 返回的列表
     for word in words:
         # 每个元素是一个 pair 对象，包含 word 和 flag 两个属性，分别表示词和词性
         if word.flag == 'ns':
             # ns 词性表示地名
-            city = word.word
+            return word.word
 
-    # 返回意图命令，前两个参数必填，分别表示置信度和意图命令名
-    return IntentCommand(90.0, 'weather', current_arg=city or '')
+    return None

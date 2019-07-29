@@ -1,20 +1,10 @@
-""" 根据城市名获取天气数据
+""" 和风天气
 """
 import json
 import re
 import urllib
 
 import requests
-
-
-async def get_weather_of_city(city):
-    """ 获取天气数据
-    """
-    str_data = heweather(city)
-    if not str_data:
-        str_data = f'我才不是因为不知道才不告诉你{city}的天气呢'
-    return str_data
-
 
 KEY = '6ff5a040195245328b3cdc693d1c0bb2'
 
