@@ -1,5 +1,6 @@
-""" 记录数据
+""" 数据记录插件
 
+记录排行版插件，历史插件，状态插件所需的数据
 如果遇到老版本数据，则自动升级
 """
 from datetime import datetime, timedelta
@@ -10,7 +11,7 @@ VERSION = '1'
 DATA = PluginData('recorder')
 
 
-def get_history_pkl_name(dt):
+def get_history_pkl_name(dt: datetime):
     time_str = dt.strftime('%Y-%m')
     return time_str
 

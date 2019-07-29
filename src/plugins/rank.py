@@ -13,7 +13,7 @@ from .tools import to_number
 
 
 @on_command('rank',
-            aliases={'排名'},
+            aliases={'排名', '排行榜'},
             only_to_me=False,
             permission=permission.GROUP)
 async def rank(session: CommandSession):
