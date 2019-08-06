@@ -16,6 +16,8 @@ async def call_qingyunke_api(session: CommandSession,
         return None
 
     # 构造请求数据
+    # 替换关键词，因为菲菲是这个机器人 API 的自称
+    text = text.replace('小誓约', '菲菲')
     url = f'http://api.qingyunke.com/api.php?key=free&appid=0&msg={text}'
 
     try:
@@ -33,8 +35,8 @@ async def call_qingyunke_api(session: CommandSession,
                     return None
 
                 return resp_payload['content'].replace('{br}', '\n').replace(
-                    '菲菲翻译', '小誓约翻译').replace('&lt;p&gt;　　',
-                                             '').replace('&lt;/p&gt;', '')
+                    '菲菲', '小誓约').replace('梁浩小妾', '是大家的最爱的人').replace(
+                        '&lt;p&gt;　　', '').replace('&lt;/p&gt;', '')
     except (aiohttp.ClientError, json.JSONDecodeError, KeyError):
         # 抛出上面任何异常，说明调用失败
         return None
