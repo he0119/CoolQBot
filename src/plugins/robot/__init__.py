@@ -6,6 +6,7 @@ from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
 from nonebot.helpers import render_expression
 
 from .qingyunke import call_qingyunke_api
+from .tuling import call_tuling_api
 
 # 定义无法获取机器人回复时的「表达（Expression）」
 EXPR_DONT_UNDERSTAND = ('我现在还不太明白你在说什么呢，但没关系，以后的我会变得更强呢！',
@@ -20,16 +21,21 @@ async def robot(session: CommandSession):
     message = session.state.get('message')
 
     # 通过封装的函数获取机器人的回复
-    reply = await call_qingyunke_api(session, message)
+    reply = await call_tuling_api(session, message)
     if reply:
         # 如果调用机器人成功，得到了回复，则转义之后发送给用户
         # 转义会把消息中的某些特殊字符做转换，以避免 酷Q 将它们理解为 CQ 码
         await session.send(escape(reply), at_sender=True)
-    else:
-        # 如果调用失败，或者它返回的内容我们目前处理不了，发送无法获取回复时的「表达」
-        # 这里的 render_expression() 函数会将一个「表达」渲染成一个字符串消息
-        await session.send(render_expression(EXPR_DONT_UNDERSTAND),
-                           at_sender=True)
+        return
+
+    reply = await call_qingyunke_api(session, message)
+    if reply:
+        await session.send(escape(reply), at_sender=True)
+        return
+
+    # 如果调用失败，或者它返回的内容我们目前处理不了，发送无法获取回复时的「表达」
+    # 这里的 render_expression() 函数会将一个「表达」渲染成一个字符串消息
+    await session.send(render_expression(EXPR_DONT_UNDERSTAND), at_sender=True)
 
 
 @on_natural_language(only_short_message=False)
