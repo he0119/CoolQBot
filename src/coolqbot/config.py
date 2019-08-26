@@ -30,4 +30,6 @@ COMMAND_START = {'/'}
 
 GROUP_ID = list(map(int, config['bot']['group_id'].split()))
 IS_COOLQ_PRO = config.getboolean('bot', 'is_coolq_pro')
-TULING_API_KEY = config['bot']['tuling_api_key']
+TULING_API_KEY = config.get('bot', 'tuling_api_key', fallback='')
+TENCENT_AI_APP_ID = config.getint('bot', 'tencent_ai_app_id', fallback='')
+TENCENT_AI_APP_KEY = config.get('bot', 'tencent_ai_app_key', fallback='')

@@ -5,7 +5,7 @@ from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
                      on_natural_language)
 from nonebot.helpers import render_expression
 
-from .qingyunke import call_qingyunke_api
+from .tencent import call_tencent_api
 from .tuling import call_tuling_api
 
 # 定义无法获取机器人回复时的「表达（Expression）」
@@ -28,7 +28,7 @@ async def robot(session: CommandSession):
         await session.send(escape(reply), at_sender=True)
         return
 
-    reply = await call_qingyunke_api(session, message)
+    reply = await call_tencent_api(session, message)
     if reply:
         await session.send(escape(reply), at_sender=True)
         return
