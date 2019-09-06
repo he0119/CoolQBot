@@ -1,8 +1,9 @@
 """ 天气插件
 """
 from jieba import posseg
-from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
-                     on_natural_language)
+from nonebot import (
+    CommandSession, IntentCommand, NLPSession, on_command, on_natural_language
+)
 
 from .eorzean import eorzean_weather
 from .heweather import heweather

@@ -1,8 +1,9 @@
 """ 自主禁言插件
 """
 from jieba import posseg
-from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
-                     on_natural_language)
+from nonebot import (
+    CommandSession, IntentCommand, NLPSession, on_command, on_natural_language
+)
 
 from .tools import to_number
 
@@ -17,7 +18,8 @@ async def ban(session: CommandSession):
         await session.bot.set_group_ban(
             group_id=session.ctx['group_id'],
             user_id=session.ctx['sender']['user_id'],
-            duration=duration)
+            duration=duration
+        )
 
     # 如果私聊的话，则在所有小誓约支持的群禁言/解除
     elif session.ctx['message_type'] == 'private':
@@ -25,7 +27,8 @@ async def ban(session: CommandSession):
             await session.bot.set_group_ban(
                 group_id=group_id,
                 user_id=session.ctx['sender']['user_id'],
-                duration=duration)
+                duration=duration
+            )
 
 
 @ban.args_parser

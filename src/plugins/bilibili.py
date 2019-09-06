@@ -12,7 +12,8 @@ async def bilibili_today(session: CommandSession):
     try:
         output = ''
         response = requests.get(
-            'https://bangumi.bilibili.com/web_api/timeline_global')
+            'https://bangumi.bilibili.com/web_api/timeline_global'
+        )
         data = response.content.decode('utf-8')
         rjson = json.loads(data)
         for day in rjson['result']:

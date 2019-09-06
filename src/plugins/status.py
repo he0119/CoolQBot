@@ -11,10 +11,9 @@ from coolqbot import bot
 from .recorder import recorder
 
 
-@on_command('status',
-            aliases={'状态'},
-            only_to_me=False,
-            permission=permission.GROUP)
+@on_command(
+    'status', aliases={'状态'}, only_to_me=False, permission=permission.GROUP
+)
 async def status(session: CommandSession):
     group_id = session.ctx['group_id']
     str_data = f'近十分钟群内聊天数量是 {recorder.message_number(10, group_id)} 条'
@@ -22,7 +21,8 @@ async def status(session: CommandSession):
     repeat_num = get_total_number(recorder.repeat_list(group_id))
     msg_num = get_total_number(recorder.msg_number_list(group_id))
     today_msg_num = get_total_number(
-        recorder.msg_number_list_by_day(datetime.now().day, group_id))
+        recorder.msg_number_list_by_day(datetime.now().day, group_id)
+    )
 
     if msg_num:
         repeat_rate = repeat_num / msg_num
@@ -80,9 +80,9 @@ async def check_status():
     if recorder.coolq_status and not recorder.send_hello:
         hello_str = get_message()
         for group_id in bot.get_bot().config.GROUP_ID:
-            await bot.get_bot().send_msg(message_type='group',
-                                         group_id=group_id,
-                                         message=hello_str)
+            await bot.get_bot().send_msg(
+                message_type='group', group_id=group_id, message=hello_str
+            )
         recorder.send_hello = True
         bot.logger.info('发送首次启动的问好信息')
 

@@ -39,8 +39,9 @@ async def call_tencent_api(session: CommandSession,
         text
     }
     # 接口鉴权 签名
-    payload['sign'] = gen_sign_string(payload,
-                                      session.bot.config.TENCENT_AI_APP_KEY)
+    payload['sign'] = gen_sign_string(
+        payload, session.bot.config.TENCENT_AI_APP_KEY
+    )
 
     try:
         # 使用 aiohttp 库发送最终的请求

@@ -1,20 +1,22 @@
 """ 基础插件
 """
-from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
-                     on_natural_language, permission)
+from nonebot import (
+    CommandSession, IntentCommand, NLPSession, on_command, on_natural_language,
+    permission
+)
 
 from coolqbot import bot
 
 
-@on_command('whoami',
-            aliases={'我是谁'},
-            permission=permission.GROUP,
-            only_to_me=False)
+@on_command(
+    'whoami', aliases={'我是谁'}, permission=permission.GROUP, only_to_me=False
+)
 async def whoami(session: CommandSession):
     msg = await session.bot.get_group_member_info(
         user_id=session.ctx['sender']['user_id'],
         group_id=session.ctx['group_id'],
-        no_cache=True)
+        no_cache=True
+    )
     if msg['card']:
         outName = msg['card']
     else:
@@ -22,16 +24,16 @@ async def whoami(session: CommandSession):
     await session.send(f'你是{outName}!')
 
 
-@on_command('whereami',
-            aliases={'我在哪'},
-            permission=permission.GROUP,
-            only_to_me=False)
+@on_command(
+    'whereami', aliases={'我在哪'}, permission=permission.GROUP, only_to_me=False
+)
 async def whereami(session: CommandSession):
     group_list = await session.bot.get_group_list()
     msg = await session.bot.get_group_member_info(
         user_id=session.ctx['sender']['user_id'],
         group_id=session.ctx['group_id'],
-        no_cache=True)
+        no_cache=True
+    )
     if msg['area']:
         country = msg['area']
     else:
@@ -40,7 +42,8 @@ async def whereami(session: CommandSession):
         if group['group_id'] == session.ctx['group_id']:
             await session.send(
                 f'\n你所在群：{group["group_name"]}\n你所在地区：{country}',
-                at_sender=True)
+                at_sender=True
+            )
 
 
 @on_command('whoareyou', aliases={'你是谁'}, only_to_me=False)

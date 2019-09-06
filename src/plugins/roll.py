@@ -11,7 +11,8 @@ async def roll(session: CommandSession):
     args = session.get(
         'args',
         prompt=
-        '欢迎使用 NGA 风格 ROLL 点插件\n请问你想怎么 ROLL 点\n你可以输入 d100\n也可以输入 2d100+2d50')
+        '欢迎使用 NGA 风格 ROLL 点插件\n请问你想怎么 ROLL 点\n你可以输入 d100\n也可以输入 2d100+2d50'
+    )
     str_data = roll_dices(args)
 
     await session.send(str_data)
