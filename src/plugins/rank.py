@@ -12,23 +12,29 @@ from .recorder import recorder
 from .tools import to_number
 
 
-@on_command('rank',
-            aliases={'排名', '排行榜'},
-            only_to_me=False,
-            permission=permission.GROUP)
+@on_command(
+    'rank',
+    aliases={'排名', '排行榜'},
+    only_to_me=False,
+    permission=permission.GROUP
+)
 async def rank(session: CommandSession):
     display_number = session.get('display_number', prompt='请输入想显示的排行条数')
-    minimal_msg_number = session.get('minimal_msg_number',
-                                     prompt='请输入进入排行，最少需要发送多少消息')
-    display_total_number = session.get('display_total_number',
-                                       prompt='是否显示每个人发送的消息总数')
+    minimal_msg_number = session.get(
+        'minimal_msg_number', prompt='请输入进入排行，最少需要发送多少消息'
+    )
+    display_total_number = session.get(
+        'display_total_number', prompt='是否显示每个人发送的消息总数'
+    )
 
     group_id = session.ctx['group_id']
     repeat_list = recorder.repeat_list(group_id)
     msg_number_list = recorder.msg_number_list(group_id)
 
-    ranking = Ranking(display_number, minimal_msg_number, display_total_number,
-                      repeat_list, msg_number_list)
+    ranking = Ranking(
+        display_number, minimal_msg_number, display_total_number, repeat_list,
+        msg_number_list
+    )
     str_data = await ranking.ranking()
 
     if not str_data:
@@ -71,9 +77,10 @@ async def _(session: CommandSession):
 class Ranking:
     """ 排行榜
     """
-
-    def __init__(self, display_number, minimal_msg_number,
-                 display_total_number, repeat_list, msg_number_list):
+    def __init__(
+        self, display_number, minimal_msg_number, display_total_number,
+        repeat_list, msg_number_list
+    ):
         self.display_number = display_number
         self.minimal_msg_number = minimal_msg_number
         self.display_total_number = display_total_number
@@ -93,7 +100,8 @@ class Ranking:
         """ 获取次数排行榜
         """
         od = collections.OrderedDict(
-            sorted(self.repeat_list.items(), key=itemgetter(1), reverse=True))
+            sorted(self.repeat_list.items(), key=itemgetter(1), reverse=True)
+        )
 
         str_data = await self.ranking_str(od, 'number')
 
@@ -107,7 +115,8 @@ class Ranking:
         """
         repeat_rate = get_repeat_rate(self.repeat_list, self.msg_number_list)
         od = collections.OrderedDict(
-            sorted(repeat_rate.items(), key=itemgetter(1), reverse=True))
+            sorted(repeat_rate.items(), key=itemgetter(1), reverse=True)
+        )
 
         str_data = await self.ranking_str(od, 'rate')
 
@@ -150,7 +159,8 @@ async def nikcname(user_id):
         msg = await bot.get_bot().get_group_member_info(
             group_id=bot.get_bot().config.GROUP_ID,
             user_id=user_id,
-            no_cache=True)
+            no_cache=True
+        )
         if msg['card']:
             return msg['card']
         return msg['nickname']

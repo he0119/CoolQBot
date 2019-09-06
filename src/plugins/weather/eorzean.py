@@ -39,9 +39,13 @@ def calc_eorzean_weather(date: int, location: str):
     """ 计算艾欧泽亚天气
     """
     for index in locationIndex:
+        if 'weatherRate' not in locationIndex[index]:
+            continue
+
         if locationIndex[index]['name'] == location:
             weatherRate = weatherRateIndex[str(
-                locationIndex[index]['weatherRate'])]
+                locationIndex[index]['weatherRate']
+            )]
             break
 
     target = forecastTarget(date)

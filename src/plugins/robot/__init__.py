@@ -1,17 +1,21 @@
 """ 机器人插件
 """
 from aiocqhttp.message import escape
-from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
-                     on_natural_language)
+from nonebot import (
+    CommandSession, IntentCommand, NLPSession, on_command, on_natural_language
+)
 from nonebot.helpers import render_expression
 
 from .tencent import call_tencent_api
 from .tuling import call_tuling_api
 
 # 定义无法获取机器人回复时的「表达（Expression）」
-EXPR_DONT_UNDERSTAND = ('我现在还不太明白你在说什么呢，但没关系，以后的我会变得更强呢！',
-                        '我有点看不懂你的意思呀，可以跟我聊些简单的话题嘛', '其实我不太明白你的意思……',
-                        '抱歉哦，我现在的能力还不能够明白你在说什么，但我会加油的～')
+EXPR_DONT_UNDERSTAND = (
+    '我现在还不太明白你在说什么呢，但没关系，以后的我会变得更强呢！',
+    '我有点看不懂你的意思呀，可以跟我聊些简单的话题嘛',
+    '其实我不太明白你的意思...',
+    '抱歉哦，我现在的能力还不能够明白你在说什么，但我会加油的～'
+) # yapf: disable
 
 
 # 注册一个仅内部使用的命令，不需要 aliases

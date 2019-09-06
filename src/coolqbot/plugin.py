@@ -12,7 +12,6 @@ class PluginData:
     将插件数据保存在 `data` 文件夹对应的目录下。
     提供保存和读取文件/数据的方法。
     """
-
     def __init__(self, name, config=False):
         # 插件名，用来确定插件的文件夹位置
         self._name = name

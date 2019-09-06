@@ -16,12 +16,9 @@ from .tools import to_number
 DATA = PluginData('history')
 
 
-@bot.scheduler.scheduled_job('cron',
-                             day=1,
-                             hour=0,
-                             minute=0,
-                             second=0,
-                             id='clear_data')
+@bot.scheduler.scheduled_job(
+    'cron', day=1, hour=0, minute=0, second=0, id='clear_data'
+)
 async def clear_data():
     """ 每个月最后一天 24 点（下月 0 点）保存记录于历史记录文件夹，并重置记录
     """
@@ -33,10 +30,9 @@ async def clear_data():
     bot.logger.info('记录清除完成')
 
 
-@on_command('history',
-            aliases={'历史'},
-            only_to_me=False,
-            permission=permission.GROUP)
+@on_command(
+    'history', aliases={'历史'}, only_to_me=False, permission=permission.GROUP
+)
 async def history(session: CommandSession):
     year = session.get('year', prompt='你请输入你要查询的年份')
     month = session.get('month', prompt='你请输入你要查询的月份')
@@ -77,8 +73,10 @@ async def history(session: CommandSession):
     minimal_msg_number = 0
     display_total_number = True
 
-    ranking = Ranking(display_number, minimal_msg_number, display_total_number,
-                      repeat_list, msg_number_list)
+    ranking = Ranking(
+        display_number, minimal_msg_number, display_total_number, repeat_list,
+        msg_number_list
+    )
     ranking_str = await ranking.ranking()
 
     if ranking_str:

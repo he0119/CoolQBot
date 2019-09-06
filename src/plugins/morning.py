@@ -15,19 +15,17 @@ MINUTE = int(DATA.config_get('morning', 'minute', fallback='30'))
 SECOND = int(DATA.config_get('morning', 'second', fallback='0'))
 
 
-@bot.scheduler.scheduled_job('cron',
-                             hour=HOUR,
-                             minute=MINUTE,
-                             second=SECOND,
-                             id='morning')
+@bot.scheduler.scheduled_job(
+    'cron', hour=HOUR, minute=MINUTE, second=SECOND, id='morning'
+)
 async def morning():
     """ 早安
     """
     hello_str = get_message()
     for group_id in bot.get_bot().config.GROUP_ID:
-        await bot.get_bot().send_msg(message_type='group',
-                                     group_id=group_id,
-                                     message=hello_str)
+        await bot.get_bot().send_msg(
+            message_type='group', group_id=group_id, message=hello_str
+        )
     bot.logger.info('发送早安信息')
 
 

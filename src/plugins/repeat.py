@@ -4,8 +4,10 @@ import re
 import secrets
 from datetime import datetime, timedelta
 
-from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
-                     on_natural_language, on_notice, permission)
+from nonebot import (
+    CommandSession, IntentCommand, NLPSession, on_command, on_natural_language,
+    on_notice, permission
+)
 
 from coolqbot import PluginData, bot
 
@@ -110,6 +112,6 @@ async def _(session: NLPSession):
 async def _(session: NLPSession):
     match = re.match(r'^\[CQ:sign(.+)\]$', session.msg)
     if match:
-        return IntentCommand(90.0,
-                             'repeat_sign',
-                             args={'message': session.msg})
+        return IntentCommand(
+            90.0, 'repeat_sign', args={'message': session.msg}
+        )

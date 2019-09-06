@@ -11,6 +11,9 @@ from nonebot.helpers import context_id
 async def call_tuling_api(session: CommandSession, text: str) -> Optional[str]:
     """ 调用图灵机器人的 API 获取回复
     """
+    if not session.bot.config.TULING_API_KEY:
+        return None
+
     if not text:
         return None
 

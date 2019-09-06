@@ -15,7 +15,7 @@ TEXTS = [
     '走[direction]，准没错！难道你不相信可爱的小誓约吗！',
     '投了个硬币，仔细一看，走[direction]。不信我，难道你还不信硬币么！',
     '直觉告诉我，你走[direction]就会马上出去......'
-]
+] # yapf: disable
 
 
 @on_command('gate', only_to_me=False)
@@ -26,8 +26,9 @@ async def gate(session: CommandSession):
 
     direction = get_direction(int(door_number))
 
-    await session.send(TEXTS[text_index].replace('[direction]', direction),
-                       at_sender=True)
+    await session.send(
+        TEXTS[text_index].replace('[direction]', direction), at_sender=True
+    )
 
 
 @gate.args_parser

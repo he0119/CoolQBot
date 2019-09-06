@@ -2,6 +2,7 @@
 """
 from nonebot import CommandSession
 
+
 def to_number(arg: str, session: CommandSession):
     """ 转换成数字
     """
