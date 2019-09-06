@@ -17,6 +17,9 @@ async def call_tencent_api(session: CommandSession,
                            text: str) -> Optional[str]:
     """ 调用腾讯机器人的 API 获取回复
     """
+    if not session.bot.config.TENCENT_AI_APP_ID:
+        return None
+
     if not text:
         return None
 
