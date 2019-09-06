@@ -32,8 +32,8 @@ async def rank(session: CommandSession):
     msg_number_list = recorder.msg_number_list(group_id)
 
     ranking = Ranking(
-        display_number, minimal_msg_number, display_total_number, repeat_list,
-        msg_number_list
+        group_id, display_number, minimal_msg_number, display_total_number,
+        repeat_list, msg_number_list
     )
     str_data = await ranking.ranking()
 
@@ -78,9 +78,10 @@ class Ranking:
     """ 排行榜
     """
     def __init__(
-        self, display_number, minimal_msg_number, display_total_number,
-        repeat_list, msg_number_list
+        self, group_id, display_number, minimal_msg_number,
+        display_total_number, repeat_list, msg_number_list
     ):
+        self.group_id = group_id
         self.display_number = display_number
         self.minimal_msg_number = minimal_msg_number
         self.display_total_number = display_total_number
@@ -113,7 +114,9 @@ class Ranking:
     async def repeat_rate_ranking(self):
         """ 获取复读概率排行榜
         """
-        repeat_rate = get_repeat_rate(self.repeat_list, self.msg_number_list)
+        repeat_rate = self.get_repeat_rate(
+            self.repeat_list, self.msg_number_list
+        )
         od = collections.OrderedDict(
             sorted(repeat_rate.items(), key=itemgetter(1), reverse=True)
         )
@@ -133,7 +136,7 @@ class Ranking:
         for user_id, v in sorted_list.items():
             if i < self.display_number:
                 if self.msg_number_list[user_id] >= self.minimal_msg_number:
-                    name = await nikcname(user_id)
+                    name = await self.nikcname(user_id)
                     if self.display_total_number:
                         str_data += f'\n{name}({self.msg_number_list[user_id]})：'
                     else:
@@ -144,27 +147,27 @@ class Ranking:
                 return str_data
         return str_data
 
+    @staticmethod
+    def get_repeat_rate(repeat_list, msg_number_list):
+        """ 获取复读概率表
+        """
+        repeat_rate = {
+            k: v / msg_number_list[k]
+            for k, v in repeat_list.items()
+        }
+        return repeat_rate
 
-def get_repeat_rate(repeat_list, msg_number_list):
-    """ 获取复读概率表
-    """
-    repeat_rate = {k: v / msg_number_list[k] for k, v in repeat_list.items()}
-    return repeat_rate
-
-
-async def nikcname(user_id):
-    """ 输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称
-    """
-    try:
-        msg = await bot.get_bot().get_group_member_info(
-            group_id=bot.get_bot().config.GROUP_ID,
-            user_id=user_id,
-            no_cache=True
-        )
-        if msg['card']:
-            return msg['card']
-        return msg['nickname']
-    except:
-        # 如果不在群里的话(因为有可能会退群)
-        msg = await bot.get_bot().get_stranger_info(user_id=user_id)
-        return msg['nickname']
+    async def nikcname(self, user_id):
+        """ 输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称
+        """
+        try:
+            msg = await bot.get_bot().get_group_member_info(
+                group_id=self.group_id, user_id=user_id, no_cache=True
+            )
+            if msg['card']:
+                return msg['card']
+            return msg['nickname']
+        except:
+            # 如果不在群里的话(因为有可能会退群)
+            msg = await bot.get_bot().get_stranger_info(user_id=user_id)
+            return msg['nickname']
