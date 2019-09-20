@@ -9,7 +9,6 @@ from nonebot import CommandSession, on_command, permission
 from coolqbot import bot
 
 from .recorder import recorder
-from .tools import to_number
 
 
 @on_command(
@@ -71,7 +70,11 @@ async def _(session: CommandSession):
     if not stripped_arg:
         session.pause('你什么都不输入我怎么知道呢！')
 
-    session.state[session.current_key] = to_number(stripped_arg, session)
+    # 检查输入参数是不是数字
+    if stripped_arg.isdigit():
+        session.state[session.current_key] = int(stripped_arg)
+    else:
+        session.pause('请只输入数字，不然我没法理解呢！')
 
 
 class Ranking:

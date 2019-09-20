@@ -11,7 +11,6 @@ from coolqbot import PluginData, bot
 
 from .rank import Ranking
 from .recorder import Recorder, get_history_pkl_name, recorder
-from .tools import to_number
 
 DATA = PluginData('history')
 
@@ -116,7 +115,10 @@ async def _(session: CommandSession):
         session.pause('你什么都不输入我怎么知道呢！')
 
     # 检查输入参数是不是数字
-    session.state[session.current_key] = to_number(stripped_arg, session)
+    if stripped_arg.isdigit():
+        session.state[session.current_key] = int(stripped_arg)
+    else:
+        session.pause('请只输入数字，不然我没法理解呢！')
 
 
 def is_valid_date(year, month, day, now):
