@@ -5,8 +5,6 @@ from nonebot import (
     CommandSession, IntentCommand, NLPSession, on_command, on_natural_language
 )
 
-from .tools import to_number
-
 
 @on_command('ban', aliases=('禁言'), only_to_me=False)
 async def ban(session: CommandSession):
@@ -45,7 +43,11 @@ async def _(session: CommandSession):
     if not stripped_arg:
         session.pause('禁言时间不能为空呢，请重新输入')
 
-    session.state[session.current_key] = to_number(stripped_arg, session)
+    # 检查输入参数是不是数字
+    if stripped_arg.isdigit():
+        session.state[session.current_key] = int(stripped_arg)
+    else:
+        session.pause('请只输入数字，不然我没法理解呢！')
 
 
 @on_natural_language(keywords={'禁言'})
