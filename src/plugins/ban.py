@@ -22,7 +22,7 @@ EXPR_OWNER = (
 @on_command('ban', aliases=('禁言'), only_to_me=False)
 async def ban(session: CommandSession):
     duration = session.get('duration', prompt='你想被禁言多少分钟呢？')
-    duration = duration * 60
+    duration_sec = duration * 60
 
     # 如果在群里发送，则在当前群禁言/解除
     if session.ctx['message_type'] == 'group':
@@ -32,7 +32,7 @@ async def ban(session: CommandSession):
             await session.bot.set_group_ban(
                 group_id=session.ctx['group_id'],
                 user_id=session.ctx['sender']['user_id'],
-                duration=duration
+                duration=duration_sec
             )
         elif role == 'admin':
             owner_id = await get_owner(group_id, session.bot)
@@ -51,7 +51,7 @@ async def ban(session: CommandSession):
             await session.bot.set_group_ban(
                 group_id=group_id,
                 user_id=session.ctx['sender']['user_id'],
-                duration=duration
+                duration=duration_sec
             )
 
 
