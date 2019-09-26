@@ -73,8 +73,8 @@ async def history(session: CommandSession):
     display_total_number = True
 
     ranking = Ranking(
-        display_number, minimal_msg_number, display_total_number, repeat_list,
-        msg_number_list
+        group_id, display_number, minimal_msg_number, display_total_number,
+        repeat_list, msg_number_list
     )
     ranking_str = await ranking.ranking()
 
