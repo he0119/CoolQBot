@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+## [0.9.1] - 2019-09-26
+
+### Changed
+
+- 禁言插件会自动识别权限，并根据拥有的权限做出反应
+
+### Fixed
+
+- 修复了历史插件无法使用的问题
+
 ## [0.9.0] - 2019-07-29
 
 ### Added
@@ -216,7 +226,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/he0119/CoolQBot/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/he0119/CoolQBot/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/he0119/CoolQBot/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/he0119/CoolQBot/compare/v0.7.1...v0.8.0
