@@ -4,7 +4,20 @@ from jieba import posseg
 from nonebot import (
     CommandSession, IntentCommand, NLPSession, on_command, on_natural_language
 )
+from nonebot.helpers import render_expression
 
+# 定义管理员请求时的「表达（Expression）」
+EXPR_ADMIN = (
+    '你是管理员，我没法禁言你，不过我可以帮你[CQ:at,qq={owner_id}]~',
+    '有人想被禁言 {duration} 分钟，群主[CQ:at,qq={owner_id}]，快满足他~',
+    '群主群主[CQ:at,qq={owner_id}]，快禁言他 {duration} 分钟'
+) # yapf: disable
+
+EXPR_OWNER = (
+    '你是群主，你开心就好。',
+    '群主别闹了！',
+    '没人能禁言你的！不要@我了！'
+) # yapf: disable
 
 @on_command('ban', aliases=('禁言'), only_to_me=False)
 async def ban(session: CommandSession):
@@ -24,10 +37,13 @@ async def ban(session: CommandSession):
         elif role == 'admin':
             owner_id = await get_owner(group_id, session.bot)
             await session.send(
-                f'你是管理员，我没法禁言你，不过我可以帮你[CQ:at,qq={owner_id}]~', at_sender=True
+                render_expression(
+                    EXPR_ADMIN, duration=duration, owner_id=owner_id
+                ),
+                at_sender=True
             )
         elif role == 'owner':
-            await session.send(f'你是群主，你开心就好。', at_sender=True)
+            await session.send(render_expression(EXPR_ADMIN), at_sender=True)
 
     # 如果私聊的话，则在所有小誓约支持的群禁言/解除
     elif session.ctx['message_type'] == 'private':

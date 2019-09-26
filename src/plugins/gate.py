@@ -4,17 +4,18 @@ import re
 from random import randint
 
 from nonebot import CommandSession, on_command
+from nonebot.helpers import render_expression
 
 TEXTS = [
-    '掐指一算，你应该走[direction]！',
-    '夜观天象，你应该走[direction]！',
-    '冷静分析，你应该走[direction]！',
-    '一拍大腿，你应该走[direction]！',
-    '我寻思，走[direction]一定可以到7层',
-    '想了想，走[direction]应该是最好的选择！',
-    '走[direction]，准没错！难道你不相信可爱的小誓约吗！',
-    '投了个硬币，仔细一看，走[direction]。不信我，难道你还不信硬币么！',
-    '直觉告诉我，你走[direction]就会马上出去......'
+    '掐指一算，你应该走{direction}！',
+    '夜观天象，你应该走{direction}！',
+    '冷静分析，你应该走{direction}！',
+    '一拍大腿，你应该走{direction}！',
+    '我寻思，走{direction}一定可以到7层',
+    '想了想，走{direction}应该是最好的选择！',
+    '走{direction}，准没错！难道你不相信可爱的小誓约吗！',
+    '投了个硬币，仔细一看，走{direction}。不信我，难道你还不信硬币么！',
+    '直觉告诉我，你走{direction}就会马上出去......'
 ] # yapf: disable
 
 
@@ -22,12 +23,10 @@ TEXTS = [
 async def gate(session: CommandSession):
     door_number = session.get('door_number', prompt='总共有多少个门呢？')
 
-    text_index = randint(0, len(TEXTS) - 1)
-
     direction = get_direction(int(door_number))
 
     await session.send(
-        TEXTS[text_index].replace('[direction]', direction), at_sender=True
+        render_expression(TEXTS, direction=direction), at_sender=True
     )
 
 
