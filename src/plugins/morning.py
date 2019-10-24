@@ -1,10 +1,10 @@
 """ 每日早安插件
 """
 import re
-from random import randint
 
 import requests
-from nonebot import CommandSession, on_command
+from nonebot import on_command
+from nonebot.helpers import render_expression
 
 from coolqbot import PluginData, bot
 
@@ -29,7 +29,12 @@ async def morning():
     bot.logger.info('发送早安信息')
 
 
-TEXTS = ['早上好呀~>_<~', '大家早上好呀！', '朋友们早上好！', '圆神的信徒们早上好~']
+EXPR_MORNING = [
+    '早上好呀~>_<~\n{message}',
+    '大家早上好呀！\n{message}',
+    '朋友们早上好！\n{message}',
+    '群友们早上好！\n{message}',
+] # yapf: disable
 
 
 def get_message():
@@ -43,12 +48,9 @@ def get_message():
     except:
         res = {'code': -1}
 
-    text_index = randint(0, len(TEXTS) - 1)
-    str_data = f'{TEXTS[text_index]}\n'
-
     if res['code'] == 0:
-        str_data += res['tts']
+        message = res['tts']
     else:
-        str_data += '好像没法获得节假日信息了，嘤嘤嘤'
+        message = '好像没法获得节假日信息了，嘤嘤嘤'
 
-    return str_data
+    return render_expression(EXPR_MORNING, message=message)
