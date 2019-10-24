@@ -18,7 +18,7 @@
 
 - 新建一个 `coolq` 和 `bot` 文件夹，
 
-- 将 `bot.ini.example` 文件复制到 `/bot/` 文件夹下并重命名为 `bot.ini` 且填入对应配置。
+- 将 `src/bot.ini.example` 文件复制到 `bot/` 文件夹下并重命名为 `bot.ini` 且填入对应配置。
 
 - 提供了 `Docker Image`，使用以下命令即可运行。
 
@@ -35,7 +35,7 @@
   #   -e COOLQ_URL=http://dlsec.cqp.me/cqp-tuling \ # 专业版
   ```
 
-  或者使用 Docker-Compose 运行
+  或者使用 [Docker-Compose](https://docs.docker.com/compose/install/) 运行
 
   创建 `docker-compose.yml` 文件并填入一下内容
 
