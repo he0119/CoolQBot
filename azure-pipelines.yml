@@ -38,7 +38,7 @@ jobs:
       key: $(BUILDKIT_CACHE_KEY)
       path: '$(System.DefaultWorkingDirectory)/buildkit'
       cacheHitVar: 'BuildKitToolHit'
-    displayName: 'cache buildkit tool'
+    displayName: 'Cache BuildKit tool'
 
   - script: |
       git clone https://github.com/moby/buildkit.git
@@ -53,6 +53,7 @@ jobs:
       sudo make install
       which buildctl
       which buildkitd
+    displayName: 'Install BuildKit tool'
 
   # restore the BuildKit cache based on the Dockerfile ...
   - task: CacheBeta@0
