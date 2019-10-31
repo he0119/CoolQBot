@@ -88,7 +88,7 @@ jobs:
         sleep 1
       done
 
-      DOCKER_COMMAND="$(DOCKER_COMMAND)"
+      DOCKER_COMMAND="$(DOCKER_COMMAND) --opt target=$(dockerId)/$(imageName):$(imageTag)"
 
       if [ -d "$(BUILD_KIT_CACHE)" ]; then
         echo "Will use cached layers from $(BUILD_KIT_CACHE)"
@@ -101,7 +101,7 @@ jobs:
         DOCKER_COMMAND="$DOCKER_COMMAND --export-cache mode=max,type=local,dest=$(BUILD_KIT_CACHE)"
       fi
 
-      sudo $DOCKER_COMMAND --opt target=$(dockerId)/$(imageName):$(imageTag)
+      sudo $DOCKER_COMMAND
 
       find $(BUILD_KIT_CACHE)
 
