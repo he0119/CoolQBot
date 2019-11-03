@@ -65,6 +65,7 @@ jobs:
         $(CACHE_KEY_FALLBACK)
     displayName: 'cache docker layers'
 
+  # 根据触发的种类设置 tag
   - bash: echo '##vso[task.setvariable variable=imageTag]test'
     condition: eq(variables['Build.Reason'], 'PullRequest')
     displayName: 'set imageTag to test'
@@ -81,7 +82,7 @@ jobs:
 
   - script: |
       set -e -x
-      sudo buildkitd --debug --root /var/lib/buildkit &
+      sudo buildkitd --root /var/lib/buildkit &
 
       until sudo buildctl du -v
       do
