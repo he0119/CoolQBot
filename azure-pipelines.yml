@@ -103,7 +103,7 @@ jobs:
       fi
 
       docker login -u $(dockerId) -p $(pswd)
-      sudo $DOCKER_COMMAND | docker load
+      sudo $DOCKER_COMMAND
 
       find $(BUILD_KIT_CACHE)
 
