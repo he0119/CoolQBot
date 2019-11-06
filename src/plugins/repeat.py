@@ -81,7 +81,8 @@ def is_repeat(session: CommandSession, message):
     return True
 
 
-@on_command('repeat')
+# privileged 设置为 true，防止之前复读没有结束而导致下一个复读判定失败。
+@on_command('repeat', privileged=True)
 async def repeat(session: CommandSession):
     """ 人类本质
     """
