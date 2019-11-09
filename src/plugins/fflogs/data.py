@@ -1,9 +1,9 @@
 """ 一些数据
 """
 boss_list = {
-    (28, 1045): ['缇坦妮雅', '妖精', '极妖精'],
-    (28, 1046): ['无瑕灵君', '肥宅', '极肥宅'],
-    (28, 1049): ['哈迪斯']
+    (28, 1045): ['缇坦妮雅', '妖精', '极妖精', '妖灵王', '老婆', '10王'],
+    (28, 1046): ['无瑕灵君', '肥宅', '极肥宅', '全能王'],
+    (28, 1049): ['哈迪斯', '老公']
 } # yapf: disable
 
 job_list = {
@@ -20,7 +20,7 @@ job_list = {
     'Paladin':     ['骑士', '圣骑', '奶骑'],
     'RedMage':     ['赤魔法师', '赤魔', '吃馍', '红色治疗'],
     'Samurai':     ['武士', '侍'],
-    'Scholar':     ['学者', '小仙女', '气炎法师'],
+    'Scholar':     ['学者', '小仙女', '死炎法师'],
     'Summoner':    ['召唤师', '召唤'],
     'Warrior':     ['战士', '战爹'],
     'WhiteMage':   ['白魔法师', '白魔', '白膜', '投石机'],
@@ -33,7 +33,7 @@ def get_boss_info(name):
     for boss, nickname in boss_list.items():
         if name in nickname:
             return boss, nickname[0]
-    return None
+    return (None, None), None
 
 
 def get_job_name(name):
@@ -42,4 +42,4 @@ def get_job_name(name):
     for name_en, nickname in job_list.items():
         if name in nickname:
             return name_en, nickname[0]
-    return None
+    return None, None
