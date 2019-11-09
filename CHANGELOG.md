@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- 添加了查询 fflogs 输出百分比的功能
+
 ## [0.9.1] - 2019-09-26
 
 ### Changed
