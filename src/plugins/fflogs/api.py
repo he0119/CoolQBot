@@ -13,7 +13,12 @@ class FFlogs:
     def __init__(self):
         self.base_url = 'https://cn.fflogs.com/v1'
         self.data = PluginData('fflogs', config=True)
+
         self.token = self.get_token()
+        # 当前是 5.0 版本
+        self.version = self.data.config_get('fflogs', 'version', '0')
+        # 默认为两周的数据
+        self.range = self.data.config_get('fflogs', 'range', '14')
 
     def set_token(self, token):
         self.token = token
@@ -61,9 +66,7 @@ class FFlogs:
         if not job_name_en:
             return f'找不到 {job} 的数据，请换个名字试试'
 
-        # 当前是 5.0 版本
-        version = '0'
-        fflogs_url = f'https://cn.fflogs.com/zone/statistics/table/{boss_bucket}/dps/{boss_id}/100/8/5/100/1/1/{version}/Global/{job_name_en}/All/0/normalized/single/0/-1/?keystone=15&dpstype={dps_type}'
+        fflogs_url = f'https://cn.fflogs.com/zone/statistics/table/{boss_bucket}/dps/{boss_id}/100/8/5/100/1/{self.range}/{self.version}/Global/{job_name_en}/All/0/normalized/single/0/-1/?keystone=15&dpstype={dps_type}'
 
         res = await self._http(fflogs_url, is_json=False)
 
