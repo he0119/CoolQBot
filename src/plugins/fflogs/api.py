@@ -30,11 +30,11 @@ class FFlogs:
         except:
             return None
 
-    async def _http(self, url, is_json=True):
+    async def _http(self, url, is_json=True, headers=None):
         try:
             # 使用 aiohttp 库发送最终的请求
             async with aiohttp.ClientSession() as sess:
-                async with sess.get(url) as response:
+                async with sess.get(url, headers=headers) as response:
                     if response.status != 200:
                         # 如果 HTTP 响应状态码不是 200，说明调用失败
                         return None
@@ -67,8 +67,12 @@ class FFlogs:
             return f'找不到 {job} 的数据，请换个名字试试'
 
         fflogs_url = f'https://cn.fflogs.com/zone/statistics/table/{boss_bucket}/dps/{boss_id}/100/8/5/100/1/{self.range}/{self.version}/Global/{job_name_en}/All/0/normalized/single/0/-1/?keystone=15&dpstype={dps_type}'
+        headers = {
+            'Host': 'cn.fflogs.com',
+            'Referer': f'https://cn.fflogs.com/zone/statistics/{boss_bucket}'
+        }
 
-        res = await self._http(fflogs_url, is_json=False)
+        res = await self._http(fflogs_url, is_json=False, headers=headers)
 
         percentage_list = [100, 99, 95, 75, 50, 25, 10]
         reply = f'{boss_name} {job_name_cn} 的数据({dps_type})'
