@@ -34,7 +34,9 @@ async def dps(session: CommandSession):
     #     session.finish(str(reply[int(session.argv[1])]))
 
     if len(session.argv) > 1 and len(session.argv) < 4:
-        reply = await API.dps(*session.argv)
-        session.finish(reply)
+        # 暂时禁用这个功能，等待完善之后在启用
+        # reply = await API.dps(*session.argv)
+        # session.finish(reply)
+        session.finish('抱歉，这个功能现在暂时没法用了。')
 
     session.finish('抱歉，并没有这个功能。')
