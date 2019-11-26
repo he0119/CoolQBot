@@ -1,11 +1,16 @@
 """ API
+
+文档网址 https://cn.fflogs.com/v1/docs
 """
 import json
+import math
 import re
+from datetime import datetime, timedelta
 
 import aiohttp
 
 from coolqbot import PluginData
+
 from .data import get_boss_info, get_job_name
 
 
@@ -14,21 +19,21 @@ class FFlogs:
         self.base_url = 'https://cn.fflogs.com/v1'
         self.data = PluginData('fflogs', config=True)
 
-        self.token = self.get_token()
         # 当前是 5.0 版本
         self.version = self.data.config_get('fflogs', 'version', '0')
         # 默认为两周的数据
-        self.range = self.data.config_get('fflogs', 'range', '14')
+        self.range = int(self.data.config_get('fflogs', 'range', '14'))
 
-    def set_token(self, token):
-        self.token = token
-        self.data.config_set('fflogs', 'token', self.token)
-
-    def get_token(self):
+    @property
+    def token(self):
         try:
             return self.data.config_get('fflogs', 'token')
         except:
             return None
+
+    @token.setter
+    def token(self, token):
+        self.data.config_set('fflogs', 'token', token)
 
     async def _http(self, url, is_json=True, headers=None):
         try:
@@ -48,6 +53,44 @@ class FFlogs:
             # 抛出上面任何异常，说明调用失败
             return None
 
+    def _find_ranking_cache(self, boss, job, dps_type, date):
+        """ 查找是否缓存了此数据
+        """
+        name = f'{boss}_{job}_{dps_type}_{date[0]}_{date[1]}'
+        if self.data.exists(f'{name}.pkl'):
+            return self.data.load_pkl(name)
+        return None
+
+    def _save_ranking_cache(self, boss, job, dps_type, date, data):
+        """ 缓存数据
+        """
+        name = f'{boss}_{job}_{dps_type}_{date[0]}_{date[1]}'
+        self.data.save_pkl(data, name)
+
+    async def _get_all_ranking(self, boss, job, dps_type, date):
+        """ 获取指定 boss，指定职业，指定时间的所有排名数据
+        """
+        # 查看是否有缓存
+        rankings = self._find_ranking_cache(boss, job, dps_type, date)
+        if rankings:
+            return rankings
+
+        page = 1
+        hasMorePages = True
+        rankings = []
+
+        while hasMorePages:
+            rankings_url = f'{self.base_url}/rankings/encounter/{boss}?metric={dps_type}&spec={job}&page={page}&filter=date.{date[0]}.{date[1]}&api_key={self.token}'
+            res = await self._http(rankings_url)
+            hasMorePages = res['hasMorePages']
+            rankings += res['rankings']
+            page += 1
+
+        # 缓存数据
+        self._save_ranking_cache(boss, job, dps_type, date, rankings)
+
+        return rankings
+
     async def zones(self):
         """ 副本
         """
@@ -55,35 +98,55 @@ class FFlogs:
         data = await self._http(url)
         return data
 
+    async def classes(self):
+        """ 职业
+        """
+        url = f'{self.base_url}/classes?api_key={self.token}'
+        data = await self._http(url)
+        return data
+
     async def dps(self, boss, job, dps_type='rdps'):
         """ 查询 DPS 百分比排名
         """
-        (boss_bucket, boss_id), boss_name = get_boss_info(boss)
-        if not boss_bucket:
+        boss_id, boss_name = get_boss_info(boss)
+        if not boss_id:
             return f'找不到 {boss} 的数据，请换个名字试试'
 
-        job_name_en, job_name_cn = get_job_name(job)
-        if not job_name_en:
+        job_id, job_name = get_job_name(job)
+        if not job_id:
             return f'找不到 {job} 的数据，请换个名字试试'
 
-        fflogs_url = f'https://cn.fflogs.com/zone/statistics/table/{boss_bucket}/dps/{boss_id}/100/8/5/100/1/{self.range}/{self.version}/Global/{job_name_en}/All/0/normalized/single/0/-1/?keystone=15&dpstype={dps_type}'
-        headers = {
-            'Host': 'cn.fflogs.com',
-            'Referer': f'https://cn.fflogs.com/zone/statistics/{boss_bucket}'
-        }
+        if dps_type not in ['dps', 'rdps']:
+            return f'找不到类型为 {dps_type} 的数据，现在只支持 dps rdps'
 
-        res = await self._http(fflogs_url, is_json=False, headers=headers)
+        # 日期应该是今天 24 点前开始计算
+        now = datetime.now()
+        end_date = datetime(
+            year=now.year,
+            month=now.month,
+            day=now.day,
+            hour=23,
+            minute=59,
+            second=59
+        )
+        start_date = end_date - timedelta(days=self.range)
+        start_date = int(start_date.timestamp()) * 1000
+        end_date = int(end_date.timestamp()) * 1000
 
+        rankings = await self._get_all_ranking(
+            boss_id, job_id, dps_type, (start_date, end_date)
+        )
+
+        reply = f'{boss_name} {job_name} 的数据({dps_type})'
+
+        # 计算百分比的 DPS
+        total = len(rankings)
         percentage_list = [100, 99, 95, 75, 50, 25, 10]
-        reply = f'{boss_name} {job_name_cn} 的数据({dps_type})'
         for perc in percentage_list:
-            if perc == 100:
-                re_str = ('series' + r'.data.push\((\d*\.?\d*)\)')
-            else:
-                re_str = (f'series{perc}' + r'.data.push\((\d*\.?\d*)\)')
-            ptn = re.compile(re_str)
-            find_res = float(ptn.findall(res)[0])
-            reply += f'\n{perc}% : {find_res:.2f}'
+            number = math.floor(total * 0.01 * (100 - perc))
+            dps = float(rankings[number]['total'])
+            reply += f'\n{perc}% : {dps:.2f}'
+
         return reply
 
 
