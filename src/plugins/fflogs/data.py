@@ -1,9 +1,17 @@
 """ 一些数据
 """
 boss_list = {
-    1045: ['缇坦妮雅', '妖精', '极妖精', '妖灵王', '妖精王', '老婆', '10王'],
-    1046: ['无瑕灵君', '肥宅', '极肥宅', '全能王'],
-    1049: ['哈迪斯', '老公']
+    (1045, 0): ['提坦妮雅歼殛战', '缇坦妮雅', '妖精', '极妖精', '妖灵王', '妖精王', '老婆', '10王'],
+    (1046, 0): ['无瑕灵君', '肥宅', '极肥宅', '全能王'],
+    (1049, 0): ['哈迪斯', '老公'],
+    (65, 100): ['至尊伊甸', 'E1', 'e1'],
+    (66, 100): ['虚空行者','E2', 'e2'],
+    (67, 100): ['利维亚桑','E3', 'e3'],
+    (68, 100): ['泰坦','E4', 'e4'],
+    (65, 0):   ['至尊伊甸','E1S', 'e1s', 'E1s', 'e1S'],
+    (66, 0):   ['虚空行者','E2S', 'e2s', 'E2s', 'e2S'],
+    (67, 0):   ['利维亚桑','E3S', 'e3s', 'E3s', 'e3S'],
+    (68, 0):   ['泰坦','E4S', 'e4s', 'E4s', 'e4S'],
 } # yapf: disable
 
 job_list = {
@@ -30,10 +38,10 @@ job_list = {
 def get_boss_info(name):
     """ 根据昵称获取 boss 的 ID 同时返回正式名称
     """
-    for boss_id, nickname in boss_list.items():
+    for (boss_id, difficulty), nickname in boss_list.items():
         if name in nickname:
-            return boss_id, nickname[0]
-    return None, None
+            return boss_id, difficulty, nickname[0]
+    return None, None, None
 
 
 def get_job_name(name):

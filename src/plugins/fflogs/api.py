@@ -53,25 +53,28 @@ class FFlogs:
             # 抛出上面任何异常，说明调用失败
             return None
 
-    def _find_ranking_cache(self, boss, job, dps_type, date):
+    def _find_ranking_cache(self, boss, difficulty, job, dps_type, date):
         """ 查找是否缓存了此数据
         """
-        name = f'{boss}_{job}_{dps_type}_{date[0]}_{date[1]}'
+        name = f'{boss}_{difficulty}_{job}_{dps_type}_{date[0]}_{date[1]}'
         if self.data.exists(f'{name}.pkl'):
             return self.data.load_pkl(name)
         return None
 
-    def _save_ranking_cache(self, boss, job, dps_type, date, data):
+    def _save_ranking_cache(self, boss, difficulty, job, dps_type, date, data):
         """ 缓存数据
         """
-        name = f'{boss}_{job}_{dps_type}_{date[0]}_{date[1]}'
+        name = f'{boss}_{difficulty}_{job}_{dps_type}_{date[0]}_{date[1]}'
         self.data.save_pkl(data, name)
 
-    async def _get_all_ranking(self, boss, job, dps_type, date):
+    async def _get_all_ranking(self, boss, difficulty, job, dps_type, date):
         """ 获取指定 boss，指定职业，指定时间的所有排名数据
         """
+        if dps_type == 'adps':
+            dps_type = 'dps'
+
         # 查看是否有缓存
-        rankings = self._find_ranking_cache(boss, job, dps_type, date)
+        rankings = self._find_ranking_cache(boss, difficulty, job, dps_type, date)
         if rankings:
             return rankings
 
@@ -80,14 +83,14 @@ class FFlogs:
         rankings = []
 
         while hasMorePages:
-            rankings_url = f'{self.base_url}/rankings/encounter/{boss}?metric={dps_type}&spec={job}&page={page}&filter=date.{date[0]}.{date[1]}&api_key={self.token}'
+            rankings_url = f'{self.base_url}/rankings/encounter/{boss}?metric={dps_type}&difficulty={difficulty}&spec={job}&page={page}&filter=date.{date[0]}.{date[1]}&api_key={self.token}'
             res = await self._http(rankings_url)
             hasMorePages = res['hasMorePages']
             rankings += res['rankings']
             page += 1
 
         # 缓存数据
-        self._save_ranking_cache(boss, job, dps_type, date, rankings)
+        self._save_ranking_cache(boss, difficulty, job, dps_type, date, rankings)
 
         return rankings
 
@@ -108,7 +111,7 @@ class FFlogs:
     async def dps(self, boss, job, dps_type='rdps'):
         """ 查询 DPS 百分比排名
         """
-        boss_id, boss_name = get_boss_info(boss)
+        boss_id, difficulty, boss_name = get_boss_info(boss)
         if not boss_id:
             return f'找不到 {boss} 的数据，请换个名字试试'
 
@@ -116,8 +119,8 @@ class FFlogs:
         if not job_id:
             return f'找不到 {job} 的数据，请换个名字试试'
 
-        if dps_type not in ['dps', 'rdps']:
-            return f'找不到类型为 {dps_type} 的数据，现在只支持 dps rdps'
+        if dps_type not in ['adps', 'rdps']:
+            return f'找不到类型为 {dps_type} 的数据，现在只支持 adps rdps'
 
         # 日期应该是今天 24 点前开始计算
         now = datetime.now()
@@ -134,7 +137,7 @@ class FFlogs:
         end_date = int(end_date.timestamp()) * 1000
 
         rankings = await self._get_all_ranking(
-            boss_id, job_id, dps_type, (start_date, end_date)
+            boss_id, difficulty, job_id, dps_type, (start_date, end_date)
         )
 
         reply = f'{boss_name} {job_name} 的数据({dps_type})'
