@@ -53,44 +53,67 @@ class FFlogs:
             # 抛出上面任何异常，说明调用失败
             return None
 
-    def _find_ranking_cache(self, boss, difficulty, job, dps_type, date):
-        """ 查找是否缓存了此数据
+    async def _get_one_day_ranking(
+        self, boss, difficulty, job, date: datetime
+    ):
+        """ 获取指定 boss，指定职业，指定一天中的排名数据
         """
-        name = f'{boss}_{difficulty}_{job}_{dps_type}_{date[0]}_{date[1]}'
-        if self.data.exists(f'{name}.pkl'):
-            return self.data.load_pkl(name)
-        return None
-
-    def _save_ranking_cache(self, boss, difficulty, job, dps_type, date, data):
-        """ 缓存数据
-        """
-        name = f'{boss}_{difficulty}_{job}_{dps_type}_{date[0]}_{date[1]}'
-        self.data.save_pkl(data, name)
-
-    async def _get_all_ranking(self, boss, difficulty, job, dps_type, date):
-        """ 获取指定 boss，指定职业，指定时间的所有排名数据
-        """
-        if dps_type == 'adps':
-            dps_type = 'dps'
-
         # 查看是否有缓存
-        rankings = self._find_ranking_cache(boss, difficulty, job, dps_type, date)
-        if rankings:
-            return rankings
+        cache_name = f'{boss}_{difficulty}_{job}_{date.strftime("%Y%m%d")}'
+        if self.data.exists(f'{cache_name}.pkl'):
+            return self.data.load_pkl(cache_name)
 
         page = 1
         hasMorePages = True
         rankings = []
 
+        end_date = date + timedelta(days=1)
+        # 转换成 API 支持的时间戳格式
+        start_timestamp = int(date.timestamp()) * 1000
+        end_timestamp = int(end_date.timestamp()) * 1000
+
         while hasMorePages:
-            rankings_url = f'{self.base_url}/rankings/encounter/{boss}?metric={dps_type}&difficulty={difficulty}&spec={job}&page={page}&filter=date.{date[0]}.{date[1]}&api_key={self.token}'
+            rankings_url = f'{self.base_url}/rankings/encounter/{boss}?metric=rdps&difficulty={difficulty}&spec={job}&page={page}&filter=date.{start_timestamp}.{end_timestamp}&api_key={self.token}'
+
             res = await self._http(rankings_url)
+
             hasMorePages = res['hasMorePages']
             rankings += res['rankings']
             page += 1
 
-        # 缓存数据
-        self._save_ranking_cache(boss, difficulty, job, dps_type, date, rankings)
+        # 如果获取数据的日期不是当天，则缓存数据
+        # 因为今天的数据可能还会增加，不能先缓存了
+        if end_date < datetime.now():
+            self.data.save_pkl(rankings, cache_name)
+
+        return rankings
+
+    async def _get_whole_ranking(
+        self, boss, difficulty, job, dps_type: str, date: datetime
+    ):
+        date = datetime(year=date.year, month=date.month, day=date.day)
+
+        rankings = []
+        for _ in range(self.range):
+            rankings += await self._get_one_day_ranking(
+                boss, difficulty, job, date
+            )
+            date -= timedelta(days=1)
+
+        # 根据 DPS 类型进行排序，并提取数据
+        if dps_type == 'rdps':
+            rankings.sort(key=lambda x: x['total'], reverse=True)
+            rankings = [i['total'] for i in rankings]
+
+        if dps_type == 'adps':
+            rankings.sort(
+                key=lambda x: x['other_per_second_amount'], reverse=True
+            )
+            rankings = [i['other_per_second_amount'] for i in rankings]
+
+        if dps_type == 'pdps':
+            rankings.sort(key=lambda x: x['raw_dps'], reverse=True)
+            rankings = [i['raw_dps'] for i in rankings]
 
         return rankings
 
@@ -119,35 +142,24 @@ class FFlogs:
         if not job_id:
             return f'找不到 {job} 的数据，请换个名字试试'
 
-        if dps_type not in ['adps', 'rdps']:
-            return f'找不到类型为 {dps_type} 的数据，现在只支持 adps rdps'
+        if dps_type not in ['adps', 'rdps', 'pdps']:
+            return f'找不到类型为 {dps_type} 的数据，只支持 adps rdps pdps'
 
-        # 日期应该是今天 24 点前开始计算
-        now = datetime.now()
-        end_date = datetime(
-            year=now.year,
-            month=now.month,
-            day=now.day,
-            hour=23,
-            minute=59,
-            second=59
-        )
-        start_date = end_date - timedelta(days=self.range)
-        start_date = int(start_date.timestamp()) * 1000
-        end_date = int(end_date.timestamp()) * 1000
-
-        rankings = await self._get_all_ranking(
-            boss_id, difficulty, job_id, dps_type, (start_date, end_date)
+        # 排名从前一天开始排，因为今天的数据并不全
+        date = datetime.now() - timedelta(days=1)
+        rankings = await self._get_whole_ranking(
+            boss_id, difficulty, job_id, dps_type, date
         )
 
         reply = f'{boss_name} {job_name} 的数据({dps_type})'
 
-        # 计算百分比的 DPS
         total = len(rankings)
+        reply += f'\n数据总数：{total} 条'
+        # 计算百分比的 DPS
         percentage_list = [100, 99, 95, 75, 50, 25, 10]
         for perc in percentage_list:
             number = math.floor(total * 0.01 * (100 - perc))
-            dps = float(rankings[number]['total'])
+            dps = float(rankings[number])
             reply += f'\n{perc}% : {dps:.2f}'
 
         return reply
