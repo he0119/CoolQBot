@@ -3,11 +3,31 @@
 从网站 https://cn.fflogs.com/ 获取输出数据
 文档网址 https://cn.fflogs.com/v1/docs
 """
+import asyncio
+
 from nonebot import CommandSession, on_command
 
 from coolqbot import bot
 
 from .api import API
+from .data import boss_list, job_list
+
+HOUR = int(API.data.config_get('cache', 'hour', fallback='4'))
+MINUTE = int(API.data.config_get('cache', 'minute', fallback='30'))
+SECOND = int(API.data.config_get('cache', 'second', fallback='0'))
+
+
+@bot.scheduler.scheduled_job(
+    'cron', hour=HOUR, minute=MINUTE, second=SECOND, id='fflogs_cache'
+)
+async def fflogs_cache():
+    """ 定时缓存数据
+    """
+    for (boss_id, difficulty), boss_nickname in boss_list.items():
+        for job_id, job_nickname in job_list.items():
+            await API.dps(boss_nickname[0], job_nickname[0])
+            bot.logger.debug(f'{boss_nickname[0]} {job_nickname[0]}的数据缓存完成。')
+            await asyncio.sleep(30)
 
 
 @on_command('dps', aliases=['输出'], only_to_me=False, shell_like=True)
