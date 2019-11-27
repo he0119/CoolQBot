@@ -35,7 +35,7 @@ async def dps(session: CommandSession):
     """ 查询 DPS
     """
     # 设置 Token
-    if len(session.argv) == 2 and session.argv[0] == 'token':
+    if session.argv[0] == 'token' and len(session.argv) == 2:
         API.token = session.argv[1]
         session.finish('Token 设置完成。')
 

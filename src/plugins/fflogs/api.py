@@ -4,7 +4,6 @@
 """
 import json
 import math
-import re
 from datetime import datetime, timedelta
 
 import aiohttp
@@ -12,6 +11,7 @@ import aiohttp
 from coolqbot import PluginData
 
 from .data import get_boss_info, get_job_name
+from .exceptions import AuthException, DataException
 
 
 class FFlogs:
@@ -19,9 +19,7 @@ class FFlogs:
         self.base_url = 'https://cn.fflogs.com/v1'
         self.data = PluginData('fflogs', config=True)
 
-        # 当前是 5.0 版本
-        self.version = self.data.config_get('fflogs', 'version', '0')
-        # 默认为两周的数据
+        # 默认从两周的数据中计算排名百分比
         self.range = int(self.data.config_get('fflogs', 'range', '14'))
 
     @property
@@ -40,6 +38,8 @@ class FFlogs:
             # 使用 aiohttp 库发送最终的请求
             async with aiohttp.ClientSession() as sess:
                 async with sess.get(url, headers=headers) as response:
+                    if response.status == 401:
+                        raise AuthException('Token 有误，无法获取数据')
                     if response.status != 200:
                         # 如果 HTTP 响应状态码不是 200，说明调用失败
                         return None
@@ -77,12 +77,15 @@ class FFlogs:
 
             res = await self._http(rankings_url)
 
+            if not res:
+                raise DataException('服务器没有正确返回数据')
+
             hasMorePages = res['hasMorePages']
             rankings += res['rankings']
             page += 1
 
         # 如果获取数据的日期不是当天，则缓存数据
-        # 因为今天的数据可能还会增加，不能先缓存了
+        # 因为今天的数据可能还会增加，不能先缓存
         if end_date < datetime.now():
             self.data.save_pkl(rankings, cache_name)
 
@@ -147,9 +150,14 @@ class FFlogs:
 
         # 排名从前一天开始排，因为今天的数据并不全
         date = datetime.now() - timedelta(days=1)
-        rankings = await self._get_whole_ranking(
-            boss_id, difficulty, job_id, dps_type, date
-        )
+        try:
+            rankings = await self._get_whole_ranking(
+                boss_id, difficulty, job_id, dps_type, date
+            )
+        except DataException as e:
+            return f'{e}，请稍后再试'
+        except AuthException as e:
+            return f'{e}，请检查 Token'
 
         reply = f'{boss_name} {job_name} 的数据({dps_type})'
 
