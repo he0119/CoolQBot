@@ -6,7 +6,10 @@ import urllib
 
 import requests
 
-KEY = '6ff5a040195245328b3cdc693d1c0bb2'
+from coolqbot import PluginData
+
+DATA = PluginData('weather', config=True)
+KEY = DATA.config_get('heweather', 'key')
 
 
 def heweather(city):
@@ -18,6 +21,9 @@ def heweather(city):
     2018-08-14 小雨 降水概率：13% 温度：33~26℃
     2018-08-15 小雨 降水概率：11% 温度：32~25℃
     """
+    if not KEY:
+        return None
+
     try:
         city_name = urllib.parse.quote(city.encode('utf-8'))
         url_str = f'https://free-api.heweather.com/s6/weather?location={city_name}&key={KEY}'
