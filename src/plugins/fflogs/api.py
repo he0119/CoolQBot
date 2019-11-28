@@ -162,6 +162,9 @@ class FFlogs:
         reply = f'{boss_name} {job_name} 的数据({dps_type})'
 
         total = len(rankings)
+        if not total:
+            return '网站里没有数据，请以后再试'
+
         reply += f'\n数据总数：{total} 条'
         # 计算百分比的 DPS
         percentage_list = [100, 99, 95, 75, 50, 25, 10]
