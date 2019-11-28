@@ -14,7 +14,7 @@ from .data import get_boss_info, get_job_name
 from .exceptions import AuthException, DataException
 
 
-class FFlogs:
+class FFLogs:
     def __init__(self):
         self.base_url = 'https://cn.fflogs.com/v1'
         self.data = PluginData('fflogs', config=True)
@@ -176,4 +176,4 @@ class FFlogs:
         return reply
 
 
-API = FFlogs()
+API = FFLogs()

@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+### Changed
+
+- 将机器人从 CoolQ Docker 镜像中独立出来
+- 更新了部署文档
+- 使用 Python 3.8
+
 ## [0.10.1] - 2019-11-28
 
 ### Fixed
