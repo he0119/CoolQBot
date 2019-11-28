@@ -14,47 +14,12 @@
 
 ## 运行
 
-- 新建一个 `coolq` 和 `bot` 文件夹，
+## 主要功能
 
-- 将 `bot.ini.example` 文件复制到 `/bot/` 文件夹下并重命名为 `bot.ini` 且填入对应配置。
+### 复读([repeat](src/plugins/repeat.py))
 
-- 提供了 `Docker Image`，使用以下命令即可运行。
+以一定概率复读群消息
 
-  ```shell
-  sudo docker pull he0119/coolqbot:latest && \
-  sudo docker run -d --restart always --name coolqbot
-    -v $(pwd)/coolq:/home/user/coolq \  # 将宿主目录挂载到容器内用于持久化酷 Q 的程序文件
-    -v $(pwd)/bot:/home/user/coolqbot/bot \  # 将宿主目录挂载到容器内用于持久化机器人配置和数据文件
-    -p 9000:9000 \  # noVNC 端口，用于从浏览器控制酷 Q
-    -e COOLQ_ACCOUNT=2062765419 \ # 要登录的 QQ 账号，可选但建议填
-    -e VNC_PASSWD=12345687 \ # noVNC 的密码（官方说不能超过 8 个字符，但实测可以超过）
-    he0119/coolqbot:latest
-  # docker run -ti --rm --name coolqbot-test \
-  #   -e COOLQ_URL=http://dlsec.cqp.me/cqp-tuling \ # 专业版
-  ```
+### FFLogs([fflogs](src/plugins/fflogs/__init__.py))
 
-  或者使用 Docker-Compose 运行
-
-  创建 `docker-compose.yml` 文件并填入一下内容
-
-  ```yaml
-  version: "3.7"
-  services:
-
-    coolqbot:
-      image: he0119/coolqbot:latest
-      container_name: coolqbot
-      restart: always
-      ports:
-        - "9000:9000"
-      environment:
-        - VNC_PASSWD=12345687
-        - COOLQ_ACCOUNT=2062765419
-      volumes:
-        - ./coolq:/home/user/coolq
-        - ./bot:/home/user/coolqbot/bot
-  ```
-
-  运行 `sudo docker-compose up -d` 即可启动你的机器人。
-
-- 所有配置数据都在 `/bot/` 下。
+利用 FFLogs 网站提供的 API 获取并计算 DPS 百分比数据

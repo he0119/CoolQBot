@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+### Changed
+
+- 将机器人从 CoolQ Docker 镜像中独立出来
+- 更新了部署文档
+- 使用 Python 3.8
+
 ## [0.10.1] - 2019-11-28
 
 ### Fixed
@@ -57,12 +63,12 @@
 
 ## [0.8.0] - 2019-06-18
 
-## Added
+### Added
 
 - 支持自然语言处理
 - 支持权限管理
 
-## Changed
+### Changed
 
 - 使用 `NoneBot` 机器人框架
 
