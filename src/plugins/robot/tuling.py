@@ -7,11 +7,16 @@ import aiohttp
 from nonebot import CommandSession
 from nonebot.helpers import context_id
 
+from coolqbot import PluginData
+
+DATA = PluginData('robot', config=True)
+TULING_API_KEY = DATA.config_get('tuling', 'api_key', fallback=' ')
+
 
 async def call_tuling_api(session: CommandSession, text: str) -> Optional[str]:
     """ 调用图灵机器人的 API 获取回复
     """
-    if not session.bot.config.TULING_API_KEY:
+    if not TULING_API_KEY:
         return None
 
     if not text:
@@ -28,7 +33,7 @@ async def call_tuling_api(session: CommandSession, text: str) -> Optional[str]:
             }
         },
         'userInfo': {
-            'apiKey': session.bot.config.TULING_API_KEY,
+            'apiKey': TULING_API_KEY,
             'userId': context_id(session.ctx, use_hash=True)
         }
     }
