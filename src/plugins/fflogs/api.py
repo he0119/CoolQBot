@@ -118,6 +118,9 @@ class FFlogs:
             rankings.sort(key=lambda x: x['raw_dps'], reverse=True)
             rankings = [i['raw_dps'] for i in rankings]
 
+        if not rankings:
+            raise DataException('网站里没有数据')
+
         return rankings
 
     async def zones(self):
