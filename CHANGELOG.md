@@ -4,7 +4,13 @@
 
 ## [Unreleased]
 
-## [0.10.0] - 2019-11-28
+## [0.10.1] - 2019-11-28
+
+### Fixed
+
+- 修复 `fflogs` 插件中如果副本不存在数据时的报错
+
+## [0.10.0] - 2019-11-27
 
 ### Added
 
@@ -236,7 +242,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/he0119/CoolQBot/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/he0119/CoolQBot/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/he0119/CoolQBot/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/he0119/CoolQBot/compare/v0.8.1...v0.9.0
