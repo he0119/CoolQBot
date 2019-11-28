@@ -1,4 +1,7 @@
 """ 腾讯机器人
+
+https://ai.qq.com/
+智能闲聊 功能
 """
 import hashlib
 import json
@@ -15,8 +18,8 @@ from nonebot.helpers import context_id
 from coolqbot import PluginData
 
 DATA = PluginData('robot', config=True)
-TENCENT_AI_APP_ID = DATA.config_get('tencent', 'app_id', fallback=' ')
-TENCENT_AI_APP_KEY = DATA.config_get('tencent', 'app_key', fallback=' ')
+TENCENT_AI_APP_ID = DATA.config_get('tencent', 'app_id')
+TENCENT_AI_APP_KEY = DATA.config_get('tencent', 'app_key')
 
 
 async def call_tencent_api(session: CommandSession,
