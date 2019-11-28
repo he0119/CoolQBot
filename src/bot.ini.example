@@ -1,6 +1,8 @@
 [bot]
 group_id = 438789224
 is_coolq_pro = 0
+host = 127.0.0.1
+port = 8080
 admin = 417557420
 nickname = 小誓约 小17
 tuling_api_key =

@@ -23,6 +23,9 @@ if not CONFIG_FILE_PATH.exists():
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH, encoding='UTF-8')
 
+HOST = config.get('bot', 'host', fallback='127.0.0.1')
+PORT = config.get('bot', 'port', fallback=8080)
+
 SUPERUSERS = set(map(int, config['bot']['admin'].split()))
 NICKNAME = config['bot']['nickname'].split()
 SHORT_MESSAGE_MAX_LENGTH = 28
