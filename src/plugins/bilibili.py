@@ -1,4 +1,6 @@
 """ 获取B站番剧的今日更新
+
+https://www.bilibili.com/anime/timeline
 """
 import json
 import re
