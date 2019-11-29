@@ -1,4 +1,7 @@
 """ 腾讯机器人
+
+https://ai.qq.com/
+智能闲聊 功能
 """
 import hashlib
 import json
@@ -12,12 +15,18 @@ import aiohttp
 from nonebot import CommandSession
 from nonebot.helpers import context_id
 
+from coolqbot import PluginData
+
+DATA = PluginData('robot', config=True)
+TENCENT_AI_APP_ID = DATA.config_get('tencent', 'app_id')
+TENCENT_AI_APP_KEY = DATA.config_get('tencent', 'app_key')
+
 
 async def call_tencent_api(session: CommandSession,
                            text: str) -> Optional[str]:
     """ 调用腾讯机器人的 API 获取回复
     """
-    if not session.bot.config.TENCENT_AI_APP_ID:
+    if not TENCENT_AI_APP_KEY:
         return None
 
     if not text:
@@ -28,7 +37,7 @@ async def call_tencent_api(session: CommandSession,
     # 构造请求数据
     payload = {
         'app_id':
-        session.bot.config.TENCENT_AI_APP_ID,
+        int(TENCENT_AI_APP_ID),
         'time_stamp':
         int(time.time()),
         'nonce_str':
@@ -39,9 +48,7 @@ async def call_tencent_api(session: CommandSession,
         text
     }
     # 接口鉴权 签名
-    payload['sign'] = gen_sign_string(
-        payload, session.bot.config.TENCENT_AI_APP_KEY
-    )
+    payload['sign'] = gen_sign_string(payload, TENCENT_AI_APP_KEY)
 
     try:
         # 使用 aiohttp 库发送最终的请求

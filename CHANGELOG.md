@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+## [0.11.0] - 2019-11-29
+
+### Changed
+
+- 将机器人从 CoolQ Docker 镜像中独立出来
+- 更新了文档，添加了部署方法和一些插件的使用说明
+- 使用 Python 3.8
+
 ## [0.10.1] - 2019-11-28
 
 ### Fixed
@@ -57,12 +65,12 @@
 
 ## [0.8.0] - 2019-06-18
 
-## Added
+### Added
 
 - 支持自然语言处理
 - 支持权限管理
 
-## Changed
+### Changed
 
 - 使用 `NoneBot` 机器人框架
 
@@ -242,7 +250,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.10.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/he0119/CoolQBot/compare/v0.10.1...v0.11.0
 [0.10.1]: https://github.com/he0119/CoolQBot/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/he0119/CoolQBot/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/he0119/CoolQBot/compare/v0.9.0...v0.9.1

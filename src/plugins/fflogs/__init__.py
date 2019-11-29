@@ -1,7 +1,6 @@
-""" fflogs
+""" FFLogs
 
 从网站 https://cn.fflogs.com/ 获取输出数据
-文档网址 https://cn.fflogs.com/v1/docs
 """
 import asyncio
 

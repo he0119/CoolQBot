@@ -41,16 +41,16 @@ class PluginData:
             data = pickle.load(f)
         return data
 
-    def config_get(self, section, option, fallback=None):
+    def config_get(self, section, option, fallback=''):
         """ 获得配置
 
-        如果配置不存在则使用`fallback`并保存
+        如果配置不存在则使用 `fallback` 并保存
+
+        如果不提供 `fallback` 默认返回空字符串
         """
         try:
             value = self.config.get(section, option)
         except (configparser.NoSectionError, configparser.NoOptionError):
-            if not fallback:
-                raise
             value = fallback
             # 保存默认配置
             if section not in self.config.sections():
