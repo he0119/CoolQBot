@@ -9,6 +9,10 @@ trigger:
     include:
     - master
     - refs/tags/*
+  paths:
+    include:
+    - src/*
+    - requirements.txt
 
 jobs:
 - job: 'Build'
