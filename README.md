@@ -133,7 +133,7 @@ DPS 种类如果不填写默认为 `rdps`，且支持 `adps` 和 `pdps`。
         10% : 3683.76
 ```
 
-### bilibili 番剧([bilibili](src/plugins/bilibili.py))
+### B站番剧([bilibili](src/plugins/bilibili.py))
 
 #### 用法
 
