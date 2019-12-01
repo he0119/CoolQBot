@@ -13,6 +13,7 @@ trigger:
     exclude:
     - README.md
     - CHANGELOG.md
+    - azure-pipelines.yml
 
 jobs:
 - job: 'Build'
