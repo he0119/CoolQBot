@@ -9,6 +9,11 @@ trigger:
     include:
     - master
     - refs/tags/*
+  paths:
+    include:
+    - '*'
+    exclude:
+    - '*.md'
 
 jobs:
 - job: 'Build'
