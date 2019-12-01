@@ -10,9 +10,9 @@ trigger:
     - master
     - refs/tags/*
   paths:
-    include:
-    - src/*
-    - requirements.txt
+    exclude:
+    - README.md
+    - CHANGELOG.md
 
 jobs:
 - job: 'Build'
