@@ -10,10 +10,10 @@ trigger:
     - master
     - refs/tags/*
   paths:
+    include:
+    - '*'
     exclude:
-    - README.md
-    - CHANGELOG.md
-    - azure-pipelines.yml
+    - '*.md'
 
 jobs:
 - job: 'Build'
