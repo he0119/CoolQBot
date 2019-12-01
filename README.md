@@ -16,15 +16,15 @@
 
 机器人的运行离不开 [酷Q](https://cqp.cc/) 与 [CoolQ HTTP API 插件](https://cqhttp.cc/docs/)，请参考其文档完成插件安装并成功运行。
 
-此机器人基于 [NoneBot](https://github.com/richardchien/nonebot) ，请参考其 [文档](https://nonebot.cqp.moe/guide/getting-started.html) 完成 `CoolQ HTTP API 插件` 的配置。
+由于机器人基于 [NoneBot](https://github.com/richardchien/nonebot) ，请参考其 [文档](https://nonebot.cqp.moe/guide/getting-started.html) 完成 `CoolQ HTTP API 插件` 的配置。
 
 接下来就可以尝试第一次运行机器人。
 
 ```shell
 # 首先克隆代码到本地
-$git clone https://github.com/he0119/CoolQBot.git
+git clone https://github.com/he0119/CoolQBot.git
 # 安装机器人所需依赖
-$pip install requirements.txt
+pip install requirements.txt
 # 运行机器人
 cd ./src && python ./run.py
 ```
@@ -106,7 +106,7 @@ cd ./src && python ./run.py
 
 #### 用法
 
-/dps 副本名 职业 [DPS 种类】
+/dps 副本名 职业 [DPS 种类]
 
 DPS 种类如果不填写默认为 `rdps`，且支持 `adps` 和 `pdps`。
 
@@ -133,7 +133,7 @@ DPS 种类如果不填写默认为 `rdps`，且支持 `adps` 和 `pdps`。
         10% : 3683.76
 ```
 
-### bilibili番剧([bilibili](src/plugins/bilibili.py))
+### bilibili 番剧([bilibili](src/plugins/bilibili.py))
 
 #### 用法
 
