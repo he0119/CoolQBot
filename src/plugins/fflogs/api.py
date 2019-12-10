@@ -152,6 +152,9 @@ class FFLogs:
         if not res:
             raise DataException('获取数据失败')
 
+        if 'hidden' in res:
+            raise DataException('角色数据被隐藏')
+
         # 提取所需的数据
         # 零式副本的难度是 101，普通的则是 100
         # 极神也是 100
