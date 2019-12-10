@@ -19,6 +19,9 @@ class FFLogs:
         self.base_url = 'https://cn.fflogs.com/v1'
         self.data = PluginData('fflogs', config=True)
 
+        # Token
+        self._token = None
+
         # 默认从两周的数据中计算排名百分比
         self.range = int(self.data.config_get('fflogs', 'range', '14'))
 
@@ -30,14 +33,14 @@ class FFLogs:
 
     @property
     def token(self):
-        try:
-            return self.data.config_get('fflogs', 'token')
-        except:
-            return None
+        if not self._token:
+            self_token = self.data.config_get('fflogs', 'token')
+        return self._token
 
     @token.setter
     def token(self, token):
         self.data.config_set('fflogs', 'token', token)
+        self._token = token
 
     async def _http(self, url, is_json=True, headers=None):
         try:
@@ -135,6 +138,10 @@ class FFLogs:
     async def _get_character_ranking(
         self, characterName, serverName, zone, encounter, difficulty, metric
     ):
+        """ 查询指定角色的 DPS
+
+        返回列表
+        """
         url = f'https://cn.fflogs.com/v1/rankings/character/{characterName}/{serverName}/CN?zone={zone}&encounter={encounter}&metric={metric}&api_key={self.token}'
 
         res = await self._http(url)
@@ -232,7 +239,6 @@ class FFLogs:
 
         for i in ranking:
             reply += f'\n{i["spec"]} {i["percentile"]}% {i["total"]:.2f}'
-
 
         return reply
 
