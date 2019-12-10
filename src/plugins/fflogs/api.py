@@ -34,7 +34,7 @@ class FFLogs:
     @property
     def token(self):
         if not self._token:
-            self_token = self.data.config_get('fflogs', 'token')
+            self._token = self.data.config_get('fflogs', 'token')
         return self._token
 
     @token.setter
@@ -153,7 +153,7 @@ class FFLogs:
             raise DataException('获取数据失败')
 
         # 提取所需的数据
-        # 零式副本的困难度是 101，普通的则是 100
+        # 零式副本的难度是 101，普通的则是 100
         # 极神也是 100
         if difficulty == 0:
             ranking = [i for i in res if i['difficulty'] == 101]
