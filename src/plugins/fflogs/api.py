@@ -11,7 +11,7 @@ import aiohttp
 from coolqbot import PluginData
 
 from .data import get_boss_info, get_job_name
-from .exceptions import AuthException, DataException
+from .exceptions import AuthException, DataException, ParameterException
 
 
 class FFLogs:
@@ -19,19 +19,28 @@ class FFLogs:
         self.base_url = 'https://cn.fflogs.com/v1'
         self.data = PluginData('fflogs', config=True)
 
+        # Token
+        self._token = None
+
         # 默认从两周的数据中计算排名百分比
         self.range = int(self.data.config_get('fflogs', 'range', '14'))
 
+        # QQ号 与 最终幻想14 角色用户名，服务器的对应关系
+        if self.data.exists('characters.pkl'):
+            self.characters = self.data.load_pkl('characters')
+        else:
+            self.characters = {}
+
     @property
     def token(self):
-        try:
-            return self.data.config_get('fflogs', 'token')
-        except:
-            return None
+        if not self._token:
+            self._token = self.data.config_get('fflogs', 'token')
+        return self._token
 
     @token.setter
     def token(self, token):
         self.data.config_set('fflogs', 'token', token)
+        self._token = token
 
     async def _http(self, url, is_json=True, headers=None):
         try:
@@ -40,6 +49,8 @@ class FFLogs:
                 async with sess.get(url, headers=headers) as response:
                     if response.status == 401:
                         raise AuthException('Token 有误，无法获取数据')
+                    if response.status == 400:
+                        raise ParameterException('参数有误，无法获取数据')
                     if response.status != 200:
                         # 如果 HTTP 响应状态码不是 200，说明调用失败
                         return None
@@ -72,7 +83,8 @@ class FFLogs:
         start_timestamp = int(date.timestamp()) * 1000
         end_timestamp = int(end_date.timestamp()) * 1000
 
-        while hasMorePages:
+        # API 只支持获取 50 页以内的数据
+        while hasMorePages and page < 51:
             rankings_url = f'{self.base_url}/rankings/encounter/{boss}?metric=rdps&difficulty={difficulty}&spec={job}&page={page}&filter=date.{start_timestamp}.{end_timestamp}&api_key={self.token}'
 
             res = await self._http(rankings_url)
@@ -123,6 +135,32 @@ class FFLogs:
 
         return rankings
 
+    async def _get_character_ranking(
+        self, characterName, serverName, zone, encounter, difficulty, metric
+    ):
+        """ 查询指定角色的 DPS
+
+        返回列表
+        """
+        url = f'https://cn.fflogs.com/v1/rankings/character/{characterName}/{serverName}/CN?zone={zone}&encounter={encounter}&metric={metric}&api_key={self.token}'
+
+        res = await self._http(url)
+
+        if not res and isinstance(res, list):
+            raise DataException('网站里没有数据')
+
+        if not res:
+            raise DataException('获取数据失败')
+
+        # 提取所需的数据
+        # 零式副本的难度是 101，普通的则是 100
+        # 极神也是 100
+        if difficulty == 0:
+            ranking = [i for i in res if i['difficulty'] == 101]
+        else:
+            ranking = [i for i in res if i['difficulty'] == 100]
+        return ranking
+
     async def zones(self):
         """ 副本
         """
@@ -140,7 +178,7 @@ class FFLogs:
     async def dps(self, boss, job, dps_type='rdps'):
         """ 查询 DPS 百分比排名
         """
-        boss_id, difficulty, boss_name = get_boss_info(boss)
+        boss_zone, boss_id, difficulty, boss_name = get_boss_info(boss)
         if not boss_id:
             return f'找不到 {boss} 的数据，请换个名字试试'
 
@@ -159,8 +197,6 @@ class FFLogs:
             )
         except DataException as e:
             return f'{e}，请稍后再试'
-        except AuthException as e:
-            return f'{e}，请检查 Token'
 
         reply = f'{boss_name} {job_name} 的数据({dps_type})'
 
@@ -172,6 +208,37 @@ class FFLogs:
             number = math.floor(total * 0.01 * (100 - perc))
             dps = float(rankings[number])
             reply += f'\n{perc}% : {dps:.2f}'
+
+        return reply
+
+    def set_character(self, user_id, character_name, server_name):
+        """ 设置 QQ号 与 最终幻想14 用户名和服务器名
+        """
+        self.characters[user_id] = [character_name, server_name]
+        self.data.save_pkl(self.characters, 'characters')
+
+    async def character_dps(
+        self, boss, character_name, server_name, dps_type='rdps'
+    ):
+        """ 查询指定角色的 DPS
+        """
+        boss_zone, boss_id, difficulty, boss_name = get_boss_info(boss)
+        if not boss_id:
+            return f'找不到 {boss} 的数据，请换个名字试试'
+        reply = f'{boss_name} {character_name}-{server_name} 的排名({dps_type})'
+
+        try:
+            ranking = await self._get_character_ranking(
+                character_name, server_name, boss_zone, boss_id, difficulty,
+                dps_type
+            )
+        except DataException as e:
+            return f'{e}，请稍后再试'
+        except ParameterException:
+            return '角色名或者服务器名有误，无法获取数据。'
+
+        for i in ranking:
+            reply += f'\n{i["spec"]} {i["percentile"]}% {i["total"]:.2f}'
 
         return reply
 
