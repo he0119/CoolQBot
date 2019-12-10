@@ -7,6 +7,10 @@ class DataException(Exception):
     """
     pass
 
+class ParameterException(Exception):
+    """ 参数异常
+    """
+    pass
 
 class AuthException(Exception):
     """ 认证异常
