@@ -72,7 +72,8 @@ class FFLogs:
         start_timestamp = int(date.timestamp()) * 1000
         end_timestamp = int(end_date.timestamp()) * 1000
 
-        while hasMorePages:
+        # API 只支持获取 50 页以内的数据
+        while hasMorePages and page < 51:
             rankings_url = f'{self.base_url}/rankings/encounter/{boss}?metric=rdps&difficulty={difficulty}&spec={job}&page={page}&filter=date.{start_timestamp}.{end_timestamp}&api_key={self.token}'
 
             res = await self._http(rankings_url)
