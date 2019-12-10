@@ -227,6 +227,8 @@ class FFLogs:
             )
         except DataException as e:
             return f'{e}，请稍后再试'
+        except ParameterException:
+            return '角色名或者服务器名有误，无法获取数据。'
 
         for i in ranking:
             reply += f'\n{i["spec"]} {i["percentile"]}% {i["total"]:.2f}'
