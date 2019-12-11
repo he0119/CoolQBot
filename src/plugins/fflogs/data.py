@@ -2,7 +2,8 @@
 
 副本与职业数据
 """
-from typing import Dict, List, NamedTuple, Optional
+from dataclasses import dataclass
+from typing import Dict, List, Optional
 
 # (zone, encounter, difficulty): [nicknames]
 boss_list = {
@@ -40,7 +41,8 @@ job_list = {
     17: ['绝枪战士', '绝枪', '枪刃', '枪决战士'],
 } # yapf: disable
 
-class BossInfo(NamedTuple):
+@dataclass
+class BossInfo:
     """ BOSS 的信息 """
     name: str
     zone: int
@@ -48,7 +50,8 @@ class BossInfo(NamedTuple):
     difficulty: int
 
 
-class JobInfo(NamedTuple):
+@dataclass
+class JobInfo:
     """ 职业的信息 """
     name: str
     spec: int
@@ -57,7 +60,7 @@ class JobInfo(NamedTuple):
 def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:
     """ 根据昵称获取 BOSS 的相关信息
 
-    返回包含 `name`, `zone`, `encounter`, `difficulty` 信息的命名元组
+    返回包含 `name`, `zone`, `encounter`, `difficulty` 信息的数据类
     """
     for (zone, encounter, difficulty), nicknames in boss_list.items():
         if name in nicknames:
@@ -76,7 +79,7 @@ def get_all_boss_info() -> List[BossInfo]:
 def get_job_info_by_nickname(name: str) -> Optional[JobInfo]:
     """ 根据昵称获取职业的相关信息
 
-    返回包含 `name`, `spec` 信息的命名元组
+    返回包含 `name`, `spec` 信息的数据类
     """
     for spec, nicknames in job_list.items():
         if name in nicknames:
