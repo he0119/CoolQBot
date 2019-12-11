@@ -10,43 +10,42 @@ import aiohttp
 
 from coolqbot import PluginData
 
-from .data import get_boss_info, get_job_name
+from .data import DATA, get_boss_info_by_nickname, get_job_info_by_nickname
 from .exceptions import AuthException, DataException, ParameterException
 
 
 class FFLogs:
     def __init__(self):
         self.base_url = 'https://cn.fflogs.com/v1'
-        self.data = PluginData('fflogs', config=True)
 
         # Token
         self._token = None
 
         # 默认从两周的数据中计算排名百分比
-        self.range = int(self.data.config_get('fflogs', 'range', '14'))
+        self.range = int(DATA.config_get('fflogs', 'range', '14'))
 
         # QQ号 与 最终幻想14 角色用户名，服务器的对应关系
-        if self.data.exists('characters.pkl'):
-            self.characters = self.data.load_pkl('characters')
+        if DATA.exists('characters.pkl'):
+            self.characters = DATA.load_pkl('characters')
         else:
             self.characters = {}
 
     @property
     def token(self):
         if not self._token:
-            self._token = self.data.config_get('fflogs', 'token')
+            self._token = DATA.config_get('fflogs', 'token')
         return self._token
 
     @token.setter
     def token(self, token):
-        self.data.config_set('fflogs', 'token', token)
+        DATA.config_set('fflogs', 'token', token)
         self._token = token
 
-    async def _http(self, url, is_json=True, headers=None):
+    async def _http(self, url):
         try:
             # 使用 aiohttp 库发送最终的请求
             async with aiohttp.ClientSession() as sess:
-                async with sess.get(url, headers=headers) as response:
+                async with sess.get(url) as response:
                     if response.status == 401:
                         raise AuthException('Token 有误，无法获取数据')
                     if response.status == 400:
@@ -54,12 +53,7 @@ class FFLogs:
                     if response.status != 200:
                         # 如果 HTTP 响应状态码不是 200，说明调用失败
                         return None
-                    if is_json:
-                        resp_payload = json.loads(await response.text())
-                    else:
-                        resp_payload = await response.text()
-
-                    return resp_payload
+                    return json.loads(await response.text())
         except (aiohttp.ClientError, json.JSONDecodeError, KeyError):
             # 抛出上面任何异常，说明调用失败
             return None
@@ -71,8 +65,8 @@ class FFLogs:
         """
         # 查看是否有缓存
         cache_name = f'{boss}_{difficulty}_{job}_{date.strftime("%Y%m%d")}'
-        if self.data.exists(f'{cache_name}.pkl'):
-            return self.data.load_pkl(cache_name)
+        if DATA.exists(f'{cache_name}.pkl'):
+            return DATA.load_pkl(cache_name)
 
         page = 1
         hasMorePages = True
@@ -99,7 +93,7 @@ class FFLogs:
         # 如果获取数据的日期不是当天，则缓存数据
         # 因为今天的数据可能还会增加，不能先缓存
         if end_date < datetime.now():
-            self.data.save_pkl(rankings, cache_name)
+            DATA.save_pkl(rankings, cache_name)
 
         return rankings
 
@@ -165,29 +159,31 @@ class FFLogs:
         return ranking
 
     async def zones(self):
-        """ 副本
-        """
+        """ 副本 """
         url = f'{self.base_url}/zones?api_key={self.token}'
         data = await self._http(url)
         return data
 
     async def classes(self):
-        """ 职业
-        """
+        """ 职业 """
         url = f'{self.base_url}/classes?api_key={self.token}'
         data = await self._http(url)
         return data
 
-    async def dps(self, boss, job, dps_type='rdps'):
+    async def dps(self, boss_nickname, job_nickname, dps_type='rdps'):
         """ 查询 DPS 百分比排名
-        """
-        boss_zone, boss_id, difficulty, boss_name = get_boss_info(boss)
-        if not boss_id:
-            return f'找不到 {boss} 的数据，请换个名字试试'
 
-        job_id, job_name = get_job_name(job)
-        if not job_id:
-            return f'找不到 {job} 的数据，请换个名字试试'
+        :param boss_nickname: BOSS 的称呼
+        :param job_nickname: 职业的称呼
+        :param dps_type: DPS 的种类，支持 rdps, adps, pdps (Default value = 'rdps')
+        """
+        boss = get_boss_info_by_nickname(boss_nickname)
+        if not boss:
+            return f'找不到 {boss_nickname} 的数据，请换个名字试试'
+
+        job = get_job_info_by_nickname(job_nickname)
+        if not job:
+            return f'找不到 {job_nickname} 的数据，请换个名字试试'
 
         if dps_type not in ['adps', 'rdps', 'pdps']:
             return f'找不到类型为 {dps_type} 的数据，只支持 adps rdps pdps'
@@ -196,12 +192,12 @@ class FFLogs:
         date = datetime.now() - timedelta(days=1)
         try:
             rankings = await self._get_whole_ranking(
-                boss_id, difficulty, job_id, dps_type, date
+                boss.encounter, boss.difficulty, job.spec, dps_type, date
             )
         except DataException as e:
             return f'{e}，请稍后再试'
 
-        reply = f'{boss_name} {job_name} 的数据({dps_type})'
+        reply = f'{boss.name} {job.name} 的数据({dps_type})'
 
         total = len(rankings)
         reply += f'\n数据总数：{total} 条'
@@ -209,8 +205,8 @@ class FFLogs:
         percentage_list = [100, 99, 95, 75, 50, 25, 10]
         for perc in percentage_list:
             number = math.floor(total * 0.01 * (100 - perc))
-            dps = float(rankings[number])
-            reply += f'\n{perc}% : {dps:.2f}'
+            dps_value = float(rankings[number])
+            reply += f'\n{perc}% : {dps_value:.2f}'
 
         return reply
 
@@ -218,22 +214,27 @@ class FFLogs:
         """ 设置 QQ号 与 最终幻想14 用户名和服务器名
         """
         self.characters[user_id] = [character_name, server_name]
-        self.data.save_pkl(self.characters, 'characters')
+        DATA.save_pkl(self.characters, 'characters')
 
     async def character_dps(
-        self, boss, character_name, server_name, dps_type='rdps'
+        self, boss_nickname, character_name, server_name, dps_type='rdps'
     ):
-        """ 查询指定角色的 DPS
+        """ 查询指定角色在某个副本的 DPS
+
+        :param boss_nickname: BOSS 的称呼
+        :param character_name: 角色名
+        :param server_name: 服务器名
+        :param dps_type: DPS 的种类，支持 rdps, adps (Default value = 'rdps')
         """
-        boss_zone, boss_id, difficulty, boss_name = get_boss_info(boss)
-        if not boss_id:
-            return f'找不到 {boss} 的数据，请换个名字试试'
-        reply = f'{boss_name} {character_name}-{server_name} 的排名({dps_type})'
+        boss = get_boss_info_by_nickname(boss_nickname)
+        if not boss:
+            return f'找不到 {boss_nickname} 的数据，请换个名字试试'
+        reply = f'{boss.name} {character_name}-{server_name} 的排名({dps_type})'
 
         try:
             ranking = await self._get_character_ranking(
-                character_name, server_name, boss_zone, boss_id, difficulty,
-                dps_type
+                character_name, server_name, boss.zone,
+                boss.encounter, boss.difficulty, dps_type
             )
         except DataException as e:
             return f'{e}，请稍后再试'
