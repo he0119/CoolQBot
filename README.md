@@ -35,13 +35,16 @@ cd ./src && python ./run.py
 
 ### Docker
 
-如果你的计算机上安装有 `Docker` 并且拥有 `Docker Compose`。
+如果你的计算机上安装有 [Docker](https://www.docker.com/get-started) 并且拥有 [Docker Compose](https://docs.docker.com/compose/install/)。
 
-请直接将仓库中的 `docker-compose.yml` 文件放置在一个你想存放机器人的文件夹内。
+你不需要执行上面的步骤，请直接将仓库中的 `docker-compose.yml` 文件放置在一个你想存放机器人的文件夹内。
 
-按需调整 `docker-compose.yml` 文件中的 `VNC_PASSWD` `COOLQ_ACCOUNT` 的值之后。
+按需调整 `docker-compose.yml` 文件中的 `VNC_PASSWD` `COOLQ_ACCOUNT` 的值
 
-运行 `sudo docker-compose up -d`，便可同时启动机器人，[酷Q](https://cqp.cc/) 和 [CoolQ HTTP API 插件](https://github.com/richardchien/coolq-http-api)。
+- `VNC_PASSWD` 为 `noVNC` 的登陆密码
+- `COOLQ_ACCOUNT` 为机器人的 QQ 号
+
+之后在 `docker-compose.yml` 文件所在目录下运行 `sudo docker-compose up -d`，便可同时启动机器人，[酷Q](https://cqp.cc/) 和 [CoolQ HTTP API 插件](https://github.com/richardchien/coolq-http-api)。
 
 然后访问 `http://<你的IP>:9000/` 进入 `noVNC`（密码为 `VNC_PASSWD` 的值），登录 `酷Q`，即可开始使用。
 

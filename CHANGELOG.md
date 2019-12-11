@@ -4,9 +4,15 @@
 
 ## [Unreleased]
 
+## [0.11.1] - 2019-12-11
+
 ### Added
 
-- `fflog` 插件现在支持获取指定角色的排名数据
+- `fflogs` 插件现在支持获取指定角色的排名数据
+
+### Changed
+
+- `fflogs` 插件修改和查看 `Token` 需要超级用户权限
 
 ## [0.11.0] - 2019-11-29
 
@@ -254,7 +260,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.11.1...HEAD
+[0.11.1]: https://github.com/he0119/CoolQBot/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/he0119/CoolQBot/compare/v0.10.1...v0.11.0
 [0.10.1]: https://github.com/he0119/CoolQBot/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/he0119/CoolQBot/compare/v0.9.1...v0.10.0
