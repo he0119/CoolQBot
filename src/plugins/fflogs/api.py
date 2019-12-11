@@ -10,7 +10,7 @@ import aiohttp
 
 from coolqbot import PluginData
 
-from .data import get_boss_info, get_job_name
+from .data import get_boss_info_by_nickname, get_job_info_by_nickname
 from .exceptions import AuthException, DataException, ParameterException
 
 
@@ -181,12 +181,12 @@ class FFLogs:
     async def dps(self, boss, job, dps_type='rdps'):
         """ 查询 DPS 百分比排名
         """
-        boss_zone, boss_id, difficulty, boss_name = get_boss_info(boss)
-        if not boss_id:
+        boss_info = get_boss_info_by_nickname(boss)
+        if not boss_info:
             return f'找不到 {boss} 的数据，请换个名字试试'
 
-        job_id, job_name = get_job_name(job)
-        if not job_id:
+        job_info = get_job_info_by_nickname(job)
+        if not job_info:
             return f'找不到 {job} 的数据，请换个名字试试'
 
         if dps_type not in ['adps', 'rdps', 'pdps']:
@@ -196,12 +196,13 @@ class FFLogs:
         date = datetime.now() - timedelta(days=1)
         try:
             rankings = await self._get_whole_ranking(
-                boss_id, difficulty, job_id, dps_type, date
+                boss_info.encounter, boss_info.difficulty, job_info.spec,
+                dps_type, date
             )
         except DataException as e:
             return f'{e}，请稍后再试'
 
-        reply = f'{boss_name} {job_name} 的数据({dps_type})'
+        reply = f'{boss_info.name} {job_info.name} 的数据({dps_type})'
 
         total = len(rankings)
         reply += f'\n数据总数：{total} 条'
@@ -225,15 +226,15 @@ class FFLogs:
     ):
         """ 查询指定角色的 DPS
         """
-        boss_zone, boss_id, difficulty, boss_name = get_boss_info(boss)
-        if not boss_id:
+        boss_info = get_boss_info_by_nickname(boss)
+        if not boss_info:
             return f'找不到 {boss} 的数据，请换个名字试试'
-        reply = f'{boss_name} {character_name}-{server_name} 的排名({dps_type})'
+        reply = f'{boss_info.name} {character_name}-{server_name} 的排名({dps_type})'
 
         try:
             ranking = await self._get_character_ranking(
-                character_name, server_name, boss_zone, boss_id, difficulty,
-                dps_type
+                character_name, server_name, boss_info.zone,
+                boss_info.encounter, boss_info.difficulty, dps_type
             )
         except DataException as e:
             return f'{e}，请稍后再试'

@@ -2,6 +2,9 @@
 
 副本与职业数据
 """
+from typing import Dict, List, NamedTuple, Optional
+
+# (zone, encounter, difficulty): [nicknames]
 boss_list = {
     (28, 1045, 100): ['提坦妮雅歼殛战', '缇坦妮雅', '妖精', '极妖精', '妖灵王', '妖精王', '老婆', '10王'],
     (28, 1046, 100): ['无瑕灵君歼殛战', '无瑕灵君', '肥宅', '极肥宅', '全能王'],
@@ -16,6 +19,7 @@ boss_list = {
     (29, 68, 0):   ['伊甸零式希望乐园 觉醒之章4', 'E4S', 'e4s', 'E4s', 'e4S'],
 } # yapf: disable
 
+# spec: [nicknames]
 job_list = {
     1:  ['占星术士', '占星'],
     2:  ['吟游诗人', '诗人'],
@@ -36,20 +40,53 @@ job_list = {
     17: ['绝枪战士', '绝枪', '枪刃', '枪决战士'],
 } # yapf: disable
 
+class BossInfo(NamedTuple):
+    """ BOSS 的信息 """
+    name: str
+    zone: int
+    encounter: int
+    difficulty: int
 
-def get_boss_info(name):
-    """ 根据昵称获取 boss 的 ID 同时返回正式名称
+
+class JobInfo(NamedTuple):
+    """ 职业的信息 """
+    name: str
+    spec: int
+
+
+def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:
+    """ 根据昵称获取 BOSS 的相关信息
+
+    返回包含 `name`, `zone`, `encounter`, `difficulty` 信息的命名元组
     """
-    for (boss_zone, boss_id, difficulty), nickname in boss_list.items():
-        if name in nickname:
-            return boss_zone, boss_id, difficulty, nickname[0]
-    return None, None, None, None
+    for (zone, encounter, difficulty), nicknames in boss_list.items():
+        if name in nicknames:
+            return BossInfo(nicknames[0], zone, encounter, difficulty)
+    return None
 
 
-def get_job_name(name):
-    """ 将中文昵称转换成具体的 ID 同时返回正式名称
+def get_all_boss_info() -> List[BossInfo]:
+    """ 获取所有 BOSS 的相关信息 """
+    boss_info = []
+    for (zone, encounter, difficulty), nicknames in boss_list.items():
+        boss_info.append(BossInfo(nicknames[0], zone, encounter, difficulty))
+    return boss_info
+
+
+def get_job_info_by_nickname(name: str) -> Optional[JobInfo]:
+    """ 根据昵称获取职业的相关信息
+
+    返回包含 `name`, `spec` 信息的命名元组
     """
-    for job_id, nickname in job_list.items():
-        if name in nickname:
-            return job_id, nickname[0]
-    return None, None
+    for spec, nicknames in job_list.items():
+        if name in nicknames:
+            return JobInfo(nicknames[0], spec)
+    return None
+
+
+def get_all_job_info() -> List[JobInfo]:
+    """ 获取所有职业的相关信息 """
+    job_info = []
+    for spec, nicknames in job_list.items():
+        job_info.append(JobInfo(nicknames[0], spec))
+    return job_info
