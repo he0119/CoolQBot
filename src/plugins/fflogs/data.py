@@ -5,19 +5,23 @@
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
+from coolqbot import PluginData
+
+DATA = PluginData('fflogs', config=True)
+
 # (zone, encounter, difficulty): [nicknames]
 boss_list = {
     (28, 1045, 100): ['提坦妮雅歼殛战', '缇坦妮雅', '妖精', '极妖精', '妖灵王', '妖精王', '老婆', '10王'],
     (28, 1046, 100): ['无瑕灵君歼殛战', '无瑕灵君', '肥宅', '极肥宅', '全能王'],
     (28, 1049, 100): ['哈迪斯歼殛战', '哈迪斯', '老公'],
-    (29, 65, 100): ['伊甸希望乐园 觉醒之章1', 'E1', 'e1'],
-    (29, 66, 100): ['伊甸希望乐园 觉醒之章2', 'E2', 'e2'],
-    (29, 67, 100): ['伊甸希望乐园 觉醒之章3', 'E3', 'e3'],
-    (29, 68, 100): ['伊甸希望乐园 觉醒之章4', 'E4', 'e4'],
-    (29, 65, 0):   ['伊甸零式希望乐园 觉醒之章1', 'E1S', 'e1s', 'E1s', 'e1S'],
-    (29, 66, 0):   ['伊甸零式希望乐园 觉醒之章2', 'E2S', 'e2s', 'E2s', 'e2S'],
-    (29, 67, 0):   ['伊甸零式希望乐园 觉醒之章3', 'E3S', 'e3s', 'E3s', 'e3S'],
-    (29, 68, 0):   ['伊甸零式希望乐园 觉醒之章4', 'E4S', 'e4s', 'E4s', 'e4S'],
+    (29, 65, 100):   ['伊甸希望乐园 觉醒之章1', 'E1', 'e1'],
+    (29, 66, 100):   ['伊甸希望乐园 觉醒之章2', 'E2', 'e2'],
+    (29, 67, 100):   ['伊甸希望乐园 觉醒之章3', 'E3', 'e3'],
+    (29, 68, 100):   ['伊甸希望乐园 觉醒之章4', 'E4', 'e4'],
+    (29, 65, 0):     ['伊甸零式希望乐园 觉醒之章1', 'E1S', 'e1s', 'E1s', 'e1S'],
+    (29, 66, 0):     ['伊甸零式希望乐园 觉醒之章2', 'E2S', 'e2s', 'E2s', 'e2S'],
+    (29, 67, 0):     ['伊甸零式希望乐园 觉醒之章3', 'E3S', 'e3s', 'E3s', 'e3S'],
+    (29, 68, 0):     ['伊甸零式希望乐园 觉醒之章4', 'E4S', 'e4s', 'E4s', 'e4S'],
 } # yapf: disable
 
 # spec: [nicknames]
@@ -60,7 +64,8 @@ class JobInfo:
 def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:
     """ 根据昵称获取 BOSS 的相关信息
 
-    返回包含 `name`, `zone`, `encounter`, `difficulty` 信息的数据类
+    :param name: BOSS 的昵称
+    :returns: 返回包含 `name`, `zone`, `encounter`, `difficulty` 信息的数据类，如果找不到返回 None
     """
     for (zone, encounter, difficulty), nicknames in boss_list.items():
         if name in nicknames:
@@ -79,7 +84,8 @@ def get_bosses_info() -> List[BossInfo]:
 def get_job_info_by_nickname(name: str) -> Optional[JobInfo]:
     """ 根据昵称获取职业的相关信息
 
-    返回包含 `name`, `spec` 信息的数据类
+    :param name: 职业的昵称
+    :returns: 返回包含 `name`, `spec` 信息的数据类，如果找不到返回 None
     """
     for spec, nicknames in job_list.items():
         if name in nicknames:

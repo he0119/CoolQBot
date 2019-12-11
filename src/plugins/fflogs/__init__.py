@@ -9,11 +9,11 @@ from nonebot import CommandSession, on_command
 from coolqbot import bot
 
 from .api import API
-from .data import get_bosses_info, get_jobs_info
+from .data import DATA, get_bosses_info, get_jobs_info
 
-HOUR = int(API.data.config_get('cache', 'hour', fallback='4'))
-MINUTE = int(API.data.config_get('cache', 'minute', fallback='30'))
-SECOND = int(API.data.config_get('cache', 'second', fallback='0'))
+HOUR = int(DATA.config_get('cache', 'hour', fallback='4'))
+MINUTE = int(DATA.config_get('cache', 'minute', fallback='30'))
+SECOND = int(DATA.config_get('cache', 'second', fallback='0'))
 
 
 @bot.scheduler.scheduled_job(
