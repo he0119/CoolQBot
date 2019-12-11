@@ -68,7 +68,7 @@ def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:
     return None
 
 
-def get_all_boss_info() -> List[BossInfo]:
+def get_bosses_info() -> List[BossInfo]:
     """ 获取所有 BOSS 的相关信息 """
     boss_info = []
     for (zone, encounter, difficulty), nicknames in boss_list.items():
@@ -87,7 +87,7 @@ def get_job_info_by_nickname(name: str) -> Optional[JobInfo]:
     return None
 
 
-def get_all_job_info() -> List[JobInfo]:
+def get_jobs_info() -> List[JobInfo]:
     """ 获取所有职业的相关信息 """
     job_info = []
     for spec, nicknames in job_list.items():

@@ -9,7 +9,7 @@ from nonebot import CommandSession, on_command
 from coolqbot import bot
 
 from .api import API
-from .data import get_all_boss_info, get_all_job_info
+from .data import get_bosses_info, get_jobs_info
 
 HOUR = int(API.data.config_get('cache', 'hour', fallback='4'))
 MINUTE = int(API.data.config_get('cache', 'minute', fallback='30'))
@@ -22,10 +22,10 @@ SECOND = int(API.data.config_get('cache', 'second', fallback='0'))
 async def fflogs_cache():
     """ 定时缓存数据
     """
-    boss_info = get_all_boss_info()
-    job_info = get_all_job_info()
-    for boss in boss_info:
-        for job in job_info:
+    bosses = get_bosses_info()
+    jobs = get_jobs_info()
+    for boss in bosses:
+        for job in jobs:
             await API.dps(boss.name, job.name)
             bot.logger.debug(f'{boss.name} {job.name}的数据缓存完成。')
             await asyncio.sleep(30)
