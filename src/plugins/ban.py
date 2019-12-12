@@ -16,7 +16,7 @@ EXPR_ADMIN = (
 EXPR_OWNER = (
     '你是群主，你开心就好。',
     '群主别闹了！',
-    '没人能禁言你的！请不要@我！'
+    '没人能禁言你的！请不要再找我了！'
 ) # yapf: disable
 
 @on_command('ban', aliases=('禁言'), only_to_me=False)
@@ -25,9 +25,10 @@ async def ban(session: CommandSession):
     duration_sec = duration * 60
 
     user_id = session.ctx['sender']['user_id']
+    message_type = session.ctx['message_type']
 
     # 如果在群里发送，则在当前群禁言/解除
-    if session.ctx['message_type'] == 'group':
+    if message_type == 'group':
         role = session.ctx['sender']['role']
         group_id = session.ctx['group_id']
         if role == 'member':
@@ -45,10 +46,10 @@ async def ban(session: CommandSession):
                 )
             )
         elif role == 'owner':
-            await session.send(render_expression(EXPR_ADMIN), at_sender=True)
+            await session.send(render_expression(EXPR_OWNER), at_sender=True)
 
     # 如果私聊的话，则在所有小誓约支持的群禁言/解除
-    elif session.ctx['message_type'] == 'private':
+    elif message_type == 'private':
         for group_id in session.bot.config.GROUP_ID:
             await session.bot.set_group_ban(
                 group_id=group_id, user_id=user_id, duration=duration_sec
