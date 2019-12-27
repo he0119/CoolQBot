@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [0.11.3] - 2019-12-27
+
+### Fixed
+
+- 修复 `FFLogs` 插件 在普通或零式只有一个有数据时导致查询无法正确返回数据的错误
+
 ## [0.11.2] - 2019-12-14
 
 ### Fixed
@@ -266,7 +272,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.11.2...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.11.3...HEAD
+[0.11.3]: https://github.com/he0119/CoolQBot/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/he0119/CoolQBot/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/he0119/CoolQBot/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/he0119/CoolQBot/compare/v0.10.1...v0.11.0
