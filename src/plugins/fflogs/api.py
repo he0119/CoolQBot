@@ -156,6 +156,10 @@ class FFLogs:
             ranking = [i for i in res if i['difficulty'] == 101]
         else:
             ranking = [i for i in res if i['difficulty'] == 100]
+
+        if not ranking:
+            raise DataException('网站里没有数据')
+
         return ranking
 
     async def zones(self):
@@ -233,8 +237,8 @@ class FFLogs:
 
         try:
             ranking = await self._get_character_ranking(
-                character_name, server_name, boss.zone,
-                boss.encounter, boss.difficulty, dps_type
+                character_name, server_name, boss.zone, boss.encounter,
+                boss.difficulty, dps_type
             )
         except DataException as e:
             return f'{e}，请稍后再试'
