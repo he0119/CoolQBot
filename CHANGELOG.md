@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [0.11.4] - 2020-01-23
+
+### Added
+
+- 添加通过 @他人来获取他人输出数据的功能
+
 ## [0.11.3] - 2019-12-27
 
 ### Fixed
@@ -272,7 +278,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.11.3...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.11.4...HEAD
+[0.11.4]: https://github.com/he0119/CoolQBot/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/he0119/CoolQBot/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/he0119/CoolQBot/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/he0119/CoolQBot/compare/v0.11.0...v0.11.1
