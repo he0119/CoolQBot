@@ -81,14 +81,18 @@ async def dps(session: CommandSession):
     # 判断查询排行是指个人还是特定职业
     if len(session.argv) == 2:
         # <BOSS名> me
+        # <BOSS名> <@他人>
         # <BOSS名> <职业名>
         if session.argv[1].lower() in ['me', 'i', '我']:
-            if user_id not in API.characters:
-                session.finish(
-                    '抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me <角色名> <服务器名>\n绑定自己的角色。'
-                )
-            reply = await API.character_dps(
-                session.argv[0], *API.characters[user_id]
+            reply = await get_character_dps_by_user_id(
+                session.argv[0], user_id
+            )
+        elif '[CQ:at,qq=' in session.argv[1]:
+            # @他人的格式
+            # [CQ:at,qq=12345678]
+            user_id = int(session.argv[1][10:-1])
+            reply = await get_character_dps_by_user_id(
+                session.argv[0], user_id
             )
         else:
             reply = await API.dps(*session.argv)
@@ -104,3 +108,10 @@ async def dps(session: CommandSession):
         session.finish(reply)
 
     session.finish('抱歉，并没有这个功能。')
+
+
+async def get_character_dps_by_user_id(boss_nickname: str, user_id: int):
+    """ 通过 BOSS 名称和 QQ 号来获取角色的 DPS 数据 """
+    if user_id not in API.characters:
+        return '抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me <角色名> <服务器名>\n绑定自己的角色。'
+    return await API.character_dps(boss_nickname, *API.characters[user_id])
