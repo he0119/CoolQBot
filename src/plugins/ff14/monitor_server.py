@@ -25,7 +25,7 @@ class ServerMonitor:
 
     def enable(self):
         self._job = bot.scheduler.add_job(
-            self.monitor_server_status, 'interval', seconds=10
+            self.monitor_server_status, 'interval', seconds=self.interval
         )
         self._data.config_set('ff14', 'monitor_server_status', '1')
 
@@ -55,6 +55,12 @@ class ServerMonitor:
             return resp
         else:
             return '无数据'
+
+    @property
+    def interval(self):
+        return int(
+            self._data.config_get('ff14', 'monitor_server_interval', '60')
+        )
 
     @staticmethod
     async def is_open(ip, port):
