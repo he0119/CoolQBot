@@ -11,7 +11,7 @@ import time
 from typing import Optional
 from urllib import parse
 
-import aiohttp
+import httpx
 from nonebot import CommandSession
 from nonebot.helpers import context_id
 
@@ -51,20 +51,20 @@ async def call_tencent_api(session: CommandSession,
     payload['sign'] = gen_sign_string(payload, TENCENT_AI_APP_KEY)
 
     try:
-        # 使用 aiohttp 库发送最终的请求
-        async with aiohttp.ClientSession() as sess:
-            async with sess.get(url, params=payload) as response:
-                if response.status != 200:
+        # 使用 httpx 库发送最终的请求
+        async with httpx.AsyncClient() as client:
+                resp = await client.get(url, params=payload)
+                if resp.status_code != 200:
                     # 如果 HTTP 响应状态码不是 200，说明调用失败
                     return None
 
-                resp_payload = json.loads(await response.text())
+                resp_payload = json.loads(resp.text)
                 if resp_payload['ret'] != 0:
                     # 返回非 0 表示出错
                     return None
 
                 return resp_payload['data']['answer']
-    except (aiohttp.ClientError, json.JSONDecodeError, KeyError):
+    except (httpx.HTTPError, json.JSONDecodeError, KeyError):
         # 抛出上面任何异常，说明调用失败
         return None
 

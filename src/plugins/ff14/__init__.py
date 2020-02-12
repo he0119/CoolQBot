@@ -16,6 +16,8 @@ async def ff14(session: CommandSession):
     """ 最终幻想XIV
     """
     user_id = session.ctx['user_id']
+    if len(session.argv) == 0:
+        session.finish('当前支持的功能有\nserver：查询服务器在线状态')
     if session.argv[0] == 'server' and len(session.argv) == 1:
         session.finish(server_monitor.status)
     if session.argv[0] == 'server' and len(session.argv) == 2:
