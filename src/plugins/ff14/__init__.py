@@ -24,10 +24,10 @@ async def ff14(session: CommandSession):
         if session.argv[1].lower() in ['0', 'off', 'false']:
             if server_monitor.is_enabled:
                 server_monitor.disable()
-            session.finish('已停止监测服务器状态')
+            session.finish('已停止监控服务器状态')
         else:
             if not server_monitor.is_enabled:
                 server_monitor.enable()
-            session.finish('已开始监测服务器状态')
+            session.finish('已开始监控服务器状态')
 
     session.finish('抱歉，并没有这个功能。')
