@@ -6,7 +6,7 @@ import json
 import math
 from datetime import datetime, timedelta
 
-import aiohttp
+import httpx
 
 from coolqbot import PluginData
 
@@ -43,18 +43,18 @@ class FFLogs:
 
     async def _http(self, url):
         try:
-            # 使用 aiohttp 库发送最终的请求
-            async with aiohttp.ClientSession() as sess:
-                async with sess.get(url) as response:
-                    if response.status == 401:
-                        raise AuthException('Token 有误，无法获取数据')
-                    if response.status == 400:
-                        raise ParameterException('参数有误，无法获取数据')
-                    if response.status != 200:
-                        # 如果 HTTP 响应状态码不是 200，说明调用失败
-                        return None
-                    return json.loads(await response.text())
-        except (aiohttp.ClientError, json.JSONDecodeError, KeyError):
+            # 使用 httpx 库发送最终的请求
+            async with httpx.AsyncClient() as client:
+                resp = await client.get(url)
+                if resp.status_code == 401:
+                    raise AuthException('Token 有误，无法获取数据')
+                if resp.status_code == 400:
+                    raise ParameterException('参数有误，无法获取数据')
+                if resp.status_code != 200:
+                    # 如果 HTTP 响应状态码不是 200，说明调用失败
+                    return None
+                return json.loads(resp.text)
+        except (httpx.HTTPError, json.JSONDecodeError, KeyError):
             # 抛出上面任何异常，说明调用失败
             return None
 

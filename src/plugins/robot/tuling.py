@@ -5,7 +5,7 @@ http://www.turingapi.com/
 import json
 from typing import Optional
 
-import aiohttp
+import httpx
 from nonebot import CommandSession
 from nonebot.helpers import context_id
 
@@ -45,23 +45,23 @@ async def call_tuling_api(session: CommandSession, text: str) -> Optional[str]:
         payload['userInfo']['groupId'] = group_unique_id
 
     try:
-        # 使用 aiohttp 库发送最终的请求
-        async with aiohttp.ClientSession() as sess:
-            async with sess.post(url, json=payload) as response:
-                if response.status != 200:
-                    # 如果 HTTP 响应状态码不是 200，说明调用失败
-                    return None
+        # 使用 httpx 库发送最终的请求
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, json=payload)
+            if resp.status_code != 200:
+                # 如果 HTTP 响应状态码不是 200，说明调用失败
+                return None
 
-                resp_payload = json.loads(await response.text())
-                if resp_payload['intent']['code'] == 4003:
-                    # 如果 code 是 4003 说明该 apikey 没有可用请求次数
-                    return None
+            resp_payload = json.loads(resp.text)
+            if resp_payload['intent']['code'] == 4003:
+                # 如果 code 是 4003 说明该 apikey 没有可用请求次数
+                return None
 
-                if resp_payload['results']:
-                    for result in resp_payload['results']:
-                        if result['resultType'] == 'text':
-                            # 返回文本类型的回复
-                            return result['values']['text']
-    except (aiohttp.ClientError, json.JSONDecodeError, KeyError):
+            if resp_payload['results']:
+                for result in resp_payload['results']:
+                    if result['resultType'] == 'text':
+                        # 返回文本类型的回复
+                        return result['values']['text']
+    except (httpx.HTTPError, json.JSONDecodeError, KeyError):
         # 抛出上面任何异常，说明调用失败
         return None
