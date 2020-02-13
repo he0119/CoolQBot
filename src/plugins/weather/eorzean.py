@@ -1,5 +1,6 @@
 """ 艾欧泽亚天气预报
 """
+import datetime
 import time
 
 from .eorzean_data import locationIndex, weatherIndex, weatherRateIndex
@@ -68,16 +69,17 @@ def eorzean_weather(location: str):
 
         date = int(time.time())
         weather = calc_eorzean_weather(date, location)
-        furWeather = calc_eorzean_weather(date + 1400, location)
-        str_data += f'当前天气：{weather}\n'
-        str_data += f'还剩{next_weather_time(date)}切换到天气：{furWeather}'
-
+        str_data += f'当前天气：{weather}'
+        for i in range(9):
+            next_date = date + 1400 * (i + 1)
+            furWeather = calc_eorzean_weather(next_date, location)
+            str_data += f'\n还剩{next_weather_time(date, i)}切换到天气：{furWeather}'
         return str_data
     except:
         return None
 
 
-def next_weather_time(date: int):
+def next_weather_time(date: int, count: int):
     """ 计算下一个天气时段所剩时间(格式mm:ss)
     """
     # 计算当前时间戳所属的区间(以4200s为一个完整的周期，艾欧泽亚日)
@@ -87,7 +89,12 @@ def next_weather_time(date: int):
         left_sec = increament - cur_time
     else:
         left_sec = 4200 - cur_time
-    minute = left_sec // 60
+    left_sec += 1400 * count
+
+    hour = left_sec // 3600
+    minute = (left_sec // 60) % 60
     second = left_sec % 60
 
+    if hour:
+        return f'{hour}时{minute}分{second}秒'
     return f'{minute}分{second}秒'
