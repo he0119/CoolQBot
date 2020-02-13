@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+## [0.12.0] - 2020-02-13
+
+### Added
+
+- 增加了监控 `最终幻想XIV` 服务器状态的功能
+
+### Changed
+
+- 增加艾欧泽亚天气预报的数量
+
 ## [0.11.4] - 2020-01-23
 
 ### Added
@@ -278,7 +288,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.11.4...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/he0119/CoolQBot/compare/v0.11.4...v0.12.0
 [0.11.4]: https://github.com/he0119/CoolQBot/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/he0119/CoolQBot/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/he0119/CoolQBot/compare/v0.11.1...v0.11.2
