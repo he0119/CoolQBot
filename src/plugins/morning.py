@@ -10,9 +10,9 @@ from coolqbot import PluginData, bot
 
 DATA = PluginData('morning', config=True)
 
-HOUR = int(DATA.config_get('morning', 'hour', fallback='7'))
-MINUTE = int(DATA.config_get('morning', 'minute', fallback='30'))
-SECOND = int(DATA.config_get('morning', 'second', fallback='0'))
+HOUR = int(DATA.get_config('morning', 'hour', fallback='7'))
+MINUTE = int(DATA.get_config('morning', 'minute', fallback='30'))
+SECOND = int(DATA.get_config('morning', 'second', fallback='0'))
 
 
 @bot.scheduler.scheduled_job(

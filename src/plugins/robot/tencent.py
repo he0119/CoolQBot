@@ -18,8 +18,8 @@ from nonebot.helpers import context_id
 from coolqbot import PluginData
 
 DATA = PluginData('robot', config=True)
-TENCENT_AI_APP_ID = DATA.config_get('tencent', 'app_id')
-TENCENT_AI_APP_KEY = DATA.config_get('tencent', 'app_key')
+TENCENT_AI_APP_ID = DATA.get_config('tencent', 'app_id')
+TENCENT_AI_APP_KEY = DATA.get_config('tencent', 'app_key')
 
 
 async def call_tencent_api(session: CommandSession,

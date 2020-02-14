@@ -8,7 +8,7 @@ import httpx
 from coolqbot import PluginData
 
 DATA = PluginData('weather', config=True)
-KEY = DATA.config_get('heweather', 'key')
+KEY = DATA.get_config('heweather', 'key')
 
 
 async def heweather(city):

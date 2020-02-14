@@ -12,7 +12,7 @@ from nonebot.helpers import context_id
 from coolqbot import PluginData
 
 DATA = PluginData('robot', config=True)
-TULING_API_KEY = DATA.config_get('tuling', 'api_key')
+TULING_API_KEY = DATA.get_config('tuling', 'api_key')
 
 
 async def call_tuling_api(session: CommandSession, text: str) -> Optional[str]:

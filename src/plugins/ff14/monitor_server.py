@@ -19,7 +19,7 @@ class ServerMonitor:
 
         # 根据配置启动
         if bool(
-            int(self._data.config_get('ff14', 'monitor_server_status', '0'))
+            int(self._data.get_config('ff14', 'monitor_server_status', '0'))
         ):
             self.enable()
 
@@ -27,11 +27,11 @@ class ServerMonitor:
         self._job = bot.scheduler.add_job(
             self.monitor_server_status, 'interval', seconds=self.interval
         )
-        self._data.config_set('ff14', 'monitor_server_status', '1')
+        self._data.set_config('ff14', 'monitor_server_status', '1')
 
     def disable(self):
         self._job.remove()
-        self._data.config_set('ff14', 'monitor_server_status', '0')
+        self._data.set_config('ff14', 'monitor_server_status', '0')
 
     @property
     def is_enabled(self):
@@ -59,7 +59,7 @@ class ServerMonitor:
     @property
     def interval(self):
         return int(
-            self._data.config_get('ff14', 'monitor_server_interval', '60')
+            self._data.get_config('ff14', 'monitor_server_interval', '60')
         )
 
     @staticmethod
