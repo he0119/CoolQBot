@@ -51,7 +51,7 @@ async def get_weather_of_city(city):
     # 艾欧泽亚的天气
     str_data = eorzean_weather(city)
     if not str_data:
-        str_data = heweather(city)
+        str_data = await heweather(city)
     if not str_data:
         str_data = f'我才不是因为不知道才不告诉你{city}的天气呢'
     return str_data
