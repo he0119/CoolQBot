@@ -1,10 +1,9 @@
 """ 和风天气
 """
-import json
 import re
 import urllib
 
-import requests
+import httpx
 
 from coolqbot import PluginData
 
@@ -12,7 +11,7 @@ DATA = PluginData('weather', config=True)
 KEY = DATA.config_get('heweather', 'key')
 
 
-def heweather(city):
+async def heweather(city):
     """ 和风天气 API
 
     日本 东京
@@ -27,9 +26,9 @@ def heweather(city):
     try:
         city_name = urllib.parse.quote(city.encode('utf-8'))
         url_str = f'https://free-api.heweather.com/s6/weather?location={city_name}&key={KEY}'
-        response = requests.get(url_str)
-        data = response.content.decode('utf-8')
-        weather_result = json.loads(data)['HeWeather6'][0]
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url_str)
+        weather_result = resp.json()['HeWeather6'][0]
         weather_basic = weather_result['basic']
         weather_now = weather_result['now']
         weather_forecast = weather_result['daily_forecast']

@@ -11,11 +11,12 @@ TEXTS = [
     '夜观天象，你应该走{direction}！',
     '冷静分析，你应该走{direction}！',
     '一拍大腿，你应该走{direction}！',
-    '我寻思，走{direction}一定可以到7层',
+    '我寻思，走{direction}一定可以到最底层！',
     '想了想，走{direction}应该是最好的选择！',
     '走{direction}，准没错！难道你不相信可爱的小誓约吗！',
     '投了个硬币，仔细一看，走{direction}。不信我，难道你还不信硬币么！',
-    '直觉告诉我，你走{direction}就会马上出去......'
+    '直觉告诉我，你走{direction}就会马上出去......',
+    '千万不要走{direction}，会马上出去的！',
 ] # yapf: disable
 
 
@@ -24,8 +25,10 @@ async def gate(session: CommandSession):
     door_number = session.get('door_number', prompt='总共有多少个门呢？')
 
     direction = get_direction(int(door_number))
+    if not direction:
+        session.finish('暂时只支持两个门或者三个门的情况，请重新输入吧。')
 
-    await session.send(
+    session.finish(
         render_expression(TEXTS, direction=direction), at_sender=True
     )
 

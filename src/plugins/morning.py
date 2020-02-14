@@ -2,7 +2,7 @@
 """
 import re
 
-import requests
+import httpx
 from nonebot import on_command
 from nonebot.helpers import render_expression
 
@@ -21,7 +21,7 @@ SECOND = int(DATA.config_get('morning', 'second', fallback='0'))
 async def morning():
     """ 早安
     """
-    hello_str = get_message()
+    hello_str = await get_message()
     for group_id in bot.get_bot().config.GROUP_ID:
         await bot.get_bot().send_msg(
             message_type='group', group_id=group_id, message=hello_str
@@ -37,14 +37,15 @@ EXPR_MORNING = [
 ] # yapf: disable
 
 
-def get_message():
+async def get_message():
     """ 获得消息
 
     不同的问候语
     """
     try:
         # 获得不同的问候语
-        res = requests.get('http://timor.tech/api/holiday/tts').json()
+        async with httpx.AsyncClient() as client:
+            res = await client.get('http://timor.tech/api/holiday/tts').json()
     except:
         res = {'code': -1}
 
