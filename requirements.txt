@@ -1,6 +1,6 @@
-nonebot==1.4.0
-requests==2.22.0
+git+https://github.com/richardchien/nonebot.git@cfa9fc39366c59ebeee4270774d8f194f31a5a8f
 apscheduler==3.6.3
+httpx>=0.11.1
 jieba==0.39
 python-dateutil==2.8.1
 msgpack==0.6.2
