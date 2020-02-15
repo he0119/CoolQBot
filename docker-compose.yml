@@ -9,6 +9,12 @@ services:
       - ./bot:/usr/src/app/bot
     depends_on:
       - cqhttp
+      - netease
+
+  netease:
+    image: binaryify/netease_cloud_music_api
+    container_name: netease
+    restart: always
 
   cqhttp:
     image: richardchien/cqhttp:4.12.3
