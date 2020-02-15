@@ -45,12 +45,13 @@ async def get_message():
     try:
         # 获得不同的问候语
         async with httpx.AsyncClient() as client:
-            res = await client.get('http://timor.tech/api/holiday/tts').json()
+            r = await client.get('http://timor.tech/api/holiday/tts')
+            rjson = r.json()
     except:
-        res = {'code': -1}
+        rjson = {'code': -1}
 
-    if res['code'] == 0:
-        message = res['tts']
+    if rjson['code'] == 0:
+        message = rjson['tts']
     else:
         message = '好像没法获得节假日信息了，嘤嘤嘤'
 
