@@ -4,14 +4,21 @@
 
 ## [Unreleased]
 
+## [0.12.2] - 2020-02-15
+
+### Fixed
+
+- 修复早安插件
+- 使用自建的网易云音乐 API
+
 ## [0.12.1] - 2020-02-13
 
-## Fixed
+### Fixed
 
 - 更新 `nonebot` 至 `1.4.1` 以修复 `render_expression` 的错误
 - 修复藏宝选门插件未正确处理不符合参数的问题
 
-## Changed
+### Changed
 
 - 用 `httpx` 替换 `requests`
 
@@ -299,7 +306,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.12.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.12.2...HEAD
+[0.12.2]: https://github.com/he0119/CoolQBot/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/he0119/CoolQBot/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/he0119/CoolQBot/compare/v0.11.4...v0.12.0
 [0.11.4]: https://github.com/he0119/CoolQBot/compare/v0.11.3...v0.11.4
