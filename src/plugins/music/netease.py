@@ -1,6 +1,5 @@
 """ 网易云音乐
 """
-import json
 from typing import Optional
 
 import httpx
@@ -13,26 +12,22 @@ async def call_netease_api(name: str) -> Optional[str]:
         return None
 
     # 构造请求数据
-    url = f'https://music.aityp.com/search?keywords={name}'
+    url = f'http://netease:3000/search?keywords={name}'
 
     try:
         # 使用 httpx 库发送最终的请求
         async with httpx.AsyncClient() as client:
-            resp = await client.get(url)
-            if resp.status_code != 200:
-                # 如果 HTTP 响应状态码不是 200，说明调用失败
-                return None
+            r = await client.get(url)
+            rjson = r.json()
 
-            resp_payload = json.loads(resp.text)
-
-            if resp_payload['code'] != 200:
+            if rjson['code'] != 200:
                 # 如果 code 不是 200，说明出错
                 return None
 
-                # 获取音乐 ID，并返回对应的 CQ 码
-                music_id = resp_payload['result']['songs'][0]['id']
-                return f'[CQ:music,type=163,id={music_id}]'
+            # 获取音乐 ID，并返回对应的 CQ 码
+            music_id = rjson['result']['songs'][0]['id']
+            return f'[CQ:music,type=163,id={music_id}]'
 
-    except (httpx.HTTPError, json.JSONDecodeError, KeyError):
+    except (httpx.HTTPError, KeyError):
         # 抛出上面任何异常，说明调用失败
         return None
