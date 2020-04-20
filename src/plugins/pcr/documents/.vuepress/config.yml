@@ -1,0 +1,45 @@
+base: /
+dest: ../docs
+title: yobot
+description: 公主链接群聊机器人
+head:
+  - - link
+    - rel: icon
+      href: /logo/logo.ico
+  - - link
+    - rel: apple-touch-icon
+      href: /logo/logo.ico
+themeConfig:
+  logo: /logo/logo.png
+  search: false
+  smoothScroll: true
+  repo: https://github.com/yuudi/yobot
+  docsDir: documents
+  editLinks: true
+  editLinkText: 编辑此页面
+  nav:
+    - text: 首页
+      link: /
+    - text: 安装方法
+      items:
+        - text: 使用酷Q安装
+          link: /install/cq/
+        - text: 使用mirai安装
+          link: /install/mirai/
+    - text: 使用方法
+      items:
+        - text: 功能表
+          link: /features/
+        - text: 开启 Web 模式
+          link: /usage/web-mode/
+        - text: Web 模式公会战
+          link: /usage/web-clanbattle/
+    - text: 常见问题
+      link: /usage/faq/
+    - text: 关于
+      link: /about/
+plugins:
+  vuepress-plugin-clean-urls:
+    normalSuffix: /
+    indexSuffix: /
+    notFoundPath: /404.html

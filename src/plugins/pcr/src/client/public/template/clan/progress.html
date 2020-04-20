@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<head>
+  <title>出刀记录</title>
+  <meta name='viewport' content='width=1485' charset="utf-8" />
+  <script src="//cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+  <script src="//cdn.staticfile.org/axios/0.19.2/axios.min.js"></script>
+  <script src="//cdn.staticfile.org/element-ui/2.13.0/index.js"></script>
+  <link rel="stylesheet" href="//cdn.staticfile.org/element-ui/2.13.0/theme-chalk/index.css">
+  <style>
+    .el-table td,
+    .el-table th {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <el-page-header @back="location='..'" content="出刀记录"></el-page-header>
+    <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleTitleSelect">
+      <el-menu-item index="1">面板</el-menu-item>
+      <el-menu-item index="2">预约</el-menu-item>
+      <el-menu-item index="3">查刀</el-menu-item>
+      <el-menu-item index="4">统计</el-menu-item>
+      <el-menu-item index="5">我的</el-menu-item>
+    </el-menu>
+    <h1 style="text-align:center">出刀记录</h1>
+    <el-date-picker v-model="reportDate" type="date" placeholder="选择日期" @change="report_day"></el-date-picker>
+    <el-button type="primary" @click="selectUnfinished">选中未完成</el-button>
+    <el-button type="warning" @click="sendRequest('send_remind')">提醒出刀</el-button>
+    <el-button type="danger" @click="dropMemberVisible = true">删除成员</el-button>
+    <el-dialog title="警告" :visible.sync="dropMemberVisible">
+      <p>你确定要删除这[[ multipleSelection.length ]]名成员吗</p>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dropMemberVisible = false">取消</el-button>
+        <el-button type="danger" @click="sendRequest('drop_member'),dropMemberVisible = false">确定</el-button>
+      </span>
+    </el-dialog>
+    <template v-if="progressData.length > 0">
+      共[[ members.length ]]人，共[[ progressData.reduce((s,i)=>s+i.finished,0) ]]刀
+      <el-table :data="progressData" :span-method="arraySpanMethod" style="width: 1485" ref="multipleTable"
+        @selection-change="handleSelectionChange" stripe>
+        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column prop="qqid" label="QQ号" width="120" sortable></el-table-column>
+        <el-table-column prop="nickname" label="昵称" width="200" sortable></el-table-column>
+        <el-table-column prop="finished" label="已完成" width="100" sortable></el-table-column>
+        <el-table-column label="第一刀">
+          <el-table-column label="尾刀" width="150">
+            <template v-if="scope.row.detail[0]" slot-scope="scope">
+              [[ csummary(scope.row.detail[0]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[0])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
+            </template>
+          </el-table-column>
+          <el-table-column label="剩余刀" width="150">
+            <template v-if="scope.row.detail[1]" slot-scope="scope">
+              [[ csummary(scope.row.detail[1]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[1])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
+            </template>
+          </el-table-column>
+        </el-table-column>
+        <el-table-column label="第二刀">
+          <el-table-column label="尾刀" width="150">
+            <template v-if="scope.row.detail[2]" slot-scope="scope">
+              [[ csummary(scope.row.detail[2]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[2])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
+            </template>
+          </el-table-column>
+          <el-table-column label="剩余刀" width="150">
+            <template v-if="scope.row.detail[3]" slot-scope="scope">
+              [[ csummary(scope.row.detail[3]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[3])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
+            </template>
+          </el-table-column>
+        </el-table-column>
+        <el-table-column label="第三刀">
+          <el-table-column label="尾刀" width="150">
+            <template v-if="scope.row.detail[4]" slot-scope="scope">
+              [[ csummary(scope.row.detail[4]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[4])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
+            </template>
+          </el-table-column>
+          <el-table-column label="剩余刀" width="150">
+            <template v-if="scope.row.detail[5]" slot-scope="scope">
+              [[ csummary(scope.row.detail[5]) ]]
+              <el-popover placement="top" effect="light" trigger="hover">
+                <p v-html="cdetail(scope.row.detail[5])"></p>
+                <i class="el-icon-info" slot="reference"></i>
+              </el-popover>
+            </template>
+          </el-table-column>
+        </el-table-column>
+        <el-table-column prop="sl" label="SL" width="55" sortable>
+          <template slot-scope="scope">
+            <template v-if="today==-1">-</template>
+            <template v-else>
+              <i v-if="scope.row.sl==today" class="el-icon-no-smoking" style="color:#F56C6C"></i>
+              <i v-else class="el-icon-smoking" style="color:#67C23A"></i>
+            </template>
+          </template>
+        </el-table-column>
+        <el-table-column label="历史" width="55">
+          <template slot-scope="scope">
+            <el-button type="text" icon="el-icon-time" @click="location='../'+scope.row.qqid+'/'"></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-button @click="viewInExcel" size="mini">在Excel中查看（测试功能）</el-button>
+    </template>
+    <template v-else>
+      没有记录
+    </template>
+  </div>
+</body>
+<script>var csrf_token = "{{ session['csrf_token'] }}";</script>
+<script src="{{ url_for('yobot_static', filename='clan/progress.js') }}"></script>
+
+</html>
