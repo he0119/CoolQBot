@@ -7,7 +7,6 @@ services:
     restart: always
     volumes:
       - ./bot:/usr/src/app/bot
-      - ./yobot_data:/usr/src/app/plugins/pcr/src/client/yobot_data
     depends_on:
       - cqhttp
       - netease
