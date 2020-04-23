@@ -1,8 +1,10 @@
 """ 公主连结Re:Dive
 
-版本 3378
 https://github.com/yuudi/yobot
 """
+# 下载 Yobot
+
+# 配置 Yobot
 import asyncio
 
 from nonebot import CommandSession, get_bot, on_command, scheduler
@@ -24,7 +26,7 @@ bot = Yobot(
 )
 
 
-@on_command('pcr', only_to_me=False)
+@on_command('pcr', aliases=['公主连结'], only_to_me=False)
 async def handle_msg(session: CommandSession):
     ctx = session.ctx.copy()
     ctx['raw_message'] = ctx['raw_message'][5:]
