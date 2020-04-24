@@ -10,6 +10,10 @@
 
 - 整合 `yobot`
 
+### Changed
+
+- 修改 `PluginData` 的方法命名
+
 ## [0.12.2] - 2020-02-15
 
 ### Fixed
