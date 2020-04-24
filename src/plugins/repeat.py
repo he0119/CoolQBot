@@ -15,9 +15,9 @@ from .recorder import recorder
 
 DATA = PluginData('repeat', config=True)
 # 复读概率
-REPEAT_RATE = int(DATA.config_get('bot', 'repeat_rate', fallback='10'))
+REPEAT_RATE = int(DATA.get_config('bot', 'repeat_rate', fallback='10'))
 # 复读间隔
-REPEAT_INTERVAL = int(DATA.config_get('bot', 'repeat_interval', fallback='1'))
+REPEAT_INTERVAL = int(DATA.get_config('bot', 'repeat_interval', fallback='1'))
 
 
 def is_repeat(session: CommandSession, message):

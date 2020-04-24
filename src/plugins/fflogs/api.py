@@ -22,7 +22,7 @@ class FFLogs:
         self._token = None
 
         # 默认从两周的数据中计算排名百分比
-        self.range = int(DATA.config_get('fflogs', 'range', '14'))
+        self.range = int(DATA.get_config('fflogs', 'range', '14'))
 
         # QQ号 与 最终幻想14 角色用户名，服务器的对应关系
         if DATA.exists('characters.pkl'):
@@ -33,12 +33,12 @@ class FFLogs:
     @property
     def token(self):
         if not self._token:
-            self._token = DATA.config_get('fflogs', 'token')
+            self._token = DATA.get_config('fflogs', 'token')
         return self._token
 
     @token.setter
     def token(self, token):
-        DATA.config_set('fflogs', 'token', token)
+        DATA.set_config('fflogs', 'token', token)
         self._token = token
 
     async def _http(self, url):

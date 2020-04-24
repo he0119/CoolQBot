@@ -41,7 +41,7 @@ class PluginData:
             data = pickle.load(f)
         return data
 
-    def config_get(self, section, option, fallback=''):
+    def get_config(self, section, option, fallback=''):
         """ 获得配置
 
         如果配置不存在则使用 `fallback` 并保存
@@ -59,7 +59,7 @@ class PluginData:
             self._save_config()
         return value
 
-    def config_set(self, section, option, value):
+    def set_config(self, section, option, value):
         """ 设置配置
         """
         if section not in self.config.sections():

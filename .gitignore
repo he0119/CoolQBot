@@ -127,3 +127,6 @@ pip-selfcheck.json
 *.pkl
 *.conf
 *.ini
+
+# Plugins
+plugin-*/

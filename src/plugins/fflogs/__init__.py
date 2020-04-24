@@ -11,9 +11,9 @@ from coolqbot import bot
 from .api import API
 from .data import DATA, get_bosses_info, get_jobs_info
 
-HOUR = int(DATA.config_get('cache', 'hour', fallback='4'))
-MINUTE = int(DATA.config_get('cache', 'minute', fallback='30'))
-SECOND = int(DATA.config_get('cache', 'second', fallback='0'))
+HOUR = int(DATA.get_config('cache', 'hour', fallback='4'))
+MINUTE = int(DATA.get_config('cache', 'minute', fallback='30'))
+SECOND = int(DATA.get_config('cache', 'second', fallback='0'))
 
 
 @bot.scheduler.scheduled_job(
