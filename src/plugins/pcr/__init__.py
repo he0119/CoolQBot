@@ -10,7 +10,7 @@ import json
 
 from nonebot import CommandSession, get_bot, on_command, scheduler
 
-from coolqbot import PluginData
+from coolqbot import PluginData, restart
 
 # 下载 Yobot
 YOBOT_DIR = Path(__file__).resolve().parent / 'yobot'
@@ -95,10 +95,14 @@ bot = Yobot(
 
 @on_command('pcr', aliases=['公主连结'], shell_like=True, only_to_me=False)
 async def handle_msg(session: CommandSession):
-    if session.argv[0] in ['更新', '强制更新'] and len(session.argv) == 1:
+    if session.argv[0] in ['更新', '强制更新', 'update'] and len(session.argv) == 1:
         ver_id = 3300 + sum(Yobot.Commit.values())
         reply = update_yobot(ver_id)
         session.finish(reply)
+
+    if session.argv[0] in ['重启', 'restart'] and len(session.argv) == 1:
+        await session.send('正在重启，请耐心等待')
+        restart()
 
     ctx = session.ctx.copy()
     ctx['raw_message'] = ctx['raw_message'][5:]
