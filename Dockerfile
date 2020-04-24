@@ -18,4 +18,4 @@ RUN apk add --no-cache git
 # 复制 CoolQBot
 COPY src/ .
 
-CMD [ "sh", "./run.py" ]
+CMD [ "sh", "./run.sh" ]
