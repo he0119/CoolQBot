@@ -5,6 +5,8 @@ services:
     image: he0119/coolqbot:latest
     container_name: coolqbot
     restart: always
+    ports:
+      - "8080:8080"
     volumes:
       - ./bot:/usr/src/app/bot
     depends_on:

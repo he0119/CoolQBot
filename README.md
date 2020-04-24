@@ -200,3 +200,8 @@ DPS 种类如果不填写默认为 `rdps`，且支持 `adps` 和 `pdps`。
 群友A：
 小誓约：
 ```
+
+## 感谢
+
+- [NoneBot](https://github.com/nonebot/nonebot)
+- [yobot](https://github.com/yuudi/yobot)
