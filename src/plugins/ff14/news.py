@@ -61,7 +61,7 @@ class News:
 
     def format_message(self, item):
         message = ''
-        message += f'{item["title"]}\n\n'
+        message += f'{item["title"]}\n'
         message += item['link']
         return message
 
