@@ -51,7 +51,7 @@ class News:
                     return None
                 feed = feedparser.parse(r.text)
                 if feed['bozo']:
-                    bot.logger.error('RSS 解析错误，无法获得最终幻想14的新闻')
+                    bot.logger.error('RSS 解析错误，无法获得最终幻想XIV的新闻')
                     return None
                 return feed
         except (httpx.HTTPError, KeyError) as e:
@@ -70,12 +70,12 @@ class News:
 
         feed = await self.get_news_feed()
         if feed is None:
-            bot.logger.warn('最终幻想14 RSS 订阅获取失败')
+            bot.logger.warn('最终幻想XIV RSS 订阅获取失败')
             return
 
         if self._last_id is None:
             self._last_id = feed['entries'][0]['id']
-            bot.logger.info('初始化最终幻想14 RSS 订阅')
+            bot.logger.info('初始化最终幻想XIV RSS 订阅')
             return
 
         for item in feed['entries']:
