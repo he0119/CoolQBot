@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 import feedparser
 import httpx
 
@@ -19,6 +21,13 @@ class News:
             self.enable()
 
     def enable(self):
+        bot.logger.info('初始化最终幻想XIV RSS 订阅')
+        # 开启后先运行一次
+        bot.scheduler.add_job(
+            self.send_news,
+            'date',
+            run_date=(datetime.now() + timedelta(seconds=30))
+        )
         self._job = bot.scheduler.add_job(
             self.send_news, 'interval', minutes=self.interval
         )
@@ -40,12 +49,18 @@ class News:
     def interval(self):
         return int(self._data.get_config('ff14', 'push_news_interval', '30'))
 
+    @property
+    def last_id(self):
+        return self._data.get_config('ff14', 'push_news_last_id')
+
+    @last_id.setter
+    def last_id(self, last_id):
+        self._data.set_config('ff14', 'push_news_last_id', last_id)
+
     async def get_news_feed(self):
         try:
             async with httpx.AsyncClient() as client:
-                r = await client.get(
-                    self._rss_url, headers={'host': 'rsshub.app'}
-                )
+                r = await client.get(self._rss_url)
                 if r.status_code != 200:
                     # 如果 HTTP 响应状态码不是 200，说明调用失败
                     return None
@@ -73,15 +88,16 @@ class News:
             bot.logger.warn('最终幻想XIV RSS 订阅获取失败')
             return
 
-        if self._last_id is None:
-            self._last_id = feed['entries'][0]['id']
-            bot.logger.info('初始化最终幻想XIV RSS 订阅')
-            return
+        if not self.last_id:
+            # 如果初次运行，则记录并发送第一条新闻
+            self.last_id = feed['entries'][0]['id']
+            news_list.append(feed['entries'][0])
 
         for item in feed['entries']:
-            if item['id'] == self._last_id:
+            if item['id'] == self.last_id:
                 break
             news_list.append(item)
+
         if news_list:
             group_id = bot.get_bot().config.GROUP_ID[0]
             for item in news_list:
@@ -90,6 +106,7 @@ class News:
                     group_id=group_id,
                     message=self.format_message(item)
                 )
+                self.last_id = item['id']
 
 
 news = News()
