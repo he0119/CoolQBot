@@ -21,7 +21,7 @@ class News:
             self.enable()
 
     def enable(self):
-        bot.logger.info('初始化最终幻想XIV RSS 订阅')
+        bot.logger.info('初始化 最终幻想XIV RSS 订阅')
         # 开启后先运行一次
         bot.scheduler.add_job(
             self.send_news,
@@ -81,6 +81,7 @@ class News:
         return message
 
     async def send_news(self):
+        bot.logger.info('开始检查 最终幻想XIV 新闻')
         news_list = []
 
         feed = await self.get_news_feed()
