@@ -7,7 +7,7 @@ from coolqbot import PluginData, bot
 class News:
     def __init__(self):
         self._data = PluginData('ff14', config=True)
-        self._rss_url = 'http://rsshub.app.cdn.cloudflare.net/ff14/ff14_zh/news'
+        self._rss_url = 'http://rsshub:1200/ff14/ff14_zh/news'
         self._last_id = None
         # 定时任务
         self._job = None
