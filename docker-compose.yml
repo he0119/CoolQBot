@@ -12,7 +12,6 @@ services:
     depends_on:
       - cqhttp
       - netease
-      - rsshub
 
   netease:
     image: binaryify/netease_cloud_music_api
@@ -37,26 +36,3 @@ services:
       - CQHTTP_SHOW_LOG_CONSOLE=false
     volumes:
       - ./coolq:/home/user/coolq
-
-  rsshub:
-    image: diygod/rsshub
-    container_name: rsshub
-    restart: always
-    environment:
-      NODE_ENV: production
-      CACHE_TYPE: redis
-      REDIS_URL: 'redis://redis:6379/'
-      PUPPETEER_WS_ENDPOINT: 'ws://browserless:3000'
-    depends_on:
-      - redis
-      - browserless
-
-  browserless:
-    image: browserless/chrome
-    restart: always
-
-  redis:
-    image: redis:alpine
-    restart: always
-    volumes:
-      - ./redis-data:/data

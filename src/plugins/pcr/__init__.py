@@ -25,7 +25,7 @@ def download_yobot(force=False):
         pass
     else:
         subprocess.run(
-            f'cd "{YOBOT_DIR.parent}" && git clone https://github.com/he0119/yobot.git',
+            f'cd "{YOBOT_DIR.parent}" && git clone https://github.com/yuudi/yobot.git',
             shell=True,
             check=True
         )
@@ -41,7 +41,7 @@ def configure_yobot():
 
 def update_yobot(ver_id: int):
     check_url = [
-        'https://raw.githubusercontent.com/he0119/yobot/master/docs/v3/ver.json',
+        'https://raw.githubusercontent.com/yuudi/yobot/master/docs/v3/ver.json',
     ]
     for url in check_url:
         try:
