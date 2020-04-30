@@ -6,7 +6,7 @@ import logging
 def add_file_handler(logger, path):
     # create file handler and set level to debug
     fh = logging.FileHandler(path, encoding='UTF-8')
-    fh.setLevel(logging.DEBUG)
+    fh.setLevel(logging.INFO)
 
     # create formatter
     formatter = logging.Formatter(
