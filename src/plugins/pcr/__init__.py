@@ -25,7 +25,7 @@ def download_yobot(force=False):
         pass
     else:
         subprocess.run(
-            f'cd "{YOBOT_DIR.parent}" && git clone https://gitee.com/yobot/yobot.git',
+            f'cd "{YOBOT_DIR.parent}" && git clone https://github.com/yuudi/yobot.git',
             shell=True,
             check=True
         )
@@ -41,9 +41,7 @@ def configure_yobot():
 
 def update_yobot(ver_id: int):
     check_url = [
-        'https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json',
-        'https://yuudi.github.io/yobot/v3/ver.json',
-        'http://api.yobot.xyz/v3/version/'
+        'https://raw.githubusercontent.com/yuudi/yobot/master/docs/v3/ver.json',
     ]
     for url in check_url:
         try:
@@ -95,17 +93,29 @@ bot = Yobot(
 
 @on_command('pcr', aliases=['公主连结'], shell_like=True, only_to_me=False)
 async def handle_msg(session: CommandSession):
-    if session.argv[0] in ['更新', '强制更新', 'update'] and len(session.argv) == 1:
+    user_id = session.ctx['user_id']
+
+    if len(session.argv) == 0:
+        session.finish('欢迎使用 公主连结Re:Dive 小助手~\n请输入 /pcr help 来获取帮助')
+
+    if len(session.argv) == 1 and session.argv[0] in ['更新', '强制更新', 'update']:
+        # 检查是否是超级用户
+        if user_id not in session.bot.config.SUPERUSERS:
+            session.finish('抱歉，你没有权限使用该功能')
         ver_id = 3300 + sum(Yobot.Commit.values())
         reply = update_yobot(ver_id)
         session.finish(reply)
 
-    if session.argv[0] in ['重启', 'restart'] and len(session.argv) == 1:
+    if len(session.argv) == 1 and session.argv[0] in ['重启', 'restart']:
+        # 检查是否是超级用户
+        if user_id not in session.bot.config.SUPERUSERS:
+            session.finish('抱歉，你没有权限使用该功能')
         await session.send('正在重启，请耐心等待')
         restart()
 
     ctx = session.ctx.copy()
-    ctx['raw_message'] = ctx['raw_message'][5:]
+    # 去除命令，因为 yobot 不需要
+    ctx['raw_message'] = ctx['raw_message'].split(maxsplit=1)[1]
 
     reply = await bot.proc_async(ctx)
     if reply != "" and reply is not None:
