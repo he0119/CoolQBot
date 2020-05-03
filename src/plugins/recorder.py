@@ -5,7 +5,9 @@
 """
 from datetime import datetime, timedelta
 
-from coolqbot import PluginData, bot
+from nonebot import get_bot, logger, scheduler
+
+from coolqbot import PluginData
 
 VERSION = '1'
 DATA = PluginData('recorder')
@@ -182,7 +184,7 @@ class Recorder:
         """ 加载数据
         """
         if not self._data.exists(f'{self._name}.pkl'):
-            bot.logger.error(f'{self._name}.pkl does not exist!')
+            logger.error(f'{self._name}.pkl does not exist!')
             return
 
         data = self._data.load_pkl(self._name)
@@ -190,10 +192,10 @@ class Recorder:
         # 如果是老版本格式的数据则先升级在加载
         # 默认使用配置中第一个群来升级老数据
         if 'version' not in data or data['version'] != VERSION:
-            bot.logger.info('发现旧版本数据，正在升级数据')
-            data = update(data, bot.get_bot().config.GROUP_ID[0])
+            logger.info('发现旧版本数据，正在升级数据')
+            data = update(data, get_bot().config.GROUP_ID[0])
             self._data.save_pkl(data, self._name)
-            bot.logger.info('升级数据成功')
+            logger.info('升级数据成功')
 
         # 加载数据
         self._last_message_on = data['last_message_on']
@@ -202,7 +204,7 @@ class Recorder:
         self._msg_number_list = data['msg_number_list']
 
         # 如果群列表新加了群，则补充所需的数据
-        for group_id in bot.get_bot().config.GROUP_ID:
+        for group_id in get_bot().config.GROUP_ID:
             if group_id not in self._last_message_on:
                 self._last_message_on[group_id] = datetime.now()
 
@@ -238,31 +240,31 @@ class Recorder:
         """
         self._last_message_on = {
             group_id: datetime.now()
-            for group_id in bot.get_bot().config.GROUP_ID
+            for group_id in get_bot().config.GROUP_ID
         }
         self._msg_send_time = {
             group_id: []
-            for group_id in bot.get_bot().config.GROUP_ID
+            for group_id in get_bot().config.GROUP_ID
         }
         self._repeat_list = {
             group_id: {}
-            for group_id in bot.get_bot().config.GROUP_ID
+            for group_id in get_bot().config.GROUP_ID
         }
         self._msg_number_list = {
             group_id: {}
-            for group_id in bot.get_bot().config.GROUP_ID
+            for group_id in get_bot().config.GROUP_ID
         }
 
 
 recorder = Recorder('recorder', DATA)
 
 
-@bot.scheduler.scheduled_job('interval', minutes=1, id='save_recorder')
+@scheduler.scheduled_job('interval', minutes=1, id='save_recorder')
 async def save_recorder():
     """ 每隔一分钟保存一次数据
     """
     # 保存数据前先清理 msg_send_time 列表，仅保留最近 10 分钟的数据
-    for group_id in bot.get_bot().config.GROUP_ID:
+    for group_id in get_bot().config.GROUP_ID:
         recorder.message_number(10, group_id)
 
     recorder.save_data()

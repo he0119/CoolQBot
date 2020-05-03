@@ -4,8 +4,6 @@
 """
 from nonebot import CommandSession, on_command
 
-from coolqbot import bot
-
 from .monitor_server import server_monitor
 from .news import news
 

@@ -4,12 +4,10 @@ import re
 import secrets
 from datetime import datetime, timedelta
 
-from nonebot import (
-    CommandSession, IntentCommand, NLPSession, on_command, on_natural_language,
-    on_notice, permission
-)
+from nonebot import (CommandSession, IntentCommand, NLPSession, logger,
+                     on_command, on_natural_language, on_notice, permission)
 
-from coolqbot import PluginData, bot
+from coolqbot import PluginData
 
 from .recorder import recorder
 
@@ -59,7 +57,7 @@ def is_repeat(session: CommandSession, message):
     # 当10分钟内发送消息数量大于30条时，降低复读概率
     # 因为排行榜需要固定概率来展示欧非，暂时取消
     # if recorder.message_number(10) > 30:
-    #     bot.logger.info('Repeat rate changed!')
+    #     logger.info('Repeat rate changed!')
     #     repeat_rate = 5
 
     # 记录每个人发送消息数量
@@ -68,7 +66,7 @@ def is_repeat(session: CommandSession, message):
     # 按照设定概率复读
     random = secrets.SystemRandom()
     rand = random.randint(1, 100)
-    bot.logger.info(f'repeat: {rand}')
+    logger.info(f'repeat: {rand}')
     if rand > repeat_rate:
         return False
 

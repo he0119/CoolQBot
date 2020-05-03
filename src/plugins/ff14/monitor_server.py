@@ -5,7 +5,9 @@
 import asyncio
 from datetime import datetime
 
-from coolqbot import PluginData, bot
+from nonebot import scheduler, get_bot
+
+from coolqbot import PluginData
 
 
 class ServerMonitor:
@@ -24,7 +26,7 @@ class ServerMonitor:
             self.enable()
 
     def enable(self):
-        self._job = bot.scheduler.add_job(
+        self._job = scheduler.add_job(
             self.monitor_server_status, 'interval', seconds=self.interval
         )
         self._data.set_config('ff14', 'monitor_server_status', '1')
@@ -76,7 +78,7 @@ class ServerMonitor:
 
     async def monitor_server_status(self):
         """ 监控服务器状态 """
-        group_id = bot.get_bot().config.GROUP_ID[0]
+        group_id = get_bot().config.GROUP_ID[0]
         if not self._status:
             self._status = await self.get_server_status()
         else:
@@ -84,7 +86,7 @@ class ServerMonitor:
             if self._status['data'] == current_status['data']:
                 pass
             else:
-                await bot.get_bot().send_msg(
+                await get_bot().send_msg(
                     message_type='group',
                     group_id=group_id,
                     message=self.status

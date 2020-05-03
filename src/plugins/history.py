@@ -5,9 +5,9 @@ from calendar import monthrange
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
-from nonebot import CommandSession, on_command, permission
+from nonebot import CommandSession, logger, on_command, permission, scheduler
 
-from coolqbot import PluginData, bot
+from coolqbot import PluginData
 
 from .rank import Ranking
 from .recorder import Recorder, get_history_pkl_name, recorder
@@ -15,7 +15,7 @@ from .recorder import Recorder, get_history_pkl_name, recorder
 DATA = PluginData('history')
 
 
-@bot.scheduler.scheduled_job(
+@scheduler.scheduled_job(
     'cron', day=1, hour=0, minute=0, second=0, id='clear_data'
 )
 async def clear_data():
@@ -26,7 +26,7 @@ async def clear_data():
     DATA.save_pkl(recorder.get_data(), get_history_pkl_name(date))
     # 清除现有数据
     recorder.init_data()
-    bot.logger.info('记录清除完成')
+    logger.info('记录清除完成')
 
 
 @on_command(

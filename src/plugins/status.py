@@ -4,9 +4,8 @@ import re
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
-from nonebot import CommandSession, on_command, permission
-
-from coolqbot import bot
+from nonebot import (CommandSession, get_bot, logger, on_command, permission,
+                     scheduler)
 
 from .recorder import recorder
 
@@ -60,31 +59,31 @@ def get_total_number(record_list):
     return num
 
 
-@bot.scheduler.scheduled_job('interval', seconds=5, id='coolq_status')
+@scheduler.scheduled_job('interval', seconds=5, id='coolq_status')
 async def coolq_status():
     """ 检查酷Q状态
 
     每5秒检查一次状态，并记录
     """
     try:
-        msg = await bot.get_bot().get_status()
+        msg = await get_bot().get_status()
         recorder.coolq_status = msg['good']
     except:
-        bot.logger.debug('当前无法获取酷Q状态')
+        logger.debug('当前无法获取酷Q状态')
 
 
-@bot.scheduler.scheduled_job('interval', seconds=5, id='start_message')
+@scheduler.scheduled_job('interval', seconds=5, id='start_message')
 async def check_status():
     """ 检测是否需要发送问好信息
     """
     if recorder.coolq_status and not recorder.send_hello:
         hello_str = get_message()
-        for group_id in bot.get_bot().config.GROUP_ID:
-            await bot.get_bot().send_msg(
+        for group_id in get_bot().config.GROUP_ID:
+            await get_bot().send_msg(
                 message_type='group', group_id=group_id, message=hello_str
             )
         recorder.send_hello = True
-        bot.logger.info('发送首次启动的问好信息')
+        logger.info('发送首次启动的问好信息')
 
 
 def get_message():

@@ -4,9 +4,7 @@
 """
 import asyncio
 
-from nonebot import CommandSession, on_command
-
-from coolqbot import bot
+from nonebot import CommandSession, logger, on_command, scheduler
 
 from .api import API
 from .data import DATA, get_bosses_info, get_jobs_info
@@ -16,7 +14,7 @@ MINUTE = int(DATA.get_config('cache', 'minute', fallback='30'))
 SECOND = int(DATA.get_config('cache', 'second', fallback='0'))
 
 
-@bot.scheduler.scheduled_job(
+@scheduler.scheduled_job(
     'cron', hour=HOUR, minute=MINUTE, second=SECOND, id='fflogs_cache'
 )
 async def fflogs_cache():
@@ -27,7 +25,7 @@ async def fflogs_cache():
     for boss in bosses:
         for job in jobs:
             await API.dps(boss.name, job.name)
-            bot.logger.debug(f'{boss.name} {job.name}的数据缓存完成。')
+            logger.debug(f'{boss.name} {job.name}的数据缓存完成。')
             await asyncio.sleep(30)
 
 

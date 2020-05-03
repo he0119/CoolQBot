@@ -3,10 +3,10 @@
 import re
 
 import httpx
-from nonebot import on_command
+from nonebot import logger, on_command, scheduler, get_bot
 from nonebot.helpers import render_expression
 
-from coolqbot import PluginData, bot
+from coolqbot import PluginData
 
 DATA = PluginData('morning', config=True)
 
@@ -15,18 +15,18 @@ MINUTE = int(DATA.get_config('morning', 'minute', fallback='30'))
 SECOND = int(DATA.get_config('morning', 'second', fallback='0'))
 
 
-@bot.scheduler.scheduled_job(
+@scheduler.scheduled_job(
     'cron', hour=HOUR, minute=MINUTE, second=SECOND, id='morning'
 )
 async def morning():
     """ 早安
     """
     hello_str = await get_message()
-    for group_id in bot.get_bot().config.GROUP_ID:
-        await bot.get_bot().send_msg(
+    for group_id in get_bot().config.GROUP_ID:
+        await get_bot().send_msg(
             message_type='group', group_id=group_id, message=hello_str
         )
-    bot.logger.info('发送早安信息')
+    logger.info('发送早安信息')
 
 
 EXPR_MORNING = [

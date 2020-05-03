@@ -1,11 +1,7 @@
 """ 基础插件
 """
-from nonebot import (
-    CommandSession, IntentCommand, NLPSession, on_command, on_natural_language,
-    permission
-)
-
-from coolqbot import bot
+from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
+                     on_natural_language, permission)
 
 
 @on_command(
