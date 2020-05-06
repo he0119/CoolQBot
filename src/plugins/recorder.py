@@ -99,18 +99,17 @@ class Recorder:
         self._load_data()
 
     def message_number(self, x: int, group_id: int):
-        """ 返回指定群 x 分钟内的消息条数，并清除之前的消息记录
-        """
+        """ 返回指定群 x 分钟内的消息条数，并清除之前的消息记录 """
         times = self._msg_send_time[group_id]
         now = datetime.now()
         for i in range(len(times)):
             if times[i] > now - timedelta(minutes=x):
-                times = times[i:]
-                return len(times)
+                self._msg_send_time[group_id] = times[i:]
+                return len(self._msg_send_time[group_id])
 
         # 如果没有满足条件的消息，则清除记录
-        times = []
-        return len(times)
+        self._msg_send_time[group_id] = []
+        return len(self._msg_send_time[group_id])
 
     def repeat_list(self, group_id: int):
         """ 获取指定群整个月的复读记录

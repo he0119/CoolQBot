@@ -25,7 +25,7 @@ def download_yobot(force=False):
         pass
     else:
         subprocess.run(
-            f'cd "{YOBOT_DIR.parent}" && git clone https://github.com/yuudi/yobot.git',
+            f'cd "{YOBOT_DIR.parent}" && git clone https://gitee.com/yobot/yobot.git',
             shell=True,
             check=True
         )
@@ -41,7 +41,7 @@ def configure_yobot():
 
 def update_yobot(ver_id: int):
     check_url = [
-        'https://raw.githubusercontent.com/yuudi/yobot/master/docs/v3/ver.json',
+        'https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json',
     ]
     for url in check_url:
         try:
@@ -102,7 +102,7 @@ async def handle_msg(session: CommandSession):
         # 检查是否是超级用户
         if user_id not in session.bot.config.SUPERUSERS:
             session.finish('抱歉，你没有权限使用该功能')
-        ver_id = 3300 + sum(Yobot.Commit.values())
+        ver_id = 3300 + Yobot.Version_id
         reply = update_yobot(ver_id)
         session.finish(reply)
 
