@@ -1,21 +1,15 @@
 """ 复读排行榜
 """
 import collections
-import re
 from operator import itemgetter
 
-from nonebot import CommandSession, get_bot, on_command, permission
+from nonebot import CommandSession, get_bot
 
 from .recorder import recorder
 
 
-@on_command(
-    'rank',
-    aliases={'排名', '排行榜'},
-    only_to_me=False,
-    permission=permission.GROUP
-)
-async def rank(session: CommandSession):
+async def get_rank(session: CommandSession):
+    """ 获取排行榜 """
     display_number = session.get('display_number', prompt='请输入想显示的排行条数')
     minimal_msg_number = session.get(
         'minimal_msg_number', prompt='请输入进入排行，最少需要发送多少消息'
@@ -37,42 +31,7 @@ async def rank(session: CommandSession):
     if not str_data:
         str_data = '暂时还没有满足条件的数据~>_<~'
 
-    await session.send(str_data)
-
-
-@rank.args_parser
-async def _(session: CommandSession):
-    stripped_arg = session.current_arg_text.strip()
-    if session.is_first_run:
-        match = re.match(r'^(?:(\d+))?(?:n(\d+))?$', stripped_arg)
-        if match:
-            display_number = match.group(1)
-            minimal_msg_number = match.group(2)
-            display_total_number = False
-
-            if display_number:
-                display_number = int(display_number)
-            else:
-                display_number = 3
-
-            if minimal_msg_number:
-                minimal_msg_number = int(minimal_msg_number)
-                display_total_number = True
-            else:
-                minimal_msg_number = 30
-            session.state['display_number'] = display_number
-            session.state['minimal_msg_number'] = minimal_msg_number
-            session.state['display_total_number'] = display_total_number
-        return
-
-    if not stripped_arg:
-        session.pause('你什么都不输入我怎么知道呢！')
-
-    # 检查输入参数是不是数字
-    if stripped_arg.isdigit():
-        session.state[session.current_key] = int(stripped_arg)
-    else:
-        session.pause('请只输入数字，不然我没法理解呢！')
+    return str_data
 
 
 class Ranking:
