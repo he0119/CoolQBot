@@ -5,7 +5,7 @@ from datetime import datetime
 
 import aiocqhttp
 from dateutil.relativedelta import relativedelta
-from nonebot import (CommandSession, get_bot, logger, on_websocket_connect)
+from nonebot import CommandSession, get_bot, logger, on_websocket_connect
 
 from .recorder import recorder
 
