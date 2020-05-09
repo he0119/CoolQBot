@@ -1,4 +1,3 @@
-import json
 from datetime import datetime, timedelta
 
 import httpx
@@ -52,13 +51,13 @@ class News:
         return int(self._data.get_config('ff14', 'push_news_interval', '30'))
 
     @property
-    def last_news_date(self):
-        """ 上次推送新闻的发布日期 """
-        return self._data.get_config('ff14', 'push_news_last_news_date')
+    def last_news_id(self) -> int:
+        """ 上次推送新闻的发布 ID """
+        return int(self._data.get_config('ff14', 'push_news_last_news_id', '0'))
 
-    @last_news_date.setter
-    def last_news_date(self, date_str: str):
-        self._data.set_config('ff14', 'push_news_last_news_date', date_str)
+    @last_news_id.setter
+    def last_news_id(self, news_id: int):
+        self._data.set_config('ff14', 'push_news_last_news_id', str(news_id))
 
     async def get_news(self):
         """ 获取最新的新闻 """
@@ -68,8 +67,8 @@ class News:
                 if r.status_code != 200:
                     # 如果 HTTP 响应状态码不是 200，说明调用失败
                     return None
-                return json.loads(r.text)
-        except (httpx.HTTPError, json.JSONDecodeError, KeyError) as e:
+                return r.json()
+        except (httpx.HTTPError, KeyError) as e:
             logger.error(f'获取新闻出错，{e}')
             # 抛出上面任何异常，说明调用失败
             return None
@@ -92,17 +91,20 @@ class News:
             logger.error('最终幻想XIV 新闻获取失败')
             return
 
-        if not self.last_news_date:
+        if not self.last_news_id:
             # 如果初次运行，则记录并发送第一条新闻
-            self.last_news_date = news['Data'][0]['PublishDate']
+            self.last_news_id = news['Data'][0]['Id']
             news_list.append(news['Data'][0])
 
         for item in news['Data']:
-            if item['PublishDate'] == self.last_news_date:
+            if item['Id'] <= self.last_news_id:
                 break
             news_list.append(item)
 
         if news_list:
+            # 添加最新的那一条新闻的 ID
+            self.last_news_id = news_list[0]['Id']
+
             group_id = get_bot().config.GROUP_ID[0]
             for item in news_list:
                 await get_bot().send_msg(
@@ -110,7 +112,6 @@ class News:
                     group_id=group_id,
                     message=self.format_message(item)
                 )
-                self.last_news_date = item['PublishDate']
 
 
 news = News()
