@@ -39,7 +39,7 @@ async def get_history(session: CommandSession):
         return message
     date = datetime(year=year, month=month, day=1)
 
-    group_id = session.ctx['group_id']
+    group_id = session.event.group_id
     # 尝试读取历史数据
     # 如果是本月就直接从 recorder 中获取数据
     # 不是则从历史记录中获取

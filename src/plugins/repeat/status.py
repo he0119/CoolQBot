@@ -12,7 +12,7 @@ from .recorder import recorder
 
 async def get_status(session: CommandSession):
     """ 获取状态 """
-    group_id = session.ctx['group_id']
+    group_id = session.event.group_id
     str_data = f'近十分钟群内聊天数量是 {recorder.message_number(10, group_id)} 条'
 
     repeat_num = get_total_number(recorder.repeat_list(group_id))

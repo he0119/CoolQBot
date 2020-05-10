@@ -33,7 +33,7 @@ async def fflogs_cache():
 async def dps(session: CommandSession):
     """ 查询 DPS
     """
-    user_id = session.ctx['user_id']
+    user_id = session.event.user_id
     # 设置 Token
     if session.argv[0] == 'token' and len(session.argv) == 2:
         # 检查是否是超级用户

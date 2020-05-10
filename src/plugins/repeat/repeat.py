@@ -10,15 +10,15 @@ from . import DATA
 from .recorder import recorder
 
 # 复读概率
-REPEAT_RATE = int(DATA.get_config('repeat', 'repeat_rate', fallback='10'))
+REPEAT_RATE = int(DATA.get_config('repeat', 'rate', fallback='10'))
 # 复读间隔
-REPEAT_INTERVAL = int(DATA.get_config('repeat', 'repeat_interval', fallback='1'))
+REPEAT_INTERVAL = int(DATA.get_config('repeat', 'interval', fallback='1'))
 
 
 def is_repeat(session: CommandSession, message: str):
     """ 是否复读这个消息 """
-    group_id = session.ctx['group_id']
-    user_id = session.ctx['sender']['user_id']
+    group_id = session.event.group_id
+    user_id = session.event.user_id
     # 只复读指定群内消息
     if group_id not in session.bot.config.GROUP_ID:
         return False

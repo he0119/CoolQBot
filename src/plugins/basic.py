@@ -9,8 +9,8 @@ from nonebot import (CommandSession, IntentCommand, NLPSession, on_command,
 )
 async def whoami(session: CommandSession):
     msg = await session.bot.get_group_member_info(
-        user_id=session.ctx['sender']['user_id'],
-        group_id=session.ctx['group_id'],
+        user_id=session.event.user_id,
+        group_id=session.event.group_id,
         no_cache=True
     )
     if msg['card']:
@@ -26,8 +26,8 @@ async def whoami(session: CommandSession):
 async def whereami(session: CommandSession):
     group_list = await session.bot.get_group_list()
     msg = await session.bot.get_group_member_info(
-        user_id=session.ctx['sender']['user_id'],
-        group_id=session.ctx['group_id'],
+        user_id=session.event.user_id,
+        group_id=session.event.group_id,
         no_cache=True
     )
     if msg['area']:
@@ -35,7 +35,7 @@ async def whereami(session: CommandSession):
     else:
         country = '不知道不关心'
     for group in group_list:
-        if group['group_id'] == session.ctx['group_id']:
+        if group['group_id'] == session.event.group_id:
             await session.send(
                 f'\n你所在群：{group["group_name"]}\n你所在地区：{country}',
                 at_sender=True

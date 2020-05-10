@@ -18,7 +18,7 @@ async def get_rank(session: CommandSession):
         'display_total_number', prompt='是否显示每个人发送的消息总数'
     )
 
-    group_id = session.ctx['group_id']
+    group_id = session.event.group_id
     repeat_list = recorder.repeat_list(group_id)
     msg_number_list = recorder.msg_number_list(group_id)
 

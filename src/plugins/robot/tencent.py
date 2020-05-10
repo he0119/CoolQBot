@@ -43,7 +43,7 @@ async def call_tencent_api(session: CommandSession,
         'nonce_str':
         ''.join(random.sample(string.ascii_letters + string.digits, 32)),
         'session':
-        context_id(session.ctx, use_hash=True),
+        context_id(session.event, use_hash=True),
         'question':
         text
     }
