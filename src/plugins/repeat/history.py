@@ -1,21 +1,18 @@
-""" 历史记录插件
+""" 历史记录
 """
 import re
 from calendar import monthrange
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
-from nonebot import CommandSession, on_command, permission
+from nonebot import CommandSession, logger, scheduler
 
-from coolqbot import PluginData, bot
-
+from . import DATA
 from .rank import Ranking
 from .recorder import Recorder, get_history_pkl_name, recorder
 
-DATA = PluginData('history')
 
-
-@bot.scheduler.scheduled_job(
+@scheduler.scheduled_job(
     'cron', day=1, hour=0, minute=0, second=0, id='clear_data'
 )
 async def clear_data():
@@ -26,13 +23,11 @@ async def clear_data():
     DATA.save_pkl(recorder.get_data(), get_history_pkl_name(date))
     # 清除现有数据
     recorder.init_data()
-    bot.logger.info('记录清除完成')
+    logger.info('记录清除完成')
 
 
-@on_command(
-    'history', aliases={'历史'}, only_to_me=False, permission=permission.GROUP
-)
-async def history(session: CommandSession):
+async def get_history(session: CommandSession):
+    """ 获取历史数据 """
     year = session.get('year', prompt='你请输入你要查询的年份')
     month = session.get('month', prompt='你请输入你要查询的月份')
     day = session.get('day', prompt='你请输入你要查询的日期（如查询整月排名请输入 0）')
@@ -41,10 +36,10 @@ async def history(session: CommandSession):
     now = datetime.now()
     is_valid, message = is_valid_date(year, month, day, now)
     if not is_valid:
-        return await session.send(message)
+        return message
     date = datetime(year=year, month=month, day=1)
 
-    group_id = session.ctx['group_id']
+    group_id = session.event.group_id
     # 尝试读取历史数据
     # 如果是本月就直接从 recorder 中获取数据
     # 不是则从历史记录中获取
@@ -57,8 +52,8 @@ async def history(session: CommandSession):
                 str_data = f'{date.year} 年 {date.month} 月 {day} 日的数据不存在，请换个试试吧 ~>_<~'
             else:
                 str_data = f'{date.year} 年 {date.month} 月的数据不存在，请换个试试吧 0.0'
-            return await session.send(str_data)
-        history_data = Recorder(history_filename, DATA)
+            return str_data
+        history_data = Recorder(history_filename)
 
     if day:
         repeat_list = history_data.repeat_list_by_day(day, group_id)
@@ -88,38 +83,7 @@ async def history(session: CommandSession):
     if not str_data:
         str_data = '找不到满足条件的数据 ~>_<~'
 
-    await session.send(str_data)
-
-
-@history.args_parser
-async def _(session: CommandSession):
-    stripped_arg = session.current_arg_text.strip()
-    if session.is_first_run:
-        match = re.match(r'^(\d+)(?:\-(\d+)(?:\-(\d+))?)?$', stripped_arg)
-        if match:
-            year = match.group(1)
-            month = match.group(2)
-            day = match.group(3)
-            if year:
-                year = int(year)
-            if month:
-                month = int(month)
-            if day:
-                day = int(day)
-            session.state['year'] = year
-            session.state['month'] = month
-            session.state['day'] = day
-        return
-
-    if not stripped_arg:
-        session.pause('你什么都不输入我怎么知道呢！')
-
-    # 检查输入参数是不是数字
-    if stripped_arg.isdigit():
-        session.state[session.current_key] = int(stripped_arg)
-    else:
-        session.pause('请只输入数字，不然我没法理解呢！')
-
+    return str_data
 
 def is_valid_date(year, month, day, now):
     """ 确认输入日期是否合法

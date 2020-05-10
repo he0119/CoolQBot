@@ -1,14 +1,15 @@
-""" 数据记录插件
+""" 数据记录
 
-记录排行版插件，历史插件，状态插件所需的数据
+记录排行版，历史，状态所需的数据
 如果遇到老版本数据，则自动升级
 """
 from datetime import datetime, timedelta
 
-from coolqbot import PluginData, bot
+from nonebot import get_bot, logger, scheduler
+
+from . import DATA
 
 VERSION = '1'
-DATA = PluginData('recorder')
 
 
 def get_history_pkl_name(dt: datetime):
@@ -79,9 +80,8 @@ def update_old_2(data: list, group_id: int):
 
 
 class Recorder:
-    def __init__(self, name: str, data: PluginData):
+    def __init__(self, name: str):
         self._name = name
-        self._data = data
 
         # 初始化运行数据
         self.init_data()
@@ -180,19 +180,19 @@ class Recorder:
     def _load_data(self):
         """ 加载数据
         """
-        if not self._data.exists(f'{self._name}.pkl'):
-            bot.logger.error(f'{self._name}.pkl does not exist!')
+        if not DATA.exists(f'{self._name}.pkl'):
+            logger.error(f'{self._name}.pkl does not exist!')
             return
 
-        data = self._data.load_pkl(self._name)
+        data = DATA.load_pkl(self._name)
 
         # 如果是老版本格式的数据则先升级在加载
         # 默认使用配置中第一个群来升级老数据
         if 'version' not in data or data['version'] != VERSION:
-            bot.logger.info('发现旧版本数据，正在升级数据')
-            data = update(data, bot.get_bot().config.GROUP_ID[0])
-            self._data.save_pkl(data, self._name)
-            bot.logger.info('升级数据成功')
+            logger.info('发现旧版本数据，正在升级数据')
+            data = update(data, get_bot().config.GROUP_ID[0])
+            DATA.save_pkl(data, self._name)
+            logger.info('升级数据成功')
 
         # 加载数据
         self._last_message_on = data['last_message_on']
@@ -201,7 +201,7 @@ class Recorder:
         self._msg_number_list = data['msg_number_list']
 
         # 如果群列表新加了群，则补充所需的数据
-        for group_id in bot.get_bot().config.GROUP_ID:
+        for group_id in get_bot().config.GROUP_ID:
             if group_id not in self._last_message_on:
                 self._last_message_on[group_id] = datetime.now()
 
@@ -217,7 +217,7 @@ class Recorder:
     def save_data(self):
         """ 保存数据
         """
-        self._data.save_pkl(self.get_data(), self._name)
+        DATA.save_pkl(self.get_data(), self._name)
 
     def get_data(self):
         """ 获取当前数据
@@ -237,31 +237,31 @@ class Recorder:
         """
         self._last_message_on = {
             group_id: datetime.now()
-            for group_id in bot.get_bot().config.GROUP_ID
+            for group_id in get_bot().config.GROUP_ID
         }
         self._msg_send_time = {
             group_id: []
-            for group_id in bot.get_bot().config.GROUP_ID
+            for group_id in get_bot().config.GROUP_ID
         }
         self._repeat_list = {
             group_id: {}
-            for group_id in bot.get_bot().config.GROUP_ID
+            for group_id in get_bot().config.GROUP_ID
         }
         self._msg_number_list = {
             group_id: {}
-            for group_id in bot.get_bot().config.GROUP_ID
+            for group_id in get_bot().config.GROUP_ID
         }
 
 
-recorder = Recorder('recorder', DATA)
+recorder = Recorder('recorder')
 
 
-@bot.scheduler.scheduled_job('interval', minutes=1, id='save_recorder')
+@scheduler.scheduled_job('interval', minutes=1, id='save_recorder')
 async def save_recorder():
     """ 每隔一分钟保存一次数据
     """
     # 保存数据前先清理 msg_send_time 列表，仅保留最近 10 分钟的数据
-    for group_id in bot.get_bot().config.GROUP_ID:
+    for group_id in get_bot().config.GROUP_ID:
         recorder.message_number(10, group_id)
 
     recorder.save_data()

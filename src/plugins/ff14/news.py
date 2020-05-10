@@ -1,9 +1,9 @@
-import json
 from datetime import datetime, timedelta
 
 import httpx
+from nonebot import get_bot, logger, scheduler
 
-from coolqbot import PluginData, bot
+from coolqbot import PluginData
 
 
 class News:
@@ -20,14 +20,14 @@ class News:
 
     def enable(self):
         """ 开启新闻自动推送 """
-        bot.logger.info('初始化 最终幻想XIV 新闻推送')
+        logger.info('初始化 最终幻想XIV 新闻推送')
         # 开启后先运行一次
-        bot.scheduler.add_job(
+        scheduler.add_job(
             self.push_news,
             'date',
             run_date=(datetime.now() + timedelta(seconds=30))
         )
-        self._job = bot.scheduler.add_job(
+        self._job = scheduler.add_job(
             self.push_news, 'interval', minutes=self.interval
         )
         self._data.set_config('ff14', 'push_news', '1')
@@ -67,9 +67,9 @@ class News:
                 if r.status_code != 200:
                     # 如果 HTTP 响应状态码不是 200，说明调用失败
                     return None
-                return json.loads(r.text)
-        except (httpx.HTTPError, json.JSONDecodeError, KeyError) as e:
-            bot.logger.error(f'获取新闻出错，{e}')
+                return r.json()
+        except (httpx.HTTPError, KeyError) as e:
+            logger.error(f'获取新闻出错，{e}')
             # 抛出上面任何异常，说明调用失败
             return None
 
@@ -83,12 +83,12 @@ class News:
 
     async def push_news(self):
         """ 推送消息 """
-        bot.logger.info('开始检查 最终幻想XIV 新闻')
+        logger.info('开始检查 最终幻想XIV 新闻')
         news_list = []
 
         news = await self.get_news()
         if news is None:
-            bot.logger.error('最终幻想XIV 新闻获取失败')
+            logger.error('最终幻想XIV 新闻获取失败')
             return
 
         if not self.last_news_id:
@@ -105,9 +105,9 @@ class News:
             # 添加最新的那一条新闻的 ID
             self.last_news_id = news_list[0]['Id']
 
-            group_id = bot.get_bot().config.GROUP_ID[0]
+            group_id = get_bot().config.GROUP_ID[0]
             for item in news_list:
-                await bot.get_bot().send_msg(
+                await get_bot().send_msg(
                     message_type='group',
                     group_id=group_id,
                     message=self.format_message(item)

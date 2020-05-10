@@ -93,7 +93,7 @@ bot = Yobot(
 
 @on_command('pcr', aliases=['公主连结'], shell_like=True, only_to_me=False)
 async def handle_msg(session: CommandSession):
-    user_id = session.ctx['user_id']
+    user_id = session.event.user_id
 
     if len(session.argv) == 0:
         session.finish('欢迎使用 公主连结Re:Dive 小助手~\n请输入 /pcr help 来获取帮助')
@@ -113,7 +113,7 @@ async def handle_msg(session: CommandSession):
         await session.send('正在重启，请耐心等待')
         restart()
 
-    ctx = session.ctx.copy()
+    ctx = session.event.copy()
     # 去除命令，因为 yobot 不需要
     ctx['raw_message'] = ctx['raw_message'].split(maxsplit=1)[1]
 

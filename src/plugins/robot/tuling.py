@@ -36,11 +36,11 @@ async def call_tuling_api(session: CommandSession, text: str) -> Optional[str]:
         },
         'userInfo': {
             'apiKey': TULING_API_KEY,
-            'userId': context_id(session.ctx, use_hash=True)
+            'userId': context_id(session.event, use_hash=True)
         }
     }
 
-    group_unique_id = context_id(session.ctx, mode='group', use_hash=True)
+    group_unique_id = context_id(session.event, mode='group', use_hash=True)
     if group_unique_id:
         payload['userInfo']['groupId'] = group_unique_id
 

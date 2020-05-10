@@ -24,13 +24,13 @@ async def ban(session: CommandSession):
     duration = session.get('duration', prompt='你想被禁言多少分钟呢？')
     duration_sec = duration * 60
 
-    user_id = session.ctx['sender']['user_id']
-    message_type = session.ctx['message_type']
+    user_id = session.event.user_id
+    message_type = session.event['message_type']
 
     # 如果在群里发送，则在当前群禁言/解除
     if message_type == 'group':
-        role = session.ctx['sender']['role']
-        group_id = session.ctx['group_id']
+        role = session.event.sender['role']
+        group_id = session.event.group_id
         if role == 'member':
             await session.bot.set_group_ban(
                 group_id=group_id, user_id=user_id, duration=duration_sec
