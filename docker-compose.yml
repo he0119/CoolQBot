@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3"
 services:
 
   coolqbot:
@@ -30,9 +30,9 @@ services:
       - VNC_PASSWD=12345687
       - COOLQ_ACCOUNT=2062765419
       - CQHTTP_SERVE_DATA_FILES=true
-      - CQHTTP_WS_REVERSE_API_URL=ws://coolqbot:8080/ws/api/
-      - CQHTTP_WS_REVERSE_EVENT_URL=ws://coolqbot:8080/ws/event/
       - CQHTTP_USE_WS_REVERSE=true
+      - CQHTTP_WS_REVERSE_USE_UNIVERSAL_CLIENT=true
+      - CQHTTP_WS_REVERSE_URL=ws://coolqbot:8080/ws/
       - CQHTTP_SHOW_LOG_CONSOLE=false
     volumes:
       - ./coolq:/home/user/coolq
