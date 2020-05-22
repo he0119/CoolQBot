@@ -1,3 +1,4 @@
+import json
 import re
 
 from nonebot import CommandSession, permission
@@ -24,6 +25,25 @@ async def sign(session: CommandSession):
         title = re.findall(r'title=(\w+\s?\w+)', session.state.get('message'))
         session.finish(f'今天的打卡是 {title[0]}', at_sender=True)
 
+@cg.command('mina')
+async def mina(session: CommandSession):
+    """ 复读小程序（电脑上没法看小程序内容） """
+    if session.event.group_id in session.bot.config.GROUP_ID:
+        if '小程序' in session.event.message[0]['data']['title']:
+            content = session.event.message[0]['data']['content']
+            # 将 HTTP 的 &#44; 替换回逗号
+            content = content.replace('&#44;', ',')
+            content = json.loads(content)
+            content = content['detail_1']
+            # 生成消息
+            message = '请在手机版QQ查看[qq小程序分享]应用.jpg\n\n'
+            title = content['title']
+            desc = content['desc']
+            message += f'{title}\n{desc}'
+            if 'qqdocurl' in content:
+                url = content['qqdocurl']
+                message += f'\n{url}'
+            session.finish(message, at_sender=True)
 
 @cg.command(
     'rank',

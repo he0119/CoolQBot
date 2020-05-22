@@ -21,3 +21,14 @@ async def _(session: NLPSession):
         return IntentCommand(
             90.0, ('repeat', 'sign'), args={'message': session.msg}
         )
+
+
+@on_natural_language(only_to_me=False)
+async def _(session: NLPSession):
+    """ 复读小程序
+
+    将小程序转换为电脑可以打开的网址
+    """
+    match = re.match(r'^\[CQ:rich(.+)\]$', session.msg)
+    if match:
+        return IntentCommand(90.0, ('repeat', 'mina'))
