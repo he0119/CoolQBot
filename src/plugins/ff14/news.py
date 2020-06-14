@@ -10,7 +10,7 @@ class News:
     def __init__(self):
         self._data = PluginData('ff14', config=True)
         # 新闻数据的地址
-        self._url = 'http://api.act.sdo.com/UnionNews/List?gameCode=ma&category=5309,5310,5311,5312,5313&pageIndex=0&pageSize=5'
+        self._url = 'http://api.act.sdo.com/UnionNews/List?gameCode=ff&category=5309,5310,5311,5312,5313&pageIndex=0&pageSize=5'
         # 定时任务
         self._job = None
 
