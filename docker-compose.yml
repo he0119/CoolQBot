@@ -21,7 +21,7 @@ services:
       - HOST=0.0.0.0
 
   cqhttp:
-    image: richardchien/cqhttp:latest
+    image: richardchien/cqhttp:4.15.0
     container_name: cqhttp
     restart: always
     ports:
