@@ -27,13 +27,16 @@ async def ff14(session: CommandSession):
             session.bot, session.event, IS_SUPERUSER
         ):
             session.finish('我才不要听你的呢。')
-        if strtobool(session.argv[1]):
-            if not news.is_enabled:
-                news.enable()
-            session.finish('已开始新闻自动推送')
-        else:
-            if news.is_enabled:
-                news.disable()
-            session.finish('已停止新闻自动推送')
+        try:
+            if strtobool(session.argv[1]):
+                if not news.is_enabled:
+                    news.enable()
+                session.finish('已开始新闻自动推送')
+            else:
+                if news.is_enabled:
+                    news.disable()
+                session.finish('已停止新闻自动推送')
+        except ValueError:
+            session.finish('请问你想开启还是关闭新闻自动推送呢？')
 
     session.finish('抱歉，并没有这个用法。')
