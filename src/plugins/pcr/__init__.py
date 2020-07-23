@@ -3,12 +3,13 @@
 https://github.com/yuudi/yobot
 """
 import asyncio
+import json
 import subprocess
 from pathlib import Path
-import requests
-import json
 
+import requests
 from nonebot import CommandSession, get_bot, on_command, scheduler
+from nonebot.permission import SUPERUSER, check_permission
 
 from coolqbot import PluginData, restart
 
@@ -40,18 +41,13 @@ def configure_yobot():
 
 
 def update_yobot(ver_id: int):
-    check_url = [
-        'https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json',
-    ]
-    for url in check_url:
-        try:
-            response = requests.get(url)
-        except requests.ConnectionError:
-            continue
-        if response.status_code == 200:
-            server_available = True
-            break
-    if not server_available:
+    check_url = 'https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json'
+
+    try:
+        response = requests.get(check_url)
+        if response.status_code != 200:
+            raise requests.ConnectionError
+    except requests.ConnectionError:
         return '无法连接服务器'
     verinfo = json.loads(response.text)
     verinfo = verinfo['stable']
@@ -100,7 +96,7 @@ async def handle_msg(session: CommandSession):
 
     if len(session.argv) == 1 and session.argv[0] in ['更新', '强制更新', 'update']:
         # 检查是否是超级用户
-        if user_id not in session.bot.config.SUPERUSERS:
+        if not await check_permission(session.bot, session.event, SUPERUSER):
             session.finish('抱歉，你没有权限使用该功能')
         ver_id = 3300 + Yobot.Version_id
         reply = update_yobot(ver_id)
@@ -108,7 +104,7 @@ async def handle_msg(session: CommandSession):
 
     if len(session.argv) == 1 and session.argv[0] in ['重启', 'restart']:
         # 检查是否是超级用户
-        if user_id not in session.bot.config.SUPERUSERS:
+        if not await check_permission(session.bot, session.event, SUPERUSER):
             session.finish('抱歉，你没有权限使用该功能')
         await session.send('正在重启，请耐心等待')
         restart()

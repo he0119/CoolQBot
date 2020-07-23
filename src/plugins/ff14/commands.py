@@ -1,7 +1,7 @@
 from distutils.util import strtobool
 
 from nonebot import CommandSession
-from nonebot.permission import IS_SUPERUSER, check_permission
+from nonebot.permission import SUPERUSER, check_permission
 
 from . import cg
 from .news import news
@@ -23,9 +23,7 @@ async def ff14(session: CommandSession):
             session.finish('新闻自动推送关闭中')
     if len(session.argv) == 2 and session.argv[0] == 'news':
         # 检查是否是超级用户
-        if not await check_permission(
-            session.bot, session.event, IS_SUPERUSER
-        ):
+        if not await check_permission(session.bot, session.event, SUPERUSER):
             session.finish('我才不要听你的呢。')
         try:
             if strtobool(session.argv[1]):

@@ -5,6 +5,7 @@
 import asyncio
 
 from nonebot import CommandSession, logger, on_command, scheduler
+from nonebot.permission import SUPERUSER, check_permission
 
 from .api import API
 from .data import DATA, get_bosses_info, get_jobs_info
@@ -37,7 +38,7 @@ async def dps(session: CommandSession):
     # 设置 Token
     if session.argv[0] == 'token' and len(session.argv) == 2:
         # 检查是否是超级用户
-        if user_id not in session.bot.config.SUPERUSERS:
+        if not await check_permission(session.bot, session.event, SUPERUSER):
             session.finish('抱歉，你没有权限修改 Token。')
 
         API.token = session.argv[1]
@@ -51,7 +52,7 @@ async def dps(session: CommandSession):
 
     if session.argv[0] == 'token' and len(session.argv) == 1:
         # 检查是否是超级用户
-        if user_id not in session.bot.config.SUPERUSERS:
+        if not await check_permission(session.bot, session.event, SUPERUSER):
             session.finish('抱歉，你没有权限查看 Token。')
         session.finish(f'当前的 Token 为 {API.token}')
 
