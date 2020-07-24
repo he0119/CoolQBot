@@ -3,72 +3,11 @@
 https://github.com/yuudi/yobot
 """
 import asyncio
-import json
-import subprocess
-from pathlib import Path
 
-import requests
 from nonebot import CommandSession, get_bot, on_command, scheduler
-from nonebot.permission import SUPERUSER, check_permission
 
-from coolqbot import PluginData, restart
-
-# 下载 Yobot
-YOBOT_DIR = Path(__file__).resolve().parent / 'yobot'
-
-
-def download_yobot(force=False):
-    """ 下载 Yobot
-
-    force: 是否强制下载，如是则先删除文件夹内文件之后再下载
-    """
-    if force:
-        pass
-    else:
-        subprocess.run(
-            f'cd "{YOBOT_DIR.parent}" && git clone https://gitee.com/yobot/yobot.git',
-            shell=True,
-            check=True
-        )
-
-
-def configure_yobot():
-    """ 运行前配置 """
-    yobot_init_file: Path = YOBOT_DIR / '__init__.py'
-    # 如果有 init 文件，则删除
-    if yobot_init_file.exists():
-        yobot_init_file.unlink()
-
-
-def update_yobot(ver_id: int):
-    check_url = 'https://gitee.com/yobot/yobot/raw/master/docs/v3/ver.json'
-
-    try:
-        response = requests.get(check_url)
-        if response.status_code != 200:
-            raise requests.ConnectionError
-    except requests.ConnectionError:
-        return '无法连接服务器'
-    verinfo = json.loads(response.text)
-    verinfo = verinfo['stable']
-    if not (verinfo['version'] > ver_id):
-        return '已经是最新版本'
-
-    subprocess.run(
-        f'cd "{YOBOT_DIR}" && git checkout . && git pull',
-        shell=True,
-        check=True
-    )
-    return '升级成功，请重新启动'
-
-
-if not YOBOT_DIR.exists():
-    download_yobot()
-
-# 配置 Yobot
-configure_yobot()
-
-from .yobot.src.client.yobot import Yobot
+from coolqbot import PluginData
+from yobot.yobot import Yobot
 
 DATA = PluginData('pcr')
 
@@ -89,25 +28,8 @@ bot = Yobot(
 
 @on_command('pcr', aliases=['公主连结'], shell_like=True, only_to_me=False)
 async def handle_msg(session: CommandSession):
-    user_id = session.event.user_id
-
     if len(session.argv) == 0:
         session.finish('欢迎使用 公主连结Re:Dive 小助手~\n请输入 /pcr help 来获取帮助')
-
-    if len(session.argv) == 1 and session.argv[0] in ['更新', '强制更新', 'update']:
-        # 检查是否是超级用户
-        if not await check_permission(session.bot, session.event, SUPERUSER):
-            session.finish('抱歉，你没有权限使用该功能')
-        ver_id = 3300 + Yobot.Version_id
-        reply = update_yobot(ver_id)
-        session.finish(reply)
-
-    if len(session.argv) == 1 and session.argv[0] in ['重启', 'restart']:
-        # 检查是否是超级用户
-        if not await check_permission(session.bot, session.event, SUPERUSER):
-            session.finish('抱歉，你没有权限使用该功能')
-        await session.send('正在重启，请耐心等待')
-        restart()
 
     ctx = session.event.copy()
     # 去除命令，因为 yobot 不需要
