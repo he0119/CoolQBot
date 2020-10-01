@@ -1,4 +1,6 @@
-# Created by https://www.gitignore.io/api/python
+
+# Created by https://www.toptal.com/developers/gitignore/api/python
+# Edit at https://www.toptal.com/developers/gitignore?templates=python
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
@@ -23,6 +25,8 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -41,14 +45,17 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+.nox/
 .coverage
 .coverage.*
 .cache
 nosetests.xml
 coverage.xml
 *.cover
+*.py,cover
 .hypothesis/
 .pytest_cache/
+pytestdebug.log
 
 # Translations
 *.mo
@@ -58,6 +65,7 @@ coverage.xml
 *.log
 local_settings.py
 db.sqlite3
+db.sqlite3-journal
 
 # Flask stuff:
 instance/
@@ -68,6 +76,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+doc/_build/
 
 # PyBuilder
 target/
@@ -75,11 +84,26 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 
+# IPython
+profile_default/
+ipython_config.py
+
 # pyenv
 .python-version
 
-# celery beat schedule file
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
 celerybeat-schedule
+celerybeat.pid
 
 # SageMath parsed files
 *.sage.py
@@ -105,28 +129,15 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+.dmypy.json
+dmypy.json
 
-### Python Patch ###
-.venv/
+# Pyre type checker
+.pyre/
 
-### Python.VirtualEnv Stack ###
-# Virtualenv
-# http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
-[Bb]in
-[Ii]nclude
-[Ll]ib
-[Ll]ib64
-[Ll]ocal
-[Ss]cripts
-pyvenv.cfg
-pip-selfcheck.json
+# pytype static type analyzer
+.pytype/
 
+# End of https://www.toptal.com/developers/gitignore/api/python
 
-# End of https://www.gitignore.io/api/python
 .vscode
-*.pkl
-*.conf
-*.ini
-
-# Plugins
-plugin-*/

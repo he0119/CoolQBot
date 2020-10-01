@@ -1,21 +1,9 @@
-FROM python:3.8-alpine
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 
-WORKDIR /usr/src/app
+RUN python3 -m pip config set global.index-url https://mirrors.aliyun.com/pypi/simple
 
-# 修改时区
-RUN apk add --no-cache tzdata
-ENV TZ Asia/Shanghai
+RUN python3 -m pip install poetry && poetry config virtualenvs.create false
 
-# 安装依赖
-RUN apk add --no-cache --virtual .build-deps gcc musl-dev
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-RUN apk del .build-deps
+COPY ./pyproject.toml ./poetry.lock* /app/
 
-# 安装 Git
-RUN apk add --no-cache git
-
-# 复制 CoolQBot
-COPY src/ .
-
-CMD [ "sh", "./run.sh" ]
+RUN poetry install --no-root --no-dev

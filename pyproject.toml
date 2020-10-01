@@ -1,6 +1,6 @@
 [tool.poetry]
 authors = ["hemengyang <hmy0119@gmail.com>"]
-description = "基于 酷Q 和 NoneBot 的聊天机器人"
+description = "基于 NoneBot 的聊天机器人"
 license = "MIT"
 name = "coolqbot"
 readme = "README.md"
@@ -8,13 +8,9 @@ repository = "https://github.com/he0119/CoolQBot"
 version = "0.13.1"
 
 [tool.poetry.dependencies]
-httpx = "^0.13.3"
-jieba = "^0.42.1"
-msgpack = "^1.0.0"
-nonebot = {extras = ["scheduler"], version = "^1.6.0"}
-python = "^3.8"
-python-dateutil = "^2.8.1"
-yobot = {git = "https://hub.fastgit.org/he0119/yobot.git", tag = "v3.6.4-beta.1"}
+nb-cli = "^0.1.0"
+nonebot2 = "^2.0.0.a1"
+python = "^3.7"
 
 [tool.poetry.dev-dependencies]
 yapf = "*"
