@@ -142,3 +142,4 @@ dmypy.json
 
 .vscode
 .env.dev
+data/
