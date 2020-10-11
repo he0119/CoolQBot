@@ -20,8 +20,7 @@ async def morning():
     """ 早安
     """
     hello_str = await get_message()
-    # FIXME: 不知道该怎么发送消息
-    await get_bots()[0].send_msg(
+    await list(get_bots().values())[0].send_msg(
         message_type='group',
         group_id=get_driver().config.group_id,
         message=hello_str
