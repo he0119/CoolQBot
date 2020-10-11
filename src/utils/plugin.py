@@ -4,7 +4,6 @@ import configparser
 import pickle
 from typing import IO, NoReturn
 
-from _typeshed import OpenTextMode
 from nonebot import get_driver
 
 
@@ -77,7 +76,7 @@ class PluginData:
         with self.open(self._config_path, 'w') as configfile:
             self.config.write(configfile)
 
-    def open(self, filename: str, open_mode: OpenTextMode = 'r') -> IO:
+    def open(self, filename: str, open_mode: str = 'r') -> IO:
         path = self._base_path / filename
         return open(path, open_mode)
 

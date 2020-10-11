@@ -3,18 +3,19 @@
 import httpx
 from nonebot import get_bots, get_driver, logger, scheduler
 
-from src.utils.helpers import render_expression
-from src.utils.plugin import PluginData
+from utils.helpers import render_expression
 
-DATA = PluginData('morning', config=True)
+from .config import Config
 
-HOUR = int(DATA.get_config('morning', 'hour', fallback='7'))
-MINUTE = int(DATA.get_config('morning', 'minute', fallback='30'))
-SECOND = int(DATA.get_config('morning', 'second', fallback='0'))
+morning_config = Config(**get_driver().config.dict())
 
 
 @scheduler.scheduled_job(
-    'cron', hour=HOUR, minute=MINUTE, second=SECOND, id='morning'
+    'cron',
+    hour=morning_config.morning_hour,
+    minute=morning_config.morning_minute,
+    second=morning_config.morning_second,
+    id='morning'
 )
 async def morning():
     """ 早安
@@ -36,7 +37,7 @@ EXPR_MORNING = [
 ] # yapf: disable
 
 
-async def get_message():
+async def get_message() -> str:
     """ 获得消息
     不同的问候语
     """
