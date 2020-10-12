@@ -1,13 +1,35 @@
 """ 每日早安插件
 """
-import httpx
-from nonebot import get_bots, get_driver, logger, scheduler
 
-from utils.helpers import render_expression
+from nonebot import get_bots, get_driver, logger, on_metaevent, scheduler
+from nonebot.adapters.cqhttp import Bot, Event
+from nonebot.rule import Rule
 
 from .config import Config
+from .data import get_first_connect_message, get_moring_message
 
 morning_config = Config(**get_driver().config.dict())
+
+
+async def check_first_connect(bot: Bot, event: Event, state: dict) -> bool:
+    if event.detail_type == 'lifecycle' and event.raw_event['sub_type'
+                                                            ] == 'connect':
+        return True
+    return False
+
+
+morning = on_metaevent(priority=5, block=True, rule=Rule(check_first_connect))
+
+
+@morning.handle()
+async def handle_first_connect(bot: Bot, event: Event, state: dict):
+    """ 启动时发送问好信息 """
+    hello_str = get_first_connect_message()
+    for group_id in bot.config.group_id:
+        await bot.send_msg(
+            message_type='group', group_id=group_id, message=hello_str
+        )
+    logger.info('发送首次启动的问好信息')
 
 
 @scheduler.scheduled_job(
@@ -20,38 +42,10 @@ morning_config = Config(**get_driver().config.dict())
 async def morning():
     """ 早安
     """
-    hello_str = await get_message()
+    hello_str = await get_moring_message()
     await list(get_bots().values())[0].send_msg(
         message_type='group',
         group_id=get_driver().config.group_id,
         message=hello_str
     )
     logger.info('发送早安信息')
-
-
-EXPR_MORNING = [
-    '早上好呀~>_<~\n{message}',
-    '大家早上好呀！\n{message}',
-    '朋友们早上好！\n{message}',
-    '群友们早上好！\n{message}',
-] # yapf: disable
-
-
-async def get_message() -> str:
-    """ 获得消息
-    不同的问候语
-    """
-    try:
-        # 获得不同的问候语
-        async with httpx.AsyncClient() as client:
-            r = await client.get('http://timor.tech/api/holiday/tts')
-            rjson = r.json()
-    except:
-        rjson = {'code': -1}
-
-    if rjson['code'] == 0:
-        message = rjson['tts']
-    else:
-        message = '好像没法获得节假日信息了，嘤嘤嘤'
-
-    return render_expression(EXPR_MORNING, message=message)

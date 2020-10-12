@@ -1,6 +1,6 @@
 from pydantic import BaseSettings
 
-from utils.plugin import PluginData
+from src.utils.plugin import PluginData
 
 DATA = PluginData('morning', config=True)
 
