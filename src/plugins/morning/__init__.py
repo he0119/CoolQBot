@@ -12,8 +12,7 @@ morning_config = Config(**get_driver().config.dict())
 
 
 async def check_first_connect(bot: Bot, event: Event, state: dict) -> bool:
-    if event.detail_type == 'lifecycle' and event.raw_event['sub_type'
-                                                            ] == 'connect':
+    if event.sub_type == 'connect':
         return True
     return False
 
