@@ -13,6 +13,8 @@ from .recorder import recorder
 
 async def is_repeat(bot: Bot, event: Event, state: dict) -> bool:
     """ 是否复读这个消息 """
+    if bool(event.to_me):
+        return False
     group_id = event.group_id
     user_id = event.user_id
     message = str(event.message)
