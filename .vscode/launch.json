@@ -9,7 +9,8 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/bot.py",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }

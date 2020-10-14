@@ -1,8 +1,9 @@
 """ 机器人插件
 """
 from nonebot import on_message
-from nonebot.adapters.cqhttp import Bot, Event, escape
+from nonebot.adapters.cqhttp import escape
 from nonebot.rule import to_me
+from nonebot.typing import Bot, Event
 
 from src.utils.helpers import render_expression
 

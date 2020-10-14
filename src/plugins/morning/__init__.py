@@ -1,9 +1,8 @@
 """ 每日早安插件
 """
-
 from nonebot import get_bots, get_driver, logger, on_metaevent, scheduler
-from nonebot.adapters.cqhttp import Bot, Event
 from nonebot.rule import Rule
+from nonebot.typing import Bot, Event
 
 from .config import Config
 from .data import get_first_connect_message, get_moring_message
