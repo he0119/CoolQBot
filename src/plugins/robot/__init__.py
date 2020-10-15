@@ -29,7 +29,7 @@ async def handle_robot(bot: Bot, event: Event, state: dict):
 
 
 @robot.got('msg')
-async def handle_city(bot: Bot, event: Event, state: dict):
+async def handle_msg(bot: Bot, event: Event, state: dict):
     msg = state['msg']
     # 通过封装的函数获取机器人的回复
     reply = await call_tuling_api(event, msg)

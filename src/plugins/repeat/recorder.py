@@ -219,6 +219,11 @@ class Recorder:
         """
         DATA.save_pkl(self.get_data(), self._name)
 
+    def save_data_to_history(self):
+        """ 保存数据到历史文件夹 """
+        date = datetime.now() - timedelta(hours=1)
+        DATA.save_pkl(self.get_data(), get_history_pkl_name(date))
+
     def get_data(self):
         """ 获取当前数据
 
