@@ -16,7 +16,11 @@ async def check_first_connect(bot: Bot, event: Event, state: dict) -> bool:
     return False
 
 
-morning = on_metaevent(priority=5, block=True, rule=Rule(check_first_connect))
+morning = on_metaevent(
+    rule=Rule(check_first_connect),
+    priority=1,
+    block=True,
+)
 
 
 @morning.handle()
