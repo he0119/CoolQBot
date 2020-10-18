@@ -3,7 +3,7 @@
 import collections
 from operator import itemgetter
 
-from nonebot import get_bots
+from src.utils.helpers import get_first_bot
 
 from .recorder import recorder
 
@@ -114,7 +114,7 @@ class Ranking:
         """ 输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称
         """
         try:
-            msg = await list(get_bots().values())[0].get_group_member_info(
+            msg = await get_first_bot().get_group_member_info(
                 group_id=self.group_id, user_id=user_id, no_cache=True
             )
             if msg['card']:
@@ -122,6 +122,5 @@ class Ranking:
             return msg['nickname']
         except:
             # 如果不在群里的话(因为有可能会退群)
-            msg = await list(get_bots().values()
-                             )[0].get_stranger_info(user_id=user_id)
+            msg = await get_first_bot().get_stranger_info(user_id=user_id)
             return msg['nickname']

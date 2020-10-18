@@ -2,7 +2,8 @@ import hashlib
 import random
 from typing import Sequence
 
-from nonebot.adapters.cqhttp import Event
+from nonebot import get_bots
+from nonebot.typing import Bot, Event
 
 from .typing import Expression_T
 
@@ -56,3 +57,24 @@ def context_id(
     if ctx_id and use_hash:
         ctx_id = hashlib.md5(ctx_id.encode('ascii')).hexdigest()
     return ctx_id
+
+
+def get_first_bot() -> Bot:
+    """ 获得连接的第一个 bot """
+    if get_bots():
+        return list(get_bots().values())[0]
+
+
+from distutils.util import strtobool as py_strtobool
+
+
+def strtobool(val: str) -> bool:
+    """ 将文本转化成布尔值
+
+    如果是 y, yes, t, true, on, 1, 是, 确认, 开, 返回 True;
+    其他的均为返回 False;
+    """
+    val = val.lower()
+    if val in ('y', 'yes', 't', 'true', 'on', '1', '是', '确认', '开'):
+        return True
+    return False

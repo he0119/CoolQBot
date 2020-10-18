@@ -1,8 +1,10 @@
 """ 每日早安插件
 """
-from nonebot import get_bots, get_driver, logger, on_metaevent, scheduler
+from nonebot import get_driver, logger, on_metaevent, scheduler
 from nonebot.rule import Rule
 from nonebot.typing import Bot, Event
+
+from src.utils.helpers import get_first_bot
 
 from .config import Config
 from .data import get_first_connect_message, get_moring_message
@@ -45,7 +47,7 @@ async def morning():
     """ 早安
     """
     hello_str = await get_moring_message()
-    await list(get_bots().values())[0].send_msg(
+    await get_first_bot().send_msg(
         message_type='group',
         group_id=get_driver().config.group_id,
         message=hello_str
