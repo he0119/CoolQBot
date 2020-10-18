@@ -5,19 +5,19 @@ import httpx
 from nonebot import get_driver, logger, scheduler
 
 from src.utils.helpers import get_first_bot
-from src.utils.plugin import PluginData
+
+from .config import ff14_config
 
 
 class News:
     def __init__(self):
-        self._data = PluginData('ff14', config=True)
         # 新闻数据的地址
         self._url = 'http://api.act.sdo.com/UnionNews/List?gameCode=ff&category=5309,5310,5311,5312,5313&pageIndex=0&pageSize=5'
         # 定时任务
         self._job = None
 
         # 根据配置启动
-        if bool(int(self._data.get_config('ff14', 'push_news', '0'))):
+        if ff14_config.push_news:
             self.enable()
 
     def enable(self):
@@ -30,15 +30,15 @@ class News:
             run_date=(datetime.now() + timedelta(seconds=30))
         )
         self._job = scheduler.add_job(
-            self.push_news, 'interval', minutes=self.interval
+            self.push_news, 'interval', minutes=ff14_config.push_news_interval
         )
-        self._data.set_config('ff14', 'push_news', '1')
+        ff14_config.push_news = True
 
     def disable(self):
         """ 关闭新闻自动推送 """
         self._job.remove()
         self._job = None
-        self._data.set_config('ff14', 'push_news', '0')
+        ff14_config.push_news = False
 
     @property
     def is_enabled(self):
@@ -47,22 +47,6 @@ class News:
             return True
         else:
             return False
-
-    @property
-    def interval(self):
-        """ 自动推送新闻的间隔，单位 分钟 """
-        return int(self._data.get_config('ff14', 'push_news_interval', '30'))
-
-    @property
-    def last_news_id(self) -> int:
-        """ 上次推送新闻的发布 ID """
-        return int(
-            self._data.get_config('ff14', 'push_news_last_news_id', '0')
-        )
-
-    @last_news_id.setter
-    def last_news_id(self, news_id: int):
-        self._data.set_config('ff14', 'push_news_last_news_id', str(news_id))
 
     async def get_news(self):
         """ 获取最新的新闻 """
@@ -96,13 +80,13 @@ class News:
             logger.error('最终幻想XIV 新闻获取失败')
             return
 
-        if not self.last_news_id:
+        if not ff14_config.push_news_last_news_id:
             # 如果初次运行，则记录并发送第一条新闻
-            self.last_news_id = news['Data'][0]['Id']
+            ff14_config.push_news_last_news_id = news['Data'][0]['Id']
             news_list.append(news['Data'][0])
 
         for item in news['Data']:
-            if item['Id'] <= self.last_news_id:
+            if item['Id'] <= ff14_config.push_news_last_news_id:
                 break
             news_list.append(item)
 
@@ -116,7 +100,7 @@ class News:
                     message_type='group', group_id=group_id, message=msg
                 )
             # 添加最新的那一条新闻的 ID
-            self.last_news_id = news_list[0]['Id']
+            ff14_config.push_news_last_news_id = news_list[0]['Id']
 
 
 news_data = News()
