@@ -2,7 +2,7 @@
 """
 import configparser
 import pickle
-from typing import IO, NoReturn
+from typing import IO
 
 from nonebot import get_driver
 
@@ -12,7 +12,7 @@ class PluginData:
     将插件数据保存在 `data` 文件夹对应的目录下。
     提供保存和读取文件/数据的方法。
     """
-    def __init__(self, name: str, config: bool = False) -> NoReturn:
+    def __init__(self, name: str, config: bool = False) -> None:
         # 插件名，用来确定插件的文件夹位置
         self._name = name
         self._base_path = get_driver().config.data_dir_path / f'plugin-{name}'
@@ -32,7 +32,7 @@ class PluginData:
             else:
                 self._save_config()
 
-    def save_pkl(self, data: object, filename: str) -> NoReturn:
+    def save_pkl(self, data: object, filename: str) -> None:
         with self.open(f'{filename}.pkl', 'wb') as f:
             pickle.dump(data, f)
 
@@ -57,7 +57,7 @@ class PluginData:
             self._save_config()
         return value
 
-    def set_config(self, section: str, option: str, value: str) -> NoReturn:
+    def set_config(self, section: str, option: str, value: str) -> None:
         """ 设置配置
         """
         if section not in self.config.sections():
@@ -65,15 +65,15 @@ class PluginData:
         self.config.set(section, option, value)
         self._save_config()
 
-    def _load_config(self) -> NoReturn:
+    def _load_config(self) -> None:
         """ 读取配置
         """
-        self.config.read(self._config_path)
+        self.config.read(self._config_path, encoding='utf8')
 
-    def _save_config(self) -> NoReturn:
+    def _save_config(self) -> None:
         """ 保存配置
         """
-        with self.open(self._config_path, 'w') as configfile:
+        with open(self._config_path, 'w', encoding='utf8') as configfile:
             self.config.write(configfile)
 
     def open(self, filename: str, open_mode: str = 'r') -> IO:

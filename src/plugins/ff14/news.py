@@ -6,7 +6,7 @@ from nonebot import get_driver, logger, scheduler
 
 from src.utils.helpers import get_first_bot
 
-from .config import ff14_config
+from .config import config
 
 
 class News:
@@ -17,7 +17,7 @@ class News:
         self._job = None
 
         # 根据配置启动
-        if ff14_config.push_news:
+        if config.push_news:
             self.enable()
 
     def enable(self):
@@ -30,15 +30,15 @@ class News:
             run_date=(datetime.now() + timedelta(seconds=30))
         )
         self._job = scheduler.add_job(
-            self.push_news, 'interval', minutes=ff14_config.push_news_interval
+            self.push_news, 'interval', minutes=config.push_news_interval
         )
-        ff14_config.push_news = True
+        config.push_news = True
 
     def disable(self):
         """ 关闭新闻自动推送 """
         self._job.remove()
         self._job = None
-        ff14_config.push_news = False
+        config.push_news = False
 
     @property
     def is_enabled(self):
@@ -80,13 +80,13 @@ class News:
             logger.error('最终幻想XIV 新闻获取失败')
             return
 
-        if not ff14_config.push_news_last_news_id:
+        if not config.push_news_last_news_id:
             # 如果初次运行，则记录并发送第一条新闻
-            ff14_config.push_news_last_news_id = news['Data'][0]['Id']
+            config.push_news_last_news_id = news['Data'][0]['Id']
             news_list.append(news['Data'][0])
 
         for item in news['Data']:
-            if item['Id'] <= ff14_config.push_news_last_news_id:
+            if item['Id'] <= config.push_news_last_news_id:
                 break
             news_list.append(item)
 
@@ -100,7 +100,7 @@ class News:
                     message_type='group', group_id=group_id, message=msg
                 )
             # 添加最新的那一条新闻的 ID
-            ff14_config.push_news_last_news_id = news_list[0]['Id']
+            config.push_news_last_news_id = news_list[0]['Id']
 
 
 news_data = News()
