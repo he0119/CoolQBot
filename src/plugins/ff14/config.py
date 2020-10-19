@@ -42,7 +42,7 @@ class Config(BaseSettings):
     fflogs_token: str = DATA.get_config('fflogs', 'token')
     # 默认从两周的数据中计算排名百分比
     fflogs_range: int = int(DATA.get_config('fflogs', 'range', '14'))
-    # 是否开启自动缓存
+    # 是否开启定时缓存
     fflogs_cache: bool = bool(
         int(DATA.get_config('fflogs', 'cache_enable', '0'))
     )
@@ -56,16 +56,24 @@ class Config(BaseSettings):
     fflogs_cache_second: int = int(
         DATA.get_config('fflogs', 'cache_second', fallback='0')
     )
-    # 缓存的副本
-    fflogs_cache_boss: List[str] = DATA.get_config(
-        'fflogs', 'fflogs_cache_boss'
-    ).split()
+    # 需要缓存的副本
+    fflogs_cache_boss: List[str] = DATA.get_config('fflogs',
+                                                   'cache_boss').split()
 
     @validator('fflogs_token', always=True)
     def fflogs_token_validator(cls, v):
         """ 验证并保存配置 """
         DATA.set_config('fflogs', 'token', v)
         return v
+
+    @validator('fflogs_cache', always=True)
+    def fflogs_cache_validator(cls, v):
+        """ 验证并保存配置 """
+        if v:
+            DATA.set_config('fflogs', 'cache_enable', '1')
+            return True
+        DATA.set_config('fflogs', 'cache_enable', '0')
+        return False
 
     class Config:
         extra = 'ignore'

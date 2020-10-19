@@ -4,14 +4,19 @@ v1 版的 API，现在已经废弃，不没有维护
 以后可能会失效
 文档网址 https://cn.fflogs.com/v1/docs
 """
+import asyncio
 import json
 import math
 from datetime import datetime, timedelta
 
 import httpx
+from nonebot.log import logger
+from nonebot.sched import scheduler
 
 from .config import DATA, config
-from .fflogs_data import get_boss_info_by_nickname, get_job_info_by_nickname
+from .fflogs_data import (
+    get_boss_info_by_nickname, get_job_info_by_nickname, get_jobs_info
+)
 
 
 class DataException(Exception):
@@ -33,11 +38,56 @@ class FFLogs:
     def __init__(self):
         self.base_url = 'https://cn.fflogs.com/v1'
 
+        # 定时缓存任务
+        self._cache_job = None
+
+        # 根据配置启动
+        if config.fflogs_cache:
+            self.enable_cache()
+
         # QQ号 与 最终幻想14 角色用户名，服务器的对应关系
         if DATA.exists('characters.pkl'):
             self.characters = DATA.load_pkl('characters')
         else:
             self.characters = {}
+
+    def enable_cache(self):
+        """ 开启定时缓存任务 """
+        self._cache_job = scheduler.add_job(
+            self.cache_data,
+            'cron',
+            hour=config.fflogs_cache_hour,
+            minute=config.fflogs_cache_minute,
+            second=config.fflogs_cache_second,
+            id='fflogs_cache'
+        )
+        config.fflogs_cache = True
+        logger.info(
+            f'开启定时缓存，执行时间为每天 {config.fflogs_cache_hour}:{config.fflogs_cache_minute}:{config.fflogs_cache_second}'
+        )
+
+    def disable_cache(self):
+        """ 关闭定时缓存任务 """
+        self._cache_job.remove()
+        self._cache_job = None
+        config.fflogs_cache = False
+        logger.info('定时缓存已关闭')
+
+    @property
+    def is_cache_enabled(self):
+        """ 是否启用定时缓存 """
+        if self._cache_job:
+            return True
+        else:
+            return False
+
+    async def cache_data(self):
+        jobs = get_jobs_info()
+        for boss in config.fflogs_cache_boss:
+            for job in jobs:
+                await self.dps(boss, job.name)
+                logger.info(f'{boss} {job.name}的数据缓存完成。')
+                await asyncio.sleep(30)
 
     @staticmethod
     async def _http(url):

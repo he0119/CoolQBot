@@ -104,7 +104,7 @@ fflogs_help = """
 
 
 @fflogs.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def handle_fflogs(bot: Bot, event: Event, state: dict):
     user_id = event.user_id
     argv = str(event.message).strip().split()
 
@@ -131,6 +131,26 @@ async def _(bot: Bot, event: Event, state: dict):
         if user_id not in bot.config.superusers:
             await fflogs.finish('抱歉，你没有权限查看 Token。')
         await fflogs.finish(f'当前的 Token 为 {config.fflogs_token}')
+
+    # 缓存相关设置
+    if argv[0] == 'cache':
+        # 检查是否是超级用户
+        if user_id not in bot.config.superusers:
+            await fflogs.finish('抱歉，你没有设置缓存。')
+        if len(argv) == 2:
+            if strtobool(argv[1]):
+                if not fflogs_api.is_cache_enabled:
+                    fflogs_api.enable_cache()
+                await fflogs.finish('已开始定时缓存')
+            else:
+                if fflogs_api.is_cache_enabled:
+                    fflogs_api.disable_cache()
+                await fflogs.finish('已停止定时缓存')
+        else:
+            if fflogs_api.is_cache_enabled:
+                await fflogs.finish('定时缓存开启中')
+            else:
+                await fflogs.finish('定时缓存关闭中')
 
     if argv[0] == 'me' and len(argv) == 1:
         if user_id not in fflogs_api.characters:
