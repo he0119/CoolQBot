@@ -532,6 +532,19 @@ url = "https://mirrors.aliyun.com/pypi/simple"
 
 [[package]]
 category = "main"
+description = "Chinese Words Segmentation Utilities"
+name = "jieba"
+optional = false
+python-versions = "*"
+version = "0.42.1"
+
+[package.source]
+reference = 'aliyun'
+type = "legacy"
+url = "https://mirrors.aliyun.com/pypi/simple"
+
+[[package]]
+category = "main"
 description = "A very fast and expressive template engine."
 name = "jinja2"
 optional = false
@@ -695,6 +708,7 @@ test = ["nonebot-test (^0.1.0)"]
 reference = "ac3d0e50b8db537049e944cd5134b6c594cbf27c"
 type = "git"
 url = "https://hub.fastgit.org/he0119/nonebot2.git"
+
 [[package]]
 category = "main"
 description = "SSH2 protocol library"
@@ -1290,7 +1304,7 @@ type = "legacy"
 url = "https://mirrors.aliyun.com/pypi/simple"
 
 [metadata]
-content-hash = "a6ee7650379fa02457ea8bcf7025ebcc63560a1d631326708a66ad474f3773d8"
+content-hash = "1f69cea7132d214e9f199870498ac0d8e7ce4c7a81eaa94209a54f93607cf58b"
 lock-version = "1.0"
 python-versions = "^3.7"
 
@@ -1480,6 +1494,9 @@ idna = [
 importlib-metadata = [
     {file = "importlib_metadata-2.0.0-py2.py3-none-any.whl", hash = "sha256:cefa1a2f919b866c5beb7c9f7b0ebb4061f30a8a9bf16d609b000e2dfaceb9c3"},
     {file = "importlib_metadata-2.0.0.tar.gz", hash = "sha256:77a540690e24b0305878c37ffd421785a6f7e53c8b5720d211b211de8d0e95da"},
+]
+jieba = [
+    {file = "jieba-0.42.1.tar.gz", hash = "sha256:055ca12f62674fafed09427f176506079bc135638a14e23e25be909131928db2"},
 ]
 jinja2 = [
     {file = "Jinja2-2.11.2-py2.py3-none-any.whl", hash = "sha256:f0a4641d3cf955324a89c04f3d94663aa4d638abe8f733ecd3582848e1c37035"},
