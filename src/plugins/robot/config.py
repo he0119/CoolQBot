@@ -14,7 +14,7 @@ class Config(BaseSettings):
     tuling_api_key: str = DATA.get_config('tuling', 'api_key')
 
     class Config:
-        extra = "ignore"
+        extra = "allow"
 
 
 robot_config = Config(**get_driver().config.dict())

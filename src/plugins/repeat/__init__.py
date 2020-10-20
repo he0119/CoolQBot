@@ -5,11 +5,12 @@
 """
 import re
 
-from nonebot import get_driver, logger, on_command, on_message, scheduler
+from nonebot import logger, on_command, on_message, scheduler
 from nonebot.permission import GROUP
 from nonebot.rule import Rule
 from nonebot.typing import Bot, Event
 
+from .config import config
 from .history import get_history
 from .rank import get_rank
 from .recorder import recorder
@@ -23,7 +24,7 @@ async def save_recorder():
     """ 每隔一分钟保存一次数据
     """
     # 保存数据前先清理 msg_send_time 列表，仅保留最近 10 分钟的数据
-    for group_id in get_driver().config.group_id:
+    for group_id in config.group_id:
         recorder.message_number(10, group_id)
 
     recorder.save_data()

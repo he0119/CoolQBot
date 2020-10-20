@@ -1,15 +1,13 @@
 """ 每日早安插件
 """
-from nonebot import get_driver, logger, on_metaevent, scheduler
+from nonebot import logger, on_metaevent, scheduler
 from nonebot.rule import Rule
 from nonebot.typing import Bot, Event
 
 from src.utils.helpers import get_first_bot
 
-from .config import Config
+from .config import config
 from .data import get_first_connect_message, get_moring_message
-
-morning_config = Config(**get_driver().config.dict())
 
 
 async def check_first_connect(bot: Bot, event: Event, state: dict) -> bool:
@@ -38,9 +36,9 @@ async def handle_first_connect(bot: Bot, event: Event, state: dict):
 
 @scheduler.scheduled_job(
     'cron',
-    hour=morning_config.morning_hour,
-    minute=morning_config.morning_minute,
-    second=morning_config.morning_second,
+    hour=config.morning_hour,
+    minute=config.morning_minute,
+    second=config.morning_second,
     id='morning'
 )
 async def morning():
@@ -49,7 +47,7 @@ async def morning():
     hello_str = await get_moring_message()
     await get_first_bot().send_msg(
         message_type='group',
-        group_id=get_driver().config.group_id,
-        message=hello_str
+        group_id=config.group_id,
+        message=hello_str,
     )
     logger.info('发送早安信息')

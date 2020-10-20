@@ -1,3 +1,4 @@
+from nonebot import get_driver
 from pydantic import BaseSettings
 
 from src.utils.plugin import PluginData
@@ -15,4 +16,7 @@ class Config(BaseSettings):
     )
 
     class Config:
-        extra = "ignore"
+        extra = "allow"
+
+
+config = Config(**get_driver().config.dict())

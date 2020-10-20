@@ -17,7 +17,7 @@ class Config(BaseSettings):
     )
 
     class Config:
-        extra = "ignore"
+        extra = "allow"
 
 
-repeat_config = Config(**get_driver().config.dict())
+config = Config(**get_driver().config.dict())

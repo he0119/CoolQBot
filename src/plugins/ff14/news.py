@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 
 import httpx
-from nonebot import get_driver, logger, scheduler
+from nonebot import logger, scheduler
 
 from src.utils.helpers import get_first_bot
 
@@ -95,7 +95,7 @@ class News:
             msg = '最终幻想XIV官网更新：\n=======\n' + '\n-------\n'.join(
                 map(self.format_message, news_list)
             )
-            for group_id in get_driver().config.group_id:
+            for group_id in config.group_id:
                 await get_first_bot().send_msg(
                     message_type='group', group_id=group_id, message=msg
                 )

@@ -76,7 +76,7 @@ class Config(BaseSettings):
         return False
 
     class Config:
-        extra = 'ignore'
+        extra = 'allow'
         validate_assignment = True
 
 

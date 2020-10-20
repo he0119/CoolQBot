@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from nonebot import logger
 from nonebot.typing import Bot, Event
 
-from .config import repeat_config
+from .config import config
 from .recorder import recorder
 
 
@@ -42,10 +42,10 @@ async def is_repeat(bot: Bot, event: Event, state: dict) -> bool:
 
     # 复读之后一定时间内不再复读
     time = recorder.last_message_on(group_id)
-    if now < time + timedelta(minutes=repeat_config.repeat_interval):
+    if now < time + timedelta(minutes=config.repeat_interval):
         return False
 
-    repeat_rate = repeat_config.repeat_rate
+    repeat_rate = config.repeat_rate
     # 当10分钟内发送消息数量大于30条时，降低复读概率
     # 因为排行榜需要固定概率来展示欧非，暂时取消
     # if recorder.message_number(10) > 30:

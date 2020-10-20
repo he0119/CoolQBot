@@ -10,8 +10,7 @@ import math
 from datetime import datetime, timedelta
 
 import httpx
-from nonebot.log import logger
-from nonebot.sched import scheduler
+from nonebot import logger, scheduler
 
 from .config import DATA, config
 from .fflogs_data import (
@@ -82,6 +81,7 @@ class FFLogs:
             return False
 
     async def cache_data(self):
+        """ 缓存数据 """
         jobs = get_jobs_info()
         for boss in config.fflogs_cache_boss:
             for job in jobs:
