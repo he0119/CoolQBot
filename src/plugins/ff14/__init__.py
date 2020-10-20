@@ -15,11 +15,11 @@ from .news import news_data
 ff14 = CommandGroup('ff14', priority=1, block=True)
 
 #region 藏宝选门
-gate = ff14.command('gate')
+gate = ff14.command('gate', aliases={'gate'})
 
 
 @gate.args_parser
-async def _(bot: Bot, event: Event, state: dict):
+async def gate_args_parser(bot: Bot, event: Event, state: dict):
     stripped_arg = str(event.message).strip()
 
     if not stripped_arg:
@@ -49,19 +49,6 @@ async def handle_gate(bot: Bot, event: Event, state: dict):
 news = ff14.command('news')
 
 
-@news.args_parser
-async def _(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
-
-    if not stripped_arg:
-        await news.reject('你什么都不输入我怎么知道呢，请告诉我有几个门！')
-
-    if stripped_arg not in ['2', '3']:
-        await news.reject('暂时只支持两个门或者三个门的情况，请重新输入吧。')
-
-    state['door_number'] = int(stripped_arg)
-
-
 @news.handle()
 async def handle_first_news(bot: Bot, event: Event, state: dict):
     stripped_arg = str(event.message).strip()
@@ -83,7 +70,7 @@ async def handle_first_news(bot: Bot, event: Event, state: dict):
 
 #endregion
 #region FFLogs
-fflogs = ff14.command('dps', aliases=['dps'])
+fflogs = ff14.command('dps', aliases={'dps'})
 
 fflogs_help = """
 欢迎使用最终幻想XIV输出查询插件

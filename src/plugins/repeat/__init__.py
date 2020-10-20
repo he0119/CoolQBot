@@ -59,7 +59,7 @@ async def handle_repeat(bot: Bot, event: Event, state: dict):
 #region 运行状态
 repeat_status = on_command(
     'status',
-    aliases=['状态'],
+    aliases={'状态'},
     priority=5,
     block=True,
 )
@@ -74,10 +74,26 @@ async def handle_status(bot: Bot, event: Event, state: dict):
 #region 排行榜
 repeat_rank = on_command(
     'rank',
-    aliases=['排行榜'],
+    aliases={'排行榜'},
     priority=1,
     block=True,
 )
+
+
+@repeat_rank.args_parser
+async def repeat_rank_args_parser(bot: Bot, event: Event, state: dict):
+    """ 排行榜的参数解析函数 """
+    args = str(event.message).strip()
+    # 检查输入参数是不是数字
+    if not args.isdigit():
+        await repeat_rank.reject('请只输入数字，不然我没法理解呢！')
+
+    if state['_current_key'] == 'display_number':
+        state['display_number'] = int(args)
+    if state['_current_key'] == 'minimal_msg_number':
+        state['minimal_msg_number'] = int(args)
+    if state['_current_key'] == 'display_total_number':
+        state['display_total_number'] = int(args)
 
 
 @repeat_rank.handle()
@@ -103,36 +119,9 @@ async def handle_first_rank(bot: Bot, event: Event, state: dict):
         state['display_total_number'] = display_total_number
 
 
-async def repeat_rank_args_parser(bot: Bot, event: Event, state: dict):
-    """ 排行榜的参数解析函数 """
-    args = str(event.message).strip()
-    # 检查输入参数是不是数字
-    if not args.isdigit():
-        await repeat_rank.reject('请只输入数字，不然我没法理解呢！')
-
-    if state['_current_key'] == 'display_number':
-        state['display_number'] = int(args)
-    if state['_current_key'] == 'minimal_msg_number':
-        state['minimal_msg_number'] = int(args)
-    if state['_current_key'] == 'display_total_number':
-        state['display_total_number'] = int(args)
-
-
-@repeat_rank.got(
-    'display_number',
-    prompt='请输入想显示的排行条数',
-    args_parser=repeat_rank_args_parser,
-)
-@repeat_rank.got(
-    'minimal_msg_number',
-    prompt='请输入进入排行，最少需要发送多少消息',
-    args_parser=repeat_rank_args_parser,
-)
-@repeat_rank.got(
-    'display_total_number',
-    prompt='是否显示每个人发送的消息总数',
-    args_parser=repeat_rank_args_parser,
-)
+@repeat_rank.got('display_number', prompt='请输入想显示的排行条数')
+@repeat_rank.got('minimal_msg_number', prompt='请输入进入排行，最少需要发送多少消息')
+@repeat_rank.got('display_total_number', prompt='是否显示每个人发送的消息总数')
 async def handle_rank(bot: Bot, event: Event, state: dict):
     res = await get_rank(
         display_number=state['display_number'],
@@ -147,10 +136,26 @@ async def handle_rank(bot: Bot, event: Event, state: dict):
 #region 历史记录
 repeat_history = on_command(
     'history',
-    aliases=['历史', '复读历史'],
+    aliases={'历史', '复读历史'},
     priority=1,
     block=True,
 )
+
+
+@repeat_history.args_parser
+async def repeat_history_args_parser(bot: Bot, event: Event, state: dict):
+    """ 历史记录的参数解析函数 """
+    args = str(event.message).strip()
+    # 检查输入参数是不是数字
+    if not args.isdigit():
+        await repeat_history.reject('请只输入数字，不然我没法理解呢！')
+
+    if state['_current_key'] == 'year':
+        state['year'] = int(args)
+    if state['_current_key'] == 'month':
+        state['month'] = int(args)
+    if state['_current_key'] == 'day':
+        state['day'] = int(args)
 
 
 @repeat_history.handle()
@@ -174,36 +179,9 @@ async def handle_first_history(bot: Bot, event: Event, state: dict):
         state['day'] = day
 
 
-async def repeat_history_args_parser(bot: Bot, event: Event, state: dict):
-    """ 历史记录的参数解析函数 """
-    args = str(event.message).strip()
-    # 检查输入参数是不是数字
-    if not args.isdigit():
-        await repeat_history.reject('请只输入数字，不然我没法理解呢！')
-
-    if state['_current_key'] == 'year':
-        state['year'] = int(args)
-    if state['_current_key'] == 'month':
-        state['month'] = int(args)
-    if state['_current_key'] == 'day':
-        state['day'] = int(args)
-
-
-@repeat_history.got(
-    'year',
-    prompt='你请输入你要查询的年份',
-    args_parser=repeat_history_args_parser,
-)
-@repeat_history.got(
-    'month',
-    prompt='你请输入你要查询的月份',
-    args_parser=repeat_history_args_parser,
-)
-@repeat_history.got(
-    'day',
-    prompt='你请输入你要查询的日期（如查询整月排名请输入 0）',
-    args_parser=repeat_history_args_parser,
-)
+@repeat_history.got('year', prompt='你请输入你要查询的年份')
+@repeat_history.got('month', prompt='你请输入你要查询的月份')
+@repeat_history.got('day', prompt='你请输入你要查询的日期（如查询整月排名请输入 0）')
 async def handle_history(bot: Bot, event: Event, state: dict):
     res = await get_history(
         year=state['year'],
