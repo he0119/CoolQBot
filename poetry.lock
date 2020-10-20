@@ -692,10 +692,9 @@ scheduler = ["apscheduler (^3.6.3)"]
 test = ["nonebot-test (^0.1.0)"]
 
 [package.source]
-reference = "308824d0b1ab7b2de1aa62dc6442babe75c83583"
+reference = "ac3d0e50b8db537049e944cd5134b6c594cbf27c"
 type = "git"
-url = "https://hub.fastgit.org/nonebot/nonebot2.git"
-
+url = "https://hub.fastgit.org/he0119/nonebot2.git"
 [[package]]
 category = "main"
 description = "SSH2 protocol library"
@@ -1291,7 +1290,7 @@ type = "legacy"
 url = "https://mirrors.aliyun.com/pypi/simple"
 
 [metadata]
-content-hash = "f6e7e27d0c9c05cea19d3cb4326c0fef05d9e65311cbc945473b76c6cdbf75d6"
+content-hash = "a6ee7650379fa02457ea8bcf7025ebcc63560a1d631326708a66ad474f3773d8"
 lock-version = "1.0"
 python-versions = "^3.7"
 
