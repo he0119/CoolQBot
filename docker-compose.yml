@@ -2,7 +2,9 @@ version: "2"
 services:
   # 其他配置参考 https://hub.docker.com/r/tiangolo/uvicorn-gunicorn-fastapi/
   coolqbot:
-    build: .
+    image: he0119/coolqbot:test
+    container_name: coolqbot
+    restart: always
     volumes:
       - "/etc/localtime:/etc/localtime"
       - "./:/app/"
@@ -13,12 +15,20 @@ services:
     environment:
       - ENVIRONMENT=prod # 配置 nonebot 运行环境，此项会被 .env 文件覆盖
       - APP_MODULE=bot:app # 配置 asgi 入口
-      - SECRET # 通过 SECRET=xxx nb up -d 传递密钥
-      - ACCESS_TOKEN # 通过 ACCESS_TOKEN=xxx nb up -d 传递密钥
       - MAX_WORKERS=1 # 如果你有多个QQ，且存在 self_id 指定，多个 worker 会导致无法找到其他 websocket 连接
+    depends_on:
+      - cqhttp
+      - netease
   netease:
     image: binaryify/netease_cloud_music_api
     container_name: netease
     restart: always
     environment:
       - HOST=0.0.0.0
+  cqhttp:
+    build: ./cqhttp
+    image: he0119/go-cqhttp
+    container_name: cqhttp
+    restart: always
+    volumes:
+      - ./data:/data
