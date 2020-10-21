@@ -1,38 +1,34 @@
-version: "3.7"
+version: "3"
 services:
-
+  # 其他配置参考 https://hub.docker.com/r/tiangolo/uvicorn-gunicorn-fastapi/
   coolqbot:
-    image: he0119/coolqbot:latest
+    image: he0119/coolqbot:test
     container_name: coolqbot
     restart: always
-    ports:
-      - "8080:8080"
     volumes:
-      - ./bot:/usr/src/app/bot
+      - "./bot:/app/data"
+      - './.env.prod:/app/.env.prod'
+    ports:
+      - "8080:8080" # 映射端口到宿主机 宿主机端口:容器端口
+    env_file:
+      - ".env.prod" # fastapi 使用的环境变量文件
+    environment:
+      - ENVIRONMENT=prod # 配置 nonebot 运行环境，此项会被 .env 文件覆盖
+      - APP_MODULE=bot:app # 配置 asgi 入口
+      - MAX_WORKERS=1 # 如果你有多个QQ，且存在 self_id 指定，多个 worker 会导致无法找到其他 websocket 连接
     depends_on:
       - cqhttp
       - netease
-
   netease:
     image: binaryify/netease_cloud_music_api
     container_name: netease
     restart: always
     environment:
       - HOST=0.0.0.0
-
   cqhttp:
-    image: richardchien/cqhttp:latest
+    build: ./cqhttp
+    image: he0119/go-cqhttp
     container_name: cqhttp
     restart: always
-    ports:
-      - "9000:9000"
-    environment:
-      - VNC_PASSWD=12345687
-      - COOLQ_ACCOUNT=2062765419
-      - CQHTTP_SERVE_DATA_FILES=true
-      - CQHTTP_WS_REVERSE_API_URL=ws://coolqbot:8080/ws/api/
-      - CQHTTP_WS_REVERSE_EVENT_URL=ws://coolqbot:8080/ws/event/
-      - CQHTTP_USE_WS_REVERSE=true
-      - CQHTTP_SHOW_LOG_CONSOLE=false
     volumes:
-      - ./coolq:/home/user/coolq
+      - ./data:/data

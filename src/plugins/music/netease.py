@@ -7,6 +7,8 @@ import httpx
 
 async def call_netease_api(name: str) -> Optional[str]:
     """ 网易云搜索 API
+
+    https://github.com/Binaryify/NeteaseCloudMusicApi
     """
     if not name:
         return None

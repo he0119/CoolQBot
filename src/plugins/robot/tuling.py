@@ -6,19 +6,17 @@ import json
 from typing import Optional
 
 import httpx
-from nonebot import CommandSession
-from nonebot.helpers import context_id
+from nonebot.adapters.cqhttp import Event
 
-from coolqbot import PluginData
+from src.utils.helpers import context_id
 
-DATA = PluginData('robot', config=True)
-TULING_API_KEY = DATA.get_config('tuling', 'api_key')
+from .config import robot_config
 
 
-async def call_tuling_api(session: CommandSession, text: str) -> Optional[str]:
+async def call_tuling_api(event: Event, text: str) -> Optional[str]:
     """ 调用图灵机器人的 API 获取回复
     """
-    if not TULING_API_KEY:
+    if not robot_config.tuling_api_key:
         return None
 
     if not text:
@@ -35,12 +33,12 @@ async def call_tuling_api(session: CommandSession, text: str) -> Optional[str]:
             }
         },
         'userInfo': {
-            'apiKey': TULING_API_KEY,
-            'userId': context_id(session.event, use_hash=True)
+            'apiKey': robot_config.tuling_api_key,
+            'userId': context_id(event, use_hash=True)
         }
     }
 
-    group_unique_id = context_id(session.event, mode='group', use_hash=True)
+    group_unique_id = context_id(event, mode='group', use_hash=True)
     if group_unique_id:
         payload['userInfo']['groupId'] = group_unique_id
 

@@ -1,21 +1,10 @@
-FROM python:3.8-alpine
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 
-WORKDIR /usr/src/app
+RUN python3 -m pip install poetry && poetry config virtualenvs.create false
 
-# 修改时区
-RUN apk add --no-cache tzdata
-ENV TZ Asia/Shanghai
+COPY ./pyproject.toml ./poetry.lock* bot.py /app/
 
-# 安装依赖
-RUN apk add --no-cache --virtual .build-deps gcc musl-dev
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-RUN apk del .build-deps
+COPY src/ /app/src/
 
-# 安装 Git
-RUN apk add --no-cache git
+RUN poetry install --no-root --no-dev
 
-# 复制 CoolQBot
-COPY src/ .
-
-CMD [ "sh", "./run.sh" ]

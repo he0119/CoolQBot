@@ -1,6 +1,5 @@
 """ 艾欧泽亚天气预报
 """
-import datetime
 import time
 
 from .eorzean_data import locationIndex, weatherIndex, weatherRateIndex

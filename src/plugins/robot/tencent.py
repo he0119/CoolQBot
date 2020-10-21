@@ -12,21 +12,17 @@ from typing import Optional
 from urllib import parse
 
 import httpx
-from nonebot import CommandSession
-from nonebot.helpers import context_id
+from nonebot.adapters.cqhttp import Event
 
-from coolqbot import PluginData
+from src.utils.helpers import context_id
 
-DATA = PluginData('robot', config=True)
-TENCENT_AI_APP_ID = DATA.get_config('tencent', 'app_id')
-TENCENT_AI_APP_KEY = DATA.get_config('tencent', 'app_key')
+from .config import robot_config
 
 
-async def call_tencent_api(session: CommandSession,
-                           text: str) -> Optional[str]:
+async def call_tencent_api(event: Event, text: str) -> Optional[str]:
     """ 调用腾讯机器人的 API 获取回复
     """
-    if not TENCENT_AI_APP_KEY:
+    if not robot_config.tencent_ai_app_key:
         return None
 
     if not text:
@@ -37,33 +33,33 @@ async def call_tencent_api(session: CommandSession,
     # 构造请求数据
     payload = {
         'app_id':
-        int(TENCENT_AI_APP_ID),
+        int(robot_config.tencent_ai_app_id),
         'time_stamp':
         int(time.time()),
         'nonce_str':
         ''.join(random.sample(string.ascii_letters + string.digits, 32)),
         'session':
-        context_id(session.event, use_hash=True),
+        context_id(event, use_hash=True),
         'question':
         text
     }
     # 接口鉴权 签名
-    payload['sign'] = gen_sign_string(payload, TENCENT_AI_APP_KEY)
+    payload['sign'] = gen_sign_string(payload, robot_config.tencent_ai_app_key)
 
     try:
         # 使用 httpx 库发送最终的请求
         async with httpx.AsyncClient() as client:
-                resp = await client.get(url, params=payload)
-                if resp.status_code != 200:
-                    # 如果 HTTP 响应状态码不是 200，说明调用失败
-                    return None
+            resp = await client.get(url, params=payload)
+            if resp.status_code != 200:
+                # 如果 HTTP 响应状态码不是 200，说明调用失败
+                return None
 
-                resp_payload = json.loads(resp.text)
-                if resp_payload['ret'] != 0:
-                    # 返回非 0 表示出错
-                    return None
+            resp_payload = json.loads(resp.text)
+            if resp_payload['ret'] != 0:
+                # 返回非 0 表示出错
+                return None
 
-                return resp_payload['data']['answer']
+            return resp_payload['data']['answer']
     except (httpx.HTTPError, json.JSONDecodeError, KeyError):
         # 抛出上面任何异常，说明调用失败
         return None

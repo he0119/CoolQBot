@@ -1,37 +1,15 @@
 """ 历史记录
 """
-import re
 from calendar import monthrange
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from dateutil.relativedelta import relativedelta
-from nonebot import CommandSession, logger, scheduler
-
-from . import DATA
+from .config import DATA
 from .rank import Ranking
 from .recorder import Recorder, get_history_pkl_name, recorder
 
 
-@scheduler.scheduled_job(
-    'cron', day=1, hour=0, minute=0, second=0, id='clear_data'
-)
-async def clear_data():
-    """ 每个月最后一天 24 点（下月 0 点）保存记录于历史记录文件夹，并重置记录
-    """
-    # 保存数据到历史文件夹
-    date = datetime.now() - timedelta(hours=1)
-    DATA.save_pkl(recorder.get_data(), get_history_pkl_name(date))
-    # 清除现有数据
-    recorder.init_data()
-    logger.info('记录清除完成')
-
-
-async def get_history(session: CommandSession):
+async def get_history(year: int, month: int, day: int, group_id: int) -> str:
     """ 获取历史数据 """
-    year = session.get('year', prompt='你请输入你要查询的年份')
-    month = session.get('month', prompt='你请输入你要查询的月份')
-    day = session.get('day', prompt='你请输入你要查询的日期（如查询整月排名请输入 0）')
-
     str_data = ''
     now = datetime.now()
     is_valid, message = is_valid_date(year, month, day, now)
@@ -39,7 +17,6 @@ async def get_history(session: CommandSession):
         return message
     date = datetime(year=year, month=month, day=1)
 
-    group_id = session.event.group_id
     # 尝试读取历史数据
     # 如果是本月就直接从 recorder 中获取数据
     # 不是则从历史记录中获取
@@ -85,7 +62,8 @@ async def get_history(session: CommandSession):
 
     return str_data
 
-def is_valid_date(year, month, day, now):
+
+def is_valid_date(year: int, month: int, day: int, now: datetime) -> bool:
     """ 确认输入日期是否合法
     """
     if not year and year != 0:

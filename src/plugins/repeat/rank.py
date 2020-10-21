@@ -3,22 +3,15 @@
 import collections
 from operator import itemgetter
 
-from nonebot import CommandSession, get_bot
+from src.utils.helpers import get_first_bot
 
 from .recorder import recorder
 
 
-async def get_rank(session: CommandSession):
+async def get_rank(
+    display_number, minimal_msg_number, display_total_number, group_id
+):
     """ 获取排行榜 """
-    display_number = session.get('display_number', prompt='请输入想显示的排行条数')
-    minimal_msg_number = session.get(
-        'minimal_msg_number', prompt='请输入进入排行，最少需要发送多少消息'
-    )
-    display_total_number = session.get(
-        'display_total_number', prompt='是否显示每个人发送的消息总数'
-    )
-
-    group_id = session.event.group_id
     repeat_list = recorder.repeat_list(group_id)
     msg_number_list = recorder.msg_number_list(group_id)
 
@@ -121,7 +114,7 @@ class Ranking:
         """ 输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称
         """
         try:
-            msg = await get_bot().get_group_member_info(
+            msg = await get_first_bot().get_group_member_info(
                 group_id=self.group_id, user_id=user_id, no_cache=True
             )
             if msg['card']:
@@ -129,5 +122,5 @@ class Ranking:
             return msg['nickname']
         except:
             # 如果不在群里的话(因为有可能会退群)
-            msg = await get_bot().get_stranger_info(user_id=user_id)
+            msg = await get_first_bot().get_stranger_info(user_id=user_id)
             return msg['nickname']
