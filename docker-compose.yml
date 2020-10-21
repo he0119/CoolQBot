@@ -1,7 +1,7 @@
 version: "2"
 services:
   # 其他配置参考 https://hub.docker.com/r/tiangolo/uvicorn-gunicorn-fastapi/
-  nonebot:
+  coolqbot:
     build: .
     volumes:
       - "/etc/localtime:/etc/localtime"
@@ -16,4 +16,9 @@ services:
       - SECRET # 通过 SECRET=xxx nb up -d 传递密钥
       - ACCESS_TOKEN # 通过 ACCESS_TOKEN=xxx nb up -d 传递密钥
       - MAX_WORKERS=1 # 如果你有多个QQ，且存在 self_id 指定，多个 worker 会导致无法找到其他 websocket 连接
-    network_mode: bridge
+  netease:
+    image: binaryify/netease_cloud_music_api
+    container_name: netease
+    restart: always
+    environment:
+      - HOST=0.0.0.0
