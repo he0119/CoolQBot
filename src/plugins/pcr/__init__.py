@@ -2,6 +2,8 @@
 
 B站动态推送
 日程推送和查询
+
+参考 https://github.com/pcrbot/yobot
 """
 from nonebot import CommandGroup
 from nonebot.typing import Bot, Event
