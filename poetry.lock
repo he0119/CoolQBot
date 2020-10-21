@@ -419,7 +419,7 @@ description = "Chromium HSTS Preload list as a Python package and updated daily"
 name = "hstspreload"
 optional = false
 python-versions = ">=3.6"
-version = "2020.10.6"
+version = "2020.10.20"
 
 [package.source]
 reference = 'aliyun'
@@ -705,10 +705,9 @@ scheduler = ["apscheduler (^3.6.3)"]
 test = ["nonebot-test (^0.1.0)"]
 
 [package.source]
-reference = "ac3d0e50b8db537049e944cd5134b6c594cbf27c"
+reference = "bd919e335cd0fbd2175fa8b314d5cd18c16c099a"
 type = "git"
 url = "https://hub.fastgit.org/he0119/nonebot2.git"
-
 [[package]]
 category = "main"
 description = "SSH2 protocol library"
@@ -1458,8 +1457,8 @@ hpack = [
     {file = "hpack-3.0.0.tar.gz", hash = "sha256:8eec9c1f4bfae3408a3f30500261f7e6a65912dc138526ea054f9ad98892e9d2"},
 ]
 hstspreload = [
-    {file = "hstspreload-2020.10.6-py3-none-any.whl", hash = "sha256:f413669d7b53a6d4cd5fc0fb313562bfba9fb5fba63bbb32a62a752ed72734bd"},
-    {file = "hstspreload-2020.10.6.tar.gz", hash = "sha256:01a9b58e8f32f2ef4d1f9aacc7658ec13e23c57ce9f625ea18693ec2ed38dcfb"},
+    {file = "hstspreload-2020.10.20-py3-none-any.whl", hash = "sha256:0cd540f86c2930fe466348bd984e5ae1c96a0041fb97df61431997523d9e719d"},
+    {file = "hstspreload-2020.10.20.tar.gz", hash = "sha256:0a79313c2f52f18aa0ade1f27664ee39bee1cb4eb2ed1d610e2bd22e2e4050e1"},
 ]
 httpcore = [
     {file = "httpcore-0.9.1-py3-none-any.whl", hash = "sha256:9850fe97a166a794d7e920590d5ec49a05488884c9fc8b5dba8561effab0c2a0"},
