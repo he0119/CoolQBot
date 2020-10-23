@@ -2,8 +2,10 @@
 
 https://space.bilibili.com/353840826/dynamic
 """
-from datetime import datetime, timedelta
 import json
+from datetime import datetime, timedelta
+from typing import Dict
+
 import httpx
 from nonebot import logger, scheduler
 
@@ -74,6 +76,11 @@ class News:
             return None
 
     @staticmethod
+    def get_news_id(news: Dict) -> int:
+        """ 获取新闻的 ID """
+        return news['desc']['dynamic_id']
+
+    @staticmethod
     def format_message(item):
         """ 格式化消息 """
         card_item = item['card']['item']
@@ -105,11 +112,11 @@ class News:
 
         if not config.push_news_last_news_id:
             # 如果初次运行，则记录并发送第一条动态
-            config.push_news_last_news_id = news[0]['card']['item']['id']
+            config.push_news_last_news_id = self.get_news_id(news[0])
             news_list.append(news[0])
 
         for item in news:
-            if item['card']['item']['id'] <= config.push_news_last_news_id:
+            if self.get_news_id(item) <= config.push_news_last_news_id:
                 break
             news_list.append(item)
 
@@ -123,7 +130,7 @@ class News:
                     message_type='group', group_id=group_id, message=msg
                 )
             # 添加最新的那一条动态的 ID
-            config.push_news_last_news_id = news_list[0]['card']['item']['id']
+            config.push_news_last_news_id = self.get_news_id(news_list[0])
 
 
 news_data = News()
