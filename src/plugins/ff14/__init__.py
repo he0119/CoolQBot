@@ -5,6 +5,7 @@
 from nonebot import CommandGroup
 from nonebot.typing import Bot, Event
 
+from src.utils.commands import get_command_help
 from src.utils.helpers import strtobool
 
 from .config import config
@@ -17,9 +18,9 @@ ff14 = CommandGroup('ff14', priority=1, block=True)
 #region 藏宝选门
 gate_cmd = ff14.command('gate', aliases={'gate'})
 gate_cmd.__doc__ = """
-gate
+ff14.gate gate
 
-最终幻想XIV藏宝选门
+最终幻想XIV 藏宝选门
 
 选择门的数量
 /gate 2
@@ -59,7 +60,7 @@ news_cmd = ff14.command('news')
 news_cmd.__doc__ = """
 ff14.news
 
-最终幻想XIV新闻推送
+最终幻想XIV 新闻推送
 
 开启推送
 /ff14.news on
@@ -96,16 +97,16 @@ async def handle_first_news(bot: Bot, event: Event, state: dict):
 fflogs_cmd = ff14.command('dps', aliases={'dps'})
 
 fflogs_cmd.__doc__ = """
-dps
+ff14.dps dps
 
-欢迎使用最终幻想XIV输出查询插件
+最终幻想XIV 输出查询
 
 查询输出排行榜：
 /dps <副本名> <职业> <DPS种类>（支持 rdps adps pdps，留空默认为 rdps）
 查询指定角色的排名：
-/dps 副本名 角色名 服务器名
+/dps <副本名> <角色名> <服务器名>
 也可直接查询自己绑定角色的排名：
-/dps 副本名 me
+/dps <副本名> me
 """
 
 
@@ -115,7 +116,7 @@ async def handle_fflogs(bot: Bot, event: Event, state: dict):
     argv = str(event.message).strip().split()
 
     if not argv:
-        await fflogs_cmd.finish(fflogs_cmd.__doc__)
+        await fflogs_cmd.finish(get_command_help('ff14.dps'))
 
     # 设置 Token
     if argv[0] == 'token' and len(argv) == 2:
@@ -204,7 +205,7 @@ async def handle_fflogs(bot: Bot, event: Event, state: dict):
             reply = await fflogs.character_dps(*argv)
         await fflogs_cmd.finish(reply)
 
-    await fflogs_cmd.finish(fflogs_cmd.__doc__)
+    await fflogs_cmd.finish(get_command_help('ff14.dps'))
 
 
 async def get_character_dps_by_user_id(boss_nickname: str, user_id: int):
