@@ -705,7 +705,7 @@ scheduler = ["apscheduler (^3.6.3)"]
 test = ["nonebot-test (^0.1.0)"]
 
 [package.source]
-reference = "bd919e335cd0fbd2175fa8b314d5cd18c16c099a"
+reference = "27b9cfa0549022428acc965e2eb1529292e0fe5e"
 type = "git"
 url = "https://hub.fastgit.org/he0119/nonebot2.git"
 [[package]]
