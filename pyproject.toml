@@ -20,8 +20,8 @@ yapf = "*"
 
 [[tool.poetry.source]]
 default = true
-name = 'aliyun'
-url = 'https://mirrors.aliyun.com/pypi/simple/'
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple/"
 
 [build-system]
 build-backend = "poetry.masonry.api"

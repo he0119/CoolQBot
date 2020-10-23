@@ -86,8 +86,8 @@ class Calender:
         while t <= end_time:
             daystr = t.strftime('%Y%m%d')
             if daystr not in self._timeline:
-                self._timeline[daystr] = list()
-            self._timeline[daystr].append(name)
+                self._timeline[daystr] = set()
+            self._timeline[daystr].add(name)
             t += timedelta(days=1)
 
     async def push_calender(self):
