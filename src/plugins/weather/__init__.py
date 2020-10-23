@@ -10,10 +10,24 @@ from .heweather import heweather
 
 weather = on_command(
     'weather',
-    aliases={'天气', '天气预报', '查天气'},
+    aliases={'天气'},
     priority=1,
     block=True,
 )
+weather.__doc__ = """
+weather 天气
+
+天气预报
+
+查询天气
+/weather 成都
+也支持英文
+/weather chengdu
+还支持外国
+/weather Tokyo
+甚至支持最终幻想XIV
+/weather 格里达尼亚
+"""
 
 
 @weather.handle()

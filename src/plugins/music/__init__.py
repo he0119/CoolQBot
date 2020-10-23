@@ -11,6 +11,17 @@ from .netease import call_netease_api
 EXPR_NOT_FOUND = ('为什么找不到匹配的歌呢！', '似乎哪里出错了，找不到你想点的歌 ~><~')
 
 music = on_command('music', aliases={'点歌'}, priority=1, block=True)
+music.__doc__ = """
+music 点歌
+
+点歌
+
+参数为歌曲相关信息
+/music Sagitta luminis
+如果仅凭歌曲名称无法获得正确歌曲时
+可以尝试在后面加上歌手名称或其他信息
+/music Sagitta luminis 梶浦由記
+"""
 
 
 @music.handle()

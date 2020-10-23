@@ -19,6 +19,17 @@ EXPR_OWNER = (
 ) # yapf: disable
 
 ban = on_command('ban', aliases={'禁言'}, priority=1, block=True)
+ban.__doc__ = """
+ban 禁言
+
+自主禁言
+
+禁言自己，参数为分钟
+/ban 30 (禁言 30 分钟)
+解除禁言
+/ban 0
+如果私聊，则在所有注册的群禁言或解除禁言
+"""
 
 
 @ban.handle()
