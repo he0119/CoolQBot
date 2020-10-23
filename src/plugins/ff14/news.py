@@ -103,4 +103,4 @@ class News:
             config.push_news_last_news_id = news_list[0]['Id']
 
 
-news_data = News()
+news = News()

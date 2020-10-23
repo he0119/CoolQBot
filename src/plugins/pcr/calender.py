@@ -130,4 +130,4 @@ class Calender:
         return reply
 
 
-calender_data = Calender()
+calender = Calender()

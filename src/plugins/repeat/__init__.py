@@ -64,6 +64,14 @@ repeat_status = on_command(
     priority=5,
     block=True,
 )
+repeat_status.__doc__ = """
+status 状态
+
+状态
+
+获取当前的机器人状态
+/status
+"""
 
 
 @repeat_status.handle()
@@ -79,6 +87,18 @@ repeat_rank = on_command(
     priority=1,
     block=True,
 )
+repeat_rank.__doc__ = """
+rank 排行榜
+
+排行榜
+
+获取当前的排行榜（默认显示前三名）
+/rank
+限制进入排行榜所需发送消息的数量
+/rank n30
+限制显示的人数
+/rank 3n30
+"""
 
 
 @repeat_rank.args_parser
@@ -141,6 +161,16 @@ repeat_history = on_command(
     priority=1,
     block=True,
 )
+repeat_history.__doc__ = """
+history 历史 复读历史
+
+历史
+
+显示2020年1月的数据
+/history 2020-1
+显示2020年1月1日的数据
+/history 2020-1-1
+"""
 
 
 @repeat_history.args_parser

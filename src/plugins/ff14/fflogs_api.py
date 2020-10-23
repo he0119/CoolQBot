@@ -304,4 +304,4 @@ class FFLogs:
         return reply
 
 
-fflogs_api = FFLogs()
+fflogs = FFLogs()
