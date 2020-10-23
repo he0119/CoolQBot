@@ -16,6 +16,14 @@ ff14 = CommandGroup('ff14', priority=1, block=True)
 
 #region 藏宝选门
 gate = ff14.command('gate', aliases={'gate'})
+gate.__doc__ = """
+/gate
+最终幻想XIV藏宝选门
+
+选择门的数量
+/gate 2
+/gate 3
+"""
 
 
 @gate.args_parser
@@ -47,6 +55,19 @@ async def handle_gate(bot: Bot, event: Event, state: dict):
 #endregion
 #region 新闻推送
 news = ff14.command('news')
+news.__doc__ = """
+/ff14.news
+最终幻想XIV新闻推送
+
+开启推送
+/ff14.news on
+关闭推送
+/ff14.news off
+在本群启用
+/ff14.news enable
+在本群禁用
+/ff14.news disable
+"""
 
 
 @news.handle()
@@ -72,22 +93,17 @@ async def handle_first_news(bot: Bot, event: Event, state: dict):
 #region FFLogs
 fflogs = ff14.command('dps', aliases={'dps'})
 
-fflogs_help = """
+fflogs.__doc__ = """
+/dps
 欢迎使用最终幻想XIV输出查询插件
 
-你可以绑定自己的角色，之后查询中，可以用 me 代替角色名和服务器名
-/dps me
-/dps me <角色名> <服务器名>
-
-查询特定职业在副本的数据，支持 pdps，rdps
-/dps <副本名> <职业名> <DPS种类>
-
-查询角色在副本中的数据
-/dps <副本名> me
-/dps <副本名> <角色名> <服务器名>
-也可直接@群成员，查询该成员的数据（该成员必须先绑定自己的角色）
-/dps <副本名> @群成员
-""".strip()
+查询输出排行榜：
+/dps <副本名> <职业> <DPS种类>（支持 rdps adps pdps，留空默认为 rdps）
+查询指定角色的排名：
+/dps 副本名 角色名 服务器名
+也可直接查询自己绑定角色的排名：
+/dps 副本名 me
+"""
 
 
 @fflogs.handle()
@@ -96,7 +112,7 @@ async def handle_fflogs(bot: Bot, event: Event, state: dict):
     argv = str(event.message).strip().split()
 
     if not argv:
-        await fflogs.finish(fflogs_help)
+        await fflogs.finish(fflogs.__doc__)
 
     # 设置 Token
     if argv[0] == 'token' and len(argv) == 2:
@@ -185,7 +201,7 @@ async def handle_fflogs(bot: Bot, event: Event, state: dict):
             reply = await fflogs_api.character_dps(*argv)
         await fflogs.finish(reply)
 
-    await fflogs.finish(fflogs_help)
+    await fflogs.finish(fflogs.__doc__)
 
 
 async def get_character_dps_by_user_id(boss_nickname: str, user_id: int):
