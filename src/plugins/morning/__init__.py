@@ -45,9 +45,10 @@ async def morning():
     """ 早安
     """
     hello_str = await get_moring_message()
-    await get_first_bot().send_msg(
-        message_type='group',
-        group_id=config.group_id,
-        message=hello_str,
-    )
+    for group_id in config.group_id:
+        await get_first_bot().send_msg(
+            message_type='group',
+            group_id=group_id,
+            message=hello_str,
+        )
     logger.info('发送早安信息')
