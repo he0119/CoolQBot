@@ -2,17 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from pathlib import Path
-import nonebot
 
-# Custom your logger
-from nonebot.log import logger, default_format
-logger.add(
-    'error.log',
-    rotation='00:00',
-    diagnose=False,
-    level='ERROR',
-    format=default_format
-)
+import nonebot
 
 # You can pass some keyword args config to init function
 nonebot.init()
@@ -23,6 +14,17 @@ config = nonebot.get_driver().config
 config.home_dir_path = Path().resolve()
 # 插件数据目录
 config.data_dir_path = config.home_dir_path / 'data'
+
+# Custom your logger
+from nonebot.log import default_format, logger
+
+logger.add(
+    config.data_dir_path / 'logs' / 'error.log',
+    rotation='00:00',
+    diagnose=False,
+    level='ERROR',
+    format=default_format
+)
 
 nonebot.load_plugins('src/plugins')
 
