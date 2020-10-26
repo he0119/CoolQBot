@@ -65,9 +65,6 @@ def get_first_bot() -> Bot:
         return list(get_bots().values())[0]
 
 
-from distutils.util import strtobool as py_strtobool
-
-
 def strtobool(val: str) -> bool:
     """ 将文本转化成布尔值
 

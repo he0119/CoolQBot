@@ -1,6 +1,7 @@
 """ 插件数据
 """
 import configparser
+import os
 import pickle
 from typing import IO
 
@@ -18,10 +19,7 @@ class PluginData:
         self._base_path = get_driver().config.data_dir_path / f'plugin-{name}'
 
         # 如果文件夹不存在则自动新建
-        if not get_driver().config.data_dir_path.exists():
-            get_driver().config.data_dir_path.mkdir()
-        if not self._base_path.exists():
-            self._base_path.mkdir()
+        os.makedirs(self._base_path, exist_ok=True)
 
         # 如果需要则初始化并加载配置
         if config:

@@ -3,7 +3,6 @@
 https://tools.yobot.win/calender/#cn
 """
 from datetime import datetime, timedelta
-from typing import Dict
 
 import httpx
 from nonebot import logger, scheduler
