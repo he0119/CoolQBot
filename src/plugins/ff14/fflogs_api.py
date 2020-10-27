@@ -164,14 +164,12 @@ class FFLogs:
             rankings = [i['total'] for i in rankings]
 
         if dps_type == 'adps':
-            rankings.sort(
-                key=lambda x: x['other_per_second_amount'], reverse=True
-            )
-            rankings = [i['other_per_second_amount'] for i in rankings]
+            rankings.sort(key=lambda x: x['otherAmount'], reverse=True)
+            rankings = [i['otherAmount'] for i in rankings]
 
         if dps_type == 'pdps':
-            rankings.sort(key=lambda x: x['raw_dps'], reverse=True)
-            rankings = [i['raw_dps'] for i in rankings]
+            rankings.sort(key=lambda x: x['rawDPS'], reverse=True)
+            rankings = [i['rawDPS'] for i in rankings]
 
         if not rankings:
             raise DataException('网站里没有数据')
