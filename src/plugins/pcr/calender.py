@@ -3,6 +3,7 @@
 https://tools.yobot.win/calender/#cn
 """
 from datetime import datetime, timedelta
+from typing import Dict, List, Optional
 
 import httpx
 from nonebot import logger, scheduler
@@ -19,7 +20,8 @@ class Calender:
         # 定时任务
         self._job = None
         # 日程表
-        self._timeline = {}
+        self._timeline: Dict[str, List[str]] = {}
+        self._timeline_update_time: Optional[datetime] = None
 
         # 根据配置启动
         if config.push_calender:
@@ -54,6 +56,11 @@ class Calender:
 
     async def refresh_calender(self) -> None:
         """ 获取最新的日程表 """
+        if self._timeline:
+            # 最近四小时内才更新的不用再次更新
+            if self._timeline_update_time > datetime.now(
+            ) - timedelta(hours=4):
+                return None
         try:
             async with httpx.AsyncClient() as client:
                 r = await client.get(self._url)
@@ -61,6 +68,8 @@ class Calender:
                     # 如果 HTTP 响应状态码不是 200，说明调用失败
                     return None
 
+                # 清楚以前的时间线
+                self._timeline.clear()
                 for event in r.json():
                     start_time = datetime.strptime(
                         event['start_time'], '%Y/%m/%d %H:%M:%S'
@@ -71,6 +80,7 @@ class Calender:
                     name = event['name']
                     self.add_event(start_time, end_time, name)
 
+                self._timeline_update_time = datetime.now()
                 logger.info('公主连结Re:Dive 日程表刷新成功')
         except (httpx.HTTPError, KeyError) as e:
             logger.error(f'获取日程表出错，{e}')
@@ -117,7 +127,7 @@ class Calender:
 
         for _ in range(7):
             events = self._timeline.get(date.strftime('%Y%m%d'), ())
-            events_str = '\n⨠'.join(events)
+            events_str = '\n⨠'.join(sorted(events))
             if events_str == '':
                 events_str = '没有记录'
             daystr = date.strftime('%Y%m%d')
