@@ -80,7 +80,7 @@ async def _(bot: Bot, event: Event, state: dict):
 
     # 检查输入参数是不是数字
     if args.isdigit():
-        state['_current_key'] = int(args)
+        state[state['_current_key']] = int(args)
     else:
         await ban_cmd.reject('请只输入数字，不然我没法理解呢！')
 
