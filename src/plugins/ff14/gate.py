@@ -3,7 +3,7 @@ from random import randint
 
 from src.utils.helpers import render_expression
 
-TEXTS = [
+EXPR_GATE = [
     '掐指一算，你应该走{direction}！',
     '夜观天象，你应该走{direction}！',
     '冷静分析，你应该走{direction}！',
@@ -30,4 +30,4 @@ def get_direction(door_number: int) -> str:
         elif rand == 2:
             direction = '中间'
         direction = '右边'
-    return render_expression(TEXTS, direction=direction)
+    return render_expression(EXPR_GATE, direction=direction)

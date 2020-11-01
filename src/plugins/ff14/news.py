@@ -1,5 +1,6 @@
 """ 消息推送 """
 from datetime import datetime, timedelta
+from typing import Dict, Optional
 
 import httpx
 from nonebot import logger, scheduler
@@ -20,7 +21,7 @@ class News:
         if config.push_news:
             self.enable()
 
-    def enable(self):
+    def enable(self) -> None:
         """ 开启新闻自动推送 """
         logger.info('初始化 最终幻想XIV 新闻推送')
         # 开启后先运行一次
@@ -34,21 +35,21 @@ class News:
         )
         config.push_news = True
 
-    def disable(self):
+    def disable(self) -> None:
         """ 关闭新闻自动推送 """
         self._job.remove()
         self._job = None
         config.push_news = False
 
     @property
-    def is_enabled(self):
+    def is_enabled(self) -> bool:
         """ 是否启用新闻自动推送 """
         if self._job:
             return True
         else:
             return False
 
-    async def get_news(self):
+    async def get_news(self) -> Optional[Dict]:
         """ 获取最新的新闻 """
         try:
             async with httpx.AsyncClient() as client:
@@ -62,7 +63,7 @@ class News:
             # 抛出上面任何异常，说明调用失败
             return None
 
-    def format_message(self, item):
+    def format_message(self, item: Dict) -> str:
         """ 格式化消息 """
         message = ''
         message += f'{item["Title"]}\n'
@@ -70,7 +71,7 @@ class News:
         message += f'{item["Summary"]}'
         return message
 
-    async def push_news(self):
+    async def push_news(self) -> None:
         """ 推送消息 """
         logger.info('开始检查 最终幻想XIV 新闻')
         news_list = []

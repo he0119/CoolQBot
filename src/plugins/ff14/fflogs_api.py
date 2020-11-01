@@ -1,6 +1,6 @@
 """ FFLogs API
 
-v1 版的 API，现在已经废弃，不没有维护
+v1 版的 API，现在已经废弃，没有维护
 以后可能会失效
 文档网址 https://cn.fflogs.com/v1/docs
 """
@@ -8,6 +8,7 @@ import asyncio
 import json
 import math
 from datetime import datetime, timedelta
+from typing import List, Literal, Union
 
 import httpx
 from nonebot import logger, scheduler
@@ -50,7 +51,7 @@ class FFLogs:
         else:
             self.characters = {}
 
-    def enable_cache(self):
+    def enable_cache(self) -> None:
         """ 开启定时缓存任务 """
         self._cache_job = scheduler.add_job(
             self.cache_data,
@@ -65,7 +66,7 @@ class FFLogs:
             f'开启定时缓存，执行时间为每天 {config.fflogs_cache_hour}:{config.fflogs_cache_minute}:{config.fflogs_cache_second}'
         )
 
-    def disable_cache(self):
+    def disable_cache(self) -> None:
         """ 关闭定时缓存任务 """
         self._cache_job.remove()
         self._cache_job = None
@@ -73,14 +74,14 @@ class FFLogs:
         logger.info('定时缓存已关闭')
 
     @property
-    def is_cache_enabled(self):
+    def is_cache_enabled(self) -> bool:
         """ 是否启用定时缓存 """
         if self._cache_job:
             return True
         else:
             return False
 
-    async def cache_data(self):
+    async def cache_data(self) -> None:
         """ 缓存数据 """
         jobs = get_jobs_info()
         for boss in config.fflogs_cache_boss:
@@ -108,8 +109,8 @@ class FFLogs:
             return None
 
     async def _get_one_day_ranking(
-        self, boss, difficulty, job, date: datetime
-    ):
+        self, boss: int, difficulty: int, job: int, date: datetime
+    ) -> List:
         """ 获取指定 boss，指定职业，指定一天中的排名数据
         """
         # 查看是否有缓存
@@ -147,8 +148,9 @@ class FFLogs:
         return rankings
 
     async def _get_whole_ranking(
-        self, boss, difficulty, job, dps_type: str, date: datetime
-    ):
+        self, boss: int, difficulty: int, job: int,
+        dps_type: Literal['rdps', 'adps', 'pdps'], date: datetime
+    ) -> List:
         date = datetime(year=date.year, month=date.month, day=date.day)
 
         rankings = []
@@ -177,7 +179,8 @@ class FFLogs:
         return rankings
 
     async def _get_character_ranking(
-        self, characterName, serverName, zone, encounter, difficulty, metric
+        self, characterName: str, serverName: str, zone: int, encounter: int,
+        difficulty: int, metric: Literal['rdps', 'adps', 'pdps']
     ):
         """ 查询指定角色的 DPS
 
@@ -221,7 +224,12 @@ class FFLogs:
         data = await self._http(url)
         return data
 
-    async def dps(self, boss_nickname, job_nickname, dps_type='rdps'):
+    async def dps(
+        self,
+        boss_nickname: str,
+        job_nickname: str,
+        dps_type: Literal['rdps', 'adps', 'pdps'] = 'rdps'
+    ) -> str:
         """ 查询 DPS 百分比排名
 
         :param boss_nickname: BOSS 的称呼
@@ -261,9 +269,10 @@ class FFLogs:
 
         return reply
 
-    def set_character(self, user_id, character_name, server_name) -> None:
-        """ 设置 QQ号 与 最终幻想14 用户名和服务器名
-        """
+    def set_character(
+        self, user_id: int, character_name: str, server_name: str
+    ) -> None:
+        """ 设置 QQ号 与 最终幻想14 用户名和服务器名 """
         self.characters[user_id] = [character_name, server_name]
         DATA.save_pkl(self.characters, 'characters')
 

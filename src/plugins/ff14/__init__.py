@@ -1,6 +1,8 @@
 """ 最终幻想XIV
 
-各种小工具
+藏宝选门
+新闻推送
+FFLogs
 """
 from nonebot import CommandGroup
 from nonebot.typing import Bot, Event
@@ -13,7 +15,7 @@ from .fflogs_api import fflogs
 from .gate import get_direction
 from .news import news
 
-ff14 = CommandGroup('ff14', priority=1, block=True)
+ff14 = CommandGroup('ff14', block=True)
 
 #region 藏宝选门
 gate_cmd = ff14.command('gate', aliases={'gate'})
@@ -29,29 +31,30 @@ ff14.gate gate
 
 
 @gate_cmd.args_parser
-async def gate_args_parser(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
+async def _(bot: Bot, event: Event, state: dict):
+    args = str(event.message).strip()
 
-    if not stripped_arg:
+    if not args:
         await gate_cmd.reject('你什么都不输入我怎么知道呢，请告诉我有几个门！')
 
-    if stripped_arg not in ['2', '3']:
+    if args not in ['2', '3']:
         await gate_cmd.reject('暂时只支持两个门或者三个门的情况，请重新输入吧。')
 
-    state['door_number'] = int(stripped_arg)
+    state[state['_current_key']] = int(args)
 
 
 @gate_cmd.handle()
-async def handle_first_gate(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
-    if stripped_arg in ['2', '3']:
-        state['door_number'] = int(stripped_arg)
+async def _(bot: Bot, event: Event, state: dict):
+    args = str(event.message).strip()
+
+    if args in ['2', '3']:
+        state['door_number'] = int(args)
 
 
 @gate_cmd.got('door_number', prompt='总共有多少个门呢？')
-async def handle_gate(bot: Bot, event: Event, state: dict):
+async def _(bot: Bot, event: Event, state: dict):
     direction = get_direction(state['door_number'])
-    await gate_cmd.finish(direction)
+    await gate_cmd.finish(direction, at_sender=True)
 
 
 #endregion
@@ -62,22 +65,21 @@ ff14.news
 
 最终幻想XIV 新闻推送
 
+当前新闻推送状态
+/ff14.news
 开启推送
 /ff14.news on
 关闭推送
 /ff14.news off
-在本群启用
-/ff14.news enable
-在本群禁用
-/ff14.news disable
 """
 
 
 @news_cmd.handle()
-async def handle_first_news(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
-    if stripped_arg:
-        if strtobool(stripped_arg):
+async def _(bot: Bot, event: Event, state: dict):
+    args = str(event.message).strip()
+
+    if args:
+        if strtobool(args):
             if not news.is_enabled:
                 news.enable()
             await news_cmd.finish('已开始新闻自动推送')
@@ -95,28 +97,29 @@ async def handle_first_news(bot: Bot, event: Event, state: dict):
 #endregion
 #region FFLogs
 fflogs_cmd = ff14.command('dps', aliases={'dps'})
-
 fflogs_cmd.__doc__ = """
 ff14.dps dps
 
 最终幻想XIV 输出查询
 
 查询输出排行榜：
-/dps <副本名> <职业> <DPS种类>（支持 rdps adps pdps，留空默认为 rdps）
+/dps 副本名 职业 DPS种类（支持 rdps adps pdps，留空默认为 rdps）
 查询指定角色的排名：
-/dps <副本名> <角色名> <服务器名>
+/dps 副本名 角色名 服务器名
 也可直接查询自己绑定角色的排名：
-/dps <副本名> me
+/dps 副本名 me
+查询当前QQ号绑定的角色
+/dps me
 """
 
 
 @fflogs_cmd.handle()
-async def handle_fflogs(bot: Bot, event: Event, state: dict):
-    user_id = event.user_id
+async def _(bot: Bot, event: Event, state: dict):
     argv = str(event.message).strip().split()
-
     if not argv:
         await fflogs_cmd.finish(get_command_help('ff14.dps'))
+
+    user_id = event.user_id
 
     # 设置 Token
     if argv[0] == 'token' and len(argv) == 2:
@@ -143,7 +146,7 @@ async def handle_fflogs(bot: Bot, event: Event, state: dict):
     if argv[0] == 'cache':
         # 检查是否是超级用户
         if user_id not in bot.config.superusers:
-            await fflogs_cmd.finish('抱歉，你没有设置缓存。')
+            await fflogs_cmd.finish('抱歉，你没有权限设置缓存。')
         if len(argv) == 2:
             if strtobool(argv[1]):
                 if not fflogs.is_cache_enabled:
@@ -162,7 +165,7 @@ async def handle_fflogs(bot: Bot, event: Event, state: dict):
     if argv[0] == 'me' and len(argv) == 1:
         if user_id not in fflogs.characters:
             await fflogs_cmd.finish(
-                '抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me <角色名> <服务器名>\n绑定自己的角色。'
+                '抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。'
             )
         await fflogs_cmd.finish(
             f'你当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}'
@@ -185,7 +188,7 @@ async def handle_fflogs(bot: Bot, event: Event, state: dict):
         # <BOSS名> me
         # <BOSS名> <@他人>
         # <BOSS名> <职业名>
-        if argv[1].lower() in ['me', 'i', '我']:
+        if argv[1].lower() == 'me':
             reply = await get_character_dps_by_user_id(argv[0], user_id)
         elif '[CQ:at,qq=' in argv[1]:
             # @他人的格式
@@ -199,6 +202,7 @@ async def handle_fflogs(bot: Bot, event: Event, state: dict):
     if len(argv) == 3:
         # <BOSS名> <职业名> <DPS种类>
         # <BOSS名> <角色名> <服务器名>
+        argv[2] = argv[2].lower()
         if argv[2] in ['adps', 'rdps', 'pdps']:
             reply = await fflogs.dps(*argv)
         else:

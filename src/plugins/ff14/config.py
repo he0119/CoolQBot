@@ -5,6 +5,7 @@ from typing import List
 from nonebot import get_driver
 from pydantic import BaseSettings, validator
 
+from src.utils.helpers import strtobool
 from src.utils.plugin import PluginData
 
 DATA = PluginData('ff14', config=True)
@@ -13,7 +14,7 @@ DATA = PluginData('ff14', config=True)
 class Config(BaseSettings):
     # 新闻推送相关配置
     # 是否自动推送新闻
-    push_news: bool = bool(int(DATA.get_config('ff14', 'push_news', '0')))
+    push_news: bool = strtobool(DATA.get_config('ff14', 'push_news', 'True'))
     # 自动推送新闻的间隔，单位 分钟
     push_news_interval: int = int(
         DATA.get_config('ff14', 'push_news_interval', '30')
@@ -28,9 +29,9 @@ class Config(BaseSettings):
         """ 验证并保存配置 """
         if v:
             DATA.set_config('ff14', 'push_news', '1')
-            return True
-        DATA.set_config('ff14', 'push_news', '0')
-        return False
+        else:
+            DATA.set_config('ff14', 'push_news', '0')
+        return v
 
     @validator('push_news_last_news_id', always=True)
     def push_news_last_news_id_validator(cls, v):
@@ -43,8 +44,8 @@ class Config(BaseSettings):
     # 默认从两周的数据中计算排名百分比
     fflogs_range: int = int(DATA.get_config('fflogs', 'range', '14'))
     # 是否开启定时缓存
-    fflogs_cache: bool = bool(
-        int(DATA.get_config('fflogs', 'cache_enable', '0'))
+    fflogs_cache: bool = strtobool(
+        DATA.get_config('fflogs', 'cache_enable', '0')
     )
     # 缓存的时间
     fflogs_cache_hour: int = int(
@@ -71,9 +72,9 @@ class Config(BaseSettings):
         """ 验证并保存配置 """
         if v:
             DATA.set_config('fflogs', 'cache_enable', '1')
-            return True
-        DATA.set_config('fflogs', 'cache_enable', '0')
-        return False
+        else:
+            DATA.set_config('fflogs', 'cache_enable', '0')
+        return v
 
     class Config:
         extra = 'allow'
