@@ -14,7 +14,7 @@ DATA = PluginData('ff14', config=True)
 class Config(BaseSettings):
     # 新闻推送相关配置
     # 是否自动推送新闻
-    push_news: bool = strtobool(DATA.get_config('ff14', 'push_news', 'True'))
+    push_news: bool = strtobool(DATA.get_config('ff14', 'push_news', '0'))
     # 自动推送新闻的间隔，单位 分钟
     push_news_interval: int = int(
         DATA.get_config('ff14', 'push_news_interval', '30')
