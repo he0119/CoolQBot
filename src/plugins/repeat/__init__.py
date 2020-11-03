@@ -8,14 +8,13 @@ import re
 from nonebot import logger, on_message, scheduler
 from nonebot.permission import GROUP
 from nonebot.plugin import CommandGroup
-from nonebot.rule import Rule
 from nonebot.typing import Bot, Event
 
 from .config import config
 from .history import get_history
 from .rank import get_rank
 from .recorder import recorder
-from .repeat_rule import is_repeat
+from .repeat_rule import need_repeat
 from .status import get_status
 
 repeat = CommandGroup('repeat', block=True)
@@ -44,17 +43,17 @@ async def _():
 
 #endregion
 #region 复读
-repeat_basic = on_message(
-    rule=is_repeat,
+repeat_message = on_message(
+    rule=need_repeat,
     permission=GROUP,
     priority=5,
     block=True,
 )
 
 
-@repeat_basic.handle()
+@repeat_message.handle()
 async def _(bot: Bot, event: Event, state: dict):
-    await repeat_basic.finish(event.raw_message)
+    await repeat_message.finish(event.raw_message)
 
 
 #endregion

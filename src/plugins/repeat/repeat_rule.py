@@ -11,13 +11,16 @@ from .config import config
 from .recorder import recorder
 
 
-def is_repeat(bot: Bot, event: Event, state: dict) -> bool:
+def need_repeat(bot: Bot, event: Event, state: dict) -> bool:
     """ 是否复读这个消息 """
+    # 不复读对机器人说的，因为这个应该由闲聊插件处理
     if bool(event.to_me):
         return False
+
     group_id = event.group_id
     user_id = event.user_id
     message = str(event.message)
+
     # 只复读指定群内消息
     if group_id not in bot.config.group_id:
         return False
