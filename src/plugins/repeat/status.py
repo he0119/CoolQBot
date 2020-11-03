@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from .recorder import recorder
 
 
-def get_status(group_id: int):
+def get_status(group_id: int) -> str:
     """ 获取机器人运行状态，具体如下
 
     近十分钟群内聊天数量

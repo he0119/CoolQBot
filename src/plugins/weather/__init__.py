@@ -1,6 +1,7 @@
 """ 天气插件
 """
 from typing import Optional
+
 from jieba import posseg
 from nonebot import on_command
 from nonebot.typing import Bot, Event
@@ -8,13 +9,8 @@ from nonebot.typing import Bot, Event
 from .eorzean import eorzean_weather
 from .heweather import heweather
 
-weather = on_command(
-    'weather',
-    aliases={'天气'},
-    priority=1,
-    block=True,
-)
-weather.__doc__ = """
+weather_cmd = on_command('weather', aliases={'天气'}, block=True)
+weather_cmd.__doc__ = """
 weather 天气
 
 天气预报
@@ -30,28 +26,28 @@ weather 天气
 """
 
 
-@weather.handle()
+@weather_cmd.handle()
 async def _(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
+    args = str(event.message).strip()
 
-    if stripped_arg:
-        state['city'] = stripped_arg
+    if args:
+        state['city'] = args
 
 
-@weather.got('city', prompt='你想查询哪个城市的天气呢？')
+@weather_cmd.got('city', prompt='你想查询哪个城市的天气呢？')
 async def _(bot: Bot, event: Event, state: dict):
     weather_report = await get_weather_of_city(state['city'])
-    await weather.finish(weather_report)
+    await weather_cmd.finish(weather_report)
 
 
-@weather.args_parser
+@weather_cmd.args_parser
 async def _(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
+    args = str(event.message).strip()
 
-    if not stripped_arg:
-        weather.reject('要查询的城市名称不能为空呢，请重新输入！')
+    if not args:
+        weather_cmd.reject('要查询的城市名称不能为空呢，请重新输入！')
 
-    state['city'] = stripped_arg
+    state[state['_current_key']] = args
 
 
 async def get_weather_of_city(city: str) -> str:

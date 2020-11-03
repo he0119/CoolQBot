@@ -1,4 +1,6 @@
 """ 网易云音乐
+
+https://github.com/Binaryify/NeteaseCloudMusicApi
 """
 from typing import Optional
 
@@ -6,10 +8,7 @@ import httpx
 
 
 async def call_netease_api(name: str) -> Optional[str]:
-    """ 网易云搜索 API
-
-    https://github.com/Binaryify/NeteaseCloudMusicApi
-    """
+    """ 网易云搜索 API """
     if not name:
         return None
 

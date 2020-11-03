@@ -1,13 +1,14 @@
 """ 和风天气
 """
 import urllib
+from typing import Optional
 
 import httpx
 
 from .config import config
 
 
-async def heweather(city):
+async def heweather(city: str) -> Optional[str]:
     """ 和风天气 API
 
     日本 东京

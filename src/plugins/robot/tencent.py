@@ -20,8 +20,7 @@ from .config import robot_config
 
 
 async def call_tencent_api(event: Event, text: str) -> Optional[str]:
-    """ 调用腾讯机器人的 API 获取回复
-    """
+    """ 调用腾讯机器人的 API 获取回复 """
     if not robot_config.tencent_ai_app_key:
         return None
 
@@ -65,7 +64,7 @@ async def call_tencent_api(event: Event, text: str) -> Optional[str]:
         return None
 
 
-def gen_sign_string(parser, app_key: str):
+def gen_sign_string(parser, app_key: str) -> str:
     """ 获取请求签名，接口鉴权 https://ai.qq.com/doc/auth.shtml
 
     1.将 <key, value> 请求参数对按 key 进行字典升序排序，得到有序的参数对列表 N

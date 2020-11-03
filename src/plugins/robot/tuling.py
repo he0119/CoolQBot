@@ -14,8 +14,7 @@ from .config import robot_config
 
 
 async def call_tuling_api(event: Event, text: str) -> Optional[str]:
-    """ 调用图灵机器人的 API 获取回复
-    """
+    """ 调用图灵机器人的 API 获取回复 """
     if not robot_config.tuling_api_key:
         return None
 

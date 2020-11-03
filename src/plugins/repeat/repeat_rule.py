@@ -11,7 +11,7 @@ from .config import config
 from .recorder import recorder
 
 
-async def is_repeat(bot: Bot, event: Event, state: dict) -> bool:
+def is_repeat(bot: Bot, event: Event, state: dict) -> bool:
     """ 是否复读这个消息 """
     if bool(event.to_me):
         return False

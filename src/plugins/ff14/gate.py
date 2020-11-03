@@ -3,7 +3,7 @@ from random import randint
 
 from src.utils.helpers import render_expression
 
-EXPR_GATE = [
+EXPR_GATE = (
     '掐指一算，你应该走{direction}！',
     '夜观天象，你应该走{direction}！',
     '冷静分析，你应该走{direction}！',
@@ -14,7 +14,7 @@ EXPR_GATE = [
     '投了个硬币，仔细一看，走{direction}。不信我，难道你还不信硬币么！',
     '直觉告诉我，你走{direction}就会马上出去......',
     '千万不要走{direction}，会马上出去的！',
-] # yapf: disable
+) # yapf: disable
 
 
 def get_direction(door_number: int) -> str:
