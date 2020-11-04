@@ -12,7 +12,7 @@ from .rand import get_rand
 from .roll import roll_dices
 
 #region roll
-roll_cmd = on_command('roll', priority=1, block=True)
+roll_cmd = on_command('roll', block=True)
 roll_cmd.__doc__ = """
 roll
 
@@ -27,29 +27,29 @@ roll 两次点数100和两次点数50
 
 @roll_cmd.handle()
 async def _(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
+    args = str(event.message).strip()
 
     # 检查是否符合规则
-    match = re.match(r'^([\dd+\s]+?)$', stripped_arg)
+    match = re.match(r'^([\dd+\s]+?)$', args)
 
-    if stripped_arg and match:
-        state['input'] = stripped_arg
+    if args and match:
+        state['input'] = args
 
 
 @roll_cmd.args_parser
 async def _(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
+    args = str(event.message).strip()
 
     # 检查是否符合规则
-    match = re.match(r'^([\dd+\s]+?)$', stripped_arg)
+    match = re.match(r'^([\dd+\s]+?)$', args)
 
-    if not stripped_arg:
+    if not args:
         await roll_cmd.reject('ROLL 点方式不能为空呢，请重新输入')
 
     if not match:
         await roll_cmd.reject('请输入正确的参数 ~>_<~')
 
-    state['input'] = stripped_arg
+    state[state['_current_key']] = args
 
 
 @roll_cmd.got(
@@ -64,7 +64,7 @@ async def _(bot: Bot, event: Event, state: dict):
 
 #endregion
 #region rand
-rand_cmd = on_command('rand', priority=1, block=True)
+rand_cmd = on_command('rand', block=True)
 rand_cmd.__doc__ = """
 rand
 
@@ -77,8 +77,9 @@ rand
 
 @rand_cmd.handle()
 async def _(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
-    str_data = get_rand(stripped_arg)
+    args = str(event.message).strip()
+
+    str_data = get_rand(args)
     await rand_cmd.finish(str_data, at_sender=True)
 
 

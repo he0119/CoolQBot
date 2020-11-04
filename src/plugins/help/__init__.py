@@ -4,8 +4,8 @@ from nonebot.typing import Bot, Event
 
 from src.utils.commands import CommandInfo, get_command_help, get_commands
 
-help = on_command('help', aliases={'帮助'}, priority=1, block=True)
-help.__doc__ = """
+help_cmd = on_command('help', aliases={'帮助'}, block=True)
+help_cmd.__doc__ = """
 help 帮助
 
 获取帮助
@@ -13,7 +13,7 @@ help 帮助
 获取所有支持的命令
 /help all
 获取某个命令的帮助
-/help <cmd>
+/help 命令名
 """
 
 
@@ -25,18 +25,19 @@ def format_name_aliases(command: CommandInfo) -> str:
         return command.name
 
 
-@help.handle()
-async def handle(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
-    if stripped_arg == 'all':
+@help_cmd.handle()
+async def _(bot: Bot, event: Event, state: dict):
+    args = str(event.message).strip()
+
+    if args == 'all':
         commands = get_commands()
         docs = "命令（别名）列表：\n"
         docs += "\n".join(sorted(map(format_name_aliases, commands)))
-        await help.finish(docs)
-    elif stripped_arg:
-        command_help = get_command_help(stripped_arg)
+        await help_cmd.finish(docs)
+    elif args:
+        command_help = get_command_help(args)
         if command_help:
-            await help.finish(command_help)
-        await help.finish('请输入支持的命令')
+            await help_cmd.finish(command_help)
+        await help_cmd.finish('请输入支持的命令')
     else:
-        await help.finish(get_command_help('help'))
+        await help_cmd.finish(get_command_help('help'))

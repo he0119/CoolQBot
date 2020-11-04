@@ -1,25 +1,23 @@
 """ 艾欧泽亚天气预报
 """
 import time
+from typing import Optional
 
 from .eorzean_data import locationIndex, weatherIndex, weatherRateIndex
 
 
 def int_overflow(n: int):
-    """ 模拟 JavaScript 的溢出
-    """
+    """ 模拟 JavaScript 的溢出 """
     return n & (2**32 - 1)
 
 
 def unsigned_right_shitf(n: int, i: int):
-    """ 模拟 JavaScript 的无符号右移
-    """
+    """ 模拟 JavaScript 的无符号右移 """
     return (n & (2**32 - 1)) >> i
 
 
 def forecastTarget(date: int):
-    """ 预测
-    """
+    """ 预测 """
     bell = date // 175
     increment = (bell + 8 - (bell % 8)) % 24
 
@@ -35,9 +33,8 @@ def forecastTarget(date: int):
     return step2 % 100
 
 
-def calc_eorzean_weather(date: int, location: str):
-    """ 计算艾欧泽亚天气
-    """
+def calc_eorzean_weather(date: int, location: str) -> str:
+    """ 计算艾欧泽亚天气 """
     for index in locationIndex:
         if 'weatherRate' not in locationIndex[index]:
             continue
@@ -56,7 +53,7 @@ def calc_eorzean_weather(date: int, location: str):
             return weather
 
 
-def eorzean_weather(location: str):
+def eorzean_weather(location: str) -> Optional[str]:
     """ 艾欧泽亚天气
 
     利姆萨·罗敏萨
@@ -78,9 +75,8 @@ def eorzean_weather(location: str):
         return None
 
 
-def next_weather_time(date: int, count: int):
-    """ 计算下一个天气时段所剩时间(格式mm:ss)
-    """
+def next_weather_time(date: int, count: int) -> str:
+    """ 计算下一个天气时段所剩时间(格式mm:ss) """
     # 计算当前时间戳所属的区间(以4200s为一个完整的周期，艾欧泽亚日)
     increament = (date + 1400 - (date % 1400)) % 4200
     cur_time = date % 4200

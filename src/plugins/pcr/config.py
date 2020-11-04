@@ -3,6 +3,7 @@
 from nonebot import get_driver
 from pydantic import BaseSettings, validator
 
+from src.utils.helpers import strtobool
 from src.utils.plugin import PluginData
 
 DATA = PluginData('pcr', config=True)
@@ -11,7 +12,7 @@ DATA = PluginData('pcr', config=True)
 class Config(BaseSettings):
     # 新闻推送相关配置
     # 是否自动推送新闻
-    push_news: bool = bool(int(DATA.get_config('news', 'push_news', '0')))
+    push_news: bool = strtobool(DATA.get_config('news', 'push_news', '0'))
     # 自动推送新闻的间隔，单位 分钟
     push_news_interval: int = int(
         DATA.get_config('news', 'push_news_interval', '30')
@@ -26,9 +27,9 @@ class Config(BaseSettings):
         """ 验证并保存配置 """
         if v:
             DATA.set_config('news', 'push_news', '1')
-            return True
-        DATA.set_config('news', 'push_news', '0')
-        return False
+        else:
+            DATA.set_config('news', 'push_news', '0')
+        return v
 
     @validator('push_news_last_news_id')
     def push_news_last_news_id_validator(cls, v):
@@ -36,9 +37,10 @@ class Config(BaseSettings):
         DATA.set_config('news', 'push_news_last_news_id', str(v))
         return v
 
-    push_calender: bool = bool(
-        int(DATA.get_config('calender', 'push_calender', '0'))
+    push_calender: bool = strtobool(
+        DATA.get_config('calender', 'push_calender', '0')
     )
+
     calender_hour: int = int(DATA.get_config('calender', 'hour', fallback='7'))
     calender_minute: int = int(
         DATA.get_config('calender', 'minute', fallback='30')
@@ -52,9 +54,9 @@ class Config(BaseSettings):
         """ 验证并保存配置 """
         if v:
             DATA.set_config('calender', 'push_calender', '1')
-            return True
-        DATA.set_config('calender', 'push_calender', '0')
-        return False
+        else:
+            DATA.set_config('calender', 'push_calender', '0')
+        return v
 
     class Config:
         extra = 'allow'

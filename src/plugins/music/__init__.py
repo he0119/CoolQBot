@@ -7,11 +7,15 @@ from src.utils.helpers import render_expression
 
 from .netease import call_netease_api
 
-# 定义无法获取歌曲时的「表达（Expression）」
-EXPR_NOT_FOUND = ('为什么找不到匹配的歌呢！', '似乎哪里出错了，找不到你想点的歌 ~><~')
+# 无法获取歌曲时的回答
+EXPR_NOT_FOUND = (
+    '为什么找不到匹配的歌呢！',
+    '似乎哪里出错了，找不到你想点的歌 ~><~',
+    '没有找到，要不要换个关键字试试？'
+) # yapf: disable
 
-music = on_command('music', aliases={'点歌'}, priority=1, block=True)
-music.__doc__ = """
+music_cmd = on_command('music', aliases={'点歌'}, block=True)
+music_cmd.__doc__ = """
 music 点歌
 
 点歌
@@ -24,28 +28,30 @@ music 点歌
 """
 
 
-@music.handle()
+@music_cmd.handle()
 async def _(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
+    args = str(event.message).strip()
 
-    if stripped_arg:
-        state['name'] = stripped_arg
+    if args:
+        state['name'] = args
 
 
-@music.got('name', prompt='你想听哪首歌呢？')
+@music_cmd.got('name', prompt='你想听哪首歌呢？')
 async def _(bot: Bot, event: Event, state: dict):
     music_str = await call_netease_api(state['name'])
     if music_str:
-        await music.finish(music_str)
+        await music_cmd.finish(music_str)
     else:
-        await music.finish(render_expression(EXPR_NOT_FOUND), at_sender=True)
+        await music_cmd.finish(
+            render_expression(EXPR_NOT_FOUND), at_sender=True
+        )
 
 
-@music.args_parser
+@music_cmd.args_parser
 async def _(bot: Bot, event: Event, state: dict):
-    stripped_arg = str(event.message).strip()
+    args = str(event.message).strip()
 
-    if not stripped_arg:
-        await music.reject('歌曲名不能为空呢，请重新输入！')
+    if not args:
+        await music_cmd.reject('歌曲名不能为空呢，请重新输入！')
 
-    state['name'] = stripped_arg
+    state[state['_current_key']] = args

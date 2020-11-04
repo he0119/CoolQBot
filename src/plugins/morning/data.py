@@ -22,12 +22,12 @@ def get_first_connect_message():
 
 
 
-EXPR_MORNING = [
+EXPR_MORNING = (
     '早上好呀~>_<~\n{message}',
     '大家早上好呀！\n{message}',
     '朋友们早上好！\n{message}',
     '群友们早上好！\n{message}',
-] # yapf: disable
+ ) # yapf: disable
 
 
 async def get_moring_message() -> str:

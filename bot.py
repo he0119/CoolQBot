@@ -1,31 +1,28 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from pathlib import Path
 
 import nonebot
 
-# You can pass some keyword args config to init function
 nonebot.init()
 app = nonebot.get_asgi()
 
-# Modify some config / config depends on loaded configs
+# 添加额外的配置
 config = nonebot.get_driver().config
 config.home_dir_path = Path().resolve()
 # 插件数据目录
 config.data_dir_path = config.home_dir_path / 'data'
 
-# Custom your logger
+# 自定义 logger
 from nonebot.log import default_format, logger
 
 logger.add(
     config.data_dir_path / 'logs' / 'error.log',
-    rotation='00:00',
+    rotation='5 MB',
     diagnose=False,
     level='ERROR',
     format=default_format
 )
 
+# 加载插件
 nonebot.load_plugins('src/plugins')
 
 # 测试框架
