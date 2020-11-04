@@ -108,8 +108,12 @@ ff14.dps dps
 /dps 副本名 角色名 服务器名
 也可直接查询自己绑定角色的排名：
 /dps 副本名 me
+或查询他人绑定的角色排名
+/dps 副本名 @他人
 查询当前QQ号绑定的角色
 /dps me
+查询他人绑定的角色
+/dps @他人
 """
 
 
@@ -169,6 +173,14 @@ async def _(bot: Bot, event: Event, state: dict):
             )
         await fflogs_cmd.finish(
             f'你当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}'
+        )
+
+    if '[CQ:at,qq=' in argv[0] and len(argv) == 1:
+        user_id = int(argv[0][10:-1])
+        if user_id not in fflogs.characters:
+            await fflogs_cmd.finish('抱歉，该用户没有绑定最终幻想14的角色。')
+        await fflogs_cmd.finish(
+            f'[CQ:at,qq={user_id}] 当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}'
         )
 
     if argv[0] == 'me' and len(argv) == 3:
