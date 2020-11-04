@@ -176,7 +176,7 @@ async def _(bot: Bot, event: Event, state: dict):
         )
 
     if '[CQ:at,qq=' in argv[0] and len(argv) == 1:
-        user_id = int(argv[1][10:-1])
+        user_id = int(argv[0][10:-1])
         if user_id not in fflogs.characters:
             await fflogs_cmd.finish('抱歉，该用户没有绑定最终幻想14的角色。')
         await fflogs_cmd.finish(
