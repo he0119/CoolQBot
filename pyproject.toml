@@ -9,7 +9,7 @@ version = "0.13.1"
 
 [tool.poetry.dependencies]
 jieba = "^0.42.1"
-nonebot2 = {extras = ["scheduler"], git = "https://hub.fastgit.org/nonebot/nonebot2.git", branch = "dev"}
+nonebot2 = {extras = ["scheduler"], version = "^2.0.0-alpha.4"}
 python = "~3.8"
 python-dateutil = "^2.8.1"
 
