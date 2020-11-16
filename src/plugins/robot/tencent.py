@@ -12,16 +12,16 @@ from typing import Optional
 from urllib import parse
 
 import httpx
-from nonebot.adapters.cqhttp import Event
+from nonebot.typing import Event
 
 from src.utils.helpers import context_id
 
-from .config import robot_config
+from .config import plugin_config
 
 
 async def call_tencent_api(event: Event, text: str) -> Optional[str]:
     """ 调用腾讯机器人的 API 获取回复 """
-    if not robot_config.tencent_ai_app_key:
+    if not plugin_config.tencent_ai_app_key:
         return None
 
     if not text:
@@ -32,7 +32,7 @@ async def call_tencent_api(event: Event, text: str) -> Optional[str]:
     # 构造请求数据
     payload = {
         'app_id':
-        int(robot_config.tencent_ai_app_id),
+        int(plugin_config.tencent_ai_app_id),
         'time_stamp':
         int(time.time()),
         'nonce_str':
@@ -43,7 +43,9 @@ async def call_tencent_api(event: Event, text: str) -> Optional[str]:
         text
     }
     # 接口鉴权 签名
-    payload['sign'] = gen_sign_string(payload, robot_config.tencent_ai_app_key)
+    payload['sign'] = gen_sign_string(
+        payload, plugin_config.tencent_ai_app_key
+    )
 
     try:
         # 使用 httpx 库发送最终的请求

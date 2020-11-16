@@ -6,16 +6,16 @@ import json
 from typing import Optional
 
 import httpx
-from nonebot.adapters.cqhttp import Event
+from nonebot.typing import Event
 
 from src.utils.helpers import context_id
 
-from .config import robot_config
+from .config import plugin_config
 
 
 async def call_tuling_api(event: Event, text: str) -> Optional[str]:
     """ 调用图灵机器人的 API 获取回复 """
-    if not robot_config.tuling_api_key:
+    if not plugin_config.tuling_api_key:
         return None
 
     if not text:
@@ -32,7 +32,7 @@ async def call_tuling_api(event: Event, text: str) -> Optional[str]:
             }
         },
         'userInfo': {
-            'apiKey': robot_config.tuling_api_key,
+            'apiKey': plugin_config.tuling_api_key,
             'userId': context_id(event, use_hash=True)
         }
     }
@@ -44,7 +44,7 @@ async def call_tuling_api(event: Event, text: str) -> Optional[str]:
     try:
         # 使用 httpx 库发送最终的请求
         async with httpx.AsyncClient() as client:
-            resp = await client.get(url, json=payload)
+            resp = await client.post(url, json=payload)
             if resp.status_code != 200:
                 # 如果 HTTP 响应状态码不是 200，说明调用失败
                 return None
