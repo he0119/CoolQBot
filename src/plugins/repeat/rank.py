@@ -9,8 +9,9 @@ from .recorder import recorder
 
 
 async def get_rank(
-    display_number, minimal_msg_number, display_total_number, group_id
-):
+    display_number: int, minimal_msg_number: int, display_total_number: int,
+    group_id: int
+) -> str:
     """ 获取排行榜 """
     repeat_list = recorder.repeat_list(group_id)
     msg_number_list = recorder.msg_number_list(group_id)

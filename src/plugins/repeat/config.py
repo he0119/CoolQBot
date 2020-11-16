@@ -2,10 +2,11 @@
 """
 from typing import List
 
-import nonebot
+from nonebot import get_driver
 from pydantic import BaseSettings, validator
 
 from src.utils.plugin import PluginData
+from src.utils.helpers import groupidtostr, strtogroupid
 
 DATA = PluginData('repeat', config=True)
 
@@ -18,21 +19,18 @@ class Config(BaseSettings):
         DATA.get_config('repeat', 'interval', fallback='1')
     )
     # 启用的群
-    repeat_group_id: List[int] = list(
-        map(int,
-            DATA.get_config('repeat', 'group_id').split(','))
-    ) if DATA.get_config('repeat', 'group_id') else []
+    group_id: List[int] = strtogroupid(DATA.get_config('repeat', 'group_id'))
 
-    @validator('repeat_group_id', always=True)
-    def repeat_group_id_validator(cls, v):
+    @validator('group_id', always=True)
+    def group_id_validator(cls, v):
         """ 验证并保存配置 """
-        DATA.set_config('repeat', 'group_id', ','.join(map(str, v)))
+        DATA.set_config('repeat', 'group_id', groupidtostr(v))
         return v
 
     class Config:
-        extra = "ignore"
+        extra = 'ignore'
         validate_assignment = True
 
 
-global_config = nonebot.get_driver().config
+global_config = get_driver().config
 plugin_config = Config(**global_config.dict())

@@ -27,7 +27,7 @@ repeat = CommandGroup('repeat', block=True)
 async def _():
     """ 每隔一分钟保存一次数据 """
     # 保存数据前先清理 msg_send_time 列表，仅保留最近 10 分钟的数据
-    for group_id in plugin_config.repeat_group_id:
+    for group_id in plugin_config.group_id:
         recorder.message_number(10, group_id)
 
     recorder.save_data()
@@ -83,15 +83,15 @@ async def _(bot: Bot, event: Event, state: dict):
 
     if args and group_id:
         if strtobool(args):
-            plugin_config.repeat_group_id += [group_id]
+            plugin_config.group_id += [group_id]
             await repeat_cmd.finish('已在本群开启复读功能')
         else:
-            plugin_config.repeat_group_id = [
-                n for n in plugin_config.repeat_group_id if n != group_id
+            plugin_config.group_id = [
+                n for n in plugin_config.group_id if n != group_id
             ]
             await repeat_cmd.finish('已在本群关闭复读功能')
     else:
-        if group_id in plugin_config.repeat_group_id:
+        if group_id in plugin_config.group_id:
             await repeat_cmd.finish('复读功能开启中')
         else:
             await repeat_cmd.finish('复读功能关闭中')
@@ -112,8 +112,7 @@ status 状态
 
 @status_cmd.handle()
 async def _(bot: Bot, event: Event, state: dict):
-    if event.group_id:
-        await status_cmd.finish(get_status(event.group_id))
+    await status_cmd.finish(get_status(event.group_id))
 
 
 #endregion
@@ -147,6 +146,9 @@ async def _(bot: Bot, event: Event, state: dict):
 
 @rank_cmd.handle()
 async def _(bot: Bot, event: Event, state: dict):
+    if event.group_id:
+        state['group_id'] = event.group_id
+
     match = re.match(r'^(?:(\d+))?(?:n(\d+))?$', str(event.message).strip())
     if match:
         display_number = match.group(1)
@@ -171,12 +173,13 @@ async def _(bot: Bot, event: Event, state: dict):
 @rank_cmd.got('display_number', prompt='请输入想显示的排行条数')
 @rank_cmd.got('minimal_msg_number', prompt='请输入进入排行，最少需要发送多少消息')
 @rank_cmd.got('display_total_number', prompt='是否显示每个人发送的消息总数')
+@rank_cmd.got('group_id', prompt='请问你想查询哪个群？')
 async def _(bot: Bot, event: Event, state: dict):
     res = await get_rank(
         display_number=state['display_number'],
         minimal_msg_number=state['minimal_msg_number'],
         display_total_number=state['display_total_number'],
-        group_id=event.group_id,
+        group_id=state['group_id'],
     )
     await rank_cmd.finish(res)
 
@@ -210,6 +213,9 @@ async def _(bot: Bot, event: Event, state: dict):
 
 @history_cmd.handle()
 async def _(bot: Bot, event: Event, state: dict):
+    if event.group_id:
+        state['group_id'] = event.group_id
+
     match = re.match(
         r'^(\d+)(?:\-(\d+)(?:\-(\d+))?)?$',
         str(event.message).strip()
@@ -232,15 +238,15 @@ async def _(bot: Bot, event: Event, state: dict):
 @history_cmd.got('year', prompt='你请输入你要查询的年份')
 @history_cmd.got('month', prompt='你请输入你要查询的月份')
 @history_cmd.got('day', prompt='你请输入你要查询的日期（如查询整月排名请输入 0）')
+@history_cmd.got('group_id', prompt='请问你想查询哪个群？')
 async def _(bot: Bot, event: Event, state: dict):
-    if event.group_id:
-        res = await get_history(
-            year=state['year'],
-            month=state['month'],
-            day=state['day'],
-            group_id=event.group_id,
-        )
-        await history_cmd.finish(res)
+    res = await get_history(
+        year=state['year'],
+        month=state['month'],
+        day=state['day'],
+        group_id=state['group_id'],
+    )
+    await history_cmd.finish(res)
 
 
 #endregion
