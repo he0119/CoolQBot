@@ -27,7 +27,7 @@ repeat = CommandGroup('repeat', block=True)
 async def _():
     """ 每隔一分钟保存一次数据 """
     # 保存数据前先清理 msg_send_time 列表，仅保留最近 10 分钟的数据
-    for group_id in plugin_config.group_id:
+    for group_id in plugin_config.repeat_group_id:
         recorder.message_number(10, group_id)
 
     recorder.save_data()
@@ -83,15 +83,15 @@ async def _(bot: Bot, event: Event, state: dict):
 
     if args and group_id:
         if strtobool(args):
-            plugin_config.group_id += [group_id]
+            plugin_config.repeat_group_id += [group_id]
             await repeat_cmd.finish('已在本群开启复读功能')
         else:
-            plugin_config.group_id = [
-                n for n in plugin_config.group_id if n != group_id
+            plugin_config.repeat_group_id = [
+                n for n in plugin_config.repeat_group_id if n != group_id
             ]
             await repeat_cmd.finish('已在本群关闭复读功能')
     else:
-        if group_id in plugin_config.group_id:
+        if group_id in plugin_config.repeat_group_id:
             await repeat_cmd.finish('复读功能开启中')
         else:
             await repeat_cmd.finish('复读功能关闭中')

@@ -18,13 +18,13 @@ class Config(BaseSettings):
         DATA.get_config('repeat', 'interval', fallback='1')
     )
     # 启用的群
-    group_id: List[int] = list(
+    repeat_group_id: List[int] = list(
         map(int,
             DATA.get_config('repeat', 'group_id').split(','))
     ) if DATA.get_config('repeat', 'group_id') else []
 
-    @validator('group_id', always=True)
-    def group_id_validator(cls, v):
+    @validator('repeat_group_id', always=True)
+    def repeat_group_id_validator(cls, v):
         """ 验证并保存配置 """
         DATA.set_config('repeat', 'group_id', ','.join(map(str, v)))
         return v

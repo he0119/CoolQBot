@@ -24,7 +24,7 @@ def need_repeat(bot: Bot, event: Event, state: dict) -> bool:
     message = str(event.message)
 
     # 只复读指定群内消息
-    if group_id not in plugin_config.group_id:
+    if group_id not in plugin_config.repeat_group_id:
         return False
 
     # 不要复读指令

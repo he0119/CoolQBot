@@ -190,7 +190,7 @@ class Recorder:
         # 默认使用配置中第一个群来升级老数据
         if 'version' not in data or data['version'] != VERSION:
             logger.info('发现旧版本数据，正在升级数据')
-            data = update(data, plugin_config.group_id[0])
+            data = update(data, plugin_config.repeat_group_id[0])
             DATA.save_pkl(data, self._name)
             logger.info('升级数据成功')
 
@@ -201,7 +201,7 @@ class Recorder:
         self._msg_number_list = data['msg_number_list']
 
         # 如果群列表新加了群，则补充所需的数据
-        for group_id in plugin_config.group_id:
+        for group_id in plugin_config.repeat_group_id:
             if group_id not in self._last_message_on:
                 self._last_message_on[group_id] = datetime.now()
 
@@ -242,19 +242,19 @@ class Recorder:
         """
         self._last_message_on = {
             group_id: datetime.now()
-            for group_id in plugin_config.group_id
+            for group_id in plugin_config.repeat_group_id
         }
         self._msg_send_time = {
             group_id: []
-            for group_id in plugin_config.group_id
+            for group_id in plugin_config.repeat_group_id
         }
         self._repeat_list = {
             group_id: {}
-            for group_id in plugin_config.group_id
+            for group_id in plugin_config.repeat_group_id
         }
         self._msg_number_list = {
             group_id: {}
-            for group_id in plugin_config.group_id
+            for group_id in plugin_config.repeat_group_id
         }
 
 
