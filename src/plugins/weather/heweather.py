@@ -5,7 +5,7 @@ from typing import Optional
 
 import httpx
 
-from .config import config
+from .config import plugin_config
 
 
 async def heweather(city: str) -> Optional[str]:
@@ -17,12 +17,12 @@ async def heweather(city: str) -> Optional[str]:
     2018-08-14 小雨 降水概率：13% 温度：33~26℃
     2018-08-15 小雨 降水概率：11% 温度：32~25℃
     """
-    if not config.heweather_key:
+    if not plugin_config.heweather_key:
         return None
 
     try:
         city_name = urllib.parse.quote(city.encode('utf-8'))
-        url_str = f'https://free-api.heweather.com/s6/weather?location={city_name}&key={config.heweather_key}'
+        url_str = f'https://free-api.heweather.com/s6/weather?location={city_name}&key={plugin_config.heweather_key}'
         async with httpx.AsyncClient() as client:
             resp = await client.get(url_str)
         weather_result = resp.json()['HeWeather6'][0]

@@ -10,7 +10,8 @@ class Config(BaseSettings):
     heweather_key: str = DATA.get_config('heweather', 'key')
 
     class Config:
-        extra = "allow"
+        extra = 'ignore'
 
 
-config = Config(**get_driver().config.dict())
+global_config = get_driver().config
+plugin_config = Config(**global_config.dict())
