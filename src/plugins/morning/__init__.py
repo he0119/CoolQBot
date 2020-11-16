@@ -25,7 +25,7 @@ morning_metaevent = on_metaevent(rule=check_first_connect, block=True)
 async def _(bot: Bot, event: Event, state: dict):
     """ 启动时发送问好信息 """
     hello_str = get_first_connect_message()
-    for group_id in bot.config.group_id:
+    for group_id in plugin_config.group_id:
         await bot.send_msg(
             message_type='group', group_id=group_id, message=hello_str
         )
