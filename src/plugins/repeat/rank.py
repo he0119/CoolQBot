@@ -47,7 +47,7 @@ class Ranking:
         repeat_rate_ranking = await self.repeat_rate_ranking()
         repeat_number_ranking = await self.repeat_number_ranking()
 
-        if repeat_rate_ranking and repeat_rate_ranking:
+        if repeat_rate_ranking and repeat_number_ranking:
             return repeat_rate_ranking + '\n\n' + repeat_number_ranking
 
     async def repeat_number_ranking(self):

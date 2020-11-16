@@ -10,7 +10,9 @@ from nonebot.permission import GROUP
 from nonebot.plugin import CommandGroup
 from nonebot.typing import Bot, Event
 
-from .config import config
+from src.utils.helpers import strtobool
+
+from .config import plugin_config
 from .history import get_history
 from .rank import get_rank
 from .recorder import recorder
@@ -25,7 +27,7 @@ repeat = CommandGroup('repeat', block=True)
 async def _():
     """ 每隔一分钟保存一次数据 """
     # 保存数据前先清理 msg_send_time 列表，仅保留最近 10 分钟的数据
-    for group_id in config.group_id:
+    for group_id in plugin_config.group_id:
         recorder.message_number(10, group_id)
 
     recorder.save_data()
@@ -56,6 +58,45 @@ async def _(bot: Bot, event: Event, state: dict):
     await repeat_message.finish(event.raw_message)
 
 
+repeat_cmd = repeat.command(
+    'basic', aliases={'repeat', '复读'}, permission=GROUP
+)
+repeat_cmd.__doc__ = """
+repeat 复读
+
+复读
+
+查看当前群是否启用复读功能
+/repeat
+启用复读功能
+/repeat on
+关闭复读功能
+/repeat off
+"""
+
+
+@repeat_cmd.handle()
+async def _(bot: Bot, event: Event, state: dict):
+    args = str(event.message).strip()
+
+    group_id = event.group_id
+
+    if args and group_id:
+        if strtobool(args):
+            plugin_config.group_id += [group_id]
+            await repeat_cmd.finish('已在本群开启复读功能')
+        else:
+            plugin_config.group_id = [
+                n for n in plugin_config.group_id if n != group_id
+            ]
+            await repeat_cmd.finish('已在本群关闭复读功能')
+    else:
+        if group_id in plugin_config.group_id:
+            await repeat_cmd.finish('复读功能开启中')
+        else:
+            await repeat_cmd.finish('复读功能关闭中')
+
+
 #endregion
 #region 运行状态
 status_cmd = repeat.command('status', aliases={'status', '状态'})
@@ -71,7 +112,8 @@ status 状态
 
 @status_cmd.handle()
 async def _(bot: Bot, event: Event, state: dict):
-    await status_cmd.finish(get_status(event.group_id))
+    if event.group_id:
+        await status_cmd.finish(get_status(event.group_id))
 
 
 #endregion
@@ -191,13 +233,14 @@ async def _(bot: Bot, event: Event, state: dict):
 @history_cmd.got('month', prompt='你请输入你要查询的月份')
 @history_cmd.got('day', prompt='你请输入你要查询的日期（如查询整月排名请输入 0）')
 async def _(bot: Bot, event: Event, state: dict):
-    res = await get_history(
-        year=state['year'],
-        month=state['month'],
-        day=state['day'],
-        group_id=event.group_id,
-    )
-    await history_cmd.finish(res)
+    if event.group_id:
+        res = await get_history(
+            year=state['year'],
+            month=state['month'],
+            day=state['day'],
+            group_id=event.group_id,
+        )
+        await history_cmd.finish(res)
 
 
 #endregion
