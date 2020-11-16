@@ -68,18 +68,25 @@ class News:
     @staticmethod
     def format_message(item):
         """ 格式化消息 """
-        card_item = item['card']['item']
-        card_desc = item["desc"]
+        if 'item' in item['card']:
+            card_item = item['card']['item']
+        else:
+            card_item = item['card']
+        card_desc = item['desc']
 
         message = ''
 
         # 只需要其中一个有内容就好
         if 'title' in card_item and card_item['title']:
             message += card_item['title']
+        elif 'desc' in card_item and card_item['desc']:
+            message += card_item['desc']
         elif 'description' in card_item and card_item['description']:
             message += card_item['description']
         elif 'content' in card_item and card_item['content']:
             message += card_item['content']
+        elif 'summary' in card_item and card_item['summary']:
+            message += card_item['summary']
 
         message += f'https://t.bilibili.com/{card_desc["dynamic_id"]}'
 

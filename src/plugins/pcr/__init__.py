@@ -12,6 +12,7 @@ from src.utils.helpers import strtobool
 
 from .calender import calender
 from .config import plugin_config
+from .news import news
 
 pcr = CommandGroup('pcr', block=True)
 
