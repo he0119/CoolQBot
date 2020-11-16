@@ -81,7 +81,7 @@ async def _(bot: Bot, event: Event, state: dict):
             plugin_config.group_id += [group_id]
             await morning_cmd.finish('已在本群开启每日早安功能')
         else:
-            plugin_config.repeat_group_id = [
+            plugin_config.group_id = [
                 n for n in plugin_config.group_id if n != group_id
             ]
             await morning_cmd.finish('已在本群关闭每日早安功能')
