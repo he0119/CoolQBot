@@ -11,7 +11,7 @@ from nonebot.typing import Bot, Event
 from src.utils.helpers import strtobool
 
 from .calender import calender
-from .news import news
+from .config import plugin_config
 
 pcr = CommandGroup('pcr', block=True)
 
@@ -35,17 +35,19 @@ pcr.news
 async def _(bot: Bot, event: Event, state: dict):
     args = str(event.message).strip()
 
-    if args:
+    group_id = event.group_id
+
+    if args and group_id:
         if strtobool(args):
-            if not news.is_enabled:
-                news.enable()
+            plugin_config.push_news_group_id += [group_id]
             await news_cmd.finish('已开始新闻自动推送')
         else:
-            if news.is_enabled:
-                news.disable()
+            plugin_config.push_news_group_id = [
+                n for n in plugin_config.push_news_group_id if n != group_id
+            ]
             await news_cmd.finish('已停止新闻自动推送')
     else:
-        if news.is_enabled:
+        if group_id in plugin_config.push_news_group_id:
             await news_cmd.finish('新闻自动推送开启中')
         else:
             await news_cmd.finish('新闻自动推送关闭中')
@@ -75,19 +77,23 @@ async def _(bot: Bot, event: Event, state: dict):
     args = str(event.message).strip()
 
     if args in ['status', '状态']:
-        if calender.is_enabled:
-            await calender_cmd.finish('日程自动推送开启中')
+        group_id = event.group_id
+
+        if args and group_id:
+            if strtobool(args):
+                plugin_config.push_calender_group_id += [group_id]
+                await news_cmd.finish('已开始日程自动推送')
+            else:
+                plugin_config.push_calender_group_id = [
+                    n for n in plugin_config.push_calender_group_id
+                    if n != group_id
+                ]
+                await news_cmd.finish('已停止日程自动推送')
         else:
-            await calender_cmd.finish('日程自动推送关闭中')
-    elif args:
-        if strtobool(args):
-            if not calender.is_enabled:
-                calender.enable()
-            await calender_cmd.finish('已开始日程自动推送')
-        else:
-            if calender.is_enabled:
-                calender.disable()
-            await calender_cmd.finish('已停止日程自动推送')
+            if group_id in plugin_config.push_calender_group_id:
+                await news_cmd.finish('日程自动推送开启中')
+            else:
+                await news_cmd.finish('日程自动推送关闭中')
     else:
         await calender_cmd.finish(await calender.get_week_events())
 
