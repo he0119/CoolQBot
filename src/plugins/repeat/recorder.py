@@ -201,7 +201,10 @@ class Recorder:
         self._repeat_list = data['repeat_list']
         self._msg_number_list = data['msg_number_list']
 
-        # 如果群列表新加了群，则补充所需的数据
+        self.add_new_group()
+
+    def add_new_group(self):
+        """ 如果群列表新加了群，则补充所需的数据 """
         for group_id in plugin_config.group_id:
             if group_id not in self._last_message_on:
                 self._last_message_on[group_id] = datetime.now()

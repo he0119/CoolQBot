@@ -84,6 +84,7 @@ async def _(bot: Bot, event: Event, state: dict):
     if args and group_id:
         if strtobool(args):
             plugin_config.group_id += [group_id]
+            recorder.add_new_group()
             await repeat_cmd.finish('已在本群开启复读功能')
         else:
             plugin_config.group_id = [

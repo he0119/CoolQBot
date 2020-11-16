@@ -77,24 +77,23 @@ pcr.calender pcr.日程表 pcr.日程
 async def _(bot: Bot, event: Event, state: dict):
     args = str(event.message).strip()
 
-    if args in ['status', '状态']:
-        group_id = event.group_id
+    group_id = event.group_id
 
-        if args and group_id:
-            if strtobool(args):
-                plugin_config.push_calender_group_id += [group_id]
-                await news_cmd.finish('已开始日程自动推送')
-            else:
-                plugin_config.push_calender_group_id = [
-                    n for n in plugin_config.push_calender_group_id
-                    if n != group_id
-                ]
-                await news_cmd.finish('已停止日程自动推送')
+    if args in ['status', '状态']:
+        if group_id in plugin_config.push_calender_group_id:
+            await news_cmd.finish('日程自动推送开启中')
         else:
-            if group_id in plugin_config.push_calender_group_id:
-                await news_cmd.finish('日程自动推送开启中')
-            else:
-                await news_cmd.finish('日程自动推送关闭中')
+            await news_cmd.finish('日程自动推送关闭中')
+    elif args and group_id:
+        if strtobool(args):
+            plugin_config.push_calender_group_id += [group_id]
+            await news_cmd.finish('已开始日程自动推送')
+        else:
+            plugin_config.push_calender_group_id = [
+                n for n in plugin_config.push_calender_group_id
+                if n != group_id
+            ]
+            await news_cmd.finish('已停止日程自动推送')
     else:
         await calender_cmd.finish(await calender.get_week_events())
 
