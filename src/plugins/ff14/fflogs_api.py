@@ -13,7 +13,7 @@ from typing import List, Literal, Union
 import httpx
 from nonebot import logger, scheduler
 
-from .config import DATA, config
+from .config import DATA, plugin_config
 from .fflogs_data import (
     get_boss_info_by_nickname, get_job_info_by_nickname, get_jobs_info
 )
@@ -42,7 +42,7 @@ class FFLogs:
         self._cache_job = None
 
         # 根据配置启动
-        if config.fflogs_cache:
+        if plugin_config.fflogs_cache:
             self.enable_cache()
 
         # QQ号 与 最终幻想14 角色用户名，服务器的对应关系
@@ -56,21 +56,21 @@ class FFLogs:
         self._cache_job = scheduler.add_job(
             self.cache_data,
             'cron',
-            hour=config.fflogs_cache_hour,
-            minute=config.fflogs_cache_minute,
-            second=config.fflogs_cache_second,
+            hour=plugin_config.fflogs_cache_hour,
+            minute=plugin_config.fflogs_cache_minute,
+            second=plugin_config.fflogs_cache_second,
             id='fflogs_cache'
         )
-        config.fflogs_cache = True
+        plugin_config.fflogs_cache = True
         logger.info(
-            f'开启定时缓存，执行时间为每天 {config.fflogs_cache_hour}:{config.fflogs_cache_minute}:{config.fflogs_cache_second}'
+            f'开启定时缓存，执行时间为每天 {plugin_config.fflogs_cache_hour}:{plugin_config.fflogs_cache_minute}:{plugin_config.fflogs_cache_second}'
         )
 
     def disable_cache(self) -> None:
         """ 关闭定时缓存任务 """
         self._cache_job.remove()
         self._cache_job = None
-        config.fflogs_cache = False
+        plugin_config.fflogs_cache = False
         logger.info('定时缓存已关闭')
 
     @property
@@ -84,7 +84,7 @@ class FFLogs:
     async def cache_data(self) -> None:
         """ 缓存数据 """
         jobs = get_jobs_info()
-        for boss in config.fflogs_cache_boss:
+        for boss in plugin_config.fflogs_cache_boss:
             for job in jobs:
                 await self.dps(boss, job.name)
                 logger.info(f'{boss} {job.name}的数据缓存完成。')
@@ -129,7 +129,7 @@ class FFLogs:
 
         # API 只支持获取 50 页以内的数据
         while hasMorePages and page < 51:
-            rankings_url = f'{self.base_url}/rankings/encounter/{boss}?metric=rdps&difficulty={difficulty}&spec={job}&page={page}&filter=date.{start_timestamp}.{end_timestamp}&api_key={config.fflogs_token}'
+            rankings_url = f'{self.base_url}/rankings/encounter/{boss}?metric=rdps&difficulty={difficulty}&spec={job}&page={page}&filter=date.{start_timestamp}.{end_timestamp}&api_key={plugin_config.fflogs_token}'
 
             res = await self._http(rankings_url)
 
@@ -154,7 +154,7 @@ class FFLogs:
         date = datetime(year=date.year, month=date.month, day=date.day)
 
         rankings = []
-        for _ in range(config.fflogs_range):
+        for _ in range(plugin_config.fflogs_range):
             rankings += await self._get_one_day_ranking(
                 boss, difficulty, job, date
             )
@@ -186,7 +186,7 @@ class FFLogs:
 
         返回列表
         """
-        url = f'https://cn.fflogs.com/v1/rankings/character/{characterName}/{serverName}/CN?zone={zone}&encounter={encounter}&metric={metric}&api_key={config.fflogs_token}'
+        url = f'https://cn.fflogs.com/v1/rankings/character/{characterName}/{serverName}/CN?zone={zone}&encounter={encounter}&metric={metric}&api_key={plugin_config.fflogs_token}'
 
         res = await self._http(url)
 
@@ -214,13 +214,13 @@ class FFLogs:
 
     async def zones(self):
         """ 副本 """
-        url = f'{self.base_url}/zones?api_key={config.fflogs_token}'
+        url = f'{self.base_url}/zones?api_key={plugin_config.fflogs_token}'
         data = await self._http(url)
         return data
 
     async def classes(self):
         """ 职业 """
-        url = f'{self.base_url}/classes?api_key={config.fflogs_token}'
+        url = f'{self.base_url}/classes?api_key={plugin_config.fflogs_token}'
         data = await self._http(url)
         return data
 
@@ -281,7 +281,7 @@ class FFLogs:
         boss_nickname: str,
         character_name: str,
         server_name: str,
-        dps_type: str = 'rdps'
+        dps_type: Literal['rdps', 'adps', 'pdps'] = 'rdps'
     ) -> str:
         """ 查询指定角色在某个副本的 DPS
 

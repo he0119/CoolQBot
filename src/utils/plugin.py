@@ -3,7 +3,7 @@
 import configparser
 import os
 import pickle
-from typing import IO
+from typing import IO, Any
 
 from nonebot import get_driver
 
@@ -34,7 +34,7 @@ class PluginData:
         with self.open(f'{filename}.pkl', 'wb') as f:
             pickle.dump(data, f)
 
-    def load_pkl(self, filename: str) -> object:
+    def load_pkl(self, filename: str) -> Any:
         with self.open(f'{filename}.pkl', 'rb') as f:
             data = pickle.load(f)
         return data
