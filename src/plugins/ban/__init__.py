@@ -1,7 +1,7 @@
 """ 自主禁言
 """
 from enum import Enum
-from typing import Dict
+from typing import Dict, Optional
 
 from nonebot import on_command, on_notice
 from nonebot.typing import Bot, Event
@@ -96,7 +96,7 @@ async def _(bot: Bot, event: Event, state: dict):
     message_type = event.detail_type
 
     # 如果在群里发送，则在当前群禁言/解除
-    if message_type == 'group':
+    if message_type == 'group' and event.group_id:
         group_id = event.group_id
         bot_role = _admin_status[group_id]
         sender_role = event.sender['role']
@@ -130,7 +130,7 @@ async def _(bot: Bot, event: Event, state: dict):
             )
 
 
-async def get_owner_id(group_id: int, bot: Bot) -> int:
+async def get_owner_id(group_id: int, bot: Bot) -> Optional[int]:
     """ 获取群主 QQ 号 """
     group_member_list = await bot.get_group_member_list(group_id=group_id)
     for member in group_member_list:
@@ -165,7 +165,7 @@ admin_notice = on_notice(rule=group_admin)
 
 @admin_notice.handle()
 async def _(bot: Bot, event: Event, state: dict):
-    if bot.self_id == event.self_id:
+    if bot.self_id == event.self_id and event.group_id:
         if event.sub_type == 'set':
             _admin_status[event.group_id] = 'admin'
         elif event.sub_type == 'unset':

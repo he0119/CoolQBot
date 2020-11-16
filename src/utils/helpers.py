@@ -1,6 +1,6 @@
 import hashlib
 import random
-from typing import Sequence
+from typing import List, Optional, Sequence
 
 from nonebot import get_bots
 from nonebot.typing import Bot, Event
@@ -59,7 +59,7 @@ def context_id(
     return ctx_id
 
 
-def get_first_bot() -> Bot:
+def get_first_bot() -> Optional[Bot]:
     """ 获得连接的第一个 bot """
     if get_bots():
         return list(get_bots().values())[0]
@@ -75,3 +75,21 @@ def strtobool(val: str) -> bool:
     if val in ('y', 'yes', 't', 'true', 'on', '1', '是', '确认', '开'):
         return True
     return False
+
+
+def strtogroupid(val: str) -> List[int]:
+    """ 转换文本至群ID列表
+
+    群ID用空格隔开
+    """
+    if val:
+        return list(map(int, val.split()))
+    return []
+
+
+def groupidtostr(val: List[int]) -> str:
+    """ 群ID列表转换至文本
+
+    群ID用空格隔开
+    """
+    return ' '.join(map(str, val))

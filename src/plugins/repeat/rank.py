@@ -9,8 +9,9 @@ from .recorder import recorder
 
 
 async def get_rank(
-    display_number, minimal_msg_number, display_total_number, group_id
-):
+    display_number: int, minimal_msg_number: int, display_total_number: int,
+    group_id: int
+) -> str:
     """ 获取排行榜 """
     repeat_list = recorder.repeat_list(group_id)
     msg_number_list = recorder.msg_number_list(group_id)
@@ -47,7 +48,7 @@ class Ranking:
         repeat_rate_ranking = await self.repeat_rate_ranking()
         repeat_number_ranking = await self.repeat_number_ranking()
 
-        if repeat_rate_ranking and repeat_rate_ranking:
+        if repeat_rate_ranking and repeat_number_ranking:
             return repeat_rate_ranking + '\n\n' + repeat_number_ranking
 
     async def repeat_number_ranking(self):

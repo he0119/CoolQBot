@@ -2,6 +2,7 @@
 """
 from calendar import monthrange
 from datetime import datetime
+from typing import Tuple
 
 from .config import DATA
 from .rank import Ranking
@@ -63,7 +64,8 @@ async def get_history(year: int, month: int, day: int, group_id: int) -> str:
     return str_data
 
 
-def is_valid_date(year: int, month: int, day: int, now: datetime) -> bool:
+def is_valid_date(year: int, month: int, day: int,
+                  now: datetime) -> Tuple[bool, str]:
     """ 确认输入日期是否合法
     """
     if not year and year != 0:

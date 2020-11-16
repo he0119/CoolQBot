@@ -3,14 +3,14 @@
 https://tools.yobot.win/calender/#cn
 """
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 import httpx
 from nonebot import logger, scheduler
 
 from src.utils.helpers import get_first_bot
 
-from .config import config
+from .config import plugin_config
 
 
 class Calender:
@@ -20,39 +20,22 @@ class Calender:
         # 定时任务
         self._job = None
         # 日程表
-        self._timeline: Dict[str, List[str]] = {}
+        self._timeline: Dict[str, Set[str]] = {}
         self._timeline_update_time: Optional[datetime] = None
 
-        # 根据配置启动
-        if config.push_calender:
-            self.enable()
+        self.init()
 
-    def enable(self):
-        """ 开启日程自动推送 """
+    def init(self):
+        """ 初始化日程自动推送 """
         logger.info('初始化 公主连结Re:Dive 日程推送')
         self._job = scheduler.add_job(
             self.push_calender,
             'cron',
-            hour=config.calender_hour,
-            minute=config.calender_minute,
-            second=config.calender_second,
+            hour=plugin_config.calender_hour,
+            minute=plugin_config.calender_minute,
+            second=plugin_config.calender_second,
             id='push_calender'
         )
-        config.push_calender = True
-
-    def disable(self):
-        """ 关闭日程自动推送 """
-        self._job.remove()
-        self._job = None
-        config.push_calender = False
-
-    @property
-    def is_enabled(self):
-        """ 是否启用日程自动推送 """
-        if self._job:
-            return True
-        else:
-            return False
 
     async def refresh_calender(self) -> None:
         """ 获取最新的日程表 """
@@ -101,6 +84,10 @@ class Calender:
 
     async def push_calender(self):
         """ 推送日程 """
+        # 没有启用的群则不推送消息
+        if not plugin_config.push_calender_group_id:
+            return
+
         logger.info('推送今日 公主连结Re:Dive 日程')
 
         await self.refresh_calender()
@@ -113,7 +100,7 @@ class Calender:
             events_str = "\n".join(events)
 
         reply = '公主连结Re:Dive 今日活动：\n{}'.format(events_str)
-        for group_id in config.group_id:
+        for group_id in plugin_config.push_calender_group_id:
             await get_first_bot().send_msg(
                 message_type='group', group_id=group_id, message=reply
             )

@@ -5,7 +5,7 @@ from typing import List
 from nonebot import get_driver
 from pydantic import BaseSettings, validator
 
-from src.utils.helpers import strtobool
+from src.utils.helpers import groupidtostr, strtobool, strtogroupid
 from src.utils.plugin import PluginData
 
 DATA = PluginData('ff14', config=True)
@@ -13,8 +13,6 @@ DATA = PluginData('ff14', config=True)
 
 class Config(BaseSettings):
     # 新闻推送相关配置
-    # 是否自动推送新闻
-    push_news: bool = strtobool(DATA.get_config('ff14', 'push_news', '0'))
     # 自动推送新闻的间隔，单位 分钟
     push_news_interval: int = int(
         DATA.get_config('ff14', 'push_news_interval', '30')
@@ -24,19 +22,21 @@ class Config(BaseSettings):
         DATA.get_config('ff14', 'push_news_last_news_id', '0')
     )
 
-    @validator('push_news', always=True)
-    def push_news_validator(cls, v):
-        """ 验证并保存配置 """
-        if v:
-            DATA.set_config('ff14', 'push_news', '1')
-        else:
-            DATA.set_config('ff14', 'push_news', '0')
-        return v
+    # 启用新闻推送的群
+    push_news_group_id: List[int] = strtogroupid(
+        DATA.get_config('ff14', 'push_news_group_id')
+    )
 
     @validator('push_news_last_news_id', always=True)
-    def push_news_last_news_id_validator(cls, v):
+    def push_news_last_news_id_validator(cls, v: int):
         """ 验证并保存配置 """
         DATA.set_config('ff14', 'push_news_last_news_id', str(v))
+        return v
+
+    @validator('push_news_group_id', always=True)
+    def push_news_group_id_validator(cls, v: List[int]):
+        """ 验证并保存配置 """
+        DATA.set_config('ff14', 'push_news_group_id', groupidtostr(v))
         return v
 
     # FFLogs 相关配置
@@ -77,8 +77,9 @@ class Config(BaseSettings):
         return v
 
     class Config:
-        extra = 'allow'
+        extra = 'ignore'
         validate_assignment = True
 
 
-config = Config(**get_driver().config.dict())
+global_config = get_driver().config
+plugin_config = Config(**global_config.dict())

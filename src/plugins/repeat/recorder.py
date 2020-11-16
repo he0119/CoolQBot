@@ -4,10 +4,11 @@
 如果遇到老版本数据，则自动升级
 """
 from datetime import datetime, timedelta
+from typing import Dict
 
 from nonebot import logger
 
-from .config import DATA, config
+from .config import DATA, plugin_config
 
 VERSION = '1'
 
@@ -17,7 +18,7 @@ def get_history_pkl_name(dt: datetime):
     return time_str
 
 
-def update(data: list, group_id: int):
+def update(data: Dict, group_id: int):
     """ 升级脚本
 
     升级 0.8.1 及以前版本的 recorder 数据。
@@ -29,7 +30,7 @@ def update(data: list, group_id: int):
         return update_old_2(data, group_id)
 
 
-def update_old_1(data: list, group_id: int):
+def update_old_1(data: Dict, group_id: int):
     """ 升级 0.7.0 之前版本的数据
     """
     new_data = {}
@@ -54,7 +55,7 @@ def update_old_1(data: list, group_id: int):
     return new_data
 
 
-def update_old_2(data: list, group_id: int):
+def update_old_2(data: Dict, group_id: int):
     """ 升级 0.7.0-0.8.1 版本的 recorder 数据
     """
     new_data = {}
@@ -190,7 +191,7 @@ class Recorder:
         # 默认使用配置中第一个群来升级老数据
         if 'version' not in data or data['version'] != VERSION:
             logger.info('发现旧版本数据，正在升级数据')
-            data = update(data, config.group_id[0])
+            data = update(data, plugin_config.group_id[0])
             DATA.save_pkl(data, self._name)
             logger.info('升级数据成功')
 
@@ -200,8 +201,11 @@ class Recorder:
         self._repeat_list = data['repeat_list']
         self._msg_number_list = data['msg_number_list']
 
-        # 如果群列表新加了群，则补充所需的数据
-        for group_id in config.group_id:
+        self.add_new_group()
+
+    def add_new_group(self):
+        """ 如果群列表新加了群，则补充所需的数据 """
+        for group_id in plugin_config.group_id:
             if group_id not in self._last_message_on:
                 self._last_message_on[group_id] = datetime.now()
 
@@ -242,11 +246,20 @@ class Recorder:
         """
         self._last_message_on = {
             group_id: datetime.now()
-            for group_id in config.group_id
+            for group_id in plugin_config.group_id
         }
-        self._msg_send_time = {group_id: [] for group_id in config.group_id}
-        self._repeat_list = {group_id: {} for group_id in config.group_id}
-        self._msg_number_list = {group_id: {} for group_id in config.group_id}
+        self._msg_send_time = {
+            group_id: []
+            for group_id in plugin_config.group_id
+        }
+        self._repeat_list = {
+            group_id: {}
+            for group_id in plugin_config.group_id
+        }
+        self._msg_number_list = {
+            group_id: {}
+            for group_id in plugin_config.group_id
+        }
 
 
 recorder = Recorder('recorder')

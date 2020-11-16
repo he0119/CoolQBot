@@ -5,12 +5,14 @@
 FFLogs
 """
 from nonebot import CommandGroup
+from nonebot.exception import FinishedException
+from nonebot.permission import GROUP
 from nonebot.typing import Bot, Event
 
 from src.utils.commands import get_command_help
 from src.utils.helpers import strtobool
 
-from .config import config
+from .config import plugin_config
 from .fflogs_api import fflogs
 from .gate import get_direction
 from .news import news
@@ -59,13 +61,13 @@ async def _(bot: Bot, event: Event, state: dict):
 
 #endregion
 #region 新闻推送
-news_cmd = ff14.command('news')
+news_cmd = ff14.command('news', permission=GROUP)
 news_cmd.__doc__ = """
 ff14.news
 
 最终幻想XIV 新闻推送
 
-当前新闻推送状态
+当前群新闻推送状态
 /ff14.news
 开启推送
 /ff14.news on
@@ -78,17 +80,19 @@ ff14.news
 async def _(bot: Bot, event: Event, state: dict):
     args = str(event.message).strip()
 
-    if args:
+    group_id = event.group_id
+
+    if args and group_id:
         if strtobool(args):
-            if not news.is_enabled:
-                news.enable()
+            plugin_config.push_news_group_id += [group_id]
             await news_cmd.finish('已开始新闻自动推送')
         else:
-            if news.is_enabled:
-                news.disable()
+            plugin_config.push_news_group_id = [
+                n for n in plugin_config.push_news_group_id if n != group_id
+            ]
             await news_cmd.finish('已停止新闻自动推送')
     else:
-        if news.is_enabled:
+        if group_id in plugin_config.push_news_group_id:
             await news_cmd.finish('新闻自动推送开启中')
         else:
             await news_cmd.finish('新闻自动推送关闭中')
@@ -112,6 +116,8 @@ ff14.dps dps
 /dps 副本名 @他人
 查询当前QQ号绑定的角色
 /dps me
+绑定自己的角色
+/dps me 角色名 服务器名
 查询他人绑定的角色
 /dps @他人
 """
@@ -123,6 +129,8 @@ async def _(bot: Bot, event: Event, state: dict):
     if not argv:
         await fflogs_cmd.finish(get_command_help('ff14.dps'))
 
+    if not event.user_id:
+        raise FinishedException
     user_id = event.user_id
 
     # 设置 Token
@@ -131,11 +139,11 @@ async def _(bot: Bot, event: Event, state: dict):
         if user_id not in bot.config.superusers:
             await fflogs_cmd.finish('抱歉，你没有权限修改 Token。')
 
-        config.fflogs_token = argv[1]
+        plugin_config.fflogs_token = argv[1]
         await fflogs_cmd.finish('Token 设置完成。')
 
     # 检查 Token 是否设置
-    if not config.fflogs_token:
+    if not plugin_config.fflogs_token:
         await fflogs_cmd.finish(
             '对不起，Token 未设置，无法查询数据。\n请先使用命令\n/dps token <token>\n配置好 Token 后再尝试查询数据。'
         )
@@ -144,7 +152,7 @@ async def _(bot: Bot, event: Event, state: dict):
         # 检查是否是超级用户
         if user_id not in bot.config.superusers:
             await fflogs_cmd.finish('抱歉，你没有权限查看 Token。')
-        await fflogs_cmd.finish(f'当前的 Token 为 {config.fflogs_token}')
+        await fflogs_cmd.finish(f'当前的 Token 为 {plugin_config.fflogs_token}')
 
     # 缓存相关设置
     if argv[0] == 'cache':
@@ -208,7 +216,7 @@ async def _(bot: Bot, event: Event, state: dict):
             user_id = int(argv[1][10:-1])
             reply = await get_character_dps_by_user_id(argv[0], user_id)
         else:
-            reply = await fflogs.dps(*argv)
+            reply = await fflogs.dps(*argv)    #type:ignore
         await fflogs_cmd.finish(reply)
 
     if len(argv) == 3:
@@ -216,9 +224,9 @@ async def _(bot: Bot, event: Event, state: dict):
         # <BOSS名> <角色名> <服务器名>
         argv[2] = argv[2].lower()
         if argv[2] in ['adps', 'rdps', 'pdps']:
-            reply = await fflogs.dps(*argv)
+            reply = await fflogs.dps(*argv)    #type:ignore
         else:
-            reply = await fflogs.character_dps(*argv)
+            reply = await fflogs.character_dps(*argv)    #type:ignore
         await fflogs_cmd.finish(reply)
 
     await fflogs_cmd.finish(get_command_help('ff14.dps'))
