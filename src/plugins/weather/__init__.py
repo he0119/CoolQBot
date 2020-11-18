@@ -31,7 +31,6 @@ async def _(bot: Bot, event: Event, state: dict):
 
     if len(argv) == 1:
         state['location'] = argv[0]
-        state['adm'] = None
     if len(argv) > 1:
         state['location'] = argv[0]
         state['adm'] = argv[1]
@@ -40,7 +39,7 @@ async def _(bot: Bot, event: Event, state: dict):
 @weather_cmd.got('location', prompt='你想查询哪个城市的天气呢？')
 async def _(bot: Bot, event: Event, state: dict):
     weather_report = await get_weather_of_location(
-        state['location'], state['adm']
+        state['location'], state.get('adm')
     )
     await weather_cmd.finish(weather_report)
 
