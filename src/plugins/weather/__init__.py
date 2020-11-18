@@ -60,7 +60,7 @@ async def get_weather_of_location(location: str, adm: str = None) -> str:
     # 艾欧泽亚的天气
     str_data = eorzean_weather(location)
     if not str_data:
-        str_data = await heweather(location)
+        str_data = await heweather(location, adm)
     if not str_data:
         str_data = f'我才不是因为不知道才不告诉你{location}的天气呢'
     return str_data
