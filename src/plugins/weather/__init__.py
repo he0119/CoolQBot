@@ -1,8 +1,5 @@
 """ 天气插件
 """
-from typing import Optional
-
-from jieba import posseg
 from nonebot import on_command
 from nonebot.typing import Bot, Event
 
@@ -23,20 +20,28 @@ weather 天气
 /weather Tokyo
 甚至支持最终幻想XIV
 /weather 格里达尼亚
+如果查询结果不对，还可以指定城市所属行政区划
+/weather 西安 黑龙江
 """
 
 
 @weather_cmd.handle()
 async def _(bot: Bot, event: Event, state: dict):
-    args = str(event.message).strip()
+    argv = str(event.message).strip().split()
 
-    if args:
-        state['city'] = args
+    if len(argv) == 1:
+        state['location'] = argv[0]
+        state['adm'] = None
+    if len(argv) > 1:
+        state['location'] = argv[0]
+        state['adm'] = argv[1]
 
 
-@weather_cmd.got('city', prompt='你想查询哪个城市的天气呢？')
+@weather_cmd.got('location', prompt='你想查询哪个城市的天气呢？')
 async def _(bot: Bot, event: Event, state: dict):
-    weather_report = await get_weather_of_city(state['city'])
+    weather_report = await get_weather_of_location(
+        state['location'], state['adm']
+    )
     await weather_cmd.finish(weather_report)
 
 
@@ -50,26 +55,12 @@ async def _(bot: Bot, event: Event, state: dict):
     state[state['_current_key']] = args
 
 
-async def get_weather_of_city(city: str) -> str:
-    """ 根据城市名获取天气数据 """
+async def get_weather_of_location(location: str, adm: str = None) -> str:
+    """ 根据城市名与城市所属行政区划获取天气数据 """
     # 艾欧泽亚的天气
-    str_data = eorzean_weather(city)
+    str_data = eorzean_weather(location)
     if not str_data:
-        str_data = await heweather(city)
+        str_data = await heweather(location, adm)
     if not str_data:
-        str_data = f'我才不是因为不知道才不告诉你{city}的天气呢'
+        str_data = f'我才不是因为不知道才不告诉你{location}的天气呢'
     return str_data
-
-
-def get_city(msg: str) -> Optional[str]:
-    """ 提取消息中的地名 """
-    # 对消息进行分词和词性标注
-    words = posseg.lcut(msg)
-    # 遍历 posseg.lcut 返回的列表
-    for word in words:
-        # 每个元素是一个 pair 对象，包含 word 和 flag 两个属性，分别表示词和词性
-        if word.flag == 'ns':
-            # ns 词性表示地名
-            return word.word
-
-    return None
