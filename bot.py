@@ -25,12 +25,5 @@ logger.add(
 # 加载插件
 nonebot.load_plugins('src/plugins')
 
-# 测试框架
-try:
-    import nonebot_test
-    nonebot_test.init()
-except:
-    pass
-
 if __name__ == '__main__':
     nonebot.run(app='bot:app')
