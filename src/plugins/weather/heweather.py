@@ -52,7 +52,7 @@ async def lookup_location(location: str,
 async def now(location_id: str) -> str:
     """ 获取实时天气
 
-    当前温度：19 湿度：35(体感温度：17)
+    当前温度：19℃ 湿度：35%(体感温度：17℃)
     """
     url = f'https://devapi.qweather.com/v7/weather/now?location={location_id}'
     resp = await get(url)
@@ -61,7 +61,7 @@ async def now(location_id: str) -> str:
     humidity = resp['now']['humidity']
     feelsLike = resp['now']['feelsLike']
 
-    return f'当前温度：{temp} 湿度：{humidity}(体感温度：{feelsLike})'
+    return f'当前温度：{temp}℃ 湿度：{humidity}%(体感温度：{feelsLike}℃)'
 
 
 async def daily(location_id: str) -> str:
