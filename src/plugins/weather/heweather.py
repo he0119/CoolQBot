@@ -52,7 +52,7 @@ async def lookup_location(location: str,
 async def now(location_id: str) -> str:
     """ 获取实时天气
 
-    当前温度：19℃ 湿度：35%(体感温度：17℃)
+    当前温度：12℃ 湿度：52%(体感温度：7℃)
     """
     url = f'https://devapi.qweather.com/v7/weather/now?location={location_id}'
     resp = await get(url)
@@ -67,9 +67,9 @@ async def now(location_id: str) -> str:
 async def daily(location_id: str) -> str:
     """ 获取今后三天的天气
 
-    2020-11-18 多云转阴 温度：20~12℃
-    2020-11-19 晴转多云 温度：20~12℃
-    2020-11-20 多云转小雨 温度：18~12℃
+    2020-11-21 小雨 温度：12~8℃ 峨眉月
+    2020-11-22 小雨转阴 温度：10~6℃ 上弦月
+    2020-11-23 阴转小雨 温度：10~6℃ 盈凸月
     """
     url = f'https://devapi.qweather.com/v7/weather/3d?location={location_id}'
     resp = await get(url)
@@ -81,22 +81,14 @@ async def daily(location_id: str) -> str:
             temp_text.append(day['textDay'])
         else:
             temp_text.append(f'{day["textDay"]}转{day["textNight"]}')
-        if 'pop' in day:
-            temp_text.append(f'降水概率：{day["pop"]}%')
         temp_text.append(f'温度：{day["tempMax"]}~{day["tempMin"]}℃')
+        temp_text.append(day['moonPhase'])
         daily_text.append(' '.join(temp_text))
     return '\n'.join(daily_text)
 
 
 async def heweather(location: str, adm: Optional[str] = None) -> Optional[str]:
-    """ 和风天气 API
-
-    日本 东京
-    当前温度：25(体感温度：29)
-    2018-08-13 中雨 降水概率：0% 温度：32~26℃
-    2018-08-14 小雨 降水概率：13% 温度：33~26℃
-    2018-08-15 小雨 降水概率：11% 温度：32~25℃
-    """
+    """ 和风天气 API """
     if not plugin_config.heweather_key:
         return None
 
@@ -112,6 +104,5 @@ async def heweather(location: str, adm: Optional[str] = None) -> Optional[str]:
                 await daily(city[0]),
             ]
         )
-
     except:
         return None
