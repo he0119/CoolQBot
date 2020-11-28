@@ -58,5 +58,5 @@ jobs:
           envs: TAG_NAME
           script: |
             cd coolqbot
-            sed -i "s#coolqbot:.*#coolqbot:$TAG_NAME#g" docker-compose.yml
+            sed -i "s#he0119/coolqbot:.*#he0119/coolqbot:$TAG_NAME#g" docker-compose.yml
             docker-compose pull && docker-compose up -d
