@@ -3,8 +3,7 @@ name: ci
 on:
   push:
     branches:
-      - master
-      - dev
+      - '**'
   pull_request:
   release:
     types: [released]
