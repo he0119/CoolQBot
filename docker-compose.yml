@@ -26,7 +26,7 @@ services:
     environment:
       - HOST=0.0.0.0
   cqhttp:
-    image: he0119/go-cqhttp:latest
+    image: pcrbot/gocqhttp:latest
     container_name: cqhttp
     restart: always
     volumes:

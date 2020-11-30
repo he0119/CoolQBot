@@ -42,3 +42,5 @@ nb run
 之后在 `docker-compose.yml` 文件所在目录下运行 `sudo docker-compose up -d`，便可启动机器人。
 
 修改完配置之后运行 `sudo docker-compose restart` 重启机器人应用配置。
+
+推荐使用 `Docker` 部署，因为机器人的音乐插件依赖于 [netease_cloud_music_api](https://github.com/Binaryify/NeteaseCloudMusicApi)。
