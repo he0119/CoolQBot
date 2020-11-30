@@ -76,9 +76,8 @@ async def _(bot: Bot, event: Event, state: dict):
 @ban_cmd.handle()
 async def _(bot: Bot, event: Event, state: dict):
     """ 获取需要的参数 """
-    # 如果存群里发出的消息，则直接获取群号
-    message_type = event.detail_type
-    if message_type == 'group':
+    # 获取群号，用户 ID
+    if event.detail_type == 'group':
         state['group_id'] = event.group_id
     state['user_id'] = event.user_id
     # 如果没有获取机器人在群中的职位，则获取
@@ -86,7 +85,6 @@ async def _(bot: Bot, event: Event, state: dict):
         await refresh_bot_role(bot, event)
 
     args = str(event.message).strip()
-
     if not args:
         return
 
@@ -134,10 +132,9 @@ async def _(bot: Bot, event: Event, state: dict):
             )
 
 
-@ban_cmd.got('duration', prompt='你想被禁言多少分钟呢？')
 @ban_cmd.got('group_id', prompt='请问你想针对哪个群？')
 async def _(bot: Bot, event: Event, state: dict):
-    """ 如果私聊的话，则向用户请求群号，并在小誓约支持的群禁言/解除 """
+    """ 如果私聊的话，则向用户请求群号，并仅在支持的群禁言/解除 """
     if event.detail_type == 'private':
         group_id = state['group_id']
         user_id = state['user_id']
