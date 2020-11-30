@@ -50,3 +50,7 @@ sudo docker run -it --rm -v $PWD/cqhttp:/data pcrbot/gocqhttp:latest
 修改完机器人相关配置之后运行 `sudo docker-compose restart` 重启机器人应用配置。
 
 推荐使用 `Docker` 部署，因为机器人的音乐插件依赖于 [netease_cloud_music_api](https://github.com/Binaryify/NeteaseCloudMusicApi)。
+
+## 功能
+
+请完成部署之后，向机器人发送 `/help` 命令获取各种功能的介绍。
