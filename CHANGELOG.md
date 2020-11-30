@@ -4,6 +4,31 @@
 
 ## [Unreleased]
 
+## [0.14.0] - 2020-11-30
+
+### Added
+
+- 帮助插件
+- 支持私聊禁言特定的群
+- 给各种功能加上单独的开关
+- 可查询他人绑定的角色数据
+
+### Changed
+
+- 升级至 `NoneBot2`
+- 更新至最新的和风天气 API
+
+### Removed
+
+- B站番剧查询
+- `yobot` 集成
+- `NLP` 相关模块
+
+### Fixed
+
+- 修复数据记录数据没有正常清除的问题
+- 修复 fflogs 排行 adps 和 pdps 获取报错
+
 ## [0.13.1] - 2020-04-30
 
 ### Added
@@ -326,7 +351,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.13.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/he0119/CoolQBot/compare/v0.13.1...v0.14.0
 [0.13.1]: https://github.com/he0119/CoolQBot/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/he0119/CoolQBot/compare/v0.12.2...v0.13.0
 [0.12.2]: https://github.com/he0119/CoolQBot/compare/v0.12.1...v0.12.2
