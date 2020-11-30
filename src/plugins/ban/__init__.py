@@ -61,8 +61,30 @@ ban 禁言
 """
 
 
+@ban_cmd.args_parser
+async def _(bot: Bot, event: Event, state: dict):
+    """ 处理参数，转换成数字 """
+    args = str(event.message).strip()
+
+    # 检查输入参数是不是数字
+    if args.isdigit():
+        state[state['_current_key']] = int(args)
+    else:
+        await ban_cmd.reject('请只输入数字，不然我没法理解呢！')
+
+
 @ban_cmd.handle()
 async def _(bot: Bot, event: Event, state: dict):
+    """ 获取需要的参数 """
+    # 如果存群里发出的消息，则直接获取群号
+    message_type = event.detail_type
+    if message_type == 'group':
+        state['group_id'] = event.group_id
+    state['user_id'] = event.user_id
+    # 如果没有获取机器人在群中的职位，则获取
+    if not _bot_role:
+        await refresh_bot_role(bot, event)
+
     args = str(event.message).strip()
 
     if not args:
@@ -75,37 +97,20 @@ async def _(bot: Bot, event: Event, state: dict):
         await ban_cmd.finish('参数必须仅为数字')
 
 
-@ban_cmd.args_parser
-async def _(bot: Bot, event: Event, state: dict):
-    args = str(event.message).strip()
-
-    # 检查输入参数是不是数字
-    if args.isdigit():
-        state[state['_current_key']] = int(args)
-    else:
-        await ban_cmd.reject('请只输入数字，不然我没法理解呢！')
-
-
 @ban_cmd.got('duration', prompt='你想被禁言多少分钟呢？')
 async def _(bot: Bot, event: Event, state: dict):
-    if not _bot_role:
-        await refresh_bot_role(bot, event)
+    """ 如果在群里发送，则在当前群禁言/解除 """
+    if event.detail_type == 'group':
+        group_id = state['group_id']
+        user_id = state['user_id']
 
-    duration = state['duration']
-    duration_sec = duration * 60
-    user_id = event.user_id
-    message_type = event.detail_type
+        duration = state['duration']
+        duration_sec = duration * 60
 
-    if not user_id:
-        raise Exception('无法获取QQ号')
-
-    # 如果在群里发送，则在当前群禁言/解除
-    if message_type == 'group' and event.group_id:
-        group_id = event.group_id
         bot_role = _bot_role[group_id]
         sender_role = event.sender['role']
-        ban_type = get_ban_type(bot_role, sender_role)
 
+        ban_type = get_ban_type(bot_role, sender_role)
         if ban_type == BanType.OWNER:
             await ban_cmd.finish(render_expression(EXPR_OWNER), at_sender=True)
         elif ban_type == BanType.NEED_HELP:
@@ -128,43 +133,46 @@ async def _(bot: Bot, event: Event, state: dict):
                 render_expression(EXPR_OK, duration=duration), at_sender=True
             )
 
-    # 如果私聊的话，则向用户请求群号，并在小誓约支持的群禁言/解除
-    elif message_type == 'private':
-        group_id = state.get('group_id')
-        if group_id:
-            if group_id not in _bot_role:
-                await ban_cmd.finish('抱歉，我不在那个群里，帮不了你 >_<')
 
-            bot_role = _bot_role[group_id]
-            sender_role = await get_user_role_in_group(user_id, group_id, bot)
+@ban_cmd.got('duration', prompt='你想被禁言多少分钟呢？')
+@ban_cmd.got('group_id', prompt='请问你想针对哪个群？')
+async def _(bot: Bot, event: Event, state: dict):
+    """ 如果私聊的话，则向用户请求群号，并在小誓约支持的群禁言/解除 """
+    if event.detail_type == 'private':
+        group_id = state['group_id']
+        user_id = state['user_id']
 
-            ban_type = get_ban_type(bot_role, sender_role)
-            if ban_type == BanType.OWNER:
-                await ban_cmd.finish(render_expression(EXPR_OWNER))
-            elif ban_type == BanType.NEED_HELP:
-                owner_id = await get_owner_id(group_id, bot)
-                if not owner_id:
-                    raise Exception('无法获取群主QQ号')
-                await bot.send_group_msg(
-                    group_id=group_id,
-                    message=render_expression(
-                        EXPR_NEED_HELP,
-                        duration=duration,
-                        at_owner=MessageSegment.at(owner_id),
-                        at_user=MessageSegment.at(user_id)
-                    )
+        duration = state['duration']
+        duration_sec = duration * 60
+
+        if group_id not in _bot_role:
+            await ban_cmd.finish('抱歉，我不在那个群里，帮不了你 >_<')
+
+        bot_role = _bot_role[group_id]
+        sender_role = await get_user_role_in_group(user_id, group_id, bot)
+
+        ban_type = get_ban_type(bot_role, sender_role)
+        if ban_type == BanType.OWNER:
+            await ban_cmd.finish(render_expression(EXPR_OWNER))
+        elif ban_type == BanType.NEED_HELP:
+            owner_id = await get_owner_id(group_id, bot)
+            if not owner_id:
+                raise Exception('无法获取群主QQ号')
+            await bot.send_group_msg(
+                group_id=group_id,
+                message=render_expression(
+                    EXPR_NEED_HELP,
+                    duration=duration,
+                    at_owner=MessageSegment.at(owner_id),
+                    at_user=MessageSegment.at(user_id)
                 )
-                await ban_cmd.finish('帮你@群主了，请耐心等待。')
-            else:
-                await bot.set_group_ban(
-                    group_id=group_id, user_id=user_id, duration=duration_sec
-                )
-                await ban_cmd.finish(
-                    render_expression(EXPR_OK, duration=duration)
-                )
+            )
+            await ban_cmd.finish('帮你@群主了，请耐心等待。')
         else:
-            state['_current_key'] = 'group_id'
-            await ban_cmd.reject('请问你想针对哪个群？')
+            await bot.set_group_ban(
+                group_id=group_id, user_id=user_id, duration=duration_sec
+            )
+            await ban_cmd.finish(render_expression(EXPR_OK, duration=duration))
 
 
 async def get_owner_id(group_id: int, bot: Bot) -> Optional[int]:
