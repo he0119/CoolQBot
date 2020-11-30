@@ -1,15 +1,19 @@
-name: ci
+name: CI
 
 on:
   push:
     branches:
-      - '**'
+      - 'master'
+      - 'dev'
+      - 'feature/*'
+      - 'he0119/*'
   pull_request:
   release:
     types: [published]
 
 jobs:
   docker:
+    name: Docker
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

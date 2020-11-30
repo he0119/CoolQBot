@@ -1,6 +1,6 @@
 # CoolQBot
 
-![ci](https://github.com/he0119/CoolQBot/workflows/ci/badge.svg)
+![CI](https://github.com/he0119/CoolQBot/workflows/CI/badge.svg)
 
 该机器人利用了
 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp)
