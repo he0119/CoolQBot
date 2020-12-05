@@ -3,11 +3,13 @@ from datetime import datetime, timedelta
 from typing import Dict, Optional
 
 import httpx
-from nonebot import logger, scheduler
+from nonebot import logger, require
 
 from src.utils.helpers import get_first_bot
 
 from .config import plugin_config
+
+scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
 class News:

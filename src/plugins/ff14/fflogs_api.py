@@ -11,12 +11,14 @@ from datetime import datetime, timedelta
 from typing import List, Literal, Union
 
 import httpx
-from nonebot import logger, scheduler
+from nonebot import logger, require
 
 from .config import DATA, plugin_config
 from .fflogs_data import (
     get_boss_info_by_nickname, get_job_info_by_nickname, get_jobs_info
 )
+
+scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
 class DataException(Exception):

@@ -1,6 +1,6 @@
 """ 每日早安插件
 """
-from nonebot import logger, on_metaevent, scheduler
+from nonebot import logger, on_metaevent, require
 from nonebot.permission import GROUP
 from nonebot.plugin import on_command
 from nonebot.typing import Bot, Event
@@ -9,6 +9,8 @@ from src.utils.helpers import get_first_bot, strtobool
 
 from .config import plugin_config
 from .data import get_first_connect_message, get_moring_message
+
+scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
 #region 启动问好
