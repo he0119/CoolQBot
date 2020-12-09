@@ -49,6 +49,12 @@ async def load_data_from_repo():
         _boss_data = rjson['boss']
         _job_data = rjson['job']
         logger.info('仓库数据加载成功')
+        # 同时保存一份文件在本地，以后就不用从网络获取
+        with DATA.open(
+            'fflogs_data.json', open_mode='w', encoding='utf8'
+        ) as f:
+            json.dump(rjson, f, ensure_ascii=False, indent=2)
+            logger.info('已保存数据至本地')
 
 
 async def load_data_from_local():
