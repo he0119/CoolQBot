@@ -70,6 +70,16 @@
       "difficulty": 100
     },
     {
+      "name": "光之战士幻耀歼灭战",
+      "nicknames": [
+        "光战",
+        "极光战"
+      ],
+      "zone": 34,
+      "encounter": 1054,
+      "difficulty": 100
+    },
+    {
       "name": "伊甸希望乐园 觉醒之章1",
       "nicknames": [
         "e1"
