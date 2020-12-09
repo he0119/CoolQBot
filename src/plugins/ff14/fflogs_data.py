@@ -107,3 +107,29 @@ def get_jobs_info() -> List[JobInfo]:
     for spec, nicknames in job_list.items():
         job_info.append(JobInfo(nicknames[0], spec))
     return job_info
+
+
+if __name__ == "__main__":
+    import json
+    boss = []
+    for (zone, encounter, difficulty), nicknames in boss_list.items():
+        boss.append(
+            {
+                "name": nicknames[0],
+                "nicknames": nicknames[1:],
+                "zone": zone,
+                "encounter": encounter,
+                "difficulty": difficulty
+            }
+        )
+    job = []
+    for spec, nicknames in job_list.items():
+        job.append(
+            {
+                "name": nicknames[0],
+                "nicknames": nicknames[1:],
+                "spec": spec,
+            }
+        )
+    with open('fflogs_data.json', 'w', encoding='utf8') as json_file:
+        json.dump({'boss': boss, 'job': job}, json_file, ensure_ascii=False)
