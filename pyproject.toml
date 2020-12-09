@@ -8,7 +8,9 @@ repository = "https://github.com/he0119/CoolQBot"
 version = "0.14.0"
 
 [tool.poetry.dependencies]
+nb-cli = "^0.3.0"
 nonebot-plugin-apscheduler = "^0.1.0"
+nonebot-plugin-sentry = "^0.1.1"
 nonebot2 = "^2.0.0-alpha.7"
 python = "~3.8"
 python-dateutil = "^2.8.1"
