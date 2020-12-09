@@ -2,56 +2,15 @@
 
 副本与职业数据
 """
+import json
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Dict, List, Optional
 
-# (zone, encounter, difficulty): [nicknames]
-boss_list = {
-    (28, 1045, 100): ['提坦妮雅歼殛战', '缇坦妮雅', '妖精', '极妖精', '妖灵王', '妖精王', '老婆', '10王'],
-    (28, 1046, 100): ['无瑕灵君歼殛战', '无瑕灵君', '肥宅', '极肥宅', '全能王'],
-    (28, 1049, 100): ['哈迪斯歼殛战', '哈迪斯', '老公'],
-    (28, 1051, 100): ['红宝石神兵狂想作战1', '红玉神兵1', '神兵1', '神兵门神'],
-    (28, 1052, 100): ['红宝石神兵狂想作战2', '红玉神兵2', '神兵2', '神兵本体'],
-    (28, 1053, 100): ['博兹雅堡垒追忆战', '老屁股', '极老屁股'],
-    (29, 65, 100):   ['伊甸希望乐园 觉醒之章1', 'e1'],
-    (29, 66, 100):   ['伊甸希望乐园 觉醒之章2', 'e2'],
-    (29, 67, 100):   ['伊甸希望乐园 觉醒之章3', 'e3'],
-    (29, 68, 100):   ['伊甸希望乐园 觉醒之章4', 'e4'],
-    (29, 65, 0):     ['伊甸零式希望乐园 觉醒之章1', 'e1s'],
-    (29, 66, 0):     ['伊甸零式希望乐园 觉醒之章2', 'e2s'],
-    (29, 67, 0):     ['伊甸零式希望乐园 觉醒之章3', 'e3s'],
-    (29, 68, 0):     ['伊甸零式希望乐园 觉醒之章4', 'e4s'],
-    (32, 1050, 0):   ['亚历山大绝境战', '绝亚'],
-    (33, 69, 100):   ['伊甸希望乐园 共鸣之章1', 'e5'],
-    (33, 70, 100):   ['伊甸希望乐园 共鸣之章2', 'e6'],
-    (33, 71, 100):   ['伊甸希望乐园 共鸣之章3', 'e7'],
-    (33, 72, 100):   ['伊甸希望乐园 共鸣之章4', 'e8'],
-    (33, 69, 0):     ['伊甸零式希望乐园 共鸣之章1', 'e5s'],
-    (33, 70, 0):     ['伊甸零式希望乐园 共鸣之章2', 'e6s'],
-    (33, 71, 0):     ['伊甸零式希望乐园 共鸣之章3', 'e7s'],
-    (33, 72, 0):     ['伊甸零式希望乐园 共鸣之章4', 'e8s'],
-} # yapf: disable
+import httpx
+from nonebot.log import logger
 
-# spec: [nicknames]
-job_list = {
-    1:  ['占星术士', '占星'],
-    2:  ['吟游诗人', '诗人'],
-    3:  ['黑魔法师', '黑魔', '伏地魔', '永动机'],
-    4:  ['暗黑骑士', '黑骑', '暗骑', 'DK'],
-    5:  ['龙骑士', '龙骑', '躺尸龙', '擦炮工'],
-    6:  ['机工士', '机工'],
-    7:  ['武僧', '扫地僧', '猴子', '和尚'],
-    8:  ['忍者', '兔忍', '火影'],
-    9:  ['骑士', '圣骑', '奶骑'],
-    10: ['学者', '小仙女', '死炎法师'],
-    11: ['召唤师', '召唤'],
-    12: ['战士', '战爹'],
-    13: ['白魔法师', '白魔', '白膜', '投石机', '抛光机'],
-    14: ['赤魔法师', '赤魔', '吃馍', '红色治疗'],
-    15: ['武士', '侍'],
-    16: ['舞者', '舞娘'],
-    17: ['绝枪战士', '绝枪', '枪刃', '枪决战士'],
-} # yapf: disable
+from .config import DATA
+
 
 @dataclass
 class BossInfo:
@@ -69,41 +28,116 @@ class JobInfo:
     spec: int
 
 
-def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:
+_boss_data: List = []
+_job_data: List = []
+
+
+async def load_data_from_repo():
+    """ 从仓库获取数据 """
+    logger.info('正在加载仓库数据')
+
+    global _boss_data, _job_data
+    async with httpx.AsyncClient() as client:
+        r = await client.get(
+            'https://cdn.jsdelivr.net/gh/he0119/coolqbot/src/plugins/ff14/fflogs_data.json',
+            timeout=30
+        )
+        if r.status_code != 200:
+            logger.error('仓库数据加载失败')
+            return
+        rjson = r.json()
+        _boss_data = rjson['boss']
+        _job_data = rjson['job']
+        logger.info('仓库数据加载成功')
+
+
+async def load_data_from_local():
+    """ 从本地获取数据 """
+    logger.info('正在加载本地数据')
+
+    global _boss_data, _job_data
+    if DATA.exists('fflogs_data.json'):
+        with DATA.open('fflogs_data.json', encoding='utf8') as f:
+            data = json.load(f)
+            _boss_data = data['boss']
+            _job_data = data['job']
+            logger.info('本地数据加载成功')
+    else:
+        logger.info('本地数据不存在')
+
+
+async def load_data():
+    """ 加载数据
+
+    先从本地加载，如果失败则从仓库加载
+    """
+    if not _boss_data or not _job_data:
+        await load_data_from_local()
+    if not _boss_data or not _job_data:
+        await load_data_from_repo()
+
+
+async def get_boss_data() -> List:
+    """ 获取 boss 数据 """
+    if not _boss_data:
+        await load_data()
+    return _boss_data
+
+
+async def get_job_data() -> List:
+    """ 获取 job 数据 """
+    if not _job_data:
+        await load_data()
+    return _job_data
+
+
+async def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:
     """ 根据昵称获取 BOSS 的相关信息
 
     :param name: BOSS 的昵称
     :returns: 返回包含 `name`, `zone`, `encounter`, `difficulty` 信息的数据类，如果找不到返回 None
     """
-    for (zone, encounter, difficulty), nicknames in boss_list.items():
-        if name.lower() in nicknames:
-            return BossInfo(nicknames[0], zone, encounter, difficulty)
+    for boss in await get_boss_data():
+        if name.lower() in [boss['name'], *boss['nicknames']]:
+            return BossInfo(
+                boss['name'],
+                boss['zone'],
+                boss['encounter'],
+                boss['difficulty'],
+            )
     return None
 
 
-def get_bosses_info() -> List[BossInfo]:
+async def get_bosses_info() -> List[BossInfo]:
     """ 获取所有 BOSS 的相关信息 """
     boss_info = []
-    for (zone, encounter, difficulty), nicknames in boss_list.items():
-        boss_info.append(BossInfo(nicknames[0], zone, encounter, difficulty))
+    for boss in await get_boss_data():
+        boss_info.append(
+            BossInfo(
+                boss['name'],
+                boss['zone'],
+                boss['encounter'],
+                boss['difficulty'],
+            )
+        )
     return boss_info
 
 
-def get_job_info_by_nickname(name: str) -> Optional[JobInfo]:
+async def get_job_info_by_nickname(name: str) -> Optional[JobInfo]:
     """ 根据昵称获取职业的相关信息
 
     :param name: 职业的昵称
     :returns: 返回包含 `name`, `spec` 信息的数据类，如果找不到返回 None
     """
-    for spec, nicknames in job_list.items():
-        if name in nicknames:
-            return JobInfo(nicknames[0], spec)
+    for job in await get_job_data():
+        if name in [job['name'], *job['nicknames']]:
+            return JobInfo(job['name'], job['spec'])
     return None
 
 
-def get_jobs_info() -> List[JobInfo]:
+async def get_jobs_info() -> List[JobInfo]:
     """ 获取所有职业的相关信息 """
     job_info = []
-    for spec, nicknames in job_list.items():
-        job_info.append(JobInfo(nicknames[0], spec))
+    for job in await get_job_data():
+        job_info.append(JobInfo(job['name'], job['spec']))
     return job_info

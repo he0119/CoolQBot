@@ -74,9 +74,9 @@ class PluginData:
         with open(self._config_path, 'w', encoding='utf8') as configfile:
             self.config.write(configfile)
 
-    def open(self, filename: str, open_mode: str = 'r') -> IO:
+    def open(self, filename: str, open_mode: str = 'r', encoding=None) -> IO:
         path = self._base_path / filename
-        return open(path, open_mode)
+        return open(path, open_mode, encoding=encoding)
 
     def exists(self, filename: str) -> bool:
         """ 判断文件是否存在

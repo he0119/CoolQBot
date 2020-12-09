@@ -1,0 +1,375 @@
+{
+  "boss": [
+    {
+      "name": "提坦妮雅歼殛战",
+      "nicknames": [
+        "缇坦妮雅",
+        "妖精",
+        "极妖精",
+        "妖灵王",
+        "妖精王",
+        "老婆",
+        "10王"
+      ],
+      "zone": 28,
+      "encounter": 1045,
+      "difficulty": 100
+    },
+    {
+      "name": "无瑕灵君歼殛战",
+      "nicknames": [
+        "无瑕灵君",
+        "肥宅",
+        "极肥宅",
+        "全能王"
+      ],
+      "zone": 28,
+      "encounter": 1046,
+      "difficulty": 100
+    },
+    {
+      "name": "哈迪斯歼殛战",
+      "nicknames": [
+        "哈迪斯",
+        "老公"
+      ],
+      "zone": 28,
+      "encounter": 1049,
+      "difficulty": 100
+    },
+    {
+      "name": "红宝石神兵狂想作战1",
+      "nicknames": [
+        "红玉神兵1",
+        "神兵1",
+        "神兵门神"
+      ],
+      "zone": 28,
+      "encounter": 1051,
+      "difficulty": 100
+    },
+    {
+      "name": "红宝石神兵狂想作战2",
+      "nicknames": [
+        "红玉神兵2",
+        "神兵2",
+        "神兵本体"
+      ],
+      "zone": 28,
+      "encounter": 1052,
+      "difficulty": 100
+    },
+    {
+      "name": "博兹雅堡垒追忆战",
+      "nicknames": [
+        "老屁股",
+        "极老屁股"
+      ],
+      "zone": 28,
+      "encounter": 1053,
+      "difficulty": 100
+    },
+    {
+      "name": "光之战士幻耀歼灭战",
+      "nicknames": [
+        "光战",
+        "极光战"
+      ],
+      "zone": 28,
+      "encounter": 1054,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章1",
+      "nicknames": [
+        "e1"
+      ],
+      "zone": 29,
+      "encounter": 65,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章2",
+      "nicknames": [
+        "e2"
+      ],
+      "zone": 29,
+      "encounter": 66,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章3",
+      "nicknames": [
+        "e3"
+      ],
+      "zone": 29,
+      "encounter": 67,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章4",
+      "nicknames": [
+        "e4"
+      ],
+      "zone": 29,
+      "encounter": 68,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章1",
+      "nicknames": [
+        "e1s"
+      ],
+      "zone": 29,
+      "encounter": 65,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章2",
+      "nicknames": [
+        "e2s"
+      ],
+      "zone": 29,
+      "encounter": 66,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章3",
+      "nicknames": [
+        "e3s"
+      ],
+      "zone": 29,
+      "encounter": 67,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章4",
+      "nicknames": [
+        "e4s"
+      ],
+      "zone": 29,
+      "encounter": 68,
+      "difficulty": 0
+    },
+    {
+      "name": "亚历山大绝境战",
+      "nicknames": [
+        "绝亚"
+      ],
+      "zone": 32,
+      "encounter": 1050,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章1",
+      "nicknames": [
+        "e5"
+      ],
+      "zone": 33,
+      "encounter": 69,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章2",
+      "nicknames": [
+        "e6"
+      ],
+      "zone": 33,
+      "encounter": 70,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章3",
+      "nicknames": [
+        "e7"
+      ],
+      "zone": 33,
+      "encounter": 71,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章4",
+      "nicknames": [
+        "e8"
+      ],
+      "zone": 33,
+      "encounter": 72,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章1",
+      "nicknames": [
+        "e5s"
+      ],
+      "zone": 33,
+      "encounter": 69,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章2",
+      "nicknames": [
+        "e6s"
+      ],
+      "zone": 33,
+      "encounter": 70,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章3",
+      "nicknames": [
+        "e7s"
+      ],
+      "zone": 33,
+      "encounter": 71,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章4",
+      "nicknames": [
+        "e8s"
+      ],
+      "zone": 33,
+      "encounter": 72,
+      "difficulty": 0
+    }
+  ],
+  "job": [
+    {
+      "name": "占星术士",
+      "nicknames": [
+        "占星"
+      ],
+      "spec": 1
+    },
+    {
+      "name": "吟游诗人",
+      "nicknames": [
+        "诗人"
+      ],
+      "spec": 2
+    },
+    {
+      "name": "黑魔法师",
+      "nicknames": [
+        "黑魔",
+        "伏地魔",
+        "永动机"
+      ],
+      "spec": 3
+    },
+    {
+      "name": "暗黑骑士",
+      "nicknames": [
+        "黑骑",
+        "暗骑",
+        "DK"
+      ],
+      "spec": 4
+    },
+    {
+      "name": "龙骑士",
+      "nicknames": [
+        "龙骑",
+        "躺尸龙",
+        "擦炮工"
+      ],
+      "spec": 5
+    },
+    {
+      "name": "机工士",
+      "nicknames": [
+        "机工"
+      ],
+      "spec": 6
+    },
+    {
+      "name": "武僧",
+      "nicknames": [
+        "扫地僧",
+        "猴子",
+        "和尚"
+      ],
+      "spec": 7
+    },
+    {
+      "name": "忍者",
+      "nicknames": [
+        "兔忍",
+        "火影"
+      ],
+      "spec": 8
+    },
+    {
+      "name": "骑士",
+      "nicknames": [
+        "圣骑",
+        "奶骑"
+      ],
+      "spec": 9
+    },
+    {
+      "name": "学者",
+      "nicknames": [
+        "小仙女",
+        "死炎法师"
+      ],
+      "spec": 10
+    },
+    {
+      "name": "召唤师",
+      "nicknames": [
+        "召唤"
+      ],
+      "spec": 11
+    },
+    {
+      "name": "战士",
+      "nicknames": [
+        "战爹"
+      ],
+      "spec": 12
+    },
+    {
+      "name": "白魔法师",
+      "nicknames": [
+        "白魔",
+        "白膜",
+        "投石机",
+        "抛光机"
+      ],
+      "spec": 13
+    },
+    {
+      "name": "赤魔法师",
+      "nicknames": [
+        "赤魔",
+        "吃馍",
+        "红色治疗"
+      ],
+      "spec": 14
+    },
+    {
+      "name": "武士",
+      "nicknames": [
+        "侍"
+      ],
+      "spec": 15
+    },
+    {
+      "name": "舞者",
+      "nicknames": [
+        "舞娘"
+      ],
+      "spec": 16
+    },
+    {
+      "name": "绝枪战士",
+      "nicknames": [
+        "绝枪",
+        "枪刃",
+        "枪决战士"
+      ],
+      "spec": 17
+    }
+  ]
+}

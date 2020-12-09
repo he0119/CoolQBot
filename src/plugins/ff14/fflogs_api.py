@@ -8,7 +8,7 @@ import asyncio
 import json
 import math
 from datetime import datetime, timedelta
-from typing import List, Literal, Union
+from typing import List, Literal
 
 import httpx
 from nonebot import logger, require
@@ -85,7 +85,7 @@ class FFLogs:
 
     async def cache_data(self) -> None:
         """ 缓存数据 """
-        jobs = get_jobs_info()
+        jobs = await get_jobs_info()
         for boss in plugin_config.fflogs_cache_boss:
             for job in jobs:
                 await self.dps(boss, job.name)
@@ -238,11 +238,11 @@ class FFLogs:
         :param job_nickname: 职业的称呼
         :param dps_type: DPS 的种类，支持 rdps, adps, pdps (Default value = 'rdps')
         """
-        boss = get_boss_info_by_nickname(boss_nickname)
+        boss = await get_boss_info_by_nickname(boss_nickname)
         if not boss:
             return f'找不到 {boss_nickname} 的数据，请换个名字试试'
 
-        job = get_job_info_by_nickname(job_nickname)
+        job = await get_job_info_by_nickname(job_nickname)
         if not job:
             return f'找不到 {job_nickname} 的数据，请换个名字试试'
 
@@ -292,7 +292,7 @@ class FFLogs:
         :param server_name: 服务器名
         :param dps_type: DPS 的种类，支持 rdps, adps (Default value = 'rdps')
         """
-        boss = get_boss_info_by_nickname(boss_nickname)
+        boss = await get_boss_info_by_nickname(boss_nickname)
         if not boss:
             return f'找不到 {boss_nickname} 的数据，请换个名字试试'
         reply = f'{boss.name} {character_name}-{server_name} 的排名({dps_type})'
