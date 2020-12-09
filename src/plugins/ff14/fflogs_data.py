@@ -39,7 +39,7 @@ async def load_data_from_repo():
     global _boss_data, _job_data
     async with httpx.AsyncClient() as client:
         r = await client.get(
-            'https://cdn.jsdelivr.net/gh/he0119/coolqbot/src/plugins/ff14/fflogs_data.json',
+            'https://cdn.jsdelivr.net/gh/he0119/coolqbot@master/src/plugins/ff14/fflogs_data.json',
             timeout=30
         )
         if r.status_code != 200:
