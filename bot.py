@@ -5,7 +5,7 @@ from nonebot.adapters.cqhttp import Bot as CQHTTPBot
 
 nonebot.init()
 driver = nonebot.get_driver()
-driver.register_adapter("cqhttp", CQHTTPBot)
+driver.register_adapter('cqhttp', CQHTTPBot)
 app = nonebot.get_asgi()
 
 # 添加额外的配置
@@ -26,8 +26,7 @@ logger.add(
 )
 
 # 加载外部插件
-nonebot.load_plugin("nonebot_plugin_apscheduler")
-nonebot.load_plugin("nonebot_plugin_sentry")
+nonebot.load_plugin('nonebot_plugin_sentry')
 # 加载开发环境插件
 if config.debug:
     nonebot.load_plugin('nonebot_plugin_test')
