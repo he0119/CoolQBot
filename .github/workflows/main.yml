@@ -40,9 +40,33 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
 
-  deploy:
-    name: Deploy
+  deploy_dev:
+    name: Deploy Dev
     runs-on: ubuntu-latest
+    environment: dev
+    needs: docker
+    if: ${{ github.ref == 'refs/heads/dev' }}
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script_stop: true
+          envs: TAG_NAME
+          script: |
+            cd coolqbot
+            sed -i "s#he0119/coolqbot:.*#he0119/coolqbot:dev#g" docker-compose.yml
+            sudo docker-compose pull
+            sudo docker-compose up -d
+
+  deploy_prod:
+    name: Deploy Prod
+    runs-on: ubuntu-latest
+    environment: prod
     needs: docker
     if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
     steps:
@@ -59,4 +83,5 @@ jobs:
           script: |
             cd coolqbot
             sed -i "s#he0119/coolqbot:.*#he0119/coolqbot:$TAG_NAME#g" docker-compose.yml
-            docker-compose pull && docker-compose up -d
+            docker-compose pull
+            docker-compose up -d
