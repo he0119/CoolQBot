@@ -28,9 +28,10 @@ logger.add(
 # 加载外部插件
 nonebot.load_plugin("nonebot_plugin_apscheduler")
 nonebot.load_plugin("nonebot_plugin_sentry")
-# 加载调试环境插件
-nonebot.load_plugin("nonebot_plugin_test")
-nonebot.load_plugin("nonebot_plugin_docs")
+# 加载开发环境插件
+if config.debug:
+    nonebot.load_plugin('nonebot_plugin_test')
+    nonebot.load_plugin('nonebot_plugin_docs')
 # 加载自己的插件
 nonebot.load_plugins('src/plugins')
 
