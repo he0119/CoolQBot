@@ -8,7 +8,7 @@ from nonebot.adapters.cqhttp import MessageSegment
 from nonebot.adapters.cqhttp.event import (GroupAdminNoticeEvent,
                                            GroupMessageEvent,
                                            PrivateMessageEvent)
-from nonebot.typing import Bot, Event
+from nonebot.typing import Bot, Event, T_State
 
 from src.utils.helpers import render_expression
 
@@ -65,7 +65,7 @@ ban 禁言
 
 
 @ban_cmd.args_parser
-async def _(bot: Bot, event: Event, state: dict):
+async def _(bot: Bot, event: Event, state: T_State):
     """ 处理参数，转换成数字 """
     args = str(event.get_message()).strip()
 
@@ -77,7 +77,7 @@ async def _(bot: Bot, event: Event, state: dict):
 
 
 @ban_cmd.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def _(bot: Bot, event: Event, state: T_State):
     """ 获取需要的参数 """
     # 如果没有获取机器人在群中的职位，则获取
     if not _bot_role:
@@ -95,7 +95,7 @@ async def _(bot: Bot, event: Event, state: dict):
 
 
 @ban_cmd.got('duration', prompt='你想被禁言多少分钟呢？')
-async def _(bot: Bot, event: GroupMessageEvent, state: dict):
+async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
     """ 如果在群里发送，则在当前群禁言/解除 """
     group_id = event.group_id
     user_id = event.user_id
@@ -130,7 +130,7 @@ async def _(bot: Bot, event: GroupMessageEvent, state: dict):
 
 @ban_cmd.got('duration', prompt='你想被禁言多少分钟呢？')
 @ban_cmd.got('group_id', prompt='请问你想针对哪个群？')
-async def _(bot: Bot, event: PrivateMessageEvent, state: dict):
+async def _(bot: Bot, event: PrivateMessageEvent, state: T_State):
     """ 如果私聊的话，则向用户请求群号，并仅在支持的群禁言/解除 """
     group_id = state['group_id']
     user_id = event.user_id
@@ -198,7 +198,7 @@ admin_notice = on_notice()
 
 
 @admin_notice.handle()
-async def _(bot: Bot, event: GroupAdminNoticeEvent, state: dict):
+async def _(bot: Bot, event: GroupAdminNoticeEvent, state: T_State):
     if bot.self_id == event.self_id and event.group_id:
         if event.sub_type == 'set':
             _bot_role[event.group_id] = 'admin'
