@@ -4,11 +4,10 @@ from enum import Enum
 from typing import Dict, Optional
 
 from nonebot import on_command, on_notice
-from nonebot.adapters.cqhttp import MessageSegment
-from nonebot.adapters.cqhttp.event import (GroupAdminNoticeEvent,
-                                           GroupMessageEvent,
-                                           PrivateMessageEvent)
-from nonebot.typing import Bot, Event, T_State
+from nonebot.adapters import Bot, Event
+from nonebot.adapters.cqhttp import (GroupAdminNoticeEvent, GroupMessageEvent,
+                                     MessageSegment, PrivateMessageEvent)
+from nonebot.typing import T_State
 
 from src.utils.helpers import render_expression
 
@@ -95,6 +94,11 @@ async def _(bot: Bot, event: Event, state: T_State):
 
 
 @ban_cmd.got('duration', prompt='你想被禁言多少分钟呢？')
+async def _(bot: Bot, event: Event, state: T_State):
+    pass
+
+
+@ban_cmd.handle()
 async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
     """ 如果在群里发送，则在当前群禁言/解除 """
     group_id = event.group_id
@@ -128,7 +132,6 @@ async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
                              at_sender=True)
 
 
-@ban_cmd.got('duration', prompt='你想被禁言多少分钟呢？')
 @ban_cmd.got('group_id', prompt='请问你想针对哪个群？')
 async def _(bot: Bot, event: PrivateMessageEvent, state: T_State):
     """ 如果私聊的话，则向用户请求群号，并仅在支持的群禁言/解除 """

@@ -580,7 +580,7 @@ reference = "aliyun"
 
 [[package]]
 name = "nonebot-plugin-docs"
-version = "2.0.0a8"
+version = "2.0.0a8.post1"
 description = "View NoneBot2 Docs Locally"
 category = "dev"
 optional = false
@@ -767,7 +767,7 @@ reference = "aliyun"
 
 [[package]]
 name = "pygtrie"
-version = "2.4.1"
+version = "2.4.2"
 description = "A pure Python trie data structure implementation."
 category = "main"
 optional = false
@@ -1274,7 +1274,7 @@ reference = "aliyun"
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.8"
-content-hash = "520d5238fa78c2cc795ead95ec815ae408b173c3c72c4f4b0973a9aa192ebcb4"
+content-hash = "44c43709d30303498c9bfb33776853f08ee73364209e402b24ff7df6cc316be9"
 
 [metadata.files]
 aiofiles = [
@@ -1494,8 +1494,10 @@ nonebot-plugin-apscheduler = [
     {file = "nonebot_plugin_apscheduler-0.1.0-py3-none-any.whl", hash = "sha256:419715acbb13ad6e20f661aace1c4c3c33a411e663c2f249d605b829d5d88b8a"},
 ]
 nonebot-plugin-docs = [
+    {file = "nonebot-plugin-docs-2.0.0a8.post1.tar.gz", hash = "sha256:56742478c4cdc0fb4cf8144c7bba86a9ab8c74b59f08d11bcea5517533d33221"},
     {file = "nonebot-plugin-docs-2.0.0a8.tar.gz", hash = "sha256:3327f5ee0f633e303a5eae79c66a402b2f4cae3a68126c61ff89a1098fc1b385"},
     {file = "nonebot_plugin_docs-2.0.0a8-py3-none-any.whl", hash = "sha256:a3aee119acf78c227df3b013321e9a3ea22af26e6d2756ce697e7af10f949e33"},
+    {file = "nonebot_plugin_docs-2.0.0a8.post1-py3-none-any.whl", hash = "sha256:568492d4f05456cd78f52f06e4bde7673aae737cd5197d93f191d6d82e22ad84"},
 ]
 nonebot-plugin-sentry = [
     {file = "nonebot-plugin-sentry-0.1.1.tar.gz", hash = "sha256:a1ff3280259026605e89960b0d2c7d2e51a0e1a123b399ca8fcaacc4edeec18f"},
@@ -1559,7 +1561,7 @@ pygments = [
     {file = "Pygments-2.7.3.tar.gz", hash = "sha256:ccf3acacf3782cbed4a989426012f1c535c9a90d3a7fc3f16d231b9372d2b716"},
 ]
 pygtrie = [
-    {file = "pygtrie-2.4.1.tar.gz", hash = "sha256:4367b87d92eaf475107421dce0295a9d4d72156702908c96c430a426b654aee7"},
+    {file = "pygtrie-2.4.2.tar.gz", hash = "sha256:43205559d28863358dbbf25045029f58e2ab357317a59b11f11ade278ac64692"},
 ]
 pyinquirer = [
     {file = "PyInquirer-1.0.3.tar.gz", hash = "sha256:c9a92d68d7727fbd886a7908c08fd9e9773e5dc211bf5cbf836ba90d366dee51"},
