@@ -1,6 +1,8 @@
 """ 帮助 """
 from nonebot import on_command
-from nonebot.typing import Bot, Event
+from nonebot.adapters.cqhttp.event import MessageEvent
+from nonebot.adapters import Bot
+from nonebot.typing import T_State
 
 from src.utils.commands import CommandInfo, get_command_help, get_commands
 
@@ -26,7 +28,7 @@ def format_name_aliases(command: CommandInfo) -> str:
 
 
 @help_cmd.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def _(bot: Bot, event: MessageEvent, state: T_State):
     args = str(event.message).strip()
 
     if args == 'all':
