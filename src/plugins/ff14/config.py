@@ -4,6 +4,8 @@ from typing import List
 
 from nonebot import get_driver
 from pydantic import BaseSettings, validator
+from dateutil.parser import parse
+from datetime import date, datetime
 
 from src.utils.helpers import groupidtostr, strtobool, strtogroupid
 from src.utils.plugin import PluginData
@@ -17,9 +19,9 @@ class Config(BaseSettings):
     push_news_interval: int = int(
         DATA.get_config('ff14', 'push_news_interval', '30')
     )
-    # 上次推送新闻的发布 ID
-    push_news_last_news_id: int = int(
-        DATA.get_config('ff14', 'push_news_last_news_id', '0')
+    # 上次推送新闻的发布时间
+    push_news_last_news_date: datetime = parse(
+        DATA.get_config('ff14', 'push_news_last_news_date', '2000-01-01')
     )
 
     # 启用新闻推送的群
@@ -27,10 +29,10 @@ class Config(BaseSettings):
         DATA.get_config('ff14', 'push_news_group_id')
     )
 
-    @validator('push_news_last_news_id', always=True)
-    def push_news_last_news_id_validator(cls, v: int):
+    @validator('push_news_last_news_date', always=True)
+    def push_news_last_news_date_validator(cls, v: datetime):
         """ 验证并保存配置 """
-        DATA.set_config('ff14', 'push_news_last_news_id', str(v))
+        DATA.set_config('ff14', 'push_news_last_news_date', v.isoformat())
         return v
 
     @validator('push_news_group_id', always=True)
