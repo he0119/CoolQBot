@@ -1,6 +1,7 @@
 """ 消息推送 """
 from datetime import datetime, timedelta
 from typing import Dict, Optional
+from dateutil.parser import parse
 
 import httpx
 from nonebot import logger, require
@@ -73,13 +74,17 @@ class News:
             logger.error('最终幻想XIV 新闻获取失败')
             return
 
-        if not plugin_config.push_news_last_news_id:
+        if plugin_config.push_news_last_news_date == datetime(2000, 1, 1):
             # 如果初次运行，则记录并发送第一条新闻
-            plugin_config.push_news_last_news_id = news['Data'][0]['Id']
+            plugin_config.push_news_last_news_date = parse(
+                news['Data'][0]['PublishDate']
+            )
             news_list.append(news['Data'][0])
 
         for item in news['Data']:
-            if item['Id'] <= plugin_config.push_news_last_news_id:
+            if parse(
+                item['PublishDate']
+            ) <= plugin_config.push_news_last_news_date:
                 break
             news_list.append(item)
 
@@ -93,7 +98,9 @@ class News:
                     message_type='group', group_id=group_id, message=msg
                 )
             # 添加最新的那一条新闻的 ID
-            plugin_config.push_news_last_news_id = news_list[0]['Id']
+            plugin_config.push_news_last_news_date = parse(
+                news_list[0]['PublishDate']
+            )
 
 
 news = News()
