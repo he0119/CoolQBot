@@ -94,11 +94,6 @@ async def _(bot: Bot, event: Event, state: T_State):
 
 
 @ban_cmd.got('duration', prompt='你想被禁言多少分钟呢？')
-async def _(bot: Bot, event: Event, state: T_State):
-    pass
-
-
-@ban_cmd.handle()
 async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
     """ 如果在群里发送，则在当前群禁言/解除 """
     group_id = event.group_id
@@ -132,6 +127,7 @@ async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
                              at_sender=True)
 
 
+@ban_cmd.got('duration', prompt='你想被禁言多少分钟呢？')
 @ban_cmd.got('group_id', prompt='请问你想针对哪个群？')
 async def _(bot: Bot, event: PrivateMessageEvent, state: T_State):
     """ 如果私聊的话，则向用户请求群号，并仅在支持的群禁言/解除 """
@@ -202,6 +198,7 @@ admin_notice = on_notice()
 
 @admin_notice.handle()
 async def _(bot: Bot, event: GroupAdminNoticeEvent, state: T_State):
+    """ 群内管理员发生变化时，更新机器人在群内的身份 """
     if bot.self_id == event.self_id and event.group_id:
         if event.sub_type == 'set':
             _bot_role[event.group_id] = 'admin'
