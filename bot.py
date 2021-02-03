@@ -17,16 +17,14 @@ config.data_dir_path = config.home_dir_path / 'data'
 # 自定义 logger
 from nonebot.log import default_format, logger
 
-logger.add(
-    config.data_dir_path / 'logs' / 'error.log',
-    rotation='5 MB',
-    diagnose=False,
-    level='ERROR',
-    format=default_format
-)
+logger.add(config.data_dir_path / 'logs' / 'error.log',
+           rotation='5 MB',
+           diagnose=False,
+           level='ERROR',
+           format=default_format)
 
 # 加载外部插件
-nonebot.load_plugin('nonebot_plugin_sentry')
+# nonebot.load_plugin('nonebot_plugin_sentry')
 # 加载开发环境插件
 if config.debug:
     nonebot.load_plugin('nonebot_plugin_test')

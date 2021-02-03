@@ -11,13 +11,13 @@ version = "0.14.0"
 nb-cli = "^0.3.0"
 nonebot-plugin-apscheduler = "^0.1.0"
 nonebot-plugin-sentry = "^0.1.1"
-nonebot2 = "^2.0.0-alpha.8"
+nonebot2 = "^2.0.0-alpha.9"
 python = "~3.8"
 python-dateutil = "^2.8.1"
 
 [tool.poetry.dev-dependencies]
-nonebot-plugin-docs = "^2.0.0-alpha.8"
-nonebot-plugin-test = "^0.1.0"
+nonebot-plugin-docs = "^2.0.0-alpha.9"
+nonebot-plugin-test = "*"
 yapf = "*"
 
 [[tool.poetry.source]]
