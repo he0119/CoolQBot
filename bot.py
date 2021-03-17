@@ -4,9 +4,12 @@ import nonebot
 from nonebot.adapters.cqhttp import Bot as CQHTTPBot
 
 nonebot.init()
+app = nonebot.get_asgi()
+
 driver = nonebot.get_driver()
 driver.register_adapter('cqhttp', CQHTTPBot)
-app = nonebot.get_asgi()
+
+nonebot.load_from_toml("pyproject.toml")
 
 # 添加额外的配置
 config = nonebot.get_driver().config
@@ -33,4 +36,6 @@ if config.debug:
 nonebot.load_plugins('src/plugins')
 
 if __name__ == '__main__':
-    nonebot.run(app='bot:app')
+    nonebot.logger.warning(
+        "Always use `nb run` to start the bot instead of manually running!")
+    nonebot.run(app="__mp_main__:app")
