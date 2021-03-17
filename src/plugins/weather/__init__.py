@@ -1,7 +1,9 @@
 """ 天气插件
 """
 from nonebot import on_command
-from nonebot.typing import Bot, Event
+from nonebot.adapters import Bot, Event
+from nonebot.typing import T_State
+from nonebot.adapters.cqhttp import MessageEvent
 
 from .eorzean import eorzean_weather
 from .heweather import heweather
@@ -26,7 +28,7 @@ weather 天气
 
 
 @weather_cmd.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def _(bot: Bot, event: MessageEvent, state: T_State):
     argv = str(event.message).strip().split()
 
     if len(argv) == 1:
@@ -37,7 +39,7 @@ async def _(bot: Bot, event: Event, state: dict):
 
 
 @weather_cmd.got('location', prompt='你想查询哪个城市的天气呢？')
-async def _(bot: Bot, event: Event, state: dict):
+async def _(bot: Bot, event: MessageEvent, state: T_State):
     weather_report = await get_weather_of_location(
         state['location'], state.get('adm')
     )
@@ -45,11 +47,11 @@ async def _(bot: Bot, event: Event, state: dict):
 
 
 @weather_cmd.args_parser
-async def _(bot: Bot, event: Event, state: dict):
-    args = str(event.message).strip()
+async def _(bot: Bot, event: Event, state: T_State):
+    args = str(event.get_message()).strip()
 
     if not args:
-        weather_cmd.reject('要查询的城市名称不能为空呢，请重新输入！')
+        await weather_cmd.reject('要查询的城市名称不能为空呢，请重新输入！')
 
     state[state['_current_key']] = args
 

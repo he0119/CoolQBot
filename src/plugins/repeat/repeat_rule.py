@@ -5,14 +5,19 @@ import secrets
 from datetime import datetime, timedelta
 
 from nonebot import logger
-from nonebot.typing import Bot, Event
+from nonebot.adapters import Bot, Event
+from nonebot.adapters.cqhttp.event import GroupMessageEvent
+from nonebot.typing import T_State
 
 from .config import plugin_config
 from .recorder import recorder
 
 
-def need_repeat(bot: Bot, event: Event, state: dict) -> bool:
+def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
     """ 是否复读这个消息 """
+    if not isinstance(event, GroupMessageEvent):
+        return False
+
     # 不复读对机器人说的，因为这个应该由闲聊插件处理
     if bool(event.to_me):
         return False

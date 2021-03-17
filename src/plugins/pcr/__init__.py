@@ -6,7 +6,9 @@ B站动态推送
 参考 https://github.com/pcrbot/yobot
 """
 from nonebot import CommandGroup
-from nonebot.typing import Bot, Event
+from nonebot.adapters import Bot
+from nonebot.adapters.cqhttp.event import GroupMessageEvent
+from nonebot.typing import T_State
 
 from src.utils.helpers import strtobool
 
@@ -33,7 +35,7 @@ pcr.news
 
 
 @news_cmd.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
     args = str(event.message).strip()
 
     group_id = event.group_id
@@ -74,7 +76,7 @@ pcr.calender pcr.日程表 pcr.日程
 
 
 @calender_cmd.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
     args = str(event.message).strip()
 
     group_id = event.group_id
