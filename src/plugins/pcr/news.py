@@ -29,16 +29,12 @@ class News:
         """ 初始化动态自动推送 """
         logger.info('初始化 公主连结Re:Dive 动态推送')
         # 启动之后先运行一次
-        scheduler.add_job(
-            self.push_news,
-            'date',
-            run_date=(datetime.now() + timedelta(seconds=30))
-        )
-        self._job = scheduler.add_job(
-            self.push_news,
-            'interval',
-            minutes=plugin_config.push_news_interval
-        )
+        scheduler.add_job(self.push_news,
+                          'date',
+                          run_date=(datetime.now() + timedelta(seconds=30)))
+        self._job = scheduler.add_job(self.push_news,
+                                      'interval',
+                                      minutes=plugin_config.push_news_interval)
 
     async def get_news(self):
         """ 获取最新的动态 """
@@ -54,9 +50,7 @@ class News:
                         lambda x: {
                             'desc': x['desc'],
                             'card': json.loads(x['card']),
-                        }, cards
-                    )
-                )
+                        }, cards))
         except (httpx.HTTPError, KeyError) as e:
             logger.error(f'获取动态出错，{e}')
             # 抛出上面任何异常，说明调用失败
@@ -121,16 +115,14 @@ class News:
         if news_list:
             # 参考 [Yobot](https://github.com/pcrbot/yobot/blob/master/src/client/ybplugins/push_news.py) 的格式
             msg = '公主连结Re:Dive B站动态更新：\n=======\n' + '\n-------\n'.join(
-                map(self.format_message, news_list)
-            )
+                map(self.format_message, news_list))
             for group_id in plugin_config.push_news_group_id:
-                await get_first_bot().send_msg(
-                    message_type='group', group_id=group_id, message=msg
-                )
+                await get_first_bot().send_msg(message_type='group',
+                                               group_id=group_id,
+                                               message=msg)
             # 添加最新的那一条动态的 ID
             plugin_config.push_news_last_news_id = self.get_news_id(
-                news_list[0]
-            )
+                news_list[0])
 
 
 news = News()

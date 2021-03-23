@@ -24,8 +24,7 @@ def get_status(group_id: Optional[int]) -> str:
         repeat_num = get_total_number(recorder.repeat_list(group_id))
         msg_num = get_total_number(recorder.msg_number_list(group_id))
         today_msg_num = get_total_number(
-            recorder.msg_number_list_by_day(datetime.now().day, group_id)
-        )
+            recorder.msg_number_list_by_day(datetime.now().day, group_id))
 
         if msg_num:
             repeat_rate = repeat_num / msg_num

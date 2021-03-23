@@ -56,8 +56,7 @@ async def _(bot: Bot, event: Event, state: T_State):
 
 @roll_cmd.got(
     'input',
-    prompt='欢迎使用 NGA 风格 ROLL 点插件\n请问你想怎么 ROLL 点\n你可以输入 d100\n也可以输入 2d100+2d50'
-)
+    prompt='欢迎使用 NGA 风格 ROLL 点插件\n请问你想怎么 ROLL 点\n你可以输入 d100\n也可以输入 2d100+2d50')
 async def _(bot: Bot, event: MessageEvent, state: T_State):
     input_str = state['input']
     str_data = roll_dices(input_str)

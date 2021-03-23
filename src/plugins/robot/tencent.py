@@ -41,9 +41,8 @@ async def call_tencent_api(event: MessageEvent, text: str) -> Optional[str]:
         text
     }
     # 接口鉴权 签名
-    payload['sign'] = gen_sign_string(
-        payload, plugin_config.tencent_ai_app_key
-    )
+    payload['sign'] = gen_sign_string(payload,
+                                      plugin_config.tencent_ai_app_key)
 
     try:
         # 使用 httpx 库发送最终的请求

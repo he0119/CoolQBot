@@ -97,12 +97,10 @@ async def heweather(location: str, adm: Optional[str] = None) -> Optional[str]:
         if not city:
             return None
 
-        return '\n'.join(
-            [
-                city[1],
-                await now(city[0]),
-                await daily(city[0]),
-            ]
-        )
+        return '\n'.join([
+            city[1],
+            await now(city[0]),
+            await daily(city[0]),
+        ])
     except:
         return None

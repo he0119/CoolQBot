@@ -45,10 +45,8 @@ async def get_history(year: int, month: int, day: int, group_id: int) -> str:
     minimal_msg_number = 0
     display_total_number = True
 
-    ranking = Ranking(
-        group_id, display_number, minimal_msg_number, display_total_number,
-        repeat_list, msg_number_list
-    )
+    ranking = Ranking(group_id, display_number, minimal_msg_number,
+                      display_total_number, repeat_list, msg_number_list)
     ranking_str = await ranking.ranking()
 
     if ranking_str:

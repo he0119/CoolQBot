@@ -43,21 +43,17 @@ def get_commands() -> List[CommandInfo]:
         plugins = get_loaded_plugins()
         matchers = reduce(lambda x, y: x.union(y.matcher), plugins, set())
         matcher_docs = list(
-            map(
-                lambda x: inspect.cleandoc(x.__doc__),
-                filter(lambda x: x.__doc__, matchers)
-            )
-        )
+            map(lambda x: inspect.cleandoc(x.__doc__),
+                filter(lambda x: x.__doc__, matchers)))
         _commands = list(map(extract_command_info, matcher_docs))
     return _commands
 
 
-def get_command_help(name: str) -> str:
+def get_command_help(name: str) -> Optional[str]:
     """ 通过命令名字获取命令的帮助 """
     commands = get_commands()
     commands = list(
-        filter(lambda x: x.name == name or name in x.aliases, commands)
-    )
+        filter(lambda x: x.name == name or name in x.aliases, commands))
     if commands:
         return commands[0].help
     else:

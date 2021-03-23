@@ -15,17 +15,14 @@ class Config(BaseSettings):
     # 新闻推送相关配置
     # 自动推送新闻的间隔，单位 分钟
     push_news_interval: int = int(
-        DATA.get_config('ff14', 'push_news_interval', '30')
-    )
+        DATA.get_config('ff14', 'push_news_interval', '30'))
     # 上次推送新闻的发布 ID
     push_news_last_news_id: int = int(
-        DATA.get_config('ff14', 'push_news_last_news_id', '0')
-    )
+        DATA.get_config('ff14', 'push_news_last_news_id', '0'))
 
     # 启用新闻推送的群
     push_news_group_id: List[int] = strtogroupid(
-        DATA.get_config('ff14', 'push_news_group_id')
-    )
+        DATA.get_config('ff14', 'push_news_group_id'))
 
     @validator('push_news_last_news_id', always=True)
     def push_news_last_news_id_validator(cls, v: int):
@@ -45,18 +42,14 @@ class Config(BaseSettings):
     fflogs_range: int = int(DATA.get_config('fflogs', 'range', '14'))
     # 是否开启定时缓存
     fflogs_cache: bool = strtobool(
-        DATA.get_config('fflogs', 'cache_enable', '0')
-    )
+        DATA.get_config('fflogs', 'cache_enable', '0'))
     # 缓存的时间
     fflogs_cache_hour: int = int(
-        DATA.get_config('fflogs', 'cache_hour', fallback='4')
-    )
+        DATA.get_config('fflogs', 'cache_hour', fallback='4'))
     fflogs_cache_minute: int = int(
-        DATA.get_config('fflogs', 'cache_minute', fallback='30')
-    )
+        DATA.get_config('fflogs', 'cache_minute', fallback='30'))
     fflogs_cache_second: int = int(
-        DATA.get_config('fflogs', 'cache_second', fallback='0')
-    )
+        DATA.get_config('fflogs', 'cache_second', fallback='0'))
     # 需要缓存的副本
     fflogs_cache_boss: List[str] = DATA.get_config('fflogs',
                                                    'cache_boss').split()

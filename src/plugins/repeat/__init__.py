@@ -38,9 +38,12 @@ async def _():
     recorder.save_data()
 
 
-@scheduler.scheduled_job(
-    'cron', day=1, hour=0, minute=0, second=0, id='clear_recorder'
-)
+@scheduler.scheduled_job('cron',
+                         day=1,
+                         hour=0,
+                         minute=0,
+                         second=0,
+                         id='clear_recorder')
 async def _():
     """ 每个月最后一天 24 点（下月 0 点）保存记录于历史记录文件夹，并重置记录 """
     recorder.save_data_to_history()
@@ -63,9 +66,9 @@ async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
     await repeat_message.finish(event.message)
 
 
-repeat_cmd = repeat.command(
-    'basic', aliases={'repeat', '复读'}, permission=GROUP
-)
+repeat_cmd = repeat.command('basic',
+                            aliases={'repeat', '复读'},
+                            permission=GROUP)
 repeat_cmd.__doc__ = """
 repeat 复读
 
@@ -222,10 +225,8 @@ async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
     if event.group_id:
         state['group_id'] = event.group_id
 
-    match = re.match(
-        r'^(\d+)(?:\-(\d+)(?:\-(\d+))?)?$',
-        str(event.message).strip()
-    )
+    match = re.match(r'^(\d+)(?:\-(\d+)(?:\-(\d+))?)?$',
+                     str(event.message).strip())
     if match:
         year = match.group(1)
         month = match.group(2)

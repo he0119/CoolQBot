@@ -40,9 +40,8 @@ async def _(bot: Bot, event: MessageEvent, state: T_State):
 
 @weather_cmd.got('location', prompt='你想查询哪个城市的天气呢？')
 async def _(bot: Bot, event: MessageEvent, state: T_State):
-    weather_report = await get_weather_of_location(
-        state['location'], state.get('adm')
-    )
+    weather_report = await get_weather_of_location(state['location'],
+                                                   state.get('adm'))
     await weather_cmd.finish(weather_report)
 
 

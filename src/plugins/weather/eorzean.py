@@ -41,8 +41,7 @@ def calc_eorzean_weather(date: int, location: str) -> str:
 
         if locationIndex[index]['name'] == location:
             weatherRate = weatherRateIndex[str(
-                locationIndex[index]['weatherRate']
-            )]
+                locationIndex[index]['weatherRate'])]
             break
 
     target = forecastTarget(date)
