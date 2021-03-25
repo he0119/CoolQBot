@@ -12,9 +12,9 @@ from nonebot.typing import T_State
 
 from src.utils.helpers import strtobool
 
-from .calender import calender
+from .calender import calender_obj
 from .config import plugin_config
-from .news import news
+from .news import news_obj
 
 pcr = CommandGroup('pcr', block=True)
 
@@ -97,7 +97,7 @@ async def calender_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
             ]
             await news_cmd.finish('已停止日程自动推送')
     else:
-        await calender_cmd.finish(await calender.get_week_events())
+        await calender_cmd.finish(await calender_obj.get_week_events())
 
 
 #endregion

@@ -1,7 +1,7 @@
 """ 艾欧泽亚天气预报
 """
 import time
-from typing import Optional
+from typing import Dict, Optional
 
 from .eorzean_data import locationIndex, weatherIndex, weatherRateIndex
 
@@ -33,8 +33,10 @@ def forecastTarget(date: int):
     return step2 % 100
 
 
-def calc_eorzean_weather(date: int, location: str) -> str:
+def calc_eorzean_weather(date: int, location: str) -> Optional[str]:
     """ 计算艾欧泽亚天气 """
+    weatherRate = {}
+
     for index in locationIndex:
         if 'weatherRate' not in locationIndex[index]:
             continue

@@ -10,7 +10,7 @@ from nonebot.adapters.cqhttp.event import GroupMessageEvent
 from nonebot.typing import T_State
 
 from .config import plugin_config
-from .recorder import recorder
+from .recorder import recorder_obj
 
 
 def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
@@ -39,7 +39,7 @@ def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
 
     # 记录群内发送消息数量和时间
     now = datetime.now()
-    recorder.add_msg_send_time(now, group_id)
+    recorder_obj.add_msg_send_time(now, group_id)
 
     # 不要复读应用消息
     if user_id == 1000000:
@@ -51,7 +51,7 @@ def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
         return False
 
     # 复读之后一定时间内不再复读
-    time = recorder.last_message_on(group_id)
+    time = recorder_obj.last_message_on(group_id)
     if now < time + timedelta(minutes=plugin_config.repeat_interval):
         return False
 
@@ -63,7 +63,7 @@ def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
     #     repeat_rate = 5
 
     # 记录每个人发送消息数量
-    recorder.add_msg_number_list(user_id, group_id)
+    recorder_obj.add_msg_number_list(user_id, group_id)
 
     # 按照设定概率复读
     random = secrets.SystemRandom()
@@ -73,9 +73,9 @@ def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
         return False
 
     # 记录复读时间
-    recorder.reset_last_message_on(group_id)
+    recorder_obj.reset_last_message_on(group_id)
 
     # 记录复读次数
-    recorder.add_repeat_list(user_id, group_id)
+    recorder_obj.add_repeat_list(user_id, group_id)
 
     return True

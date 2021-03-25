@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import httpx
+from nonebot.adapters.cqhttp import Message
 
 from src.utils.helpers import render_expression
 
@@ -30,7 +31,7 @@ EXPR_MORNING = (
  ) # yapf: disable
 
 
-async def get_moring_message() -> str:
+async def get_moring_message() -> Message:
     """ 获得早上问好
 
     日期不同，不同的问候语

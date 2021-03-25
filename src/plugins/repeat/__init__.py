@@ -18,7 +18,7 @@ from src.utils.helpers import strtobool
 from .config import plugin_config
 from .history import get_history
 from .rank import get_rank
-from .recorder import recorder
+from .recorder import recorder_obj
 from .repeat_rule import need_repeat
 from .status import get_status
 
@@ -33,9 +33,9 @@ async def save_recorder():
     """ 每隔一分钟保存一次数据 """
     # 保存数据前先清理 msg_send_time 列表，仅保留最近 10 分钟的数据
     for group_id in plugin_config.group_id:
-        recorder.message_number(10, group_id)
+        recorder_obj.message_number(10, group_id)
 
-    recorder.save_data()
+    recorder_obj.save_data()
 
 
 @scheduler.scheduled_job('cron',
@@ -46,8 +46,8 @@ async def save_recorder():
                          id='clear_recorder')
 async def clear_recorder():
     """ 每个月最后一天 24 点（下月 0 点）保存记录于历史记录文件夹，并重置记录 """
-    recorder.save_data_to_history()
-    recorder.init_data()
+    recorder_obj.save_data_to_history()
+    recorder_obj.init_data()
     logger.info('记录清除完成')
 
 
@@ -93,7 +93,7 @@ async def repeat_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
     if args and group_id:
         if strtobool(args):
             plugin_config.group_id += [group_id]
-            recorder.add_new_group()
+            recorder_obj.add_new_group()
             await repeat_cmd.finish('已在本群开启复读功能')
         else:
             plugin_config.group_id = [

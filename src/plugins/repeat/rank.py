@@ -5,14 +5,14 @@ from operator import itemgetter
 
 from src.utils.helpers import get_first_bot
 
-from .recorder import recorder
+from .recorder import recorder_obj
 
 
 async def get_rank(display_number: int, minimal_msg_number: int,
                    display_total_number: int, group_id: int) -> str:
     """ 获取排行榜 """
-    repeat_list = recorder.repeat_list(group_id)
-    msg_number_list = recorder.msg_number_list(group_id)
+    repeat_list = recorder_obj.repeat_list(group_id)
+    msg_number_list = recorder_obj.msg_number_list(group_id)
 
     ranking = Ranking(group_id, display_number, minimal_msg_number,
                       display_total_number, repeat_list, msg_number_list)

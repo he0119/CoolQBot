@@ -125,4 +125,4 @@ class News:
                 news_list[0])
 
 
-news = News()
+news_obj = News()
