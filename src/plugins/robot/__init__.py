@@ -3,7 +3,9 @@
 from nonebot import on_message
 from nonebot.adapters.cqhttp import escape
 from nonebot.rule import to_me
-from nonebot.typing import Bot, Event
+from nonebot.adapters import Bot
+from nonebot.adapters.cqhttp import MessageEvent
+from nonebot.typing import T_State
 
 from src.utils.helpers import render_expression
 
@@ -22,7 +24,8 @@ EXPR_DONT_UNDERSTAND = (
 
 
 @robot_message.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def robot_handle_first_receive(bot: Bot, event: MessageEvent,
+                                     state: T_State):
     args = str(event.message).strip()
 
     if args:
@@ -30,7 +33,7 @@ async def _(bot: Bot, event: Event, state: dict):
 
 
 @robot_message.got('msg')
-async def _(bot: Bot, event: Event, state: dict):
+async def robot_handle(bot: Bot, event: MessageEvent, state: T_State):
     msg = state['msg']
     # 通过封装的函数获取机器人的回复
     reply = await call_tuling_api(event, msg)

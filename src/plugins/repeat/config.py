@@ -16,8 +16,7 @@ class Config(BaseSettings):
     repeat_rate: int = int(DATA.get_config('repeat', 'rate', fallback='10'))
     # 复读间隔
     repeat_interval: int = int(
-        DATA.get_config('repeat', 'interval', fallback='1')
-    )
+        DATA.get_config('repeat', 'interval', fallback='1'))
     # 启用的群
     group_id: List[int] = strtogroupid(DATA.get_config('repeat', 'group_id'))
 

@@ -1,6 +1,8 @@
 """ 藏宝选门 """
 from random import randint
 
+from nonebot.adapters import Message
+
 from src.utils.helpers import render_expression
 
 EXPR_GATE = (
@@ -17,7 +19,7 @@ EXPR_GATE = (
 ) # yapf: disable
 
 
-def get_direction(door_number: int) -> str:
+def get_direction(door_number: int) -> Message:
     direction = ''
     if door_number == 2:
         if randint(1, 2) == 1:

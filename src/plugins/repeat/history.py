@@ -6,7 +6,7 @@ from typing import Tuple
 
 from .config import DATA
 from .rank import Ranking
-from .recorder import Recorder, get_history_pkl_name, recorder
+from .recorder import Recorder, get_history_pkl_name, recorder_obj
 
 
 async def get_history(year: int, month: int, day: int, group_id: int) -> str:
@@ -22,7 +22,7 @@ async def get_history(year: int, month: int, day: int, group_id: int) -> str:
     # 如果是本月就直接从 recorder 中获取数据
     # 不是则从历史记录中获取
     if year == now.year and month == now.month:
-        history_data = recorder
+        history_data = recorder_obj
     else:
         history_filename = get_history_pkl_name(date)
         if not DATA.exists(f'{history_filename}.pkl'):
@@ -45,10 +45,8 @@ async def get_history(year: int, month: int, day: int, group_id: int) -> str:
     minimal_msg_number = 0
     display_total_number = True
 
-    ranking = Ranking(
-        group_id, display_number, minimal_msg_number, display_total_number,
-        repeat_list, msg_number_list
-    )
+    ranking = Ranking(group_id, display_number, minimal_msg_number,
+                      display_total_number, repeat_list, msg_number_list)
     ranking_str = await ranking.ranking()
 
     if ranking_str:

@@ -6,14 +6,12 @@ import json
 from typing import Optional
 
 import httpx
-from nonebot.typing import Event
-
-from src.utils.helpers import context_id
+from nonebot.adapters.cqhttp import MessageEvent
 
 from .config import plugin_config
 
 
-async def call_tuling_api(event: Event, text: str) -> Optional[str]:
+async def call_tuling_api(event: MessageEvent, text: str) -> Optional[str]:
     """ 调用图灵机器人的 API 获取回复 """
     if not plugin_config.tuling_api_key:
         return None
@@ -33,11 +31,11 @@ async def call_tuling_api(event: Event, text: str) -> Optional[str]:
         },
         'userInfo': {
             'apiKey': plugin_config.tuling_api_key,
-            'userId': context_id(event, use_hash=True)
+            'userId': event.user_id
         }
     }
 
-    group_unique_id = context_id(event, mode='group', use_hash=True)
+    group_unique_id = event.get_session_id()
     if group_unique_id:
         payload['userInfo']['groupId'] = group_unique_id
 

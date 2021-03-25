@@ -1,9 +1,12 @@
 """ 每日早安插件
 """
-from nonebot import logger, on_metaevent, require
-from nonebot.permission import GROUP
+import nonebot
+from nonebot import logger, require
+from nonebot.adapters import Bot
+from nonebot.adapters.cqhttp.event import GroupMessageEvent
+from nonebot.adapters.cqhttp.permission import GROUP
 from nonebot.plugin import on_command
-from nonebot.typing import Bot, Event
+from nonebot.typing import T_State
 
 from src.utils.helpers import get_first_bot, strtobool
 
@@ -11,39 +14,29 @@ from .config import plugin_config
 from .data import get_first_connect_message, get_moring_message
 
 scheduler = require("nonebot_plugin_apscheduler").scheduler
+driver = nonebot.get_driver()
 
 
 #region 启动问好
-def check_first_connect(bot: Bot, event: Event, state: dict) -> bool:
-    if event.sub_type == 'connect':
-        return True
-    return False
-
-
-morning_metaevent = on_metaevent(rule=check_first_connect, block=True)
-
-
-@morning_metaevent.handle()
-async def _(bot: Bot, event: Event, state: dict):
+@driver.on_bot_connect
+async def hello_on_connect(bot: Bot) -> None:
     """ 启动时发送问好信息 """
     hello_str = get_first_connect_message()
     for group_id in plugin_config.group_id:
-        await bot.send_msg(
-            message_type='group', group_id=group_id, message=hello_str
-        )
+        await bot.send_msg(message_type='group',
+                           group_id=group_id,
+                           message=hello_str)
     logger.info('发送首次启动的问好信息')
 
 
 #endregion
 #region 每日早安
-@scheduler.scheduled_job(
-    'cron',
-    hour=plugin_config.morning_hour,
-    minute=plugin_config.morning_minute,
-    second=plugin_config.morning_second,
-    id='morning'
-)
-async def _():
+@scheduler.scheduled_job('cron',
+                         hour=plugin_config.morning_hour,
+                         minute=plugin_config.morning_minute,
+                         second=plugin_config.morning_second,
+                         id='morning')
+async def morning():
     """ 早安 """
     hello_str = await get_moring_message()
     for group_id in plugin_config.group_id:
@@ -73,7 +66,7 @@ morning 早安
 
 
 @morning_cmd.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def morning_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
     args = str(event.message).strip()
 
     group_id = event.group_id

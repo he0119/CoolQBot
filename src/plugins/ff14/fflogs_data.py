@@ -40,8 +40,7 @@ async def load_data_from_repo():
     async with httpx.AsyncClient() as client:
         r = await client.get(
             'https://cdn.jsdelivr.net/gh/he0119/coolqbot@master/src/plugins/ff14/fflogs_data.json',
-            timeout=30
-        )
+            timeout=30)
         if r.status_code != 200:
             logger.error('仓库数据加载失败')
             return
@@ -50,9 +49,8 @@ async def load_data_from_repo():
         _job_data = rjson['job']
         logger.info('仓库数据加载成功')
         # 同时保存一份文件在本地，以后就不用从网络获取
-        with DATA.open(
-            'fflogs_data.json', open_mode='w', encoding='utf8'
-        ) as f:
+        with DATA.open('fflogs_data.json', open_mode='w',
+                       encoding='utf8') as f:
             json.dump(rjson, f, ensure_ascii=False, indent=2)
             logger.info('已保存数据至本地')
 
@@ -124,8 +122,7 @@ async def get_bosses_info() -> List[BossInfo]:
                 boss['zone'],
                 boss['encounter'],
                 boss['difficulty'],
-            )
-        )
+            ))
     return boss_info
 
 

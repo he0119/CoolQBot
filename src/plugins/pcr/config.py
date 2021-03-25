@@ -15,12 +15,10 @@ class Config(BaseSettings):
     # 新闻推送相关配置
     # 自动推送新闻的间隔，单位 分钟
     push_news_interval: int = int(
-        DATA.get_config('news', 'push_news_interval', '30')
-    )
+        DATA.get_config('news', 'push_news_interval', '30'))
     # 上次推送新闻的发布 ID
     push_news_last_news_id: int = int(
-        DATA.get_config('news', 'push_news_last_news_id', '0')
-    )
+        DATA.get_config('news', 'push_news_last_news_id', '0'))
 
     @validator('push_news_last_news_id')
     def push_news_last_news_id_validator(cls, v):
@@ -30,8 +28,7 @@ class Config(BaseSettings):
 
     # 启用新闻推送的群
     push_news_group_id: List[int] = strtogroupid(
-        DATA.get_config('news', 'group_id')
-    )
+        DATA.get_config('news', 'group_id'))
 
     @validator('push_news_group_id', always=True)
     def push_news_group_id_validator(cls, v: List[int]):
@@ -42,16 +39,13 @@ class Config(BaseSettings):
     # 日程推送功能
     calender_hour: int = int(DATA.get_config('calender', 'hour', fallback='7'))
     calender_minute: int = int(
-        DATA.get_config('calender', 'minute', fallback='30')
-    )
+        DATA.get_config('calender', 'minute', fallback='30'))
     calender_second: int = int(
-        DATA.get_config('calender', 'second', fallback='0')
-    )
+        DATA.get_config('calender', 'second', fallback='0'))
 
     # 启用日程推送的群
     push_calender_group_id: List[int] = strtogroupid(
-        DATA.get_config('calender', 'group_id')
-    )
+        DATA.get_config('calender', 'group_id'))
 
     @validator('push_calender_group_id', always=True)
     def push_calender_group_id_validator(cls, v: List[int]):
