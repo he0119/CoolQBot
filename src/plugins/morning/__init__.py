@@ -19,7 +19,7 @@ driver = nonebot.get_driver()
 
 #region 启动问好
 @driver.on_bot_connect
-async def _(bot: Bot) -> None:
+async def hello_on_connect(bot: Bot) -> None:
     """ 启动时发送问好信息 """
     hello_str = get_first_connect_message()
     for group_id in plugin_config.group_id:
@@ -36,7 +36,7 @@ async def _(bot: Bot) -> None:
                          minute=plugin_config.morning_minute,
                          second=plugin_config.morning_second,
                          id='morning')
-async def _():
+async def morning():
     """ 早安 """
     hello_str = await get_moring_message()
     for group_id in plugin_config.group_id:
@@ -66,7 +66,7 @@ morning 早安
 
 
 @morning_cmd.handle()
-async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def morning_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
     args = str(event.message).strip()
 
     group_id = event.group_id

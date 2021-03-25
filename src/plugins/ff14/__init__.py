@@ -35,7 +35,7 @@ ff14.gate gate
 
 
 @gate_cmd.args_parser
-async def _(bot: Bot, event: Event, state: T_State):
+async def gate_args_parser(bot: Bot, event: Event, state: T_State):
     args = str(event.get_message()).strip()
 
     if not args:
@@ -48,7 +48,8 @@ async def _(bot: Bot, event: Event, state: T_State):
 
 
 @gate_cmd.handle()
-async def _(bot: Bot, event: MessageEvent, state: T_State):
+async def gate_handle_first_receive(bot: Bot, event: MessageEvent,
+                                    state: T_State):
     args = str(event.message).strip()
 
     if args in ['2', '3']:
@@ -56,7 +57,7 @@ async def _(bot: Bot, event: MessageEvent, state: T_State):
 
 
 @gate_cmd.got('door_number', prompt='总共有多少个门呢？')
-async def _(bot: Bot, event: Event, state: T_State):
+async def gate_handle(bot: Bot, event: Event, state: T_State):
     direction = get_direction(state['door_number'])
     await gate_cmd.finish(direction, at_sender=True)
 
@@ -79,7 +80,7 @@ ff14.news
 
 
 @news_cmd.handle()
-async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def news_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
     args = str(event.message).strip()
 
     group_id = event.group_id
@@ -126,7 +127,7 @@ ff14.dps dps
 
 
 @fflogs_cmd.handle()
-async def _(bot: Bot, event: MessageEvent, state: T_State):
+async def fflogs_handle(bot: Bot, event: MessageEvent, state: T_State):
     argv = str(event.message).strip().split()
     if not argv:
         await fflogs_cmd.finish(get_command_help('ff14.dps'))

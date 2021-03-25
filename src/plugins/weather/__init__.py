@@ -28,7 +28,8 @@ weather 天气
 
 
 @weather_cmd.handle()
-async def _(bot: Bot, event: MessageEvent, state: T_State):
+async def weather_handle_first_receive(bot: Bot, event: MessageEvent,
+                                       state: T_State):
     argv = str(event.message).strip().split()
 
     if len(argv) == 1:
@@ -39,14 +40,14 @@ async def _(bot: Bot, event: MessageEvent, state: T_State):
 
 
 @weather_cmd.got('location', prompt='你想查询哪个城市的天气呢？')
-async def _(bot: Bot, event: MessageEvent, state: T_State):
+async def weather_handle(bot: Bot, event: MessageEvent, state: T_State):
     weather_report = await get_weather_of_location(state['location'],
                                                    state.get('adm'))
     await weather_cmd.finish(weather_report)
 
 
 @weather_cmd.args_parser
-async def _(bot: Bot, event: Event, state: T_State):
+async def weather_args_parser(bot: Bot, event: Event, state: T_State):
     args = str(event.get_message()).strip()
 
     if not args:

@@ -1,6 +1,6 @@
 [tool.poetry]
 authors = ["hemengyang <hmy0119@gmail.com>"]
-description = "基于 NoneBot 的聊天机器人"
+description = "基于 NoneBot2 的聊天机器人"
 license = "MIT"
 name = "coolqbot"
 readme = "README.md"

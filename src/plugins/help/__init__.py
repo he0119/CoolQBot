@@ -28,7 +28,7 @@ def format_name_aliases(command: CommandInfo) -> str:
 
 
 @help_cmd.handle()
-async def _(bot: Bot, event: MessageEvent, state: T_State):
+async def help_handle(bot: Bot, event: MessageEvent, state: T_State):
     args = str(event.message).strip()
 
     if args == 'all':

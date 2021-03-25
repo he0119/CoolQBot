@@ -6,7 +6,7 @@
 import re
 
 from nonebot import logger, on_message, require
-from nonebot.adapters.cqhttp.event import GroupMessageEvent
+from nonebot.adapters.cqhttp.event import GroupMessageEvent, PrivateMessageEvent
 from nonebot.adapters.cqhttp.permission import GROUP
 from nonebot.plugin import CommandGroup
 from nonebot.adapters import Bot, Event
@@ -29,7 +29,7 @@ repeat = CommandGroup('repeat', block=True)
 
 #region 自动保存数据
 @scheduler.scheduled_job('interval', minutes=1, id='save_recorder')
-async def _():
+async def save_recorder():
     """ 每隔一分钟保存一次数据 """
     # 保存数据前先清理 msg_send_time 列表，仅保留最近 10 分钟的数据
     for group_id in plugin_config.group_id:
@@ -44,7 +44,7 @@ async def _():
                          minute=0,
                          second=0,
                          id='clear_recorder')
-async def _():
+async def clear_recorder():
     """ 每个月最后一天 24 点（下月 0 点）保存记录于历史记录文件夹，并重置记录 """
     recorder.save_data_to_history()
     recorder.init_data()
@@ -62,7 +62,8 @@ repeat_message = on_message(
 
 
 @repeat_message.handle()
-async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def repeat_message_handle(bot: Bot, event: GroupMessageEvent,
+                                state: T_State):
     await repeat_message.finish(event.message)
 
 
@@ -84,7 +85,7 @@ repeat 复读
 
 
 @repeat_cmd.handle()
-async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def repeat_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
     args = str(event.message).strip()
 
     group_id = event.group_id
@@ -120,7 +121,7 @@ status 状态
 
 
 @status_cmd.handle()
-async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def status_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
     await status_cmd.finish(get_status(event.group_id))
 
 
@@ -142,7 +143,7 @@ rank 排行榜
 
 
 @rank_cmd.args_parser
-async def _(bot: Bot, event: Event, state: T_State):
+async def rank_args_parser(bot: Bot, event: Event, state: T_State):
     """ 排行榜的参数解析函数 """
     args = str(event.get_message()).strip()
 
@@ -154,10 +155,8 @@ async def _(bot: Bot, event: Event, state: T_State):
 
 
 @rank_cmd.handle()
-async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
-    if event.group_id:
-        state['group_id'] = event.group_id
-
+async def rank_handle_first_receive(bot: Bot, event: MessageEvent,
+                                    state: T_State):
     match = re.match(r'^(?:(\d+))?(?:n(\d+))?$', str(event.message).strip())
     if match:
         display_number = match.group(1)
@@ -182,8 +181,23 @@ async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
 @rank_cmd.got('display_number', prompt='请输入想显示的排行条数')
 @rank_cmd.got('minimal_msg_number', prompt='请输入进入排行，最少需要发送多少消息')
 @rank_cmd.got('display_total_number', prompt='是否显示每个人发送的消息总数')
+async def rank_handle_group_message(bot: Bot, event: GroupMessageEvent,
+                                    state: T_State):
+    res = await get_rank(
+        display_number=state['display_number'],
+        minimal_msg_number=state['minimal_msg_number'],
+        display_total_number=state['display_total_number'],
+        group_id=event.group_id,
+    )
+    await rank_cmd.finish(res)
+
+
+@rank_cmd.got('display_number', prompt='请输入想显示的排行条数')
+@rank_cmd.got('minimal_msg_number', prompt='请输入进入排行，最少需要发送多少消息')
+@rank_cmd.got('display_total_number', prompt='是否显示每个人发送的消息总数')
 @rank_cmd.got('group_id', prompt='请问你想查询哪个群？')
-async def _(bot: Bot, event: MessageEvent, state: T_State):
+async def rank_handle_private_message(bot: Bot, event: PrivateMessageEvent,
+                                      state: T_State):
     res = await get_rank(
         display_number=state['display_number'],
         minimal_msg_number=state['minimal_msg_number'],
@@ -209,7 +223,7 @@ history 历史 复读历史
 
 
 @history_cmd.args_parser
-async def _(bot: Bot, event: Event, state: T_State):
+async def history_args_parser(bot: Bot, event: Event, state: T_State):
     """ 历史记录的参数解析函数 """
     args = str(event.get_message()).strip()
 
@@ -221,10 +235,8 @@ async def _(bot: Bot, event: Event, state: T_State):
 
 
 @history_cmd.handle()
-async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
-    if event.group_id:
-        state['group_id'] = event.group_id
-
+async def history_handle_first_receive(bot: Bot, event: MessageEvent,
+                                       state: T_State):
     match = re.match(r'^(\d+)(?:\-(\d+)(?:\-(\d+))?)?$',
                      str(event.message).strip())
     if match:
@@ -245,8 +257,23 @@ async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
 @history_cmd.got('year', prompt='你请输入你要查询的年份')
 @history_cmd.got('month', prompt='你请输入你要查询的月份')
 @history_cmd.got('day', prompt='你请输入你要查询的日期（如查询整月排名请输入 0）')
+async def history_handle_group_message(bot: Bot, event: GroupMessageEvent,
+                                       state: T_State):
+    res = await get_history(
+        year=state['year'],
+        month=state['month'],
+        day=state['day'],
+        group_id=event.group_id,
+    )
+    await history_cmd.finish(res)
+
+
+@history_cmd.got('year', prompt='你请输入你要查询的年份')
+@history_cmd.got('month', prompt='你请输入你要查询的月份')
+@history_cmd.got('day', prompt='你请输入你要查询的日期（如查询整月排名请输入 0）')
 @history_cmd.got('group_id', prompt='请问你想查询哪个群？')
-async def _(bot: Bot, event: MessageEvent, state: T_State):
+async def history_handle_private_message(bot: Bot, event: PrivateMessageEvent,
+                                         state: T_State):
     res = await get_history(
         year=state['year'],
         month=state['month'],

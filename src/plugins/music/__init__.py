@@ -31,7 +31,8 @@ music 点歌
 
 
 @music_cmd.handle()
-async def _(bot: Bot, event: MessageEvent, state: T_State):
+async def music_handle_first_receive(bot: Bot, event: MessageEvent,
+                                     state: T_State):
     args = str(event.message).strip()
 
     if args:
@@ -39,7 +40,7 @@ async def _(bot: Bot, event: MessageEvent, state: T_State):
 
 
 @music_cmd.got('name', prompt='你想听哪首歌呢？')
-async def _(bot: Bot, event: MessageEvent, state: dict):
+async def music_handle(bot: Bot, event: MessageEvent, state: T_State):
     music_str = await call_netease_api(state['name'])
     if music_str:
         await music_cmd.finish(music_str)
@@ -49,7 +50,7 @@ async def _(bot: Bot, event: MessageEvent, state: dict):
 
 
 @music_cmd.args_parser
-async def _(bot: Bot, event: Event, state: dict):
+async def music_args_parser(bot: Bot, event: Event, state: T_State):
     args = str(event.get_message()).strip()
 
     if not args:

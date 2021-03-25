@@ -35,7 +35,7 @@ pcr.news
 
 
 @news_cmd.handle()
-async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def news_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
     args = str(event.message).strip()
 
     group_id = event.group_id
@@ -76,7 +76,7 @@ pcr.calender pcr.日程表 pcr.日程
 
 
 @calender_cmd.handle()
-async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def calender_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
     args = str(event.message).strip()
 
     group_id = event.group_id
