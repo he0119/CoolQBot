@@ -12,7 +12,7 @@ nb-cli = "^0.4.0"
 nonebot-adapter-cqhttp = "^2.0.0-alpha.11"
 nonebot-plugin-apscheduler = "^0.1.2"
 nonebot-plugin-sentry = "^0.2.0"
-nonebot2 = "^2.0.0-alpha.11"
+nonebot2 = "^2.0.0a12"
 python = "^3.8"
 python-dateutil = "^2.8.1"
 
