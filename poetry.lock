@@ -390,7 +390,7 @@ reference = "aliyun"
 
 [[package]]
 name = "nonebot-plugin-docs"
-version = "2.0.0a11"
+version = "2.0.0a13.post1"
 description = "View NoneBot2 Docs Locally"
 category = "dev"
 optional = false
@@ -1023,7 +1023,7 @@ reference = "aliyun"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "2768e54a8ef87428af01c180e0fcf1b0da04891c377f86507d738add81bceef2"
+content-hash = "be5161d2f065711bfc3cd10b06a879e43afc0abc0a4e918d8f3669cc24a76913"
 
 [metadata.files]
 aiofiles = [
@@ -1177,8 +1177,10 @@ nonebot-plugin-apscheduler = [
     {file = "nonebot_plugin_apscheduler-0.1.2-py3-none-any.whl", hash = "sha256:eed7b9e60d08826ae4919f82dc240fc7ec469185271c2271e14438a3e0ca7692"},
 ]
 nonebot-plugin-docs = [
-    {file = "nonebot-plugin-docs-2.0.0a11.tar.gz", hash = "sha256:db3f1833347cb752c7d0fb488734a9541c8378eeecdb31fe3a19614d5375b9a5"},
-    {file = "nonebot_plugin_docs-2.0.0a11-py3-none-any.whl", hash = "sha256:8d1bda341d899d50fd5e2a1f1d48fc85ba0c4ae70a015434a045154fe99f8f90"},
+    {file = "nonebot-plugin-docs-2.0.0a13.post1.tar.gz", hash = "sha256:6c374228ce1e061666c111b9ff5b6ad3c5266ec0dd9858f8a41a9d8de088d409"},
+    {file = "nonebot-plugin-docs-2.0.0a13.tar.gz", hash = "sha256:aac861e6f45fb499b26ccb9ce741b02f610ee9496c144e3ea60b778decab12c4"},
+    {file = "nonebot_plugin_docs-2.0.0a13-py3-none-any.whl", hash = "sha256:14d17746c1513eb572f6c28a602c70664978ea4dd1fdaa5f6b2baf5b6e0b5262"},
+    {file = "nonebot_plugin_docs-2.0.0a13.post1-py3-none-any.whl", hash = "sha256:f54ad68932b4572f26958c815b79133553a7175d5094556d9a62016b9c6d2a70"},
 ]
 nonebot-plugin-sentry = [
     {file = "nonebot-plugin-sentry-0.2.0.tar.gz", hash = "sha256:8e773fc632d07cf4055315cfb15db26c2d561fe575923c1986c154832dd5032a"},
