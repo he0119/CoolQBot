@@ -442,7 +442,7 @@ reference = "aliyun"
 
 [[package]]
 name = "nonebot2"
-version = "2.0.0a11"
+version = "2.0.0a13"
 description = "An asynchronous python bot framework."
 category = "main"
 optional = false
@@ -1023,7 +1023,7 @@ reference = "aliyun"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "2768e54a8ef87428af01c180e0fcf1b0da04891c377f86507d738add81bceef2"
+content-hash = "a3e51c59eb7f0c16425c8b1d91e35986181a59fb84bd873f04add242ddd89e10"
 
 [metadata.files]
 aiofiles = [
@@ -1189,8 +1189,10 @@ nonebot-plugin-test = [
     {file = "nonebot_plugin_test-0.2.0-py3-none-any.whl", hash = "sha256:75cd18cc282815a03250bb86c7d2a8d6a66a5064ac335bedc9a3e268a1e7dd13"},
 ]
 nonebot2 = [
-    {file = "nonebot2-2.0.0a11-py3-none-any.whl", hash = "sha256:3387dd0a1e1cc5ce3d9b7a3a5a05563863f6dbe761a60ec12bd52283e3d6c896"},
-    {file = "nonebot2-2.0.0a11.tar.gz", hash = "sha256:7ccefa3b802efd121e2d2f81f694a4fcb067f4e706c2b03752cee78edeea4726"},
+    {file = "nonebot2-2.0.0a13-py3-none-any.whl", hash = "sha256:08422f31e42a705270a0c0dd5704febc9c929f4e7b9e94146c56faf926733536"},
+    {file = "nonebot2-2.0.0a13.post1-py3-none-any.whl", hash = "sha256:357f4117e2dab195c77b04f54d7cae965c5c073b9be607a981b255f6a0a992f2"},
+    {file = "nonebot2-2.0.0a13.post1.tar.gz", hash = "sha256:c8decc92d7f68693cdb40a253123100b1e7c52ef2e2616f0fc86820154ebee3c"},
+    {file = "nonebot2-2.0.0a13.tar.gz", hash = "sha256:61f59fac17ca5f238802045ec34d58faeaf9be9a1aa4bc33fadb132c0679a9f6"},
 ]
 poyo = [
     {file = "poyo-0.5.0-py2.py3-none-any.whl", hash = "sha256:3e2ca8e33fdc3c411cd101ca395668395dd5dc7ac775b8e809e3def9f9fe041a"},
