@@ -11,7 +11,7 @@ from nonebot.typing import T_State
 from nonebot.adapters.cqhttp import MessageEvent
 
 from .rand import get_rand
-from .roll import roll_dices
+from .data import roll_dices
 
 #region roll
 roll_cmd = on_command('roll', block=True)
