@@ -80,6 +80,24 @@
       "difficulty": 100
     },
     {
+      "name": "希瓦幻巧战",
+      "nicknames": [
+        "幻冰神"
+      ],
+      "zone": 36,
+      "encounter": 3001,
+      "difficulty": 100
+    },
+    {
+      "name": "泰坦幻巧战",
+      "nicknames": [
+        "幻泰坦"
+      ],
+      "zone": 36,
+      "encounter": 3002,
+      "difficulty": 100
+    },
+    {
       "name": "伊甸希望乐园 觉醒之章1",
       "nicknames": [
         "e1"
@@ -230,6 +248,96 @@
       ],
       "zone": 33,
       "encounter": 72,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸希望乐园 再生之章1",
+      "nicknames": [
+        "e9"
+      ],
+      "zone": 38,
+      "encounter": 73,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 再生之章2",
+      "nicknames": [
+        "e10"
+      ],
+      "zone": 38,
+      "encounter": 74,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 再生之章3",
+      "nicknames": [
+        "e11"
+      ],
+      "zone": 38,
+      "encounter": 75,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 再生之章4（门神）",
+      "nicknames": [
+        "e12门神"
+      ],
+      "zone": 38,
+      "encounter": 76,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 再生之章4",
+      "nicknames": [
+        "e12"
+      ],
+      "zone": 38,
+      "encounter": 77,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 再生之章1",
+      "nicknames": [
+        "e9s"
+      ],
+      "zone": 38,
+      "encounter": 73,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 再生之章2",
+      "nicknames": [
+        "e10s"
+      ],
+      "zone": 38,
+      "encounter": 74,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 再生之章3",
+      "nicknames": [
+        "e11s"
+      ],
+      "zone": 38,
+      "encounter": 75,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 再生之章4（门神）",
+      "nicknames": [
+        "e12s门神"
+      ],
+      "zone": 38,
+      "encounter": 76,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 再生之章4",
+      "nicknames": [
+        "e12s"
+      ],
+      "zone": 38,
+      "encounter": 77,
       "difficulty": 0
     }
   ],
