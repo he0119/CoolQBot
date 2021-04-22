@@ -81,6 +81,11 @@ async def load_data():
         await load_data_from_repo()
 
 
+async def update_data():
+    """ 从网络更新数据 """
+    await load_data_from_repo()
+
+
 async def get_boss_data() -> List:
     """ 获取 boss 数据 """
     if not _boss_data:
