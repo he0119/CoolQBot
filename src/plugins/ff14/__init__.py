@@ -16,6 +16,7 @@ from src.utils.helpers import strtobool
 
 from .config import plugin_config
 from .fflogs_api import fflogs
+from .fflogs_data import update_data
 from .gate import get_direction
 from .news import news
 
@@ -109,6 +110,9 @@ ff14.dps dps
 
 最终幻想XIV 输出查询
 
+更新副本数据
+/dps update
+
 查询输出排行榜：
 /dps 副本名 职业 DPS种类（支持 rdps adps pdps，留空默认为 rdps）
 查询指定角色的排名：
@@ -156,6 +160,10 @@ async def fflogs_handle(bot: Bot, event: MessageEvent, state: T_State):
         if user_id not in bot.config.superusers:
             await fflogs_cmd.finish('抱歉，你没有权限查看 Token。')
         await fflogs_cmd.finish(f'当前的 Token 为 {plugin_config.fflogs_token}')
+
+    if argv[0] == 'update' and len(argv) == 1:
+        await update_data()
+        await fflogs_cmd.finish('副本数据更新成功')
 
     # 缓存相关设置
     if argv[0] == 'cache':
