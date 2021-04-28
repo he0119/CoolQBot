@@ -5,21 +5,17 @@ from operator import itemgetter
 
 from src.utils.helpers import get_first_bot
 
-from .recorder import recorder
+from .recorder import recorder_obj
 
 
-async def get_rank(
-    display_number: int, minimal_msg_number: int, display_total_number: int,
-    group_id: int
-) -> str:
+async def get_rank(display_number: int, minimal_msg_number: int,
+                   display_total_number: int, group_id: int) -> str:
     """ 获取排行榜 """
-    repeat_list = recorder.repeat_list(group_id)
-    msg_number_list = recorder.msg_number_list(group_id)
+    repeat_list = recorder_obj.repeat_list(group_id)
+    msg_number_list = recorder_obj.msg_number_list(group_id)
 
-    ranking = Ranking(
-        group_id, display_number, minimal_msg_number, display_total_number,
-        repeat_list, msg_number_list
-    )
+    ranking = Ranking(group_id, display_number, minimal_msg_number,
+                      display_total_number, repeat_list, msg_number_list)
     str_data = await ranking.ranking()
 
     if not str_data:
@@ -31,10 +27,8 @@ async def get_rank(
 class Ranking:
     """ 排行榜
     """
-    def __init__(
-        self, group_id, display_number, minimal_msg_number,
-        display_total_number, repeat_list, msg_number_list
-    ):
+    def __init__(self, group_id, display_number, minimal_msg_number,
+                 display_total_number, repeat_list, msg_number_list):
         self.group_id = group_id
         self.display_number = display_number
         self.minimal_msg_number = minimal_msg_number
@@ -55,8 +49,7 @@ class Ranking:
         """ 获取次数排行榜
         """
         od = collections.OrderedDict(
-            sorted(self.repeat_list.items(), key=itemgetter(1), reverse=True)
-        )
+            sorted(self.repeat_list.items(), key=itemgetter(1), reverse=True))
 
         str_data = await self.ranking_str(od, 'number')
 
@@ -68,12 +61,10 @@ class Ranking:
     async def repeat_rate_ranking(self):
         """ 获取复读概率排行榜
         """
-        repeat_rate = self.get_repeat_rate(
-            self.repeat_list, self.msg_number_list
-        )
+        repeat_rate = self.get_repeat_rate(self.repeat_list,
+                                           self.msg_number_list)
         od = collections.OrderedDict(
-            sorted(repeat_rate.items(), key=itemgetter(1), reverse=True)
-        )
+            sorted(repeat_rate.items(), key=itemgetter(1), reverse=True))
 
         str_data = await self.ranking_str(od, 'rate')
 
@@ -116,8 +107,7 @@ class Ranking:
         """
         try:
             msg = await get_first_bot().get_group_member_info(
-                group_id=self.group_id, user_id=user_id, no_cache=True
-            )
+                group_id=self.group_id, user_id=user_id, no_cache=True)
             if msg['card']:
                 return msg['card']
             return msg['nickname']

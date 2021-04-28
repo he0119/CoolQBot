@@ -5,15 +5,18 @@
 FFLogs
 """
 from nonebot import CommandGroup
+from nonebot.adapters import Bot, Event
+from nonebot.adapters.cqhttp.event import GroupMessageEvent, MessageEvent
+from nonebot.adapters.cqhttp.permission import GROUP
 from nonebot.exception import FinishedException
-from nonebot.permission import GROUP
-from nonebot.typing import Bot, Event
+from nonebot.typing import T_State
 
 from src.utils.commands import get_command_help
 from src.utils.helpers import strtobool
 
 from .config import plugin_config
 from .fflogs_api import fflogs
+from .fflogs_data import update_data
 from .gate import get_direction
 from .news import news
 
@@ -33,8 +36,8 @@ ff14.gate gate
 
 
 @gate_cmd.args_parser
-async def _(bot: Bot, event: Event, state: dict):
-    args = str(event.message).strip()
+async def gate_args_parser(bot: Bot, event: Event, state: T_State):
+    args = str(event.get_message()).strip()
 
     if not args:
         await gate_cmd.reject('你什么都不输入我怎么知道呢，请告诉我有几个门！')
@@ -46,7 +49,8 @@ async def _(bot: Bot, event: Event, state: dict):
 
 
 @gate_cmd.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def gate_handle_first_receive(bot: Bot, event: MessageEvent,
+                                    state: T_State):
     args = str(event.message).strip()
 
     if args in ['2', '3']:
@@ -54,7 +58,7 @@ async def _(bot: Bot, event: Event, state: dict):
 
 
 @gate_cmd.got('door_number', prompt='总共有多少个门呢？')
-async def _(bot: Bot, event: Event, state: dict):
+async def gate_handle(bot: Bot, event: Event, state: T_State):
     direction = get_direction(state['door_number'])
     await gate_cmd.finish(direction, at_sender=True)
 
@@ -77,7 +81,7 @@ ff14.news
 
 
 @news_cmd.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def news_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
     args = str(event.message).strip()
 
     group_id = event.group_id
@@ -106,6 +110,9 @@ ff14.dps dps
 
 最终幻想XIV 输出查询
 
+更新副本数据
+/dps update
+
 查询输出排行榜：
 /dps 副本名 职业 DPS种类（支持 rdps adps pdps，留空默认为 rdps）
 查询指定角色的排名：
@@ -124,7 +131,7 @@ ff14.dps dps
 
 
 @fflogs_cmd.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def fflogs_handle(bot: Bot, event: MessageEvent, state: T_State):
     argv = str(event.message).strip().split()
     if not argv:
         await fflogs_cmd.finish(get_command_help('ff14.dps'))
@@ -154,6 +161,10 @@ async def _(bot: Bot, event: Event, state: dict):
             await fflogs_cmd.finish('抱歉，你没有权限查看 Token。')
         await fflogs_cmd.finish(f'当前的 Token 为 {plugin_config.fflogs_token}')
 
+    if argv[0] == 'update' and len(argv) == 1:
+        await update_data()
+        await fflogs_cmd.finish('副本数据更新成功')
+
     # 缓存相关设置
     if argv[0] == 'cache':
         # 检查是否是超级用户
@@ -177,8 +188,7 @@ async def _(bot: Bot, event: Event, state: dict):
     if argv[0] == 'me' and len(argv) == 1:
         if user_id not in fflogs.characters:
             await fflogs_cmd.finish(
-                '抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。'
-            )
+                '抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。')
         await fflogs_cmd.finish(
             f'你当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}'
         )
@@ -216,7 +226,7 @@ async def _(bot: Bot, event: Event, state: dict):
             user_id = int(argv[1][10:-1])
             reply = await get_character_dps_by_user_id(argv[0], user_id)
         else:
-            reply = await fflogs.dps(*argv)    #type:ignore
+            reply = await fflogs.dps(*argv)  #type:ignore
         await fflogs_cmd.finish(reply)
 
     if len(argv) == 3:
@@ -224,9 +234,9 @@ async def _(bot: Bot, event: Event, state: dict):
         # <BOSS名> <角色名> <服务器名>
         argv[2] = argv[2].lower()
         if argv[2] in ['adps', 'rdps', 'pdps']:
-            reply = await fflogs.dps(*argv)    #type:ignore
+            reply = await fflogs.dps(*argv)  #type:ignore
         else:
-            reply = await fflogs.character_dps(*argv)    #type:ignore
+            reply = await fflogs.character_dps(*argv)  #type:ignore
         await fflogs_cmd.finish(reply)
 
     await fflogs_cmd.finish(get_command_help('ff14.dps'))

@@ -262,4 +262,4 @@ class Recorder:
         }
 
 
-recorder = Recorder('recorder')
+recorder_obj = Recorder('recorder')

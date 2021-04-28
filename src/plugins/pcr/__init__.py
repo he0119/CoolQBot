@@ -6,13 +6,15 @@ B站动态推送
 参考 https://github.com/pcrbot/yobot
 """
 from nonebot import CommandGroup
-from nonebot.typing import Bot, Event
+from nonebot.adapters import Bot
+from nonebot.adapters.cqhttp.event import GroupMessageEvent
+from nonebot.typing import T_State
 
 from src.utils.helpers import strtobool
 
-from .calender import calender
+from .calender import calender_obj
 from .config import plugin_config
-from .news import news
+from .news import news_obj
 
 pcr = CommandGroup('pcr', block=True)
 
@@ -33,7 +35,7 @@ pcr.news
 
 
 @news_cmd.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def news_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
     args = str(event.message).strip()
 
     group_id = event.group_id
@@ -74,7 +76,7 @@ pcr.calender pcr.日程表 pcr.日程
 
 
 @calender_cmd.handle()
-async def _(bot: Bot, event: Event, state: dict):
+async def calender_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
     args = str(event.message).strip()
 
     group_id = event.group_id
@@ -95,7 +97,7 @@ async def _(bot: Bot, event: Event, state: dict):
             ]
             await news_cmd.finish('已停止日程自动推送')
     else:
-        await calender_cmd.finish(await calender.get_week_events())
+        await calender_cmd.finish(await calender_obj.get_week_events())
 
 
 #endregion

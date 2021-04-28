@@ -14,9 +14,8 @@ import httpx
 from nonebot import logger, require
 
 from .config import DATA, plugin_config
-from .fflogs_data import (
-    get_boss_info_by_nickname, get_job_info_by_nickname, get_jobs_info
-)
+from .fflogs_data import (get_boss_info_by_nickname, get_job_info_by_nickname,
+                          get_jobs_info)
 
 scheduler = require("nonebot_plugin_apscheduler").scheduler
 
@@ -61,8 +60,7 @@ class FFLogs:
             hour=plugin_config.fflogs_cache_hour,
             minute=plugin_config.fflogs_cache_minute,
             second=plugin_config.fflogs_cache_second,
-            id='fflogs_cache'
-        )
+            id='fflogs_cache')
         plugin_config.fflogs_cache = True
         logger.info(
             f'开启定时缓存，执行时间为每天 {plugin_config.fflogs_cache_hour}:{plugin_config.fflogs_cache_minute}:{plugin_config.fflogs_cache_second}'
@@ -110,9 +108,8 @@ class FFLogs:
             # 抛出上面任何异常，说明调用失败
             return None
 
-    async def _get_one_day_ranking(
-        self, boss: int, difficulty: int, job: int, date: datetime
-    ) -> List:
+    async def _get_one_day_ranking(self, boss: int, difficulty: int, job: int,
+                                   date: datetime) -> List:
         """ 获取指定 boss，指定职业，指定一天中的排名数据
         """
         # 查看是否有缓存
@@ -149,17 +146,15 @@ class FFLogs:
 
         return rankings
 
-    async def _get_whole_ranking(
-        self, boss: int, difficulty: int, job: int,
-        dps_type: Literal['rdps', 'adps', 'pdps'], date: datetime
-    ) -> List:
+    async def _get_whole_ranking(self, boss: int, difficulty: int, job: int,
+                                 dps_type: Literal['rdps', 'adps', 'pdps'],
+                                 date: datetime) -> List:
         date = datetime(year=date.year, month=date.month, day=date.day)
 
         rankings = []
         for _ in range(plugin_config.fflogs_range):
             rankings += await self._get_one_day_ranking(
-                boss, difficulty, job, date
-            )
+                boss, difficulty, job, date)
             date -= timedelta(days=1)
 
         # 根据 DPS 类型进行排序，并提取数据
@@ -180,10 +175,10 @@ class FFLogs:
 
         return rankings
 
-    async def _get_character_ranking(
-        self, characterName: str, serverName: str, zone: int, encounter: int,
-        difficulty: int, metric: Literal['rdps', 'adps', 'pdps']
-    ):
+    async def _get_character_ranking(self, characterName: str, serverName: str,
+                                     zone: int, encounter: int,
+                                     difficulty: int,
+                                     metric: Literal['rdps', 'adps', 'pdps']):
         """ 查询指定角色的 DPS
 
         返回列表
@@ -226,12 +221,10 @@ class FFLogs:
         data = await self._http(url)
         return data
 
-    async def dps(
-        self,
-        boss_nickname: str,
-        job_nickname: str,
-        dps_type: Literal['rdps', 'adps', 'pdps'] = 'rdps'
-    ) -> str:
+    async def dps(self,
+                  boss_nickname: str,
+                  job_nickname: str,
+                  dps_type: Literal['rdps', 'adps', 'pdps'] = 'rdps') -> str:
         """ 查询 DPS 百分比排名
 
         :param boss_nickname: BOSS 的称呼
@@ -252,9 +245,9 @@ class FFLogs:
         # 排名从前一天开始排，因为今天的数据并不全
         date = datetime.now() - timedelta(days=1)
         try:
-            rankings = await self._get_whole_ranking(
-                boss.encounter, boss.difficulty, job.spec, dps_type, date
-            )
+            rankings = await self._get_whole_ranking(boss.encounter,
+                                                     boss.difficulty, job.spec,
+                                                     dps_type, date)
         except DataException as e:
             return f'{e}，请稍后再试'
 
@@ -271,20 +264,18 @@ class FFLogs:
 
         return reply
 
-    def set_character(
-        self, user_id: int, character_name: str, server_name: str
-    ) -> None:
+    def set_character(self, user_id: int, character_name: str,
+                      server_name: str) -> None:
         """ 设置 QQ号 与 最终幻想14 用户名和服务器名 """
         self.characters[user_id] = [character_name, server_name]
         DATA.save_pkl(self.characters, 'characters')
 
     async def character_dps(
-        self,
-        boss_nickname: str,
-        character_name: str,
-        server_name: str,
-        dps_type: Literal['rdps', 'adps', 'pdps'] = 'rdps'
-    ) -> str:
+            self,
+            boss_nickname: str,
+            character_name: str,
+            server_name: str,
+            dps_type: Literal['rdps', 'adps', 'pdps'] = 'rdps') -> str:
         """ 查询指定角色在某个副本的 DPS
 
         :param boss_nickname: BOSS 的称呼
@@ -300,8 +291,7 @@ class FFLogs:
         try:
             ranking = await self._get_character_ranking(
                 character_name, server_name, boss.zone, boss.encounter,
-                boss.difficulty, dps_type
-            )
+                boss.difficulty, dps_type)
         except DataException as e:
             return f'{e}，请稍后再试'
         except ParameterException:

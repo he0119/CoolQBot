@@ -1,6 +1,6 @@
 [tool.poetry]
 authors = ["hemengyang <hmy0119@gmail.com>"]
-description = "基于 NoneBot 的聊天机器人"
+description = "基于 NoneBot2 的聊天机器人"
 license = "MIT"
 name = "coolqbot"
 readme = "README.md"
@@ -8,23 +8,29 @@ repository = "https://github.com/he0119/CoolQBot"
 version = "0.14.0"
 
 [tool.poetry.dependencies]
-nb-cli = "^0.3.0"
-nonebot-plugin-apscheduler = "^0.1.0"
-nonebot-plugin-sentry = "^0.1.1"
-nonebot2 = "^2.0.0-alpha.7"
-python = "~3.8"
+nb-cli = "^0.4.0"
+nonebot-adapter-cqhttp = "^2.0.0a13"
+nonebot-plugin-apscheduler = "^0.1.2"
+nonebot-plugin-sentry = "^0.2.0"
+nonebot2 = "^2.0.0-alpha.13"
+python = "^3.8"
 python-dateutil = "^2.8.1"
 
 [tool.poetry.dev-dependencies]
-nonebot-plugin-docs = "^2.0.0-alpha.7"
-nonebot-plugin-test = "^0.1.0"
-yapf = "*"
+nonebot-plugin-docs = "^2.0.0-alpha.11"
+nonebot-plugin-test = "^0.2.0"
+toml = "^0.10.2"
+yapf = ">=0.31.0"
 
 [[tool.poetry.source]]
 default = true
 name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple/"
 
+[nonebot.plugins]
+plugin_dirs = ["src/plugins"]
+plugins = []
+
 [build-system]
-build-backend = "poetry.masonry.api"
-requires = ["poetry>=0.12"]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]

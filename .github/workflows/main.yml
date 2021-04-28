@@ -58,7 +58,7 @@ jobs:
           script_stop: true
           envs: TAG_NAME
           script: |
-            cd coolqbot
+            cd coolqbot/dev
             sed -i "s#he0119/coolqbot:.*#he0119/coolqbot:dev#g" docker-compose.yml
             sudo docker-compose pull
             sudo docker-compose up -d
@@ -81,7 +81,7 @@ jobs:
           script_stop: true
           envs: TAG_NAME
           script: |
-            cd coolqbot
+            cd coolqbot/prod
             sed -i "s#he0119/coolqbot:.*#he0119/coolqbot:$TAG_NAME#g" docker-compose.yml
             docker-compose pull
             docker-compose up -d

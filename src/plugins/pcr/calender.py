@@ -30,21 +30,19 @@ class Calender:
     def init(self):
         """ 初始化日程自动推送 """
         logger.info('初始化 公主连结Re:Dive 日程推送')
-        self._job = scheduler.add_job(
-            self.push_calender,
-            'cron',
-            hour=plugin_config.calender_hour,
-            minute=plugin_config.calender_minute,
-            second=plugin_config.calender_second,
-            id='push_calender'
-        )
+        self._job = scheduler.add_job(self.push_calender,
+                                      'cron',
+                                      hour=plugin_config.calender_hour,
+                                      minute=plugin_config.calender_minute,
+                                      second=plugin_config.calender_second,
+                                      id='push_calender')
 
     async def refresh_calender(self) -> None:
         """ 获取最新的日程表 """
         if self._timeline:
             # 最近四小时内才更新的不用再次更新
-            if self._timeline_update_time > datetime.now(
-            ) - timedelta(hours=4):
+            if self._timeline_update_time > datetime.now() - timedelta(
+                    hours=4):
                 return None
         try:
             async with httpx.AsyncClient() as client:
@@ -56,12 +54,10 @@ class Calender:
                 # 清楚以前的时间线
                 self._timeline.clear()
                 for event in r.json():
-                    start_time = datetime.strptime(
-                        event['start_time'], '%Y/%m/%d %H:%M:%S'
-                    )
-                    end_time = datetime.strptime(
-                        event['end_time'], '%Y/%m/%d %H:%M:%S'
-                    )
+                    start_time = datetime.strptime(event['start_time'],
+                                                   '%Y/%m/%d %H:%M:%S')
+                    end_time = datetime.strptime(event['end_time'],
+                                                 '%Y/%m/%d %H:%M:%S')
                     name = event['name']
                     self.add_event(start_time, end_time, name)
 
@@ -72,9 +68,8 @@ class Calender:
             # 抛出上面任何异常，说明调用失败
             return None
 
-    def add_event(
-        self, start_time: datetime, end_time: datetime, name: str
-    ) -> None:
+    def add_event(self, start_time: datetime, end_time: datetime,
+                  name: str) -> None:
         """ 添加日程至日程表 """
         t = start_time
         while t <= end_time:
@@ -103,9 +98,9 @@ class Calender:
 
         reply = '公主连结Re:Dive 今日活动：\n{}'.format(events_str)
         for group_id in plugin_config.push_calender_group_id:
-            await get_first_bot().send_msg(
-                message_type='group', group_id=group_id, message=reply
-            )
+            await get_first_bot().send_msg(message_type='group',
+                                           group_id=group_id,
+                                           message=reply)
 
     async def get_week_events(self) -> str:
         """ 获取日程表 """
@@ -128,4 +123,4 @@ class Calender:
         return reply
 
 
-calender = Calender()
+calender_obj = Calender()
