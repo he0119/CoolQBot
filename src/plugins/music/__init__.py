@@ -41,9 +41,9 @@ async def music_handle_first_receive(bot: Bot, event: MessageEvent,
 
 @music_cmd.got('name', prompt='你想听哪首歌呢？')
 async def music_handle(bot: Bot, event: MessageEvent, state: T_State):
-    music_str = await call_netease_api(state['name'])
-    if music_str:
-        await music_cmd.finish(music_str)
+    music_message = await call_netease_api(state['name'])
+    if music_message:
+        await music_cmd.finish(music_message)
     else:
         await music_cmd.finish(render_expression(EXPR_NOT_FOUND),
                                at_sender=True)
