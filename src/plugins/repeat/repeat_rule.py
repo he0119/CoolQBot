@@ -44,6 +44,10 @@ def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
     if event.message[0].type in ['sign', 'share', 'json', 'forward']:
         return False
 
+    # 不要复读带网址的消息
+    if 'http' in event.raw_message:
+        return False
+
     # 复读之后一定时间内不再复读
     time = recorder_obj.last_message_on(group_id)
     if now < time + timedelta(minutes=plugin_config.repeat_interval):
