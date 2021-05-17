@@ -45,7 +45,8 @@ def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
         return False
 
     # 不要复读带网址的消息
-    if 'http' in event.raw_message:
+    if 'http://' in event.raw_message.lower(
+    ) or 'https://' in event.raw_message.lower():
         return False
 
     # 复读之后一定时间内不再复读
