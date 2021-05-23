@@ -4,7 +4,7 @@ from nonebot.adapters.cqhttp.event import MessageEvent
 from nonebot.adapters import Bot
 from nonebot.typing import T_State
 
-from src.utils.commands import CommandInfo, get_command_help, get_commands
+from .commands import CommandInfo, get_command_help, get_commands
 
 help_cmd = on_command('help', aliases={'帮助'}, block=True)
 help_cmd.__doc__ = """
