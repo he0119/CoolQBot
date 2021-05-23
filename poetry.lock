@@ -329,7 +329,7 @@ reference = "aliyun"
 
 [[package]]
 name = "nb-cli"
-version = "0.4.1"
+version = "0.4.2"
 description = "CLI for nonebot2"
 category = "main"
 optional = false
@@ -729,7 +729,7 @@ reference = "aliyun"
 
 [[package]]
 name = "rfc3986"
-version = "1.4.0"
+version = "1.5.0"
 description = "Validating URI References per RFC 3986"
 category = "main"
 optional = false
@@ -1023,7 +1023,7 @@ reference = "aliyun"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "1c5e6a7e38f9dd42b136ae46be12b4c028c04663c0d27a3ac5a2098b7fb5e3db"
+content-hash = "a4829b773e7ebf2a2ed56b4f2004bf5da4a3e4be5721a205810d2d623fb92406"
 
 [metadata.files]
 aiofiles = [
@@ -1163,8 +1163,8 @@ markupsafe = [
     {file = "MarkupSafe-1.1.1.tar.gz", hash = "sha256:29872e92839765e546828bb7754a68c418d927cd064fd4708fab9fe9c8bb116b"},
 ]
 nb-cli = [
-    {file = "nb-cli-0.4.1.tar.gz", hash = "sha256:77afdfb0f9b802d0604adf11c42413d584e741f2f0d6fe0328718e342c375522"},
-    {file = "nb_cli-0.4.1-py3-none-any.whl", hash = "sha256:04dfbe530628a0317d26db0f2dc1a38609f25bb510b3a67ca5485dc47a1a6f42"},
+    {file = "nb-cli-0.4.2.tar.gz", hash = "sha256:315377ce6899767dadb6969ea560a6ebfd4effcc8651477ba2e30c01ba3ab605"},
+    {file = "nb_cli-0.4.2-py3-none-any.whl", hash = "sha256:726082216de9994f8730d8168d6a2bd598c3e8d22b80f5d5cc022e5bbe1de121"},
 ]
 nonebot-adapter-cqhttp = [
     {file = "nonebot-adapter-cqhttp-2.0.0a13.tar.gz", hash = "sha256:906891c318d394d358331c15ed6d8b1a6a4df75d9ceb43a2d0115ebfb204b5d2"},
@@ -1343,8 +1343,8 @@ requests = [
     {file = "requests-2.25.1.tar.gz", hash = "sha256:27973dd4a904a4f13b263a19c866c13b92a39ed1c964655f025f3f8d3d75b804"},
 ]
 rfc3986 = [
-    {file = "rfc3986-1.4.0-py2.py3-none-any.whl", hash = "sha256:af9147e9aceda37c91a05f4deb128d4b4b49d6b199775fd2d2927768abdc8f50"},
-    {file = "rfc3986-1.4.0.tar.gz", hash = "sha256:112398da31a3344dc25dbf477d8df6cb34f9278a94fee2625d89e4514be8bb9d"},
+    {file = "rfc3986-1.5.0-py2.py3-none-any.whl", hash = "sha256:a86d6e1f5b1dc238b218b012df0aa79409667bb209e58da56d0b94704e712a97"},
+    {file = "rfc3986-1.5.0.tar.gz", hash = "sha256:270aaf10d87d0d4e095063c65bf3ddbc6ee3d0b226328ce21e036f946e421835"},
 ]
 sentry-sdk = [
     {file = "sentry-sdk-1.0.0.tar.gz", hash = "sha256:71de00c9711926816f750bc0f57ef2abbcb1bfbdf5378c601df7ec978f44857a"},
