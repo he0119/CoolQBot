@@ -5,7 +5,7 @@
 import inspect
 from dataclasses import dataclass
 from functools import reduce
-from typing import List, Optional
+from typing import Optional
 
 from nonebot import get_loaded_plugins
 
@@ -14,11 +14,11 @@ from nonebot import get_loaded_plugins
 class CommandInfo:
     """ 命令的信息 """
     name: str
-    aliases: List[str]
+    aliases: list[str]
     help: str
 
 
-_commands: Optional[List[CommandInfo]] = None
+_commands: Optional[list[CommandInfo]] = None
 
 
 def extract_command_info(doc: str) -> CommandInfo:
@@ -33,7 +33,7 @@ def extract_command_info(doc: str) -> CommandInfo:
     return CommandInfo(name=name, aliases=aliases, help=help)
 
 
-def get_commands() -> List[CommandInfo]:
+def get_commands() -> list[CommandInfo]:
     """ 获取所有命令的信息
 
     并保存，方便下次使用
