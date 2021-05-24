@@ -11,9 +11,9 @@ from nonebot.adapters.cqhttp.permission import GROUP
 from nonebot.exception import FinishedException
 from nonebot.typing import T_State
 
-from src.utils.commands import get_command_help
 from src.utils.helpers import strtobool
 
+from ..help.commands import get_command_help
 from .config import plugin_config
 from .fflogs_api import fflogs
 from .fflogs_data import update_data
