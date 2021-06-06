@@ -3,11 +3,11 @@ from pydantic import BaseSettings
 
 from src.utils.plugin import PluginData
 
-DATA = PluginData('weather', config=True)
+DATA = PluginData('weather')
 
 
 class Config(BaseSettings):
-    heweather_key: str = DATA.get_config('heweather', 'key')
+    heweather_key: str = DATA.config.get('heweather', 'key')
 
     class Config:
         extra = 'ignore'

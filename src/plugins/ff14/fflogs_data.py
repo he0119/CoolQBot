@@ -2,12 +2,8 @@
 
 副本与职业数据
 """
-import json
 from dataclasses import dataclass
-from typing import Dict, List, Optional
-
-import httpx
-from nonebot.log import logger
+from typing import Optional
 
 from .config import DATA
 
@@ -28,76 +24,22 @@ class JobInfo:
     spec: int
 
 
-_boss_data: List = []
-_job_data: List = []
+FFLOGS_DATA = DATA.network_file(
+    'https://cdn.jsdelivr.net/gh/he0119/coolqbot@master/src/plugins/ff14/fflogs_data.json',
+    'fflogs_data.json',
+)
 
 
-async def load_data_from_repo():
-    """ 从仓库获取数据 """
-    logger.info('正在加载仓库数据')
-
-    global _boss_data, _job_data
-    async with httpx.AsyncClient() as client:
-        r = await client.get(
-            'https://cdn.jsdelivr.net/gh/he0119/coolqbot@master/src/plugins/ff14/fflogs_data.json',
-            timeout=30)
-        if r.status_code != 200:
-            logger.error('仓库数据加载失败')
-            return
-        rjson = r.json()
-        _boss_data = rjson['boss']
-        _job_data = rjson['job']
-        logger.info('仓库数据加载成功')
-        # 同时保存一份文件在本地，以后就不用从网络获取
-        with DATA.open('fflogs_data.json', open_mode='w',
-                       encoding='utf8') as f:
-            json.dump(rjson, f, ensure_ascii=False, indent=2)
-            logger.info('已保存数据至本地')
-
-
-async def load_data_from_local():
-    """ 从本地获取数据 """
-    logger.info('正在加载本地数据')
-
-    global _boss_data, _job_data
-    if DATA.exists('fflogs_data.json'):
-        with DATA.open('fflogs_data.json', encoding='utf8') as f:
-            data = json.load(f)
-            _boss_data = data['boss']
-            _job_data = data['job']
-            logger.info('本地数据加载成功')
-    else:
-        logger.info('本地数据不存在')
-
-
-async def load_data():
-    """ 加载数据
-
-    先从本地加载，如果失败则从仓库加载
-    """
-    if not _boss_data or not _job_data:
-        await load_data_from_local()
-    if not _boss_data or not _job_data:
-        await load_data_from_repo()
-
-
-async def update_data():
-    """ 从网络更新数据 """
-    await load_data_from_repo()
-
-
-async def get_boss_data() -> List:
+async def get_boss_data() -> list:
     """ 获取 boss 数据 """
-    if not _boss_data:
-        await load_data()
-    return _boss_data
+    data = await FFLOGS_DATA.data
+    return data['boss']
 
 
-async def get_job_data() -> List:
+async def get_job_data() -> list:
     """ 获取 job 数据 """
-    if not _job_data:
-        await load_data()
-    return _job_data
+    data = await FFLOGS_DATA.data
+    return data['job']
 
 
 async def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:
@@ -117,7 +59,7 @@ async def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:
     return None
 
 
-async def get_bosses_info() -> List[BossInfo]:
+async def get_bosses_info() -> list[BossInfo]:
     """ 获取所有 BOSS 的相关信息 """
     boss_info = []
     for boss in await get_boss_data():
@@ -143,7 +85,7 @@ async def get_job_info_by_nickname(name: str) -> Optional[JobInfo]:
     return None
 
 
-async def get_jobs_info() -> List[JobInfo]:
+async def get_jobs_info() -> list[JobInfo]:
     """ 获取所有职业的相关信息 """
     job_info = []
     for job in await get_job_data():

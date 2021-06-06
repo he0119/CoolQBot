@@ -16,7 +16,7 @@ from src.utils.helpers import strtobool
 from ..help.commands import get_command_help
 from .config import plugin_config
 from .fflogs_api import fflogs
-from .fflogs_data import update_data
+from .fflogs_data import FFLOGS_DATA
 from .gate import get_direction
 from .news import news
 
@@ -162,7 +162,7 @@ async def fflogs_handle(bot: Bot, event: MessageEvent, state: T_State):
         await fflogs_cmd.finish(f'当前的 Token 为 {plugin_config.fflogs_token}')
 
     if argv[0] == 'update' and len(argv) == 1:
-        await update_data()
+        await FFLOGS_DATA.update()
         await fflogs_cmd.finish('副本数据更新成功')
 
     # 缓存相关设置
