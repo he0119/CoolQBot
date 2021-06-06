@@ -106,7 +106,7 @@ class NetworkFile:
 
     async def update(self) -> None:
         """ 从网络更新数据 """
-        await self.load_from_network()
+        self._data = await self.load_from_network()
 
 
 class PluginData:
