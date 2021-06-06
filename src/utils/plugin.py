@@ -1,12 +1,15 @@
 """ 插件数据
 """
 import configparser
+import json
 import os
 import pickle
 from pathlib import Path
-from typing import IO, Any
+from typing import IO, Any, Optional
 
+import httpx
 from nonebot import get_driver
+from nonebot.log import logger
 
 
 class ConfigData:
@@ -53,8 +56,62 @@ class ConfigData:
         self._save_config()
 
 
+class NetworkFile:
+    """ 从网络获取文件
+
+    暂时只支持 json 格式
+    """
+    def __init__(self, url: str, filename: str,
+                 plugin_data: "PluginData") -> None:
+        self._url = url
+        self._filename = filename
+        self._plugin_data = plugin_data
+
+        self._data = None
+
+    async def load_from_network(self) -> Optional[dict]:
+        """ 从网络加载文件 """
+        logger.info('正在从网络获取数据')
+        async with httpx.AsyncClient() as client:
+            r = await client.get(self._url, timeout=30)
+            rjson = r.json()
+            # 同时保存一份文件在本地，以后就不用从网络获取
+            with self._plugin_data.open(
+                    self._filename,
+                    open_mode='w',
+                    encoding='utf8',
+            ) as f:
+                json.dump(rjson, f, ensure_ascii=False, indent=2)
+            logger.info('已保存数据至本地')
+            return rjson
+
+    def load_from_local(self) -> Optional[dict]:
+        """ 从本地获取数据 """
+        logger.info('正在加载本地数据')
+        if self._plugin_data.exists(self._filename):
+            with self._plugin_data.open(self._filename, encoding='utf8') as f:
+                return json.load(f)
+
+    @property
+    async def data(self) -> Optional[dict]:
+        """ 数据
+
+        先从本地加载，如果失败则从仓库加载
+        """
+        if not self._data:
+            self._data = self.load_from_local()
+        if not self._data:
+            self._data = await self.load_from_network()
+        return self._data
+
+    async def update(self) -> None:
+        """ 从网络更新数据 """
+        await self.load_from_network()
+
+
 class PluginData:
     """ 插件数据管理
+
     将插件数据保存在 `data` 文件夹对应的目录下。
     提供保存和读取文件/数据的方法。
     """
@@ -91,7 +148,9 @@ class PluginData:
         return open(path, open_mode, encoding=encoding)
 
     def exists(self, filename: str) -> bool:
-        """ 判断文件是否存在
-        """
+        """ 判断文件是否存在 """
         path = self._base_path / filename
         return path.exists()
+
+    def network_file(self, url: str, filename: str):
+        return NetworkFile(url, filename, self)
