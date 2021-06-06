@@ -153,4 +153,8 @@ class PluginData:
         return path.exists()
 
     def network_file(self, url: str, filename: str):
+        """ 网络文件
+
+        从网络上获取数据，并缓存至本地，仅支持 json 格式
+        """
         return NetworkFile(url, filename, self)
