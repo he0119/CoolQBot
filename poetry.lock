@@ -406,7 +406,7 @@ reference = "aliyun"
 
 [[package]]
 name = "nonebot-plugin-sentry"
-version = "0.2.0"
+version = "0.2.1"
 description = "Push your bot errors to Sentry.io"
 category = "main"
 optional = false
@@ -1022,7 +1022,7 @@ reference = "aliyun"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "a4829b773e7ebf2a2ed56b4f2004bf5da4a3e4be5721a205810d2d623fb92406"
+content-hash = "48e31f92b5837d9b2c43abcbb6364bc6f5ad469421d25f0cf7d2915ffac93b10"
 
 [metadata.files]
 aiofiles = [
@@ -1165,8 +1165,8 @@ nonebot-plugin-docs = [
     {file = "nonebot_plugin_docs-2.0.0a13.post1-py3-none-any.whl", hash = "sha256:f54ad68932b4572f26958c815b79133553a7175d5094556d9a62016b9c6d2a70"},
 ]
 nonebot-plugin-sentry = [
-    {file = "nonebot-plugin-sentry-0.2.0.tar.gz", hash = "sha256:8e773fc632d07cf4055315cfb15db26c2d561fe575923c1986c154832dd5032a"},
-    {file = "nonebot_plugin_sentry-0.2.0-py3-none-any.whl", hash = "sha256:1f1298944a709f58b7b5b94188aade56978bbfe0b8f13869c0a7764560149ea8"},
+    {file = "nonebot-plugin-sentry-0.2.1.tar.gz", hash = "sha256:7fd235c1008d46d5bf14c9e634291d20027124e01f0b0cd2cefccfbd4a31942b"},
+    {file = "nonebot_plugin_sentry-0.2.1-py3-none-any.whl", hash = "sha256:32ef18aca624b5eb983a9e599c8d678e96708ebe1c40e2d926c1a1d83fe57a93"},
 ]
 nonebot-plugin-test = [
     {file = "nonebot-plugin-test-0.2.0.tar.gz", hash = "sha256:c9ee997c5c96160de4af02d10a7c6301b3fc4e942df7e70906df0534606ea23b"},
