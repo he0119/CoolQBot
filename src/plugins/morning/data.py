@@ -1,12 +1,11 @@
-import json
 from datetime import datetime
+from typing import Optional
 
 import httpx
 from nonebot.adapters.cqhttp import Message
-from nonebot.log import logger
 
 from src.utils.helpers import render_expression
-
+from dateutil import parser
 from .config import DATA
 
 
@@ -26,65 +25,41 @@ def get_first_connect_message():
     return '早上好呀！'
 
 
-holidays: list = []
-
-
-async def load_data_from_repo():
-    """ 从仓库获取数据 """
-    logger.info('正在加载仓库数据')
-
-    global holidays
-    async with httpx.AsyncClient() as client:
-        r = await client.get(
-            'https://cdn.jsdelivr.net/gh/he0119/coolqbot@change/morning/src/plugins/morning/holidays.json',
-            timeout=30)
-        if r.status_code != 200:
-            logger.error('仓库数据加载失败')
-            return
-        rjson = r.json()
-        logger.info('仓库数据加载成功')
-        # 同时保存一份文件在本地，以后就不用从网络获取
-        with DATA.open('holidays.json', open_mode='w', encoding='utf8') as f:
-            json.dump(rjson, f, ensure_ascii=False, indent=2)
-            logger.info('已保存数据至本地')
-
-
-async def load_data_from_local():
-    """ 从本地获取数据 """
-    logger.info('正在加载本地数据')
-
-    global holidays
-    if DATA.exists('holidays.json'):
-        with DATA.open('holidays.json', encoding='utf8') as f:
-            data = json.load(f)
-            logger.info('本地数据加载成功')
-    else:
-        logger.info('本地数据不存在')
-
-
-async def load_data():
-    """ 加载数据
-
-    先从本地加载，如果失败则从仓库加载
-    """
-    if not holidays:
-        await load_data_from_local()
-    if not holidays:
-        await load_data_from_repo()
-
-
-async def update_data():
-    """ 从网络更新数据 """
-    await load_data_from_repo()
-
-
-
 EXPR_MORNING = (
     '早上好呀~>_<~\n{message}',
     '大家早上好呀！\n{message}',
     '朋友们早上好！\n{message}',
     '群友们早上好！\n{message}',
  ) # yapf: disable
+
+
+HOLIDAYS_DATA = DATA.network_file(
+    'https://cdn.jsdelivr.net/gh/he0119/coolqbot@change/morning/src/plugins/morning/holidays.json',
+    'holidays.json',
+)
+
+
+async def get_recent_holiday() -> Optional[dict[str, dict]]:
+    """ 获取最近的节假日
+
+    返回最近的节假日信息
+    """
+    now = datetime.now()
+    # 提取所需要的数据，今年和明年的节日数据
+    # 因为明年元旦的节假日可能从今年开始
+    holidays = {}
+    data = await HOLIDAYS_DATA.data
+    if data:
+        if str(now.year) in data:
+            holidays.update(data[str(now.year)])
+        if str(now.year + 1) in data:
+            holidays.update(data[str(now.year + 1)])
+    # 查找最近的节日
+    for holiday in holidays:
+        if parser.parse(holiday) > now:
+            info = holidays[holiday]
+            info['date'] = holiday
+            return info
 
 
 async def get_moring_message() -> Message:

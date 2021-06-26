@@ -6,12 +6,12 @@ from nonebot.adapters import Bot
 from nonebot.adapters.cqhttp.event import GroupMessageEvent
 from nonebot.adapters.cqhttp.permission import GROUP
 from nonebot.plugin import on_command
-from nonebot.typing import T_State
 
 from src.utils.helpers import get_first_bot, strtobool
 
 from .config import plugin_config
-from .data import get_first_connect_message, get_moring_message
+from .data import (get_first_connect_message, get_moring_message,
+                   get_recent_holiday)
 
 scheduler = require("nonebot_plugin_apscheduler").scheduler
 driver = nonebot.get_driver()
@@ -38,14 +38,16 @@ async def hello_on_connect(bot: Bot) -> None:
                          id='morning')
 async def morning():
     """ 早安 """
-    hello_str = await get_moring_message()
-    for group_id in plugin_config.group_id:
-        await get_first_bot().send_msg(
-            message_type='group',
-            group_id=group_id,
-            message=hello_str,
-        )
-    logger.info('发送早安信息')
+    bot = get_first_bot()
+    if bot:
+        hello_str = await get_moring_message()
+        for group_id in plugin_config.group_id:
+            await bot.send_msg(
+                message_type='group',
+                group_id=group_id,
+                message=hello_str,
+            )
+        logger.info('发送早安信息')
 
 
 morning_cmd = on_command('morning', aliases={'早安'}, permission=GROUP)
@@ -66,10 +68,13 @@ morning 早安
 
 
 @morning_cmd.handle()
-async def morning_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def morning_handle(bot: Bot, event: GroupMessageEvent):
     args = str(event.message).strip()
 
     group_id = event.group_id
+
+    if args == 'test':
+        await morning_cmd.finish(str(await get_recent_holiday()))
 
     if args and group_id:
         if strtobool(args):
