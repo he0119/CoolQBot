@@ -821,6 +821,19 @@ url = "https://mirrors.aliyun.com/pypi/simple"
 reference = "aliyun"
 
 [[package]]
+name = "tencentcloud-sdk-python"
+version = "3.0.434"
+description = "Tencent Cloud SDK for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.aliyun.com/pypi/simple"
+reference = "aliyun"
+
+[[package]]
 name = "text-unidecode"
 version = "1.3"
 description = "The most basic Text::Unidecode port"
@@ -1022,7 +1035,7 @@ reference = "aliyun"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "9e1852d9a4215105f95cfca03eb779823ed01ff9048dfa22ab393ddf67738c06"
+content-hash = "ad58ad397fd53f9e89272850fa7d7436a5caab47a6722160c3b41398d341dce7"
 
 [metadata.files]
 aiofiles = [
@@ -1346,6 +1359,10 @@ sniffio = [
 starlette = [
     {file = "starlette-0.13.6-py3-none-any.whl", hash = "sha256:bd2ffe5e37fb75d014728511f8e68ebf2c80b0fa3d04ca1479f4dc752ae31ac9"},
     {file = "starlette-0.13.6.tar.gz", hash = "sha256:ebe8ee08d9be96a3c9f31b2cb2a24dbdf845247b745664bd8a3f9bd0c977fdbc"},
+]
+tencentcloud-sdk-python = [
+    {file = "tencentcloud-sdk-python-3.0.434.tar.gz", hash = "sha256:8350b592099250e9a988fe65003134afce3f0b5832dd97ae333899080d79f49f"},
+    {file = "tencentcloud_sdk_python-3.0.434-py2.py3-none-any.whl", hash = "sha256:9cded5a470af7c801686273e822c32d6d8829b912e9234bc61b45552e1d172ad"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},
