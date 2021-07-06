@@ -15,7 +15,7 @@ nonebot-plugin-sentry = "^0.2.2"
 nonebot2 = "^2.0.0-alpha.13"
 python = "^3.8"
 python-dateutil = "^2.8.1"
-tencentcloud-sdk-python = "^3.0.434"
+tencentcloud-sdk-python = "^3.0.436"
 
 [tool.poetry.dev-dependencies]
 nonebot-plugin-docs = "^2.0.0-alpha.11"
