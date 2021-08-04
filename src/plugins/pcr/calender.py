@@ -6,9 +6,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Set
 
 import httpx
-from nonebot import logger, require
-
-from src.utils.helpers import get_first_bot
+from nonebot import get_bot, logger, require
 
 from .config import plugin_config
 
@@ -98,9 +96,9 @@ class Calender:
 
         reply = '公主连结Re:Dive 今日活动：\n{}'.format(events_str)
         for group_id in plugin_config.push_calender_group_id:
-            await get_first_bot().send_msg(message_type='group',
-                                           group_id=group_id,
-                                           message=reply)
+            await get_bot().send_msg(message_type='group',
+                                     group_id=group_id,
+                                     message=reply)
 
     async def get_week_events(self) -> str:
         """ 获取日程表 """

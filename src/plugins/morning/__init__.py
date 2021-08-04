@@ -1,14 +1,14 @@
 """ 每日早安插件
 """
 import nonebot
-from nonebot import logger, require
+from nonebot import get_bot, logger, require
 from nonebot.adapters import Bot
 from nonebot.adapters.cqhttp.event import GroupMessageEvent
 from nonebot.adapters.cqhttp.permission import GROUP
 from nonebot.plugin import on_command
 from nonebot.typing import T_State
 
-from src.utils.helpers import get_first_bot, strtobool
+from src.utils.helpers import strtobool
 
 from .config import plugin_config
 from .data import get_first_connect_message, get_moring_message
@@ -40,7 +40,7 @@ async def morning():
     """ 早安 """
     hello_str = await get_moring_message()
     for group_id in plugin_config.group_id:
-        await get_first_bot().send_msg(
+        await get_bot().send_msg(
             message_type='group',
             group_id=group_id,
             message=hello_str,
