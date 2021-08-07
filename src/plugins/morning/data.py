@@ -1,7 +1,6 @@
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, timedelta
+from typing import Optional, TypedDict
 
-import httpx
 from nonebot.adapters.cqhttp import Message
 
 from src.utils.helpers import render_expression
@@ -32,6 +31,13 @@ EXPR_MORNING = (
     '群友们早上好！\n{message}',
  ) # yapf: disable
 
+class HolidayInfo(TypedDict):
+    """ 节假日信息 """
+    name: str
+    date: datetime
+    holiday: bool
+    after: bool
+
 
 HOLIDAYS_DATA = DATA.network_file(
     'https://cdn.jsdelivr.net/gh/he0119/coolqbot@change/morning/src/plugins/morning/holidays.json',
@@ -39,46 +45,72 @@ HOLIDAYS_DATA = DATA.network_file(
 )
 
 
-async def get_recent_holiday() -> Optional[dict[str, dict]]:
+async def get_recent_holiday() -> Optional[HolidayInfo]:
     """ 获取最近的节假日
 
     返回最近的节假日信息
     """
+    data = await HOLIDAYS_DATA.data
+    if not data:
+        raise
+
     now = datetime.now()
     # 提取所需要的数据，今年和明年的节日数据
     # 因为明年元旦的节假日可能从今年开始
-    holidays = {}
-    data = await HOLIDAYS_DATA.data
-    if data:
-        if str(now.year) in data:
-            holidays.update(data[str(now.year)])
-        if str(now.year + 1) in data:
-            holidays.update(data[str(now.year + 1)])
-    # 查找最近的节日
+    holiday_raw_data: dict[str, dict] = {}
+    for year in range(now.year, now.year + 2):
+        if str(year) in data:
+            holiday_raw_data.update(data[str(year)])
+
+    holidays: list[HolidayInfo] = []
+    for date in holiday_raw_data:
+        holidays += process_holiday(parser.parse(date), holiday_raw_data[date])
+    holidays.sort(key=lambda info: info['date'])
+
     for holiday in holidays:
-        if parser.parse(holiday) > now:
-            info = holidays[holiday]
-            info['date'] = holiday
-            return info
+        if holiday['date'] > now:
+            return holiday
+
+
+def process_holiday(date: datetime, data: dict) -> list[HolidayInfo]:
+    """ 处理节假日数据 """
+    holidays: list[HolidayInfo] = []
+    for i in range(data['duration']):
+        holidays.append(
+            HolidayInfo(
+                name=data['name'],
+                date=date + timedelta(days=i),
+                holiday=True,
+                after=False,
+            ))
+    # if data['workdays']:
+    #     for workday in data['workdays']:
+    #         workday = parser.parse(workday)
+    #         holidays.append(
+    #             HolidayInfo(
+    #                 name=data['name'],
+    #                 date=workday,
+    #                 holiday=False,
+    #                 after=workday > date,
+    #             ))
+    return holidays
 
 
 async def get_moring_message() -> Message:
     """ 获得早上问好
 
     日期不同，不同的问候语
-    通过 [免费节假日 API](http://timor.tech/api/holiday/)
     """
-    try:
-        # 获得不同的问候语
-        async with httpx.AsyncClient() as client:
-            r = await client.get('http://timor.tech/api/holiday/tts')
-            rjson = r.json()
-    except:
-        rjson = {'code': -1}
+    now = datetime.now()
+    now = datetime(now.year, now.month, now.day)
 
-    if rjson['code'] == 0:
-        message = rjson['tts']
-    else:
-        message = '好像没法获得节假日信息了，嘤嘤嘤'
+    holiday = await get_recent_holiday()
+    if holiday:
+        # 周末的日期，确认是否在周末，是否和节假日重叠
+
+        # 节日距离现在还有多少天
+        rest = (holiday['date'] - now).days
+
+    message = ''
 
     return render_expression(EXPR_MORNING, message=message)

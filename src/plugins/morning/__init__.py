@@ -10,8 +10,7 @@ from nonebot.plugin import on_command
 from src.utils.helpers import get_first_bot, strtobool
 
 from .config import plugin_config
-from .data import (get_first_connect_message, get_moring_message,
-                   get_recent_holiday)
+from .data import get_first_connect_message, get_moring_message
 
 scheduler = require("nonebot_plugin_apscheduler").scheduler
 driver = nonebot.get_driver()
@@ -74,7 +73,7 @@ async def morning_handle(bot: Bot, event: GroupMessageEvent):
     group_id = event.group_id
 
     if args == 'test':
-        await morning_cmd.finish(str(await get_recent_holiday()))
+        await morning_cmd.finish(await get_moring_message())
 
     if args and group_id:
         if strtobool(args):
