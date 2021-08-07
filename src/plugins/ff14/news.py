@@ -1,12 +1,10 @@
 """ 消息推送 """
 from datetime import datetime, timedelta
 from typing import Dict, Optional
-from dateutil.parser import parse
 
 import httpx
-from nonebot import logger, require
-
-from src.utils.helpers import get_first_bot
+from dateutil.parser import parse
+from nonebot import get_bot, logger, require
 
 from .config import plugin_config
 
@@ -73,14 +71,12 @@ class News:
         if plugin_config.push_news_last_news_date == datetime(2000, 1, 1):
             # 如果初次运行，则记录并发送第一条新闻
             plugin_config.push_news_last_news_date = parse(
-                news['Data'][0]['PublishDate']
-            )
+                news['Data'][0]['PublishDate'])
             news_list.append(news['Data'][0])
 
         for item in news['Data']:
-            if parse(
-                item['PublishDate']
-            ) <= plugin_config.push_news_last_news_date:
+            if parse(item['PublishDate']
+                     ) <= plugin_config.push_news_last_news_date:
                 break
             news_list.append(item)
 
@@ -89,13 +85,12 @@ class News:
             msg = '最终幻想XIV官网更新：\n=======\n' + '\n-------\n'.join(
                 map(self.format_message, news_list))
             for group_id in plugin_config.push_news_group_id:
-                await get_first_bot().send_msg(message_type='group',
-                                               group_id=group_id,
-                                               message=msg)
+                await get_bot().send_msg(message_type='group',
+                                         group_id=group_id,
+                                         message=msg)
             # 添加最新的那一条新闻的 ID
             plugin_config.push_news_last_news_date = parse(
-                news_list[0]['PublishDate']
-            )
+                news_list[0]['PublishDate'])
 
 
 news = News()

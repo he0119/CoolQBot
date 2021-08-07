@@ -1,7 +1,6 @@
 import random
-from typing import List, Optional, Sequence
+from typing import List, Sequence
 
-from nonebot import get_bots
 from nonebot.adapters import Bot
 from nonebot.adapters.cqhttp import Message
 
@@ -24,12 +23,6 @@ def render_expression(expr: Expression_T, *args, **kwargs) -> Message:
     else:
         result = expr
     return Message(result.format(*args, **kwargs))
-
-
-def get_first_bot() -> Optional[Bot]:
-    """ 获得连接的第一个 bot """
-    if get_bots():
-        return list(get_bots().values())[0]
 
 
 def strtobool(val: str) -> bool:

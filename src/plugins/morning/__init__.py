@@ -1,13 +1,13 @@
 """ 每日早安插件
 """
 import nonebot
-from nonebot import logger, require
+from nonebot import get_bot, logger, require
 from nonebot.adapters import Bot
 from nonebot.adapters.cqhttp.event import GroupMessageEvent
 from nonebot.adapters.cqhttp.permission import GROUP
 from nonebot.plugin import on_command
 
-from src.utils.helpers import get_first_bot, strtobool
+from src.utils.helpers import strtobool
 
 from .config import plugin_config
 from .data import get_first_connect_message, get_moring_message
@@ -37,16 +37,14 @@ async def hello_on_connect(bot: Bot) -> None:
                          id='morning')
 async def morning():
     """ 早安 """
-    bot = get_first_bot()
-    if bot:
-        hello_str = await get_moring_message()
-        for group_id in plugin_config.group_id:
-            await bot.send_msg(
-                message_type='group',
-                group_id=group_id,
-                message=hello_str,
-            )
-        logger.info('发送早安信息')
+    hello_str = await get_moring_message()
+    for group_id in plugin_config.group_id:
+        await get_bot().send_msg(
+            message_type='group',
+            group_id=group_id,
+            message=hello_str,
+        )
+    logger.info('发送早安信息')
 
 
 morning_cmd = on_command('morning', aliases={'早安'}, permission=GROUP)
