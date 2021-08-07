@@ -48,6 +48,10 @@ class ConfigData:
             self._save_config()
         return value
 
+    def getint(self, section: str, option: str, fallback: int = 0) -> int:
+        """ 默认为 0 """
+        return int(self.get(section, option, str(fallback)))
+
     def set(self, section: str, option: str, value: str) -> None:
         """ 设置配置 """
         if section not in self._config.sections():
