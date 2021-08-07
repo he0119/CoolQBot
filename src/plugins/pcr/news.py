@@ -7,9 +7,7 @@ from datetime import datetime, timedelta
 from typing import Dict
 
 import httpx
-from nonebot import logger, require
-
-from src.utils.helpers import get_first_bot
+from nonebot import get_bot, logger, require
 
 from .config import plugin_config
 
@@ -117,9 +115,9 @@ class News:
             msg = '公主连结Re:Dive B站动态更新：\n=======\n' + '\n-------\n'.join(
                 map(self.format_message, news_list))
             for group_id in plugin_config.push_news_group_id:
-                await get_first_bot().send_msg(message_type='group',
-                                               group_id=group_id,
-                                               message=msg)
+                await get_bot().send_msg(message_type='group',
+                                         group_id=group_id,
+                                         message=msg)
             # 添加最新的那一条动态的 ID
             plugin_config.push_news_last_news_id = self.get_news_id(
                 news_list[0])
