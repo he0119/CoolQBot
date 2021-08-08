@@ -1,18 +1,18 @@
 """ 每日早安插件
 """
 import nonebot
-from nonebot import get_bot, logger, require
+from nonebot import get_bot, logger
 from nonebot.adapters import Bot
 from nonebot.adapters.cqhttp.event import GroupMessageEvent
 from nonebot.adapters.cqhttp.permission import GROUP
 from nonebot.plugin import on_command
+from nonebot_plugin_apscheduler import scheduler
 
 from src.utils.helpers import strtobool
 
 from .config import plugin_config
 from .data import get_first_connect_message, get_moring_message
 
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 driver = nonebot.get_driver()
 
 
