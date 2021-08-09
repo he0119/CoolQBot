@@ -35,7 +35,10 @@ class HolidayInfo(TypedDict):
     """ 节假日信息 """
     name: str
     date: datetime
+    # 是否为节假日
     holiday: bool
+    # 调休是否在节假日后
+    # 如果是节假日则默认为真
     after: bool
 
 
@@ -72,6 +75,33 @@ async def get_recent_holiday() -> Optional[HolidayInfo]:
             return holiday
 
 
+async def get_recent_workday() -> Optional[HolidayInfo]:
+    """ 获取最近的节假日调休
+
+    返回最近的节假日调休信息
+    """
+    data = await HOLIDAYS_DATA.data
+    if not data:
+        raise
+
+    now = datetime.now()
+    # 提取所需要的数据，今年和明年的节日数据
+    # 因为明年元旦的节假日可能从今年开始
+    holiday_raw_data: dict[str, dict] = {}
+    for year in range(now.year, now.year + 2):
+        if str(year) in data:
+            holiday_raw_data.update(data[str(year)])
+
+    workdays: list[HolidayInfo] = []
+    for date in holiday_raw_data:
+        workdays += process_workday(parser.parse(date), holiday_raw_data[date])
+    workdays.sort(key=lambda info: info['date'])
+
+    for workday in workdays:
+        if workday['date'] > now:
+            return workday
+
+
 def process_holiday(date: datetime, data: dict) -> list[HolidayInfo]:
     """ 处理节假日数据 """
     holidays: list[HolidayInfo] = []
@@ -83,17 +113,23 @@ def process_holiday(date: datetime, data: dict) -> list[HolidayInfo]:
                 holiday=True,
                 after=False,
             ))
-    # if data['workdays']:
-    #     for workday in data['workdays']:
-    #         workday = parser.parse(workday)
-    #         holidays.append(
-    #             HolidayInfo(
-    #                 name=data['name'],
-    #                 date=workday,
-    #                 holiday=False,
-    #                 after=workday > date,
-    #             ))
     return holidays
+
+
+def process_workday(date: datetime, data: dict) -> list[HolidayInfo]:
+    """ 处理节假日调休数据 """
+    workdays: list[HolidayInfo] = []
+    if data['workdays']:
+        for workday in data['workdays']:
+            workday = parser.parse(workday)
+            workdays.append(
+                HolidayInfo(
+                    name=data['name'],
+                    date=workday,
+                    holiday=False,
+                    after=workday > date,
+                ))
+    return workdays
 
 
 async def get_moring_message() -> Message:
@@ -104,13 +140,14 @@ async def get_moring_message() -> Message:
     now = datetime.now()
     now = datetime(now.year, now.month, now.day)
 
+    message = ''
+
     holiday = await get_recent_holiday()
+    workday = await get_recent_workday()
     if holiday:
         # 周末的日期，确认是否在周末，是否和节假日重叠
 
         # 节日距离现在还有多少天
         rest = (holiday['date'] - now).days
-
-    message = ''
 
     return render_expression(EXPR_MORNING, message=message)
