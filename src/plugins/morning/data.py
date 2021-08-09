@@ -42,9 +42,21 @@ class HolidayInfo(TypedDict):
     after: bool
 
 
+def process_data(data: dict) -> dict:
+    # 提取所需要的数据，今年和明年的节日数据
+    # 因为明年元旦的节假日可能从今年开始
+    now = datetime.now()
+    holidays: dict[str, dict] = {}
+    for year in range(now.year, now.year + 2):
+        if str(year) in data:
+            holidays.update(data[str(year)])
+    return holidays
+
+
 HOLIDAYS_DATA = DATA.network_file(
     'https://cdn.jsdelivr.net/gh/he0119/coolqbot@change/morning/src/plugins/morning/holidays.json',
     'holidays.json',
+    process_data,
 )
 
 
@@ -58,16 +70,10 @@ async def get_recent_holiday() -> Optional[HolidayInfo]:
         raise
 
     now = datetime.now()
-    # 提取所需要的数据，今年和明年的节日数据
-    # 因为明年元旦的节假日可能从今年开始
-    holiday_raw_data: dict[str, dict] = {}
-    for year in range(now.year, now.year + 2):
-        if str(year) in data:
-            holiday_raw_data.update(data[str(year)])
 
     holidays: list[HolidayInfo] = []
-    for date in holiday_raw_data:
-        holidays += process_holiday(parser.parse(date), holiday_raw_data[date])
+    for date in data:
+        holidays += process_holiday(parser.parse(date), data[date])
     holidays.sort(key=lambda info: info['date'])
 
     for holiday in holidays:
@@ -85,16 +91,10 @@ async def get_recent_workday() -> Optional[HolidayInfo]:
         raise
 
     now = datetime.now()
-    # 提取所需要的数据，今年和明年的节日数据
-    # 因为明年元旦的节假日可能从今年开始
-    holiday_raw_data: dict[str, dict] = {}
-    for year in range(now.year, now.year + 2):
-        if str(year) in data:
-            holiday_raw_data.update(data[str(year)])
 
     workdays: list[HolidayInfo] = []
-    for date in holiday_raw_data:
-        workdays += process_workday(parser.parse(date), holiday_raw_data[date])
+    for date in data:
+        workdays += process_workday(parser.parse(date), data[date])
     workdays.sort(key=lambda info: info['date'])
 
     for workday in workdays:
