@@ -5,7 +5,7 @@ import json
 import os
 import pickle
 from pathlib import Path
-from typing import IO, Any, Optional
+from typing import IO, Any, Callable, Optional
 
 import httpx
 from nonebot import get_driver
@@ -65,11 +65,15 @@ class NetworkFile:
 
     暂时只支持 json 格式
     """
-    def __init__(self, url: str, filename: str,
-                 plugin_data: "PluginData") -> None:
+    def __init__(self,
+                 url: str,
+                 filename: str,
+                 plugin_data: "PluginData",
+                 process_data: Callable[[dict], dict] = None) -> None:
         self._url = url
         self._filename = filename
         self._plugin_data = plugin_data
+        self._process_data = process_data
 
         self._data = None
 
@@ -87,6 +91,8 @@ class NetworkFile:
             ) as f:
                 json.dump(rjson, f, ensure_ascii=False, indent=2)
             logger.info('已保存数据至本地')
+            if self._process_data:
+                rjson = self._process_data(rjson)
             return rjson
 
     def load_from_local(self) -> Optional[dict]:
@@ -94,7 +100,10 @@ class NetworkFile:
         logger.info('正在加载本地数据')
         if self._plugin_data.exists(self._filename):
             with self._plugin_data.open(self._filename, encoding='utf8') as f:
-                return json.load(f)
+                data = json.load(f)
+                if self._process_data:
+                    data = self._process_data(data)
+                return data
 
     @property
     async def data(self) -> Optional[dict]:
@@ -156,9 +165,13 @@ class PluginData:
         path = self._base_path / filename
         return path.exists()
 
-    def network_file(self, url: str, filename: str):
+    def network_file(self,
+                     url: str,
+                     filename: str,
+                     process_data: Callable[[dict], dict] = None):
         """ 网络文件
 
         从网络上获取数据，并缓存至本地，仅支持 json 格式
+        且可以在获取数据之后同时处理数据
         """
-        return NetworkFile(url, filename, self)
+        return NetworkFile(url, filename, self, process_data)
