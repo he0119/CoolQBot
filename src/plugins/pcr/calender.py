@@ -3,14 +3,13 @@
 https://tools.yobot.win/calender/#cn
 """
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Set
+from typing import Dict, Optional, Set
 
 import httpx
-from nonebot import get_bot, logger, require
+from nonebot import get_bot, logger
+from nonebot_plugin_apscheduler import scheduler
 
 from .config import plugin_config
-
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
 class Calender:

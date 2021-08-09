@@ -4,11 +4,10 @@ from typing import Dict, Optional
 
 import httpx
 from dateutil.parser import parse
-from nonebot import get_bot, logger, require
+from nonebot import get_bot, logger
+from nonebot_plugin_apscheduler import scheduler
 
 from .config import plugin_config
-
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
 class News:
