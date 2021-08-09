@@ -65,7 +65,7 @@ async def gate_handle(bot: Bot, event: Event, state: T_State):
 
 #endregion
 #region 新闻推送
-news_cmd = ff14.command('news', permission=GROUP)
+news_cmd = ff14.command('news', aliases=None, permission=GROUP)
 news_cmd.__doc__ = """
 ff14.news
 
@@ -211,7 +211,8 @@ async def fflogs_handle(bot: Bot, event: MessageEvent, state: T_State):
 
     if argv[0] == 'zones' and len(argv) == 2:
         reply = await fflogs.zones()
-        await fflogs_cmd.finish(str(reply[int(argv[1])]))
+        if reply:
+            await fflogs_cmd.finish(str(reply[int(argv[1])]))
 
     # 判断查询排行是指个人还是特定职业
     if len(argv) == 2:

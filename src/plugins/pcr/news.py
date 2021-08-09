@@ -7,11 +7,10 @@ from datetime import datetime, timedelta
 from typing import Dict
 
 import httpx
-from nonebot import get_bot, logger, require
+from nonebot import get_bot, logger
+from nonebot_plugin_apscheduler import scheduler
 
 from .config import plugin_config
-
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
 class News:
