@@ -55,7 +55,7 @@ def process_data(data: dict) -> dict:
 
 
 HOLIDAYS_DATA = DATA.network_file(
-    'https://cdn.jsdelivr.net/gh/he0119/coolqbot@change/morning/src/plugins/morning/holidays.json',
+    'https://cdn.jsdelivr.net/gh/he0119/coolqbot@master/src/plugins/morning/holidays.json',
     'holidays.json',
     process_data,
 )
