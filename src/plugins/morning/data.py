@@ -25,13 +25,6 @@ def get_first_connect_message():
     return '早上好呀！'
 
 
-EXPR_MORNING = (
-    '早上好呀~>_<~\n{message}',
-    '大家早上好呀！\n{message}',
-    '朋友们早上好！\n{message}',
-    '群友们早上好！\n{message}',
- ) # yapf: disable
-
 class HolidayInfo(TypedDict):
     """ 节假日信息 """
     name: str
@@ -140,15 +133,17 @@ async def get_holiday_message() -> str:
 
     日期不同，不同的问候语，参考 http://timor.tech/api/holiday/tts
 
-    今天就是劳动节，好好玩吧！
-    明天就是劳动节了，开不开心？
-    今天是劳动节前调休，马上就是劳动节了，还有6天，加油！
-    劳动节才刚刚过完。今天是劳动节后调休，老老实实上班吧。
-    今天是周六，放松一下吧！
-
-    明天是中秋节前调休，记得设置好闹钟，上班别迟到了。再过2天是中秋节。
-    还有2天就是周六了，先好好工作吧！最近的一个节日是劳动节。还要9天。早着呢！
-    还有3天就是劳动节了，别着急。
+    节假日/周末：
+        今天就是劳动节，好好玩吧！
+        今天是周六，放松一下吧！
+    调休：
+        今天是劳动节前调休，马上就是劳动节了，还有6天，加油！
+        劳动节才刚刚过完。今天是劳动节后调休，老老实实上班吧。
+    工作日：
+        明天就是劳动节了，开不开心？
+        明天是中秋节前调休，记得设置好闹钟，上班别迟到了。再过2天是中秋节。
+        还有2天就是周六了，先好好工作吧！最近的一个节日是劳动节。还要9天。早着呢！
+        还有3天就是劳动节了，别着急。
     """
     holiday = await get_recent_holiday()
     workday = await get_recent_workday()
@@ -220,6 +215,12 @@ async def get_holiday_message() -> str:
 
     return f'还有{weekend_rest}天就是周六了，先好好工作吧！'
 
+EXPR_MORNING = (
+    '早上好呀~>_<~\n{message}',
+    '大家早上好呀！\n{message}',
+    '朋友们早上好！\n{message}',
+    '群友们早上好！\n{message}',
+ ) # yapf: disable
 
 async def get_moring_message() -> Message:
     """ 获得早上问好 """
