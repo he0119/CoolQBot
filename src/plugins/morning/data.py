@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Optional, TypedDict
 
 from dateutil import parser
@@ -28,7 +28,7 @@ def get_first_connect_message():
 class HolidayInfo(TypedDict):
     """ 节假日信息 """
     name: str
-    date: datetime
+    date: date
     # 是否为节假日
     holiday: bool
     # 调休是否在节假日后
@@ -39,9 +39,9 @@ class HolidayInfo(TypedDict):
 def process_data(data: dict) -> dict:
     # 提取所需要的数据，今年和明年的节日数据
     # 因为明年元旦的节假日可能从今年开始
-    now = datetime.now()
+    today = date.today()
     holidays: dict[str, dict] = {}
-    for year in range(now.year, now.year + 2):
+    for year in range(today.year, today.year + 2):
         if str(year) in data:
             holidays.update(data[str(year)])
     return holidays
@@ -61,18 +61,18 @@ async def get_recent_holiday() -> Optional[HolidayInfo]:
     """
     data = await HOLIDAYS_DATA.data
     if not data:
-        raise
+        raise Exception('获取节假日数据失败')
 
-    now = datetime.now()
-    now = datetime(now.year, now.month, now.day)
+    today = date.today()
 
     holidays: list[HolidayInfo] = []
-    for date in data:
-        holidays += process_holiday(parser.parse(date), data[date])
+    for date_str in data:
+        holidays += process_holiday(
+            parser.parse(date_str).date(), data[date_str])
     holidays.sort(key=lambda info: info['date'])
 
     for holiday in holidays:
-        if holiday['date'] >= now:
+        if holiday['date'] >= today:
             return holiday
 
 
@@ -85,20 +85,19 @@ async def get_recent_workday() -> Optional[HolidayInfo]:
     if not data:
         raise
 
-    now = datetime.now()
-    now = datetime(now.year, now.month, now.day)
+    today = date.today()
 
     workdays: list[HolidayInfo] = []
-    for date in data:
-        workdays += process_workday(parser.parse(date), data[date])
+    for date_str in data:
+        workdays += process_workday(parser.parse(date_str), data[date_str])
     workdays.sort(key=lambda info: info['date'])
 
     for workday in workdays:
-        if workday['date'] >= now:
+        if workday['date'] >= today:
             return workday
 
 
-def process_holiday(date: datetime, data: dict) -> list[HolidayInfo]:
+def process_holiday(date: date, data: dict) -> list[HolidayInfo]:
     """ 处理节假日数据 """
     holidays: list[HolidayInfo] = []
     for i in range(data['duration']):
@@ -112,7 +111,7 @@ def process_holiday(date: datetime, data: dict) -> list[HolidayInfo]:
     return holidays
 
 
-def process_workday(date: datetime, data: dict) -> list[HolidayInfo]:
+def process_workday(date: date, data: dict) -> list[HolidayInfo]:
     """ 处理节假日调休数据 """
     workdays: list[HolidayInfo] = []
     if data['workdays']:
@@ -152,16 +151,16 @@ async def get_holiday_message() -> str:
     workday_rest = -1
     holiday_rest = -1
 
-    now = datetime.now()
-    now = datetime(now.year, now.month, now.day)
+    today = date.today()
+
     # 周末距离现在还有多少天
-    weekend_rest = 5 - now.weekday()
+    weekend_rest = 5 - today.weekday()
     if workday:
         # 调休距离现在还有多少天
-        workday_rest = (workday['date'] - now).days
+        workday_rest = (workday['date'] - today).days
     if holiday:
         # 节日距离现在还有多少天
-        holiday_rest = (holiday['date'] - now).days
+        holiday_rest = (holiday['date'] - today).days
 
     # 根据节假日与调休生成问候语
 
@@ -181,13 +180,13 @@ async def get_holiday_message() -> str:
             return f'今天是{workday["name"]}前调休，马上就是{holiday["name"]}了，还有{holiday_rest}天，加油！'
 
     # 处理今天是周末，且不是节假日或者调休的情况
-    if now.weekday() == 5:
+    if today.weekday() == 5:
         return '今天是星期六，放松一下吧！'
-    if now.weekday() == 6:
+    if today.weekday() == 6:
         return '今天是星期日，放松一下吧！'
 
     # 如果今天是星期五且最近两天有调休
-    if workday and workday_rest < 3 and now.weekday() == 4:
+    if workday and workday_rest < 3 and today.weekday() == 4:
         after = workday['after']
         if after:
             weekend_name = "周六" if workday_rest == 1 else "周日"
