@@ -170,8 +170,7 @@ async def get_holiday_message() -> str:
 
     # 处理今天是调休的情况
     if workday and workday_rest == 0:
-        after = workday['after']
-        if after:
+        if workday['after']:
             return f'{workday["name"]}才刚刚过完。今天是{workday["name"]}后调休，老老实实上班吧。'
         # 调休的第二天就是节假日
         elif holiday and holiday_rest == 1:
@@ -187,8 +186,7 @@ async def get_holiday_message() -> str:
 
     # 如果今天是星期五且最近两天有调休
     if workday and workday_rest < 3 and today.weekday() == 4:
-        after = workday['after']
-        if after:
+        if workday['after']:
             weekend_name = "周六" if workday_rest == 1 else "周日"
             if holiday:
                 return f'很遗憾的告诉您，这{weekend_name}要{workday["name"]}后调休。最近的一个节日是{holiday["name"]}。还要{holiday_rest}天。早着呢！'
