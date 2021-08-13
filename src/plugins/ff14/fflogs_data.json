@@ -106,6 +106,16 @@
       "difficulty": 100
     },
     {
+      "name": "钻石神兵狂想作战",
+      "nicknames": [
+        "钻石",
+        "钻石神兵"
+      ],
+      "zone": 37,
+      "encounter": 1057,
+      "difficulty": 100
+    },
+    {
       "name": "希瓦幻巧战",
       "nicknames": [
         "幻冰神"
@@ -121,6 +131,15 @@
       ],
       "zone": 36,
       "encounter": 3002,
+      "difficulty": 100
+    },
+    {
+      "name": "利维亚桑幻巧战",
+      "nicknames": [
+        "幻水神"
+      ],
+      "zone": 36,
+      "encounter": 3003,
       "difficulty": 100
     },
     {
