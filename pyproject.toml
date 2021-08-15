@@ -18,7 +18,7 @@ python-dateutil = "^2.8.1"
 tencentcloud-sdk-python = "^3.0.434"
 
 [tool.poetry.dev-dependencies]
-nonebot-plugin-docs = "^2.0.0a14"
+nonebot-plugin-docs = "^2.0.0a15"
 # nonebot-plugin-test = "^0.2.0"
 toml = "^0.10.2"
 yapf = ">=0.31.0"
