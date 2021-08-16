@@ -89,7 +89,8 @@ async def get_recent_workday() -> Optional[HolidayInfo]:
 
     workdays: list[HolidayInfo] = []
     for date_str in data:
-        workdays += process_workday(parser.parse(date_str), data[date_str])
+        workdays += process_workday(
+            parser.parse(date_str).date(), data[date_str])
     workdays.sort(key=lambda info: info['date'])
 
     for workday in workdays:
@@ -116,7 +117,7 @@ def process_workday(date: date, data: dict) -> list[HolidayInfo]:
     workdays: list[HolidayInfo] = []
     if data['workdays']:
         for workday in data['workdays']:
-            workday = parser.parse(workday)
+            workday = parser.parse(workday).date()
             workdays.append(
                 HolidayInfo(
                     name=data['name'],
