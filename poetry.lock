@@ -457,7 +457,7 @@ reference = "aliyun"
 
 [[package]]
 name = "nonebot-adapter-cqhttp"
-version = "2.0.0a14"
+version = "2.0.0a15"
 description = "OneBot(CQHTTP) adapter for nonebot2"
 category = "main"
 optional = false
@@ -491,7 +491,7 @@ reference = "aliyun"
 
 [[package]]
 name = "nonebot-plugin-docs"
-version = "2.0.0a14"
+version = "2.0.0a15"
 description = "View NoneBot2 Docs Locally"
 category = "dev"
 optional = false
@@ -524,8 +524,26 @@ url = "https://mirrors.aliyun.com/pypi/simple"
 reference = "aliyun"
 
 [[package]]
+name = "nonebot-plugin-test"
+version = "0.3.0"
+description = "Test frontend for nonebot v2+"
+category = "dev"
+optional = false
+python-versions = ">=3.7.3,<4.0.0"
+
+[package.dependencies]
+aiofiles = ">=0.7.0,<0.8.0"
+nonebot2 = ">=2.0.0-alpha.14,<3.0.0"
+python-socketio = ">=4.6.1,<5.0.0"
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.aliyun.com/pypi/simple"
+reference = "aliyun"
+
+[[package]]
 name = "nonebot2"
-version = "2.0.0a14"
+version = "2.0.0a15"
 description = "An asynchronous python bot framework."
 category = "main"
 optional = false
@@ -660,6 +678,26 @@ url = "https://mirrors.aliyun.com/pypi/simple"
 reference = "aliyun"
 
 [[package]]
+name = "python-engineio"
+version = "3.14.2"
+description = "Engine.IO server"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+six = ">=1.9.0"
+
+[package.extras]
+asyncio_client = ["aiohttp (>=3.4)"]
+client = ["requests (>=2.21.0)", "websocket-client (>=0.54.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.aliyun.com/pypi/simple"
+reference = "aliyun"
+
+[[package]]
 name = "python-slugify"
 version = "5.0.2"
 description = "A Python Slugify application that handles Unicode"
@@ -672,6 +710,27 @@ text-unidecode = ">=1.3"
 
 [package.extras]
 unidecode = ["Unidecode (>=1.1.1)"]
+
+[package.source]
+type = "legacy"
+url = "https://mirrors.aliyun.com/pypi/simple"
+reference = "aliyun"
+
+[[package]]
+name = "python-socketio"
+version = "4.6.1"
+description = "Socket.IO server"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+python-engineio = ">=3.13.0,<4"
+six = ">=1.9.0"
+
+[package.extras]
+asyncio_client = ["aiohttp (>=3.4)", "websockets (>=7.0)"]
+client = ["requests (>=2.21.0)", "websocket-client (>=0.54.0)"]
 
 [package.source]
 type = "legacy"
@@ -824,7 +883,7 @@ reference = "aliyun"
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.457"
+version = "3.0.461"
 description = "Tencent Cloud SDK for Python"
 category = "main"
 optional = false
@@ -1038,7 +1097,7 @@ reference = "aliyun"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "8152812bd13556576ef855aa4824f5ab4021b7893d04c85dd07e84c8d0a51c73"
+content-hash = "c8b4b4ab8dd4351ac233dd112aa465f6fa2ddb9a8efe11663a446cd24a29ecf0"
 
 [metadata.files]
 aiofiles = [
@@ -1191,24 +1250,28 @@ nb-cli = [
     {file = "nb_cli-0.5.0-py3-none-any.whl", hash = "sha256:3dba8448e968db7e339d04df9a3254079085879b65467219e008b46b4fab7bf9"},
 ]
 nonebot-adapter-cqhttp = [
-    {file = "nonebot-adapter-cqhttp-2.0.0a14.tar.gz", hash = "sha256:ed4bceb96d4207e30d25319d0351d0c67f2018040a5fbdbb464e48b3e18ef425"},
-    {file = "nonebot_adapter_cqhttp-2.0.0a14-py3-none-any.whl", hash = "sha256:afe5cfff7d10ae9fc606d316eafbd30c93fbbc636d56e8f222b4670f4cd85075"},
+    {file = "nonebot-adapter-cqhttp-2.0.0a15.tar.gz", hash = "sha256:cfb3dd4678d5e9f924baeb29220b95d5b651a51668e3ded1fd39df11b3531fde"},
+    {file = "nonebot_adapter_cqhttp-2.0.0a15-py3-none-any.whl", hash = "sha256:9e5802f5c1bfb1e80ae56a80d3ee0dda2ca06ca90ba2bb2673590c91addc5aaa"},
 ]
 nonebot-plugin-apscheduler = [
     {file = "nonebot-plugin-apscheduler-0.1.2.tar.gz", hash = "sha256:1765336cd388dde15f723ed12dbca942b04e4c25d5d7786878e447b09e68b909"},
     {file = "nonebot_plugin_apscheduler-0.1.2-py3-none-any.whl", hash = "sha256:eed7b9e60d08826ae4919f82dc240fc7ec469185271c2271e14438a3e0ca7692"},
 ]
 nonebot-plugin-docs = [
-    {file = "nonebot-plugin-docs-2.0.0a14.tar.gz", hash = "sha256:6cce6ba9d03c449ffe36774ee680a4c642c441d9af530b62287038308e6640d0"},
-    {file = "nonebot_plugin_docs-2.0.0a14-py3-none-any.whl", hash = "sha256:7b921b380a5f572ebc436e85710292b62a59368eefda27e3ac9f5b5dc6203b14"},
+    {file = "nonebot-plugin-docs-2.0.0a15.tar.gz", hash = "sha256:215ca443afc74b3bee1612aae8f37f19b166ccc1b52f0da9cd8bd6f334dc7a8b"},
+    {file = "nonebot_plugin_docs-2.0.0a15-py3-none-any.whl", hash = "sha256:20293b16b64eb5c84cff66f10e60f70e1a3c0aca8acb1c763ec61fc0ea4e72c2"},
 ]
 nonebot-plugin-sentry = [
     {file = "nonebot-plugin-sentry-0.2.2.tar.gz", hash = "sha256:e042e773e1d533d9bb5deb81cc0e9a0d78800e43c5093475d65d8c91308f98f7"},
     {file = "nonebot_plugin_sentry-0.2.2-py3-none-any.whl", hash = "sha256:cc7aab8a258aa1931bd4fdab36672e6e99f645d438c6c24999688a8422ba0dd3"},
 ]
+nonebot-plugin-test = [
+    {file = "nonebot-plugin-test-0.3.0.tar.gz", hash = "sha256:6cea9342f4df69a73b9aa27a3eaa22a08c6e54b675e2e6638b4b3fc8568cd6fe"},
+    {file = "nonebot_plugin_test-0.3.0-py3-none-any.whl", hash = "sha256:edb880340436323ccd0a13b31d48975136b6bdc71daa178601c4b05b068cc73e"},
+]
 nonebot2 = [
-    {file = "nonebot2-2.0.0a14-py3-none-any.whl", hash = "sha256:2f25409917b82a01df06e794a893b71bbde18aeec087c354cbd60e67ae481d2c"},
-    {file = "nonebot2-2.0.0a14.tar.gz", hash = "sha256:d5e287a1a427d3106f0af205e4bdbe068a5ae2b72edef83fd470b3d7ae49ac3c"},
+    {file = "nonebot2-2.0.0a15-py3-none-any.whl", hash = "sha256:bc5c99bacf2864c84b8cd186c92a9850489f69354a5467c047b0210c4f4a20da"},
+    {file = "nonebot2-2.0.0a15.tar.gz", hash = "sha256:f8fb5e58a3e5b08f985d46b01798f14654e66d0cab34e73e5c5ae4ddb4a4db67"},
 ]
 poyo = [
     {file = "poyo-0.5.0-py2.py3-none-any.whl", hash = "sha256:3e2ca8e33fdc3c411cd101ca395668395dd5dc7ac775b8e809e3def9f9fe041a"},
@@ -1257,9 +1320,17 @@ python-dotenv = [
     {file = "python-dotenv-0.19.0.tar.gz", hash = "sha256:f521bc2ac9a8e03c736f62911605c5d83970021e3fa95b37d769e2bbbe9b6172"},
     {file = "python_dotenv-0.19.0-py2.py3-none-any.whl", hash = "sha256:aae25dc1ebe97c420f50b81fb0e5c949659af713f31fdb63c749ca68748f34b1"},
 ]
+python-engineio = [
+    {file = "python-engineio-3.14.2.tar.gz", hash = "sha256:eab4553f2804c1ce97054c8b22cf0d5a9ab23128075248b97e1a5b2f29553085"},
+    {file = "python_engineio-3.14.2-py2.py3-none-any.whl", hash = "sha256:5a9e6086d192463b04a1428ff1f85b6ba631bbb19d453b144ffc04f530542b84"},
+]
 python-slugify = [
     {file = "python-slugify-5.0.2.tar.gz", hash = "sha256:f13383a0b9fcbe649a1892b9c8eb4f8eab1d6d84b84bb7a624317afa98159cab"},
     {file = "python_slugify-5.0.2-py2.py3-none-any.whl", hash = "sha256:6d8c5df75cd4a7c3a2d21e257633de53f52ab0265cd2d1dc62a730e8194a7380"},
+]
+python-socketio = [
+    {file = "python-socketio-4.6.1.tar.gz", hash = "sha256:cd1f5aa492c1eb2be77838e837a495f117e17f686029ebc03d62c09e33f4fa10"},
+    {file = "python_socketio-4.6.1-py2.py3-none-any.whl", hash = "sha256:5a21da53fdbdc6bb6c8071f40e13d100e0b279ad997681c2492478e06f370523"},
 ]
 pytz = [
     {file = "pytz-2021.1-py2.py3-none-any.whl", hash = "sha256:eb10ce3e7736052ed3623d49975ce333bcd712c7bb19a58b9e2089d4057d0798"},
@@ -1321,8 +1392,8 @@ starlette = [
     {file = "starlette-0.14.2.tar.gz", hash = "sha256:7d49f4a27f8742262ef1470608c59ddbc66baf37c148e938c7038e6bc7a998aa"},
 ]
 tencentcloud-sdk-python = [
-    {file = "tencentcloud-sdk-python-3.0.457.tar.gz", hash = "sha256:ac0cc48173522c9af91031d6d070794df4e3bd60c7098e95a36cdada07255640"},
-    {file = "tencentcloud_sdk_python-3.0.457-py2.py3-none-any.whl", hash = "sha256:0c55fd6bd98178c54a26638287ef7b50f86237c82fd1628433ce921325097105"},
+    {file = "tencentcloud-sdk-python-3.0.461.tar.gz", hash = "sha256:5f69d7f2eb1a75573c70da5682ca3528c49aeda56be9577b197225cee4b9d1d7"},
+    {file = "tencentcloud_sdk_python-3.0.461-py2.py3-none-any.whl", hash = "sha256:5313b80110c5befd17b8e4c2d0ab3626430e27c3de812e90422b8149aacbfe15"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},

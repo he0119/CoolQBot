@@ -28,7 +28,7 @@ logger.add(config.data_dir_path / 'logs' / 'error.log',
 nonebot.load_plugin('nonebot_plugin_sentry')
 # 加载开发环境插件
 if config.debug:
-#     nonebot.load_plugin('nonebot_plugin_test')
+    nonebot.load_plugin('nonebot_plugin_test')
     nonebot.load_plugin('nonebot_plugin_docs')
 # 加载自己的插件
 nonebot.load_from_toml("pyproject.toml")
