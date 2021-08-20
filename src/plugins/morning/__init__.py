@@ -61,6 +61,10 @@ morning 早安
 /morning on
 关闭每日早安功能
 /morning off
+更新节假日数据
+/morning update
+获取今天的问好
+/morning today
 """
 
 
@@ -70,7 +74,7 @@ async def morning_handle(bot: Bot, event: GroupMessageEvent):
 
     group_id = event.group_id
 
-    if args == 'test':
+    if args == 'today':
         await morning_cmd.finish(await get_moring_message())
 
     if args == 'update':
