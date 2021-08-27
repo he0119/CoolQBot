@@ -93,11 +93,19 @@ class Calender:
         else:
             events_str = "\n".join(events)
 
+        try:
+            bot = get_bot()
+        except ValueError:
+            bot = None
+
         reply = '公主连结Re:Dive 今日活动：\n{}'.format(events_str)
         for group_id in plugin_config.push_calender_group_id:
-            await get_bot().send_msg(message_type='group',
-                                     group_id=group_id,
-                                     message=reply)
+            if bot:
+                await bot.send_msg(message_type='group',
+                                   group_id=group_id,
+                                   message=reply)
+            else:
+                logger.warning('no bot connected')
 
     async def get_week_events(self) -> str:
         """ 获取日程表 """
