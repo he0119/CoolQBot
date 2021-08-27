@@ -6,6 +6,8 @@ from nonebot import CommandGroup, logger
 from nonebot.adapters import Bot, Event
 from nonebot.adapters.cqhttp import GroupMessageEvent
 from nonebot.adapters.cqhttp.message import Message
+from nonebot.adapters.cqhttp.permission import GROUP_ADMIN, GROUP_OWNER
+from nonebot.permission import SUPERUSER
 from nonebot.typing import T_State
 
 from .config import Config
@@ -22,12 +24,15 @@ common_platform = [p.platform_name for p in \
 sub = CommandGroup('sub', block=True)
 
 #region 添加订阅
-add_sub_cmd = sub.command('add', aliases={'添加订阅'})
+add_sub_cmd = sub.command('add',
+                          aliases={'添加订阅'},
+                          permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
 add_sub_cmd.__doc__ = """
 sub.add 添加订阅
 
 订阅
 
+仅允许群主与管理员操作
 /添加订阅
 """
 
@@ -156,12 +161,15 @@ async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
 
 #endregion
 #region 删除订阅
-del_sub_cmd = sub.command('del', aliases={'删除订阅'})
+del_sub_cmd = sub.command('del',
+                          aliases={'删除订阅'},
+                          permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
 del_sub_cmd.__doc__ = """
 sub.del 删除订阅
 
 订阅
 
+仅允许群主与管理员操作
 /删除订阅
 """
 
