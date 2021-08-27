@@ -231,6 +231,7 @@ class Platform(PlatformNameMixin, UserCustomFilterMixin, base=True):
     is_common: bool
     enabled: bool
     name: str
+    has_target:bool
 
     @abstractmethod
     async def get_target_name(self, target: Target) -> Optional[str]:
