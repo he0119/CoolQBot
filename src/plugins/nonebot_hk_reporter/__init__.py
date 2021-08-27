@@ -1,3 +1,8 @@
+""" nonebot-hk-reporter
+
+修改自 https://github.com/felinae98/nonebot-hk-reporter
+"""
+
 from nonebot import CommandGroup, logger
 from nonebot.adapters import Bot, Event
 from nonebot.adapters.cqhttp import GroupMessageEvent
