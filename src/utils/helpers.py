@@ -1,7 +1,6 @@
 import random
-from typing import List, Sequence
+from typing import Sequence
 
-from nonebot.adapters import Bot
 from nonebot.adapters.cqhttp import Message
 
 from .typing import Expression_T
@@ -37,7 +36,7 @@ def strtobool(val: str) -> bool:
     return False
 
 
-def strtogroupid(val: str) -> List[int]:
+def strtogroupid(val: str) -> list[int]:
     """ 转换文本至群ID列表
 
     群ID用空格隔开
@@ -47,7 +46,7 @@ def strtogroupid(val: str) -> List[int]:
     return []
 
 
-def groupidtostr(val: List[int]) -> str:
+def groupidtostr(val: list[int]) -> str:
     """ 群ID列表转换至文本
 
     群ID用空格隔开
