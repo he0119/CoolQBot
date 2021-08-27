@@ -22,8 +22,7 @@ def get_config_path() -> str:
     if plugin_config.hk_reporter_config_path:
         data_dir = plugin_config.hk_reporter_config_path
     else:
-        working_dir = DATA._base_path
-        data_dir = path.join(working_dir, 'data')
+        data_dir = DATA._base_path
     if not path.isdir(data_dir):
         os.makedirs(data_dir)
     return path.join(data_dir, 'hk_reporter.json')
