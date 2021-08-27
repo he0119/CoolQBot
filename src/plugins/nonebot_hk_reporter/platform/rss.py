@@ -10,12 +10,12 @@ from ..types import RawPost, Target
 from .platform import NewMessage, TargetMixin
 
 
-class Rss(NewMessage, TargetMixin):
+class RSS(NewMessage, TargetMixin):
 
     categories = {}
     enable_tag = False
     platform_name = 'rss'
-    name = "Rss"
+    name = 'RSS'
     enabled = True
     is_common = True
     schedule_type = 'interval'

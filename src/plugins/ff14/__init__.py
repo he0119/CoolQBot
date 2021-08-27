@@ -1,13 +1,11 @@
 """ 最终幻想XIV
 
 藏宝选门
-新闻推送
 FFLogs
 """
 from nonebot import CommandGroup
 from nonebot.adapters import Bot, Event
-from nonebot.adapters.cqhttp.event import GroupMessageEvent, MessageEvent
-from nonebot.adapters.cqhttp.permission import GROUP
+from nonebot.adapters.cqhttp.event import MessageEvent
 from nonebot.exception import FinishedException
 from nonebot.typing import T_State
 
@@ -18,7 +16,6 @@ from .config import plugin_config
 from .fflogs_api import fflogs
 from .fflogs_data import FFLOGS_DATA
 from .gate import get_direction
-from .news import news
 
 ff14 = CommandGroup('ff14', block=True)
 
@@ -61,45 +58,6 @@ async def gate_handle_first_receive(bot: Bot, event: MessageEvent,
 async def gate_handle(bot: Bot, event: Event, state: T_State):
     direction = get_direction(state['door_number'])
     await gate_cmd.finish(direction, at_sender=True)
-
-
-#endregion
-#region 新闻推送
-news_cmd = ff14.command('news', aliases=None, permission=GROUP)
-news_cmd.__doc__ = """
-ff14.news
-
-最终幻想XIV 新闻推送
-
-当前群新闻推送状态
-/ff14.news
-开启推送
-/ff14.news on
-关闭推送
-/ff14.news off
-"""
-
-
-@news_cmd.handle()
-async def news_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
-    args = str(event.message).strip()
-
-    group_id = event.group_id
-
-    if args and group_id:
-        if strtobool(args):
-            plugin_config.push_news_group_id += [group_id]
-            await news_cmd.finish('已开始新闻自动推送')
-        else:
-            plugin_config.push_news_group_id = [
-                n for n in plugin_config.push_news_group_id if n != group_id
-            ]
-            await news_cmd.finish('已停止新闻自动推送')
-    else:
-        if group_id in plugin_config.push_news_group_id:
-            await news_cmd.finish('新闻自动推送开启中')
-        else:
-            await news_cmd.finish('新闻自动推送关闭中')
 
 
 #endregion

@@ -4,40 +4,14 @@ from typing import List
 
 from nonebot import get_driver
 from pydantic import BaseSettings, validator
-from dateutil.parser import parse
-from datetime import date, datetime
 
-from src.utils.helpers import groupidtostr, strtobool, strtogroupid
+from src.utils.helpers import strtobool
 from src.utils.plugin import PluginData
 
 DATA = PluginData('ff14')
 
 
 class Config(BaseSettings):
-    # 新闻推送相关配置
-    # 自动推送新闻的间隔，单位 分钟
-    push_news_interval: int = int(
-        DATA.config.get('ff14', 'push_news_interval', '30'))
-    # 上次推送新闻的发布时间
-    push_news_last_news_date: datetime = parse(
-        DATA.config.get('ff14', 'push_news_last_news_date', '2000-01-01'))
-
-    # 启用新闻推送的群
-    push_news_group_id: List[int] = strtogroupid(
-        DATA.config.get('ff14', 'push_news_group_id'))
-
-    @validator('push_news_last_news_date', always=True)
-    def push_news_last_news_date_validator(cls, v: datetime):
-        """ 验证并保存配置 """
-        DATA.config.set('ff14', 'push_news_last_news_date', v.isoformat())
-        return v
-
-    @validator('push_news_group_id', always=True)
-    def push_news_group_id_validator(cls, v: List[int]):
-        """ 验证并保存配置 """
-        DATA.config.set('ff14', 'push_news_group_id', groupidtostr(v))
-        return v
-
     # FFLogs 相关配置
     fflogs_token: str = DATA.config.get('fflogs', 'token')
     # 默认从两周的数据中计算排名百分比
