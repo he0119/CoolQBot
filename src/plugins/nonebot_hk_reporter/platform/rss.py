@@ -9,6 +9,7 @@ from ..post import Post
 from ..types import RawPost, Target
 from .platform import NewMessage, TargetMixin
 
+
 class Rss(NewMessage, TargetMixin):
 
     categories = {}
@@ -22,7 +23,13 @@ class Rss(NewMessage, TargetMixin):
 
     async def get_target_name(self, target: Target) -> Optional[str]:
         async with httpx.AsyncClient() as client:
-            res = await client.get(target, timeout=10.0)
+            res = await client.get(
+                target,
+                timeout=10.0,
+                headers={
+                    'user-agent':
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Edg/92.0.902.78'
+                })
             feed = feedparser.parse(res.text)
             return feed['feed']['title']
 
@@ -34,7 +41,13 @@ class Rss(NewMessage, TargetMixin):
 
     async def get_sub_list(self, target: Target) -> list[RawPost]:
         async with httpx.AsyncClient() as client:
-            res = await client.get(target, timeout=10.0)
+            res = await client.get(
+                target,
+                timeout=10.0,
+                headers={
+                    'user-agent':
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Edg/92.0.902.78'
+                })
             feed = feedparser.parse(res)
             entries = feed.entries
             for entry in entries:
@@ -42,8 +55,13 @@ class Rss(NewMessage, TargetMixin):
             return feed.entries
 
     async def parse(self, raw_post: RawPost) -> Post:
-        text = raw_post.get('title', '') + '\n' if raw_post.get('title') else ''
+        text = raw_post.get('title',
+                            '') + '\n' if raw_post.get('title') else ''
         soup = bs(raw_post.description, 'html.parser')
         text += soup.text.strip()
         pics = list(map(lambda x: x.attrs['src'], soup('img')))
-        return Post('rss', text=text, url=raw_post.link, pics=pics, target_name=raw_post['_target_name'])
+        return Post('rss',
+                    text=text,
+                    url=raw_post.link,
+                    pics=pics,
+                    target_name=raw_post['_target_name'])
