@@ -11,16 +11,18 @@ from pyppeteer.page import Page
 
 from .plugin_config import plugin_config
 
+
 class Singleton(type):
     _instances = {}
+
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(Singleton,
+                                        cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
 
 class Render(metaclass=Singleton):
-
     def __init__(self):
         self.lock = asyncio.Lock()
         self.browser: Browser
@@ -34,25 +36,34 @@ class Render(metaclass=Singleton):
                 return await launch(executablePath=path, args=['--no-sandbox'])
             if plugin_config.hk_reporter_browser.startswith('ws:'):
                 self.remote_browser = True
-                return await connect(browserWSEndpoint=plugin_config.hk_reporter_browser)
+                return await connect(
+                    browserWSEndpoint=plugin_config.hk_reporter_browser)
             raise RuntimeError('HK_REPORTER_BROWSER error')
         if plugin_config.hk_reporter_use_local:
-            return await launch(executablePath='/usr/bin/chromium', args=['--no-sandbox'])
+            return await launch(executablePath='/usr/bin/chromium',
+                                args=['--no-sandbox'])
         return await launch(args=['--no-sandbox'])
 
     async def close_browser(self):
         if not self.remote_browser:
             await self.browser.close()
 
-    async def render(self, url: str, viewport: Optional[dict] = None, target: Optional[str] = None,
-            operation: Optional[Callable[[Page], Awaitable[None]]] = None) -> Optional[str]:
+    async def render(
+        self,
+        url: str,
+        viewport: Optional[dict] = None,
+        target: Optional[str] = None,
+        operation: Optional[Callable[[Page], Awaitable[None]]] = None
+    ) -> Optional[str]:
         retry_times = 0
         while retry_times < 3:
             try:
-                return await asyncio.wait_for(self.do_render(url, viewport, target, operation), 20)
+                return await asyncio.wait_for(
+                    self.do_render(url, viewport, target, operation), 20)
             except asyncio.TimeoutError:
                 retry_times += 1
-                logger.warning("render error {}\n".format(retry_times) + self.interval_log)
+                logger.warning("render error {}\n".format(retry_times) +
+                               self.interval_log)
                 self.interval_log = ''
                 # if self.browser:
                 #     await self.browser.close()
@@ -62,8 +73,13 @@ class Render(metaclass=Singleton):
         # self.interval_log += asctime() + '' + message + '\n'
         logger.debug(message)
 
-    async def do_render(self, url: str, viewport: Optional[dict] = None, target: Optional[str] = None,
-            operation: Optional[Callable[[Page], Awaitable[None]]] = None) -> str:
+    async def do_render(
+            self,
+            url: str,
+            viewport: Optional[dict] = None,
+            target: Optional[str] = None,
+            operation: Optional[Callable[[Page],
+                                         Awaitable[None]]] = None) -> str:
         async with self.lock:
             self.browser = await self.get_browser()
             self._inter_log('open browser')
@@ -78,7 +94,8 @@ class Render(metaclass=Singleton):
                 self._inter_log('set viewport')
             if target:
                 target_ele = await page.querySelector(target)
-                data = await target_ele.screenshot(type='jpeg', encoding='base64')
+                data = await target_ele.screenshot(type='jpeg',
+                                                   encoding='base64')
             else:
                 data = await page.screenshot(type='jpeg', encoding='base64')
             self._inter_log('screenshot')
@@ -90,13 +107,16 @@ class Render(metaclass=Singleton):
 
     async def text_to_pic(self, text: str) -> Optional[str]:
         lines = text.split('\n')
-        parsed_lines = list(map(lambda x: '<p>{}</p>'.format(escape(x)), lines))
-        html_text = '<div style="width:17em;padding:1em">{}</div>'.format(''.join(parsed_lines))
-        url = 'data:text/html;charset=UTF-8;base64,{}'.format(base64.b64encode(html_text.encode()).decode())
+        parsed_lines = list(map(lambda x: '<p>{}</p>'.format(escape(x)),
+                                lines))
+        html_text = '<div style="width:17em;padding:1em">{}</div>'.format(
+            ''.join(parsed_lines))
+        url = 'data:text/html;charset=UTF-8;base64,{}'.format(
+            base64.b64encode(html_text.encode()).decode())
         data = await self.render(url, target='div')
         return data
 
-    async def text_to_pic_cqcode(self, text:str) -> str:
+    async def text_to_pic_cqcode(self, text: str) -> str:
         data = await self.text_to_pic(text)
         # logger.debug('file size: {}'.format(len(data)))
         if data:
@@ -105,6 +125,7 @@ class Render(metaclass=Singleton):
             return code
         else:
             return '生成图片错误'
+
 
 async def parse_text(text: str) -> str:
     'return raw text if don\'t use pic, otherwise return rendered opcode'

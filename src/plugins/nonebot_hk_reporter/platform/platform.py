@@ -18,7 +18,6 @@ class CategoryNotSupport(Exception):
 
 
 class RegistryMeta(type):
-
     def __new__(cls, name, bases, namespace, **kwargs):
         return super().__new__(cls, name, bases, namespace)
 
@@ -32,11 +31,13 @@ class RegistryMeta(type):
 
         super().__init__(name, bases, namespace, **kwargs)
 
+
 class RegistryABCMeta(RegistryMeta, ABC):
     ...
 
+
 class StorageMixinProto(metaclass=RegistryABCMeta, abstract=True):
-    
+
     has_target: bool
 
     @abstractmethod
@@ -47,6 +48,7 @@ class StorageMixinProto(metaclass=RegistryABCMeta, abstract=True):
     def set_stored_data(self, target: Target, data: Any):
         ...
 
+
 class TargetMixin(StorageMixinProto, abstract=True):
 
     has_target = True
@@ -56,7 +58,7 @@ class TargetMixin(StorageMixinProto, abstract=True):
         self.store: dict[Target, Any] = dict()
 
     def get_stored_data(self, target: Target) -> Any:
-        return self.store.get(target)        
+        return self.store.get(target)
 
     def set_stored_data(self, target: Target, data: Any):
         self.store[target] = data
@@ -76,24 +78,29 @@ class NoTargetMixin(StorageMixinProto, abstract=True):
     def set_stored_data(self, _: Target, data: Any):
         self.store = data
 
+
 class PlatformNameMixin(metaclass=RegistryABCMeta, abstract=True):
     platform_name: str
-    
-class CategoryMixin(metaclass=RegistryABCMeta, abstract=True):
 
+
+class CategoryMixin(metaclass=RegistryABCMeta, abstract=True):
     @abstractmethod
     def get_category(self, post: RawPost) -> Optional[Category]:
         "Return category of given Rawpost"
         raise NotImplementedError()
 
-class ParsePostMixin(metaclass=RegistryABCMeta, abstract=True):
 
+class ParsePostMixin(metaclass=RegistryABCMeta, abstract=True):
     @abstractmethod
     async def parse(self, raw_post: RawPost) -> Post:
         "parse RawPost into post"
         ...
 
-class MessageProcessMixin(PlatformNameMixin, CategoryMixin, ParsePostMixin, abstract=True):
+
+class MessageProcessMixin(PlatformNameMixin,
+                          CategoryMixin,
+                          ParsePostMixin,
+                          abstract=True):
     "General message process fetch, parse, filter progress"
 
     def __init__(self):
@@ -103,7 +110,6 @@ class MessageProcessMixin(PlatformNameMixin, CategoryMixin, ParsePostMixin, abst
     @abstractmethod
     def get_id(self, post: RawPost) -> Any:
         "Get post id of given RawPost"
-
 
     async def _parse_with_cache(self, raw_post: RawPost) -> Post:
         post_id = self.get_id(raw_post)
@@ -127,7 +133,8 @@ class MessageProcessMixin(PlatformNameMixin, CategoryMixin, ParsePostMixin, abst
     def get_date(self, post: RawPost) -> Optional[int]:
         "Get post timestamp and return, return None if can't get the time"
 
-    async def filter_common(self, raw_post_list: list[RawPost]) -> list[RawPost]:
+    async def filter_common(self,
+                            raw_post_list: list[RawPost]) -> list[RawPost]:
         res = []
         for raw_post in raw_post_list:
             # post_id = self.get_id(raw_post)
@@ -145,7 +152,10 @@ class MessageProcessMixin(PlatformNameMixin, CategoryMixin, ParsePostMixin, abst
             res.append(raw_post)
         return res
 
-class NewMessageProcessMixin(StorageMixinProto, MessageProcessMixin, abstract=True):
+
+class NewMessageProcessMixin(StorageMixinProto,
+                             MessageProcessMixin,
+                             abstract=True):
     "General message process, fetch, parse, filter, and only returns the new Post"
 
     @dataclass
@@ -153,16 +163,20 @@ class NewMessageProcessMixin(StorageMixinProto, MessageProcessMixin, abstract=Tr
         inited: bool
         exists_posts: set[Any]
 
-    async def filter_common_with_diff(self, target: Target, raw_post_list: list[RawPost]) -> list[RawPost]:
+    async def filter_common_with_diff(
+            self, target: Target,
+            raw_post_list: list[RawPost]) -> list[RawPost]:
         filtered_post = await self.filter_common(raw_post_list)
-        store = self.get_stored_data(target) or self.MessageStorage(False, set())
+        store = self.get_stored_data(target) or self.MessageStorage(
+            False, set())
         res = []
         if not store.inited and plugin_config.hk_reporter_init_filter:
             # target not init
             for raw_post in filtered_post:
                 post_id = self.get_id(raw_post)
                 store.exists_posts.add(post_id)
-            logger.info('init {}-{} with {}'.format(self.platform_name, target, store.exists_posts))
+            logger.info('init {}-{} with {}'.format(self.platform_name, target,
+                                                    store.exists_posts))
             store.inited = True
         else:
             for raw_post in filtered_post:
@@ -174,6 +188,7 @@ class NewMessageProcessMixin(StorageMixinProto, MessageProcessMixin, abstract=Tr
         self.set_stored_data(target, store)
         return res
 
+
 class UserCustomFilterMixin(CategoryMixin, ParsePostMixin, abstract=True):
 
     categories: dict[Category, str]
@@ -183,13 +198,15 @@ class UserCustomFilterMixin(CategoryMixin, ParsePostMixin, abstract=True):
         super().__init__()
         self.reverse_category = {}
         for key, val in self.categories.items():
-           self.reverse_category[val] = key
+            self.reverse_category[val] = key
 
     @abstractmethod
     def get_tags(self, raw_post: RawPost) -> Optional[Collection[Tag]]:
         "Return Tag list of given RawPost"
 
-    async def filter_user_custom(self, raw_post_list: list[RawPost], cats: list[Category], tags: list[Tag]) -> list[RawPost]:
+    async def filter_user_custom(self, raw_post_list: list[RawPost],
+                                 cats: list[Category],
+                                 tags: list[Tag]) -> list[RawPost]:
         res: list[RawPost] = []
         for raw_post in raw_post_list:
             if self.categories:
@@ -208,12 +225,15 @@ class UserCustomFilterMixin(CategoryMixin, ParsePostMixin, abstract=True):
             res.append(raw_post)
         return res
 
-    async def dispatch_user_post(self, target: Target, new_posts: list[RawPost], users: list[UserSubInfo]) -> list[tuple[User, list[Post]]]:
+    async def dispatch_user_post(
+            self, target: Target, new_posts: list[RawPost],
+            users: list[UserSubInfo]) -> list[tuple[User, list[Post]]]:
         res: list[tuple[User, list[Post]]] = []
         for user, category_getter, tag_getter in users:
             required_tags = tag_getter(target) if self.enable_tag else []
             cats = category_getter(target)
-            user_raw_post = await self.filter_user_custom(new_posts, cats, required_tags)
+            user_raw_post = await self.filter_user_custom(
+                new_posts, cats, required_tags)
             user_post: list[Post] = []
             for raw_post in user_raw_post:
                 if isinstance(self, MessageProcessMixin):
@@ -223,33 +243,37 @@ class UserCustomFilterMixin(CategoryMixin, ParsePostMixin, abstract=True):
             res.append((user, user_post))
         return res
 
+
 class Platform(PlatformNameMixin, UserCustomFilterMixin, base=True):
-    
+
     # schedule_interval: int
     schedule_type: Literal['date', 'interval', 'cron']
     schedule_kw: dict
     is_common: bool
     enabled: bool
     name: str
-    has_target:bool
+    has_target: bool
 
     @abstractmethod
     async def get_target_name(self, target: Target) -> Optional[str]:
         ...
 
     @abstractmethod
-    async def fetch_new_post(self, target: Target, users: list[UserSubInfo]) -> list[tuple[User, list[Post]]]:
+    async def fetch_new_post(
+            self, target: Target,
+            users: list[UserSubInfo]) -> list[tuple[User, list[Post]]]:
         ...
 
-class NewMessage(
-        Platform, 
-        NewMessageProcessMixin,
-        UserCustomFilterMixin,
-        abstract=True
-        ):
+
+class NewMessage(Platform,
+                 NewMessageProcessMixin,
+                 UserCustomFilterMixin,
+                 abstract=True):
     "Fetch a list of messages, filter the new messages, dispatch it to different users"
-    
-    async def fetch_new_post(self, target: Target, users: list[UserSubInfo]) -> list[tuple[User, list[Post]]]:
+
+    async def fetch_new_post(
+            self, target: Target,
+            users: list[UserSubInfo]) -> list[tuple[User, list[Post]]]:
         try:
             post_list = await self.get_sub_list(target)
             new_posts = await self.filter_common_with_diff(target, post_list)
@@ -258,22 +282,21 @@ class NewMessage(
             else:
                 for post in new_posts:
                     logger.info('fetch new post from {} {}: {}'.format(
-                        self.platform_name,
-                        target if self.has_target else '-',
+                        self.platform_name, target if self.has_target else '-',
                         self.get_id(post)))
             res = await self.dispatch_user_post(target, new_posts, users)
             self.parse_cache = {}
             return res
         except httpx.RequestError as err:
-            logger.warning("network connection error: {}, url: {}".format(type(err), err.request.url))
+            logger.warning("network connection error: {}, url: {}".format(
+                type(err), err.request.url))
             return []
 
-class StatusChange(
-        Platform,
-        StorageMixinProto,
-        UserCustomFilterMixin,
-        abstract=True
-        ):
+
+class StatusChange(Platform,
+                   StorageMixinProto,
+                   UserCustomFilterMixin,
+                   abstract=True):
     "Watch a status, and fire a post when status changes"
 
     @abstractmethod
@@ -281,14 +304,17 @@ class StatusChange(
         ...
 
     @abstractmethod
-    def compare_status(self, target: Target, old_status, new_status) -> list[RawPost]:
+    def compare_status(self, target: Target, old_status,
+                       new_status) -> list[RawPost]:
         ...
 
     @abstractmethod
     async def parse(self, raw_post: RawPost) -> Post:
         ...
 
-    async def fetch_new_post(self, target: Target, users: list[UserSubInfo]) -> list[tuple[User, list[Post]]]:
+    async def fetch_new_post(
+            self, target: Target,
+            users: list[UserSubInfo]) -> list[tuple[User, list[Post]]]:
         try:
             new_status = await self.get_status(target)
             res = []
@@ -296,28 +322,29 @@ class StatusChange(
                 diff = self.compare_status(target, old_status, new_status)
                 if diff:
                     logger.info("status changes {} {}: {} -> {}".format(
-                        self.platform_name,
-                        target if self.has_target else '-',
-                        old_status, new_status
-                        ))
+                        self.platform_name, target if self.has_target else '-',
+                        old_status, new_status))
                     res = await self.dispatch_user_post(target, diff, users)
             self.set_stored_data(target, new_status)
             return res
         except httpx.RequestError as err:
-            logger.warning("network connection error: {}, url: {}".format(type(err), err.request.url))
+            logger.warning("network connection error: {}, url: {}".format(
+                type(err), err.request.url))
             return []
 
-class NoTargetGroup(
-        Platform,
-        NoTargetMixin,
-        UserCustomFilterMixin,
-        abstract=True
-        ):
+
+class NoTargetGroup(Platform,
+                    NoTargetMixin,
+                    UserCustomFilterMixin,
+                    abstract=True):
     enable_tag = False
     DUMMY_STR = '_DUMMY'
     enabled = True
 
-    class PlatformProto(Platform, NoTargetMixin, UserCustomFilterMixin, abstract=True):
+    class PlatformProto(Platform,
+                        NoTargetMixin,
+                        UserCustomFilterMixin,
+                        abstract=True):
         ...
 
     def __init__(self, platform_list: list[PlatformProto]):
@@ -331,14 +358,18 @@ class NoTargetGroup(
             if name == self.DUMMY_STR:
                 name = platform.name
             elif name != platform.name:
-                raise RuntimeError('Platform name for {} not fit'.format(self.platform_name))
+                raise RuntimeError('Platform name for {} not fit'.format(
+                    self.platform_name))
             platform_category_key_set = set(platform.categories.keys())
             if platform_category_key_set & categories_keys:
-                raise RuntimeError('Platform categories for {} duplicate'.format(self.platform_name))
+                raise RuntimeError(
+                    'Platform categories for {} duplicate'.format(
+                        self.platform_name))
             categories_keys |= platform_category_key_set
             self.categories.update(platform.categories)
             if platform.schedule_kw != self.schedule_kw or platform.schedule_type != self.schedule_type:
-                raise RuntimeError('Platform scheduler for {} not fit'.format(self.platform_name))
+                raise RuntimeError('Platform scheduler for {} not fit'.format(
+                    self.platform_name))
         self.name = name
         self.is_common = platform_list[0].is_common
         super().__init__()
@@ -352,7 +383,8 @@ class NoTargetGroup(
     async def fetch_new_post(self, target, users):
         res = defaultdict(list)
         for platform in self.platform_list:
-            platform_res = await platform.fetch_new_post(target=target, users=users)
+            platform_res = await platform.fetch_new_post(target=target,
+                                                         users=users)
             for user, posts in platform_res:
                 res[user].extend(posts)
         return [[key, val] for key, val in res.items()]

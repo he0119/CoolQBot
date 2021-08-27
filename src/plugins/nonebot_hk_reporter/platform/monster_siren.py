@@ -5,6 +5,7 @@ from .platform import NewMessage, NoTargetMixin
 from ..types import RawPost
 from ..post import Post
 
+
 class MonsterSiren(NewMessage, NoTargetMixin):
 
     categories = {}
@@ -22,7 +23,8 @@ class MonsterSiren(NewMessage, NoTargetMixin):
 
     async def get_sub_list(self, _) -> list[RawPost]:
         async with httpx.AsyncClient() as client:
-            raw_data = await client.get('https://monster-siren.hypergryph.com/api/news')
+            raw_data = await client.get(
+                'https://monster-siren.hypergryph.com/api/news')
             return raw_data.json()['data']['list']
 
     def get_id(self, post: RawPost) -> Any:
@@ -33,6 +35,9 @@ class MonsterSiren(NewMessage, NoTargetMixin):
 
     async def parse(self, raw_post: RawPost) -> Post:
         url = f'https://monster-siren.hypergryph.com/info/{raw_post["cid"]}'
-        return Post('monster-siren', text=raw_post['title'],
-                url=url, target_name="塞壬唱片新闻", compress=True,
-                override_use_pic=False)
+        return Post('monster-siren',
+                    text=raw_post['title'],
+                    url=url,
+                    target_name="塞壬唱片新闻",
+                    compress=True,
+                    override_use_pic=False)

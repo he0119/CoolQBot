@@ -27,7 +27,9 @@ class Arknights(NewMessage, NoTargetMixin):
 
     async def get_sub_list(self, _) -> list[RawPost]:
         async with httpx.AsyncClient() as client:
-            raw_data = await client.get('https://ak-conf.hypergryph.com/config/prod/announce_meta/IOS/announcement.meta.json')
+            raw_data = await client.get(
+                'https://ak-conf.hypergryph.com/config/prod/announce_meta/IOS/announcement.meta.json'
+            )
             return json.loads(raw_data.text)['announceList']
 
     def get_id(self, post: RawPost) -> Any:
@@ -49,13 +51,22 @@ class Arknights(NewMessage, NoTargetMixin):
             # 图文
             render = Render()
             viewport = {'width': 320, 'height': 6400, 'deviceScaleFactor': 3}
-            pic_data = await render.render(announce_url, viewport=viewport, target='div.main')
+            pic_data = await render.render(announce_url,
+                                           viewport=viewport,
+                                           target='div.main')
             pics.append('base64://{}'.format(pic_data))
         elif (pic := soup.find('img', class_='banner-image')):
             pics.append(pic['src'])
         else:
             raise CategoryNotSupport()
-        return Post('arknights', text='', url='', target_name="明日方舟游戏内公告", pics=pics, compress=True, override_use_pic=False)
+        return Post('arknights',
+                    text='',
+                    url='',
+                    target_name="明日方舟游戏内公告",
+                    pics=pics,
+                    compress=True,
+                    override_use_pic=False)
+
 
 class AkVersion(NoTargetMixin, StatusChange):
 
@@ -73,22 +84,31 @@ class AkVersion(NoTargetMixin, StatusChange):
 
     async def get_status(self, _):
         async with httpx.AsyncClient() as client:
-            res_ver = await client.get('https://ak-conf.hypergryph.com/config/prod/official/IOS/version')
-            res_preanounce = await client.get('https://ak-conf.hypergryph.com/config/prod/announce_meta/IOS/preannouncement.meta.json')
+            res_ver = await client.get(
+                'https://ak-conf.hypergryph.com/config/prod/official/IOS/version'
+            )
+            res_preanounce = await client.get(
+                'https://ak-conf.hypergryph.com/config/prod/announce_meta/IOS/preannouncement.meta.json'
+            )
         res = res_ver.json()
         res.update(res_preanounce.json())
         return res
 
     def compare_status(self, _, old_status, new_status):
         res = []
-        if old_status.get('preAnnounceType') == 2 and new_status.get('preAnnounceType') == 0:
+        if old_status.get('preAnnounceType') == 2 and new_status.get(
+                'preAnnounceType') == 0:
             res.append(Post('arknights', text='开始维护！', target_name='明日方舟更新信息'))
-        elif old_status.get('preAnnounceType') == 0 and new_status.get('preAnnounceType') == 2:
-            res.append(Post('arknights', text='维护结束！冲！', target_name='明日方舟更新信息'))
+        elif old_status.get('preAnnounceType') == 0 and new_status.get(
+                'preAnnounceType') == 2:
+            res.append(
+                Post('arknights', text='维护结束！冲！', target_name='明日方舟更新信息'))
         if old_status.get('clientVersion') != new_status.get('clientVersion'):
-            res.append(Post('arknights', text='游戏本体更新（大更新）', target_name='明日方舟更新信息'))
+            res.append(
+                Post('arknights', text='游戏本体更新（大更新）', target_name='明日方舟更新信息'))
         if old_status.get('resVersion') != new_status.get('resVersion'):
-            res.append(Post('arknights', text='游戏资源更新（小更新）', target_name='明日方舟更新信息'))
+            res.append(
+                Post('arknights', text='游戏资源更新（小更新）', target_name='明日方舟更新信息'))
         return res
 
     def get_category(self, _):

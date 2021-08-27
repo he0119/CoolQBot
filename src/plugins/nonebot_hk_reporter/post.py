@@ -10,6 +10,7 @@ from nonebot import logger
 from .plugin_config import plugin_config
 from .utils import parse_text
 
+
 @dataclass
 class Post:
 
@@ -49,7 +50,7 @@ class Post:
             cur_img = await self._pic_url_to_image(self.pics[i])
             if not self._check_image_square(cur_img.size):
                 return
-            if cur_img.size[1] != images[0].size[1]: # height not equal
+            if cur_img.size[1] != images[0].size[1]:  # height not equal
                 return
             images.append(cur_img)
         _tmp = 0
@@ -58,6 +59,7 @@ class Post:
             _tmp += images[i].size[0]
             x_coord.append(_tmp)
         y_coord = [0, first_image.size[1]]
+
         async def process_row(row: int) -> bool:
             row_first_img = await self._pic_url_to_image(self.pics[row * 3])
             if not self._check_image_square(row_first_img.size):
@@ -77,22 +79,24 @@ class Post:
             images.extend(image_row)
             y_coord.append(y_coord[-1] + row_first_img.size[1])
             return True
+
         if not await process_row(1):
             return
-        matrix = (3,2)
+        matrix = (3, 2)
         if await process_row(2):
-            matrix = (3,3)
+            matrix = (3, 3)
         logger.info('trigger merge image')
         target = Image.new('RGB', (x_coord[-1], y_coord[-1]))
         for y in range(matrix[1]):
             for x in range(matrix[0]):
-                target.paste(images[y * matrix[0] + x], (
-                    x_coord[x], y_coord[y], x_coord[x+1], y_coord[y+1]
-                    ))
+                target.paste(
+                    images[y * matrix[0] + x],
+                    (x_coord[x], y_coord[y], x_coord[x + 1], y_coord[y + 1]))
         target_io = BytesIO()
         target.save(target_io, 'JPEG')
-        b64image = 'base64://' + base64.b64encode(target_io.getvalue()).decode()
-        self.pics = self.pics[matrix[0] * matrix[1]: ]
+        b64image = 'base64://' + base64.b64encode(
+            target_io.getvalue()).decode()
+        self.pics = self.pics[matrix[0] * matrix[1]:]
         self.pics.insert(0, b64image)
 
     async def generate_messages(self):
@@ -100,7 +104,8 @@ class Post:
         msgs = []
         text = ''
         if self.text:
-            text += '{}'.format(self.text if len(self.text) < 500 else self.text[:500] + '...')
+            text += '{}'.format(
+                self.text if len(self.text) < 500 else self.text[:500] + '...')
         text += '\n来源: {}'.format(self.target_type)
         if self.target_name:
             text += ' {}'.format(self.target_name)
@@ -120,9 +125,8 @@ class Post:
 
     def __str__(self):
         return 'type: {}\nfrom: {}\ntext: {}\nurl: {}\npic: {}'.format(
-                self.target_type,
-                self.target_name,
-                self.text if len(self.text) < 500 else self.text[:500] + '...',
-                self.url,
-                ', '.join(map(lambda x: 'b64img' if x.startswith('base64') else x, self.pics))
-            )
+            self.target_type, self.target_name,
+            self.text if len(self.text) < 500 else self.text[:500] + '...',
+            self.url, ', '.join(
+                map(lambda x: 'b64img'
+                    if x.startswith('base64') else x, self.pics)))
