@@ -2,7 +2,6 @@
 
 修改自 https://github.com/felinae98/nonebot-hk-reporter
 """
-
 from nonebot import CommandGroup, logger
 from nonebot.adapters import Bot, Event
 from nonebot.adapters.cqhttp import GroupMessageEvent
@@ -38,7 +37,7 @@ async def init_promote(bot: Bot, event: GroupMessageEvent, state: T_State):
     state['_prompt'] = '请输入想要订阅的平台，目前支持：\n' + \
             ''.join(['{}：{}\n'.format(platform_name, platform_manager[platform_name].name) \
                     for platform_name in common_platform]) + \
-            '要查看全部平台请输入：“全部”'
+            '要查看全部平台请输入："全部"'
 
 
 async def parse_platform(bot: Bot, event: Event, state: T_State) -> None:
@@ -58,8 +57,7 @@ async def parse_platform(bot: Bot, event: Event, state: T_State) -> None:
 @add_sub_cmd.handle()
 async def init_id(bot: Bot, event: GroupMessageEvent, state: T_State):
     if platform_manager[state['platform']].has_target:
-        state[
-            '_prompt'] = '请输入订阅用户的id，详情查阅https://nonebot-hk-reporter.vercel.app/usage/#%E6%89%80%E6%94%AF%E6%8C%81%E5%B9%B3%E5%8F%B0%E7%9A%84uid'
+        state['_prompt'] = '请输入订阅用户的 ID'
     else:
         state['id'] = 'default'
         state['name'] = await platform_manager[state['platform']
@@ -70,7 +68,7 @@ async def parse_id(bot: Bot, event: Event, state: T_State):
     target = str(event.get_message()).strip()
     name = await check_sub_target(state['platform'], target)
     if not name:
-        await add_sub_cmd.reject('id输入错误')
+        await add_sub_cmd.reject('ID 输入错误')
     state['id'] = target
     state['name'] = name
 
@@ -81,7 +79,7 @@ async def init_cat(bot: Bot, event: GroupMessageEvent, state: T_State):
     if not platform_manager[state['platform']].categories:
         state['cats'] = []
         return
-    state['_prompt'] = '请输入要订阅的类别，以空格分隔，支持的类别有：{}'.format(','.join(
+    state['_prompt'] = '请输入要订阅的类别，以空格分隔，支持的类别有：{}'.format('，'.join(
         list(platform_manager[state['platform']].categories.values())))
 
 
@@ -100,7 +98,7 @@ async def init_tag(bot: Bot, event: GroupMessageEvent, state: T_State):
     if not platform_manager[state['platform']].enable_tag:
         state['tags'] = []
         return
-    state['_prompt'] = '请输入要订阅的tag，订阅所有tag输入"全部标签"'
+    state['_prompt'] = '请输入要订阅的标签，订阅所有标签输入"全部标签"'
 
 
 async def parser_tags(bot: Bot, event: Event, state: T_State):
