@@ -1,6 +1,6 @@
 """ 日程表
 
-https://tools.yobot.win/calender/#cn
+https://pcrbot.github.io/pcr-calendar/#cn
 """
 from datetime import datetime, timedelta
 from typing import Dict, Optional, Set
@@ -15,7 +15,7 @@ from .config import plugin_config
 class Calender:
     def __init__(self):
         # 动态的地址
-        self._url = 'https://tools.yobot.win/calender/cn.json'
+        self._url = 'https://pcrbot.github.io/calendar-updater-action/cn.json'
         # 定时任务
         self._job = None
         # 日程表
@@ -123,7 +123,7 @@ class Calender:
             reply += f'\n======{daystr}======\n⨠{events_str}'
             date += timedelta(days=1)
 
-        reply += '\n\n更多日程：https://tools.yobot.win/calender/#cn'
+        reply += '\n\n更多日程：https://pcrbot.github.io/pcr-calendar/#cn'
 
         return reply
 
