@@ -1,12 +1,16 @@
 # Changelog
 
-一个简单的更新笔记。
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/spec/v2.0.0.html).
 
 ## [Unreleased]
 
 ### Added
 
 - 给数据插件管理添加管理网络文件的方法
+- 添加订阅插件([nonebot_hk_reporter](https://github.com/felinae98/nonebot-hk-reporter))
 
 ### Changed
 
