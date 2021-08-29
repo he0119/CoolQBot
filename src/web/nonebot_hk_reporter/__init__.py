@@ -12,7 +12,7 @@ from nonebot.typing import T_State
 
 from .config import Config
 from .platform import check_sub_target, platform_manager
-from .scheduler import fetch_and_send
+from .scheduler import *
 from .types import Target
 from .utils import parse_text
 
@@ -103,7 +103,7 @@ async def init_tag(bot: Bot, event: GroupMessageEvent, state: T_State):
     if not platform_manager[state['platform']].enable_tag:
         state['tags'] = []
         return
-    state['_prompt'] = '请输入要订阅的标签，订阅所有标签输入"全部标签"'
+    state['_prompt'] = '请输入要订阅的标签，以空格分隔，订阅所有标签输入"全部标签"'
 
 
 async def parser_tags(bot: Bot, event: Event, state: T_State):
@@ -144,18 +144,21 @@ async def _(bot: Bot, event: GroupMessageEvent, state: T_State):
     config: Config = Config()
     sub_list = config.list_subscribe(
         state.get('_user_id') or event.group_id, "group")
-    res = '订阅的帐号为：\n'
+    res = ['订阅的帐号为：']
     for sub in sub_list:
-        res += '{} {} {}'.format(sub['target_type'], sub['target_name'],
+        temp = '{} {} {}'.format(sub['target_type'], sub['target_name'],
                                  sub['target'])
         platform = platform_manager[sub['target_type']]
         if platform.categories:
-            res += ' [{}]'.format(', '.join(
+            temp += ' [{}]'.format(', '.join(
                 map(lambda x: platform.categories[x], sub['cats'])))
         if platform.enable_tag:
-            res += ' {}'.format(', '.join(sub['tags']))
-        res += '\n'
-    # send_msgs(bot, event.group_id, 'group', [await parse_text(res)])
+            temp += ' {}'.format(', '.join(sub['tags']))
+        res.append(temp)
+    if len(res) == 1:
+        res = '当前无订阅'
+    else:
+        res = '\n'.join(res)
     await query_sub_cmd.finish(Message(await parse_text(res)))
 
 

@@ -34,7 +34,7 @@ name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple/"
 
 [nonebot.plugins]
-plugin_dirs = ["src/plugins"]
+plugin_dirs = ["src/plugins", "src/web"]
 plugins = []
 
 [build-system]
