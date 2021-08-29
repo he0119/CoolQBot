@@ -11,13 +11,12 @@ from datetime import datetime, timedelta
 from typing import List, Literal
 
 import httpx
-from nonebot import logger, require
+from nonebot import logger
+from nonebot_plugin_apscheduler import scheduler
 
 from .config import DATA, plugin_config
 from .fflogs_data import (get_boss_info_by_nickname, get_job_info_by_nickname,
                           get_jobs_info)
-
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
 class DataException(Exception):
@@ -68,7 +67,8 @@ class FFLogs:
 
     def disable_cache(self) -> None:
         """ 关闭定时缓存任务 """
-        self._cache_job.remove()
+        if self._cache_job:
+            self._cache_job.remove()
         self._cache_job = None
         plugin_config.fflogs_cache = False
         logger.info('定时缓存已关闭')

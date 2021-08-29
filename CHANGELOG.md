@@ -1,8 +1,33 @@
 # Changelog
 
-一个简单的更新笔记。
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.15.0] - 2021-08-29
+
+### Added
+
+- 给数据插件管理添加管理网络文件的方法
+- 添加订阅插件([nonebot_hk_reporter](https://github.com/felinae98/nonebot-hk-reporter))
+
+### Changed
+
+- 调整复读规则，不再复读带网址的内容
+- 调整插件数据管理的配置访问方式
+- 每日早安插件使用自己实现的节假日问候语
+
+### Removed
+
+- 移除最终幻想XIV与公主链接插件中的新闻订阅功能（可通过订阅插件替代）
+
+### Fixed
+
+- 修复音乐插件内容格式问题
+- 修复机器人插件，切换至腾讯自然语言处理
 
 ## [0.14.1] - 2021-04-28
 
@@ -362,7 +387,8 @@
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.14.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/he0119/CoolQBot/compare/v0.14.1...v0.15.0
 [0.14.1]: https://github.com/he0119/CoolQBot/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/he0119/CoolQBot/compare/v0.13.1...v0.14.0
 [0.13.1]: https://github.com/he0119/CoolQBot/compare/v0.13.0...v0.13.1

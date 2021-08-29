@@ -1,8 +1,6 @@
 import random
-from typing import List, Optional, Sequence
+from typing import Sequence
 
-from nonebot import get_bots
-from nonebot.adapters import Bot
 from nonebot.adapters.cqhttp import Message
 
 from .typing import Expression_T
@@ -26,12 +24,6 @@ def render_expression(expr: Expression_T, *args, **kwargs) -> Message:
     return Message(result.format(*args, **kwargs))
 
 
-def get_first_bot() -> Optional[Bot]:
-    """ 获得连接的第一个 bot """
-    if get_bots():
-        return list(get_bots().values())[0]
-
-
 def strtobool(val: str) -> bool:
     """ 将文本转化成布尔值
 
@@ -44,7 +36,7 @@ def strtobool(val: str) -> bool:
     return False
 
 
-def strtogroupid(val: str) -> List[int]:
+def strtogroupid(val: str) -> list[int]:
     """ 转换文本至群ID列表
 
     群ID用空格隔开
@@ -54,7 +46,7 @@ def strtogroupid(val: str) -> List[int]:
     return []
 
 
-def groupidtostr(val: List[int]) -> str:
+def groupidtostr(val: list[int]) -> str:
     """ 群ID列表转换至文本
 
     群ID用空格隔开

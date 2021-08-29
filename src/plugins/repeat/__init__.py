@@ -5,13 +5,15 @@
 """
 import re
 
-from nonebot import logger, on_message, require
-from nonebot.adapters.cqhttp.event import GroupMessageEvent, PrivateMessageEvent
-from nonebot.adapters.cqhttp.permission import GROUP
-from nonebot.plugin import CommandGroup
+from nonebot import logger, on_message
 from nonebot.adapters import Bot, Event
 from nonebot.adapters.cqhttp import MessageEvent
+from nonebot.adapters.cqhttp.event import (GroupMessageEvent,
+                                           PrivateMessageEvent)
+from nonebot.adapters.cqhttp.permission import GROUP
+from nonebot.plugin import CommandGroup
 from nonebot.typing import T_State
+from nonebot_plugin_apscheduler import scheduler
 
 from src.utils.helpers import strtobool
 
@@ -21,8 +23,6 @@ from .rank import get_rank
 from .recorder import recorder_obj
 from .repeat_rule import need_repeat
 from .status import get_status
-
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 repeat = CommandGroup('repeat', block=True)
 

@@ -1,19 +1,18 @@
 """ 每日早安插件
 """
 import nonebot
-from nonebot import logger, require
+from nonebot import get_bot, logger
 from nonebot.adapters import Bot
 from nonebot.adapters.cqhttp.event import GroupMessageEvent
 from nonebot.adapters.cqhttp.permission import GROUP
 from nonebot.plugin import on_command
-from nonebot.typing import T_State
+from nonebot_plugin_apscheduler import scheduler
 
-from src.utils.helpers import get_first_bot, strtobool
+from src.utils.helpers import strtobool
 
 from .config import plugin_config
-from .data import get_first_connect_message, get_moring_message
+from .data import HOLIDAYS_DATA, get_first_connect_message, get_moring_message
 
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 driver = nonebot.get_driver()
 
 
@@ -40,7 +39,7 @@ async def morning():
     """ 早安 """
     hello_str = await get_moring_message()
     for group_id in plugin_config.group_id:
-        await get_first_bot().send_msg(
+        await get_bot().send_msg(
             message_type='group',
             group_id=group_id,
             message=hello_str,
@@ -62,14 +61,25 @@ morning 早安
 /morning on
 关闭每日早安功能
 /morning off
+更新节假日数据
+/morning update
+获取今天的问好
+/morning today
 """
 
 
 @morning_cmd.handle()
-async def morning_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def morning_handle(bot: Bot, event: GroupMessageEvent):
     args = str(event.message).strip()
 
     group_id = event.group_id
+
+    if args == 'today':
+        await morning_cmd.finish(await get_moring_message())
+
+    if args == 'update':
+        await HOLIDAYS_DATA.update()
+        await morning_cmd.finish('节假日数据更新成功')
 
     if args and group_id:
         if strtobool(args):

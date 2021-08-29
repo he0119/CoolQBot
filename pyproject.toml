@@ -8,17 +8,23 @@ repository = "https://github.com/he0119/CoolQBot"
 version = "0.14.1"
 
 [tool.poetry.dependencies]
-nb-cli = "^0.4.0"
-nonebot-adapter-cqhttp = "^2.0.0a13"
+python = "^3.9"
+nb-cli = "^0.5.0"
+nonebot2 = "^2.0.0a15"
+nonebot-adapter-cqhttp = "^2.0.0a15"
 nonebot-plugin-apscheduler = "^0.1.2"
-nonebot-plugin-sentry = "^0.2.0"
-nonebot2 = "^2.0.0-alpha.13"
-python = "^3.8"
+nonebot-plugin-sentry = "^0.2.2"
 python-dateutil = "^2.8.1"
+tencentcloud-sdk-python = "^3.0.434"
+tinydb = "^4.3.0"
+beautifulsoup4 = "^4.9.3"
+feedparser = "^6.0.2"
+pyppeteer = "^0.2.5"
+pillow = "^8.1.0"
 
 [tool.poetry.dev-dependencies]
-nonebot-plugin-docs = "^2.0.0-alpha.11"
-nonebot-plugin-test = "^0.2.0"
+nonebot-plugin-docs = "^2.0.0a15"
+nonebot-plugin-test = "^0.3.0"
 toml = "^0.10.2"
 yapf = ">=0.31.0"
 
@@ -28,7 +34,7 @@ name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple/"
 
 [nonebot.plugins]
-plugin_dirs = ["src/plugins"]
+plugin_dirs = ["src/plugins", "src/web"]
 plugins = []
 
 [build-system]

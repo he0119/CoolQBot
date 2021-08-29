@@ -1,10 +1,17 @@
-""" 帮助 """
-from nonebot import on_command
-from nonebot.adapters.cqhttp.event import MessageEvent
-from nonebot.adapters import Bot
-from nonebot.typing import T_State
+""" 帮助
 
-from src.utils.commands import CommandInfo, get_command_help, get_commands
+通过给命令 __doc__ 添加信息实现
+具体格式为：
+
+命令名 命令别名 命令别名二
+
+帮助文档
+"""
+from nonebot import on_command
+from nonebot.adapters import Bot
+from nonebot.adapters.cqhttp.event import MessageEvent
+
+from .commands import CommandInfo, get_command_help, get_commands
 
 help_cmd = on_command('help', aliases={'帮助'}, block=True)
 help_cmd.__doc__ = """
@@ -28,7 +35,7 @@ def format_name_aliases(command: CommandInfo) -> str:
 
 
 @help_cmd.handle()
-async def help_handle(bot: Bot, event: MessageEvent, state: T_State):
+async def help_handle(bot: Bot, event: MessageEvent):
     args = str(event.message).strip()
 
     if args == 'all':

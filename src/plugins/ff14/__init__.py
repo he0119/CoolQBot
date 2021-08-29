@@ -1,24 +1,21 @@
 """ 最终幻想XIV
 
 藏宝选门
-新闻推送
 FFLogs
 """
 from nonebot import CommandGroup
 from nonebot.adapters import Bot, Event
-from nonebot.adapters.cqhttp.event import GroupMessageEvent, MessageEvent
-from nonebot.adapters.cqhttp.permission import GROUP
+from nonebot.adapters.cqhttp.event import MessageEvent
 from nonebot.exception import FinishedException
 from nonebot.typing import T_State
 
-from src.utils.commands import get_command_help
 from src.utils.helpers import strtobool
 
+from ..help.commands import get_command_help
 from .config import plugin_config
 from .fflogs_api import fflogs
-from .fflogs_data import update_data
+from .fflogs_data import FFLOGS_DATA
 from .gate import get_direction
-from .news import news
 
 ff14 = CommandGroup('ff14', block=True)
 
@@ -61,45 +58,6 @@ async def gate_handle_first_receive(bot: Bot, event: MessageEvent,
 async def gate_handle(bot: Bot, event: Event, state: T_State):
     direction = get_direction(state['door_number'])
     await gate_cmd.finish(direction, at_sender=True)
-
-
-#endregion
-#region 新闻推送
-news_cmd = ff14.command('news', permission=GROUP)
-news_cmd.__doc__ = """
-ff14.news
-
-最终幻想XIV 新闻推送
-
-当前群新闻推送状态
-/ff14.news
-开启推送
-/ff14.news on
-关闭推送
-/ff14.news off
-"""
-
-
-@news_cmd.handle()
-async def news_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
-    args = str(event.message).strip()
-
-    group_id = event.group_id
-
-    if args and group_id:
-        if strtobool(args):
-            plugin_config.push_news_group_id += [group_id]
-            await news_cmd.finish('已开始新闻自动推送')
-        else:
-            plugin_config.push_news_group_id = [
-                n for n in plugin_config.push_news_group_id if n != group_id
-            ]
-            await news_cmd.finish('已停止新闻自动推送')
-    else:
-        if group_id in plugin_config.push_news_group_id:
-            await news_cmd.finish('新闻自动推送开启中')
-        else:
-            await news_cmd.finish('新闻自动推送关闭中')
 
 
 #endregion
@@ -162,7 +120,7 @@ async def fflogs_handle(bot: Bot, event: MessageEvent, state: T_State):
         await fflogs_cmd.finish(f'当前的 Token 为 {plugin_config.fflogs_token}')
 
     if argv[0] == 'update' and len(argv) == 1:
-        await update_data()
+        await FFLOGS_DATA.update()
         await fflogs_cmd.finish('副本数据更新成功')
 
     # 缓存相关设置
@@ -211,7 +169,8 @@ async def fflogs_handle(bot: Bot, event: MessageEvent, state: T_State):
 
     if argv[0] == 'zones' and len(argv) == 2:
         reply = await fflogs.zones()
-        await fflogs_cmd.finish(str(reply[int(argv[1])]))
+        if reply:
+            await fflogs_cmd.finish(str(reply[int(argv[1])]))
 
     # 判断查询排行是指个人还是特定职业
     if len(argv) == 2:

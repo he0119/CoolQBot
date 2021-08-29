@@ -1,6 +1,5 @@
 """ 复读
 """
-import re
 import secrets
 from datetime import datetime, timedelta
 
@@ -19,22 +18,18 @@ def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
         return False
 
     # 不复读对机器人说的，因为这个应该由闲聊插件处理
-    if bool(event.to_me):
+    if event.to_me:
         return False
 
-    if not event.group_id:
-        return False
     group_id = event.group_id
     user_id = event.user_id
-    message = str(event.message)
 
     # 只复读指定群内消息
     if group_id not in plugin_config.group_id:
         return False
 
     # 不要复读指令
-    match = re.match(r'^\/', message)
-    if match:
+    if event.raw_message.startswith('/'):
         return False
 
     # 记录群内发送消息数量和时间
@@ -46,8 +41,12 @@ def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
         return False
 
     # 不要复读签到，分享，小程序，转发
-    match = re.match(r'^\[CQ:(sign|share|json|forward).+\]', message)
-    if match:
+    if event.message[0].type in ['sign', 'share', 'json', 'forward']:
+        return False
+
+    # 不要复读带网址的消息
+    if 'http://' in event.raw_message.lower(
+    ) or 'https://' in event.raw_message.lower():
         return False
 
     # 复读之后一定时间内不再复读

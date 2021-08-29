@@ -1,24 +1,21 @@
 """ 日程表
 
-https://tools.yobot.win/calender/#cn
+https://pcrbot.github.io/pcr-calendar/#cn
 """
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Set
+from typing import Dict, Optional, Set
 
 import httpx
-from nonebot import logger, require
-
-from src.utils.helpers import get_first_bot
+from nonebot import get_bot, logger
+from nonebot_plugin_apscheduler import scheduler
 
 from .config import plugin_config
-
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
 class Calender:
     def __init__(self):
         # 动态的地址
-        self._url = 'https://tools.yobot.win/calender/cn.json'
+        self._url = 'https://pcrbot.github.io/calendar-updater-action/cn.json'
         # 定时任务
         self._job = None
         # 日程表
@@ -96,11 +93,19 @@ class Calender:
         else:
             events_str = "\n".join(events)
 
+        try:
+            bot = get_bot()
+        except ValueError:
+            bot = None
+
         reply = '公主连结Re:Dive 今日活动：\n{}'.format(events_str)
         for group_id in plugin_config.push_calender_group_id:
-            await get_first_bot().send_msg(message_type='group',
-                                           group_id=group_id,
-                                           message=reply)
+            if bot:
+                await bot.send_msg(message_type='group',
+                                   group_id=group_id,
+                                   message=reply)
+            else:
+                logger.warning('no bot connected')
 
     async def get_week_events(self) -> str:
         """ 获取日程表 """
@@ -118,7 +123,7 @@ class Calender:
             reply += f'\n======{daystr}======\n⨠{events_str}'
             date += timedelta(days=1)
 
-        reply += '\n\n更多日程：https://tools.yobot.win/calender/#cn'
+        reply += '\n\n更多日程：https://pcrbot.github.io/pcr-calendar/#cn'
 
         return reply
 
