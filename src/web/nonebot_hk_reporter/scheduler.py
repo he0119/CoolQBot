@@ -1,4 +1,5 @@
-from nonebot import logger, get_bot
+import nonebot
+from nonebot import logger
 from nonebot_plugin_apscheduler import scheduler
 
 from .config import Config
@@ -23,13 +24,8 @@ async def fetch_and_send(target_type: str):
                     user), lambda target: config.get_sub_tags(
                         target_type, target, user.user_type, user.user)),
             send_user_list))
-
-    # 使用最新的 API
-    try:
-        bot = get_bot()
-    except ValueError:
-        bot = None
-
+    bot_list = list(nonebot.get_bots().values())
+    bot = bot_list[0] if bot_list else None
     to_send = await platform_manager[target_type].fetch_new_post(
         target, send_userinfo_list)
     for user, send_list in to_send:
