@@ -54,7 +54,7 @@ class Arknights(NewMessage, NoTargetMixin):
             pic_data = await render.render(announce_url,
                                            viewport=viewport,
                                            target='div.main')
-            pics.append('base64://{}'.format(pic_data))
+            pics.append(pic_data)
         elif (pic := soup.find('img', class_='banner-image')):
             pics.append(pic['src'])
         else:
@@ -102,7 +102,9 @@ class AkVersion(NoTargetMixin, StatusChange):
         elif old_status.get('preAnnounceType') == 0 and new_status.get(
                 'preAnnounceType') == 2:
             res.append(
-                Post('arknights', text='维护结束！冲！', target_name='明日方舟更新信息'))
+                Post('arknights',
+                     text='维护结束！冲！（可能不太准确）',
+                     target_name='明日方舟更新信息'))
         if old_status.get('clientVersion') != new_status.get('clientVersion'):
             res.append(
                 Post('arknights', text='游戏本体更新（大更新）', target_name='明日方舟更新信息'))

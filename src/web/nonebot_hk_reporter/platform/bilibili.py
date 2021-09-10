@@ -22,7 +22,7 @@ class Bilibili(NewMessage, TargetMixin):
     enabled = True
     is_common = True
     schedule_type = 'interval'
-    schedule_kw = {'seconds': 10}
+    schedule_kw = {'seconds': 30}
     name = 'B站'
 
     async def get_target_name(self, target: Target) -> Optional[str]:

@@ -2,6 +2,7 @@
 
 修改自 https://github.com/felinae98/nonebot-hk-reporter
 """
+import httpx
 from nonebot import CommandGroup, logger
 from nonebot.adapters import Bot, Event
 from nonebot.adapters.cqhttp import GroupMessageEvent
@@ -71,11 +72,14 @@ async def init_id(bot: Bot, event: GroupMessageEvent, state: T_State):
 
 async def parse_id(bot: Bot, event: Event, state: T_State):
     target = str(event.get_message()).strip()
-    name = await check_sub_target(state['platform'], target)
-    if not name:
-        await add_sub_cmd.reject('ID 输入错误')
-    state['id'] = target
-    state['name'] = name
+    try:
+        name = await check_sub_target(state['platform'], target)
+        if not name:
+            await add_sub_cmd.reject('ID 输入错误')
+        state['id'] = target
+        state['name'] = name
+    except httpx.ConnectTimeout:
+        await add_sub_cmd.finish(f'验证 ID 失败，网络连接超时，请稍后再试')
 
 
 @add_sub_cmd.got('id', '{_prompt}', parse_id)
@@ -124,6 +128,7 @@ async def add_sub_process(bot: Bot, event: GroupMessageEvent, state: T_State):
                          target_type=state['platform'],
                          cats=state.get('cats', []),
                          tags=state.get('tags', []))
+
     await add_sub_cmd.finish('添加 {} 成功'.format(state['name']))
 
 
