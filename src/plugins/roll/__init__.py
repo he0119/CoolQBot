@@ -13,8 +13,8 @@ from nonebot.adapters.cqhttp import MessageEvent
 from .rand import get_rand
 from .data import roll_dices
 
-#region roll
-roll_cmd = on_command('roll', block=True)
+# region roll
+roll_cmd = on_command("roll", block=True)
 roll_cmd.__doc__ = """
 roll
 
@@ -28,15 +28,14 @@ roll 两次点数100和两次点数50
 
 
 @roll_cmd.handle()
-async def roll_handle_first_receive(bot: Bot, event: MessageEvent,
-                                    state: T_State):
+async def roll_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
     args = str(event.message).strip()
 
     # 检查是否符合规则
-    match = re.match(r'^([\dd+\s]+?)$', args)
+    match = re.match(r"^([\dd+\s]+?)$", args)
 
     if args and match:
-        state['input'] = args
+        state["input"] = args
 
 
 @roll_cmd.args_parser
@@ -44,29 +43,30 @@ async def roll_args_parser(bot: Bot, event: Event, state: T_State):
     args = str(event.get_message()).strip()
 
     # 检查是否符合规则
-    match = re.match(r'^([\dd+\s]+?)$', args)
+    match = re.match(r"^([\dd+\s]+?)$", args)
 
     if not args:
-        await roll_cmd.reject('ROLL 点方式不能为空呢，请重新输入')
+        await roll_cmd.reject("ROLL 点方式不能为空呢，请重新输入")
 
     if not match:
-        await roll_cmd.reject('请输入正确的参数 ~>_<~')
+        await roll_cmd.reject("请输入正确的参数 ~>_<~")
 
-    state[state['_current_key']] = args
+    state[state["_current_key"]] = args
 
 
 @roll_cmd.got(
-    'input',
-    prompt='欢迎使用 NGA 风格 ROLL 点插件\n请问你想怎么 ROLL 点\n你可以输入 d100\n也可以输入 2d100+2d50')
+    "input",
+    prompt="欢迎使用 NGA 风格 ROLL 点插件\n请问你想怎么 ROLL 点\n你可以输入 d100\n也可以输入 2d100+2d50",
+)
 async def roll_handle(bot: Bot, event: MessageEvent, state: T_State):
-    input_str = state['input']
+    input_str = state["input"]
     str_data = roll_dices(input_str)
     await roll_cmd.finish(str_data, at_sender=True)
 
 
-#endregion
-#region rand
-rand_cmd = on_command('rand', block=True)
+# endregion
+# region rand
+rand_cmd = on_command("rand", block=True)
 rand_cmd.__doc__ = """
 rand
 
@@ -85,4 +85,4 @@ async def rand_handle(bot: Bot, event: MessageEvent, state: T_State):
     await rand_cmd.finish(str_data, at_sender=True)
 
 
-#endregion
+# endregion

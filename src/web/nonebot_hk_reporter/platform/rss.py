@@ -14,12 +14,12 @@ class RSS(NewMessage, TargetMixin):
 
     categories = {}
     enable_tag = False
-    platform_name = 'rss'
-    name = 'RSS'
+    platform_name = "rss"
+    name = "RSS"
     enabled = True
     is_common = True
-    schedule_type = 'interval'
-    schedule_kw = {'seconds': 30}
+    schedule_type = "interval"
+    schedule_kw = {"seconds": 30}
 
     async def get_target_name(self, target: Target) -> Optional[str]:
         async with httpx.AsyncClient() as client:
@@ -27,11 +27,11 @@ class RSS(NewMessage, TargetMixin):
                 target,
                 timeout=10.0,
                 headers={
-                    'user-agent':
-                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Edg/92.0.902.78'
-                })
+                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Edg/92.0.902.78"
+                },
+            )
             feed = feedparser.parse(res.text)
-            return feed['feed']['title']
+            return feed["feed"]["title"]
 
     def get_date(self, post: RawPost) -> int:
         return calendar.timegm(post.published_parsed)
@@ -45,23 +45,24 @@ class RSS(NewMessage, TargetMixin):
                 target,
                 timeout=10.0,
                 headers={
-                    'user-agent':
-                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Edg/92.0.902.78'
-                })
+                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36 Edg/92.0.902.78"
+                },
+            )
             feed = feedparser.parse(res)
             entries = feed.entries
             for entry in entries:
-                entry['_target_name'] = feed.feed.title
+                entry["_target_name"] = feed.feed.title
             return feed.entries
 
     async def parse(self, raw_post: RawPost) -> Post:
-        text = raw_post.get('title',
-                            '') + '\n' if raw_post.get('title') else ''
-        soup = bs(raw_post.description, 'html.parser')
+        text = raw_post.get("title", "") + "\n" if raw_post.get("title") else ""
+        soup = bs(raw_post.description, "html.parser")
         text += soup.text.strip()
-        pics = list(map(lambda x: x.attrs['src'], soup('img')))
-        return Post('rss',
-                    text=text,
-                    url=raw_post.link,
-                    pics=pics,
-                    target_name=raw_post['_target_name'])
+        pics = list(map(lambda x: x.attrs["src"], soup("img")))
+        return Post(
+            "rss",
+            text=text,
+            url=raw_post.link,
+            pics=pics,
+            target_name=raw_post["_target_name"],
+        )

@@ -17,10 +17,10 @@ from .fflogs_api import fflogs
 from .fflogs_data import FFLOGS_DATA
 from .gate import get_direction
 
-ff14 = CommandGroup('ff14', block=True)
+ff14 = CommandGroup("ff14", block=True)
 
-#region 藏宝选门
-gate_cmd = ff14.command('gate', aliases={'gate'})
+# region 藏宝选门
+gate_cmd = ff14.command("gate", aliases={"gate"})
 gate_cmd.__doc__ = """
 ff14.gate gate
 
@@ -37,32 +37,31 @@ async def gate_args_parser(bot: Bot, event: Event, state: T_State):
     args = str(event.get_message()).strip()
 
     if not args:
-        await gate_cmd.reject('你什么都不输入我怎么知道呢，请告诉我有几个门！')
+        await gate_cmd.reject("你什么都不输入我怎么知道呢，请告诉我有几个门！")
 
-    if args not in ['2', '3']:
-        await gate_cmd.reject('暂时只支持两个门或者三个门的情况，请重新输入吧。')
+    if args not in ["2", "3"]:
+        await gate_cmd.reject("暂时只支持两个门或者三个门的情况，请重新输入吧。")
 
-    state[state['_current_key']] = int(args)
+    state[state["_current_key"]] = int(args)
 
 
 @gate_cmd.handle()
-async def gate_handle_first_receive(bot: Bot, event: MessageEvent,
-                                    state: T_State):
+async def gate_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
     args = str(event.message).strip()
 
-    if args in ['2', '3']:
-        state['door_number'] = int(args)
+    if args in ["2", "3"]:
+        state["door_number"] = int(args)
 
 
-@gate_cmd.got('door_number', prompt='总共有多少个门呢？')
+@gate_cmd.got("door_number", prompt="总共有多少个门呢？")
 async def gate_handle(bot: Bot, event: Event, state: T_State):
-    direction = get_direction(state['door_number'])
+    direction = get_direction(state["door_number"])
     await gate_cmd.finish(direction, at_sender=True)
 
 
-#endregion
-#region FFLogs
-fflogs_cmd = ff14.command('dps', aliases={'dps'})
+# endregion
+# region FFLogs
+fflogs_cmd = ff14.command("dps", aliases={"dps"})
 fflogs_cmd.__doc__ = """
 ff14.dps dps
 
@@ -92,82 +91,83 @@ ff14.dps dps
 async def fflogs_handle(bot: Bot, event: MessageEvent, state: T_State):
     argv = str(event.message).strip().split()
     if not argv:
-        await fflogs_cmd.finish(get_command_help('ff14.dps'))
+        await fflogs_cmd.finish(get_command_help("ff14.dps"))
 
     if not event.user_id:
         raise FinishedException
     user_id = event.user_id
 
     # 设置 Token
-    if argv[0] == 'token' and len(argv) == 2:
+    if argv[0] == "token" and len(argv) == 2:
         # 检查是否是超级用户
         if user_id not in bot.config.superusers:
-            await fflogs_cmd.finish('抱歉，你没有权限修改 Token。')
+            await fflogs_cmd.finish("抱歉，你没有权限修改 Token。")
 
         plugin_config.fflogs_token = argv[1]
-        await fflogs_cmd.finish('Token 设置完成。')
+        await fflogs_cmd.finish("Token 设置完成。")
 
     # 检查 Token 是否设置
     if not plugin_config.fflogs_token:
         await fflogs_cmd.finish(
-            '对不起，Token 未设置，无法查询数据。\n请先使用命令\n/dps token <token>\n配置好 Token 后再尝试查询数据。'
+            "对不起，Token 未设置，无法查询数据。\n请先使用命令\n/dps token <token>\n配置好 Token 后再尝试查询数据。"
         )
 
-    if argv[0] == 'token' and len(argv) == 1:
+    if argv[0] == "token" and len(argv) == 1:
         # 检查是否是超级用户
         if user_id not in bot.config.superusers:
-            await fflogs_cmd.finish('抱歉，你没有权限查看 Token。')
-        await fflogs_cmd.finish(f'当前的 Token 为 {plugin_config.fflogs_token}')
+            await fflogs_cmd.finish("抱歉，你没有权限查看 Token。")
+        await fflogs_cmd.finish(f"当前的 Token 为 {plugin_config.fflogs_token}")
 
-    if argv[0] == 'update' and len(argv) == 1:
+    if argv[0] == "update" and len(argv) == 1:
         await FFLOGS_DATA.update()
-        await fflogs_cmd.finish('副本数据更新成功')
+        await fflogs_cmd.finish("副本数据更新成功")
 
     # 缓存相关设置
-    if argv[0] == 'cache':
+    if argv[0] == "cache":
         # 检查是否是超级用户
         if user_id not in bot.config.superusers:
-            await fflogs_cmd.finish('抱歉，你没有权限设置缓存。')
+            await fflogs_cmd.finish("抱歉，你没有权限设置缓存。")
         if len(argv) == 2:
             if strtobool(argv[1]):
                 if not fflogs.is_cache_enabled:
                     fflogs.enable_cache()
-                await fflogs_cmd.finish('已开始定时缓存')
+                await fflogs_cmd.finish("已开始定时缓存")
             else:
                 if fflogs.is_cache_enabled:
                     fflogs.disable_cache()
-                await fflogs_cmd.finish('已停止定时缓存')
+                await fflogs_cmd.finish("已停止定时缓存")
         else:
             if fflogs.is_cache_enabled:
-                await fflogs_cmd.finish('定时缓存开启中')
+                await fflogs_cmd.finish("定时缓存开启中")
             else:
-                await fflogs_cmd.finish('定时缓存关闭中')
+                await fflogs_cmd.finish("定时缓存关闭中")
 
-    if argv[0] == 'me' and len(argv) == 1:
+    if argv[0] == "me" and len(argv) == 1:
         if user_id not in fflogs.characters:
             await fflogs_cmd.finish(
-                '抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。')
+                "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。"
+            )
         await fflogs_cmd.finish(
-            f'你当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}'
+            f"你当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}"
         )
 
-    if '[CQ:at,qq=' in argv[0] and len(argv) == 1:
+    if "[CQ:at,qq=" in argv[0] and len(argv) == 1:
         user_id = int(argv[0][10:-1])
         if user_id not in fflogs.characters:
-            await fflogs_cmd.finish('抱歉，该用户没有绑定最终幻想14的角色。')
+            await fflogs_cmd.finish("抱歉，该用户没有绑定最终幻想14的角色。")
         await fflogs_cmd.finish(
-            f'[CQ:at,qq={user_id}] 当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}'
+            f"[CQ:at,qq={user_id}] 当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}"
         )
 
-    if argv[0] == 'me' and len(argv) == 3:
+    if argv[0] == "me" and len(argv) == 3:
         fflogs.set_character(user_id, argv[1], argv[2])
-        await fflogs_cmd.finish('角色绑定成功！')
+        await fflogs_cmd.finish("角色绑定成功！")
 
-    if argv[0] == 'classes' and len(argv) == 1:
+    if argv[0] == "classes" and len(argv) == 1:
         reply = await fflogs.classes()
         await fflogs_cmd.finish(str(reply))
 
-    if argv[0] == 'zones' and len(argv) == 2:
+    if argv[0] == "zones" and len(argv) == 2:
         reply = await fflogs.zones()
         if reply:
             await fflogs_cmd.finish(str(reply[int(argv[1])]))
@@ -177,38 +177,38 @@ async def fflogs_handle(bot: Bot, event: MessageEvent, state: T_State):
         # <BOSS名> me
         # <BOSS名> <@他人>
         # <BOSS名> <职业名>
-        if argv[1].lower() == 'me':
+        if argv[1].lower() == "me":
             reply = await get_character_dps_by_user_id(argv[0], user_id)
-        elif '[CQ:at,qq=' in argv[1]:
+        elif "[CQ:at,qq=" in argv[1]:
             # @他人的格式
             # [CQ:at,qq=12345678]
             user_id = int(argv[1][10:-1])
             reply = await get_character_dps_by_user_id(argv[0], user_id)
         else:
-            reply = await fflogs.dps(*argv)  #type:ignore
+            reply = await fflogs.dps(*argv)  # type:ignore
         await fflogs_cmd.finish(reply)
 
     if len(argv) == 3:
         # <BOSS名> <职业名> <DPS种类>
         # <BOSS名> <角色名> <服务器名>
         argv[2] = argv[2].lower()
-        if argv[2] in ['adps', 'rdps', 'pdps']:
-            reply = await fflogs.dps(*argv)  #type:ignore
+        if argv[2] in ["adps", "rdps", "pdps"]:
+            reply = await fflogs.dps(*argv)  # type:ignore
         else:
-            reply = await fflogs.character_dps(*argv)  #type:ignore
+            reply = await fflogs.character_dps(*argv)  # type:ignore
         await fflogs_cmd.finish(reply)
 
-    await fflogs_cmd.finish(get_command_help('ff14.dps'))
+    await fflogs_cmd.finish(get_command_help("ff14.dps"))
 
 
 async def get_character_dps_by_user_id(boss_nickname: str, user_id: int):
-    """ 通过 BOSS 名称和 QQ 号来获取角色的 DPS 数据 """
+    """通过 BOSS 名称和 QQ 号来获取角色的 DPS 数据"""
     if user_id not in fflogs.characters:
-        return '抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me <角色名> <服务器名>\n绑定自己的角色。'
+        return "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me <角色名> <服务器名>\n绑定自己的角色。"
     return await fflogs.character_dps(
         boss_nickname,
         *fflogs.characters[user_id],
     )
 
 
-#endregion
+# endregion

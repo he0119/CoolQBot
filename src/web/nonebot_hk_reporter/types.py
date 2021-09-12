@@ -1,10 +1,10 @@
 from typing import Any, Callable, NamedTuple, NewType
 from dataclasses import dataclass
 
-RawPost = NewType('RawPost', Any)
-Target = NewType('Target', str)
-Category = NewType('Category', int)
-Tag = NewType('Tag', str)
+RawPost = NewType("RawPost", Any)
+Target = NewType("Target", str)
+Category = NewType("Category", int)
+Tag = NewType("Tag", str)
 
 
 @dataclass(eq=True, frozen=True)

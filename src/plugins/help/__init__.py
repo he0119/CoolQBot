@@ -13,7 +13,7 @@ from nonebot.adapters.cqhttp.event import MessageEvent
 
 from .commands import CommandInfo, get_command_help, get_commands
 
-help_cmd = on_command('help', aliases={'帮助'}, block=True)
+help_cmd = on_command("help", aliases={"帮助"}, block=True)
 help_cmd.__doc__ = """
 help 帮助
 
@@ -27,7 +27,7 @@ help 帮助
 
 
 def format_name_aliases(command: CommandInfo) -> str:
-    """ 格式化命令名称 """
+    """格式化命令名称"""
     if command.aliases:
         return f'{command.name}({", ".join(command.aliases)})'
     else:
@@ -38,7 +38,7 @@ def format_name_aliases(command: CommandInfo) -> str:
 async def help_handle(bot: Bot, event: MessageEvent):
     args = str(event.message).strip()
 
-    if args == 'all':
+    if args == "all":
         commands = get_commands()
         docs = "命令（别名）列表：\n"
         docs += "\n".join(sorted(map(format_name_aliases, commands)))
@@ -47,6 +47,6 @@ async def help_handle(bot: Bot, event: MessageEvent):
         command_help = get_command_help(args)
         if command_help:
             await help_cmd.finish(command_help)
-        await help_cmd.finish('请输入支持的命令')
+        await help_cmd.finish("请输入支持的命令")
     else:
-        await help_cmd.finish(get_command_help('help'))
+        await help_cmd.finish(get_command_help("help"))

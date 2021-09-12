@@ -1,10 +1,9 @@
 """ 机器人插件
 """
 from nonebot import on_message
-from nonebot.adapters.cqhttp import escape
-from nonebot.rule import to_me
 from nonebot.adapters import Bot
-from nonebot.adapters.cqhttp import MessageEvent
+from nonebot.adapters.cqhttp import MessageEvent, escape
+from nonebot.rule import to_me
 from nonebot.typing import T_State
 
 from src.utils.helpers import render_expression
@@ -16,25 +15,24 @@ robot_message = on_message(rule=to_me(), priority=5, block=True)
 
 # 无法获取机器人回复时的表达
 EXPR_DONT_UNDERSTAND = (
-    '我现在还不太明白你在说什么呢，但没关系，以后的我会变得更强呢！',
-    '我有点看不懂你的意思呀，可以跟我聊些简单的话题嘛',
-    '其实我不太明白你的意思...',
-    '抱歉哦，我现在的能力还不能够明白你在说什么，但我会加油的～'
-) # yapf: disable
+    "我现在还不太明白你在说什么呢，但没关系，以后的我会变得更强呢！",
+    "我有点看不懂你的意思呀，可以跟我聊些简单的话题嘛",
+    "其实我不太明白你的意思...",
+    "抱歉哦，我现在的能力还不能够明白你在说什么，但我会加油的～",
+)
 
 
 @robot_message.handle()
-async def robot_handle_first_receive(bot: Bot, event: MessageEvent,
-                                     state: T_State):
+async def robot_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
     args = str(event.message).strip()
 
     if args:
-        state['msg'] = args
+        state["msg"] = args
 
 
-@robot_message.got('msg')
+@robot_message.got("msg")
 async def robot_handle(bot: Bot, event: MessageEvent, state: T_State):
-    msg = state['msg']
+    msg = state["msg"]
     # 通过封装的函数获取机器人的回复
     reply = await call_tuling_api(event, msg)
     if reply:

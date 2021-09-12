@@ -93,37 +93,38 @@ class Post:
             matrix = (3, 1)
         if await process_row(2):
             matrix = (3, 3)
-        logger.info('trigger merge image')
-        target = Image.new('RGB', (x_coord[-1], y_coord[-1]))
+        logger.info("trigger merge image")
+        target = Image.new("RGB", (x_coord[-1], y_coord[-1]))
         for y in range(matrix[1]):
             for x in range(matrix[0]):
                 target.paste(
                     images[y * matrix[0] + x],
-                    (x_coord[x], y_coord[y], x_coord[x + 1], y_coord[y + 1]))
+                    (x_coord[x], y_coord[y], x_coord[x + 1], y_coord[y + 1]),
+                )
         target_io = BytesIO()
-        target.save(target_io, 'JPEG')
-        self.pics = self.pics[matrix[0] * matrix[1]:]
+        target.save(target_io, "JPEG")
+        self.pics = self.pics[matrix[0] * matrix[1] :]
         self.pics.insert(0, target_io.getvalue())
 
     async def generate_messages(self):
         if self._message is None:
             await self._pic_merge()
             msgs = []
-            text = ''
+            text = ""
             if self.text:
-                text += '{}'.format(
-                    self.text if len(self.text) < 500 else self.text[:500] +
-                    '...')
-            text += '\n来源: {}'.format(self.target_type)
+                text += "{}".format(
+                    self.text if len(self.text) < 500 else self.text[:500] + "..."
+                )
+            text += "\n来源: {}".format(self.target_type)
             if self.target_name:
-                text += ' {}'.format(self.target_name)
+                text += " {}".format(self.target_name)
             if self._use_pic():
                 msgs.append(await parse_text(text))
-                if not self.target_type == 'rss' and self.url:
+                if not self.target_type == "rss" and self.url:
                     msgs.append(MessageSegment.text(self.url))
             else:
                 if self.url:
-                    text += ' \n详情: {}'.format(self.url)
+                    text += " \n详情: {}".format(self.url)
                 msgs.append(MessageSegment.text(text))
             for pic in self.pics:
                 # if isinstance(pic, bytes):
@@ -137,11 +138,17 @@ class Post:
         return self._message
 
     def __str__(self):
-        return 'type: {}\nfrom: {}\ntext: {}\nurl: {}\npic: {}'.format(
-            self.target_type, self.target_name,
-            self.text if len(self.text) < 500 else self.text[:500] + '...',
-            self.url, ', '.join(
+        return "type: {}\nfrom: {}\ntext: {}\nurl: {}\npic: {}".format(
+            self.target_type,
+            self.target_name,
+            self.text if len(self.text) < 500 else self.text[:500] + "...",
+            self.url,
+            ", ".join(
                 map(
-                    lambda x: 'b64img'
-                    if isinstance(x, bytes) or x.startswith('base64') else x,
-                    self.pics)))
+                    lambda x: "b64img"
+                    if isinstance(x, bytes) or x.startswith("base64")
+                    else x,
+                    self.pics,
+                )
+            ),
+        )

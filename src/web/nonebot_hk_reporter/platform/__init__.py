@@ -7,7 +7,7 @@ from importlib import import_module
 
 _package_dir = str(Path(__file__).resolve().parent)
 for (_, module_name, _) in iter_modules([_package_dir]):
-    import_module(f'{__name__}.{module_name}')
+    import_module(f"{__name__}.{module_name}")
 
 
 async def check_sub_target(target_type, target):
@@ -26,4 +26,5 @@ for name, platform_list in _platform_list.items():
         platform_manager[name] = platform_list[0]()
     else:
         platform_manager[name] = NoTargetGroup(
-            [_platform() for _platform in platform_list])
+            [_platform() for _platform in platform_list]
+        )
