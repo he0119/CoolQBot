@@ -1,0 +1,3 @@
+[submodule "src/web/GenshinUID"]
+	path = src/web/GenshinUID
+	url = https://github.com/he0119/GenshinUID
