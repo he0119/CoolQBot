@@ -16,14 +16,53 @@ from .data import HOLIDAYS_DATA, get_first_connect_message, get_moring_message
 driver = nonebot.get_driver()
 
 
-# region 启动问好
+# region 启动问候
 @driver.on_bot_connect
 async def hello_on_connect(bot: Bot) -> None:
-    """启动时发送问好信息"""
+    """启动时发送问候"""
     hello_str = get_first_connect_message()
-    for group_id in plugin_config.group_id:
+    for group_id in plugin_config.hello_group_id:
         await bot.send_msg(message_type="group", group_id=group_id, message=hello_str)
-    logger.info("发送首次启动的问好信息")
+    logger.info("发送首次启动的问候")
+
+
+hello_cmd = on_command("hello", aliases={"问候"}, permission=GROUP)
+hello_cmd.__doc__ = """
+hello 问候
+
+启动问候
+
+开启时会在每天机器人第一次启动时发送问候
+
+查看当前群是否开启启动问候
+/hello
+开启启动问候功能
+/hello on
+关闭启动问候功能
+/hello off
+"""
+
+
+@hello_cmd.handle()
+async def hello_handle(bot: Bot, event: GroupMessageEvent):
+    args = str(event.message).strip()
+
+    group_id = event.group_id
+
+    if args and group_id:
+        if strtobool(args):
+            plugin_config.hello_group_id += [group_id]
+            await hello_cmd.finish("已在本群开启启动问候功能")
+        else:
+            plugin_config.hello_group_id = [
+                n for n in plugin_config.hello_group_id if n != group_id
+            ]
+            await hello_cmd.finish("已在本群关闭启动问候功能")
+    else:
+        if group_id in plugin_config.hello_group_id:
+            await hello_cmd.finish("启动问候功能开启中")
+        else:
+            await hello_cmd.finish("启动问候功能关闭中")
 
 
 # endregion
@@ -38,7 +77,7 @@ async def hello_on_connect(bot: Bot) -> None:
 async def morning():
     """早安"""
     hello_str = await get_moring_message()
-    for group_id in plugin_config.group_id:
+    for group_id in plugin_config.morning_group_id:
         await get_bot().send_msg(
             message_type="group",
             group_id=group_id,
@@ -53,11 +92,11 @@ morning 早安
 
 每日早安
 
-启用时会在每天早晨发送早安信息
+开启时会在每天早晨发送早安信息
 
-查看当前群是否启用每日早安功能
+查看当前群是否开启每日早安功能
 /morning
-启用每日早安功能
+开启每日早安功能
 /morning on
 关闭每日早安功能
 /morning off
@@ -83,15 +122,15 @@ async def morning_handle(bot: Bot, event: GroupMessageEvent):
 
     if args and group_id:
         if strtobool(args):
-            plugin_config.group_id += [group_id]
+            plugin_config.morning_group_id += [group_id]
             await morning_cmd.finish("已在本群开启每日早安功能")
         else:
-            plugin_config.group_id = [
-                n for n in plugin_config.group_id if n != group_id
+            plugin_config.morning_group_id = [
+                n for n in plugin_config.morning_group_id if n != group_id
             ]
             await morning_cmd.finish("已在本群关闭每日早安功能")
     else:
-        if group_id in plugin_config.group_id:
+        if group_id in plugin_config.morning_group_id:
             await morning_cmd.finish("每日早安功能开启中")
         else:
             await morning_cmd.finish("每日早安功能关闭中")
