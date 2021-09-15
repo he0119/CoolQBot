@@ -61,6 +61,7 @@ jobs:
             cd coolqbot/dev
             sed -i "s#he0119/coolqbot:.*#he0119/coolqbot:dev#g" docker-compose.yml
             sudo docker-compose pull
+            sudo docker-compose down
             sudo docker-compose up -d
 
   deploy_prod:
@@ -83,5 +84,6 @@ jobs:
           script: |
             cd coolqbot/prod
             sed -i "s#he0119/coolqbot:.*#he0119/coolqbot:$TAG_NAME#g" docker-compose.yml
-            docker-compose pull
-            docker-compose up -d
+            sudo docker-compose pull
+            sudo docker-compose down
+            sudo docker-compose up -d
