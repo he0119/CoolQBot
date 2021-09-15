@@ -112,8 +112,10 @@ status 状态
 
 
 @status_cmd.handle()
-async def status_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
-    await status_cmd.finish(get_status(event.group_id))
+async def status_handle(bot: Bot, event: MessageEvent, state: T_State):
+    group_id = event.group_id if isinstance(event, GroupMessageEvent) else None
+    message = get_status(group_id)
+    await status_cmd.finish(message)
 
 
 # endregion

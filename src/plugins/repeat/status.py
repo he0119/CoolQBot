@@ -3,8 +3,10 @@
 from datetime import datetime
 from typing import Optional
 
+import psutil
 from dateutil.relativedelta import relativedelta
 
+from .config import plugin_config
 from .recorder import recorder_obj
 
 
@@ -18,7 +20,7 @@ def get_status(group_id: Optional[int]) -> str:
     在线时间
     """
     str_data = ""
-    if group_id:
+    if group_id in plugin_config.group_id:
         str_data = f"近十分钟群内聊天数量是 {recorder_obj.message_number(10, group_id)} 条"
 
         repeat_num = get_total_number(recorder_obj.repeat_list(group_id))
@@ -51,6 +53,7 @@ def get_status(group_id: Optional[int]) -> str:
         str_data += f" {rdate.minutes} 分钟"
     if rdate.seconds:
         str_data += f" {rdate.seconds} 秒"
+    str_data += f"\n{server_status()}"
     return str_data.strip()
 
 
@@ -60,3 +63,30 @@ def get_total_number(record_list):
     for _, v in record_list.items():
         num += v
     return num
+
+
+# https://github.com/cscs181/QQ-GitHub-Bot/tree/master/src/plugins/nonebot_plugin_status
+def server_status() -> str:
+    data = []
+
+    data.append(f"CPU: {int(cpu_status()):02d}%")
+    data.append(f"Memory: {int(memory_status()):02d}%")
+    data.append("Disk:")
+    for k, v in disk_usage().items():
+        data.append(f"  {k}: {int(v.percent):02d}%")
+
+    return "\n".join(data)
+
+
+def cpu_status() -> float:
+    return psutil.cpu_percent(interval=1)  # type: ignore
+
+
+def memory_status() -> float:
+    return psutil.virtual_memory().percent
+
+
+def disk_usage() -> dict[str, psutil._common.sdiskusage]:
+    disk_parts = psutil.disk_partitions()
+    disk_usages = {d.mountpoint: psutil.disk_usage(d.mountpoint) for d in disk_parts}
+    return disk_usages
