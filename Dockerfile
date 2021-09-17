@@ -1,4 +1,4 @@
-FROM winnerokay/uvicorn-gunicorn-fastapi:python3.9
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim
 
 ENV TZ=Asia/Shanghai
 
