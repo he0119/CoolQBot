@@ -31,3 +31,7 @@ services:
     restart: always
     volumes:
       - ./cqhttp:/data
+  rsshub:
+    image: diygod/rsshub
+    container_name: rsshub
+    restart: always
