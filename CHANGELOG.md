@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.15.1] - 2021-09-17
+
+### Added
+
+- 添加原神 UID 查询
+
 ## [0.15.0] - 2021-08-29
 
 ### Added

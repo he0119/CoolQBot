@@ -5,7 +5,7 @@ license = "MIT"
 name = "coolqbot"
 readme = "README.md"
 repository = "https://github.com/he0119/CoolQBot"
-version = "0.14.1"
+version = "0.15.1"
 
 [tool.poetry.dependencies]
 python = "^3.9"
