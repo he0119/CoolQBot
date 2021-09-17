@@ -45,12 +45,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: Set version
         run: |
           sed -ri "s#SENTRY_RELEASE=version#SENTRY_RELEASE=$VERSION#g" Dockerfile
         env:
           VERSION: ${{ needs.test.outputs.version }}
       - name: Create Sentry release
+        if: github.event_name != 'pull_request'
         uses: getsentry/action-release@v1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
