@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.15.1] - 2021-09-17
+
+### Added
+
+- 添加原神 UID 查询
+
+### Changed
+
+- 升级 nonebot-hk-reporter 至 0.3.2
+- 将每日早安与启动问候分离开来，可以分别在不同的群启用
+
 ## [0.15.0] - 2021-08-29
 
 ### Added
@@ -387,7 +398,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.15.1...HEAD
+[0.15.1]: https://github.com/he0119/CoolQBot/compare/v0.15.0...v0.15.1
 [0.15.0]: https://github.com/he0119/CoolQBot/compare/v0.14.1...v0.15.0
 [0.14.1]: https://github.com/he0119/CoolQBot/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/he0119/CoolQBot/compare/v0.13.1...v0.14.0

@@ -13,7 +13,7 @@ from .recorder import recorder_obj
 
 
 def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
-    """ 是否复读这个消息 """
+    """是否复读这个消息"""
     if not isinstance(event, GroupMessageEvent):
         return False
 
@@ -29,7 +29,7 @@ def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
         return False
 
     # 不要复读指令
-    if event.raw_message.startswith('/'):
+    if event.raw_message.startswith("/"):
         return False
 
     # 记录群内发送消息数量和时间
@@ -41,12 +41,14 @@ def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
         return False
 
     # 不要复读签到，分享，小程序，转发
-    if event.message[0].type in ['sign', 'share', 'json', 'forward']:
+    if event.message[0].type in ["sign", "share", "json", "forward"]:
         return False
 
     # 不要复读带网址的消息
-    if 'http://' in event.raw_message.lower(
-    ) or 'https://' in event.raw_message.lower():
+    if (
+        "http://" in event.raw_message.lower()
+        or "https://" in event.raw_message.lower()
+    ):
         return False
 
     # 复读之后一定时间内不再复读
@@ -67,7 +69,7 @@ def need_repeat(bot: Bot, event: Event, state: T_State) -> bool:
     # 按照设定概率复读
     random = secrets.SystemRandom()
     rand = random.randint(1, 100)
-    logger.info(f'repeat: {rand}')
+    logger.info(f"repeat: {rand}")
     if rand > repeat_rate:
         return False
 

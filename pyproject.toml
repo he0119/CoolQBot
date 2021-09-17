@@ -5,7 +5,7 @@ license = "MIT"
 name = "coolqbot"
 readme = "README.md"
 repository = "https://github.com/he0119/CoolQBot"
-version = "0.14.1"
+version = "0.15.1"
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -21,12 +21,13 @@ beautifulsoup4 = "^4.9.3"
 feedparser = "^6.0.2"
 pyppeteer = "^0.2.5"
 pillow = "^8.1.0"
+psutil = "^5.8.0"
 
 [tool.poetry.dev-dependencies]
 nonebot-plugin-docs = "^2.0.0a15"
 nonebot-plugin-test = "^0.3.0"
-toml = "^0.10.2"
-yapf = ">=0.31.0"
+black = "^21.8b0"
+isort = "^5.9.3"
 
 [[tool.poetry.source]]
 default = true
@@ -36,6 +37,14 @@ url = "https://mirrors.aliyun.com/pypi/simple/"
 [nonebot.plugins]
 plugin_dirs = ["src/plugins", "src/web"]
 plugins = []
+
+[tool.black]
+# line-length = 90
+
+[tool.isort]
+profile = "black"
+# line_length = 90
+skip_gitignore = true
 
 [build-system]
 build-backend = "poetry.core.masonry.api"

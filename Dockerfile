@@ -1,6 +1,8 @@
 FROM winnerokay/uvicorn-gunicorn-fastapi:python3.9
 
-ENV TZ Asia/Shanghai
+ENV TZ=Asia/Shanghai
+
+ENV SENTRY_RELEASE=version
 
 COPY ./pyproject.toml ./poetry.lock /app/
 RUN set -ex; \

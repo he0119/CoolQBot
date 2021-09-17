@@ -18,17 +18,17 @@ from .config import global_config, plugin_config
 
 
 async def call_tencent_api(event: MessageEvent, text: str) -> Optional[str]:
-    """ 调用腾讯机器人的 API 获取回复 """
+    """调用腾讯机器人的 API 获取回复"""
     cred = credential.Credential(
         plugin_config.tencent_ai_secret_id,
         plugin_config.tencent_ai_secret_key,
     )
     httpProfile = HttpProfile()
-    httpProfile.endpoint = 'nlp.tencentcloudapi.com'
+    httpProfile.endpoint = "nlp.tencentcloudapi.com"
 
     clientProfile = ClientProfile()
     clientProfile.httpProfile = httpProfile
-    client = nlp_client.NlpClient(cred, 'ap-guangzhou', clientProfile)
+    client = nlp_client.NlpClient(cred, "ap-guangzhou", clientProfile)
 
     req = models.ChatBotRequest()
     params = {"Query": text}
@@ -40,7 +40,7 @@ async def call_tencent_api(event: MessageEvent, text: str) -> Optional[str]:
         # 替换腾讯昵称
         # 从小龙女换成设置的机器人昵称
         nickname: str = list(global_config.nickname)[0]
-        msg = msg.replace('腾讯小龙女', nickname)
-        msg = msg.replace('小龙女', nickname)
+        msg = msg.replace("腾讯小龙女", nickname)
+        msg = msg.replace("小龙女", nickname)
 
         return msg

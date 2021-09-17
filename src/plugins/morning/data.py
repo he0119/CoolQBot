@@ -10,23 +10,24 @@ from .config import DATA
 
 
 def get_first_connect_message():
-    """ 根据当前时间返回对应消息 """
+    """根据当前时间返回对应消息"""
     hour = datetime.now().hour
 
     if hour > 18 or hour < 6:
-        return '晚上好呀！'
+        return "晚上好呀！"
 
     if hour > 13:
-        return '下午好呀！'
+        return "下午好呀！"
 
     if hour > 11:
-        return '中午好呀！'
+        return "中午好呀！"
 
-    return '早上好呀！'
+    return "早上好呀！"
 
 
 class HolidayInfo(TypedDict):
-    """ 节假日信息 """
+    """节假日信息"""
+
     name: str
     date: date
     # 是否为节假日
@@ -48,36 +49,35 @@ def process_data(data: dict) -> dict:
 
 
 HOLIDAYS_DATA = DATA.network_file(
-    'https://cdn.jsdelivr.net/gh/he0119/coolqbot@master/src/plugins/morning/holidays.json',
-    'holidays.json',
+    "https://cdn.jsdelivr.net/gh/he0119/coolqbot@master/src/plugins/morning/holidays.json",
+    "holidays.json",
     process_data,
 )
 
 
 async def get_recent_holiday() -> Optional[HolidayInfo]:
-    """ 获取最近的节假日
+    """获取最近的节假日
 
     返回最近的节假日信息
     """
     data = await HOLIDAYS_DATA.data
     if not data:
-        raise Exception('获取节假日数据失败')
+        raise Exception("获取节假日数据失败")
 
     today = date.today()
 
     holidays: list[HolidayInfo] = []
     for date_str in data:
-        holidays += process_holiday(
-            parser.parse(date_str).date(), data[date_str])
-    holidays.sort(key=lambda info: info['date'])
+        holidays += process_holiday(parser.parse(date_str).date(), data[date_str])
+    holidays.sort(key=lambda info: info["date"])
 
     for holiday in holidays:
-        if holiday['date'] >= today:
+        if holiday["date"] >= today:
             return holiday
 
 
 async def get_recent_workday() -> Optional[HolidayInfo]:
-    """ 获取最近的节假日调休
+    """获取最近的节假日调休
 
     返回最近的节假日调休信息
     """
@@ -89,47 +89,48 @@ async def get_recent_workday() -> Optional[HolidayInfo]:
 
     workdays: list[HolidayInfo] = []
     for date_str in data:
-        workdays += process_workday(
-            parser.parse(date_str).date(), data[date_str])
-    workdays.sort(key=lambda info: info['date'])
+        workdays += process_workday(parser.parse(date_str).date(), data[date_str])
+    workdays.sort(key=lambda info: info["date"])
 
     for workday in workdays:
-        if workday['date'] >= today:
+        if workday["date"] >= today:
             return workday
 
 
 def process_holiday(date: date, data: dict) -> list[HolidayInfo]:
-    """ 处理节假日数据 """
+    """处理节假日数据"""
     holidays: list[HolidayInfo] = []
-    for i in range(data['duration']):
+    for i in range(data["duration"]):
         holidays.append(
             HolidayInfo(
-                name=data['name'],
+                name=data["name"],
                 date=date + timedelta(days=i),
                 holiday=True,
                 after=False,
-            ))
+            )
+        )
     return holidays
 
 
 def process_workday(date: date, data: dict) -> list[HolidayInfo]:
-    """ 处理节假日调休数据 """
+    """处理节假日调休数据"""
     workdays: list[HolidayInfo] = []
-    if data['workdays']:
-        for workday in data['workdays']:
+    if data["workdays"]:
+        for workday in data["workdays"]:
             workday = parser.parse(workday).date()
             workdays.append(
                 HolidayInfo(
-                    name=data['name'],
+                    name=data["name"],
                     date=workday,
                     holiday=False,
                     after=workday > date,
-                ))
+                )
+            )
     return workdays
 
 
 async def get_holiday_message() -> str:
-    """ 获得问候语
+    """获得问候语
 
     日期不同，不同的问候语，参考 http://timor.tech/api/holiday/tts
 
@@ -158,10 +159,10 @@ async def get_holiday_message() -> str:
     weekend_rest = 5 - today.weekday()
     if workday:
         # 调休距离现在还有多少天
-        workday_rest = (workday['date'] - today).days
+        workday_rest = (workday["date"] - today).days
     if holiday:
         # 节日距离现在还有多少天
-        holiday_rest = (holiday['date'] - today).days
+        holiday_rest = (holiday["date"] - today).days
 
     # 根据节假日与调休生成问候语
 
@@ -171,7 +172,7 @@ async def get_holiday_message() -> str:
 
     # 处理今天是调休的情况
     if workday and workday_rest == 0:
-        if workday['after']:
+        if workday["after"]:
             return f'{workday["name"]}才刚刚过完。今天是{workday["name"]}后调休，老老实实上班吧。'
         # 不需要考虑节假日不存在的情况
         # 因为如果调休在节假日前，说明调休后一定有节假日
@@ -179,17 +180,19 @@ async def get_holiday_message() -> str:
         elif holiday_rest == 1:
             return f'今天是{workday["name"]}前调休，明天就是{workday["name"]}了，加油！'
         else:
-            return f'今天是{workday["name"]}前调休，马上就是{workday["name"]}了，还有{holiday_rest}天，加油！'
+            return (
+                f'今天是{workday["name"]}前调休，马上就是{workday["name"]}了，还有{holiday_rest}天，加油！'
+            )
 
     # 处理今天是周末，且不是节假日或者调休的情况
     if today.weekday() == 5:
-        return '今天是星期六，放松一下吧！'
+        return "今天是星期六，放松一下吧！"
     if today.weekday() == 6:
-        return '今天是星期日，放松一下吧！'
+        return "今天是星期日，放松一下吧！"
 
     # 处理今天是星期五且最近两天有调休的情况
     if workday and workday_rest < 3 and today.weekday() == 4:
-        if workday['after']:
+        if workday["after"]:
             weekend_name = "周六" if workday_rest == 1 else "周日"
             if holiday:
                 return f'很遗憾的告诉您，这{weekend_name}要{workday["name"]}后调休。最近的一个节日是{holiday["name"]}。还要{holiday_rest}天。早着呢！'
@@ -214,16 +217,18 @@ async def get_holiday_message() -> str:
     if holiday:
         return f'还有{weekend_rest}天就是周六了，先好好工作吧！最近的一个节日是{holiday["name"]}，还要{holiday_rest}天。早着呢！'
 
-    return f'还有{weekend_rest}天就是周六了，先好好工作吧！'
+    return f"还有{weekend_rest}天就是周六了，先好好工作吧！"
+
 
 EXPR_MORNING = (
-    '早上好呀~>_<~\n{message}',
-    '大家早上好呀！\n{message}',
-    '朋友们早上好！\n{message}',
-    '群友们早上好！\n{message}',
- ) # yapf: disable
+    "早上好呀~>_<~\n{message}",
+    "大家早上好呀！\n{message}",
+    "朋友们早上好！\n{message}",
+    "群友们早上好！\n{message}",
+)
+
 
 async def get_moring_message() -> Message:
-    """ 获得早上问好 """
+    """获得早上问好"""
     message = await get_holiday_message()
     return render_expression(EXPR_MORNING, message=message)

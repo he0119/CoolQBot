@@ -14,10 +14,10 @@ from src.utils.helpers import strtobool
 from .calender import calender_obj
 from .config import plugin_config
 
-pcr = CommandGroup('pcr', block=True)
+pcr = CommandGroup("pcr", block=True)
 
-#region 日程表
-calender_cmd = pcr.command('calender', aliases={('pcr', '日程表'), ('pcr', '日程')})
+# region 日程表
+calender_cmd = pcr.command("calender", aliases={("pcr", "日程表"), ("pcr", "日程")})
 calender_cmd.__doc__ = """
 pcr.calender pcr.日程表 pcr.日程
 
@@ -40,23 +40,22 @@ async def calender_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
 
     group_id = event.group_id
 
-    if args in ['status', '状态']:
+    if args in ["status", "状态"]:
         if group_id in plugin_config.push_calender_group_id:
-            await calender_cmd.finish('日程自动推送开启中')
+            await calender_cmd.finish("日程自动推送开启中")
         else:
-            await calender_cmd.finish('日程自动推送关闭中')
+            await calender_cmd.finish("日程自动推送关闭中")
     elif args and group_id:
         if strtobool(args):
             plugin_config.push_calender_group_id += [group_id]
-            await calender_cmd.finish('已开始日程自动推送')
+            await calender_cmd.finish("已开始日程自动推送")
         else:
             plugin_config.push_calender_group_id = [
-                n for n in plugin_config.push_calender_group_id
-                if n != group_id
+                n for n in plugin_config.push_calender_group_id if n != group_id
             ]
-            await calender_cmd.finish('已停止日程自动推送')
+            await calender_cmd.finish("已停止日程自动推送")
     else:
         await calender_cmd.finish(await calender_obj.get_week_events())
 
 
-#endregion
+# endregion
