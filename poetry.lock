@@ -591,14 +591,14 @@ reference = "aliyun"
 
 [[package]]
 name = "nonebot-adapter-cqhttp"
-version = "2.0.0a15"
+version = "2.0.0a16"
 description = "OneBot(CQHTTP) adapter for nonebot2"
 category = "main"
 optional = false
 python-versions = ">=3.7.3,<4.0.0"
 
 [package.dependencies]
-httpx = ">=0.18.0,<0.19.0"
+httpx = ">=0.18.0,<1.0.0"
 nonebot2 = ">=2.0.0-alpha.14,<3.0.0"
 
 [package.source]
@@ -1401,7 +1401,7 @@ reference = "aliyun"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "177a81580105ed24af430a0d2b47c55fc2a9821df600e28c54137e4254a7e3f4"
+content-hash = "53b68b752592ef55202360287548c6e69cf8ed2a81ac8f3e63b07f65bb117cb9"
 
 [metadata.files]
 aiofiles = [
@@ -1603,8 +1603,8 @@ nb-cli = [
     {file = "nb_cli-0.5.0-py3-none-any.whl", hash = "sha256:3dba8448e968db7e339d04df9a3254079085879b65467219e008b46b4fab7bf9"},
 ]
 nonebot-adapter-cqhttp = [
-    {file = "nonebot-adapter-cqhttp-2.0.0a15.tar.gz", hash = "sha256:cfb3dd4678d5e9f924baeb29220b95d5b651a51668e3ded1fd39df11b3531fde"},
-    {file = "nonebot_adapter_cqhttp-2.0.0a15-py3-none-any.whl", hash = "sha256:9e5802f5c1bfb1e80ae56a80d3ee0dda2ca06ca90ba2bb2673590c91addc5aaa"},
+    {file = "nonebot-adapter-cqhttp-2.0.0a16.tar.gz", hash = "sha256:9de270291b98c41a45e5b629c02f16e3b25cafb3867b8161851f49c84145d8aa"},
+    {file = "nonebot_adapter_cqhttp-2.0.0a16-py3-none-any.whl", hash = "sha256:831747c55c9c1a660215225f84784a4ca275a84bffa8d1312524367066b68bbe"},
 ]
 nonebot-plugin-apscheduler = [
     {file = "nonebot-plugin-apscheduler-0.1.2.tar.gz", hash = "sha256:1765336cd388dde15f723ed12dbca942b04e4c25d5d7786878e447b09e68b909"},
