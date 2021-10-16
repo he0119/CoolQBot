@@ -3,9 +3,9 @@
 https://github.com/Binaryify/NeteaseCloudMusicApi
 """
 from typing import Optional
-from nonebot.adapters.cqhttp import MessageSegment, Message
 
 import httpx
+from nonebot.adapters.cqhttp import Message, MessageSegment
 
 
 async def call_netease_api(name: str) -> Optional[Message]:

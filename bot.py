@@ -2,6 +2,7 @@ from pathlib import Path
 
 import nonebot
 from nonebot.adapters.cqhttp import Bot as CQHTTPBot
+from nonebot.log import default_format, logger
 
 nonebot.init()
 app = nonebot.get_asgi()
@@ -16,8 +17,6 @@ config.home_dir_path = Path().resolve()
 config.data_dir_path = config.home_dir_path / "data"
 
 # 自定义 logger
-from nonebot.log import default_format, logger
-
 logger.add(
     config.data_dir_path / "logs" / "error.log",
     rotation="5 MB",
@@ -36,7 +35,5 @@ if config.debug:
 nonebot.load_from_toml("pyproject.toml")
 
 if __name__ == "__main__":
-    nonebot.logger.warning(
-        "Always use `nb run` to start the bot instead of manually running!"
-    )
+    logger.warning("Always use `nb run` to start the bot instead of manually running!")
     nonebot.run(app="__mp_main__:app")

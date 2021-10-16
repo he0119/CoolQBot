@@ -6,7 +6,7 @@
 from datetime import datetime, timedelta
 from typing import Dict
 
-from nonebot import logger
+from nonebot.log import logger
 
 from .config import DATA, plugin_config
 
