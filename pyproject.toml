@@ -10,8 +10,8 @@ version = "0.15.1"
 [tool.poetry.dependencies]
 python = "^3.9"
 nb-cli = "^0.5.0"
-nonebot2 = "^2.0.0a15"
-nonebot-adapter-cqhttp = "^2.0.0a15"
+nonebot2 = "^2.0.0a16"
+nonebot-adapter-cqhttp = "^2.0.0a16"
 nonebot-plugin-apscheduler = "^0.1.2"
 nonebot-plugin-sentry = "^0.2.2"
 python-dateutil = "^2.8.1"
@@ -24,7 +24,7 @@ pillow = "^8.1.0"
 psutil = "^5.8.0"
 
 [tool.poetry.dev-dependencies]
-nonebot-plugin-docs = "^2.0.0a15"
+nonebot-plugin-docs = "^2.0.0a16"
 nonebot-plugin-test = "^0.3.0"
 black = "^21.8b0"
 isort = "^5.9.3"
@@ -33,6 +33,10 @@ isort = "^5.9.3"
 default = true
 name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple/"
+
+[[tool.poetry.source]]
+name = "tuna"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 
 [nonebot.plugins]
 plugin_dirs = ["src/plugins", "src/web"]
