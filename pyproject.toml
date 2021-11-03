@@ -27,7 +27,7 @@ psutil = "^5.8.0"
 nonebot-plugin-docs = "^2.0.0a16"
 nonebot-plugin-test = "^0.3.0"
 black = "^21.8b0"
-isort = "^5.9.3"
+isort = "^5.10.0"
 
 [[tool.poetry.source]]
 default = true
