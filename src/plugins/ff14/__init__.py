@@ -16,6 +16,7 @@ from .config import plugin_config
 from .fflogs_api import fflogs
 from .fflogs_data import FFLOGS_DATA
 from .gate import get_direction
+from .nuannuan import get_latest_nuannuan
 
 ff14 = CommandGroup("ff14", block=True)
 
@@ -209,6 +210,29 @@ async def get_character_dps_by_user_id(boss_nickname: str, user_id: int):
         boss_nickname,
         *fflogs.characters[user_id],
     )
+
+
+# endregion
+# region 时尚品鉴
+nuannuan_cmd = ff14.command("nuannuan", aliases={"时尚品鉴"})
+nuannuan_cmd.__doc__ = """
+ff14.nuannuan 时尚品鉴
+
+最终幻想XIV 时尚品鉴
+
+获取最新的满分攻略
+/时尚品鉴
+"""
+
+
+@nuannuan_cmd.handle()
+async def nuannuan_handlee(bot: Bot, event: MessageEvent):
+    """时尚品鉴"""
+    latest = await get_latest_nuannuan()
+    if latest:
+        await nuannuan_cmd.finish(latest)
+    else:
+        await nuannuan_cmd.finish("抱歉，没有找到最新的满分攻略。")
 
 
 # endregion

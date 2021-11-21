@@ -35,13 +35,17 @@ FFLOGS_DATA = DATA.network_file(
 async def get_boss_data() -> list:
     """获取 boss 数据"""
     data = await FFLOGS_DATA.data
-    return data["boss"]
+    if data:
+        return data["boss"]
+    return []
 
 
 async def get_job_data() -> list:
     """获取 job 数据"""
     data = await FFLOGS_DATA.data
-    return data["job"]
+    if data:
+        return data["job"]
+    return []
 
 
 async def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:

@@ -7,11 +7,11 @@ import re
 
 from nonebot import on_command
 from nonebot.adapters import Bot, Event
-from nonebot.typing import T_State
 from nonebot.adapters.cqhttp import MessageEvent
+from nonebot.typing import T_State
 
-from .rand import get_rand
 from .data import roll_dices
+from .rand import get_rand
 
 # region roll
 roll_cmd = on_command("roll", block=True)

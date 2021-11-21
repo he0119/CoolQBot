@@ -1,7 +1,7 @@
 """ 艾欧泽亚天气预报
 """
 import time
-from typing import Dict, Optional
+from typing import Optional
 
 from .eorzean_data import locationIndex, weatherIndex, weatherRateIndex
 

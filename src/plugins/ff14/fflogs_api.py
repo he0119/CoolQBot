@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import List, Literal
 
 import httpx
-from nonebot import logger
+from nonebot.log import logger
 from nonebot_plugin_apscheduler import scheduler
 
 from .config import DATA, plugin_config

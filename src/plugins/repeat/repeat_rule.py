@@ -3,9 +3,9 @@
 import secrets
 from datetime import datetime, timedelta
 
-from nonebot import logger
 from nonebot.adapters import Bot, Event
 from nonebot.adapters.cqhttp.event import GroupMessageEvent
+from nonebot.log import logger
 from nonebot.typing import T_State
 
 from .config import plugin_config

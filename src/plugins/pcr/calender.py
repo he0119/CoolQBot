@@ -6,7 +6,8 @@ from datetime import datetime, timedelta
 from typing import Dict, Optional, Set
 
 import httpx
-from nonebot import get_bot, logger
+from nonebot import get_bot
+from nonebot.log import logger
 from nonebot_plugin_apscheduler import scheduler
 
 from .config import plugin_config
@@ -20,7 +21,7 @@ class Calender:
         self._job = None
         # 日程表
         self._timeline: Dict[str, Set[str]] = {}
-        self._timeline_update_time: Optional[datetime] = None
+        self._timeline_update_time: datetime = datetime.now()
 
         self.init()
 
