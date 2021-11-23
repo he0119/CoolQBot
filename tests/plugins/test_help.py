@@ -1,6 +1,5 @@
-import nonebot
-import nonebug
 import pytest
+from nonebot.adapters.cqhttp.message import Message
 from nonebug import Constructor
 
 
@@ -13,9 +12,9 @@ async def test_help_plugin(bug):
         {
             "user_id": 2,
             "group_id": 1,
-            "message": "获取帮助\n\n获取所有支持的命令\n/help all\n获取某个命令的帮助\n/help 命令名",
+            "message": Message("获取帮助\n\n获取所有支持的命令\n/help all\n获取某个命令的帮助\n/help 命令名"),
             "message_type": "group",
         },
-        {"message_id": 123},
+        {"message_id": 1},
     )
     await con.test_plugin("src.plugins.help")
