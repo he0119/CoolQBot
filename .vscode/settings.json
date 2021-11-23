@@ -1,4 +1,5 @@
 {
-    "python.analysis.typeCheckingMode": "basic",
-    "git.detectSubmodules": false,
+  "python.analysis.typeCheckingMode": "basic",
+  "git.detectSubmodules": false,
+  "python.testing.pytestEnabled": true,
 }
