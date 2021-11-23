@@ -37,6 +37,33 @@ jobs:
             echo "::set-output name=environment::dev"
             echo "::set-output name=version::$VERSION-git.$COMMIT_ID"
           fi
+      - name: Install prerequisites
+        run: |
+          poetry config virtualenvs.create false
+          poetry install
+      - name: Run tests
+        run: |
+          pytest --cov=src --cov-report xml --junitxml=TEST-pytest.xml
+      - name: Publish unit test results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: >
+          always() &&
+          github.event.sender.login != 'dependabot[bot]' &&
+          ( github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository )
+        with:
+          files: "**/TEST-*.xml"
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Unit Test Results
+          path: "**/TEST-*.xml"
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          flags: unittests
 
   docker:
     name: Docker
