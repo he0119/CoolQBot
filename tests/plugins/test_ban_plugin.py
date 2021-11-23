@@ -9,5 +9,5 @@ if typing.TYPE_CHECKING:
 
 @pytest.mark.parametrize("plugin", ["ban"], indirect=["plugin"])
 def test_ban_plugin(plugin: Plugin):
-    assert plugin.name == "ban"
+    assert plugin.name == "src.plugins.ban"
     ban_module: "ban" = plugin.module  # type: ignore

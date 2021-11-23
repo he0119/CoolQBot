@@ -5,7 +5,8 @@ import pytest
 
 
 @pytest.fixture
-def plugin(request, tmpdir):
+def bot(tmpdir):
+    """初始化机器人"""
     nonebot.init()
     # 添加额外的配置
     config = nonebot.get_driver().config
@@ -13,8 +14,9 @@ def plugin(request, tmpdir):
     # 插件数据目录
     config.data_dir_path = config.home_dir_path / "data"
 
-    nonebot.load_plugins(f"src/plugins")
-    plugins = nonebot.get_loaded_plugins()
-    plugin = list(filter(lambda x: x.name == request.param, plugins))[0]
 
+@pytest.fixture
+def plugin(request, bot):
+    plugin = nonebot.load_plugin(f"src.plugins.{request.param}")
+    assert plugin is not None
     return plugin
