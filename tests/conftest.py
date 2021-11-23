@@ -6,25 +6,27 @@ import pytest
 
 
 @pytest.fixture
-def bot(tmpdir):
+def bot(tmp_path):
     """初始化机器人"""
-    nonebot.init()
-    # 添加额外的配置
-    config = nonebot.get_driver().config
-    config.home_dir_path = Path(tmpdir).resolve()
     # 插件数据目录
-    config.data_dir_path = config.home_dir_path / "data"
+    data_path = tmp_path / "data"
+    # nonebug 目录
+    nonebug_path = tmp_path / "nonebug"
+
+    # 添加额外的配置
+    nonebug.init(
+        home_dir_path=tmp_path,
+        data_dir_path=data_path,
+        nonebug_log_dir=str(nonebug_path),
+    )
 
 
 @pytest.fixture
-def bug(tmpdir):
+def nonebug_path(bot):
     """初始化测试"""
-    # 添加额外的配置
-    home_dir_path = Path(tmpdir).resolve()
-    # 插件数据目录
-    data_dir_path = home_dir_path / "data"
+    nonebug_path = nonebot.get_driver().config.nonebug_log_dir
 
-    nonebug.init(home_dir_path=home_dir_path, data_dir_path=data_dir_path)
+    return Path(nonebug_path)
 
 
 @pytest.fixture

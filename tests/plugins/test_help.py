@@ -1,10 +1,12 @@
+from pathlib import Path
+
 import pytest
 from nonebot.adapters.cqhttp.message import Message
 from nonebug import Constructor
 
 
 @pytest.mark.asyncio
-async def test_help_plugin(bug):
+async def test_help_plugin(nonebug_path: Path):
     con = Constructor("Test help", "CQHTTP", "1")
     con.set_message("/help help", user_id=2, group_id=1)
     con.add_api(
@@ -17,4 +19,9 @@ async def test_help_plugin(bug):
         },
         {"message_id": 1},
     )
-    await con.test_plugin("src.plugins.help")
+    await con.test_plugin("src.plugins.help", log_name="test_help")
+
+    out_file = nonebug_path / "test_help.log"
+    err_file = nonebug_path / "test_help_err.log"
+    assert out_file.exists()
+    assert err_file.exists() is False

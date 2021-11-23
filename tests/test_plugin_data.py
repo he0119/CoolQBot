@@ -2,7 +2,7 @@
 from src.utils.plugin import PluginData
 
 
-def test_ban_plugin(bot):
+def test_plugin_data(bot):
     data = PluginData("test")
 
     assert data.exists("test.ini") is False
