@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import nonebot
+import nonebug
 import pytest
 
 
@@ -13,6 +14,17 @@ def bot(tmpdir):
     config.home_dir_path = Path(tmpdir).resolve()
     # 插件数据目录
     config.data_dir_path = config.home_dir_path / "data"
+
+
+@pytest.fixture
+def bug(tmpdir):
+    """初始化测试"""
+    # 添加额外的配置
+    home_dir_path = Path(tmpdir).resolve()
+    # 插件数据目录
+    data_dir_path = home_dir_path / "data"
+
+    nonebug.init(home_dir_path=home_dir_path, data_dir_path=data_dir_path)
 
 
 @pytest.fixture
