@@ -31,6 +31,7 @@ isort = "^5.9.3"
 nonebug = "^0.1.0"
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
+pytest-asyncio = "^0.16.0"
 
 [[tool.poetry.source]]
 default = true
