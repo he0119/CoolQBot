@@ -3,6 +3,7 @@ from pathlib import Path
 import nonebot
 import nonebug
 import pytest
+from nonebot.plugin import plugins
 
 
 @pytest.fixture
@@ -33,4 +34,7 @@ def nonebug_path(bot):
 def plugin(request, bot):
     plugin = nonebot.load_plugin(request.param)
     assert plugin is not None
-    return plugin
+
+    yield plugin
+
+    plugins.pop(plugin.name)
