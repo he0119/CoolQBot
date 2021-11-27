@@ -31,6 +31,6 @@ def nonebug_path(bot):
 
 @pytest.fixture
 def plugin(request, bot):
-    plugin = nonebot.load_plugin(f"src.plugins.{request.param}")
+    plugin = nonebot.load_plugin(request.param)
     assert plugin is not None
     return plugin
