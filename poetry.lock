@@ -705,8 +705,8 @@ all = ["Quart (>=0.15.0,<0.16.0)", "aiohttp[speedups] (>=3.7.4,<4.0.0)"]
 [package.source]
 type = "git"
 url = "https://github.com/nonebot/nonebot2.git"
-reference = "a85ee65"
-resolved_reference = "a85ee6555f661394f3fa555d436117dc6f4ea754"
+reference = "180aaadda98a9a620a0fd4542ac4e621d7b1b71a"
+resolved_reference = "180aaadda98a9a620a0fd4542ac4e621d7b1b71a"
 
 [[package]]
 name = "pathspec"
@@ -1409,7 +1409,7 @@ reference = "aliyun"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "2691c2121bf9b6091515c0adde9cd706e5f137a70982ddcfc25bc8512a2ea45a"
+content-hash = "9851d2754ac37fcbde94c81cc351df389f828fdc49cf9d942d43506ccf64fd6f"
 
 [metadata.files]
 aiofiles = [
