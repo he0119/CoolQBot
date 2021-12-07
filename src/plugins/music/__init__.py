@@ -18,8 +18,6 @@ EXPR_NOT_FOUND = (
 
 music_cmd = on_command("music", aliases={"点歌"}, block=True)
 music_cmd.__doc__ = """
-music 点歌
-
 点歌
 
 参数为歌曲相关信息

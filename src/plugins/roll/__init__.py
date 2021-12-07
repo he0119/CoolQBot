@@ -16,8 +16,6 @@ from .rand import get_rand
 # region roll
 roll_cmd = on_command("roll", block=True)
 roll_cmd.__doc__ = """
-roll
-
 NGA 风格 ROLL 点
 
 roll 一次点数100
@@ -68,8 +66,6 @@ async def roll_handle(bot: Bot, event: MessageEvent, state: T_State):
 # region rand
 rand_cmd = on_command("rand", block=True)
 rand_cmd.__doc__ = """
-rand
-
 获得 0-100 的点数
 /rand
 获得一件事情的概率

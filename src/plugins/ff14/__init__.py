@@ -23,8 +23,6 @@ ff14 = CommandGroup("ff14", block=True)
 # region 藏宝选门
 gate_cmd = ff14.command("gate", aliases={"gate"})
 gate_cmd.__doc__ = """
-ff14.gate gate
-
 最终幻想XIV 藏宝选门
 
 选择门的数量
@@ -64,8 +62,6 @@ async def gate_handle(bot: Bot, event: Event, state: T_State):
 # region FFLogs
 fflogs_cmd = ff14.command("dps", aliases={"dps"})
 fflogs_cmd.__doc__ = """
-ff14.dps dps
-
 最终幻想XIV 输出查询
 
 更新副本数据
@@ -216,8 +212,6 @@ async def get_character_dps_by_user_id(boss_nickname: str, user_id: int):
 # region 时尚品鉴
 nuannuan_cmd = ff14.command("nuannuan", aliases={"时尚品鉴"})
 nuannuan_cmd.__doc__ = """
-ff14.nuannuan 时尚品鉴
-
 最终幻想XIV 时尚品鉴
 
 获取最新的满分攻略

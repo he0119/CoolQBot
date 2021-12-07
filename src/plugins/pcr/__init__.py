@@ -19,8 +19,6 @@ pcr = CommandGroup("pcr", block=True)
 # region 日程表
 calender_cmd = pcr.command("calender", aliases={("pcr", "日程表"), ("pcr", "日程")})
 calender_cmd.__doc__ = """
-pcr.calender pcr.日程表 pcr.日程
-
 公主连结Re:Dive 日程表
 
 获取一周日程表

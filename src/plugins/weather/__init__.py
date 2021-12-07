@@ -10,8 +10,6 @@ from .heweather import heweather
 
 weather_cmd = on_command("weather", aliases={"天气"}, block=True)
 weather_cmd.__doc__ = """
-weather 天气
-
 天气预报
 
 查询天气

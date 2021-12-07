@@ -15,8 +15,6 @@ from .commands import CommandInfo, get_command_help, get_commands
 
 help_cmd = on_command("help", aliases={"帮助"}, block=True)
 help_cmd.__doc__ = """
-help 帮助
-
 获取帮助
 
 获取所有支持的命令
