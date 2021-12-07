@@ -5,7 +5,7 @@ FFLogs
 """
 from nonebot import CommandGroup
 from nonebot.adapters import Bot, Event
-from nonebot.adapters.cqhttp.event import MessageEvent
+from nonebot.adapters.onebot.v11.event import MessageEvent
 from nonebot.exception import FinishedException
 from nonebot.typing import T_State
 

@@ -3,8 +3,8 @@
 import nonebot
 from nonebot import get_bot
 from nonebot.adapters import Bot
-from nonebot.adapters.cqhttp.event import GroupMessageEvent
-from nonebot.adapters.cqhttp.permission import GROUP
+from nonebot.adapters.onebot.v11.event import GroupMessageEvent
+from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
 from nonebot.plugin import on_command
 from nonebot_plugin_apscheduler import scheduler

@@ -7,9 +7,12 @@ import re
 
 from nonebot import CommandGroup, on_message
 from nonebot.adapters import Bot, Event
-from nonebot.adapters.cqhttp import MessageEvent
-from nonebot.adapters.cqhttp.event import GroupMessageEvent, PrivateMessageEvent
-from nonebot.adapters.cqhttp.permission import GROUP
+from nonebot.adapters.onebot.v11.event import (
+    GroupMessageEvent,
+    MessageEvent,
+    PrivateMessageEvent,
+)
+from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
 from nonebot.typing import T_State
 from nonebot_plugin_apscheduler import scheduler

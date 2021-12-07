@@ -9,7 +9,7 @@
 """
 from nonebot import on_command
 from nonebot.adapters import Bot
-from nonebot.adapters.cqhttp.event import MessageEvent
+from nonebot.adapters.onebot.v11.event import MessageEvent
 
 from .commands import CommandInfo, get_command_help, get_commands
 

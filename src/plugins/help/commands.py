@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from functools import reduce
 from typing import Optional
 
-from nonebot import get_driver, get_loaded_plugins
+from nonebot import get_loaded_plugins
 from nonebot.handler import Handler
 from nonebot.matcher import Matcher
 from nonebot.rule import Command

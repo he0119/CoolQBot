@@ -8,7 +8,7 @@ https://cloud.tencent.com/document/api/271/39416
 import json
 from typing import Optional
 
-from nonebot.adapters.cqhttp import MessageEvent
+from nonebot.adapters.onebot.v11.event import MessageEvent
 from tencentcloud.common import credential
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile

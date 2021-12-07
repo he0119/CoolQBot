@@ -6,7 +6,7 @@ import json
 from typing import Optional
 
 import httpx
-from nonebot.adapters.cqhttp import MessageEvent
+from nonebot.adapters.onebot.v11.event import MessageEvent
 
 from .config import plugin_config
 

@@ -592,21 +592,23 @@ url = "https://mirrors.aliyun.com/pypi/simple"
 reference = "aliyun"
 
 [[package]]
-name = "nonebot-adapter-cqhttp"
-version = "2.0.0a16"
+name = "nonebot-adapter-onebot"
+version = "2.0.0-beta.1"
 description = "OneBot(CQHTTP) adapter for nonebot2"
 category = "main"
 optional = false
-python-versions = ">=3.7.3,<4.0.0"
+python-versions = "^3.7.3"
+develop = false
 
 [package.dependencies]
-httpx = ">=0.18.0,<1.0.0"
-nonebot2 = ">=2.0.0-alpha.14,<3.0.0"
+httpx = ">=0.20.0, <1.0.0"
+nonebot2 = "^2.0.0-alpha.14"
 
 [package.source]
-type = "legacy"
-url = "https://mirrors.aliyun.com/pypi/simple"
-reference = "aliyun"
+type = "git"
+url = "https://github.com/nonebot/adapter-onebot"
+reference = "master"
+resolved_reference = "2e7caa7e9d07327dfe81ec0e26bcca59dbde0640"
 
 [[package]]
 name = "nonebot-plugin-apscheduler"
@@ -1409,7 +1411,7 @@ reference = "aliyun"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "9851d2754ac37fcbde94c81cc351df389f828fdc49cf9d942d43506ccf64fd6f"
+content-hash = "d83d4efd11c5e5834807bea4cefe6a462a3f32801b4c014c8c66264b1e1b091b"
 
 [metadata.files]
 aiofiles = [
@@ -1624,10 +1626,7 @@ nb-cli = [
     {file = "nb-cli-0.5.1.tar.gz", hash = "sha256:b3f31e1d2fe4e3d6551cf9dcb0843ebc53503df63baf017b51347673ad10c1e4"},
     {file = "nb_cli-0.5.1-py3-none-any.whl", hash = "sha256:c47cbdb106db6b2ae5fe4ff538775da8c8f2d17f535432b13eb23ad1889c2fc2"},
 ]
-nonebot-adapter-cqhttp = [
-    {file = "nonebot-adapter-cqhttp-2.0.0a16.tar.gz", hash = "sha256:9de270291b98c41a45e5b629c02f16e3b25cafb3867b8161851f49c84145d8aa"},
-    {file = "nonebot_adapter_cqhttp-2.0.0a16-py3-none-any.whl", hash = "sha256:831747c55c9c1a660215225f84784a4ca275a84bffa8d1312524367066b68bbe"},
-]
+nonebot-adapter-onebot = []
 nonebot-plugin-apscheduler = [
     {file = "nonebot-plugin-apscheduler-0.1.2.tar.gz", hash = "sha256:1765336cd388dde15f723ed12dbca942b04e4c25d5d7786878e447b09e68b909"},
     {file = "nonebot_plugin_apscheduler-0.1.2-py3-none-any.whl", hash = "sha256:eed7b9e60d08826ae4919f82dc240fc7ec469185271c2271e14438a3e0ca7692"},

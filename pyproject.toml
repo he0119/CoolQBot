@@ -11,7 +11,7 @@ version = "0.15.2"
 python = "^3.9"
 nb-cli = "^0.5.0"
 nonebot2 = { git = "https://github.com/nonebot/nonebot2.git", rev = "180aaadda98a9a620a0fd4542ac4e621d7b1b71a" }
-nonebot-adapter-cqhttp = "^2.0.0a16"
+nonebot-adapter-onebot = { git = "https://github.com/nonebot/adapter-onebot" }
 nonebot-plugin-apscheduler = "^0.1.2"
 nonebot-plugin-sentry = "^0.2.2"
 python-dateutil = "^2.8.1"

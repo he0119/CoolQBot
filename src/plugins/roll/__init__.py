@@ -7,7 +7,7 @@ import re
 
 from nonebot import on_command
 from nonebot.adapters import Bot, Event
-from nonebot.adapters.cqhttp import MessageEvent
+from nonebot.adapters.onebot.v11.event import MessageEvent
 from nonebot.typing import T_State
 
 from .data import roll_dices

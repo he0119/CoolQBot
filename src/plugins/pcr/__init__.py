@@ -6,7 +6,7 @@
 """
 from nonebot import CommandGroup
 from nonebot.adapters import Bot
-from nonebot.adapters.cqhttp.event import GroupMessageEvent
+from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.typing import T_State
 
 from src.utils.helpers import strtobool

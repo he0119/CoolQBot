@@ -1,7 +1,7 @@
 import random
 from typing import Sequence
 
-from nonebot.adapters.cqhttp import Message
+from nonebot.adapters.onebot import Message
 
 from .typing import Expression_T
 

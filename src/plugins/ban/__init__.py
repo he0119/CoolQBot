@@ -5,10 +5,10 @@ from typing import Dict, Optional
 
 from nonebot import on_command, on_notice
 from nonebot.adapters import Bot, Event
-from nonebot.adapters.cqhttp import (
+from nonebot.adapters.onebot import MessageSegment
+from nonebot.adapters.onebot.v11.event import (
     GroupAdminNoticeEvent,
     GroupMessageEvent,
-    MessageSegment,
     PrivateMessageEvent,
 )
 from nonebot.typing import T_State
