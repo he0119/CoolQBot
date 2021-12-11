@@ -1,6 +1,7 @@
-""" nonebot-hk-reporter
+""" nonebot-bison
 
-修改自 https://github.com/felinae98/nonebot-hk-reporter
+修改自 https://github.com/felinae98/nonebot-bison
+基于 0.4.0 版本
 """
 import re
 
