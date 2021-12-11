@@ -2,7 +2,7 @@
 """
 from nonebot import on_message
 from nonebot.adapters import Bot
-from nonebot.adapters.cqhttp import MessageEvent, escape
+from nonebot.adapters.onebot.v11.event import MessageEvent
 from nonebot.rule import to_me
 from nonebot.typing import T_State
 
@@ -38,11 +38,11 @@ async def robot_handle(bot: Bot, event: MessageEvent, state: T_State):
     if reply:
         # 如果调用机器人成功，得到了回复，则转义之后发送给用户
         # 转义会把消息中的某些特殊字符做转换，以避免 酷Q 将它们理解为 CQ 码
-        await robot_message.finish(escape(reply))
+        await robot_message.finish(reply)
 
     reply = await call_tencent_api(event, msg)
     if reply:
-        await robot_message.finish(escape(reply))
+        await robot_message.finish(reply)
 
     # 如果调用失败，或者它返回的内容我们目前处理不了，发送无法获取回复时的「表达」
     # 这里的 render_expression() 函数会将一个「表达」渲染成一个字符串消息

@@ -5,10 +5,10 @@ from typing import Dict, Optional
 
 from nonebot import on_command, on_notice
 from nonebot.adapters import Bot, Event
-from nonebot.adapters.cqhttp import (
+from nonebot.adapters.onebot import MessageSegment
+from nonebot.adapters.onebot.v11.event import (
     GroupAdminNoticeEvent,
     GroupMessageEvent,
-    MessageSegment,
     PrivateMessageEvent,
 )
 from nonebot.typing import T_State
@@ -56,8 +56,6 @@ def get_ban_type(bot_role: str, sender_role: str) -> BanType:
 
 ban_cmd = on_command("ban", aliases={"禁言"}, block=True)
 ban_cmd.__doc__ = """
-ban 禁言
-
 自主禁言
 
 禁言自己，单位为分钟

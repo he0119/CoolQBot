@@ -4,7 +4,7 @@ import secrets
 from datetime import datetime, timedelta
 
 from nonebot.adapters import Bot, Event
-from nonebot.adapters.cqhttp.event import GroupMessageEvent
+from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.log import logger
 from nonebot.typing import T_State
 

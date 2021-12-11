@@ -1,14 +1,14 @@
 from pathlib import Path
 
 import nonebot
-from nonebot.adapters.cqhttp import Bot as CQHTTPBot
+from nonebot.adapters.onebot import Bot as OneBot
 from nonebot.log import default_format, logger
 
 nonebot.init()
 app = nonebot.get_asgi()
 
 driver = nonebot.get_driver()
-driver.register_adapter("cqhttp", CQHTTPBot)
+driver.register_adapter("cqhttp", OneBot)
 
 # 添加额外的配置
 config = nonebot.get_driver().config

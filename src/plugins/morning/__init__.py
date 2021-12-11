@@ -3,8 +3,8 @@
 import nonebot
 from nonebot import get_bot
 from nonebot.adapters import Bot
-from nonebot.adapters.cqhttp.event import GroupMessageEvent
-from nonebot.adapters.cqhttp.permission import GROUP
+from nonebot.adapters.onebot.v11.event import GroupMessageEvent
+from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
 from nonebot.plugin import on_command
 from nonebot_plugin_apscheduler import scheduler
@@ -29,8 +29,6 @@ async def hello_on_connect(bot: Bot) -> None:
 
 hello_cmd = on_command("hello", aliases={"问候"}, permission=GROUP)
 hello_cmd.__doc__ = """
-hello 问候
-
 启动问候
 
 开启时会在每天机器人第一次启动时发送问候
@@ -89,8 +87,6 @@ async def morning():
 
 morning_cmd = on_command("morning", aliases={"早安"}, permission=GROUP)
 morning_cmd.__doc__ = """
-morning 早安
-
 每日早安
 
 开启时会在每天早晨发送早安信息

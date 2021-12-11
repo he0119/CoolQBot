@@ -3,7 +3,6 @@ import re
 from typing import Optional
 
 import httpx
-from nonebot.adapters.cqhttp import MessageSegment
 
 
 async def get_all_post():

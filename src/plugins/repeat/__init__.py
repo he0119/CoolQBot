@@ -7,9 +7,12 @@ import re
 
 from nonebot import CommandGroup, on_message
 from nonebot.adapters import Bot, Event
-from nonebot.adapters.cqhttp import MessageEvent
-from nonebot.adapters.cqhttp.event import GroupMessageEvent, PrivateMessageEvent
-from nonebot.adapters.cqhttp.permission import GROUP
+from nonebot.adapters.onebot.v11.event import (
+    GroupMessageEvent,
+    MessageEvent,
+    PrivateMessageEvent,
+)
+from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
 from nonebot.typing import T_State
 from nonebot_plugin_apscheduler import scheduler
@@ -62,8 +65,6 @@ async def repeat_message_handle(bot: Bot, event: GroupMessageEvent, state: T_Sta
 
 repeat_cmd = repeat.command("basic", aliases={"repeat", "复读"}, permission=GROUP)
 repeat_cmd.__doc__ = """
-repeat 复读
-
 复读
 
 查看当前群是否启用复读功能
@@ -102,8 +103,6 @@ async def repeat_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
 # region 运行状态
 status_cmd = repeat.command("status", aliases={"status", "状态"})
 status_cmd.__doc__ = """
-status 状态
-
 状态
 
 获取当前的机器人状态
@@ -122,8 +121,6 @@ async def status_handle(bot: Bot, event: MessageEvent, state: T_State):
 # region 排行榜
 rank_cmd = repeat.command("rank", aliases={"rank", "排行榜"})
 rank_cmd.__doc__ = """
-rank 排行榜
-
 排行榜
 
 获取当前的排行榜（默认显示前三名）
@@ -203,8 +200,6 @@ async def rank_handle_private_message(
 # region 历史记录
 history_cmd = repeat.command("history", aliases={"history", "历史", "复读历史"})
 history_cmd.__doc__ = """
-history 历史 复读历史
-
 历史
 
 显示2020年1月的数据

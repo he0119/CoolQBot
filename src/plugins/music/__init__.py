@@ -2,7 +2,7 @@
 """
 from nonebot import on_command
 from nonebot.adapters import Bot, Event
-from nonebot.adapters.cqhttp.event import MessageEvent
+from nonebot.adapters.onebot.v11.event import MessageEvent
 from nonebot.typing import T_State
 
 from src.utils.helpers import render_expression
@@ -18,8 +18,6 @@ EXPR_NOT_FOUND = (
 
 music_cmd = on_command("music", aliases={"点歌"}, block=True)
 music_cmd.__doc__ = """
-music 点歌
-
 点歌
 
 参数为歌曲相关信息
