@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加最终幻想XIV查价功能
+
 ### Changed
 
 - 利用新版 NoneBot2(beta1) 特性简化帮助
