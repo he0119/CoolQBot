@@ -62,7 +62,12 @@ async def get_item_price(name: str, world_or_dc: str) -> str:
         r = await client.get(
             f"https://universalis.app/api/v2/{world_or_dc}/{item_id}?listings=6"
         )
-        data = UniversalisCurrentlyShown.parse_obj(r.json())
+        rjson = r.json()
+
+        if "itemID" not in rjson:
+            return f"抱歉，没有找到 {world_or_dc} 的数据，请检查大区或服务器名称是否正确。"
+
+        data = UniversalisCurrentlyShown.parse_obj(rjson)
 
         items_info = []
         for item in data.listings:
