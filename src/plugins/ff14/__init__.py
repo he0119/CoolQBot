@@ -3,6 +3,7 @@
 藏宝选门
 FFLogs
 """
+import httpx
 from nonebot import CommandGroup
 from nonebot.adapters import Bot, Event
 from nonebot.adapters.onebot.v11.event import MessageEvent
@@ -17,6 +18,7 @@ from .fflogs_api import fflogs
 from .fflogs_data import FFLOGS_DATA
 from .gate import get_direction
 from .nuannuan import get_latest_nuannuan
+from .universalis_api import get_item_price
 
 ff14 = CommandGroup("ff14", block=True)
 
@@ -220,13 +222,39 @@ nuannuan_cmd.__doc__ = """
 
 
 @nuannuan_cmd.handle()
-async def nuannuan_handlee(bot: Bot, event: MessageEvent):
+async def nuannuan_handle(bot: Bot, event: MessageEvent):
     """时尚品鉴"""
     latest = await get_latest_nuannuan()
     if latest:
         await nuannuan_cmd.finish(latest)
     else:
         await nuannuan_cmd.finish("抱歉，没有找到最新的满分攻略。")
+
+
+# endregion
+# region 查价
+price_cmd = ff14.command("price", aliases={"查价"})
+price_cmd.__doc__ = """
+最终幻想XIV 价格查询
+
+获取服务器中的最低价格
+/查价 萨维奈舞裙 猫小胖
+"""
+
+
+@price_cmd.handle()
+async def price_handle(bot: Bot, event: MessageEvent):
+    """查价"""
+    argv = str(event.message).split()
+    if len(argv) < 2:
+        await price_cmd.finish(get_command_help("ff14.price"))
+
+    try:
+        reply = await get_item_price(*argv[:2])
+    except httpx.HTTPError:
+        reply = "抱歉，网络出错，请稍后再试。"
+
+    await price_cmd.finish(str(reply))
 
 
 # endregion
