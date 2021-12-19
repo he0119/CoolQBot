@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加最终幻想XIV查价功能
+
 ## [0.15.2] - 2021-11-21
 
 ### Added
