@@ -1,8 +1,8 @@
 """ 机器人插件
 """
 from nonebot import on_message
-from nonebot.adapters import Bot
 from nonebot.adapters.onebot.v11.event import MessageEvent
+from nonebot.params import State
 from nonebot.rule import to_me
 from nonebot.typing import T_State
 
@@ -23,7 +23,7 @@ EXPR_DONT_UNDERSTAND = (
 
 
 @robot_message.handle()
-async def robot_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
+async def robot_handle_first_receive(event: MessageEvent, state: T_State = State()):
     args = str(event.message).strip()
 
     if args:
@@ -31,7 +31,7 @@ async def robot_handle_first_receive(bot: Bot, event: MessageEvent, state: T_Sta
 
 
 @robot_message.got("msg")
-async def robot_handle(bot: Bot, event: MessageEvent, state: T_State):
+async def robot_handle(event: MessageEvent, state: T_State = State()):
     msg = state["msg"]
     # 通过封装的函数获取机器人的回复
     reply = await call_tuling_api(event, msg)

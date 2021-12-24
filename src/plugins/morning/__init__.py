@@ -43,7 +43,7 @@ hello_cmd.__doc__ = """
 
 
 @hello_cmd.handle()
-async def hello_handle(bot: Bot, event: GroupMessageEvent):
+async def hello_handle(event: GroupMessageEvent):
     args = str(event.message).strip()
 
     group_id = event.group_id
@@ -105,7 +105,7 @@ morning_cmd.__doc__ = """
 
 
 @morning_cmd.handle()
-async def morning_handle(bot: Bot, event: GroupMessageEvent):
+async def morning_handle(event: GroupMessageEvent):
     args = str(event.message).strip()
 
     group_id = event.group_id

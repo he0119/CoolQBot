@@ -1,8 +1,8 @@
 """ 音乐插件
 """
 from nonebot import on_command
-from nonebot.adapters import Bot, Event
 from nonebot.adapters.onebot.v11.event import MessageEvent
+from nonebot.params import State
 from nonebot.typing import T_State
 
 from src.utils.helpers import render_expression
@@ -29,7 +29,7 @@ music_cmd.__doc__ = """
 
 
 @music_cmd.handle()
-async def music_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
+async def music_handle_first_receive(event: MessageEvent, state: T_State = State()):
     args = str(event.message).strip()
 
     if args:
@@ -37,7 +37,7 @@ async def music_handle_first_receive(bot: Bot, event: MessageEvent, state: T_Sta
 
 
 @music_cmd.got("name", prompt="你想听哪首歌呢？")
-async def music_handle(bot: Bot, event: MessageEvent, state: T_State):
+async def music_handle(state: T_State = State()):
     music_message = await call_netease_api(state["name"])
     if music_message:
         await music_cmd.finish(music_message)
@@ -46,8 +46,8 @@ async def music_handle(bot: Bot, event: MessageEvent, state: T_State):
 
 
 @music_cmd.args_parser
-async def music_args_parser(bot: Bot, event: Event, state: T_State):
-    args = str(event.get_message()).strip()
+async def music_args_parser(event: MessageEvent, state: T_State = State()):
+    args = str(event.message).strip()
 
     if not args:
         await music_cmd.reject("歌曲名不能为空呢，请重新输入！")

@@ -1,7 +1,7 @@
 import random
 from typing import Sequence
 
-from nonebot.adapters.onebot import Message
+from nonebot.adapters.onebot.v11 import Message
 
 from .typing import Expression_T
 

@@ -1,6 +1,6 @@
 import time
 
-from nonebot.adapters.onebot import Bot
+from nonebot.adapters.onebot.v11 import Bot
 from nonebot.log import logger
 
 from .plugin_config import plugin_config

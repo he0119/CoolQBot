@@ -5,7 +5,7 @@ from io import BytesIO
 from typing import Optional, Union
 
 import httpx
-from nonebot.adapters.onebot import Message, MessageSegment
+from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from nonebot.log import logger
 from PIL import Image
 

@@ -6,8 +6,8 @@ NGA 风格 ROLL 点
 import re
 
 from nonebot import on_command
-from nonebot.adapters import Bot, Event
 from nonebot.adapters.onebot.v11.event import MessageEvent
+from nonebot.params import State
 from nonebot.typing import T_State
 
 from .data import roll_dices
@@ -26,7 +26,7 @@ roll 两次点数100和两次点数50
 
 
 @roll_cmd.handle()
-async def roll_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
+async def roll_handle_first_receive(event: MessageEvent, state: T_State = State()):
     args = str(event.message).strip()
 
     # 检查是否符合规则
@@ -37,8 +37,8 @@ async def roll_handle_first_receive(bot: Bot, event: MessageEvent, state: T_Stat
 
 
 @roll_cmd.args_parser
-async def roll_args_parser(bot: Bot, event: Event, state: T_State):
-    args = str(event.get_message()).strip()
+async def roll_args_parser(event: MessageEvent, state: T_State = State()):
+    args = str(event.message).strip()
 
     # 检查是否符合规则
     match = re.match(r"^([\dd+\s]+?)$", args)
@@ -56,7 +56,7 @@ async def roll_args_parser(bot: Bot, event: Event, state: T_State):
     "input",
     prompt="欢迎使用 NGA 风格 ROLL 点插件\n请问你想怎么 ROLL 点\n你可以输入 d100\n也可以输入 2d100+2d50",
 )
-async def roll_handle(bot: Bot, event: MessageEvent, state: T_State):
+async def roll_handle(event: MessageEvent, state: T_State = State()):
     input_str = state["input"]
     str_data = roll_dices(input_str)
     await roll_cmd.finish(str_data, at_sender=True)
@@ -74,7 +74,7 @@ rand_cmd.__doc__ = """
 
 
 @rand_cmd.handle()
-async def rand_handle(bot: Bot, event: MessageEvent, state: T_State):
+async def rand_handle(event: MessageEvent):
     args = str(event.message).strip()
 
     str_data = get_rand(args)

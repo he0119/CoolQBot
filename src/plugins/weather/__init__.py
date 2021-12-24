@@ -1,8 +1,8 @@
 """ 天气插件
 """
 from nonebot import on_command
-from nonebot.adapters import Bot, Event
 from nonebot.adapters.onebot.v11.event import MessageEvent
+from nonebot.params import State
 from nonebot.typing import T_State
 
 from .eorzean import eorzean_weather
@@ -26,7 +26,7 @@ weather_cmd.__doc__ = """
 
 
 @weather_cmd.handle()
-async def weather_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
+async def weather_handle_first_receive(event: MessageEvent, state: T_State = State()):
     argv = str(event.message).strip().split()
 
     if len(argv) == 1:
@@ -37,14 +37,14 @@ async def weather_handle_first_receive(bot: Bot, event: MessageEvent, state: T_S
 
 
 @weather_cmd.got("location", prompt="你想查询哪个城市的天气呢？")
-async def weather_handle(bot: Bot, event: MessageEvent, state: T_State):
+async def weather_handle(event: MessageEvent, state: T_State = State()):
     weather_report = await get_weather_of_location(state["location"], state.get("adm"))
     await weather_cmd.finish(weather_report)
 
 
 @weather_cmd.args_parser
-async def weather_args_parser(bot: Bot, event: Event, state: T_State):
-    args = str(event.get_message()).strip()
+async def weather_args_parser(event: MessageEvent, state: T_State = State()):
+    args = str(event.message).strip()
 
     if not args:
         await weather_cmd.reject("要查询的城市名称不能为空呢，请重新输入！")

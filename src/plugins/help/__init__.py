@@ -8,8 +8,8 @@
 帮助文档
 """
 from nonebot import on_command
-from nonebot.adapters import Bot
-from nonebot.adapters.onebot.v11.event import MessageEvent
+from nonebot.adapters import Message
+from nonebot.params import CommandArg
 
 from .commands import CommandInfo, get_command_help, get_commands
 
@@ -33,8 +33,8 @@ def format_name_aliases(command: CommandInfo) -> str:
 
 
 @help_cmd.handle()
-async def help_handle(bot: Bot, event: MessageEvent):
-    args = str(event.message).strip()
+async def help_handle(command_arg: Message = CommandArg()):
+    args = str(command_arg).strip()
 
     if args == "all":
         commands = get_commands()

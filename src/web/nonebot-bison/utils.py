@@ -7,7 +7,7 @@ from time import asctime
 from typing import Awaitable, Callable, Optional
 
 from bs4 import BeautifulSoup as bs
-from nonebot.adapters.onebot import MessageSegment
+from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.log import logger
 from pyppeteer import connect, launch
 from pyppeteer.browser import Browser

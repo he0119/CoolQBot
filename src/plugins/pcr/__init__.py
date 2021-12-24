@@ -5,9 +5,7 @@
 参考 https://github.com/pcrbot/yobot
 """
 from nonebot import CommandGroup
-from nonebot.adapters import Bot
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
-from nonebot.typing import T_State
 
 from src.utils.helpers import strtobool
 
@@ -33,7 +31,7 @@ calender_cmd.__doc__ = """
 
 
 @calender_cmd.handle()
-async def calender_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def calender_handle(event: GroupMessageEvent):
     args = str(event.message).strip()
 
     group_id = event.group_id

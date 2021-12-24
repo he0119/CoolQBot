@@ -5,9 +5,10 @@ FFLogs
 """
 import httpx
 from nonebot import CommandGroup
-from nonebot.adapters import Bot, Event
+from nonebot.adapters.onebot.v11 import Bot
 from nonebot.adapters.onebot.v11.event import MessageEvent
 from nonebot.exception import FinishedException
+from nonebot.params import State
 from nonebot.typing import T_State
 
 from src.utils.helpers import strtobool
@@ -34,8 +35,8 @@ gate_cmd.__doc__ = """
 
 
 @gate_cmd.args_parser
-async def gate_args_parser(bot: Bot, event: Event, state: T_State):
-    args = str(event.get_message()).strip()
+async def gate_args_parser(event: MessageEvent, state: T_State = State()):
+    args = str(event.message).strip()
 
     if not args:
         await gate_cmd.reject("你什么都不输入我怎么知道呢，请告诉我有几个门！")
@@ -47,7 +48,7 @@ async def gate_args_parser(bot: Bot, event: Event, state: T_State):
 
 
 @gate_cmd.handle()
-async def gate_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
+async def gate_handle_first_receive(event: MessageEvent, state: T_State = State()):
     args = str(event.message).strip()
 
     if args in ["2", "3"]:
@@ -55,7 +56,7 @@ async def gate_handle_first_receive(bot: Bot, event: MessageEvent, state: T_Stat
 
 
 @gate_cmd.got("door_number", prompt="总共有多少个门呢？")
-async def gate_handle(bot: Bot, event: Event, state: T_State):
+async def gate_handle(state: T_State = State()):
     direction = get_direction(state["door_number"])
     await gate_cmd.finish(direction, at_sender=True)
 
@@ -87,7 +88,7 @@ fflogs_cmd.__doc__ = """
 
 
 @fflogs_cmd.handle()
-async def fflogs_handle(bot: Bot, event: MessageEvent, state: T_State):
+async def fflogs_handle(bot: Bot, event: MessageEvent):
     argv = str(event.message).strip().split()
     if not argv:
         await fflogs_cmd.finish(get_command_help("ff14.dps"))
@@ -222,7 +223,7 @@ nuannuan_cmd.__doc__ = """
 
 
 @nuannuan_cmd.handle()
-async def nuannuan_handle(bot: Bot, event: MessageEvent):
+async def nuannuan_handle():
     """时尚品鉴"""
     latest = await get_latest_nuannuan()
     if latest:
@@ -245,7 +246,7 @@ price_cmd.__doc__ = """
 
 
 @price_cmd.handle()
-async def price_handle(bot: Bot, event: MessageEvent):
+async def price_handle(event: MessageEvent):
     """查价"""
     argv = str(event.message).split()
     if len(argv) < 2:

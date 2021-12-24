@@ -6,7 +6,6 @@
 import re
 
 from nonebot import CommandGroup, on_message
-from nonebot.adapters import Bot, Event
 from nonebot.adapters.onebot.v11.event import (
     GroupMessageEvent,
     MessageEvent,
@@ -14,6 +13,7 @@ from nonebot.adapters.onebot.v11.event import (
 )
 from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
+from nonebot.params import State
 from nonebot.typing import T_State
 from nonebot_plugin_apscheduler import scheduler
 
@@ -59,7 +59,7 @@ repeat_message = on_message(
 
 
 @repeat_message.handle()
-async def repeat_message_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def repeat_message_handle(event: GroupMessageEvent):
     await repeat_message.finish(event.message)
 
 
@@ -77,7 +77,7 @@ repeat_cmd.__doc__ = """
 
 
 @repeat_cmd.handle()
-async def repeat_handle(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def repeat_handle(event: GroupMessageEvent):
     args = str(event.message).strip()
 
     group_id = event.group_id
@@ -111,7 +111,7 @@ status_cmd.__doc__ = """
 
 
 @status_cmd.handle()
-async def status_handle(bot: Bot, event: MessageEvent, state: T_State):
+async def status_handle(event: MessageEvent):
     group_id = event.group_id if isinstance(event, GroupMessageEvent) else None
     message = get_status(group_id)
     await status_cmd.finish(message)
@@ -133,9 +133,9 @@ rank_cmd.__doc__ = """
 
 
 @rank_cmd.args_parser
-async def rank_args_parser(bot: Bot, event: Event, state: T_State):
+async def rank_args_parser(event: MessageEvent, state: T_State = State()):
     """排行榜的参数解析函数"""
-    args = str(event.get_message()).strip()
+    args = str(event.message).strip()
 
     # 检查输入参数是不是数字
     if not args.isdigit():
@@ -145,7 +145,7 @@ async def rank_args_parser(bot: Bot, event: Event, state: T_State):
 
 
 @rank_cmd.handle()
-async def rank_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
+async def rank_handle_first_receive(event: MessageEvent, state: T_State = State()):
     match = re.match(r"^(?:(\d+))?(?:n(\d+))?$", str(event.message).strip())
     if match:
         display_number = match.group(1)
@@ -170,7 +170,7 @@ async def rank_handle_first_receive(bot: Bot, event: MessageEvent, state: T_Stat
 @rank_cmd.got("display_number", prompt="请输入想显示的排行条数")
 @rank_cmd.got("minimal_msg_number", prompt="请输入进入排行，最少需要发送多少消息")
 @rank_cmd.got("display_total_number", prompt="是否显示每个人发送的消息总数")
-async def rank_handle_group_message(bot: Bot, event: GroupMessageEvent, state: T_State):
+async def rank_handle_group_message(event: GroupMessageEvent, state: T_State = State()):
     res = await get_rank(
         display_number=state["display_number"],
         minimal_msg_number=state["minimal_msg_number"],
@@ -185,7 +185,7 @@ async def rank_handle_group_message(bot: Bot, event: GroupMessageEvent, state: T
 @rank_cmd.got("display_total_number", prompt="是否显示每个人发送的消息总数")
 @rank_cmd.got("group_id", prompt="请问你想查询哪个群？")
 async def rank_handle_private_message(
-    bot: Bot, event: PrivateMessageEvent, state: T_State
+    event: PrivateMessageEvent, state: T_State = State()
 ):
     res = await get_rank(
         display_number=state["display_number"],
@@ -210,9 +210,9 @@ history_cmd.__doc__ = """
 
 
 @history_cmd.args_parser
-async def history_args_parser(bot: Bot, event: Event, state: T_State):
+async def history_args_parser(event: MessageEvent, state: T_State = State()):
     """历史记录的参数解析函数"""
-    args = str(event.get_message()).strip()
+    args = str(event.message).strip()
 
     # 检查输入参数是不是数字
     if not args.isdigit():
@@ -222,7 +222,7 @@ async def history_args_parser(bot: Bot, event: Event, state: T_State):
 
 
 @history_cmd.handle()
-async def history_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
+async def history_handle_first_receive(event: MessageEvent, state: T_State = State()):
     match = re.match(r"^(\d+)(?:\-(\d+)(?:\-(\d+))?)?$", str(event.message).strip())
     if match:
         year = match.group(1)
@@ -243,7 +243,7 @@ async def history_handle_first_receive(bot: Bot, event: MessageEvent, state: T_S
 @history_cmd.got("month", prompt="你请输入你要查询的月份")
 @history_cmd.got("day", prompt="你请输入你要查询的日期（如查询整月排名请输入 0）")
 async def history_handle_group_message(
-    bot: Bot, event: GroupMessageEvent, state: T_State
+    event: GroupMessageEvent, state: T_State = State()
 ):
     res = await get_history(
         year=state["year"],
@@ -259,7 +259,7 @@ async def history_handle_group_message(
 @history_cmd.got("day", prompt="你请输入你要查询的日期（如查询整月排名请输入 0）")
 @history_cmd.got("group_id", prompt="请问你想查询哪个群？")
 async def history_handle_private_message(
-    bot: Bot, event: PrivateMessageEvent, state: T_State
+    event: PrivateMessageEvent, state: T_State = State()
 ):
     res = await get_history(
         year=state["year"],
