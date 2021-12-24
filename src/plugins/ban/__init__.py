@@ -211,7 +211,7 @@ admin_notice = on_notice()
 @admin_notice.handle()
 async def admin_handle(bot: Bot, event: GroupAdminNoticeEvent):
     """群内管理员发生变化时，更新机器人在群内的身份"""
-    if bot.self_id == event.self_id:
+    if bot.self_id == str(event.self_id):
         if event.sub_type == "set":
             _bot_role[event.group_id] = "admin"
         elif event.sub_type == "unset":
