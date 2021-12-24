@@ -8,7 +8,7 @@ from nonebot.typing import T_State
 from .eorzean import eorzean_weather
 from .heweather import heweather
 
-weather_cmd = on_command("weather", aliases={"天气"}, block=True)
+weather_cmd = on_command("weather", aliases={"天气"})
 weather_cmd.__doc__ = """
 天气预报
 

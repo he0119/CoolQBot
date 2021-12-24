@@ -29,7 +29,7 @@ common_platform = [
     )
 ]
 
-sub = CommandGroup("sub", block=True)
+sub = CommandGroup("sub")
 
 # region 添加订阅
 add_sub_cmd = sub.command(

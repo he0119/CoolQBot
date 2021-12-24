@@ -14,7 +14,7 @@ from .data import roll_dices
 from .rand import get_rand
 
 # region roll
-roll_cmd = on_command("roll", block=True)
+roll_cmd = on_command("roll")
 roll_cmd.__doc__ = """
 NGA 风格 ROLL 点
 
@@ -64,7 +64,7 @@ async def roll_handle(bot: Bot, event: MessageEvent, state: T_State):
 
 # endregion
 # region rand
-rand_cmd = on_command("rand", block=True)
+rand_cmd = on_command("rand")
 rand_cmd.__doc__ = """
 获得 0-100 的点数
 /rand

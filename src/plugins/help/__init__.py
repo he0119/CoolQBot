@@ -13,7 +13,7 @@ from nonebot.adapters.onebot.v11.event import MessageEvent
 
 from .commands import CommandInfo, get_command_help, get_commands
 
-help_cmd = on_command("help", aliases={"帮助"}, block=True)
+help_cmd = on_command("help", aliases={"帮助"})
 help_cmd.__doc__ = """
 获取帮助
 

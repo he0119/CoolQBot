@@ -14,7 +14,7 @@ from src.utils.helpers import strtobool
 from .calender import calender_obj
 from .config import plugin_config
 
-pcr = CommandGroup("pcr", block=True)
+pcr = CommandGroup("pcr")
 
 # region 日程表
 calender_cmd = pcr.command("calender", aliases={("pcr", "日程表"), ("pcr", "日程")})
