@@ -25,6 +25,11 @@ psutil = "^5.8.0"
 [tool.poetry.dev-dependencies]
 black = "^21.8b0"
 isort = "^5.9.3"
+nonebug = { git = "https://github.com/nonebot/nonebug" }
+pytest = "^6.2.5"
+pytest-cov = "^3.0.0"
+pytest-mock = "^3.6.1"
+pytest-asyncio = "^0.16.0"
 
 [[tool.poetry.source]]
 default = true
