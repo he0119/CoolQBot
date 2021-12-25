@@ -8,7 +8,9 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture()
-def fake_group_message_event() -> Type["GroupMessageEvent"]:
+def fake_group_message_event(request) -> Type["GroupMessageEvent"]:
+    param = getattr(request, "param", {})
+
     from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
     from nonebot.adapters.onebot.v11.event import Sender
 
@@ -26,7 +28,11 @@ def fake_group_message_event() -> Type["GroupMessageEvent"]:
         message: Message = Message("test")
         raw_message: str = "test"
         font: int = 0
-        sender: Sender = Sender(role="member")
+        sender: Sender = Sender(
+            card=param.get("card") or "",
+            nickname=param.get("nickname") or "test",
+            role=param.get("role") or "member",
+        )
         to_me: bool = False
 
         class Config:
@@ -53,7 +59,7 @@ def fake_private_message_event() -> Type["PrivateMessageEvent"]:
         message: Message = Message("test")
         raw_message: str = "test"
         font: int = 0
-        sender: Sender = Sender(role="member")
+        sender: Sender = Sender(nickname="test")
         to_me: bool = False
 
         class Config:
