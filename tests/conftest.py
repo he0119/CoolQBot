@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal, Type
 
 import pytest
+from nonebug.app import App
 
 if TYPE_CHECKING:
     from nonebot.adapters.onebot.v11 import GroupMessageEvent, PrivateMessageEvent
@@ -71,8 +72,13 @@ def fake_private_message_event() -> Type["PrivateMessageEvent"]:
 
 
 @pytest.fixture
-def data_path(nonebug_init: None, tmp_path: Path, request) -> Path:
-    param = getattr(request, "param", None)
+def app(
+    nonebug_init: None,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    request,
+) -> App:
+    param = getattr(request, "param", ())
 
     import nonebot
 
@@ -80,8 +86,13 @@ def data_path(nonebug_init: None, tmp_path: Path, request) -> Path:
     config.home_dir_path = tmp_path
     # 插件数据目录
     config.data_dir_path = config.home_dir_path / "data"
+
+    # 加载插件
+    # 默认加载所有插件
     if param:
-        nonebot.load_plugin(param)
+        for plugin in param:
+            nonebot.load_plugin(plugin)
     else:
         nonebot.load_from_toml("pyproject.toml")
-    return config.data_dir_path
+
+    return App(monkeypatch)

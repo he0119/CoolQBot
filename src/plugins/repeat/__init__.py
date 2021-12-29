@@ -5,7 +5,7 @@
 """
 import re
 
-from nonebot import CommandGroup, on_message
+from nonebot import CommandGroup, on_message, require
 from nonebot.adapters.onebot.v11.event import (
     GroupMessageEvent,
     MessageEvent,
@@ -15,7 +15,6 @@ from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
 from nonebot.params import State
 from nonebot.typing import T_State
-from nonebot_plugin_apscheduler import scheduler
 
 from src.utils.helpers import strtobool
 
@@ -25,6 +24,8 @@ from .rank import get_rank
 from .recorder import recorder_obj
 from .repeat_rule import need_repeat
 from .status import get_status
+
+scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 repeat = CommandGroup("repeat")
 

@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 @pytest.mark.parametrize(
     "fake_group_message_event", [{"role": "admin"}, {"role": "member"}], indirect=True
 )
+@pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_owner(
     app: App,
     mocker: MockerFixture,
@@ -68,6 +69,7 @@ async def test_ban_group_bot_is_owner(
     [{"role": "owner"}, {"role": "admin"}, {"role": "member"}],
     indirect=True,
 )
+@pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_admin(
     app: App,
     mocker: MockerFixture,
@@ -144,6 +146,7 @@ async def test_ban_group_bot_is_admin(
     [{"role": "owner"}, {"role": "admin"}, {"role": "member"}],
     indirect=True,
 )
+@pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_member(
     app: App,
     mocker: MockerFixture,
@@ -209,6 +212,7 @@ async def test_ban_group_bot_is_member(
 @pytest.mark.parametrize(
     "fake_group_message_event", [{"role": "member"}, {"role": "admin"}], indirect=True
 )
+@pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_get_arg(
     app: App,
     mocker: MockerFixture,

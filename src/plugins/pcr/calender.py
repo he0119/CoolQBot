@@ -6,11 +6,12 @@ from datetime import datetime, timedelta
 from typing import Dict, Optional, Set
 
 import httpx
-from nonebot import get_bot
+from nonebot import get_bot, require
 from nonebot.log import logger
-from nonebot_plugin_apscheduler import scheduler
 
 from .config import plugin_config
+
+scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
 class Calender:

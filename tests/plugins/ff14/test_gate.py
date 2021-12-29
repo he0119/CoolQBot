@@ -9,10 +9,9 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("data_path", ["src.plugin.ff14"], indirect=True)
+@pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
 async def test_gete(
     app: App,
-    data_path,
     mocker: MockerFixture,
     fake_group_message_event: Type["GroupMessageEvent"],
 ):
@@ -52,10 +51,9 @@ async def test_gete(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("data_path", ["src.plugin.ff14"], indirect=True)
+@pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
 async def test_gete_ask_arg(
     app: App,
-    data_path,
     mocker: MockerFixture,
     fake_group_message_event: Type["GroupMessageEvent"],
 ):
