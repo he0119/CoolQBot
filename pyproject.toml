@@ -40,7 +40,7 @@ url = "https://mirrors.aliyun.com/pypi/simple/"
 name = "tuna"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 
-[nonebot.plugins]
+[tool.nonebot]
 plugin_dirs = ["src/plugins", "src/web"]
 plugins = ["nonebot_plugin_sentry"]
 

@@ -3,13 +3,15 @@
 藏宝选门
 FFLogs
 """
+from typing import Literal
+
 import httpx
 from nonebot import CommandGroup
-from nonebot.adapters.onebot.v11 import Bot
+from nonebot.adapters.onebot.v11 import Bot, Message
 from nonebot.adapters.onebot.v11.event import MessageEvent
 from nonebot.exception import FinishedException
-from nonebot.params import State
-from nonebot.typing import T_State
+from nonebot.matcher import Matcher
+from nonebot.params import ArgStr, CommandArg, Depends
 
 from src.utils.helpers import strtobool
 
@@ -34,30 +36,32 @@ gate_cmd.__doc__ = """
 """
 
 
-@gate_cmd.args_parser
-async def gate_args_parser(event: MessageEvent, state: T_State = State()):
-    args = str(event.message).strip()
-
-    if not args:
+async def get_door_number(door_number: str = ArgStr()) -> int:
+    """获取门的数量"""
+    if not door_number:
         await gate_cmd.reject("你什么都不输入我怎么知道呢，请告诉我有几个门！")
 
-    if args not in ["2", "3"]:
+    if not door_number.isdigit():
+        await gate_cmd.reject("门的数量只能是数字！")
+
+    number = int(door_number)
+    if number not in [2, 3]:
         await gate_cmd.reject("暂时只支持两个门或者三个门的情况，请重新输入吧。")
 
-    state[state["_current_key"]] = int(args)
+    return number
 
 
 @gate_cmd.handle()
-async def gate_handle_first_receive(event: MessageEvent, state: T_State = State()):
-    args = str(event.message).strip()
+async def gate_handle_first_receive(matcher: Matcher, arg=CommandArg()):
+    args = str(arg).strip()
 
     if args in ["2", "3"]:
-        state["door_number"] = int(args)
+        matcher.set_arg("door_number", Message(args))
 
 
 @gate_cmd.got("door_number", prompt="总共有多少个门呢？")
-async def gate_handle(state: T_State = State()):
-    direction = get_direction(state["door_number"])
+async def gate_handle(door_number: Literal[2, 3] = Depends(get_door_number)):
+    direction = get_direction(door_number)
     await gate_cmd.finish(direction, at_sender=True)
 
 

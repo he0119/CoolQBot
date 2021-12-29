@@ -1,18 +1,19 @@
+from pathlib import Path
 from typing import TYPE_CHECKING, Literal, Type
 
 import pytest
-from pydantic import create_model
 
 if TYPE_CHECKING:
     from nonebot.adapters.onebot.v11 import GroupMessageEvent, PrivateMessageEvent
 
 
-@pytest.fixture()
+@pytest.fixture
 def fake_group_message_event(request) -> Type["GroupMessageEvent"]:
     param = getattr(request, "param", {})
 
     from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
     from nonebot.adapters.onebot.v11.event import Sender
+    from pydantic import create_model
 
     _Fake = create_model("_Fake", __base__=GroupMessageEvent)
 
@@ -41,10 +42,11 @@ def fake_group_message_event(request) -> Type["GroupMessageEvent"]:
     return FakeEvent
 
 
-@pytest.fixture()
+@pytest.fixture
 def fake_private_message_event() -> Type["PrivateMessageEvent"]:
     from nonebot.adapters.onebot.v11 import Message, PrivateMessageEvent
     from nonebot.adapters.onebot.v11.event import Sender
+    from pydantic import create_model
 
     _Fake = create_model("_Fake", __base__=PrivateMessageEvent)
 
@@ -66,3 +68,20 @@ def fake_private_message_event() -> Type["PrivateMessageEvent"]:
             extra = "forbid"
 
     return FakeEvent
+
+
+@pytest.fixture
+def data_path(nonebug_init: None, tmp_path: Path, request) -> Path:
+    param = getattr(request, "param", None)
+
+    import nonebot
+
+    config = nonebot.get_driver().config
+    config.home_dir_path = tmp_path
+    # 插件数据目录
+    config.data_dir_path = config.home_dir_path / "data"
+    if param:
+        nonebot.load_plugin(param)
+    else:
+        nonebot.load_from_toml("pyproject.toml")
+    return config.data_dir_path

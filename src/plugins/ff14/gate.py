@@ -1,5 +1,6 @@
 """ 藏宝选门 """
 from random import randint
+from typing import Literal
 
 from nonebot.adapters import Message
 
@@ -19,17 +20,19 @@ EXPR_GATE = (
 )
 
 
-def get_direction(door_number: int) -> Message:
+def get_direction(door_number: Literal[2, 3]) -> Message:
     direction = ""
     if door_number == 2:
         if randint(1, 2) == 1:
             direction = "左边"
-        direction = "右边"
-    elif door_number == 3:
+        else:
+            direction = "右边"
+    else:
         rand = randint(1, 3)
         if rand == 1:
             direction = "左边"
         elif rand == 2:
             direction = "中间"
-        direction = "右边"
+        else:
+            direction = "右边"
     return render_expression(EXPR_GATE, direction=direction)
