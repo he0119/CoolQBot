@@ -1,14 +1,8 @@
 """ 帮助
 
-通过给命令 __doc__ 添加信息实现
-具体格式为：
-
-命令名 命令别名 命令别名二
-
-帮助文档
+通过给命令 __doc__ 添加帮助信息实现
 """
 from nonebot import on_command
-from nonebot.adapters import Message
 from nonebot.params import CommandArg
 
 from .commands import CommandInfo, get_command_help, get_commands
@@ -33,8 +27,8 @@ def format_name_aliases(command: CommandInfo) -> str:
 
 
 @help_cmd.handle()
-async def help_handle(command_arg: Message = CommandArg()):
-    args = str(command_arg).strip()
+async def help_handle(arg=CommandArg()):
+    args = str(arg).strip()
 
     if args == "all":
         commands = get_commands()
