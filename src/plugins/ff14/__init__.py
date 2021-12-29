@@ -9,7 +9,6 @@ import httpx
 from nonebot import CommandGroup
 from nonebot.adapters.onebot.v11 import Bot, Message
 from nonebot.adapters.onebot.v11.event import MessageEvent
-from nonebot.exception import FinishedException
 from nonebot.matcher import Matcher
 from nonebot.params import ArgStr, CommandArg, Depends
 
@@ -92,13 +91,11 @@ fflogs_cmd.__doc__ = """
 
 
 @fflogs_cmd.handle()
-async def fflogs_handle(bot: Bot, event: MessageEvent):
-    argv = str(event.message).strip().split()
+async def fflogs_handle(bot: Bot, event: MessageEvent, arg=CommandArg()):
+    argv = str(arg).strip().split()
     if not argv:
         await fflogs_cmd.finish(get_command_help("ff14.dps"))
 
-    if not event.user_id:
-        raise FinishedException
     user_id = event.user_id
 
     # 设置 Token
@@ -250,9 +247,9 @@ price_cmd.__doc__ = """
 
 
 @price_cmd.handle()
-async def price_handle(event: MessageEvent):
+async def price_handle(arg=CommandArg()):
     """查价"""
-    argv = str(event.message).split()
+    argv = str(arg).split()
     if len(argv) < 2:
         await price_cmd.finish(get_command_help("ff14.price"))
 
@@ -261,7 +258,7 @@ async def price_handle(event: MessageEvent):
     except httpx.HTTPError:
         reply = "抱歉，网络出错，请稍后再试。"
 
-    await price_cmd.finish(str(reply))
+    await price_cmd.finish(reply)
 
 
 # endregion

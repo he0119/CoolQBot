@@ -1,0 +1,83 @@
+from typing import TYPE_CHECKING, Type
+
+import pytest
+from nonebug import App
+from pytest_mock import MockerFixture
+
+if TYPE_CHECKING:
+    from nonebot.adapters.onebot.v11 import GroupMessageEvent
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
+async def test_dps_missing_token(
+    app: App,
+    mocker: MockerFixture,
+    fake_group_message_event: Type["GroupMessageEvent"],
+):
+    """测试 FFLOGS，缺少 Token 的情况"""
+    from nonebot import get_driver
+    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
+    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+
+    from src.plugins.ff14 import fflogs_cmd
+
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
+        bot = make_fake_bot(Bot)(adapter, "1")
+        event = fake_group_message_event(
+            message=Message("/dps me"),
+            raw_message="/dps me",
+        )
+        state = {
+            "_prefix": {
+                "command": ("dps",),
+                "command_arg": Message("me"),
+            }
+        }
+
+        ctx.receive_event(bot, event, state)
+        ctx.should_call_send(
+            event,
+            "对不起，Token 未设置，无法查询数据。\n请先使用命令\n/dps token <token>\n配置好 Token 后再尝试查询数据。",
+            "result",
+        )
+        ctx.should_finished()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
+async def test_dps_help(
+    app: App,
+    mocker: MockerFixture,
+    fake_group_message_event: Type["GroupMessageEvent"],
+):
+    """测试 FFLOGS，直接发送 /dps 命令的情况"""
+    from nonebot import get_driver
+    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
+    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+
+    from src.plugins.ff14 import fflogs_cmd
+
+    get_command_help = mocker.patch("src.plugins.ff14.get_command_help")
+    get_command_help.return_value = Message("test")
+
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
+        bot = make_fake_bot(Bot)(adapter, "1")
+        event = fake_group_message_event(
+            message=Message("/dps"),
+            raw_message="/dps",
+        )
+        state = {
+            "_prefix": {
+                "command": ("dps",),
+                "command_arg": Message(),
+            }
+        }
+
+        ctx.receive_event(bot, event, state)
+        ctx.should_call_send(event, Message("test"), "result")
+        ctx.should_finished()
+
+    get_command_help.assert_called_once_with("ff14.dps")
