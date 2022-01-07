@@ -1,11 +1,8 @@
-from typing import TYPE_CHECKING, Type
-
 import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-if TYPE_CHECKING:
-    from nonebot.adapters.onebot.v11 import GroupMessageEvent
+from tests.fake import fake_group_message_event
 
 
 @pytest.mark.asyncio
@@ -13,7 +10,6 @@ if TYPE_CHECKING:
 async def test_gete(
     app: App,
     mocker: MockerFixture,
-    fake_group_message_event: Type["GroupMessageEvent"],
 ):
     """测试藏宝选门，两个门的情况"""
     from nonebot import get_driver
@@ -31,18 +27,9 @@ async def test_gete(
     async with app.test_matcher(gate_cmd) as ctx:
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
         bot = make_fake_bot(Bot)(adapter, "1")
-        event = fake_group_message_event(
-            message=Message("/gate 2"),
-            raw_message="/gate 2",
-        )
-        state = {
-            "_prefix": {
-                "command": ("gate",),
-                "command_arg": Message("2"),
-            }
-        }
+        event = fake_group_message_event(message=Message("/gate 2"))
 
-        ctx.receive_event(bot, event, state)
+        ctx.receive_event(bot, event)
         ctx.should_call_send(event, Message("test"), "result", at_sender=True)
         ctx.should_finished()
 
@@ -55,7 +42,6 @@ async def test_gete(
 async def test_gete_ask_arg(
     app: App,
     mocker: MockerFixture,
-    fake_group_message_event: Type["GroupMessageEvent"],
 ):
     """测试藏宝选门，两个门的情况"""
     from nonebot import get_driver
@@ -73,24 +59,12 @@ async def test_gete_ask_arg(
     async with app.test_matcher(gate_cmd) as ctx:
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
         bot = make_fake_bot(Bot)(adapter, "1")
-        event = fake_group_message_event(
-            message=Message("/gate"),
-            raw_message="/gate",
-        )
-        state = {
-            "_prefix": {
-                "command": ("gate",),
-                "command_arg": Message(),
-            }
-        }
-        next_event = fake_group_message_event(
-            message=Message("2"),
-            raw_message="2",
-        )
+        event = fake_group_message_event(message=Message("/gate"))
+        next_event = fake_group_message_event(message=Message("2"))
 
-        ctx.receive_event(bot, event, state)
+        ctx.receive_event(bot, event)
         ctx.should_call_send(event, "总共有多少个门呢？", "result")
-        ctx.receive_event(bot, next_event, state)
+        ctx.receive_event(bot, next_event)
         ctx.should_call_send(next_event, Message("test"), "result", at_sender=True)
         ctx.should_finished()
 

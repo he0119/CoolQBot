@@ -1,22 +1,17 @@
-from typing import TYPE_CHECKING, Type
-
 import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-if TYPE_CHECKING:
-    from nonebot.adapters.onebot.v11 import GroupMessageEvent
+from tests.fake import fake_group_message_event
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "fake_group_message_event", [{"role": "admin"}, {"role": "member"}], indirect=True
-)
+@pytest.mark.parametrize("sender", [{"role": "admin"}, {"role": "member"}])
 @pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_owner(
     app: App,
     mocker: MockerFixture,
-    fake_group_message_event: Type["GroupMessageEvent"],
+    sender: dict,
 ):
     """测试群聊天，直接请求禁言 1 分钟
 
@@ -34,18 +29,9 @@ async def test_ban_group_bot_is_owner(
     async with app.test_matcher(ban_cmd) as ctx:
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
         bot = make_fake_bot(Bot)(adapter, "1")
-        event = fake_group_message_event(
-            message=Message("/ban 1"),
-            raw_message="/ban 1",
-        )
-        state = {
-            "_prefix": {
-                "command": ("ban",),
-                "command_arg": Message("1"),
-            }
-        }
+        event = fake_group_message_event(message=Message("/ban 1"), sender=sender)
 
-        ctx.receive_event(bot, event, state)
+        ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
         ctx.should_call_api(
             "get_group_member_info",
@@ -65,15 +51,13 @@ async def test_ban_group_bot_is_owner(
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "fake_group_message_event",
-    [{"role": "owner"}, {"role": "admin"}, {"role": "member"}],
-    indirect=True,
+    "sender", [{"role": "owner"}, {"role": "admin"}, {"role": "member"}]
 )
 @pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_admin(
     app: App,
     mocker: MockerFixture,
-    fake_group_message_event: Type["GroupMessageEvent"],
+    sender: dict,
 ):
     """测试群聊天，直接请求禁言 1 分钟
 
@@ -91,18 +75,9 @@ async def test_ban_group_bot_is_admin(
     async with app.test_matcher(ban_cmd) as ctx:
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
         bot = make_fake_bot(Bot)(adapter, "1")
-        event = fake_group_message_event(
-            message=Message("/ban 1"),
-            raw_message="/ban 1",
-        )
-        state = {
-            "_prefix": {
-                "command": ("ban",),
-                "command_arg": Message("1"),
-            }
-        }
+        event = fake_group_message_event(message=Message("/ban 1"), sender=sender)
 
-        ctx.receive_event(bot, event, state)
+        ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
         ctx.should_call_api(
             "get_group_member_info",
@@ -142,15 +117,13 @@ async def test_ban_group_bot_is_admin(
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "fake_group_message_event",
-    [{"role": "owner"}, {"role": "admin"}, {"role": "member"}],
-    indirect=True,
+    "sender", [{"role": "owner"}, {"role": "admin"}, {"role": "member"}]
 )
 @pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_member(
     app: App,
     mocker: MockerFixture,
-    fake_group_message_event: Type["GroupMessageEvent"],
+    sender: dict,
 ):
     """测试群聊天，直接请求禁言 1 分钟
 
@@ -168,18 +141,9 @@ async def test_ban_group_bot_is_member(
     async with app.test_matcher(ban_cmd) as ctx:
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
         bot = make_fake_bot(Bot)(adapter, "1")
-        event = fake_group_message_event(
-            message=Message("/ban 1"),
-            raw_message="/ban 1",
-        )
-        state = {
-            "_prefix": {
-                "command": ("ban",),
-                "command_arg": Message("1"),
-            }
-        }
+        event = fake_group_message_event(message=Message("/ban 1"), sender=sender)
 
-        ctx.receive_event(bot, event, state)
+        ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
         ctx.should_call_api(
             "get_group_member_info",
@@ -209,14 +173,12 @@ async def test_ban_group_bot_is_member(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "fake_group_message_event", [{"role": "member"}, {"role": "admin"}], indirect=True
-)
+@pytest.mark.parametrize("sender", [{"role": "member"}, {"role": "admin"}])
 @pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_get_arg(
     app: App,
     mocker: MockerFixture,
-    fake_group_message_event: Type["GroupMessageEvent"],
+    sender: dict,
 ):
     """测试群聊天，获取参数禁言 1 分钟
 
@@ -234,19 +196,11 @@ async def test_ban_group_get_arg(
     async with app.test_matcher(ban_cmd) as ctx:
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
         bot = make_fake_bot(Bot)(adapter, "1")
-        event = fake_group_message_event(
-            message=Message("/ban"),
-            raw_message="/ban",
-        )
-        state = {
-            "_prefix": {
-                "command": ("ban",),
-                "command_arg": Message(),
-            }
-        }
-        next_event = fake_group_message_event(message=Message("1"), raw_message="1")
+        event = fake_group_message_event(message=Message("/ban"), sender=sender)
 
-        ctx.receive_event(bot, event, state)
+        next_event = fake_group_message_event(message=Message("1"), sender=sender)
+
+        ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
         ctx.should_call_api(
             "get_group_member_info",
@@ -255,7 +209,7 @@ async def test_ban_group_get_arg(
         )
         ctx.should_call_send(event, "你想被禁言多少分钟呢？", "result")
         ctx.should_rejected()
-        ctx.receive_event(bot, next_event, state)
+        ctx.receive_event(bot, next_event)
         ctx.should_call_api(
             "set_group_ban",
             data={"group_id": 10000, "user_id": 10, "duration": 60},

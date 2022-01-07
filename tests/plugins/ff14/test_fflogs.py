@@ -1,20 +1,13 @@
-from typing import TYPE_CHECKING, Type
-
 import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-if TYPE_CHECKING:
-    from nonebot.adapters.onebot.v11 import GroupMessageEvent
+from tests.fake import fake_group_message_event
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
-async def test_dps_missing_token(
-    app: App,
-    mocker: MockerFixture,
-    fake_group_message_event: Type["GroupMessageEvent"],
-):
+async def test_dps_missing_token(app: App):
     """测试 FFLOGS，缺少 Token 的情况"""
     from nonebot import get_driver
     from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
@@ -25,18 +18,9 @@ async def test_dps_missing_token(
     async with app.test_matcher(fflogs_cmd) as ctx:
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
         bot = make_fake_bot(Bot)(adapter, "1")
-        event = fake_group_message_event(
-            message=Message("/dps me"),
-            raw_message="/dps me",
-        )
-        state = {
-            "_prefix": {
-                "command": ("dps",),
-                "command_arg": Message("me"),
-            }
-        }
+        event = fake_group_message_event(message=Message("/dps me"))
 
-        ctx.receive_event(bot, event, state)
+        ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
             "对不起，Token 未设置，无法查询数据。\n请先使用命令\n/dps token <token>\n配置好 Token 后再尝试查询数据。",
@@ -50,7 +34,6 @@ async def test_dps_missing_token(
 async def test_dps_help(
     app: App,
     mocker: MockerFixture,
-    fake_group_message_event: Type["GroupMessageEvent"],
 ):
     """测试 FFLOGS，直接发送 /dps 命令的情况"""
     from nonebot import get_driver
@@ -65,18 +48,9 @@ async def test_dps_help(
     async with app.test_matcher(fflogs_cmd) as ctx:
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
         bot = make_fake_bot(Bot)(adapter, "1")
-        event = fake_group_message_event(
-            message=Message("/dps"),
-            raw_message="/dps",
-        )
-        state = {
-            "_prefix": {
-                "command": ("dps",),
-                "command_arg": Message(),
-            }
-        }
+        event = fake_group_message_event(message=Message("/dps"))
 
-        ctx.receive_event(bot, event, state)
+        ctx.receive_event(bot, event)
         ctx.should_call_send(event, Message("test"), "result")
         ctx.should_finished()
 
