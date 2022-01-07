@@ -6,6 +6,7 @@ from nonebot.adapters import Bot
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
+from nonebot.params import CommandArg
 from nonebot.plugin import on_command
 
 from src.utils.helpers import strtobool
@@ -43,8 +44,8 @@ hello_cmd.__doc__ = """
 
 
 @hello_cmd.handle()
-async def hello_handle(event: GroupMessageEvent):
-    args = str(event.message).strip()
+async def hello_handle(event: GroupMessageEvent, arg=CommandArg()):
+    args = str(arg).strip()
 
     group_id = event.group_id
 
@@ -105,8 +106,8 @@ morning_cmd.__doc__ = """
 
 
 @morning_cmd.handle()
-async def morning_handle(event: GroupMessageEvent):
-    args = str(event.message).strip()
+async def morning_handle(event: GroupMessageEvent, arg=CommandArg()):
+    args = str(arg).strip()
 
     group_id = event.group_id
 
