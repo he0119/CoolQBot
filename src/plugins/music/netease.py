@@ -5,10 +5,10 @@ https://github.com/Binaryify/NeteaseCloudMusicApi
 from typing import Optional
 
 import httpx
-from nonebot.adapters.onebot.v11 import Message, MessageSegment
+from nonebot.adapters.onebot.v11 import MessageSegment
 
 
-async def call_netease_api(name: str) -> Optional[Message]:
+async def call_netease_api(name: str) -> Optional[MessageSegment]:
     """网易云搜索 API"""
     if not name:
         return None
@@ -29,7 +29,7 @@ async def call_netease_api(name: str) -> Optional[Message]:
             # 获取音乐 ID，并返回对应的 CQ 码
             music_id = rjson["result"]["songs"][0]["id"]
 
-            return Message(MessageSegment.music("163", music_id))
+            return MessageSegment.music("163", music_id)
 
     except (httpx.HTTPError, KeyError):
         # 抛出上面任何异常，说明调用失败
