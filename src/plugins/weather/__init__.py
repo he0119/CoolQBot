@@ -1,12 +1,13 @@
 """ 天气插件
 """
 from nonebot import on_command
-from nonebot.adapters.onebot.v11.event import MessageEvent
-from nonebot.params import State
+from nonebot.adapters.onebot.v11 import Message, MessageEvent
+from nonebot.matcher import Matcher
+from nonebot.params import ArgPlainText, ArgStr, CommandArg, State
 from nonebot.typing import T_State
 
-from .eorzean import eorzean_weather
-from .heweather import heweather
+from .eorzean_api import eorzean_weather
+from .heweather_api import heweather
 
 weather_cmd = on_command("weather", aliases={"天气"})
 weather_cmd.__doc__ = """
@@ -26,33 +27,24 @@ weather_cmd.__doc__ = """
 
 
 @weather_cmd.handle()
-async def weather_handle_first_receive(event: MessageEvent, state: T_State = State()):
-    argv = str(event.message).strip().split()
+async def weather_handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
+    plain_text = args.extract_plain_text()
 
-    if len(argv) == 1:
-        state["location"] = argv[0]
-    if len(argv) > 1:
-        state["location"] = argv[0]
-        state["adm"] = argv[1]
+    if plain_text:
+        matcher.set_arg("location", args)
 
 
 @weather_cmd.got("location", prompt="你想查询哪个城市的天气呢？")
-async def weather_handle(event: MessageEvent, state: T_State = State()):
-    weather_report = await get_weather_of_location(state["location"], state.get("adm"))
+async def weather_handle(location: str = ArgPlainText()):
+    """查询天气"""
+    if not location:
+        await weather_cmd.reject("要查询的城市名称不能为空呢，请重新输入！")
+
+    weather_report = await get_weather_of_location(*location.split())
     await weather_cmd.finish(weather_report)
 
 
-@weather_cmd.args_parser
-async def weather_args_parser(event: MessageEvent, state: T_State = State()):
-    args = str(event.message).strip()
-
-    if not args:
-        await weather_cmd.reject("要查询的城市名称不能为空呢，请重新输入！")
-
-    state[state["_current_key"]] = args
-
-
-async def get_weather_of_location(location: str, adm: str = None) -> str:
+async def get_weather_of_location(location: str, adm: str = None, *args) -> str:
     """根据城市名与城市所属行政区划获取天气数据"""
     # 艾欧泽亚的天气
     str_data = eorzean_weather(location)
