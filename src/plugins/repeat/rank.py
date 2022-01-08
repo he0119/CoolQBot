@@ -3,15 +3,16 @@
 import collections
 from operator import itemgetter
 
-from nonebot import get_bot
+from nonebot.adapters.onebot.v11 import Bot
 
 from .recorder import recorder_obj
 
 
 async def get_rank(
+    bot: Bot,
     display_number: int,
     minimal_msg_number: int,
-    display_total_number: int,
+    display_total_number: bool,
     group_id: int,
 ) -> str:
     """获取排行榜"""
@@ -19,6 +20,7 @@ async def get_rank(
     msg_number_list = recorder_obj.msg_number_list(group_id)
 
     ranking = Ranking(
+        bot,
         group_id,
         display_number,
         minimal_msg_number,
@@ -39,13 +41,15 @@ class Ranking:
 
     def __init__(
         self,
-        group_id,
-        display_number,
-        minimal_msg_number,
-        display_total_number,
+        bot: Bot,
+        group_id: int,
+        display_number: int,
+        minimal_msg_number: int,
+        display_total_number: bool,
         repeat_list,
         msg_number_list,
     ):
+        self.bot = bot
         self.group_id = group_id
         self.display_number = display_number
         self.minimal_msg_number = minimal_msg_number
@@ -115,7 +119,7 @@ class Ranking:
     async def nikcname(self, user_id):
         """输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称"""
         try:
-            msg = await get_bot().get_group_member_info(
+            msg = await self.bot.get_group_member_info(
                 group_id=self.group_id, user_id=user_id, no_cache=True
             )
             if msg["card"]:
@@ -123,5 +127,5 @@ class Ranking:
             return msg["nickname"]
         except:
             # 如果不在群里的话(因为有可能会退群)
-            msg = await get_bot().get_stranger_info(user_id=user_id)
+            msg = await self.bot.get_stranger_info(user_id=user_id)
             return msg["nickname"]

@@ -17,7 +17,7 @@ class Config(BaseSettings):
     # 启用的群
     group_id: list[int] = strtogroupid(DATA.config.get("repeat", "group_id"))
 
-    @validator("group_id", always=True)
+    @validator("group_id", always=True, allow_reuse=True)
     def group_id_validator(cls, v):
         """验证并保存配置"""
         DATA.config.set("repeat", "group_id", groupidtostr(v))
