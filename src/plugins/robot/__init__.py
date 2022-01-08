@@ -2,14 +2,11 @@
 """
 from nonebot import on_message
 from nonebot.adapters.onebot.v11.event import MessageEvent
-from nonebot.params import State
 from nonebot.rule import to_me
-from nonebot.typing import T_State
 
 from src.utils.helpers import render_expression
 
 from .tencent import call_tencent_api
-from .tuling import call_tuling_api
 
 robot_message = on_message(rule=to_me(), priority=5, block=True)
 
@@ -23,24 +20,13 @@ EXPR_DONT_UNDERSTAND = (
 
 
 @robot_message.handle()
-async def robot_handle_first_receive(event: MessageEvent, state: T_State = State()):
-    args = str(event.message).strip()
+async def robot_handle(event: MessageEvent):
+    msg = event.get_plaintext()
+    # if not msg:
+    #     return
 
-    if args:
-        state["msg"] = args
-
-
-@robot_message.got("msg")
-async def robot_handle(event: MessageEvent, state: T_State = State()):
-    msg = state["msg"]
     # 通过封装的函数获取机器人的回复
-    reply = await call_tuling_api(event, msg)
-    if reply:
-        # 如果调用机器人成功，得到了回复，则转义之后发送给用户
-        # 转义会把消息中的某些特殊字符做转换，以避免 酷Q 将它们理解为 CQ 码
-        await robot_message.finish(reply)
-
-    reply = await call_tencent_api(event, msg)
+    reply = await call_tencent_api(msg)
     if reply:
         await robot_message.finish(reply)
 
