@@ -31,15 +31,6 @@ pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"
 pytest-asyncio = "^0.16.0"
 
-[[tool.poetry.source]]
-default = true
-name = "aliyun"
-url = "https://mirrors.aliyun.com/pypi/simple/"
-
-[[tool.poetry.source]]
-name = "tuna"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-
 [tool.nonebot]
 plugin_dirs = ["src/plugins", "src/web"]
 plugins = ["nonebot_plugin_sentry"]
