@@ -23,13 +23,13 @@ def mocked_get(url: str, **kwargs):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("app", [("src.web.nonebot_bison",)], indirect=True)
-async def test_music_get_arg(
+async def test_add_sub(
     app: App,
     mocker: MockerFixture,
 ):
-    """测试启动问候已开启的情况"""
+    """测试添加订阅"""
     from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message, MessageSegment
+    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
     from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
 
     from src.web.nonebot_bison import add_sub_cmd
@@ -54,7 +54,9 @@ async def test_music_get_arg(
             Message(
                 '请输入想要订阅的平台，目前支持：\nbilibili：B站\nrss：RSS\nweibo：新浪微博\n要查看全部平台请输入："全部"'
             ),
-            "result",
+            "",
         )
         ctx.receive_event(bot, next_event)
-        ctx.should_call_send(next_event, Message("请输入订阅用户的 ID"), "result")
+        ctx.should_call_send(next_event, Message("请输入订阅用户的 ID"), "")
+        ctx.receive_event(bot, final_event)
+        ctx.should_call_send(final_event, "添加 Python 成功", "")

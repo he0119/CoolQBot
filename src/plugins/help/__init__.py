@@ -3,6 +3,7 @@
 通过给命令 __doc__ 添加帮助信息实现
 """
 from nonebot import on_command
+from nonebot.adapters.onebot.v11 import Message
 from nonebot.params import CommandArg
 
 from .commands import CommandInfo, get_command_help, get_commands
@@ -27,8 +28,8 @@ def format_name_aliases(command: CommandInfo) -> str:
 
 
 @help_cmd.handle()
-async def help_handle(arg=CommandArg()):
-    args = str(arg).strip()
+async def help_handle(arg: Message = CommandArg()):
+    args = arg.extract_plain_text()
 
     if args == "all":
         commands = get_commands()

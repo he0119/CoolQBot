@@ -36,11 +36,11 @@ def get_status(group_id: Optional[int]) -> str:
 
         str_data += f"\n今日群内聊天总数是 {today_msg_num} 条"
         str_data += f"\n本月群内聊天总数是 {msg_num} 条"
-        str_data += f"\n复读概率是 {repeat_rate*100:.2f}%"
+        str_data += f"\n复读概率是 {repeat_rate*100:.2f}%\n"
 
     # 距离第一次启动之后经过的时间
     rdate = relativedelta(datetime.now(), recorder_obj.start_time)
-    str_data += f"\n已在线"
+    str_data += f"已在线"
     if rdate.years:
         str_data += f" {rdate.years} 年"
     if rdate.months:
@@ -54,7 +54,7 @@ def get_status(group_id: Optional[int]) -> str:
     if rdate.seconds:
         str_data += f" {rdate.seconds} 秒"
     str_data += f"\n{server_status()}"
-    return str_data.strip()
+    return str_data
 
 
 def get_total_number(record_list):

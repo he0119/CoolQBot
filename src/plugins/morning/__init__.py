@@ -3,6 +3,7 @@
 import nonebot
 from nonebot import get_bot, require
 from nonebot.adapters import Bot
+from nonebot.adapters.onebot.v11 import Message
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
@@ -44,8 +45,8 @@ hello_cmd.__doc__ = """
 
 
 @hello_cmd.handle()
-async def hello_handle(event: GroupMessageEvent, arg=CommandArg()):
-    args = str(arg).strip()
+async def hello_handle(event: GroupMessageEvent, arg: Message = CommandArg()):
+    args = arg.extract_plain_text()
 
     group_id = event.group_id
 
@@ -106,8 +107,8 @@ morning_cmd.__doc__ = """
 
 
 @morning_cmd.handle()
-async def morning_handle(event: GroupMessageEvent, arg=CommandArg()):
-    args = str(arg).strip()
+async def morning_handle(event: GroupMessageEvent, arg: Message = CommandArg()):
+    args = arg.extract_plain_text()
 
     group_id = event.group_id
 

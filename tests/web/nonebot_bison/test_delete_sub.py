@@ -7,7 +7,7 @@ from tests.fake import fake_group_message_event
 @pytest.mark.asyncio
 @pytest.mark.parametrize("app", [("src.web.nonebot_bison",)], indirect=True)
 async def test_delete_sub(app: App):
-    """测试查询订阅"""
+    """测试删除订阅"""
     from nonebot import get_driver
     from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
     from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot

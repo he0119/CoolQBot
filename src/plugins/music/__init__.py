@@ -3,7 +3,7 @@
 from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Message
 from nonebot.matcher import Matcher
-from nonebot.params import Arg, ArgStr, CommandArg, Depends
+from nonebot.params import ArgPlainText, CommandArg, Depends
 
 from src.utils.helpers import render_expression
 
@@ -30,19 +30,18 @@ music_cmd.__doc__ = """
 
 @music_cmd.handle()
 async def music_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
-    args = str(arg).strip()
-
-    if args:
-        matcher.set_arg("name", Message(args))
+    if arg.extract_plain_text():
+        matcher.set_arg("name", arg)
 
 
-async def music_args_parser(name: Message = Arg()):
-    if not name.extract_plain_text():
+async def get_name(name: str = ArgPlainText()) -> str:
+    if not name:
         await music_cmd.reject("歌曲名不能为空呢，请重新输入！")
+    return name
 
 
-@music_cmd.got("name", prompt="你想听哪首歌呢？", parameterless=[Depends(music_args_parser)])
-async def music_handle(name: str = ArgStr()):
+@music_cmd.got("name", prompt="你想听哪首歌呢？")
+async def music_handle(name: str = Depends(get_name)):
     music_message = await call_netease_api(name)
     if music_message:
         await music_cmd.finish(music_message)

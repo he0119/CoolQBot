@@ -197,7 +197,6 @@ async def test_ban_group_get_arg(
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
         bot = make_fake_bot(Bot)(adapter, "1")
         event = fake_group_message_event(message=Message("/ban"), sender=sender)
-
         next_event = fake_group_message_event(message=Message("1"), sender=sender)
 
         ctx.receive_event(bot, event)

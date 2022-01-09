@@ -1,7 +1,7 @@
 """ 自主禁言
 """
 from enum import Enum
-from typing import Dict, Optional
+from typing import Optional
 
 from nonebot import on_command, on_notice
 from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
@@ -11,7 +11,7 @@ from nonebot.adapters.onebot.v11.event import (
     PrivateMessageEvent,
 )
 from nonebot.matcher import Matcher
-from nonebot.params import ArgStr, CommandArg, Depends
+from nonebot.params import ArgPlainText, CommandArg, Depends
 
 from src.utils.helpers import render_expression
 
@@ -66,14 +66,14 @@ ban_cmd.__doc__ = """
 """
 
 
-async def get_duration(duration: str = ArgStr()) -> int:
+async def get_duration(duration: str = ArgPlainText()) -> int:
     """检查输入参数是不是数字"""
     if not duration.isdigit():
         await ban_cmd.reject_arg("duratioin", "请只输入数字，不然我没法理解呢！")
     return int(duration)
 
 
-async def get_group_id(group_id: str = ArgStr()) -> int:
+async def get_group_id(group_id: str = ArgPlainText()) -> int:
     """检查输入参数是不是数字"""
     if not group_id.isdigit():
         await ban_cmd.reject_arg("group_id", "请只输入数字，不然我没法理解呢！")
@@ -81,13 +81,15 @@ async def get_group_id(group_id: str = ArgStr()) -> int:
 
 
 @ban_cmd.handle()
-async def ban_handle_first_receive(matcher: Matcher, bot: Bot, arg=CommandArg()):
+async def ban_handle_first_receive(
+    matcher: Matcher, bot: Bot, arg: Message = CommandArg()
+):
     """获取需要的参数"""
     # 如果没有获取机器人在群中的职位，则获取
     if not _bot_role:
         await refresh_bot_role(bot)
-
-    matcher.set_arg("duration", arg)
+    if arg.extract_plain_text():
+        matcher.set_arg("duration", arg)
 
 
 @ban_cmd.got("duration", prompt="你想被禁言多少分钟呢？")
@@ -192,7 +194,7 @@ async def get_user_role_in_group(user_id: int, group_id: int, bot: Bot) -> str:
 
 # endregion
 # region 机器人是否为管理员
-_bot_role: Dict[int, str] = {}
+_bot_role: dict[int, str] = {}
 
 
 async def refresh_bot_role(bot: Bot) -> None:

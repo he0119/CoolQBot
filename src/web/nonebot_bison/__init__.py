@@ -13,7 +13,7 @@ from nonebot.adapters.onebot.v11.message import Message
 from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
 from nonebot.log import logger
 from nonebot.matcher import Matcher
-from nonebot.params import ArgStr, Depends, State
+from nonebot.params import Arg, ArgStr, Depends, State
 from nonebot.permission import SUPERUSER
 from nonebot.typing import T_State
 
@@ -76,7 +76,7 @@ async def parse_platform(event: GroupMessageEvent, state: T_State = State()) -> 
 
 
 @add_sub_cmd.got("platform", Message.template("{_prompt}"), [Depends(parse_platform)])
-async def init_id(platform: str = ArgStr(), state: T_State = State()):
+async def init_id(platform: str = Arg(), state: T_State = State()):
     if platform_manager[platform].has_target:  # type: ignore
         state["_prompt"] = "请输入订阅用户的 ID"
     else:
@@ -109,6 +109,8 @@ async def init_cat(event: GroupMessageEvent, state: T_State = State()):
 
 
 async def parser_cats(event: GroupMessageEvent, state: T_State = State()):
+    if isinstance(state["cats"], list):
+        return
     res = []
     for cat in filter(None, re.split(r",|，", str(event.get_message()).strip())):
         if cat not in platform_manager[state["platform"]].reverse_category:
@@ -126,6 +128,8 @@ async def init_tag(event: GroupMessageEvent, state: T_State = State()):
 
 
 async def parser_tags(event: GroupMessageEvent, state: T_State = State()):
+    if isinstance(state["tags"], list):
+        return
     if str(event.get_message()).strip() == "全部标签":
         state["tags"] = []
     else:

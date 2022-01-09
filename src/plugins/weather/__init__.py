@@ -1,10 +1,9 @@
 """ 天气插件
 """
 from nonebot import on_command
-from nonebot.adapters.onebot.v11 import Message, MessageEvent
+from nonebot.adapters.onebot.v11 import Message
 from nonebot.matcher import Matcher
-from nonebot.params import ArgPlainText, ArgStr, CommandArg, State
-from nonebot.typing import T_State
+from nonebot.params import ArgPlainText, CommandArg
 
 from .eorzean_api import eorzean_weather
 from .heweather_api import heweather
@@ -27,11 +26,11 @@ weather_cmd.__doc__ = """
 
 
 @weather_cmd.handle()
-async def weather_handle_first_receive(matcher: Matcher, args: Message = CommandArg()):
-    plain_text = args.extract_plain_text()
+async def weather_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
+    plain_text = arg.extract_plain_text()
 
     if plain_text:
-        matcher.set_arg("location", args)
+        matcher.set_arg("location", arg)
 
 
 @weather_cmd.got("location", prompt="你想查询哪个城市的天气呢？")

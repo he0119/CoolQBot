@@ -16,8 +16,7 @@ from nonebot.adapters.onebot.v11.event import (
 from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
 from nonebot.matcher import Matcher
-from nonebot.params import ArgPlainText, CommandArg, Depends, State
-from nonebot.typing import T_State
+from nonebot.params import ArgPlainText, CommandArg, Depends
 
 from src.utils.helpers import check_number, strtobool
 
@@ -82,7 +81,7 @@ repeat_cmd.__doc__ = """
 
 @repeat_cmd.handle()
 async def repeat_handle(event: GroupMessageEvent, arg: Message = CommandArg()):
-    args = str(arg).strip()
+    args = arg.extract_plain_text()
 
     group_id = event.group_id
 
@@ -161,7 +160,7 @@ async def get_group_id(matcher: Matcher, group_id: str = ArgPlainText()) -> int:
 
 @rank_cmd.handle()
 async def rank_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
-    match = re.match(r"^(?:(\d+))?(?:n(\d+))?$", str(arg).strip())
+    match = re.match(r"^(?:(\d+))?(?:n(\d+))?$", arg.extract_plain_text())
     if match:
         display_number = match.group(1)
         minimal_msg_number = match.group(2)
@@ -255,7 +254,7 @@ async def get_day(matcher: Matcher, day: str = ArgPlainText()) -> int:
 
 @history_cmd.handle()
 async def history_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
-    match = re.match(r"^(\d+)(?:\-(\d+)(?:\-(\d+))?)?$", str(arg).strip())
+    match = re.match(r"^(\d+)(?:\-(\d+)(?:\-(\d+))?)?$", arg.extract_plain_text())
     if match:
         year = match.group(1)
         month = match.group(2)

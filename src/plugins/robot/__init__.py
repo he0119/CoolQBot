@@ -22,8 +22,6 @@ EXPR_DONT_UNDERSTAND = (
 @robot_message.handle()
 async def robot_handle(event: MessageEvent):
     msg = event.get_plaintext()
-    # if not msg:
-    #     return
 
     # 通过封装的函数获取机器人的回复
     reply = await call_tencent_api(msg)

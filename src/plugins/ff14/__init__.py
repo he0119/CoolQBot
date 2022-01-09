@@ -7,10 +7,9 @@ from typing import Literal
 
 import httpx
 from nonebot import CommandGroup
-from nonebot.adapters.onebot.v11 import Bot, Message
-from nonebot.adapters.onebot.v11.event import MessageEvent
+from nonebot.adapters.onebot.v11 import Bot, Message, MessageEvent
 from nonebot.matcher import Matcher
-from nonebot.params import ArgStr, CommandArg, Depends
+from nonebot.params import ArgPlainText, CommandArg, Depends
 
 from src.utils.helpers import strtobool
 
@@ -35,7 +34,7 @@ gate_cmd.__doc__ = """
 """
 
 
-async def get_door_number(door_number: str = ArgStr()) -> int:
+async def get_door_number(door_number: str = ArgPlainText()) -> int:
     """获取门的数量"""
     if not door_number:
         await gate_cmd.reject("你什么都不输入我怎么知道呢，请告诉我有几个门！")
@@ -51,11 +50,9 @@ async def get_door_number(door_number: str = ArgStr()) -> int:
 
 
 @gate_cmd.handle()
-async def gate_handle_first_receive(matcher: Matcher, arg=CommandArg()):
-    args = str(arg).strip()
-
-    if args in ["2", "3"]:
-        matcher.set_arg("door_number", Message(args))
+async def gate_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
+    if arg.extract_plain_text():
+        matcher.set_arg("door_number", arg)
 
 
 @gate_cmd.got("door_number", prompt="总共有多少个门呢？")
@@ -91,8 +88,8 @@ fflogs_cmd.__doc__ = """
 
 
 @fflogs_cmd.handle()
-async def fflogs_handle(bot: Bot, event: MessageEvent, arg=CommandArg()):
-    argv = str(arg).strip().split()
+async def fflogs_handle(bot: Bot, event: MessageEvent, arg: Message = CommandArg()):
+    argv = arg.extract_plain_text().split()
     if not argv:
         await fflogs_cmd.finish(get_command_help("ff14.dps"))
 
@@ -247,9 +244,9 @@ price_cmd.__doc__ = """
 
 
 @price_cmd.handle()
-async def price_handle(arg=CommandArg()):
+async def price_handle(arg: Message = CommandArg()):
     """查价"""
-    argv = str(arg).split()
+    argv = arg.extract_plain_text().split()
     if len(argv) < 2:
         await price_cmd.finish(get_command_help("ff14.price"))
 
