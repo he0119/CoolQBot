@@ -24,7 +24,25 @@ jobs:
         with:
           python-version: 3.9
       - name: Install poetry
-        run: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -
+        uses: Gr1N/setup-poetry@v7
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install prerequisites
+        run: poetry install
+      - name: Run tests
+        run: poetry run pytest --cov=src --cov-report xml --junitxml=TEST-pytest.xml
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Unit Test Results
+          path: |
+            **/TEST-*.xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
       - name: Set build version
         id: setVersion
         run: |
@@ -37,6 +55,16 @@ jobs:
             echo "::set-output name=environment::dev"
             echo "::set-output name=version::$VERSION-git.$COMMIT_ID"
           fi
+
+  event_file:
+    name: Event File
+    runs-on: ubuntu-latest
+    steps:
+    - name: Upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: Event File
+        path: ${{ github.event_path }}
 
   docker:
     name: Docker

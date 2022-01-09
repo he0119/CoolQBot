@@ -1,19 +1,21 @@
 """ 每日早安插件
 """
 import nonebot
-from nonebot import get_bot
+from nonebot import get_bot, require
 from nonebot.adapters import Bot
+from nonebot.adapters.onebot.v11 import Message
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
+from nonebot.params import CommandArg
 from nonebot.plugin import on_command
-from nonebot_plugin_apscheduler import scheduler
 
 from src.utils.helpers import strtobool
 
 from .config import plugin_config
 from .data import HOLIDAYS_DATA, get_first_connect_message, get_moring_message
 
+scheduler = require("nonebot_plugin_apscheduler").scheduler
 driver = nonebot.get_driver()
 
 
@@ -43,8 +45,8 @@ hello_cmd.__doc__ = """
 
 
 @hello_cmd.handle()
-async def hello_handle(bot: Bot, event: GroupMessageEvent):
-    args = str(event.message).strip()
+async def hello_handle(event: GroupMessageEvent, arg: Message = CommandArg()):
+    args = arg.extract_plain_text()
 
     group_id = event.group_id
 
@@ -105,8 +107,8 @@ morning_cmd.__doc__ = """
 
 
 @morning_cmd.handle()
-async def morning_handle(bot: Bot, event: GroupMessageEvent):
-    args = str(event.message).strip()
+async def morning_handle(event: GroupMessageEvent, arg: Message = CommandArg()):
+    args = arg.extract_plain_text()
 
     group_id = event.group_id
 

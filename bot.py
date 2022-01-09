@@ -1,14 +1,14 @@
 from pathlib import Path
 
 import nonebot
-from nonebot.adapters.onebot import Bot as OneBot
+from nonebot.adapters.onebot.v11 import Adapter
 from nonebot.log import default_format, logger
 
 nonebot.init()
 app = nonebot.get_asgi()
 
 driver = nonebot.get_driver()
-driver.register_adapter("cqhttp", OneBot)
+driver.register_adapter(Adapter)
 
 # 添加额外的配置
 config = nonebot.get_driver().config
@@ -25,13 +25,7 @@ logger.add(
     format=default_format,
 )
 
-# 加载外部插件
-nonebot.load_plugin("nonebot_plugin_sentry")
-# 加载开发环境插件
-if config.debug:
-    nonebot.load_plugin("nonebot_plugin_test")
-    nonebot.load_plugin("nonebot_plugin_docs")
-# 加载自己的插件
+# 加载插件
 nonebot.load_from_toml("pyproject.toml")
 
 if __name__ == "__main__":

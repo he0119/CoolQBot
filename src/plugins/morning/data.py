@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from typing import Optional, TypedDict
 
 from dateutil import parser
-from nonebot.adapters.onebot import Message
+from nonebot.adapters.onebot.v11 import Message
 
 from src.utils.helpers import render_expression
 

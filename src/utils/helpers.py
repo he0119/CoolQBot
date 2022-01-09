@@ -1,7 +1,8 @@
 import random
 from typing import Sequence
 
-from nonebot.adapters.onebot import Message
+from nonebot.adapters.onebot.v11 import Message
+from nonebot.matcher import Matcher
 
 from .typing import Expression_T
 
@@ -52,3 +53,9 @@ def groupidtostr(val: list[int]) -> str:
     群ID用空格隔开
     """
     return " ".join(map(str, val))
+
+
+async def check_number(number: str, matcher: Matcher) -> None:
+    """检查输入的数字是否合法"""
+    if not number.isdigit():
+        await matcher.reject("请只输入数字，不然我没法理解呢！")

@@ -3,56 +3,33 @@
 https://pcrbot.github.io/pcr-calendar/#cn
 """
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Set
 
 import httpx
-from nonebot import get_bot
 from nonebot.log import logger
-from nonebot_plugin_apscheduler import scheduler
-
-from .config import plugin_config
 
 
-class Calender:
+class Calendar:
     def __init__(self):
         # 动态的地址
         self._url = "https://pcrbot.github.io/calendar-updater-action/cn.json"
-        # 定时任务
-        self._job = None
         # 日程表
-        self._timeline: Dict[str, Set[str]] = {}
+        self._timeline: dict[str, set[str]] = {}
         self._timeline_update_time: datetime = datetime.now()
 
-        self.init()
-
-    def init(self):
-        """初始化日程自动推送"""
-        logger.info("初始化 公主连结Re:Dive 日程推送")
-        self._job = scheduler.add_job(
-            self.push_calender,
-            "cron",
-            hour=plugin_config.calender_hour,
-            minute=plugin_config.calender_minute,
-            second=plugin_config.calender_second,
-            id="push_calender",
-        )
-
-    async def refresh_calender(self) -> None:
+    async def refresh_calendar(self) -> None:
         """获取最新的日程表"""
         if self._timeline:
             # 最近四小时内才更新的不用再次更新
             if self._timeline_update_time > datetime.now() - timedelta(hours=4):
-                return None
+                return
         try:
             async with httpx.AsyncClient() as client:
                 r = await client.get(self._url)
-                if r.status_code != 200:
-                    # 如果 HTTP 响应状态码不是 200，说明调用失败
-                    return None
+                rjson = r.json()
 
-                # 清楚以前的时间线
+                # 清除以前的时间线
                 self._timeline.clear()
-                for event in r.json():
+                for event in rjson:
                     start_time = datetime.strptime(
                         event["start_time"], "%Y/%m/%d %H:%M:%S"
                     )
@@ -65,7 +42,7 @@ class Calender:
         except (httpx.HTTPError, KeyError) as e:
             logger.error(f"获取日程表出错，{e}")
             # 抛出上面任何异常，说明调用失败
-            return None
+            return
 
     def add_event(self, start_time: datetime, end_time: datetime, name: str) -> None:
         """添加日程至日程表"""
@@ -77,40 +54,9 @@ class Calender:
             self._timeline[daystr].add(name)
             t += timedelta(days=1)
 
-    async def push_calender(self):
-        """推送日程"""
-        # 没有启用的群则不推送消息
-        if not plugin_config.push_calender_group_id:
-            return
-
-        logger.info("推送今日 公主连结Re:Dive 日程")
-
-        await self.refresh_calender()
-
-        date = datetime.now()
-        events = self._timeline.get(date.strftime("%Y%m%d"))
-        if events is None:
-            events_str = "无活动或无数据"
-        else:
-            events_str = "\n".join(events)
-
-        try:
-            bot = get_bot()
-        except ValueError:
-            bot = None
-
-        reply = "公主连结Re:Dive 今日活动：\n{}".format(events_str)
-        for group_id in plugin_config.push_calender_group_id:
-            if bot:
-                await bot.send_msg(
-                    message_type="group", group_id=group_id, message=reply
-                )
-            else:
-                logger.warning("no bot connected")
-
     async def get_week_events(self) -> str:
         """获取日程表"""
-        await self.refresh_calender()
+        await self.refresh_calendar()
 
         reply = "一周日程："
         date = datetime.now()
@@ -129,4 +75,4 @@ class Calender:
         return reply
 
 
-calender_obj = Calender()
+calendar = Calendar()

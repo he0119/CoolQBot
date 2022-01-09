@@ -11,7 +11,7 @@ class Config(BaseSettings):
     # 启动问候
     hello_group_id: list[int] = strtogroupid(DATA.config.get("hello", "group_id"))
 
-    @validator("hello_group_id", always=True)
+    @validator("hello_group_id", always=True, allow_reuse=True)
     def hello_group_id_validator(cls, v: list[int]):
         """验证并保存配置"""
         DATA.config.set("hello", "group_id", groupidtostr(v))
@@ -24,7 +24,7 @@ class Config(BaseSettings):
     # 开启早安问好的群
     morning_group_id: list[int] = strtogroupid(DATA.config.get("morning", "group_id"))
 
-    @validator("morning_group_id", always=True)
+    @validator("morning_group_id", always=True, allow_reuse=True)
     def morning_group_id_validator(cls, v: list[int]):
         """验证并保存配置"""
         DATA.config.set("morning", "group_id", groupidtostr(v))

@@ -11,6 +11,15 @@
             "program": "${workspaceFolder}/bot.py",
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "CoolQBot Test",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["-s"],
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }

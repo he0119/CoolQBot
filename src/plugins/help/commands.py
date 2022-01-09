@@ -8,9 +8,9 @@ from functools import reduce
 from typing import Optional
 
 from nonebot import get_loaded_plugins
-from nonebot.handler import Handler
+from nonebot.dependencies import Dependent
 from nonebot.matcher import Matcher
-from nonebot.rule import Command
+from nonebot.rule import CommandRule
 
 
 @dataclass
@@ -27,9 +27,9 @@ _commands: Optional[list[CommandInfo]] = None
 
 def extract_command_info(matcher: Matcher) -> Optional[CommandInfo]:
     """从 Matcher 中提取命令的数据"""
-    checkers: set[Handler] = matcher.rule.checkers
-    command_handler: Optional[Handler] = next(
-        filter(lambda x: isinstance(x.call, Command), checkers), None
+    checkers: set[Dependent] = matcher.rule.checkers
+    command_handler: Optional[Dependent] = next(
+        filter(lambda x: isinstance(x.call, CommandRule), checkers), None
     )
     if not command_handler:
         return
@@ -39,7 +39,7 @@ def extract_command_info(matcher: Matcher) -> Optional[CommandInfo]:
         return
     help = inspect.cleandoc(help)
 
-    command: Command = command_handler.call
+    command: CommandRule = command_handler.call
     # 确保英文名字在前，中文名字在后
     # 命令越长越靠前
     cmds: list[tuple[str]] = sorted(

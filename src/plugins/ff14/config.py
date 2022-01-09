@@ -29,13 +29,13 @@ class Config(BaseSettings):
     # 需要缓存的副本
     fflogs_cache_boss: List[str] = DATA.config.get("fflogs", "cache_boss").split()
 
-    @validator("fflogs_token", always=True)
+    @validator("fflogs_token", always=True, allow_reuse=True)
     def fflogs_token_validator(cls, v):
         """验证并保存配置"""
         DATA.config.set("fflogs", "token", v)
         return v
 
-    @validator("fflogs_cache", always=True)
+    @validator("fflogs_cache", always=True, allow_reuse=True)
     def fflogs_cache_validator(cls, v):
         """验证并保存配置"""
         if v:

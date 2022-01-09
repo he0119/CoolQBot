@@ -3,12 +3,13 @@
 藏宝选门
 FFLogs
 """
+from typing import Literal
+
 import httpx
 from nonebot import CommandGroup
-from nonebot.adapters import Bot, Event
-from nonebot.adapters.onebot.v11.event import MessageEvent
-from nonebot.exception import FinishedException
-from nonebot.typing import T_State
+from nonebot.adapters.onebot.v11 import Bot, Message, MessageEvent
+from nonebot.matcher import Matcher
+from nonebot.params import ArgPlainText, CommandArg, Depends
 
 from src.utils.helpers import strtobool
 
@@ -20,7 +21,7 @@ from .gate import get_direction
 from .nuannuan import get_latest_nuannuan
 from .universalis_api import get_item_price
 
-ff14 = CommandGroup("ff14", block=True)
+ff14 = CommandGroup("ff14")
 
 # region 藏宝选门
 gate_cmd = ff14.command("gate", aliases={"gate"})
@@ -33,30 +34,30 @@ gate_cmd.__doc__ = """
 """
 
 
-@gate_cmd.args_parser
-async def gate_args_parser(bot: Bot, event: Event, state: T_State):
-    args = str(event.get_message()).strip()
-
-    if not args:
+async def get_door_number(door_number: str = ArgPlainText()) -> int:
+    """获取门的数量"""
+    if not door_number:
         await gate_cmd.reject("你什么都不输入我怎么知道呢，请告诉我有几个门！")
 
-    if args not in ["2", "3"]:
+    if not door_number.isdigit():
+        await gate_cmd.reject("门的数量只能是数字！")
+
+    number = int(door_number)
+    if number not in [2, 3]:
         await gate_cmd.reject("暂时只支持两个门或者三个门的情况，请重新输入吧。")
 
-    state[state["_current_key"]] = int(args)
+    return number
 
 
 @gate_cmd.handle()
-async def gate_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
-    args = str(event.message).strip()
-
-    if args in ["2", "3"]:
-        state["door_number"] = int(args)
+async def gate_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
+    if arg.extract_plain_text():
+        matcher.set_arg("door_number", arg)
 
 
 @gate_cmd.got("door_number", prompt="总共有多少个门呢？")
-async def gate_handle(bot: Bot, event: Event, state: T_State):
-    direction = get_direction(state["door_number"])
+async def gate_handle(door_number: Literal[2, 3] = Depends(get_door_number)):
+    direction = get_direction(door_number)
     await gate_cmd.finish(direction, at_sender=True)
 
 
@@ -87,13 +88,11 @@ fflogs_cmd.__doc__ = """
 
 
 @fflogs_cmd.handle()
-async def fflogs_handle(bot: Bot, event: MessageEvent, state: T_State):
-    argv = str(event.message).strip().split()
+async def fflogs_handle(bot: Bot, event: MessageEvent, arg: Message = CommandArg()):
+    argv = arg.extract_plain_text().split()
     if not argv:
         await fflogs_cmd.finish(get_command_help("ff14.dps"))
 
-    if not event.user_id:
-        raise FinishedException
     user_id = event.user_id
 
     # 设置 Token
@@ -222,7 +221,7 @@ nuannuan_cmd.__doc__ = """
 
 
 @nuannuan_cmd.handle()
-async def nuannuan_handle(bot: Bot, event: MessageEvent):
+async def nuannuan_handle():
     """时尚品鉴"""
     latest = await get_latest_nuannuan()
     if latest:
@@ -245,9 +244,9 @@ price_cmd.__doc__ = """
 
 
 @price_cmd.handle()
-async def price_handle(bot: Bot, event: MessageEvent):
+async def price_handle(arg: Message = CommandArg()):
     """查价"""
-    argv = str(event.message).split()
+    argv = arg.extract_plain_text().split()
     if len(argv) < 2:
         await price_cmd.finish(get_command_help("ff14.price"))
 
@@ -256,7 +255,7 @@ async def price_handle(bot: Bot, event: MessageEvent):
     except httpx.HTTPError:
         reply = "抱歉，网络出错，请稍后再试。"
 
-    await price_cmd.finish(str(reply))
+    await price_cmd.finish(reply)
 
 
 # endregion

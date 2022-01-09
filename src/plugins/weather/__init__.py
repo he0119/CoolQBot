@@ -1,14 +1,14 @@
 """ 天气插件
 """
 from nonebot import on_command
-from nonebot.adapters import Bot, Event
-from nonebot.adapters.onebot.v11.event import MessageEvent
-from nonebot.typing import T_State
+from nonebot.adapters.onebot.v11 import Message
+from nonebot.matcher import Matcher
+from nonebot.params import ArgPlainText, CommandArg
 
-from .eorzean import eorzean_weather
-from .heweather import heweather
+from .eorzean_api import eorzean_weather
+from .heweather_api import heweather
 
-weather_cmd = on_command("weather", aliases={"天气"}, block=True)
+weather_cmd = on_command("weather", aliases={"天气"})
 weather_cmd.__doc__ = """
 天气预报
 
@@ -26,33 +26,24 @@ weather_cmd.__doc__ = """
 
 
 @weather_cmd.handle()
-async def weather_handle_first_receive(bot: Bot, event: MessageEvent, state: T_State):
-    argv = str(event.message).strip().split()
+async def weather_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
+    plain_text = arg.extract_plain_text()
 
-    if len(argv) == 1:
-        state["location"] = argv[0]
-    if len(argv) > 1:
-        state["location"] = argv[0]
-        state["adm"] = argv[1]
+    if plain_text:
+        matcher.set_arg("location", arg)
 
 
 @weather_cmd.got("location", prompt="你想查询哪个城市的天气呢？")
-async def weather_handle(bot: Bot, event: MessageEvent, state: T_State):
-    weather_report = await get_weather_of_location(state["location"], state.get("adm"))
+async def weather_handle(location: str = ArgPlainText()):
+    """查询天气"""
+    if not location:
+        await weather_cmd.reject("要查询的城市名称不能为空呢，请重新输入！")
+
+    weather_report = await get_weather_of_location(*location.split())
     await weather_cmd.finish(weather_report)
 
 
-@weather_cmd.args_parser
-async def weather_args_parser(bot: Bot, event: Event, state: T_State):
-    args = str(event.get_message()).strip()
-
-    if not args:
-        await weather_cmd.reject("要查询的城市名称不能为空呢，请重新输入！")
-
-    state[state["_current_key"]] = args
-
-
-async def get_weather_of_location(location: str, adm: str = None) -> str:
+async def get_weather_of_location(location: str, adm: str = None, *args) -> str:
     """根据城市名与城市所属行政区划获取天气数据"""
     # 艾欧泽亚的天气
     str_data = eorzean_weather(location)
