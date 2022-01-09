@@ -59,8 +59,8 @@ async def init_promote(event: GroupMessageEvent, state: T_State = State()):
     )
 
 
-async def parse_platform(matcher: Matcher, platform: str = ArgStr()) -> None:
-    platform = platform.strip()
+async def parse_platform(event: GroupMessageEvent, state: T_State = State()) -> None:
+    platform = event.get_plaintext().strip()
     if platform == "全部":
         message = "全部平台\n" + "\n".join(
             [
@@ -70,7 +70,7 @@ async def parse_platform(matcher: Matcher, platform: str = ArgStr()) -> None:
         )
         await add_sub_cmd.reject(message)
     elif platform in platform_manager:
-        matcher.set_arg("platform", Message(platform))
+        state["platform"] = platform
     else:
         await add_sub_cmd.reject("平台输入错误")
 
@@ -98,31 +98,31 @@ async def parse_id(event: GroupMessageEvent, state: T_State = State()):
         await add_sub_cmd.finish(f"验证 ID 失败，网络连接错误，请稍后再试")
 
 
-@add_sub_cmd.got("id", Message.template("{_prompt}"))
+@add_sub_cmd.got("id", Message.template("{_prompt}"), [Depends(parse_id)])
 async def init_cat(event: GroupMessageEvent, state: T_State = State()):
     if not platform_manager[state["platform"]].categories:
         state["cats"] = []
         return
-    state["_prompt"] = "请输入要订阅的类别，以空格或逗号分隔，支持的类别有：{}".format(
+    state["_prompt"] = "请输入要订阅的类别，以逗号分隔，支持的类别有：{}".format(
         "，".join(list(platform_manager[state["platform"]].categories.values()))
     )
 
 
 async def parser_cats(event: GroupMessageEvent, state: T_State = State()):
     res = []
-    for cat in filter(None, re.split(r",|，| ", str(event.get_message()).strip())):
+    for cat in filter(None, re.split(r",|，", str(event.get_message()).strip())):
         if cat not in platform_manager[state["platform"]].reverse_category:
             await add_sub_cmd.reject("不支持 {}".format(cat))
         res.append(platform_manager[state["platform"]].reverse_category[cat])
     state["cats"] = res
 
 
-@add_sub_cmd.got("cats", Message.template("{_prompt}"))
+@add_sub_cmd.got("cats", Message.template("{_prompt}"), [Depends(parser_cats)])
 async def init_tag(event: GroupMessageEvent, state: T_State = State()):
     if not platform_manager[state["platform"]].enable_tag:
         state["tags"] = []
         return
-    state["_prompt"] = '请输入要订阅的标签，以空格或逗号分隔，订阅所有标签输入"全部标签"'
+    state["_prompt"] = '请输入要订阅的标签，以逗号分隔，订阅所有标签输入"全部标签"'
 
 
 async def parser_tags(event: GroupMessageEvent, state: T_State = State()):
@@ -130,11 +130,11 @@ async def parser_tags(event: GroupMessageEvent, state: T_State = State()):
         state["tags"] = []
     else:
         state["tags"] = list(
-            filter(None, re.split(r",|，| ", str(event.get_message()).strip()))
+            filter(None, re.split(r",|，", str(event.get_message()).strip()))
         )
 
 
-@add_sub_cmd.got("tags", Message.template("{_prompt}"))
+@add_sub_cmd.got("tags", Message.template("{_prompt}"), [Depends(parser_tags)])
 async def add_sub_process(event: GroupMessageEvent, state: T_State = State()):
     config = Config()
     config.add_subscribe(
