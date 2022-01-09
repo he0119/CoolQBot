@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Changed
 
 - 利用新版 NoneBot2(beta1) 特性简化帮助
+- 适配 NoneBot2(beta1)
+
+### Removed
+
+- 删除 公主连结Re:Dive 插件中定时推送功能
 
 ## [0.15.2] - 2021-11-21
 
