@@ -23,6 +23,10 @@ EXPR_DONT_UNDERSTAND = (
 async def robot_handle(event: MessageEvent):
     msg = event.get_plaintext()
 
+    # 如果消息是命令，则忽略
+    if msg.startswith("/"):
+        return
+
     # 通过封装的函数获取机器人的回复
     reply = await call_tencent_api(msg)
     if reply:
