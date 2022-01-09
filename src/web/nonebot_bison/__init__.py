@@ -109,7 +109,7 @@ async def init_cat(event: GroupMessageEvent, state: T_State = State()):
 
 
 async def parser_cats(event: GroupMessageEvent, state: T_State = State()):
-    if isinstance(state["cats"], list):
+    if not isinstance(state["cats"], Message):
         return
     res = []
     for cat in filter(None, re.split(r",|，", str(event.get_message()).strip())):
@@ -128,7 +128,7 @@ async def init_tag(event: GroupMessageEvent, state: T_State = State()):
 
 
 async def parser_tags(event: GroupMessageEvent, state: T_State = State()):
-    if isinstance(state["tags"], list):
+    if not isinstance(state["tags"], Message):
         return
     if str(event.get_message()).strip() == "全部标签":
         state["tags"] = []
@@ -205,6 +205,8 @@ async def send_list(bot: Bot, event: GroupMessageEvent, state: T_State = State()
     sub_list = config.list_subscribe(event.group_id, "group")
     res = "订阅的帐号为：\n"
     state["sub_table"] = {}
+    if not sub_list:
+        await del_sub_cmd.finish("当前无订阅")
     for index, sub in enumerate(sub_list, 1):
         state["sub_table"][index] = {
             "target_type": sub["target_type"],
