@@ -10,8 +10,8 @@ version = "0.15.2"
 [tool.poetry.dependencies]
 python = "^3.9"
 nb-cli = "^0.5.0"
-nonebot2 = { git = "https://github.com/nonebot/nonebot2.git", branch = "dev" }
-nonebot-adapter-onebot = { git = "https://github.com/nonebot/adapter-onebot" }
+nonebot2 = "^2.0.0b1"
+nonebot-adapter-onebot = "^2.0.0b1"
 nonebot-plugin-apscheduler = "^0.1.2"
 nonebot-plugin-sentry = "^0.2.2"
 tencentcloud-sdk-python = "^3.0.434"
@@ -25,7 +25,7 @@ psutil = "^5.8.0"
 [tool.poetry.dev-dependencies]
 black = "^21.8b0"
 isort = "^5.9.3"
-nonebug = { git = "https://github.com/nonebot/nonebug" }
+nonebug = "^0.2.0"
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"
