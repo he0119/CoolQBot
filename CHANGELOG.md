@@ -7,10 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
-### Added
-
-- 添加最终幻想XIV查价功能
-
 ### Changed
 
 - 利用新版 NoneBot2(beta1) 特性简化帮助
@@ -19,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Removed
 
 - 删除 公主连结Re:Dive 插件中定时推送功能
+
+## [0.15.3] - 2021-12-19
+
+### Added
+
+- 添加最终幻想XIV查价功能
 
 ## [0.15.2] - 2021-11-21
 
@@ -426,7 +428,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.15.2...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.15.3...HEAD
+[0.15.3]: https://github.com/he0119/CoolQBot/compare/v0.15.2...v0.15.3
 [0.15.2]: https://github.com/he0119/CoolQBot/compare/v0.15.1...v0.15.2
 [0.15.1]: https://github.com/he0119/CoolQBot/compare/v0.15.0...v0.15.1
 [0.15.0]: https://github.com/he0119/CoolQBot/compare/v0.14.1...v0.15.0
