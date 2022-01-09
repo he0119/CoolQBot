@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -39,6 +40,9 @@ async def test_calendar(
     from src.plugins.pcr import calendar_cmd
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
+    mocked_datetime = mocker.patch("src.plugins.pcr.data.datetime")
+    mocked_datetime.now.return_value = datetime(2022, 1, 8)
+    mocked_datetime.strptime = datetime.strptime
 
     async with app.test_matcher(calendar_cmd) as ctx:
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
@@ -56,3 +60,4 @@ async def test_calendar(
     get.assert_called_once_with(
         "https://pcrbot.github.io/calendar-updater-action/cn.json"
     )
+    assert mocked_datetime.now.call_count == 2
