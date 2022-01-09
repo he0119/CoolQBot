@@ -433,7 +433,7 @@ python-versions = "*"
 
 [[package]]
 name = "nb-cli"
-version = "0.5.1"
+version = "0.6.2"
 description = "CLI for nonebot2"
 category = "main"
 optional = false
@@ -444,7 +444,7 @@ click = ">=8.0.0,<9.0.0"
 colorama = ">=0.4.3,<0.5.0"
 cookiecutter = ">=1.7.2,<2.0.0"
 httpx = ">=0.18.0,<1.0.0"
-nonebot2 = ">=2.0.0-alpha.14,<3.0.0"
+nonebot2 = ">=2.0.0-beta.1,<3.0.0"
 prompt-toolkit = ">=3.0.19,<4.0.0"
 pyfiglet = ">=0.8.post1,<0.9"
 tomlkit = ">=0.7.0,<0.8.0"
@@ -1131,7 +1131,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "41feb924149f0abd2fe607b7537a729d0c0d2ca42175ff048e1a8709f5859137"
+content-hash = "404e71fcae4fd6ce527a6b9eef989af3050712f0751266d7c0def223330ed735"
 
 [metadata.files]
 anyio = [
@@ -1465,8 +1465,8 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
 nb-cli = [
-    {file = "nb-cli-0.5.1.tar.gz", hash = "sha256:b3f31e1d2fe4e3d6551cf9dcb0843ebc53503df63baf017b51347673ad10c1e4"},
-    {file = "nb_cli-0.5.1-py3-none-any.whl", hash = "sha256:c47cbdb106db6b2ae5fe4ff538775da8c8f2d17f535432b13eb23ad1889c2fc2"},
+    {file = "nb-cli-0.6.2.tar.gz", hash = "sha256:2d3882b22ceb6f05b0461904f7c40c1ed5b6557c2eabdd44527aedb30dd85d04"},
+    {file = "nb_cli-0.6.2-py3-none-any.whl", hash = "sha256:ad3dc7e048e460dc756546581e2e40a0ab706890aae7a35ef3b6c689e6def095"},
 ]
 nonebot-adapter-onebot = [
     {file = "nonebot-adapter-onebot-2.0.0b1.tar.gz", hash = "sha256:9dad770371e577fead096ceacacc43b3ef304a8e238e8fff1163eefc4e947a75"},
