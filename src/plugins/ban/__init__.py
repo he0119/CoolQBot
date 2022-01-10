@@ -13,7 +13,7 @@ from nonebot.adapters.onebot.v11.event import (
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, CommandArg, Depends
 
-from src.utils.helpers import render_expression
+from src.utils.helpers import check_number, render_expression
 
 # region 禁言
 EXPR_OK = (
@@ -66,17 +66,15 @@ ban_cmd.__doc__ = """
 """
 
 
-async def get_duration(duration: str = ArgPlainText()) -> int:
+async def get_duration(matcher: Matcher, duration: str = ArgPlainText()) -> int:
     """检查输入参数是不是数字"""
-    if not duration.isdigit():
-        await ban_cmd.reject_arg("duratioin", "请只输入数字，不然我没法理解呢！")
+    await check_number(duration, matcher)
     return int(duration)
 
 
-async def get_group_id(group_id: str = ArgPlainText()) -> int:
+async def get_group_id(matcher: Matcher, group_id: str = ArgPlainText()) -> int:
     """检查输入参数是不是数字"""
-    if not group_id.isdigit():
-        await ban_cmd.reject_arg("group_id", "请只输入数字，不然我没法理解呢！")
+    await check_number(group_id, matcher)
     return int(group_id)
 
 

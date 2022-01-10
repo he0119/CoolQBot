@@ -55,7 +55,7 @@ def groupidtostr(val: list[int]) -> str:
     return " ".join(map(str, val))
 
 
-async def check_number(number: str, matcher: Matcher) -> None:
+async def check_number(input: str, matcher: Matcher) -> None:
     """检查输入的数字是否合法"""
-    if not number.isdigit():
+    if not input.isdigit():
         await matcher.reject("请只输入数字，不然我没法理解呢！")
