@@ -18,9 +18,9 @@ tencentcloud-sdk-python = "^3.0.434"
 tinydb = "^4.3.0"
 beautifulsoup4 = "^4.9.3"
 feedparser = "^6.0.2"
-pyppeteer = "^1.0.0"
 pillow = "^9.0.0"
 psutil = "^5.8.0"
+playwright = "^1.17.2"
 
 [tool.poetry.dev-dependencies]
 black = "^21.8b0"

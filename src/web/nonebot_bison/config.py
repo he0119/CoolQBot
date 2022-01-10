@@ -169,10 +169,9 @@ def start_up():
     config = Config()
     if not (search_res := config.kv_config.search(Query().name == "version")):
         config.kv_config.insert({"name": "version", "value": config.migrate_version})
-    elif search_res[0].get("value") < config.migrate_version:
+    elif cur_version := search_res[0]["value"] < config.migrate_version:
         query = Query()
         version_query = query.name == "version"
-        cur_version = search_res[0].get("value")
         if cur_version == 1:
             cur_version = 2
             for user_conf in config.user_target.all():

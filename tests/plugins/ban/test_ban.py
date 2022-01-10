@@ -218,3 +218,54 @@ async def test_ban_group_get_arg(
         ctx.should_finished()
 
     render_expression.assert_called_once_with(EXPR_OK, duration=1)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
+async def test_ban_group_get_arg_invalid(
+    app: App,
+    mocker: MockerFixture,
+):
+    """测试群聊天，获取参数禁言 1 分钟，第一次参数错误
+
+    机器人为普通群员，禁言对象为管理员或普通群员
+    """
+    from nonebot import get_driver
+    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
+    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+
+    from src.plugins.ban import EXPR_OK, ban_cmd
+
+    render_expression = mocker.patch("src.plugins.ban.render_expression")
+    render_expression.return_value = Message("test")
+    sender = {"role": "member"}
+
+    async with app.test_matcher(ban_cmd) as ctx:
+        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
+        bot = make_fake_bot(Bot)(adapter, "1")
+        event = fake_group_message_event(message=Message("/ban"), sender=sender)
+        next_event = fake_group_message_event(message=Message("a"), sender=sender)
+        final_event = fake_group_message_event(message=Message("1"), sender=sender)
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
+        ctx.should_call_api(
+            "get_group_member_info",
+            data={"group_id": 10000, "user_id": 1},
+            result={"role": "owner"},
+        )
+        ctx.should_call_send(event, "你想被禁言多少分钟呢？", "result")
+        ctx.should_rejected()
+        ctx.receive_event(bot, next_event)
+        ctx.should_call_send(next_event, "请只输入数字，不然我没法理解呢！", "result")
+        ctx.should_rejected()
+        ctx.receive_event(bot, final_event)
+        ctx.should_call_api(
+            "set_group_ban",
+            data={"group_id": 10000, "user_id": 10, "duration": 60},
+            result=[],
+        )
+        ctx.should_call_send(final_event, Message("test"), "result", at_sender=True)
+        ctx.should_finished()
+
+    render_expression.assert_called_once_with(EXPR_OK, duration=1)

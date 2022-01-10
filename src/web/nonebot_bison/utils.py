@@ -4,15 +4,12 @@ import os
 import re
 from html import escape
 from time import asctime
-from typing import Awaitable, Callable, Optional
+from typing import Optional
 
 from bs4 import BeautifulSoup as bs
 from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.log import logger
-from pyppeteer import connect, launch
-from pyppeteer.browser import Browser
-from pyppeteer.chromium_downloader import check_chromium, download_chromium
-from pyppeteer.page import Page
+from playwright.async_api import async_playwright
 
 from .plugin_config import plugin_config
 
@@ -26,54 +23,20 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-if (
-    not plugin_config.bison_browser
-    and not plugin_config.bison_use_local
-    and not check_chromium()
-):
-    os.environ["PYPPETEER_DOWNLOAD_HOST"] = "http://npm.taobao.org/mirrors"
-    download_chromium()
-
-
 class Render(metaclass=Singleton):
     def __init__(self):
-        self.lock = asyncio.Lock()
-        self.browser: Browser
         self.interval_log = ""
         self.remote_browser = False
-
-    async def get_browser(self) -> Browser:
-        if plugin_config.bison_browser:
-            if plugin_config.bison_browser.startswith("local:"):
-                path = plugin_config.bison_browser.split("local:", 1)[1]
-                return await launch(executablePath=path, args=["--no-sandbox"])
-            if plugin_config.bison_browser.startswith("ws:"):
-                self.remote_browser = True
-                return await connect(browserWSEndpoint=plugin_config.bison_browser)
-            raise RuntimeError("bison_BROWSER error")
-        if plugin_config.bison_use_local:
-            return await launch(
-                executablePath="/usr/bin/chromium", args=["--no-sandbox"]
-            )
-        return await launch(args=["--no-sandbox"])
-
-    async def close_browser(self):
-        if not self.remote_browser:
-            await self.browser.close()
 
     async def render(
         self,
         url: str,
-        viewport: Optional[dict] = None,
         target: Optional[str] = None,
-        operation: Optional[Callable[[Page], Awaitable[None]]] = None,
     ) -> Optional[bytes]:
         retry_times = 0
         while retry_times < 3:
             try:
-                return await asyncio.wait_for(
-                    self.do_render(url, viewport, target, operation), 20
-                )
+                return await asyncio.wait_for(self.do_render(url, target), 20)
             except asyncio.TimeoutError:
                 retry_times += 1
                 logger.warning(
@@ -90,33 +53,23 @@ class Render(metaclass=Singleton):
     async def do_render(
         self,
         url: str,
-        viewport: Optional[dict] = None,
         target: Optional[str] = None,
-        operation: Optional[Callable[[Page], Awaitable[None]]] = None,
     ) -> Optional[bytes]:
-        async with self.lock:
-            self.browser = await self.get_browser()
+        async with async_playwright() as p:
+            browser = await p.chromium.launch()
             self._inter_log("open browser")
-            page = await self.browser.newPage()
-            if operation:
-                await operation(page)
-            else:
-                await page.goto(url)
+            page = await browser.new_page()
+            await page.goto(url)
             self._inter_log("open page")
-            if viewport:
-                await page.setViewport(viewport)
-                self._inter_log("set viewport")
             if target:
-                target_ele = await page.querySelector(target)
+                target_ele = await page.query_selector(target)
                 if not target_ele:
                     return None
-                data = await target_ele.screenshot(type="jpeg", encoding="binary")
+                data = await target_ele.screenshot(type="jpeg")
             else:
-                data = await page.screenshot(type="jpeg", encoding="binary")
+                data = await page.screenshot(type="jpeg")
             self._inter_log("screenshot")
-            await page.close()
-            self._inter_log("close page")
-            await self.close_browser()
+            await browser.close()
             self._inter_log("close browser")
             assert isinstance(data, bytes)
             return data
@@ -135,9 +88,7 @@ class Render(metaclass=Singleton):
 
     async def text_to_pic_cqcode(self, text: str) -> MessageSegment:
         data = await self.text_to_pic(text)
-        # logger.debug('file size: {}'.format(len(data)))
         if data:
-            # logger.debug(code)
             return MessageSegment.image(data)
         else:
             return MessageSegment.text("生成图片错误")
