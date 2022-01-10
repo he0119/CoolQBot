@@ -31,7 +31,9 @@ jobs:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
       - name: Install prerequisites
-        run: poetry install
+        run: |
+          poetry install
+          playwright install chromium
       - name: Run tests
         run: poetry run pytest --cov=src --cov-report xml --junitxml=TEST-pytest.xml -n auto
       - name: Upload Test Results
