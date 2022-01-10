@@ -518,7 +518,7 @@ all = ["Quart (>=0.16.0,<0.17.0)", "aiohttp[speedups] (>=3.7.4,<4.0.0)", "httpx[
 type = "git"
 url = "https://github.com/nonebot/nonebot2.git"
 reference = "dev"
-resolved_reference = "a14cfc8d772c18ec8132505bb8e99f2b7fd63ea7"
+resolved_reference = "00de3bcc547683c8da6f9c8c8657049363ef7c68"
 
 [[package]]
 name = "nonebug"
@@ -926,7 +926,7 @@ full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests", "gra
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.560"
+version = "3.0.561"
 description = "Tencent Cloud SDK for Python"
 category = "main"
 optional = false
@@ -1749,8 +1749,8 @@ starlette = [
     {file = "starlette-0.16.0.tar.gz", hash = "sha256:e1904b5d0007aee24bdd3c43994be9b3b729f4f58e740200de1d623f8c3a8870"},
 ]
 tencentcloud-sdk-python = [
-    {file = "tencentcloud-sdk-python-3.0.560.tar.gz", hash = "sha256:8b3de2dc63ae262012dd4b8c55d17887199ff94fba2692c6d27dfad6ecc01693"},
-    {file = "tencentcloud_sdk_python-3.0.560-py2.py3-none-any.whl", hash = "sha256:47f581e93c1a3a8209e6786f6f1b65b7273b461938dc1d2570ff6a5dbb0ad7a7"},
+    {file = "tencentcloud-sdk-python-3.0.561.tar.gz", hash = "sha256:2d0fa6792ff421b9c91d088ad94186029fbb311ed3c6ef2a214bd8a72eee348f"},
+    {file = "tencentcloud_sdk_python-3.0.561-py2.py3-none-any.whl", hash = "sha256:9d70f5d3d8393322df13f6763aa1d103ae0a95378c99791e45636bd9af2281dc"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},

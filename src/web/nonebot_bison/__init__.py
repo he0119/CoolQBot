@@ -12,8 +12,7 @@ from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.adapters.onebot.v11.message import Message
 from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
 from nonebot.log import logger
-from nonebot.matcher import Matcher
-from nonebot.params import Arg, ArgStr, Depends, State
+from nonebot.params import Arg, Depends
 from nonebot.permission import SUPERUSER
 from nonebot.typing import T_State
 
@@ -46,7 +45,7 @@ add_sub_cmd.__doc__ = """
 
 
 @add_sub_cmd.handle()
-async def init_promote(event: GroupMessageEvent, state: T_State = State()):
+async def init_promote(event: GroupMessageEvent, state: T_State):
     state["_prompt"] = (
         "请输入想要订阅的平台，目前支持：\n"
         + "".join(
@@ -59,7 +58,7 @@ async def init_promote(event: GroupMessageEvent, state: T_State = State()):
     )
 
 
-async def parse_platform(event: GroupMessageEvent, state: T_State = State()) -> None:
+async def parse_platform(event: GroupMessageEvent, state: T_State) -> None:
     platform = event.get_plaintext().strip()
     if platform == "全部":
         message = "全部平台\n" + "\n".join(
@@ -76,7 +75,7 @@ async def parse_platform(event: GroupMessageEvent, state: T_State = State()) -> 
 
 
 @add_sub_cmd.got("platform", Message.template("{_prompt}"), [Depends(parse_platform)])
-async def init_id(platform: str = Arg(), state: T_State = State()):
+async def init_id(state: T_State, platform: str = Arg()):
     if platform_manager[platform].has_target:  # type: ignore
         state["_prompt"] = "请输入订阅用户的 ID"
     else:
@@ -84,7 +83,7 @@ async def init_id(platform: str = Arg(), state: T_State = State()):
         state["name"] = await platform_manager[platform].get_target_name(Target(""))
 
 
-async def parse_id(event: GroupMessageEvent, state: T_State = State()):
+async def parse_id(event: GroupMessageEvent, state: T_State):
     target = str(event.get_message()).strip()
     try:
         name = await check_sub_target(state["platform"], target)
@@ -99,7 +98,7 @@ async def parse_id(event: GroupMessageEvent, state: T_State = State()):
 
 
 @add_sub_cmd.got("id", Message.template("{_prompt}"), [Depends(parse_id)])
-async def init_cat(event: GroupMessageEvent, state: T_State = State()):
+async def init_cat(event: GroupMessageEvent, state: T_State):
     if not platform_manager[state["platform"]].categories:
         state["cats"] = []
         return
@@ -108,7 +107,7 @@ async def init_cat(event: GroupMessageEvent, state: T_State = State()):
     )
 
 
-async def parser_cats(event: GroupMessageEvent, state: T_State = State()):
+async def parser_cats(event: GroupMessageEvent, state: T_State):
     if not isinstance(state["cats"], Message):
         return
     res = []
@@ -120,14 +119,14 @@ async def parser_cats(event: GroupMessageEvent, state: T_State = State()):
 
 
 @add_sub_cmd.got("cats", Message.template("{_prompt}"), [Depends(parser_cats)])
-async def init_tag(event: GroupMessageEvent, state: T_State = State()):
+async def init_tag(event: GroupMessageEvent, state: T_State):
     if not platform_manager[state["platform"]].enable_tag:
         state["tags"] = []
         return
     state["_prompt"] = '请输入要订阅的标签，以逗号分隔，订阅所有标签输入"全部标签"'
 
 
-async def parser_tags(event: GroupMessageEvent, state: T_State = State()):
+async def parser_tags(event: GroupMessageEvent, state: T_State):
     if not isinstance(state["tags"], Message):
         return
     if str(event.get_message()).strip() == "全部标签":
@@ -139,7 +138,7 @@ async def parser_tags(event: GroupMessageEvent, state: T_State = State()):
 
 
 @add_sub_cmd.got("tags", Message.template("{_prompt}"), [Depends(parser_tags)])
-async def add_sub_process(event: GroupMessageEvent, state: T_State = State()):
+async def add_sub_process(event: GroupMessageEvent, state: T_State):
     config = Config()
     config.add_subscribe(
         state.get("_user_id") or event.group_id,
@@ -165,7 +164,7 @@ query_sub_cmd.__doc__ = """
 
 
 @query_sub_cmd.handle()
-async def _(event: GroupMessageEvent, state: T_State = State()):
+async def _(event: GroupMessageEvent, state: T_State):
     config: Config = Config()
     sub_list = config.list_subscribe(state.get("_user_id") or event.group_id, "group")
     res = ["订阅的帐号为："]
@@ -200,7 +199,7 @@ del_sub_cmd.__doc__ = """
 
 
 @del_sub_cmd.handle()
-async def send_list(bot: Bot, event: GroupMessageEvent, state: T_State = State()):
+async def send_list(bot: Bot, event: GroupMessageEvent, state: T_State):
     config: Config = Config()
     sub_list = config.list_subscribe(event.group_id, "group")
     res = "订阅的帐号为：\n"
@@ -228,7 +227,7 @@ async def send_list(bot: Bot, event: GroupMessageEvent, state: T_State = State()
 
 
 @del_sub_cmd.receive()
-async def do_del(event: GroupMessageEvent, state: T_State = State()):
+async def do_del(event: GroupMessageEvent, state: T_State):
     try:
         index = int(str(event.get_message()).strip())
         config = Config()
