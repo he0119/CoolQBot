@@ -1,4 +1,3 @@
-import base64
 from dataclasses import dataclass, field
 from functools import reduce
 from io import BytesIO
@@ -108,7 +107,7 @@ class Post:
         target_io = BytesIO()
         target.save(target_io, "JPEG")
         self.pics = self.pics[matrix[0] * matrix[1] :]
-        self.pics.insert(0, target_io.getvalue())
+        self.pics.insert(0, target_io.getvalue())  # type: ignore
 
     async def generate_messages(self):
         if self._message is None:
