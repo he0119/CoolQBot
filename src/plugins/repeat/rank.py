@@ -56,6 +56,7 @@ class Ranking:
         self.display_total_number = display_total_number
         self.repeat_list = repeat_list
         self.msg_number_list = msg_number_list
+        self._nickname_cache = {}
 
     async def ranking(self):
         """合并两个排行榜"""
@@ -117,6 +118,15 @@ class Ranking:
         return repeat_rate
 
     async def nikcname(self, user_id):
+        """输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称"""
+        if user_id in self._nickname_cache:
+            return self._nickname_cache[user_id]
+        else:
+            name = await self._nikcname(user_id)
+            self._nickname_cache[user_id] = name
+            return name
+
+    async def _nikcname(self, user_id):
         """输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称"""
         try:
             msg = await self.bot.get_group_member_info(
