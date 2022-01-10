@@ -2,7 +2,7 @@
     "python.analysis.typeCheckingMode": "basic",
     "git.detectSubmodules": false,
     "python.testing.pytestArgs": [
-        "tests"
+        "tests", "-n", "auto"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
