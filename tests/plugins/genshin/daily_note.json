@@ -1,0 +1,46 @@
+{
+    "retcode": 0,
+    "message": "OK",
+    "data": {
+        "current_resin": 93,
+        "max_resin": 160,
+        "resin_recovery_time": "32065",
+        "finished_task_num": 0,
+        "total_task_num": 4,
+        "is_extra_task_reward_received": false,
+        "remain_resin_discount_num": 0,
+        "resin_discount_num_limit": 3,
+        "current_expedition_num": 5,
+        "max_expedition_num": 5,
+        "expeditions": [
+            {
+                "avatar_side_icon": "https://upload-bbs.mihoyo.com/game_record/genshin/character_side_icon/UI_AvatarIcon_Side_Fischl.png",
+                "status": "Ongoing",
+                "remained_time": "14553"
+            },
+            {
+                "avatar_side_icon": "https://upload-bbs.mihoyo.com/game_record/genshin/character_side_icon/UI_AvatarIcon_Side_Bennett.png",
+                "status": "Ongoing",
+                "remained_time": "14553"
+            },
+            {
+                "avatar_side_icon": "https://upload-bbs.mihoyo.com/game_record/genshin/character_side_icon/UI_AvatarIcon_Side_Keqing.png",
+                "status": "Ongoing",
+                "remained_time": "14553"
+            },
+            {
+                "avatar_side_icon": "https://upload-bbs.mihoyo.com/game_record/genshin/character_side_icon/UI_AvatarIcon_Side_Chongyun.png",
+                "status": "Ongoing",
+                "remained_time": "14553"
+            },
+            {
+                "avatar_side_icon": "https://upload-bbs.mihoyo.com/game_record/genshin/character_side_icon/UI_AvatarIcon_Side_Sara.png",
+                "status": "Ongoing",
+                "remained_time": "14553"
+            }
+        ],
+        "current_home_coin": 960,
+        "max_home_coin": 2400,
+        "home_coin_recovery_time": "174161"
+    }
+}
