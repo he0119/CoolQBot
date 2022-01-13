@@ -7,12 +7,15 @@ import json
 import random
 import time
 from datetime import timedelta
+from inspect import cleandoc
 from typing import Any, Optional
 from urllib.parse import urlencode
 
 import httpx
 from pydantic import BaseModel
 from pydantic.networks import AnyHttpUrl
+
+from src.utils.helpers import timedelta_to_chinese
 
 
 class GameRole(BaseModel):
@@ -113,17 +116,14 @@ class Genshin:
                 if role.region == "cn_gf01":
                     return role
 
-    async def daily_note(self) -> str:
-        """实时便笺信息"""
+    async def get_daily_note(self, role: GameRole) -> Optional[DailyNote]:
+        """获取实时便笺信息"""
         url = (
             "https://api-takumi-record.mihoyo.com/game_record/app/genshin/api/dailyNote"
         )
         referer = (
             "https://webstatic.mihoyo.com/app/community-game-records/index.html?v=6"
         )
-        role = await self.get_game_role()
-        if not role:
-            return "没有找到角色信息"
 
         params = {"role_id": role.game_uid, "server": role.region}
         async with httpx.AsyncClient() as client:
@@ -134,6 +134,44 @@ class Genshin:
             )
             rjson = r.json()
             if rjson["retcode"] == 0:
-                note = DailyNote.parse_obj(rjson["data"])
+                return DailyNote.parse_obj(rjson["data"])
 
-        return "失败"
+    async def daily_note(self) -> str:
+        """实时便笺信息"""
+        role = await self.get_game_role()
+        if not role:
+            return "没有找到角色信息，请检查账号是否正确"
+
+        note = await self.get_daily_note(role)
+        if not note:
+            return "获取实时便笺失败，请稍后再试"
+
+        expeditions = ""
+        for i, expedition in enumerate(note.expeditions, 1):
+            if expedition.status == "Ongoing":
+                expeditions += (
+                    f"\n角色{i}: {timedelta_to_chinese(expedition.remained_time)}后完成派遣"
+                )
+            elif expedition.status == "Finished":
+                expeditions += f"\n角色{i}: 已完成派遣"
+
+        # 每日委托奖励的说明
+        if note.is_extra_task_reward_received == True:
+            extra_task_reward_description = "已领取「每日委托」奖励"
+        elif note.finished_task_num != note.total_task_num:
+            extra_task_reward_description = "今日完成委托次数不足"
+        else:
+            extra_task_reward_description = "「每日委托」奖励待领取"
+
+        return (
+            cleandoc(
+                f"""
+            原粹树脂: {note.current_resin}/{note.max_resin} ({timedelta_to_chinese(note.resin_recovery_time)}后全部恢复)
+            洞天宝钱: {note.current_home_coin}/{note.max_home_coin} ({timedelta_to_chinese(note.home_coin_recovery_time)}后达到存储上限)
+            每日委托任务: {note.finished_task_num}/{note.total_task_num} ({extra_task_reward_description})
+            值得铭记的强敌: {note.remain_resin_discount_num}/{note.resin_discount_num_limit}
+            探索派遣: {note.current_expedition_num}/{note.max_expedition_num}
+            """
+            )
+            + expeditions
+        )

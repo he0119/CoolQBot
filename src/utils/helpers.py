@@ -1,4 +1,5 @@
 import random
+from datetime import timedelta
 from typing import Sequence
 
 from nonebot.adapters.onebot.v11 import Message
@@ -59,3 +60,27 @@ async def check_number(input: str, matcher: Matcher) -> None:
     """检查输入的数字是否合法"""
     if not input.isdigit():
         await matcher.reject("请只输入数字，不然我没法理解呢！")
+
+
+def timedelta_to_chinese(timedelta: timedelta) -> str:
+    """将 timedelta 转换为中文时间"""
+    days = timedelta.days
+    hours = timedelta.seconds // 3600
+    minutes = (timedelta.seconds % 3600) // 60
+    seconds = timedelta.seconds % 60
+
+    time_str = ""
+    if days:
+        if days == 1:
+            time_str += "明天"
+        elif days == 2:
+            time_str += "后天"
+        else:
+            time_str += f"{days}天"
+    if hours:
+        time_str += f"{hours}小时"
+    if minutes:
+        time_str += f"{minutes}分钟"
+    if seconds:
+        time_str += f"{seconds}秒"
+    return time_str
