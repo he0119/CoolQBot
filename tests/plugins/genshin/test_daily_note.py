@@ -45,12 +45,15 @@ async def test_daily_note(
     from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.genshin import daily_note_cmd
+    from src.plugins.genshin.config import set_cookie
+
+    set_cookie(10, "test")
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
     async with app.test_matcher(daily_note_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/原神.便笺"))
+        event = fake_group_message_event(message=Message("/ys.dailynote"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -61,3 +64,23 @@ async def test_daily_note(
         ctx.should_finished()
 
     assert get.call_count == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("app", [("src.plugins.genshin",)], indirect=True)
+async def test_daily_note_not_bind(
+    app: App,
+    mocker: MockerFixture,
+):
+    """测试原神实时便笺，未绑定账号"""
+    from nonebot.adapters.onebot.v11 import Message
+
+    from src.plugins.genshin import daily_note_cmd
+
+    async with app.test_matcher(daily_note_cmd) as ctx:
+        bot = ctx.create_bot()
+        event = fake_group_message_event(message=Message("/ys.dailynote"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "你还没有绑定账号，请私聊机器人绑定账号绑定后查询", "")
+        ctx.should_finished()

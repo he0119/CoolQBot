@@ -15,7 +15,9 @@ genshin = CommandGroup("ys")
 
 # region 绑定账号
 bind_cmd = genshin.command(
-    "bind", aliases={("原神", "绑定"), ("ys", "绑定账号")}, permission=PRIVATE
+    "bind",
+    aliases={("原神", "绑定"), ("原神", "绑定账号")},
+    permission=PRIVATE,
 )
 bind_cmd.__doc__ = """
 原神
@@ -45,7 +47,10 @@ async def bind_handle(event: PrivateMessageEvent, cookie: str = ArgPlainText()):
 # endregion
 
 # region 实时便笺
-daily_note_cmd = genshin.command("dailynote", aliases={("原神", "实时便笺"), ("ys", "便笺")})
+daily_note_cmd = genshin.command(
+    "dailynote",
+    aliases={("原神", "实时便笺"), ("原神", "便笺")},
+)
 daily_note_cmd.__doc__ = """
 原神 实时便笺
 
@@ -57,8 +62,9 @@ daily_note_cmd.__doc__ = """
 @daily_note_cmd.handle()
 async def daily_note(event: MessageEvent):
     """实时便笺信息"""
-    if cookie := get_cookie(event.user_id):
-        await daily_note_cmd.finish("你还没有绑定账号，请私聊机器人 /原神.绑定")
+    cookie = get_cookie(event.user_id)
+    if not cookie:
+        await daily_note_cmd.finish("你还没有绑定账号，请私聊机器人绑定账号绑定后查询")
 
     genshin = Genshin(cookie)
     note = await genshin.daily_note()
