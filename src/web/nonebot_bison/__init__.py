@@ -1,7 +1,7 @@
 """ nonebot-bison
 
 修改自 https://github.com/felinae98/nonebot-bison
-基于 0.4.0 版本
+基于 0.4.3 版本
 """
 import re
 

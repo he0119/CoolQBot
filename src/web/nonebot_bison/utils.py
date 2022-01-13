@@ -2,14 +2,17 @@ import asyncio
 import base64
 import os
 import re
+import subprocess
 from html import escape
 from time import asctime
-from typing import Optional
+from typing import Awaitable, Callable, Optional
 
+import nonebot
 from bs4 import BeautifulSoup as bs
 from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.log import logger
-from playwright.async_api import async_playwright
+from playwright._impl._driver import compute_driver_executable
+from playwright.async_api import Browser, Page, Playwright, async_playwright
 
 from .plugin_config import plugin_config
 
@@ -23,20 +26,59 @@ class Singleton(type):
         return cls._instances[cls]
 
 
+@nonebot.get_driver().on_startup
+def download_browser():
+    if not plugin_config.bison_browser and not plugin_config.bison_use_local:
+        env = os.environ.copy()
+        driver_executable = compute_driver_executable()
+        env["PW_CLI_TARGET_LANG"] = "python"
+        subprocess.run([str(driver_executable), "install", "chromium"], env=env)
+
+
 class Render(metaclass=Singleton):
     def __init__(self):
+        self.lock = asyncio.Lock()
+        self.browser: Browser
         self.interval_log = ""
         self.remote_browser = False
+
+    async def get_browser(self, playwright: Playwright) -> Browser:
+        if plugin_config.bison_browser:
+            if plugin_config.bison_browser.startswith("local:"):
+                path = plugin_config.bison_browser.split("local:", 1)[1]
+                return await playwright.chromium.launch(
+                    executable_path=path, args=["--no-sandbox"]
+                )
+            if plugin_config.bison_browser.startswith("ws:"):
+                self.remote_browser = True
+                return await playwright.chromium.connect_over_cdp(
+                    plugin_config.bison_browser
+                )
+            raise RuntimeError("bison_BROWSER error")
+        if plugin_config.bison_use_local:
+            return await playwright.chromium.launch(
+                executable_path="/usr/bin/chromium", args=["--no-sandbox"]
+            )
+        return await playwright.chromium.launch(args=["--no-sandbox"])
+
+    async def close_browser(self):
+        if not self.remote_browser:
+            await self.browser.close()
 
     async def render(
         self,
         url: str,
+        viewport: Optional[dict] = None,
         target: Optional[str] = None,
+        operation: Optional[Callable[[Page], Awaitable[None]]] = None,
     ) -> Optional[bytes]:
         retry_times = 0
+        self.interval_log = ""
         while retry_times < 3:
             try:
-                return await asyncio.wait_for(self.do_render(url, target), 20)
+                return await asyncio.wait_for(
+                    self.do_render(url, viewport, target, operation), 20
+                )
             except asyncio.TimeoutError:
                 retry_times += 1
                 logger.warning(
@@ -53,26 +95,44 @@ class Render(metaclass=Singleton):
     async def do_render(
         self,
         url: str,
+        viewport: Optional[dict] = None,
         target: Optional[str] = None,
+        operation: Optional[Callable[[Page], Awaitable[None]]] = None,
     ) -> Optional[bytes]:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch()
-            self._inter_log("open browser")
-            page = await browser.new_page()
-            await page.goto(url)
-            self._inter_log("open page")
-            if target:
-                target_ele = await page.query_selector(target)
-                if not target_ele:
-                    return None
-                data = await target_ele.screenshot(type="jpeg")
-            else:
-                data = await page.screenshot(type="jpeg")
-            self._inter_log("screenshot")
-            await browser.close()
-            self._inter_log("close browser")
-            assert isinstance(data, bytes)
-            return data
+        async with self.lock:
+            async with async_playwright() as playwright:
+                self.browser = await self.get_browser(playwright)
+                self._inter_log("open browser")
+                if viewport:
+                    constext = await self.browser.new_context(
+                        viewport={
+                            "width": viewport["width"],
+                            "height": viewport["height"],
+                        },
+                        device_scale_factor=viewport.get("deviceScaleFactor", 1),
+                    )
+                    page = await constext.new_page()
+                else:
+                    page = await self.browser.new_page()
+                if operation:
+                    await operation(page)
+                else:
+                    await page.goto(url)
+                self._inter_log("open page")
+                if target:
+                    target_ele = page.locator(target)
+                    if not target_ele:
+                        return None
+                    data = await target_ele.screenshot(type="jpeg")
+                else:
+                    data = await page.screenshot(type="jpeg")
+                self._inter_log("screenshot")
+                await page.close()
+                self._inter_log("close page")
+                await self.close_browser()
+                self._inter_log("close browser")
+                assert isinstance(data, bytes)
+                return data
 
     async def text_to_pic(self, text: str) -> Optional[bytes]:
         lines = text.split("\n")
@@ -88,7 +148,9 @@ class Render(metaclass=Singleton):
 
     async def text_to_pic_cqcode(self, text: str) -> MessageSegment:
         data = await self.text_to_pic(text)
+        # logger.debug('file size: {}'.format(len(data)))
         if data:
+            # logger.debug(code)
             return MessageSegment.image(data)
         else:
             return MessageSegment.text("生成图片错误")

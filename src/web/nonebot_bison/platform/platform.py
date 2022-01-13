@@ -2,11 +2,10 @@ import time
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass
-from functools import reduce
 from typing import Any, Collection, Literal, Optional
 
 import httpx
-from nonebot import logger
+from nonebot.log import logger
 
 from ..plugin_config import plugin_config
 from ..post import Post

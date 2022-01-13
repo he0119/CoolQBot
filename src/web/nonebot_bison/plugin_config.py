@@ -8,6 +8,8 @@ class PlugConfig(BaseSettings):
 
     bison_config_path: str = ""
     bison_use_pic: bool = False
+    bison_use_local: bool = False
+    bison_browser: str = ""
     bison_init_filter: bool = True
     bison_use_queue: bool = True
 
