@@ -17,6 +17,17 @@ genshin = CommandGroup("ys")
 bind_cmd = genshin.command(
     "bind", aliases={("原神", "绑定"), ("ys", "绑定账号")}, permission=PRIVATE
 )
+bind_cmd.__doc__ = """
+原神
+
+绑定账号
+/ys.bind
+绑定账号（直接附带 Cookie）
+/ys.bind cookie=1234567890
+
+获取 Cookie 的方法详见:
+https://github.com/Womsxd/YuanShen_User_Info
+"""
 
 
 @bind_cmd.handle()
@@ -34,7 +45,13 @@ async def bind_handle(event: PrivateMessageEvent, cookie: str = ArgPlainText()):
 # endregion
 
 # region 实时便笺
-daily_note_cmd = genshin.command("daily_note", aliases={("原神", "实时便笺"), ("ys", "便笺")})
+daily_note_cmd = genshin.command("dailynote", aliases={("原神", "实时便笺"), ("ys", "便笺")})
+daily_note_cmd.__doc__ = """
+原神 实时便笺
+
+获取实时便笺
+/ys.dailynote
+"""
 
 
 @daily_note_cmd.handle()
