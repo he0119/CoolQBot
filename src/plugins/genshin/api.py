@@ -163,15 +163,14 @@ class Genshin:
         else:
             extra_task_reward_description = "「每日委托」奖励待领取"
 
-        return (
-            cleandoc(
-                f"""
+        reply = cleandoc(
+            f"""
             原粹树脂: {note.current_resin}/{note.max_resin} ({timedelta_to_chinese(note.resin_recovery_time)}后全部恢复)
             洞天宝钱: {note.current_home_coin}/{note.max_home_coin} ({timedelta_to_chinese(note.home_coin_recovery_time)}后达到存储上限)
             每日委托任务: {note.finished_task_num}/{note.total_task_num} ({extra_task_reward_description})
             值得铭记的强敌: {note.remain_resin_discount_num}/{note.resin_discount_num_limit}
             探索派遣: {note.current_expedition_num}/{note.max_expedition_num}
             """
-            )
-            + expeditions
         )
+
+        return reply + expeditions
