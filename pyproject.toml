@@ -21,6 +21,8 @@ feedparser = "^6.0.2"
 pillow = "^9.0.0"
 psutil = "^5.8.0"
 playwright = "^1.17.2"
+nonebot-plugin-localstore = "^0.1.0"
+sqlmodel = "^0.0.6"
 
 [tool.poetry.dev-dependencies]
 black = "^21.8b0"

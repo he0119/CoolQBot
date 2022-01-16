@@ -8,8 +8,9 @@ from pathlib import Path
 from typing import IO, Any, Callable, Optional
 
 import httpx
-from nonebot import get_driver
 from nonebot.log import logger
+
+from .config import plugin_config
 
 
 class ConfigData:
@@ -136,37 +137,61 @@ class PluginData:
     def __init__(self, name: str) -> None:
         # 插件名，用来确定插件的文件夹位置
         self._name = name
-        self._base_path: Path = get_driver().config.data_dir_path / f"plugin-{name}"
-
-        # 如果文件夹不存在则自动新建
-        os.makedirs(self._base_path, exist_ok=True)
 
         # 插件配置
         self._config = None
 
     @property
+    def cache_dir(self) -> Path:
+        """缓存目录"""
+        path = plugin_config.cache_dir / self._name
+        # 如果文件夹不存在则自动新建
+        os.makedirs(path, exist_ok=True)
+        return path
+
+    @property
+    def data_dir(self) -> Path:
+        """缓存目录"""
+        path = plugin_config.data_dir / self._name
+        # 如果文件夹不存在则自动新建
+        os.makedirs(path, exist_ok=True)
+        return path
+
+    @property
     def config(self) -> ConfigData:
         """获取配置管理"""
         if not self._config:
-            self._config = ConfigData(self._base_path / f"{self._name}.ini")
+            self._config = ConfigData(self.data_dir / f"{self._name}.ini")
         return self._config
 
-    def save_pkl(self, data: object, filename: str) -> None:
-        with self.open(f"{filename}.pkl", "wb") as f:
+    def save_pkl(self, data: object, filename: str, cache=False) -> None:
+        with self.open(f"{filename}.pkl", "wb", cache=cache) as f:
             pickle.dump(data, f)
 
-    def load_pkl(self, filename: str) -> Any:
-        with self.open(f"{filename}.pkl", "rb") as f:
+    def load_pkl(self, filename: str, cache=False) -> Any:
+        with self.open(f"{filename}.pkl", "rb", cache=cache) as f:
             data = pickle.load(f)
         return data
 
-    def open(self, filename: str, open_mode: str = "r", encoding=None) -> IO:
-        path = self._base_path / filename
+    def open(
+        self,
+        filename: str,
+        open_mode: str = "r",
+        encoding=None,
+        cache=False,
+    ) -> IO:
+        if cache:
+            path = self.cache_dir / filename
+        else:
+            path = self.data_dir / filename
         return open(path, open_mode, encoding=encoding)
 
-    def exists(self, filename: str) -> bool:
+    def exists(self, filename: str, cache=False) -> bool:
         """判断文件是否存在"""
-        path = self._base_path / filename
+        if cache:
+            path = self.cache_dir / filename
+        else:
+            path = self.data_dir / filename
         return path.exists()
 
     def network_file(
