@@ -23,6 +23,7 @@ psutil = "^5.8.0"
 playwright = "^1.17.2"
 nonebot-plugin-localstore = "^0.1.0"
 sqlmodel = "^0.0.6"
+aiosqlite = "^0.17.0"
 
 [tool.poetry.dev-dependencies]
 black = "^21.8b0"

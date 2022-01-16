@@ -16,9 +16,10 @@ def app(
     import nonebot
 
     config = nonebot.get_driver().config
-    config.home_dir_path = tmp_path
     # 插件数据目录
-    config.data_dir_path = config.home_dir_path / "data"
+    config.cache_dir = tmp_path / "cache"
+    config.data_dir = tmp_path / "data"
+    config.database_url = f"sqlite+aiosqlite:///{tmp_path}/data.db"
 
     # 加载插件
     # 默认加载所有插件
@@ -29,3 +30,15 @@ def app(
         nonebot.load_from_toml("pyproject.toml")
 
     return App(monkeypatch)
+
+
+@pytest.fixture
+async def session(app: App):
+    from sqlmodel.ext.asyncio.session import AsyncSession
+
+    from src.plugins.datastore.db import engine, init_db
+
+    await init_db()
+
+    async with AsyncSession(engine) as session:
+        yield session

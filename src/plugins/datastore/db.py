@@ -1,16 +1,21 @@
+from typing import AsyncGenerator
+
 from nonebot import get_driver
-from sqlmodel import Session, SQLModel, create_engine
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel import SQLModel
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from .config import plugin_config
 
-engine = create_engine(plugin_config.database_url, echo=True)
+engine = create_async_engine(plugin_config.database_url, echo=True)
 
 
 @get_driver().on_startup
-def init_db():
-    SQLModel.metadata.create_all(engine)
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
 
 
-def get_session():
-    with Session(engine) as session:
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSession(engine) as session:
         yield session
