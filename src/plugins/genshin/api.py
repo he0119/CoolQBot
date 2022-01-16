@@ -163,12 +163,26 @@ class Genshin:
         else:
             extra_task_reward_description = "「每日委托」奖励待领取"
 
+        # 原粹树脂的说明
+        if note.resin_recovery_time:
+            resin_description = f"{timedelta_to_chinese(note.resin_recovery_time)}后全部恢复"
+        else:
+            resin_description = "已完全恢复"
+
+        # 洞天宝钱的说明
+        if note.home_coin_recovery_time:
+            home_coin_description = (
+                f"{timedelta_to_chinese(note.home_coin_recovery_time)}后达到存储上限"
+            )
+        else:
+            home_coin_description = "已满"
+
         reply = cleandoc(
             f"""
-            原粹树脂: {note.current_resin}/{note.max_resin} ({timedelta_to_chinese(note.resin_recovery_time)}后全部恢复)
-            洞天宝钱: {note.current_home_coin}/{note.max_home_coin} ({timedelta_to_chinese(note.home_coin_recovery_time)}后达到存储上限)
+            原粹树脂: {note.current_resin}/{note.max_resin} ({resin_description})
+            洞天宝钱: {note.current_home_coin}/{note.max_home_coin} ({home_coin_description})
             每日委托任务: {note.finished_task_num}/{note.total_task_num} ({extra_task_reward_description})
-            值得铭记的强敌: {note.remain_resin_discount_num}/{note.resin_discount_num_limit}
+            值得铭记的强敌: {note.remain_resin_discount_num}/{note.resin_discount_num_limit} (本周剩余消耗减半次数)
             探索派遣: {note.current_expedition_num}/{note.max_expedition_num}
             """
         )
