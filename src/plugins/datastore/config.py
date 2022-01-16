@@ -16,4 +16,4 @@ class Config(BaseModel, extra=Extra.ignore):
     database_url: str = f"sqlite:///{data_dir}/data.db"
 
 
-plugin_config = Config.parse_obj(get_driver().config)
+plugin_config = Config.parse_obj(get_driver().config.dict())

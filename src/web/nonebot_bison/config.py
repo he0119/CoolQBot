@@ -6,7 +6,7 @@ from typing import DefaultDict
 import nonebot
 from tinydb import Query, TinyDB
 
-from src.utils.plugin import PluginData
+from src.plugins.datastore import PluginData
 
 from .platform import platform_manager
 from .plugin_config import plugin_config
@@ -22,7 +22,7 @@ def get_config_path() -> str:
     if plugin_config.bison_config_path:
         data_dir = plugin_config.bison_config_path
     else:
-        data_dir = DATA._base_path
+        data_dir = DATA.data_dir
     if not path.isdir(data_dir):
         os.makedirs(data_dir)
     old_path = path.join(data_dir, "hk_reporter.json")

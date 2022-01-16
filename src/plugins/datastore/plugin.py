@@ -74,11 +74,13 @@ class NetworkFile:
         filename: str,
         plugin_data: "PluginData",
         process_data: Callable[[dict], dict] = None,
+        cache: bool = False,
     ) -> None:
         self._url = url
         self._filename = filename
         self._plugin_data = plugin_data
         self._process_data = process_data
+        self._cache = cache
 
         self._data = None
 
@@ -93,6 +95,7 @@ class NetworkFile:
                 self._filename,
                 open_mode="w",
                 encoding="utf8",
+                cache=self._cache,
             ) as f:
                 json.dump(rjson, f, ensure_ascii=False, indent=2)
             logger.info("已保存数据至本地")
@@ -104,7 +107,11 @@ class NetworkFile:
         """从本地获取数据"""
         logger.info("正在加载本地数据")
         if self._plugin_data.exists(self._filename):
-            with self._plugin_data.open(self._filename, encoding="utf8") as f:
+            with self._plugin_data.open(
+                self._filename,
+                encoding="utf8",
+                cache=self._cache,
+            ) as f:
                 data = json.load(f)
                 if self._process_data:
                     data = self._process_data(data)
@@ -199,10 +206,11 @@ class PluginData:
         url: str,
         filename: str,
         process_data: Callable[[dict], dict] = None,
+        cache: bool = False,
     ):
         """网络文件
 
         从网络上获取数据，并缓存至本地，仅支持 json 格式
         且可以在获取数据之后同时处理数据
         """
-        return NetworkFile(url, filename, self, process_data)
+        return NetworkFile(url, filename, self, process_data, cache)
