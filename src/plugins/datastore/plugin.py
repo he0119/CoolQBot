@@ -151,7 +151,7 @@ class PluginData:
     @property
     def cache_dir(self) -> Path:
         """缓存目录"""
-        path = plugin_config.cache_dir / self._name
+        path = plugin_config.cache_dir / f"plugin-{self._name}"
         # 如果文件夹不存在则自动新建
         os.makedirs(path, exist_ok=True)
         return path
@@ -159,7 +159,7 @@ class PluginData:
     @property
     def data_dir(self) -> Path:
         """缓存目录"""
-        path = plugin_config.data_dir / self._name
+        path = plugin_config.data_dir / f"plugin-{self._name}"
         # 如果文件夹不存在则自动新建
         os.makedirs(path, exist_ok=True)
         return path
