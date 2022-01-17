@@ -506,7 +506,7 @@ python-versions = "*"
 
 [[package]]
 name = "nb-cli"
-version = "0.6.3"
+version = "0.6.4"
 description = "CLI for nonebot2"
 category = "main"
 optional = false
@@ -1306,7 +1306,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "41f6ec84a2f62d18367482313885a5e6ffb78f406dd776c12e397c544af46e00"
+content-hash = "569ac6a7e377deb03b056288f7603fb4fd18013a93d552776bf40e40498fbd18"
 
 [metadata.files]
 aiosqlite = [
@@ -1791,8 +1791,8 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
 nb-cli = [
-    {file = "nb-cli-0.6.3.tar.gz", hash = "sha256:9bf78e075da6117eddf3986afa2a735d96aad78703f120b242be4b9ce88d2c59"},
-    {file = "nb_cli-0.6.3-py3-none-any.whl", hash = "sha256:c15479a8e621f5636c48fc85ade333e168f5baabc2ad0ef446753979912d5f94"},
+    {file = "nb-cli-0.6.4.tar.gz", hash = "sha256:9beffd96af65a5d9a7b2f56a70fe93be23546809b5c1bb07ca6b84eda3f214d4"},
+    {file = "nb_cli-0.6.4-py3-none-any.whl", hash = "sha256:7ed3d0e6023270be5bb1f55ad929a64f79158efd5b030adc1dd07739e8454ea1"},
 ]
 nonebot-adapter-onebot = [
     {file = "nonebot-adapter-onebot-2.0.0b1.tar.gz", hash = "sha256:9dad770371e577fead096ceacacc43b3ef304a8e238e8fff1163eefc4e947a75"},
