@@ -2,7 +2,7 @@
 """
 from nonebot import get_driver
 
-from src.utils.plugin import PluginData
+from src.plugins.datastore import PluginData
 
 DATA = PluginData("genshin")
 

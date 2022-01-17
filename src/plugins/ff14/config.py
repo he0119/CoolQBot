@@ -5,8 +5,8 @@ from typing import List
 from nonebot import get_driver
 from pydantic import BaseSettings, validator
 
+from src.plugins.datastore import PluginData
 from src.utils.helpers import strtobool
-from src.utils.plugin import PluginData
 
 DATA = PluginData("ff14")
 
