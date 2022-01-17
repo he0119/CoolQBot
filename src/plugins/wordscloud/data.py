@@ -11,6 +11,9 @@ from wordcloud import WordCloud
 from .model import Message
 
 font_path = Path(__file__).parent / "SimHei.ttf"
+stopwords_path = Path(__file__).parent / "stopwords.txt"
+with stopwords_path.open("r", encoding="utf8") as f:
+    stopwords = [word.strip() for word in f.readlines()]
 
 
 async def get_wordcloud(
@@ -29,6 +32,6 @@ async def get_wordcloud(
         words = jieba.lcut(msgs, cut_all=True)
     if words:
         txt = "\n".join(words)
-        wordcloud = WordCloud(font_path=str(font_path)).generate(txt)
-        image = wordcloud.to_image()
+        wordcloud = WordCloud(font_path=str(font_path), stopwords=stopwords)
+        image = wordcloud.generate(txt).to_image()
         return image
