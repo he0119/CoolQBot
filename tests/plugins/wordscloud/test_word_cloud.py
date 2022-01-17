@@ -25,7 +25,7 @@ async def test_word_cloud(
     now = datetime(2022, 1, 1, 12, 0, 0)
 
     async with session:
-        for word in ["你", "我", "他", "这是一句完整的话", "你知道吗？今天的天气真好呀！"]:
+        for word in ["你", "我", "他", "这是一句完整的话", "你知道吗？今天的天气真好呀！", "/今日词云"]:
             message = MessageModel(
                 user_id="10",
                 group_id="10000",

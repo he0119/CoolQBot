@@ -24,10 +24,11 @@ async def get_wordcloud(
             Message.time <= end,
         )
         msg: list[Message] = (await session.exec(statement)).all()  # type: ignore
-        msgs = " ".join([m.message for m in msg])
+        # 过滤掉命令
+        msgs = " ".join([m.message for m in msg if not m.message.startswith("/")])
         words = jieba.lcut(msgs, cut_all=True)
     if words:
-        txt = " ".join(words)
+        txt = "\n".join(words)
         wordcloud = WordCloud(font_path=str(font_path)).generate(txt)
         image = wordcloud.to_image()
         return image
