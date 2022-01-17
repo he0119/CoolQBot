@@ -6,7 +6,7 @@ from sqlmodel import Field, SQLModel
 
 class Message(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    time: Optional[datetime] = Field(default=datetime.now())
+    time: datetime
     user_id: str
     group_id: str
     message: str

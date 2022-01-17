@@ -1,7 +1,9 @@
 """ 词云
 """
+from datetime import datetime, timedelta
 
 from nonebot import CommandGroup, on_message
+from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.params import Depends
@@ -44,8 +46,18 @@ today_cmd = wordcloud.command("today", aliases={"今日词云", ("词云", "今�
 async def today_handle(
     event: GroupMessageEvent, session: AsyncSession = Depends(get_session)
 ):
-    image = await get_wordcloud(session, str(event.group_id))
-    await today_cmd.finish(image)
+    now = datetime.now()
+    now = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    image = await get_wordcloud(
+        session,
+        str(event.group_id),
+        start=now,
+        end=now + timedelta(days=1),
+    )
+    if image:
+        await today_cmd.finish(MessageSegment.image(image.tobytes()))
+    else:
+        await today_cmd.finish("今天没有足够的数据生成词云")
 
 
 # endregion
