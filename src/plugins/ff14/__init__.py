@@ -7,14 +7,14 @@ from typing import Literal
 
 import httpx
 from nonebot import CommandGroup
-from nonebot.adapters.onebot.v11 import Bot, Message, MessageEvent
+from nonebot.adapters.onebot.v11 import Message, MessageEvent
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, CommandArg, Depends
 
 from src.utils.helpers import strtobool
 
 from ..help.commands import get_command_help
-from .config import plugin_config
+from .config import global_config, plugin_config
 from .fflogs_api import fflogs
 from .fflogs_data import FFLOGS_DATA
 from .gate import get_direction
@@ -88,7 +88,7 @@ fflogs_cmd.__doc__ = """
 
 
 @fflogs_cmd.handle()
-async def fflogs_handle(bot: Bot, event: MessageEvent, arg: Message = CommandArg()):
+async def fflogs_handle(event: MessageEvent, arg: Message = CommandArg()):
     argv = arg.extract_plain_text().split()
     if not argv:
         await fflogs_cmd.finish(get_command_help("ff14.dps"))
@@ -98,7 +98,7 @@ async def fflogs_handle(bot: Bot, event: MessageEvent, arg: Message = CommandArg
     # 设置 Token
     if argv[0] == "token" and len(argv) == 2:
         # 检查是否是超级用户
-        if user_id not in bot.config.superusers:
+        if user_id not in global_config.superusers:
             await fflogs_cmd.finish("抱歉，你没有权限修改 Token。")
 
         plugin_config.fflogs_token = argv[1]
@@ -112,7 +112,7 @@ async def fflogs_handle(bot: Bot, event: MessageEvent, arg: Message = CommandArg
 
     if argv[0] == "token" and len(argv) == 1:
         # 检查是否是超级用户
-        if user_id not in bot.config.superusers:
+        if user_id not in global_config.superusers:
             await fflogs_cmd.finish("抱歉，你没有权限查看 Token。")
         await fflogs_cmd.finish(f"当前的 Token 为 {plugin_config.fflogs_token}")
 
@@ -123,7 +123,7 @@ async def fflogs_handle(bot: Bot, event: MessageEvent, arg: Message = CommandArg
     # 缓存相关设置
     if argv[0] == "cache":
         # 检查是否是超级用户
-        if user_id not in bot.config.superusers:
+        if user_id not in global_config.superusers:
             await fflogs_cmd.finish("抱歉，你没有权限设置缓存。")
         if len(argv) == 2:
             if strtobool(argv[1]):

@@ -171,11 +171,11 @@ class PluginData:
             self._config = ConfigData(self.data_dir / f"{self._name}.ini")
         return self._config
 
-    def save_pkl(self, data: object, filename: str, cache=False) -> None:
+    def save_pkl(self, data: object, filename: str, cache: bool = False) -> None:
         with self.open(f"{filename}.pkl", "wb", cache=cache) as f:
             pickle.dump(data, f)
 
-    def load_pkl(self, filename: str, cache=False) -> Any:
+    def load_pkl(self, filename: str, cache: bool = False) -> Any:
         with self.open(f"{filename}.pkl", "rb", cache=cache) as f:
             data = pickle.load(f)
         return data
@@ -184,8 +184,8 @@ class PluginData:
         self,
         filename: str,
         open_mode: str = "r",
-        encoding=None,
-        cache=False,
+        encoding: Optional[str] = None,
+        cache: bool = False,
     ) -> IO:
         if cache:
             path = self.cache_dir / filename
@@ -193,7 +193,7 @@ class PluginData:
             path = self.data_dir / filename
         return open(path, open_mode, encoding=encoding)
 
-    def exists(self, filename: str, cache=False) -> bool:
+    def exists(self, filename: str, cache: bool = False) -> bool:
         """判断文件是否存在"""
         if cache:
             path = self.cache_dir / filename

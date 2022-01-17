@@ -123,8 +123,8 @@ class FFLogs:
         """获取指定 boss，指定职业，指定一天中的排名数据"""
         # 查看是否有缓存
         cache_name = f'{boss}_{difficulty}_{job}_{date.strftime("%Y%m%d")}'
-        if DATA.exists(f"{cache_name}.pkl"):
-            return DATA.load_pkl(cache_name)
+        if DATA.exists(f"{cache_name}.pkl", cache=True):
+            return DATA.load_pkl(cache_name, cache=True)
 
         page = 1
         hasMorePages = True
@@ -151,7 +151,7 @@ class FFLogs:
         # 如果获取数据的日期不是当天，则缓存数据
         # 因为今天的数据可能还会增加，不能先缓存
         if end_date < datetime.now():
-            DATA.save_pkl(rankings, cache_name)
+            DATA.save_pkl(rankings, cache_name, cache=True)
 
         return rankings
 

@@ -9,15 +9,12 @@ from tests.fake import fake_group_message_event
 @pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
 async def test_dps_missing_token(app: App):
     """测试 FFLOGS，缺少 Token 的情况"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.ff14 import fflogs_cmd
 
     async with app.test_matcher(fflogs_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/dps me"))
 
         ctx.receive_event(bot, event)
@@ -36,9 +33,7 @@ async def test_dps_help(
     mocker: MockerFixture,
 ):
     """测试 FFLOGS，直接发送 /dps 命令的情况"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.ff14 import fflogs_cmd
 
@@ -46,12 +41,11 @@ async def test_dps_help(
     get_command_help.return_value = Message("test")
 
     async with app.test_matcher(fflogs_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/dps"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, Message("test"), "result")
+        ctx.should_call_send(event, Message("test"), "")
         ctx.should_finished()
 
     get_command_help.assert_called_once_with("ff14.dps")
