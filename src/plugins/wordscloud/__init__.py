@@ -1,6 +1,7 @@
 """ 词云
 """
 from datetime import datetime, timedelta
+from io import BytesIO
 
 from nonebot import CommandGroup, on_message
 from nonebot.adapters.onebot.v11 import MessageSegment
@@ -9,10 +10,12 @@ from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.params import Depends
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src.plugins.datastore import get_session
+from src.plugins.datastore import PluginData, get_session
 
 from .data import get_wordcloud
 from .model import Message
+
+DATA = PluginData("wordscloud")
 
 wordcloud = CommandGroup("wordcloud")
 
@@ -61,7 +64,9 @@ async def today_handle(
         end=now + timedelta(days=1),
     )
     if image:
-        await today_cmd.finish(MessageSegment.image(image.tobytes()))
+        img_byte_arr = BytesIO()
+        image.save(img_byte_arr, format="PNG")
+        await today_cmd.finish(MessageSegment.image(img_byte_arr))
     else:
         await today_cmd.finish("今天没有足够的数据生成词云")
 
