@@ -40,6 +40,12 @@ async def save_message_handle(
 
 # region 词云
 today_cmd = wordcloud.command("today", aliases={"今日词云", ("词云", "今日")})
+today_cmd.__doc__ = """
+词云
+
+获取今天的词云
+/今日词云
+"""
 
 
 @today_cmd.handle()
