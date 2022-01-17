@@ -88,7 +88,6 @@ jobs:
         with:
           images: |
             he0119/coolqbot
-            ${{ secrets.TENCENT_REGISTRY }}/he0119/coolqbot
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -99,12 +98,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Login to Tencent Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ secrets.TENCENT_REGISTRY }}
-          username: ${{ secrets.TENCENT_USERNAME }}
-          password: ${{ secrets.TENCENT_PASSWORD }}
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
