@@ -12,6 +12,10 @@ class Message(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     time: datetime
+    """ 消息时间
+
+    存放 UTC 时间
+    """
     user_id: str
     group_id: str
     message: str

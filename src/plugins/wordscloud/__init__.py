@@ -57,11 +57,13 @@ async def today_handle(
 ):
     now = datetime.now()
     now = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # 中国时区差了 8 小时
     image = await get_wordcloud(
         session,
         str(event.group_id),
-        start=now,
-        end=now + timedelta(days=1),
+        start=now - timedelta(hours=8),
+        end=now + timedelta(hours=16),
     )
     if image:
         img_byte_arr = BytesIO()
