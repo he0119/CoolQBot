@@ -18,8 +18,8 @@ async def test_word_cloud(
     """测试词云"""
     from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
+    from src.plugins.wordscloud import Message as MessageModel
     from src.plugins.wordscloud import get_wordcloud, today_cmd
-    from src.plugins.wordscloud.model import Message as MessageModel
 
     now = datetime(2022, 1, 1, 12, 0, 0)
 
