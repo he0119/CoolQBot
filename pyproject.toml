@@ -24,6 +24,8 @@ playwright = "^1.17.2"
 nonebot-plugin-localstore = "^0.1.0"
 sqlmodel = "^0.0.6"
 aiosqlite = "^0.17.0"
+wordcloud = "^1.8.1"
+jieba = "^0.42.1"
 
 [tool.poetry.dev-dependencies]
 black = "^21.8b0"
