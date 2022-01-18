@@ -7,10 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加原神实时便笺查询
+- 添加数据库插件
+- 添加词云插件
+
 ### Changed
 
 - 利用新版 NoneBot2(beta1) 特性简化帮助
 - 适配 NoneBot2(beta1)
+- 将 FFlogs 缓存数据存放至缓存目录
 
 ### Removed
 
