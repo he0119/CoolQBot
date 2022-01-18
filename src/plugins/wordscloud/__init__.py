@@ -2,6 +2,7 @@
 """
 from datetime import datetime, timedelta
 from io import BytesIO
+from zoneinfo import ZoneInfo
 
 from nonebot import CommandGroup, on_message
 from nonebot.adapters.onebot.v11 import MessageSegment
@@ -55,15 +56,16 @@ today_cmd.__doc__ = """
 async def today_handle(
     event: GroupMessageEvent, session: AsyncSession = Depends(get_session)
 ):
-    now = datetime.now()
+    # 获取中国本地时间
+    now = datetime.now(ZoneInfo("Asia/Shanghai"))
     now = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
     # 中国时区差了 8 小时
     image = await get_wordcloud(
         session,
         str(event.group_id),
-        start=now - timedelta(hours=8),
-        end=now + timedelta(hours=16),
+        start=now.astimezone(ZoneInfo("UTC")),
+        end=(now + timedelta(days=1)).astimezone(ZoneInfo("UTC")),
     )
     if image:
         img_byte_arr = BytesIO()
