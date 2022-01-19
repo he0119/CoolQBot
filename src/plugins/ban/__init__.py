@@ -10,10 +10,10 @@ from nonebot.adapters.onebot.v11.event import (
     GroupMessageEvent,
     PrivateMessageEvent,
 )
-from nonebot.matcher import Matcher
-from nonebot.params import ArgPlainText, CommandArg, Depends
+from nonebot.params import Arg, CommandArg, Depends
+from nonebot.typing import T_State
 
-from src.utils.helpers import check_number, render_expression
+from src.utils.helpers import parse_int, render_expression
 
 # region 禁言
 EXPR_OK = (
@@ -66,35 +66,29 @@ ban_cmd.__doc__ = """
 """
 
 
-async def get_duration(matcher: Matcher, duration: str = ArgPlainText()) -> int:
-    """检查输入参数是不是数字"""
-    await check_number(duration, matcher)
-    return int(duration)
-
-
-async def get_group_id(matcher: Matcher, group_id: str = ArgPlainText()) -> int:
-    """检查输入参数是不是数字"""
-    await check_number(group_id, matcher)
-    return int(group_id)
-
-
 @ban_cmd.handle()
 async def ban_handle_first_receive(
-    matcher: Matcher, bot: Bot, arg: Message = CommandArg()
+    state: T_State, bot: Bot, arg: Message = CommandArg()
 ):
     """获取需要的参数"""
     # 如果没有获取机器人在群中的职位，则获取
     if not _bot_role:
         await refresh_bot_role(bot)
-    if arg.extract_plain_text():
-        matcher.set_arg("duration", arg)
+
+    plaintext = arg.extract_plain_text()
+    if plaintext and plaintext.isdigit():
+        state["duration"] = int(plaintext)
 
 
-@ban_cmd.got("duration", prompt="你想被禁言多少分钟呢？")
+@ban_cmd.got(
+    "duration",
+    prompt="你想被禁言多少分钟呢？",
+    parameterless=[Depends(parse_int("duration"))],
+)
 async def ban_handle_group_message(
     bot: Bot,
     event: GroupMessageEvent,
-    duration: int = Depends(get_duration),
+    duration: int = Arg(),
 ):
     """如果在群里发送，则在当前群禁言/解除"""
     group_id = event.group_id
@@ -131,13 +125,21 @@ async def ban_handle_group_message(
         )
 
 
-@ban_cmd.got("duration", prompt="你想被禁言多少分钟呢？")
-@ban_cmd.got("group_id", prompt="请问你想针对哪个群？")
+@ban_cmd.got(
+    "duration",
+    prompt="你想被禁言多少分钟呢？",
+    parameterless=[Depends(parse_int("duration"))],
+)
+@ban_cmd.got(
+    "group_id",
+    prompt="请问你想针对哪个群？",
+    parameterless=[Depends(parse_int("group_id"))],
+)
 async def ban_handle_private_message(
     bot: Bot,
     event: PrivateMessageEvent,
-    duration: int = Depends(get_duration),
-    group_id: int = Depends(get_group_id),
+    duration: int = Arg(),
+    group_id: int = Arg(),
 ):
     """如果私聊的话，则向用户请求群号，并仅在支持的群禁言/解除"""
     user_id = event.user_id

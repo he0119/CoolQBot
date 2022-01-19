@@ -1,9 +1,11 @@
 import random
 from datetime import timedelta
-from typing import Sequence
+from typing import Sequence, Union
 
 from nonebot.adapters.onebot.v11 import Message
 from nonebot.matcher import Matcher
+from nonebot.params import Arg
+from nonebot.typing import T_State
 
 from .typing import Expression_T
 
@@ -56,10 +58,34 @@ def groupidtostr(val: list[int]) -> str:
     return " ".join(map(str, val))
 
 
-async def check_number(input: str, matcher: Matcher) -> None:
-    """检查输入的数字是否合法"""
-    if not input.isdigit():
-        await matcher.reject("请只输入数字，不然我没法理解呢！")
+def parse_int(key: str):
+    """解析数字，并将结果存入 state 中"""
+
+    async def _key_parser(
+        matcher: Matcher, state: T_State, input: Union[int, Message] = Arg(key)
+    ):
+        if isinstance(input, int):
+            return
+
+        plaintext = input.extract_plain_text()
+        if not plaintext.isdigit():
+            await matcher.reject_arg(key, "请只输入数字，不然我没法理解呢！")
+        state[key] = int(plaintext)
+
+    return _key_parser
+
+
+def parse_bool(key: str):
+    """解析布尔值，并将结果存入 state 中"""
+
+    async def _key_parser(state: T_State, input: Union[bool, Message] = Arg(key)):
+        if isinstance(input, bool):
+            return
+
+        plaintext = input.extract_plain_text()
+        state[key] = strtobool(plaintext)
+
+    return _key_parser
 
 
 def timedelta_to_chinese(timedelta: timedelta) -> str:

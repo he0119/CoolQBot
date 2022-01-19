@@ -43,7 +43,7 @@ async def test_ban_group_bot_is_owner(
             data={"group_id": 10000, "user_id": 10, "duration": 60},
             result=[],
         )
-        ctx.should_call_send(event, Message("test"), "result", at_sender=True)
+        ctx.should_call_send(event, Message("test"), True, at_sender=True)
         ctx.should_finished()
 
     render_expression.assert_called_once_with(EXPR_OK, duration=1)
@@ -85,21 +85,21 @@ async def test_ban_group_bot_is_admin(
             result={"role": "admin"},
         )
         if event.sender.role == "owner":
-            ctx.should_call_send(event, Message("test"), "result", at_sender=True)
+            ctx.should_call_send(event, Message("test"), True, at_sender=True)
         elif event.sender.role == "admin":
             ctx.should_call_api(
                 "get_group_member_list",
                 data={"group_id": 10000},
                 result=[{"role": "owner", "user_id": 100}],
             )
-            ctx.should_call_send(event, Message("test"), "result")
+            ctx.should_call_send(event, Message("test"), True)
         else:
             ctx.should_call_api(
                 "set_group_ban",
                 data={"group_id": 10000, "user_id": 10, "duration": 60},
                 result=[],
             )
-            ctx.should_call_send(event, Message("test"), "result", at_sender=True)
+            ctx.should_call_send(event, Message("test"), True, at_sender=True)
         ctx.should_finished()
 
     if event.sender.role == "admin":
@@ -151,14 +151,14 @@ async def test_ban_group_bot_is_member(
             result={"role": "member"},
         )
         if event.sender.role == "owner":
-            ctx.should_call_send(event, Message("test"), "result", at_sender=True)
+            ctx.should_call_send(event, Message("test"), True, at_sender=True)
         else:
             ctx.should_call_api(
                 "get_group_member_list",
                 data={"group_id": 10000},
                 result=[{"role": "owner", "user_id": 100}],
             )
-            ctx.should_call_send(event, Message("test"), "result")
+            ctx.should_call_send(event, Message("test"), True)
         ctx.should_finished()
 
     if event.sender.role == "owner":
@@ -206,7 +206,7 @@ async def test_ban_group_get_arg(
             data={"group_id": 10000, "user_id": 1},
             result={"role": "owner"},
         )
-        ctx.should_call_send(event, "你想被禁言多少分钟呢？", "result")
+        ctx.should_call_send(event, "你想被禁言多少分钟呢？", True)
         ctx.should_rejected()
         ctx.receive_event(bot, next_event)
         ctx.should_call_api(
@@ -214,7 +214,7 @@ async def test_ban_group_get_arg(
             data={"group_id": 10000, "user_id": 10, "duration": 60},
             result=[],
         )
-        ctx.should_call_send(next_event, Message("test"), "result", at_sender=True)
+        ctx.should_call_send(next_event, Message("test"), True, at_sender=True)
         ctx.should_finished()
 
     render_expression.assert_called_once_with(EXPR_OK, duration=1)
@@ -254,10 +254,10 @@ async def test_ban_group_get_arg_invalid(
             data={"group_id": 10000, "user_id": 1},
             result={"role": "owner"},
         )
-        ctx.should_call_send(event, "你想被禁言多少分钟呢？", "result")
+        ctx.should_call_send(event, "你想被禁言多少分钟呢？", True)
         ctx.should_rejected()
         ctx.receive_event(bot, next_event)
-        ctx.should_call_send(next_event, "请只输入数字，不然我没法理解呢！", "result")
+        ctx.should_call_send(next_event, "请只输入数字，不然我没法理解呢！", True)
         ctx.should_rejected()
         ctx.receive_event(bot, final_event)
         ctx.should_call_api(
@@ -265,7 +265,7 @@ async def test_ban_group_get_arg_invalid(
             data={"group_id": 10000, "user_id": 10, "duration": 60},
             result=[],
         )
-        ctx.should_call_send(final_event, Message("test"), "result", at_sender=True)
+        ctx.should_call_send(final_event, Message("test"), True, at_sender=True)
         ctx.should_finished()
 
     render_expression.assert_called_once_with(EXPR_OK, duration=1)

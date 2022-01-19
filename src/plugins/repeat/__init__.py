@@ -4,6 +4,7 @@
 拥有一些配套功能，如复读排行榜，排行榜历史记录，复读状态
 """
 import re
+from functools import cache
 
 from nonebot import CommandGroup, on_message, require
 from nonebot.adapters.onebot.v11 import Message
@@ -16,9 +17,10 @@ from nonebot.adapters.onebot.v11.event import (
 from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
 from nonebot.matcher import Matcher
-from nonebot.params import ArgPlainText, CommandArg, Depends
+from nonebot.params import Arg, ArgPlainText, CommandArg, Depends
+from nonebot.typing import T_State
 
-from src.utils.helpers import check_number, strtobool
+from src.utils.helpers import parse_bool, parse_int, strtobool
 
 from .config import plugin_config
 from .history import get_history
@@ -135,62 +137,51 @@ rank_cmd.__doc__ = """
 """
 
 
-async def get_display_number(
-    matcher: Matcher, display_number: str = ArgPlainText()
-) -> int:
-    await check_number(display_number, matcher)
-    return int(display_number)
-
-
-async def get_minimal_msg_number(
-    matcher: Matcher, minimal_msg_number: str = ArgPlainText()
-) -> int:
-    await check_number(minimal_msg_number, matcher)
-    return int(minimal_msg_number)
-
-
-async def get_display_total_number(display_total_number: str = ArgPlainText()) -> bool:
-    return strtobool(display_total_number)
-
-
-async def get_group_id(matcher: Matcher, group_id: str = ArgPlainText()) -> int:
-    await check_number(group_id, matcher)
-    return int(group_id)
-
-
 @rank_cmd.handle()
-async def rank_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
+async def rank_handle_first_receive(state: T_State, arg: Message = CommandArg()):
     match = re.match(r"^(?:(\d+))?(?:n(\d+))?$", arg.extract_plain_text())
     if match:
         display_number = match.group(1)
         minimal_msg_number = match.group(2)
-        display_total_number = "False"
+        display_total_number = False
 
         if display_number:
-            display_number = display_number
+            display_number = int(display_number)
         else:
-            display_number = "3"
+            display_number = 3
 
         if minimal_msg_number:
-            minimal_msg_number = minimal_msg_number
-            display_total_number = "True"
+            minimal_msg_number = int(minimal_msg_number)
+            display_total_number = True
         else:
-            minimal_msg_number = "30"
+            minimal_msg_number = 30
 
-        matcher.set_arg("display_number", Message(display_number))
-        matcher.set_arg("minimal_msg_number", Message(minimal_msg_number))
-        matcher.set_arg("display_total_number", Message(display_total_number))
+        state["display_number"] = display_number
+        state["minimal_msg_number"] = minimal_msg_number
+        state["display_total_number"] = display_total_number
 
 
-@rank_cmd.got("display_number", prompt="请输入想显示的排行条数")
-@rank_cmd.got("minimal_msg_number", prompt="请输入进入排行，最少需要发送多少消息")
-@rank_cmd.got("display_total_number", prompt="是否显示每个人发送的消息总数")
+@rank_cmd.got(
+    "display_number",
+    prompt="请输入想显示的排行条数",
+    parameterless=[Depends(parse_int("display_number"))],
+)
+@rank_cmd.got(
+    "minimal_msg_number",
+    prompt="请输入进入排行，最少需要发送多少消息",
+    parameterless=[Depends(parse_int("minimal_msg_number"))],
+)
+@rank_cmd.got(
+    "display_total_number",
+    prompt="是否显示每个人发送的消息总数",
+    parameterless=[Depends(parse_bool("display_total_number"))],
+)
 async def rank_handle_group_message(
     bot: Bot,
     event: GroupMessageEvent,
-    display_number: int = Depends(get_display_number),
-    minimal_msg_number: int = Depends(get_minimal_msg_number),
-    display_total_number: bool = Depends(get_display_total_number),
+    display_number: int = Arg(),
+    minimal_msg_number: int = Arg(),
+    display_total_number: bool = Arg(),
 ):
     res = await get_rank(
         bot,
@@ -202,24 +193,40 @@ async def rank_handle_group_message(
     await rank_cmd.finish(res)
 
 
-@rank_cmd.got("display_number", prompt="请输入想显示的排行条数")
-@rank_cmd.got("minimal_msg_number", prompt="请输入进入排行，最少需要发送多少消息")
-@rank_cmd.got("display_total_number", prompt="是否显示每个人发送的消息总数")
-@rank_cmd.got("group_id", prompt="请问你想查询哪个群？")
+@rank_cmd.got(
+    "display_number",
+    prompt="请输入想显示的排行条数",
+    parameterless=[Depends(parse_int("display_number"))],
+)
+@rank_cmd.got(
+    "minimal_msg_number",
+    prompt="请输入进入排行，最少需要发送多少消息",
+    parameterless=[Depends(parse_int("minimal_msg_number"))],
+)
+@rank_cmd.got(
+    "display_total_number",
+    prompt="是否显示每个人发送的消息总数",
+    parameterless=[Depends(parse_bool("display_total_number"))],
+)
+@rank_cmd.got(
+    "group_id",
+    prompt="请问你想查询哪个群？",
+    parameterless=[Depends(parse_int("group_id"))],
+)
 async def rank_handle_private_message(
     bot: Bot,
     event: PrivateMessageEvent,
-    display_number: int = Depends(get_display_number),
-    minimal_msg_number: int = Depends(get_minimal_msg_number),
-    display_total_number: bool = Depends(get_display_total_number),
-    group_id: int = Depends(get_group_id),
+    display_number: int = Arg(),
+    minimal_msg_number: int = Arg(),
+    display_total_number: bool = Arg(),
+    group_id: int = Arg(),
 ):
     res = await get_rank(
         bot,
-        display_number=display_number,
-        minimal_msg_number=minimal_msg_number,
+        display_number=int(display_number),
+        minimal_msg_number=int(minimal_msg_number),
         display_total_number=display_total_number,
-        group_id=group_id,
+        group_id=int(group_id),
     )
     await rank_cmd.finish(res)
 
@@ -237,44 +244,41 @@ history_cmd.__doc__ = """
 """
 
 
-async def get_year(matcher: Matcher, year: str = ArgPlainText()) -> int:
-    await check_number(year, matcher)
-    return int(year)
-
-
-async def get_month(matcher: Matcher, month: str = ArgPlainText()) -> int:
-    await check_number(month, matcher)
-    return int(month)
-
-
-async def get_day(matcher: Matcher, day: str = ArgPlainText()) -> int:
-    await check_number(day, matcher)
-    return int(day)
-
-
 @history_cmd.handle()
-async def history_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
+async def history_handle_first_receive(state: T_State, arg: Message = CommandArg()):
     match = re.match(r"^(\d+)(?:\-(\d+)(?:\-(\d+))?)?$", arg.extract_plain_text())
     if match:
         year = match.group(1)
         month = match.group(2)
         day = match.group(3)
         if year:
-            matcher.set_arg("year", Message(year))
+            state["year"] = int(year)
         if month:
-            matcher.set_arg("month", Message(month))
+            state["month"] = int(month)
         if day:
-            matcher.set_arg("day", Message(day))
+            state["day"] = int(day)
 
 
-@history_cmd.got("year", prompt="你请输入你要查询的年份")
-@history_cmd.got("month", prompt="你请输入你要查询的月份")
-@history_cmd.got("day", prompt="你请输入你要查询的日期（如查询整月排名请输入 0）")
+@history_cmd.got(
+    "year",
+    prompt="你请输入你要查询的年份",
+    parameterless=[Depends(parse_int("year"))],
+)
+@history_cmd.got(
+    "month",
+    prompt="你请输入你要查询的月份",
+    parameterless=[Depends(parse_int("month"))],
+)
+@history_cmd.got(
+    "day",
+    prompt="你请输入你要查询的日期（如查询整月排名请输入 0）",
+    parameterless=[Depends(parse_int("day"))],
+)
 async def history_handle_group_message(
     event: GroupMessageEvent,
-    year: int = Depends(get_year),
-    month: int = Depends(get_month),
-    day: int = Depends(get_day),
+    year: int = Arg(),
+    month: int = Arg(),
+    day: int = Arg(),
 ):
     res = await get_history(
         year=year,
@@ -285,16 +289,32 @@ async def history_handle_group_message(
     await history_cmd.finish(res)
 
 
-@history_cmd.got("year", prompt="你请输入你要查询的年份")
-@history_cmd.got("month", prompt="你请输入你要查询的月份")
-@history_cmd.got("day", prompt="你请输入你要查询的日期（如查询整月排名请输入 0）")
-@history_cmd.got("group_id", prompt="请问你想查询哪个群？")
+@history_cmd.got(
+    "year",
+    prompt="你请输入你要查询的年份",
+    parameterless=[Depends(parse_int("year"))],
+)
+@history_cmd.got(
+    "month",
+    prompt="你请输入你要查询的月份",
+    parameterless=[Depends(parse_int("month"))],
+)
+@history_cmd.got(
+    "day",
+    prompt="你请输入你要查询的日期（如查询整月排名请输入 0）",
+    parameterless=[Depends(parse_int("day"))],
+)
+@history_cmd.got(
+    "group_id",
+    prompt="请问你想查询哪个群？",
+    parameterless=[Depends(parse_int("group_id"))],
+)
 async def history_handle_private_message(
     event: PrivateMessageEvent,
-    year: int = Depends(get_year),
-    month: int = Depends(get_month),
-    day: int = Depends(get_day),
-    group_id: int = Depends(get_group_id),
+    year: int = Arg(),
+    month: int = Arg(),
+    day: int = Arg(),
+    group_id: int = Arg(),
 ):
     res = await get_history(
         year=year,
