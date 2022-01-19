@@ -27,5 +27,5 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 RUN rm requirements.txt
 
-COPY bot.py /app/
+COPY bot.py pyproject.toml /app/
 COPY src /app/src/
