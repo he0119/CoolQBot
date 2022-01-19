@@ -14,6 +14,8 @@ RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim
 
+ENV TZ Asia/Shanghai
+
 WORKDIR /app
 
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
