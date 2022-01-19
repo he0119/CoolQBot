@@ -1,28 +1,31 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9
+FROM python:3.9 as requirements-stage
 
-ENV LANG zh_CN.UTF-8
-ENV LANGUAGE zh_CN.UTF-8
-ENV LC_ALL zh_CN.UTF-8
-ENV TZ Asia/Shanghai
-ENV DEBIAN_FRONTEND noninteractive
+WORKDIR /tmp
 
-ENV SENTRY_RELEASE=version
+COPY ./pyproject.toml ./poetry.lock* /tmp/
 
-# 安装浏览器依赖，字体
-RUN set -ex; \
-  apt-get update; \
-  apt-get install -y locales locales-all fonts-noto; \
-  apt-get install -y libnss3-dev libxss1 libasound2 libxrandr2 \
-  libatk1.0-0 libgtk-3-0 libgbm-dev libxshmfence1;
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py -o install-poetry.py
 
-COPY ./pyproject.toml ./poetry.lock /app/
-RUN set -ex; \
-  curl -sSL https://install.python-poetry.org | python3 -; \
-  $HOME/.local/bin/poetry config virtualenvs.create false; \
-  $HOME/.local/bin/poetry install --no-root --no-dev;
+RUN python install-poetry.py --yes
 
-RUN echo "Install playwright headless browser..." \
-  && playwright install chromium
+ENV PATH="${PATH}:/root/.local/bin"
+
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
+
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim
+
+WORKDIR /app
+
+COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+
+RUN rm requirements.txt
 
 COPY bot.py /app/
 COPY src /app/src/
