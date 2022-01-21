@@ -7,7 +7,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from .config import plugin_config
 
-engine = create_async_engine(plugin_config.database_url, echo=True)
+engine = create_async_engine(plugin_config.real_database_url, echo=True)
 
 
 @get_driver().on_startup

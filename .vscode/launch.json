@@ -8,7 +8,8 @@
             "name": "CoolQBot",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/bot.py",
+            "module": "nb_cli",
+            "args": ["run"],
             "console": "integratedTerminal",
             "justMyCode": false
         },
