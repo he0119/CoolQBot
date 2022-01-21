@@ -157,8 +157,16 @@ class PluginData:
         return path
 
     @property
+    def config_dir(self) -> Path:
+        """配置目录"""
+        path = plugin_config.config_dir
+        # 如果文件夹不存在则自动新建
+        os.makedirs(path, exist_ok=True)
+        return path
+
+    @property
     def data_dir(self) -> Path:
-        """缓存目录"""
+        """数据目录"""
         path = plugin_config.data_dir / f"plugin-{self._name}"
         # 如果文件夹不存在则自动新建
         os.makedirs(path, exist_ok=True)
