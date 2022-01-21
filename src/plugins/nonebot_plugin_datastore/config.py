@@ -22,7 +22,7 @@ class Config(BaseModel, extra=Extra.ignore):
     默认使用 SQLite
     """
 
-    @root_validator(pre=True)
+    @root_validator(pre=True, allow_reuse=True)
     def set_database_url(cls, values: Dict):
         database_url = values.get("database_url")
         data_dir = values.get("data_dir")

@@ -1,7 +1,7 @@
 from nonebot import get_driver
 from pydantic import BaseSettings
 
-from src.plugins.datastore import PluginData
+from src.plugins.nonebot_plugin_datastore import PluginData
 
 DATA = PluginData("weather")
 

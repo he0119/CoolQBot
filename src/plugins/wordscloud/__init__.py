@@ -11,7 +11,7 @@ from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.params import Depends
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src.plugins.datastore import PluginData, get_session
+from src.plugins.nonebot_plugin_datastore import PluginData, get_session
 
 from .data import get_wordcloud
 from .model import Message
