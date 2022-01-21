@@ -5,7 +5,7 @@ import json
 import os
 import pickle
 from pathlib import Path
-from typing import IO, Any, Callable, Optional
+from typing import IO, Any, Callable, Dict, Optional
 
 import httpx
 from nonebot.log import logger
@@ -73,7 +73,7 @@ class NetworkFile:
         url: str,
         filename: str,
         plugin_data: "PluginData",
-        process_data: Callable[[dict], dict] = None,
+        process_data: Callable[[Dict], Dict] = None,
         cache: bool = False,
     ) -> None:
         self._url = url
@@ -84,7 +84,7 @@ class NetworkFile:
 
         self._data = None
 
-    async def load_from_network(self) -> Optional[dict]:
+    async def load_from_network(self) -> Optional[Dict]:
         """从网络加载文件"""
         logger.info("正在从网络获取数据")
         async with httpx.AsyncClient() as client:
@@ -103,7 +103,7 @@ class NetworkFile:
                 rjson = self._process_data(rjson)
             return rjson
 
-    def load_from_local(self) -> Optional[dict]:
+    def load_from_local(self) -> Optional[Dict]:
         """从本地获取数据"""
         logger.info("正在加载本地数据")
         if self._plugin_data.exists(self._filename):
@@ -118,7 +118,7 @@ class NetworkFile:
                 return data
 
     @property
-    async def data(self) -> Optional[dict]:
+    async def data(self) -> Optional[Dict]:
         """数据
 
         先从本地加载，如果失败则从仓库加载
@@ -213,7 +213,7 @@ class PluginData:
         self,
         url: str,
         filename: str,
-        process_data: Callable[[dict], dict] = None,
+        process_data: Callable[[Dict], Dict] = None,
         cache: bool = False,
     ):
         """网络文件
