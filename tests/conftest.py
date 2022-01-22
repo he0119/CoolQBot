@@ -36,7 +36,7 @@ def app(
 async def session(app: App):
     from sqlmodel.ext.asyncio.session import AsyncSession
 
-    from src.plugins.nonebot_plugin_datastore.db import engine, init_db
+    from nonebot_plugin_datastore.db import engine, init_db
 
     await init_db()
 

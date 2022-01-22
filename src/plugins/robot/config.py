@@ -3,7 +3,7 @@
 from nonebot import get_driver
 from pydantic import BaseSettings
 
-from src.plugins.nonebot_plugin_datastore import PluginData
+from nonebot_plugin_datastore import PluginData
 
 DATA = PluginData("robot")
 

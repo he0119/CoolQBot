@@ -4,7 +4,7 @@ from nonebot import get_driver
 from pydantic import BaseSettings, validator
 
 from src.utils.helpers import groupidtostr, strtogroupid
-from src.plugins.nonebot_plugin_datastore import PluginData
+from nonebot_plugin_datastore import PluginData
 
 DATA = PluginData("repeat")
 

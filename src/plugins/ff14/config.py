@@ -3,9 +3,9 @@
 from typing import List
 
 from nonebot import get_driver
+from nonebot_plugin_datastore import PluginData
 from pydantic import BaseSettings, validator
 
-from src.plugins.nonebot_plugin_datastore import PluginData
 from src.utils.helpers import strtobool
 
 DATA = PluginData("ff14")
