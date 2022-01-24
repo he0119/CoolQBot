@@ -9,11 +9,11 @@ version = "0.15.3"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-nb-cli = "^0.6.4"
-nonebot2 = { git = "https://github.com/nonebot/nonebot2.git", branch = "dev" }
+nonebot2 = {extras = ["httpx", "websockets"], git = "https://github.com/nonebot/nonebot2.git", branch = "dev" }
 nonebot-adapter-onebot = "^2.0.0b1"
 nonebot-plugin-apscheduler = "^0.1.2"
 nonebot-plugin-sentry = "^0.2.2"
+nonebot-plugin-datastore = {git = "https://github.com/he0119/nonebot-plugin-datastore.git", branch = "dev"}
 tencentcloud-sdk-python = "^3.0.434"
 tinydb = "^4.3.0"
 beautifulsoup4 = "^4.9.3"
@@ -21,20 +21,18 @@ feedparser = "^6.0.2"
 pillow = "^9.0.0"
 psutil = "^5.8.0"
 playwright = "^1.17.2"
-nonebot-plugin-localstore = "^0.1.0"
 sqlmodel = "^0.0.6"
 aiosqlite = "^0.17.0"
 wordcloud = "^1.8.1"
 jieba = "^0.42.1"
 
 [tool.poetry.dev-dependencies]
+nb-cli = "^0.6.4"
 black = "^21.8b0"
 isort = "^5.9.3"
 nonebug = "^0.2.0"
-pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"
-pytest-asyncio = "^0.16.0"
 pytest-xdist = "^2.5.0"
 
 [tool.nonebot]
@@ -48,6 +46,11 @@ line-length = 88
 profile = "black"
 line_length = 88
 skip_gitignore = true
+
+[[tool.poetry.source]]
+default = true
+name = "tuna"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"

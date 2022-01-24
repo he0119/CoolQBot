@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
+from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from tests.fake import fake_group_message_event
@@ -25,24 +26,26 @@ async def test_word_cloud(
 
     now = datetime(2022, 1, 2, 12, 0, 0, tzinfo=ZoneInfo("Asia/Shanghai"))
 
-    async with session:
-        for word in ["你", "我", "他", "这是一句完整的话", "你知道吗？今天的天气真好呀！", "/今日词云"]:
-            message = MessageModel(
-                user_id="10",
-                group_id="10000",
-                message=word,
-                time=datetime(2022, 1, 2, 4, 0, 0),
-                platform="qq",
-            )
-            session.add(message)
-        await session.commit()
+    for word in ["你", "我", "他", "这是一句完整的话", "你知道吗？今天的天气真好呀！", "/今日词云"]:
+        message = MessageModel(
+            user_id="10",
+            group_id="10000",
+            message=word,
+            time=datetime(2022, 1, 2, 4, 0, 0),
+            platform="qq",
+        )
+        session.add(message)
+    await session.commit()
 
-    image = await get_wordcloud(
-        session,
-        "10000",
-        start=now - timedelta(days=1),
-        end=now,
+    # 中国时区差了 8 小时
+    statement = select(MessageModel).where(
+        MessageModel.group_id == "10000",
+        MessageModel.time >= now - timedelta(days=1),
+        MessageModel.time <= now,
     )
+    messages: list[MessageModel] = (await session.exec(statement)).all()  # type: ignore
+
+    image = await get_wordcloud(messages)
 
     assert image is not None
     assert image.size == (400, 200)
@@ -63,10 +66,7 @@ async def test_word_cloud(
         ctx.should_finished()
 
     mocked_datetime.now.assert_called_once()
-    assert mocked_get_wordcloud.call_args.kwargs == {
-        "start": datetime(2022, 1, 1, 16, 0, 0, tzinfo=ZoneInfo("UTC")),
-        "end": datetime(2022, 1, 2, 16, 0, 0, tzinfo=ZoneInfo("UTC")),
-    }
+    mocked_get_wordcloud.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -101,17 +101,16 @@ async def test_word_cloud_empty_msg(
 
     now = datetime(2022, 1, 2, 12, 0, 0, tzinfo=ZoneInfo("Asia/Shanghai"))
 
-    async with session:
-        for word in ["你", "我", "他"]:
-            message = MessageModel(
-                user_id="10",
-                group_id="10000",
-                message=word,
-                time=datetime(2022, 1, 2, 4, 0, 0),
-                platform="qq",
-            )
-            session.add(message)
-        await session.commit()
+    for word in ["你", "我", "他"]:
+        message = MessageModel(
+            user_id="10",
+            group_id="10000",
+            message=word,
+            time=datetime(2022, 1, 2, 4, 0, 0),
+            platform="qq",
+        )
+        session.add(message)
+    await session.commit()
 
     mocked_datetime = mocker.patch("src.plugins.wordscloud.datetime")
     mocked_datetime.now.return_value = now

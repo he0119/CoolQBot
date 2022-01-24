@@ -1,16 +1,15 @@
 """ 配置文件
 """
 from nonebot import get_driver
+from nonebot_plugin_datastore import PluginData
 from pydantic import BaseSettings
-
-from src.plugins.datastore import PluginData
 
 DATA = PluginData("robot")
 
 
 class Config(BaseSettings):
-    tencent_ai_secret_id: str = DATA.config.get("tencent", "secret_id")
-    tencent_ai_secret_key: str = DATA.config.get("tencent", "secret_key")
+    tencent_ai_secret_id: str = DATA.config.get("tencent_secret_id", "")
+    tencent_ai_secret_key: str = DATA.config.get("tencent_secret_key", "")
 
     class Config:
         extra = "ignore"

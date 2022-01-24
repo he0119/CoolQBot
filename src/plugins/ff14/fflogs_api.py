@@ -50,12 +50,12 @@ class FFLogs:
         self._cache_job = None
 
         # 根据配置启动
-        if plugin_config.fflogs_cache:
+        if plugin_config.fflogs_enable_cache:
             self.enable_cache()
 
         # QQ号 与 最终幻想14 角色用户名，服务器的对应关系
         if DATA.exists("characters.pkl"):
-            self.characters = DATA.load_pkl("characters")
+            self.characters = DATA.load_pkl("characters.pkl")
         else:
             self.characters = {}
 
@@ -69,7 +69,7 @@ class FFLogs:
             second=plugin_config.fflogs_cache_second,
             id="fflogs_cache",
         )
-        plugin_config.fflogs_cache = True
+        plugin_config.fflogs_enable_cache = True
         logger.info(
             f"开启定时缓存，执行时间为每天 {plugin_config.fflogs_cache_hour}:{plugin_config.fflogs_cache_minute}:{plugin_config.fflogs_cache_second}"
         )
@@ -79,7 +79,7 @@ class FFLogs:
         if self._cache_job:
             self._cache_job.remove()
         self._cache_job = None
-        plugin_config.fflogs_cache = False
+        plugin_config.fflogs_enable_cache = False
         logger.info("定时缓存已关闭")
 
     @property
@@ -122,8 +122,8 @@ class FFLogs:
     ) -> List:
         """获取指定 boss，指定职业，指定一天中的排名数据"""
         # 查看是否有缓存
-        cache_name = f'{boss}_{difficulty}_{job}_{date.strftime("%Y%m%d")}'
-        if DATA.exists(f"{cache_name}.pkl", cache=True):
+        cache_name = f'{boss}_{difficulty}_{job}_{date.strftime("%Y%m%d")}.pkl'
+        if DATA.exists(cache_name, cache=True):
             return DATA.load_pkl(cache_name, cache=True)
 
         page = 1
@@ -289,7 +289,7 @@ class FFLogs:
     ) -> None:
         """设置 QQ号 与 最终幻想14 用户名和服务器名"""
         self.characters[user_id] = [character_name, server_name]
-        DATA.save_pkl(self.characters, "characters")
+        DATA.save_pkl(self.characters, "characters.pkl")
 
     async def character_dps(
         self,

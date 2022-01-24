@@ -15,7 +15,7 @@ VERSION = "1"
 
 def get_history_pkl_name(dt: datetime):
     time_str = dt.strftime("%Y-%m")
-    return time_str
+    return f"{time_str}.pkl"
 
 
 def update(data: Dict, group_id: int):
@@ -169,8 +169,8 @@ class Recorder:
 
     def _load_data(self):
         """加载数据"""
-        if not DATA.exists(f"{self._name}.pkl"):
-            logger.error(f"{self._name}.pkl does not exist!")
+        if not DATA.exists(self._name):
+            logger.error(f"{self._name} does not exist!")
             return
 
         data = DATA.load_pkl(self._name)
