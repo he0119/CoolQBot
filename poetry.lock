@@ -811,7 +811,7 @@ reference = "tuna"
 
 [[package]]
 name = "nonebot-plugin-datastore"
-version = "0.1.0"
+version = "0.1.1"
 description = "适用于 Nonebot2 的数据存储插件"
 category = "main"
 optional = false
@@ -2409,8 +2409,8 @@ nonebot-plugin-apscheduler = [
     {file = "nonebot_plugin_apscheduler-0.1.2-py3-none-any.whl", hash = "sha256:eed7b9e60d08826ae4919f82dc240fc7ec469185271c2271e14438a3e0ca7692"},
 ]
 nonebot-plugin-datastore = [
-    {file = "nonebot-plugin-datastore-0.1.0.tar.gz", hash = "sha256:a9136e95a434b6313f8cb646f20588c76d731b7afe84a38772bdf582e1d30772"},
-    {file = "nonebot_plugin_datastore-0.1.0-py3-none-any.whl", hash = "sha256:666a0131749c0bf674b82c67a65557931c6214dd8864c16d6e3485ad25c314a5"},
+    {file = "nonebot-plugin-datastore-0.1.1.tar.gz", hash = "sha256:ad2e9584fe0e85b1057d391d7f3b2ba3ba96a4882e11e9894b311240558d5e9d"},
+    {file = "nonebot_plugin_datastore-0.1.1-py3-none-any.whl", hash = "sha256:cd63f5c6bbd75d44ecf53127c45b6d8a1a51d3a842fb0a9fe865923f2ef19289"},
 ]
 nonebot-plugin-localstore = [
     {file = "nonebot-plugin-localstore-0.1.0.tar.gz", hash = "sha256:6d264cf8adcc4a470b496a78384eafd6ffd13bb8b7e14125e38e641748d2ee79"},
