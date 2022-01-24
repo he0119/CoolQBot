@@ -55,7 +55,7 @@ class FFLogs:
 
         # QQ号 与 最终幻想14 角色用户名，服务器的对应关系
         if DATA.exists("characters.pkl"):
-            self.characters = DATA.load_pkl("characters")
+            self.characters = DATA.load_pkl("characters.pkl")
         else:
             self.characters = {}
 
@@ -122,8 +122,8 @@ class FFLogs:
     ) -> List:
         """获取指定 boss，指定职业，指定一天中的排名数据"""
         # 查看是否有缓存
-        cache_name = f'{boss}_{difficulty}_{job}_{date.strftime("%Y%m%d")}'
-        if DATA.exists(f"{cache_name}.pkl", cache=True):
+        cache_name = f'{boss}_{difficulty}_{job}_{date.strftime("%Y%m%d")}.pkl'
+        if DATA.exists(cache_name, cache=True):
             return DATA.load_pkl(cache_name, cache=True)
 
         page = 1
@@ -289,7 +289,7 @@ class FFLogs:
     ) -> None:
         """设置 QQ号 与 最终幻想14 用户名和服务器名"""
         self.characters[user_id] = [character_name, server_name]
-        DATA.save_pkl(self.characters, "characters")
+        DATA.save_pkl(self.characters, "characters.pkl")
 
     async def character_dps(
         self,

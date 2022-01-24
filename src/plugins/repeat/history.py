@@ -25,7 +25,7 @@ async def get_history(year: int, month: int, day: int, group_id: int) -> str:
         history_data = recorder_obj
     else:
         history_filename = get_history_pkl_name(date)
-        if not DATA.exists(f"{history_filename}.pkl"):
+        if not DATA.exists(history_filename):
             if day:
                 str_data = f"{date.year} 年 {date.month} 月 {day} 日的数据不存在，请换个试试吧 ~>_<~"
             else:
