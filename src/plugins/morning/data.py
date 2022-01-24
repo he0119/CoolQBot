@@ -83,7 +83,7 @@ async def get_recent_workday() -> Optional[HolidayInfo]:
     """
     data = await HOLIDAYS_DATA.data
     if not data:
-        raise
+        raise Exception("获取节假日数据失败")
 
     today = date.today()
 

@@ -21,7 +21,6 @@ async def test_save_message(app: App, session: AsyncSession):
 
         ctx.receive_event(bot, event)
 
-    async with session:
-        statement = select(MessageModel).limit(1)
-        m = (await session.exec(statement)).first()  # type: ignore
-        assert m.message == "今天的天气真好呀"  # type: ignore
+    statement = select(MessageModel).limit(1)
+    m = (await session.exec(statement)).first()  # type: ignore
+    assert m.message == "今天的天气真好呀"  # type: ignore

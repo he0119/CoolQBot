@@ -9,14 +9,12 @@ from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.params import Depends
+from nonebot_plugin_datastore import get_session
+from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
-
-from nonebot_plugin_datastore import PluginData, get_session
 
 from .data import get_wordcloud
 from .model import Message
-
-DATA = PluginData("wordscloud")
 
 wordcloud = CommandGroup("wordcloud")
 
@@ -35,9 +33,8 @@ async def save_message_handle(
         message=event.message.extract_plain_text(),
         platform="qq",
     )
-    async with session:
-        session.add(message)
-        await session.commit()
+    session.add(message)
+    await session.commit()
 
 
 # endregion
@@ -61,16 +58,18 @@ async def today_handle(
     now = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
     # 中国时区差了 8 小时
-    image = await get_wordcloud(
-        session,
-        str(event.group_id),
-        start=now.astimezone(ZoneInfo("UTC")),
-        end=(now + timedelta(days=1)).astimezone(ZoneInfo("UTC")),
+    statement = select(Message).where(
+        Message.group_id == str(event.group_id),
+        Message.time >= now.astimezone(ZoneInfo("UTC")),
+        Message.time <= (now + timedelta(days=1)).astimezone(ZoneInfo("UTC")),
     )
+    messages: list[Message] = (await session.exec(statement)).all()  # type: ignore
+
+    image = await get_wordcloud(messages)
     if image:
-        img_byte_arr = BytesIO()
-        image.save(img_byte_arr, format="PNG")
-        await today_cmd.finish(MessageSegment.image(img_byte_arr))
+        image_bytes = BytesIO()
+        image.save(image_bytes, format="PNG")
+        await today_cmd.finish(MessageSegment.image(image_bytes))
     else:
         await today_cmd.finish("今天没有足够的数据生成词云")
 

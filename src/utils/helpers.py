@@ -40,24 +40,6 @@ def strtobool(val: str) -> bool:
     return False
 
 
-def strtogroupid(val: str) -> list[int]:
-    """转换文本至群ID列表
-
-    群ID用空格隔开
-    """
-    if val:
-        return list(map(int, val.split()))
-    return []
-
-
-def groupidtostr(val: list[int]) -> str:
-    """群ID列表转换至文本
-
-    群ID用空格隔开
-    """
-    return " ".join(map(str, val))
-
-
 def parse_int(key: str):
     """解析数字，并将结果存入 state 中"""
 
