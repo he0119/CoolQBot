@@ -21,7 +21,12 @@ async def get_wordcloud(messages: list[Message]) -> Optional[Image]:
     words = jieba.lcut(msgs, cut_all=True)
     txt = "\n".join(words)
     try:
-        wordcloud = WordCloud(font_path=str(font_path), stopwords=stopwords)
+        wordcloud = WordCloud(
+            font_path=str(font_path),
+            stopwords=stopwords,
+            width=1920,
+            height=1200,
+        )
         image = wordcloud.generate(txt).to_image()
         return image
     except ValueError:

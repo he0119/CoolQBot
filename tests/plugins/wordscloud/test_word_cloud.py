@@ -48,7 +48,7 @@ async def test_word_cloud(
     image = await get_wordcloud(messages)
 
     assert image is not None
-    assert image.size == (400, 200)
+    assert image.size == (1920, 1200)
 
     mocked_datetime = mocker.patch("src.plugins.wordscloud.datetime")
     mocked_datetime.now.return_value = now
