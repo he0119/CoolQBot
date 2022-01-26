@@ -75,7 +75,7 @@ async def today_handle(
         image.save(image_bytes, format="PNG")
         await today_cmd.finish(MessageSegment.image(image_bytes))
     else:
-        await today_cmd.finish("今天没有足够的数据生成词云")
+        await today_cmd.finish("没有足够的数据生成词云")
 
 
 # endregion

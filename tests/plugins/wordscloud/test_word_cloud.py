@@ -82,7 +82,7 @@ async def test_word_cloud_empty(app: App, session: AsyncSession):
         event = fake_group_message_event(message=Message("/今日词云"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "今天没有足够的数据生成词云", "")
+        ctx.should_call_send(event, "没有足够的数据生成词云", "")
         ctx.should_finished()
 
 
@@ -120,5 +120,5 @@ async def test_word_cloud_empty_msg(
         event = fake_group_message_event(message=Message("/今日词云"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "今天没有足够的数据生成词云", "")
+        ctx.should_call_send(event, "没有足够的数据生成词云", True)
         ctx.should_finished()
