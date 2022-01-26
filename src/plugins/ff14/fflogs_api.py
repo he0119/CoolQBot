@@ -11,8 +11,8 @@ from datetime import datetime, timedelta
 from typing import List, Literal
 
 import httpx
-from nonebot import require
 from nonebot.log import logger
+from nonebot_plugin_apscheduler import scheduler
 
 from .config import DATA, plugin_config
 from .fflogs_data import (
@@ -20,8 +20,6 @@ from .fflogs_data import (
     get_job_info_by_nickname,
     get_jobs_info,
 )
-
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
 class DataException(Exception):

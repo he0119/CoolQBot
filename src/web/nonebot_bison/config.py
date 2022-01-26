@@ -4,9 +4,8 @@ from os import path
 from typing import DefaultDict
 
 import nonebot
-from tinydb import Query, TinyDB
-
 from nonebot_plugin_datastore import PluginData
+from tinydb import Query, TinyDB
 
 from .platform import platform_manager
 from .plugin_config import plugin_config

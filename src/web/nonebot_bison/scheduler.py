@@ -1,14 +1,12 @@
 import nonebot
-from nonebot import require
 from nonebot.log import logger
+from nonebot_plugin_apscheduler import scheduler
 
 from .config import Config
 from .platform import platform_manager
 from .plugin_config import plugin_config
 from .send import do_send_msgs, send_msgs
 from .types import UserSubInfo
-
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 
 async def fetch_and_send(target_type: str):

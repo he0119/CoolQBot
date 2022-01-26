@@ -1,7 +1,7 @@
 """ 每日早安插件
 """
 import nonebot
-from nonebot import get_bot, require
+from nonebot import get_bot
 from nonebot.adapters import Bot
 from nonebot.adapters.onebot.v11 import Message
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
@@ -9,13 +9,13 @@ from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
 from nonebot.params import CommandArg
 from nonebot.plugin import on_command
+from nonebot_plugin_apscheduler import scheduler
 
 from src.utils.helpers import strtobool
 
 from .config import plugin_config
 from .data import HOLIDAYS_DATA, get_first_connect_message, get_moring_message
 
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 driver = nonebot.get_driver()
 
 

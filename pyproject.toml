@@ -37,7 +37,7 @@ pytest-xdist = "^2.5.0"
 
 [tool.nonebot]
 plugin_dirs = ["src/plugins", "src/web"]
-plugins = ["nonebot_plugin_sentry", "nonebot_plugin_datastore"]
+plugins = ["nonebot_plugin_apscheduler", "nonebot_plugin_sentry", "nonebot_plugin_datastore"]
 
 # [tool.pytest.ini_options]
 # addopts = "--cov=src --cov-report=term-missing"

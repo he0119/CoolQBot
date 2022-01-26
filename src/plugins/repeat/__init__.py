@@ -4,9 +4,8 @@
 拥有一些配套功能，如复读排行榜，排行榜历史记录，复读状态
 """
 import re
-from functools import cache
 
-from nonebot import CommandGroup, on_message, require
+from nonebot import CommandGroup, on_message
 from nonebot.adapters.onebot.v11 import Message
 from nonebot.adapters.onebot.v11.bot import Bot
 from nonebot.adapters.onebot.v11.event import (
@@ -16,9 +15,9 @@ from nonebot.adapters.onebot.v11.event import (
 )
 from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
-from nonebot.matcher import Matcher
-from nonebot.params import Arg, ArgPlainText, CommandArg, Depends
+from nonebot.params import Arg, CommandArg, Depends
 from nonebot.typing import T_State
+from nonebot_plugin_apscheduler import scheduler
 
 from src.utils.helpers import parse_bool, parse_int, strtobool
 
@@ -28,8 +27,6 @@ from .rank import get_rank
 from .recorder import recorder_obj
 from .repeat_rule import need_repeat
 from .status import get_status
-
-scheduler = require("nonebot_plugin_apscheduler").scheduler
 
 repeat = CommandGroup("repeat")
 
