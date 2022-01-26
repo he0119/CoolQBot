@@ -20,29 +20,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: he0119/setup-python@main
         with:
           python-version: 3.9
-      - name: Install poetry
-        uses: Gr1N/setup-poetry@v7
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
       - name: Install prerequisites
         run: |
           poetry install
           poetry run playwright install chromium
       - name: Run tests
-        run: poetry run pytest --cov=src --cov-report xml --junitxml=TEST-pytest.xml -n auto
-      - name: Upload Test Results
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: Unit Test Results
-          path: |
-            **/TEST-*.xml
+        run: poetry run pytest --cov-report xml -n auto
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
       - name: Set build version
@@ -57,16 +43,6 @@ jobs:
             echo "::set-output name=environment::dev"
             echo "::set-output name=version::$VERSION-git.$COMMIT_ID"
           fi
-
-  event_file:
-    name: Event File
-    runs-on: ubuntu-latest
-    steps:
-    - name: Upload
-      uses: actions/upload-artifact@v2
-      with:
-        name: Event File
-        path: ${{ github.event_path }}
 
   docker:
     name: Docker
