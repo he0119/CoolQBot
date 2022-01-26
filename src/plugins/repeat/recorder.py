@@ -180,7 +180,7 @@ class Recorder:
         if "version" not in data or data["version"] != VERSION:
             logger.info("发现旧版本数据，正在升级数据")
             data = update(data, plugin_config.group_id[0])
-            DATA.save_pkl(data, self._name)
+            DATA.dump_pkl(data, self._name)
             logger.info("升级数据成功")
 
         # 加载数据
@@ -208,12 +208,12 @@ class Recorder:
 
     def save_data(self):
         """保存数据"""
-        DATA.save_pkl(self.get_data(), self._name)
+        DATA.dump_pkl(self.get_data(), self._name)
 
     def save_data_to_history(self):
         """保存数据到历史文件夹"""
         date = datetime.now() - timedelta(hours=1)
-        DATA.save_pkl(self.get_data(), get_history_pkl_name(date))
+        DATA.dump_pkl(self.get_data(), get_history_pkl_name(date))
 
     def get_data(self):
         """获取当前数据

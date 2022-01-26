@@ -151,7 +151,7 @@ class FFLogs:
         # 如果获取数据的日期不是当天，则缓存数据
         # 因为今天的数据可能还会增加，不能先缓存
         if end_date < datetime.now():
-            DATA.save_pkl(rankings, cache_name, cache=True)
+            DATA.dump_pkl(rankings, cache_name, cache=True)
 
         return rankings
 
@@ -289,7 +289,7 @@ class FFLogs:
     ) -> None:
         """设置 QQ号 与 最终幻想14 用户名和服务器名"""
         self.characters[user_id] = [character_name, server_name]
-        DATA.save_pkl(self.characters, "characters.pkl")
+        DATA.dump_pkl(self.characters, "characters.pkl")
 
     async def character_dps(
         self,
