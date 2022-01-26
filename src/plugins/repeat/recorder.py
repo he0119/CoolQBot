@@ -238,4 +238,4 @@ class Recorder:
         self._msg_number_list = {group_id: {} for group_id in plugin_config.group_id}
 
 
-recorder_obj = Recorder("recorder")
+recorder_obj = Recorder("recorder.pkl")
