@@ -50,10 +50,10 @@ profile = "black"
 line_length = 88
 skip_gitignore = true
 
-[[tool.poetry.source]]
-default = true
-name = "tuna"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+# [[tool.poetry.source]]
+# default = true
+# name = "tuna"
+# url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
