@@ -27,7 +27,7 @@ wordcloud = "^1.8.1"
 jieba = "^0.42.1"
 
 [tool.poetry.dev-dependencies]
-nb-cli = "^0.6.4"
+nb-cli = "^0.6.5"
 black = "^21.8b0"
 isort = "^5.9.3"
 nonebug = "^0.2.0"

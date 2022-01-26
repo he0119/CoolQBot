@@ -536,7 +536,7 @@ python-versions = "*"
 
 [[package]]
 name = "nb-cli"
-version = "0.6.4"
+version = "0.6.5"
 description = "CLI for nonebot2"
 category = "dev"
 optional = false
@@ -551,6 +551,7 @@ nonebot2 = ">=2.0.0-beta.1,<3.0.0"
 prompt-toolkit = ">=3.0.19,<4.0.0"
 pyfiglet = ">=0.8.post1,<0.9"
 tomlkit = ">=0.7.0,<0.8.0"
+wcwidth = ">=0.2.5,<0.3.0"
 
 [package.extras]
 deploy = ["docker-compose (>=1.29.2,<1.30.0)"]
@@ -627,14 +628,13 @@ develop = false
 
 [package.dependencies]
 fastapi = "^0.70.0"
-httpx = {version = ">=0.20.0, <1.0.0", extras = ["http2"], optional = true}
+httpx = {version = ">=0.20.0,<1.0.0", extras = ["http2"], optional = true, markers = "extra == \"httpx\" or extra == \"all\""}
 loguru = "^0.5.1"
 pydantic = {version = "~1.9.0", extras = ["dotenv"]}
 pygtrie = "^2.4.1"
 tomlkit = "^0.7.0"
 typing-extensions = ">=3.10.0,<5.0.0"
 uvicorn = {version = "^0.15.0", extras = ["standard"]}
-websockets = {version = "^10.0", optional = true}
 yarl = "^1.7.2"
 
 [package.extras]
@@ -1362,7 +1362,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "530506b0d3abc33c45145718f4a57e2f87dc77cdc73753e78f5a7231e1d3eefe"
+content-hash = "2d4d70f6d95849d13b7d0c0fec2ce2fd6aa2988b0e9f8992fd56a840add572e0"
 
 [metadata.files]
 aiosqlite = [
@@ -1856,8 +1856,8 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
 nb-cli = [
-    {file = "nb-cli-0.6.4.tar.gz", hash = "sha256:9beffd96af65a5d9a7b2f56a70fe93be23546809b5c1bb07ca6b84eda3f214d4"},
-    {file = "nb_cli-0.6.4-py3-none-any.whl", hash = "sha256:7ed3d0e6023270be5bb1f55ad929a64f79158efd5b030adc1dd07739e8454ea1"},
+    {file = "nb-cli-0.6.5.tar.gz", hash = "sha256:4fba1726419a429e14371c293d2c4ffdc4544f333fead2944febf9692f927774"},
+    {file = "nb_cli-0.6.5-py3-none-any.whl", hash = "sha256:f19026c9f90b9edeaab8fe05db828f570005ce7baa4f49019ee1276f99754ac3"},
 ]
 nonebot-adapter-onebot = [
     {file = "nonebot-adapter-onebot-2.0.0b1.tar.gz", hash = "sha256:9dad770371e577fead096ceacacc43b3ef304a8e238e8fff1163eefc4e947a75"},
