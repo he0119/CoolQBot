@@ -39,8 +39,8 @@ pytest-xdist = "^2.5.0"
 plugin_dirs = ["src/plugins", "src/web"]
 plugins = ["nonebot_plugin_sentry", "nonebot_plugin_datastore"]
 
-[tool.pytest.ini_options]
-addopts = "--cov=src --cov-report=term-missing"
+# [tool.pytest.ini_options]
+# addopts = "--cov=src --cov-report=term-missing"
 
 [tool.black]
 line-length = 88

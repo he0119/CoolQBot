@@ -4,11 +4,11 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from zoneinfo import ZoneInfo
 
-from nonebot import CommandGroup, on_message
+from nonebot import on_command, on_message
 from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.adapters.onebot.v11.permission import GROUP
-from nonebot.params import Depends
+from nonebot.params import Command, Depends
 from nonebot_plugin_datastore import get_session
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -16,10 +16,8 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from .data import get_wordcloud
 from .model import Message
 
-wordcloud = CommandGroup("wordcloud")
-
 # region 保存消息
-save_message = on_message(permission=GROUP, priority=1)
+save_message = on_message(permission=GROUP, block=False)
 
 
 @save_message.handle()
@@ -38,24 +36,30 @@ async def save_message_handle(
 
 
 # endregion
-
-# region 词云
-today_cmd = wordcloud.command("today", aliases={"今日词云", ("词云", "今日")})
+# region 今日词云
+today_cmd = on_command("wordcloud", aliases={"词云", "今日词云", "昨日词云"})
 today_cmd.__doc__ = """
 词云
 
 获取今天的词云
 /今日词云
+获取昨天的词云
+/昨日词云
 """
 
 
 @today_cmd.handle()
 async def today_handle(
-    event: GroupMessageEvent, session: AsyncSession = Depends(get_session)
+    event: GroupMessageEvent,
+    session: AsyncSession = Depends(get_session),
+    commands: tuple[str, ...] = Command(),
 ):
     # 获取中国本地时间
     now = datetime.now(ZoneInfo("Asia/Shanghai"))
     now = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    if commands[0] == "昨日词云":
+        now = now - timedelta(days=1)
 
     # 中国时区差了 8 小时
     statement = select(Message).where(

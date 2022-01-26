@@ -54,15 +54,15 @@ async def test_word_cloud(
     mocked_datetime.now.return_value = now
     mocked_get_wordcloud = mocker.patch("src.plugins.wordscloud.get_wordcloud")
     mocked_get_wordcloud.return_value = image
-    img_byte_arr = BytesIO()
-    image.save(img_byte_arr, format="PNG")
+    img_bytes = BytesIO()
+    image.save(img_bytes, format="PNG")
 
     async with app.test_matcher(today_cmd) as ctx:
         bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/今日词云"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, MessageSegment.image(img_byte_arr), "")
+        ctx.should_call_send(event, MessageSegment.image(img_bytes), True)
         ctx.should_finished()
 
     mocked_datetime.now.assert_called_once()

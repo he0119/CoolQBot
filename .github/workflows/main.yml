@@ -28,7 +28,7 @@ jobs:
           poetry install
           poetry run playwright install chromium
       - name: Run tests
-        run: poetry run pytest --cov-report xml -n auto
+        run: poetry run pytest --cov=src --cov-report xml -n auto
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
       - name: Set build version
