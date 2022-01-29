@@ -54,7 +54,7 @@ zookeeper = ["kazoo"]
 
 [[package]]
 name = "arrow"
-version = "1.2.1"
+version = "1.2.2"
 description = "Better dates & times for Python"
 category = "dev"
 optional = false
@@ -619,6 +619,24 @@ nonebot2 = ">=2.0.0-alpha.6,<3.0.0"
 sentry-sdk = ">=1.0.0,<2.0.0"
 
 [[package]]
+name = "nonebot-plugin-wordcloud"
+version = "0.0.2"
+description = "适用于 Nonebot2 的词云插件"
+category = "main"
+optional = false
+python-versions = ">=3.7.3,<4.0.0"
+
+[package.dependencies]
+jieba = ">=0.42.1,<0.43.0"
+nonebot-adapter-onebot = ">=2.0.0-beta.1,<3.0.0"
+nonebot-plugin-datastore = ">=0.2.0,<0.3.0"
+nonebot2 = {version = ">=2.0.0-beta.1,<3.0.0", extras = ["httpx"]}
+numpy = {version = ">=1.22.1,<2.0.0", markers = "python_version >= \"3.8\""}
+typing-extensions = ">=4.0.1,<5.0.0"
+tzdata = ">=2021.5,<2022.0"
+wordcloud = ">=1.8.1,<2.0.0"
+
+[[package]]
 name = "nonebot2"
 version = "2.0.0-beta.1"
 description = "An asynchronous python bot framework."
@@ -649,7 +667,7 @@ all = ["Quart (>=0.16.0,<0.17.0)", "aiohttp[speedups] (>=3.7.4,<4.0.0)", "httpx[
 [package.source]
 type = "git"
 url = "https://github.com/nonebot/nonebot2.git"
-reference = "dev"
+reference = "e1dffa99a0dff8b70f38c1a8ba0a9174b90703ff"
 resolved_reference = "e1dffa99a0dff8b70f38c1a8ba0a9174b90703ff"
 
 [[package]]
@@ -750,7 +768,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "prompt-toolkit"
-version = "3.0.24"
+version = "3.0.26"
 description = "Library for building powerful interactive command lines in Python"
 category = "dev"
 optional = false
@@ -896,11 +914,11 @@ pytest = ">=3.10"
 
 [[package]]
 name = "pytest-mock"
-version = "3.6.1"
+version = "3.7.0"
 description = "Thin-wrapper around the mock package for easier use with pytest"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
 pytest = ">=5.0"
@@ -1171,7 +1189,7 @@ full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests", "gra
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.573"
+version = "3.0.575"
 description = "Tencent Cloud SDK for Python"
 category = "main"
 optional = false
@@ -1364,7 +1382,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "530506b0d3abc33c45145718f4a57e2f87dc77cdc73753e78f5a7231e1d3eefe"
+content-hash = "3f58688a575311ff5817197a883f64cad798d86d4e46431697adc93a8bb61020"
 
 [metadata.files]
 aiosqlite = [
@@ -1380,8 +1398,8 @@ apscheduler = [
     {file = "APScheduler-3.8.1.tar.gz", hash = "sha256:5cf344ebcfbdaa48ae178c029c055cec7bc7a4a47c21e315e4d1f08bd35f2355"},
 ]
 arrow = [
-    {file = "arrow-1.2.1-py3-none-any.whl", hash = "sha256:6b2914ef3997d1fd7b37a71ce9dd61a6e329d09e1c7b44f4d3099ca4a5c0933e"},
-    {file = "arrow-1.2.1.tar.gz", hash = "sha256:c2dde3c382d9f7e6922ce636bf0b318a7a853df40ecb383b29192e6c5cc82840"},
+    {file = "arrow-1.2.2-py3-none-any.whl", hash = "sha256:d622c46ca681b5b3e3574fcb60a04e5cc81b9625112d5fb2b44220c36c892177"},
+    {file = "arrow-1.2.2.tar.gz", hash = "sha256:05caf1fd3d9a11a1135b2b6f09887421153b94558e5ef4d090b567b47173ac2b"},
 ]
 asgiref = [
     {file = "asgiref-3.5.0-py3-none-any.whl", hash = "sha256:88d59c13d634dcffe0510be048210188edd79aeccb6a6c9028cdad6f31d730a9"},
@@ -1881,6 +1899,10 @@ nonebot-plugin-sentry = [
     {file = "nonebot-plugin-sentry-0.2.2.tar.gz", hash = "sha256:e042e773e1d533d9bb5deb81cc0e9a0d78800e43c5093475d65d8c91308f98f7"},
     {file = "nonebot_plugin_sentry-0.2.2-py3-none-any.whl", hash = "sha256:cc7aab8a258aa1931bd4fdab36672e6e99f645d438c6c24999688a8422ba0dd3"},
 ]
+nonebot-plugin-wordcloud = [
+    {file = "nonebot-plugin-wordcloud-0.0.2.tar.gz", hash = "sha256:173fda1fc764f7668edd3725977f3bef61780b6687d790a672251e7d6720e013"},
+    {file = "nonebot_plugin_wordcloud-0.0.2-py3-none-any.whl", hash = "sha256:a4adfdc5c71ae1fb3117c9f3c4fd1b98c93292f5e41d87b37951841aa271db54"},
+]
 nonebot2 = []
 nonebug = [
     {file = "nonebug-0.2.1-py3-none-any.whl", hash = "sha256:f4d59effd50e400ee866df57902e4d749227a76857be26a0607fc2a5f6a05f7c"},
@@ -1974,8 +1996,8 @@ poyo = [
     {file = "poyo-0.5.0.tar.gz", hash = "sha256:e26956aa780c45f011ca9886f044590e2d8fd8b61db7b1c1cf4e0869f48ed4dd"},
 ]
 prompt-toolkit = [
-    {file = "prompt_toolkit-3.0.24-py3-none-any.whl", hash = "sha256:e56f2ff799bacecd3e88165b1e2f5ebf9bcd59e80e06d395fa0cc4b8bd7bb506"},
-    {file = "prompt_toolkit-3.0.24.tar.gz", hash = "sha256:1bb05628c7d87b645974a1bad3f17612be0c29fa39af9f7688030163f680bad6"},
+    {file = "prompt_toolkit-3.0.26-py3-none-any.whl", hash = "sha256:4bcf119be2200c17ed0d518872ef922f1de336eb6d1ddbd1e089ceb6447d97c6"},
+    {file = "prompt_toolkit-3.0.26.tar.gz", hash = "sha256:a51d41a6a45fd9def54365bca8f0402c8f182f2b6f7e29c74d55faeb9fb38ac4"},
 ]
 psutil = [
     {file = "psutil-5.9.0-cp27-cp27m-manylinux2010_i686.whl", hash = "sha256:55ce319452e3d139e25d6c3f85a1acf12d1607ddedea5e35fb47a552c051161b"},
@@ -2084,8 +2106,8 @@ pytest-forked = [
     {file = "pytest_forked-1.4.0-py3-none-any.whl", hash = "sha256:bbbb6717efc886b9d64537b41fb1497cfaf3c9601276be8da2cccfea5a3c8ad8"},
 ]
 pytest-mock = [
-    {file = "pytest-mock-3.6.1.tar.gz", hash = "sha256:40217a058c52a63f1042f0784f62009e976ba824c418cced42e88d5f40ab0e62"},
-    {file = "pytest_mock-3.6.1-py3-none-any.whl", hash = "sha256:30c2f2cc9759e76eee674b81ea28c9f0b94f8f0445a1b87762cadf774f0df7e3"},
+    {file = "pytest-mock-3.7.0.tar.gz", hash = "sha256:5112bd92cc9f186ee96e1a92efc84969ea494939c3aead39c50f421c4cc69534"},
+    {file = "pytest_mock-3.7.0-py3-none-any.whl", hash = "sha256:6cff27cec936bf81dc5ee87f07132b807bcda51106b5ec4b90a04331cba76231"},
 ]
 pytest-xdist = [
     {file = "pytest-xdist-2.5.0.tar.gz", hash = "sha256:4580deca3ff04ddb2ac53eba39d76cb5dd5edeac050cb6fbc768b0dd712b4edf"},
@@ -2228,8 +2250,8 @@ starlette = [
     {file = "starlette-0.16.0.tar.gz", hash = "sha256:e1904b5d0007aee24bdd3c43994be9b3b729f4f58e740200de1d623f8c3a8870"},
 ]
 tencentcloud-sdk-python = [
-    {file = "tencentcloud-sdk-python-3.0.573.tar.gz", hash = "sha256:c5e4955986c518fcd76227f6f45fb44f71f3884367913f6a081cb5c59c74fcf6"},
-    {file = "tencentcloud_sdk_python-3.0.573-py2.py3-none-any.whl", hash = "sha256:02eb091a626e2679287acbe3cb263e8bffd65568000cc1032c7383cdb27a4ea4"},
+    {file = "tencentcloud-sdk-python-3.0.575.tar.gz", hash = "sha256:4090564645b70aa02a4405120cd513822d452f92d2ee3842aecb3919e19697b6"},
+    {file = "tencentcloud_sdk_python-3.0.575-py2.py3-none-any.whl", hash = "sha256:506413e072acb5bd2349900ed7571dbe713c4e9d0429ee4a5aff84acb72e7e42"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},
