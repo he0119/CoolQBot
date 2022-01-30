@@ -620,8 +620,8 @@ sentry-sdk = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.0.3"
-description = "适用于 Nonebot2 的词云插件"
+version = "0.0.4"
+description = "适用于 NoneBot2 的词云插件"
 category = "main"
 optional = false
 python-versions = ">=3.7.3,<4.0.0"
@@ -1382,7 +1382,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "6512267a11783786d4ff9681b56c233d7f762630833de8ede695dfa379f47580"
+content-hash = "f1e95a86f2d99317d7d63b61a1869c583c9bbb28f42a6f27e98d0db54b073224"
 
 [metadata.files]
 aiosqlite = [
@@ -1900,8 +1900,8 @@ nonebot-plugin-sentry = [
     {file = "nonebot_plugin_sentry-0.2.2-py3-none-any.whl", hash = "sha256:cc7aab8a258aa1931bd4fdab36672e6e99f645d438c6c24999688a8422ba0dd3"},
 ]
 nonebot-plugin-wordcloud = [
-    {file = "nonebot-plugin-wordcloud-0.0.3.tar.gz", hash = "sha256:f25f24e992edcbf206352e494d076d704741b3d9a286f15b19f9495acc72a669"},
-    {file = "nonebot_plugin_wordcloud-0.0.3-py3-none-any.whl", hash = "sha256:763f2bd46ce9aaa972b055768cf32506fc879dfc685c766a0c6b21fda91e58f0"},
+    {file = "nonebot-plugin-wordcloud-0.0.4.tar.gz", hash = "sha256:961568323a4139fc827a350c62f7574e1b9ef9200f82572ce9f02cadeeadc49a"},
+    {file = "nonebot_plugin_wordcloud-0.0.4-py3-none-any.whl", hash = "sha256:1117fab38312fe4685acc9bb50edb3b4d6b6fee7ac3dff1b667f3fdccd3bd91e"},
 ]
 nonebot2 = []
 nonebug = [
