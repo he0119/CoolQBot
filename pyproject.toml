@@ -19,7 +19,7 @@ tencentcloud-sdk-python = "^3.0.434"
 tinydb = "^4.3.0"
 beautifulsoup4 = "^4.9.3"
 feedparser = "^6.0.2"
-pillow = "^9.0.0"
+pillow = "^9.0.1"
 psutil = "^5.8.0"
 playwright = "^1.17.2"
 
