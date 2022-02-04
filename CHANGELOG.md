@@ -21,19 +21,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ### Removed
 
-- 删除 公主连结Re:Dive 插件中定时推送功能
+- 删除 `公主连结Re:Dive` 插件中定时推送功能
 
 ## [0.15.3] - 2021-12-19
 
 ### Added
 
-- 添加最终幻想XIV查价功能
+- 添加 `最终幻想XIV` 查价功能
 
 ## [0.15.2] - 2021-11-21
 
 ### Added
 
-- 添加最终幻想XIV时尚品鉴功能
+- 添加 `最终幻想XIV` 时尚品鉴功能
 
 ### Changed
 
@@ -70,7 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ### Removed
 
-- 移除最终幻想XIV与公主链接插件中的新闻订阅功能（可通过订阅插件替代）
+- 移除 `最终幻想XIV` 与公主链接插件中的新闻订阅功能（可通过订阅插件替代）
 
 ### Fixed
 
@@ -86,7 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Changed
 
 - 更新至 NoneBot2 2.0.0a13
-- 最终幻想XIV使用新闻发布日期作为推送判定标准
+- `最终幻想XIV` 使用新闻发布日期作为推送判定标准
 
 ## [0.14.0] - 2020-11-30
 
@@ -104,7 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ### Removed
 
-- B站番剧查询
+- B 站番剧查询
 - `yobot` 集成
 - `NLP` 相关模块
 
@@ -117,7 +117,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ### Added
 
-- 最终幻想XIV新闻自动推送
+- `最终幻想XIV` 新闻自动推送
 
 ### Changed
 
@@ -435,7 +435,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.15.3...HEAD
+[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.15.3...HEAD
 [0.15.3]: https://github.com/he0119/CoolQBot/compare/v0.15.2...v0.15.3
 [0.15.2]: https://github.com/he0119/CoolQBot/compare/v0.15.1...v0.15.2
 [0.15.1]: https://github.com/he0119/CoolQBot/compare/v0.15.0...v0.15.1
