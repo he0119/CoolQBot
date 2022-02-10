@@ -160,10 +160,7 @@ async def test_price_item_not_found(app: App, mocker: MockerFixture):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
-async def test_price_world_not_found(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_price_world_not_found(app: App, mocker: MockerFixture):
     """测试查价，服务器/大区不存在"""
     from nonebot import get_driver
     from nonebot.adapters.onebot.v11 import Adapter, Bot, Message

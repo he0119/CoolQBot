@@ -9,7 +9,7 @@ import httpx
 from nonebot import CommandGroup
 from nonebot.adapters.onebot.v11 import Message, MessageEvent
 from nonebot.matcher import Matcher
-from nonebot.params import ArgPlainText, Command, CommandArg, Depends
+from nonebot.params import ArgPlainText, CommandArg, Depends
 
 from src.utils.helpers import strtobool
 
