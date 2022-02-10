@@ -209,7 +209,7 @@ async def test_price_help(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "最终幻想XIV 价格查询\n\n查询大区中的最低价格\n/查价 萨维奈舞裙 猫小胖\n查询服务器中的最低价格\n/查价 萨维奈舞裙 静语庄园",
+            "最终幻想XIV 价格查询\n\n查询大区中的最低价格\n/查价 萨维奈舞裙 猫小胖\n查询服务器中的最低价格\n/查价 萨维奈舞裙 静语庄园\n设置默认查询的区域\n/查价 默认值 静语庄园\n查询当前设置的默认值\n/查价 默认值",
             True,
         )
         ctx.should_finished()
