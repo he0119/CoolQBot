@@ -14,7 +14,7 @@ nonebot-adapter-onebot = "^2.0.0b1"
 nonebot-plugin-apscheduler = "^0.1.2"
 nonebot-plugin-sentry = "^0.2.2"
 nonebot-plugin-datastore = "^0.3.0"
-nonebot-plugin-wordcloud = { git = "https://github.com/he0119/nonebot-plugin-wordcloud", branch= "dev"}
+nonebot-plugin-wordcloud = '^0.0.6'
 tencentcloud-sdk-python = "^3.0.434"
 tinydb = "^4.3.0"
 beautifulsoup4 = "^4.9.3"
@@ -42,9 +42,6 @@ plugins = [
     "nonebot_plugin_wordcloud"
 ]
 
-# [tool.pytest.ini_options]
-# addopts = "--cov=src --cov-report=term-missing"
-
 [tool.black]
 line-length = 88
 
@@ -52,11 +49,6 @@ line-length = 88
 profile = "black"
 line_length = 88
 skip_gitignore = true
-
-# [[tool.poetry.source]]
-# default = true
-# name = "tuna"
-# url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"
