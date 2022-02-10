@@ -4,6 +4,3 @@ updates:
   directory: "/"
   schedule:
     interval: monthly
-    time: "05:00"
-    timezone: "Asia/Shanghai"
-  target-branch: dev

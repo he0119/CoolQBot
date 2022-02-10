@@ -24,9 +24,9 @@ psutil = "^5.8.0"
 playwright = "^1.18.2"
 
 [tool.poetry.dev-dependencies]
-nb-cli = "^0.6.4"
-black = "^21.8b0"
-isort = "^5.9.3"
+nb-cli = "^0.6.5"
+black = "^22.1.0"
+isort = "^5.10.1"
 nonebug = "^0.2.0"
 pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"

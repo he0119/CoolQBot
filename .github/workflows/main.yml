@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'master'
-      - 'dev'
   pull_request:
   release:
     types: [published]
@@ -51,8 +50,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          submodules: recursive
       - name: Set version
         run: |
           sed -ri "s#SENTRY_RELEASE=version#SENTRY_RELEASE=$VERSION#g" Dockerfile
@@ -87,21 +84,18 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     needs: docker
-    if: ${{ github.ref == 'refs/heads/dev' }}
+    if: ${{ github.event_name != 'pull_request' }}
     steps:
       - name: Deploy to server
         uses: appleboy/ssh-action@master
-        env:
-          TAG_NAME: ${{ github.event.release.tag_name }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script_stop: true
-          envs: TAG_NAME
           script: |
             cd coolqbot/dev
-            sed -i "s#he0119/coolqbot:.*#he0119/coolqbot:dev#g" docker-compose.yml
+            sed -i "s#he0119/coolqbot:.*#he0119/coolqbot:master#g" docker-compose.yml
             sudo docker-compose pull
             sudo docker-compose down
             sudo docker-compose up -d
