@@ -8,12 +8,12 @@ from .eorzean_data import locationIndex, weatherIndex, weatherRateIndex
 
 def int_overflow(n: int):
     """模拟 JavaScript 的溢出"""
-    return n & (2 ** 32 - 1)
+    return n & (2**32 - 1)
 
 
 def unsigned_right_shitf(n: int, i: int):
     """模拟 JavaScript 的无符号右移"""
-    return (n & (2 ** 32 - 1)) >> i
+    return (n & (2**32 - 1)) >> i
 
 
 def forecastTarget(date: int):
