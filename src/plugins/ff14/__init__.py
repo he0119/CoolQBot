@@ -9,12 +9,12 @@ import httpx
 from nonebot import CommandGroup
 from nonebot.adapters.onebot.v11 import Message, MessageEvent
 from nonebot.matcher import Matcher
-from nonebot.params import ArgPlainText, CommandArg, Depends
+from nonebot.params import ArgPlainText, Command, CommandArg, Depends
 
 from src.utils.helpers import strtobool
 
 from ..help.commands import get_command_help
-from .config import global_config, plugin_config
+from .config import DATA, global_config, plugin_config
 from .fflogs_api import fflogs
 from .fflogs_data import FFLOGS_DATA
 from .gate import get_direction
@@ -240,22 +240,42 @@ price_cmd.__doc__ = """
 /查价 萨维奈舞裙 猫小胖
 查询服务器中的最低价格
 /查价 萨维奈舞裙 静语庄园
+设置默认查询的区域
+/查价 默认值 静语庄园
+查询当前设置的默认值
+/查价 默认值
 """
 
 
 @price_cmd.handle()
-async def price_handle(arg: Message = CommandArg()):
+async def price_handle(event: MessageEvent, args: Message = CommandArg()):
     """查价"""
-    argv = arg.extract_plain_text().split()
-    if len(argv) < 2:
+    argv = args.extract_plain_text().split()
+
+    if len(argv) == 0:
         await price_cmd.finish(get_command_help("ff14.price"))
 
-    try:
-        reply = await get_item_price(*argv[:2])
-    except httpx.HTTPError:
-        reply = "抱歉，网络出错，请稍后再试。"
+    if len(argv) == 1 and argv[0] == "默认值":
+        world_or_dc = DATA.config.get(f"price-default-{event.user_id}", "猫小胖")
+        await price_cmd.finish(f"当前设置的默认值为：{world_or_dc}")
 
-    await price_cmd.finish(reply)
+    if len(argv) == 2 and argv[0] == "默认值":
+        DATA.config.set(f"price-default-{event.user_id}", argv[1])
+        await price_cmd.finish("查询区域默认值设置成功！")
+
+    if len(argv) > 0:
+        name = argv[0]
+        if len(argv) >= 2:
+            world_or_dc = argv[1]
+        else:
+            world_or_dc = DATA.config.get(f"price-default-{event.user_id}", "猫小胖")
+
+        try:
+            reply = await get_item_price(name, world_or_dc)
+        except httpx.HTTPError:
+            reply = "抱歉，网络出错，请稍后再试。"
+
+        await price_cmd.finish(reply)
 
 
 # endregion
