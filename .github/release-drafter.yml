@@ -1,5 +1,16 @@
 name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
+autolabeler:
+  - label: 'bug'
+    branch:
+      - '/fix\/.+/'
+  - label: 'change'
+    branch:
+      - '/change\/.+/'
+  - label: 'enhancement'
+    branch:
+      - '/feature\/.+/'
+      - '/feat\/.+/'
 categories:
   - title: 'Added'
     labels:
