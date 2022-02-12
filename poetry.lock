@@ -1,4 +1,18 @@
 [[package]]
+name = "aiocache"
+version = "0.11.1"
+description = "multi backend asyncio cache"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+dev = ["asynctest (>=0.11.0)", "codecov", "coverage", "flake8", "ipdb", "marshmallow", "pystache", "pytest", "pytest-asyncio", "pytest-mock", "sphinx", "sphinx-autobuild", "sphinx-rtd-theme", "black"]
+memcached = ["aiomcache (>=0.5.2)"]
+msgpack = ["msgpack (>=0.5.5)"]
+redis = ["aioredis (>=0.3.3)", "aioredis (>=1.0.0)"]
+
+[[package]]
 name = "aiosqlite"
 version = "0.17.0"
 description = "asyncio bridge to the standard sqlite3 module"
@@ -460,6 +474,31 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "imageio"
+version = "2.15.0"
+description = "Library for reading and writing a wide range of image, video, scientific, and volumetric data formats."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+numpy = "*"
+pillow = ">=8.3.2"
+
+[package.extras]
+build = ["wheel"]
+dev = ["invoke", "pytest", "pytest-cov", "fsspec", "black", "flake8"]
+docs = ["sphinx", "numpydoc", "pydata-sphinx-theme"]
+ffmpeg = ["imageio-ffmpeg", "psutil"]
+fits = ["astropy"]
+full = ["astropy", "black", "flake8", "fsspec", "gdal", "imageio-ffmpeg", "invoke", "itk", "numpydoc", "psutil", "pydata-sphinx-theme", "pytest", "pytest-cov", "sphinx", "tifffile", "wheel"]
+gdal = ["gdal"]
+itk = ["itk"]
+linting = ["black", "flake8"]
+test = ["invoke", "pytest", "pytest-cov", "fsspec"]
+tifffile = ["tifffile"]
+
+[[package]]
 name = "iniconfig"
 version = "1.1.1"
 description = "iniconfig: brain-dead simple config-ini parsing"
@@ -674,6 +713,22 @@ python-versions = ">=3.7.3,<4.0.0"
 
 [package.dependencies]
 nonebot2 = ">=2.0.0-alpha.8,<3.0.0"
+
+[[package]]
+name = "nonebot-plugin-memes"
+version = "0.2.2.2"
+description = "Nonebot2 plugin for making memes"
+category = "main"
+optional = false
+python-versions = ">=3.7.3,<4.0.0"
+
+[package.dependencies]
+aiocache = ">=0.11.0"
+httpx = ">=0.19.0"
+imageio = ">=2.12.0,<3.0.0"
+nonebot-adapter-onebot = ">=2.0.0-beta.1,<3.0.0"
+nonebot2 = ">=2.0.0-beta.1,<3.0.0"
+Pillow = ">=8.2.0"
 
 [[package]]
 name = "nonebot-plugin-sentry"
@@ -1483,9 +1538,13 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "89e1a38ebf088657b917bd97c6a4863e1a6ce14c4e145421d6d9ac3bc6e3eab8"
+content-hash = "851a0c684b26afc09c70496b36c3b3e4ed6065a1658c82579f40671bc93e7444"
 
 [metadata.files]
+aiocache = [
+    {file = "aiocache-0.11.1-py2.py3-none-any.whl", hash = "sha256:e55c7caaa5753794fd301c3a2e592737fa1d036db9f8d04ae154facdfb48a157"},
+    {file = "aiocache-0.11.1.tar.gz", hash = "sha256:f2ebe0b05cec45782e7b5ea0bb74640f157dd4bb1028b4565364dda9fe33be7f"},
+]
 aiosqlite = [
     {file = "aiosqlite-0.17.0-py3-none-any.whl", hash = "sha256:6c49dc6d3405929b1d08eeccc72306d3677503cc5e5e43771efc1e00232e8231"},
     {file = "aiosqlite-0.17.0.tar.gz", hash = "sha256:f0e6acc24bc4864149267ac82fb46dfb3be4455f99fe21df82609cc6e6baee51"},
@@ -1757,6 +1816,10 @@ identify = [
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
     {file = "idna-3.3.tar.gz", hash = "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"},
+]
+imageio = [
+    {file = "imageio-2.15.0-py3-none-any.whl", hash = "sha256:d5e553c8e8fd01ac27094df32bf020b553f640a71b042c960c8341bf7d313a8e"},
+    {file = "imageio-2.15.0.tar.gz", hash = "sha256:d0d7abb4e5c4044c06fc573233489c4a25582698f93ca94f7bd70b6f4ab172ec"},
 ]
 iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
@@ -2040,6 +2103,10 @@ nonebot-plugin-datastore = [
 nonebot-plugin-localstore = [
     {file = "nonebot-plugin-localstore-0.1.0.tar.gz", hash = "sha256:6d264cf8adcc4a470b496a78384eafd6ffd13bb8b7e14125e38e641748d2ee79"},
     {file = "nonebot_plugin_localstore-0.1.0-py3-none-any.whl", hash = "sha256:a5be70a32f24d92561120881b883e4583c7aecec9703399cc6eef4618e5ee933"},
+]
+nonebot-plugin-memes = [
+    {file = "nonebot_plugin_memes-0.2.2.2-py3-none-any.whl", hash = "sha256:1e472be5a8489a4f56043b7f62d57992a9b08d569b3979df39292289032161a5"},
+    {file = "nonebot_plugin_memes-0.2.2.2.tar.gz", hash = "sha256:f5b39719b0bb8469977ad3f63eb7d0b29a5010d5732ca54e09d3e038b33bb7cc"},
 ]
 nonebot-plugin-sentry = [
     {file = "nonebot-plugin-sentry-0.2.2.tar.gz", hash = "sha256:e042e773e1d533d9bb5deb81cc0e9a0d78800e43c5093475d65d8c91308f98f7"},
