@@ -41,4 +41,4 @@ class Config(BaseSettings):
 
 
 global_config = get_driver().config
-plugin_config = Config(**global_config.dict())
+plugin_config = Config.parse_obj(global_config)

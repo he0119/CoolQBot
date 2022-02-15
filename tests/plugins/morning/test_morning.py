@@ -17,6 +17,10 @@ def mocked_get(url: str, **kwargs):
         def json(self):
             return self._json
 
+        @property
+        def content(self):
+            return json.dumps(self._json).encode("utf-8")
+
     test_dir = Path(__file__).parent
     if (
         url
