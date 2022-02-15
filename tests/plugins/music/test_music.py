@@ -16,6 +16,10 @@ def mocked_get(url: str, **kwargs):
         def json(self):
             return self._json
 
+        @property
+        def content(self):
+            return json.dumps(self._json).encode("utf-8")
+
     test_dir = Path(__file__).parent
     if url == "http://netease:3000/search?keywords=test":
         with open(test_dir / "netease.json", "r", encoding="utf-8") as f:
@@ -71,7 +75,9 @@ async def test_music_get_arg(
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
         bot = make_fake_bot(Bot)(adapter, "1")
         event = fake_group_message_event(message=Message("/music"))
-        next_event = fake_group_message_event(message=MessageSegment.image("12"))
+        next_event = fake_group_message_event(
+            message=Message(MessageSegment.image("12"))
+        )
         final_event = fake_group_message_event(message=Message("test"))
 
         ctx.receive_event(bot, event)

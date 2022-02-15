@@ -17,6 +17,10 @@ def mocked_get(url: str, **kwargs):
         def json(self):
             return self._json
 
+        @property
+        def content(self):
+            return json.dumps(self._json).encode("utf-8")
+
     test_dir = Path(__file__).parent
     if (
         url
@@ -157,7 +161,6 @@ async def test_morning_today(
     mocked_date.today.assert_called()
     get.assert_called_once_with(
         "https://cdn.jsdelivr.net/gh/he0119/coolqbot@master/src/plugins/morning/holidays.json",
-        timeout=30,
     )
     render_expression.assert_called_once_with(
         EXPR_MORNING,
