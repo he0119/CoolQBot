@@ -161,6 +161,7 @@ async def test_morning_today(
     mocked_date.today.assert_called()
     get.assert_called_once_with(
         "https://cdn.jsdelivr.net/gh/he0119/coolqbot@master/src/plugins/morning/holidays.json",
+        timeout=30,
     )
     render_expression.assert_called_once_with(
         EXPR_MORNING,
