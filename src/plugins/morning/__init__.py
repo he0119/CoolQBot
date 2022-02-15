@@ -2,8 +2,7 @@
 """
 import nonebot
 from nonebot import get_bot
-from nonebot.adapters import Bot
-from nonebot.adapters.onebot.v11 import Message
+from nonebot.adapters.onebot.v11 import Bot, Message
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.log import logger
