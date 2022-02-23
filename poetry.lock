@@ -627,7 +627,7 @@ Pillow = ">=8.2.0"
 
 [[package]]
 name = "nonebot-plugin-petpet"
-version = "0.2.5"
+version = "0.2.6"
 description = "Nonebot2 plugin for making fun pictures"
 category = "main"
 optional = false
@@ -656,7 +656,7 @@ sentry-sdk = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.0.7"
+version = "0.0.8"
 description = "适用于 NoneBot2 的词云插件"
 category = "main"
 optional = false
@@ -1386,7 +1386,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "1b9ca9ba45fce99f99b18967bc50171848e9c25e65d9c9f3c3cad0b06309ebc9"
+content-hash = "32dcea519093057dcfb17206251ec9c404c2972078e4a4c57d78f70f91aa9ce8"
 
 [metadata.files]
 aiocache = [
@@ -1867,16 +1867,16 @@ nonebot-plugin-memes = [
     {file = "nonebot_plugin_memes-0.2.2.2.tar.gz", hash = "sha256:f5b39719b0bb8469977ad3f63eb7d0b29a5010d5732ca54e09d3e038b33bb7cc"},
 ]
 nonebot-plugin-petpet = [
-    {file = "nonebot_plugin_petpet-0.2.5-py3-none-any.whl", hash = "sha256:2372e2a16139afa22bdc722cdbbbce0e6fb65e62b51531da53d009701d60bc36"},
-    {file = "nonebot_plugin_petpet-0.2.5.tar.gz", hash = "sha256:e6f89df05ff149787c4b03703dca16a7c4220bf6dc6abe508a45f03bf9ed5552"},
+    {file = "nonebot_plugin_petpet-0.2.6-py3-none-any.whl", hash = "sha256:f19544c70b1cff161cbee6890db473e35353bd289d5ea4f32458e2c50d61f966"},
+    {file = "nonebot_plugin_petpet-0.2.6.tar.gz", hash = "sha256:f546a754d0618c55f0f54c321f89533ab1544151bb4d2979827600358f19a7eb"},
 ]
 nonebot-plugin-sentry = [
     {file = "nonebot-plugin-sentry-0.2.2.tar.gz", hash = "sha256:e042e773e1d533d9bb5deb81cc0e9a0d78800e43c5093475d65d8c91308f98f7"},
     {file = "nonebot_plugin_sentry-0.2.2-py3-none-any.whl", hash = "sha256:cc7aab8a258aa1931bd4fdab36672e6e99f645d438c6c24999688a8422ba0dd3"},
 ]
 nonebot-plugin-wordcloud = [
-    {file = "nonebot-plugin-wordcloud-0.0.7.tar.gz", hash = "sha256:561d82d1e4af88c10190f114832f56b64f79b4e2c6e88340130599b5ccba2613"},
-    {file = "nonebot_plugin_wordcloud-0.0.7-py3-none-any.whl", hash = "sha256:280bd99d072b174f0c17b38e3061c05580411ebb5dd964cb2a461cc8bb2bf9e8"},
+    {file = "nonebot-plugin-wordcloud-0.0.8.tar.gz", hash = "sha256:1b32aed95cc3efd0febeed8d2ae47159d9b1389cb91f898e395ddbccee96955e"},
+    {file = "nonebot_plugin_wordcloud-0.0.8-py3-none-any.whl", hash = "sha256:d55fd2bba6b09c255065f2dfe3d7986109a49e92b6e68782e31ee3b1cdd6fbcc"},
 ]
 nonebot2 = [
     {file = "nonebot2-2.0.0b2-py3-none-any.whl", hash = "sha256:8166490311b607f8fbf5e31934b005e29f6d39ff222a6771ec36c9456ec337ec"},
