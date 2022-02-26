@@ -42,7 +42,7 @@ trio = ["trio (>=0.16)"]
 
 [[package]]
 name = "apscheduler"
-version = "3.8.1"
+version = "3.9.0.post1"
 description = "In-process task scheduler with Cron-like capabilities"
 category = "main"
 optional = false
@@ -61,7 +61,7 @@ mongodb = ["pymongo (>=3.0)"]
 redis = ["redis (>=3.0)"]
 rethinkdb = ["rethinkdb (>=2.4.0)"]
 sqlalchemy = ["sqlalchemy (>=0.8)"]
-testing = ["pytest (<6)", "pytest-cov", "pytest-tornado5", "mock", "pytest-asyncio (<0.6)", "pytest-asyncio"]
+testing = ["pytest", "pytest-cov", "pytest-tornado5", "mock", "pytest-asyncio (<0.6)", "pytest-asyncio"]
 tornado = ["tornado (>=4.3)"]
 twisted = ["twisted"]
 zookeeper = ["kazoo"]
@@ -656,7 +656,7 @@ sentry-sdk = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.0.8"
+version = "0.1.0"
 description = "适用于 NoneBot2 的词云插件"
 category = "main"
 optional = false
@@ -765,7 +765,7 @@ test = ["appdirs (==1.4.4)", "pytest (>=6)", "pytest-cov (>=2.7)", "pytest-mock 
 
 [[package]]
 name = "playwright"
-version = "1.19.0"
+version = "1.19.1"
 description = "A high-level API to automate web browsers"
 category = "main"
 optional = false
@@ -1191,7 +1191,7 @@ full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.586"
+version = "3.0.588"
 description = "Tencent Cloud SDK for Python"
 category = "main"
 optional = false
@@ -1315,7 +1315,7 @@ test = ["aiohttp", "flake8 (>=3.9.2,<3.10.0)", "psutil", "pycodestyle (>=2.7.0,<
 
 [[package]]
 name = "virtualenv"
-version = "20.13.1"
+version = "20.13.2"
 description = "Virtual Python Environment builder"
 category = "dev"
 optional = false
@@ -1386,7 +1386,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "32dcea519093057dcfb17206251ec9c404c2972078e4a4c57d78f70f91aa9ce8"
+content-hash = "40ee246f29167aa9556a66f554c8e0d6420a80aa22f45935630284805df46505"
 
 [metadata.files]
 aiocache = [
@@ -1402,8 +1402,8 @@ anyio = [
     {file = "anyio-3.5.0.tar.gz", hash = "sha256:a0aeffe2fb1fdf374a8e4b471444f0f3ac4fb9f5a5b542b48824475e0042a5a6"},
 ]
 apscheduler = [
-    {file = "APScheduler-3.8.1-py2.py3-none-any.whl", hash = "sha256:c22cb14b411a31435eb2c530dfbbec948ac63015b517087c7978adb61b574865"},
-    {file = "APScheduler-3.8.1.tar.gz", hash = "sha256:5cf344ebcfbdaa48ae178c029c055cec7bc7a4a47c21e315e4d1f08bd35f2355"},
+    {file = "APScheduler-3.9.0.post1-py2.py3-none-any.whl", hash = "sha256:f8a3e6e4d178de40fdbd5a3eefcc217588fc7f42f443e2335bb2dc29daf99357"},
+    {file = "APScheduler-3.9.0.post1.tar.gz", hash = "sha256:236dbf7244200ffc79c6c0b9ff7d2ed10e7e985f37f48d4a23f4142f4967dcb5"},
 ]
 asgiref = [
     {file = "asgiref-3.5.0-py3-none-any.whl", hash = "sha256:88d59c13d634dcffe0510be048210188edd79aeccb6a6c9028cdad6f31d730a9"},
@@ -1875,8 +1875,8 @@ nonebot-plugin-sentry = [
     {file = "nonebot_plugin_sentry-0.2.2-py3-none-any.whl", hash = "sha256:cc7aab8a258aa1931bd4fdab36672e6e99f645d438c6c24999688a8422ba0dd3"},
 ]
 nonebot-plugin-wordcloud = [
-    {file = "nonebot-plugin-wordcloud-0.0.8.tar.gz", hash = "sha256:1b32aed95cc3efd0febeed8d2ae47159d9b1389cb91f898e395ddbccee96955e"},
-    {file = "nonebot_plugin_wordcloud-0.0.8-py3-none-any.whl", hash = "sha256:d55fd2bba6b09c255065f2dfe3d7986109a49e92b6e68782e31ee3b1cdd6fbcc"},
+    {file = "nonebot-plugin-wordcloud-0.1.0.tar.gz", hash = "sha256:56fefd9c59671921a2d6a66b4e5ef629f60ff1878d324792613acd4889711622"},
+    {file = "nonebot_plugin_wordcloud-0.1.0-py3-none-any.whl", hash = "sha256:deb7a518bd925f19fe81106cfc49557a929d292a431bcd1e2e16089292711c74"},
 ]
 nonebot2 = [
     {file = "nonebot2-2.0.0b2-py3-none-any.whl", hash = "sha256:8166490311b607f8fbf5e31934b005e29f6d39ff222a6771ec36c9456ec337ec"},
@@ -1957,13 +1957,13 @@ platformdirs = [
     {file = "platformdirs-2.5.1.tar.gz", hash = "sha256:7535e70dfa32e84d4b34996ea99c5e432fa29a708d0f4e394bbcb2a8faa4f16d"},
 ]
 playwright = [
-    {file = "playwright-1.19.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:2a5b38514339f0e7456598ae7713c095d6acafa05fc2396b93cf8428e87373d5"},
-    {file = "playwright-1.19.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:5253b1235e4498fb61765223cf81e92600e00d3ad436a4dc028666c218438cfa"},
-    {file = "playwright-1.19.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:0c7b29bef3722b3b118178082820a230ed0817ab88061c32867dcfb582a00ac3"},
-    {file = "playwright-1.19.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:2373ddc133dea6889686562b2489de90a50b7ed0194f948aa06a3704e60a0c4b"},
-    {file = "playwright-1.19.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:99b074c91869dbe303fca8b122913d747c0b2a8c744ead60d7991cee3ce98c20"},
-    {file = "playwright-1.19.0-py3-none-win32.whl", hash = "sha256:7a8cd4ad53d70fcc46fc8947d243bfc1c7356256a1b3303cbd209a35736d2f9b"},
-    {file = "playwright-1.19.0-py3-none-win_amd64.whl", hash = "sha256:5febf7069572f34271f2d594a67fd2cdcffa7b83e4295db97c4b3825b3796536"},
+    {file = "playwright-1.19.1-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:4226fef2ef089cf9dc1593a3e32fcbe63c307ea2a79797e8cf9444e18a39f6b9"},
+    {file = "playwright-1.19.1-py3-none-macosx_11_0_arm64.whl", hash = "sha256:236a566c39bcf9a72c012da66e56fbb507ba77b46762bf962424b1129dcd8d46"},
+    {file = "playwright-1.19.1-py3-none-macosx_11_0_universal2.whl", hash = "sha256:7a5af0bfd3e9c3cba57337bfe1a6d28c95632091315549c74fb76ae31e75f21b"},
+    {file = "playwright-1.19.1-py3-none-manylinux1_x86_64.whl", hash = "sha256:48e28b10db30d76ec877ed9dab03a09d195eba3f27736a2f5df35fcab0dfc684"},
+    {file = "playwright-1.19.1-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:cf7947ec31ebbee186883f5a27d1af7edd131c939d83ce5870de60e63f288d38"},
+    {file = "playwright-1.19.1-py3-none-win32.whl", hash = "sha256:c000a5b2707792a1a688bcb7b774a0835c3f5c0bced4bc2316abd8b730295d59"},
+    {file = "playwright-1.19.1-py3-none-win_amd64.whl", hash = "sha256:f1656687532937f35ddfdf0000e8cbe3d621768689daf53659c6d194f220b573"},
 ]
 pluggy = [
     {file = "pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},
@@ -2216,8 +2216,8 @@ starlette = [
     {file = "starlette-0.17.1.tar.gz", hash = "sha256:57eab3cc975a28af62f6faec94d355a410634940f10b30d68d31cb5ec1b44ae8"},
 ]
 tencentcloud-sdk-python = [
-    {file = "tencentcloud-sdk-python-3.0.586.tar.gz", hash = "sha256:3e311355be0e8f446a38c18ad71f21b0379fd3bc02e7c48126b96d111758f63c"},
-    {file = "tencentcloud_sdk_python-3.0.586-py2.py3-none-any.whl", hash = "sha256:58eec293879c90054564da619eeb3630fa833c0762ac18e1fcb4aacf87797625"},
+    {file = "tencentcloud-sdk-python-3.0.588.tar.gz", hash = "sha256:e56762543ff655afc4f2afff0c291eec298bb63df137b4583eeaa157de788126"},
+    {file = "tencentcloud_sdk_python-3.0.588-py2.py3-none-any.whl", hash = "sha256:c5032e634bbb34e7bfb9e8fe2c70f5c0ebf48113b656f17df86ea78d33a4f1a8"},
 ]
 tinydb = [
     {file = "tinydb-4.7.0-py3-none-any.whl", hash = "sha256:e2cdf6e2dad49813e9b5fceb3c7943387309a8738125fbff0b58d248a033f7a9"},
@@ -2274,8 +2274,8 @@ uvloop = [
     {file = "uvloop-0.16.0.tar.gz", hash = "sha256:f74bc20c7b67d1c27c72601c78cf95be99d5c2cdd4514502b4f3eb0933ff1228"},
 ]
 virtualenv = [
-    {file = "virtualenv-20.13.1-py2.py3-none-any.whl", hash = "sha256:45e1d053cad4cd453181ae877c4ffc053546ae99e7dd049b9ff1d9be7491abf7"},
-    {file = "virtualenv-20.13.1.tar.gz", hash = "sha256:e0621bcbf4160e4e1030f05065c8834b4e93f4fcc223255db2a823440aca9c14"},
+    {file = "virtualenv-20.13.2-py2.py3-none-any.whl", hash = "sha256:e7b34c9474e6476ee208c43a4d9ac1510b041c68347eabfe9a9ea0c86aa0a46b"},
+    {file = "virtualenv-20.13.2.tar.gz", hash = "sha256:01f5f80744d24a3743ce61858123488e91cb2dd1d3bdf92adaf1bba39ffdedf0"},
 ]
 watchgod = [
     {file = "watchgod-0.7-py3-none-any.whl", hash = "sha256:d6c1ea21df37847ac0537ca0d6c2f4cdf513562e95f77bb93abbcf05573407b7"},
