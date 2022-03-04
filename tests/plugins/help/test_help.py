@@ -22,15 +22,15 @@ async def test_help(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "获取帮助\n\n获取所有支持的命令\n/help all\n获取某个命令的帮助\n/help 命令名",
-            "result",
+            "获取帮助\n\n获取所有支持的命令\n/help list\n获取某个命令的帮助\n/help 命令名",
+            True,
         )
         ctx.should_finished()
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("app", [("src.plugins.help",)], indirect=True)
-async def test_help_all(app: App):
+async def test_help_list(app: App):
     """测试帮助，查看所有命令"""
     from nonebot import get_driver
     from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
@@ -41,10 +41,10 @@ async def test_help_all(app: App):
     async with app.test_matcher(help_cmd) as ctx:
         adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
         bot = make_fake_bot(Bot)(adapter, "1")
-        event = fake_group_message_event(message=Message("/help all"))
+        event = fake_group_message_event(message=Message("/help list"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "命令（别名）列表：\nhelp(帮助)", "result")
+        ctx.should_call_send(event, "命令（别名）列表：\nhelp(帮助)", True)
         ctx.should_finished()
 
 
@@ -66,8 +66,8 @@ async def test_help_help(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "获取帮助\n\n获取所有支持的命令\n/help all\n获取某个命令的帮助\n/help 命令名",
-            "result",
+            "获取帮助\n\n获取所有支持的命令\n/help list\n获取某个命令的帮助\n/help 命令名",
+            True,
         )
         ctx.should_finished()
 
@@ -88,5 +88,5 @@ async def test_help_not_found(app: App):
         event = fake_group_message_event(message=Message("/help test"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "请输入支持的命令", "result")
+        ctx.should_call_send(event, "请输入支持的命令", True)
         ctx.should_finished()

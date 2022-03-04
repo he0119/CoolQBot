@@ -5,7 +5,7 @@
 import inspect
 from dataclasses import dataclass
 from functools import reduce
-from typing import Optional
+from typing import Optional, cast
 
 from nonebot import get_loaded_plugins
 from nonebot.dependencies import Dependent
@@ -39,12 +39,10 @@ def extract_command_info(matcher: Matcher) -> Optional[CommandInfo]:
         return
     help = inspect.cleandoc(help)
 
-    command: CommandRule = command_handler.call
+    command = cast(CommandRule, command_handler.call)
     # 确保英文名字在前，中文名字在后
     # 命令越长越靠前
-    cmds: list[tuple[str]] = sorted(
-        sorted(command.cmds), key=lambda x: len(x), reverse=True
-    )
+    cmds: list[tuple[str]] = sorted(command.cmds)
 
     name = ".".join(cmds[0])
     if len(cmds) > 1:
@@ -82,3 +80,18 @@ def get_command_help(name: str) -> Optional[str]:
         return command.help
     else:
         return None
+
+
+def format_name_aliases(command: CommandInfo) -> str:
+    """格式化命令名称"""
+    if command.aliases:
+        return f'{command.name}({", ".join(command.aliases)})'
+    else:
+        return command.name
+
+
+def get_command_list() -> str:
+    commands = get_commands()
+    docs = "命令（别名）列表：\n"
+    docs += "\n".join(sorted(map(format_name_aliases, commands)))
+    return docs
