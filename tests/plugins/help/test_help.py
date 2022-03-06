@@ -6,6 +6,36 @@ from tests.fake import fake_group_message_event
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("app", [("src.plugins.help",)], indirect=True)
+async def test_sort_commands(app: App):
+    from src.plugins.help.commands import sort_commands
+
+    cmds = [
+        ("ff14", "nuannuan"),
+        ("时尚品鉴",),
+        ("最终幻想14", "时尚品鉴"),
+        ("nuannuan",),
+    ]
+    assert sort_commands(cmds) == [
+        ("ff14", "nuannuan"),
+        ("nuannuan",),
+        ("最终幻想14", "时尚品鉴"),
+        ("时尚品鉴",),
+    ]
+
+    cmds = [
+        ("时尚品鉴",),
+        ("最终幻想14", "时尚品鉴"),
+        ("nuannuan",),
+    ]
+    assert sort_commands(cmds) == [
+        ("nuannuan",),
+        ("最终幻想14", "时尚品鉴"),
+        ("时尚品鉴",),
+    ]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("app", [("src.plugins.help",)], indirect=True)
 async def test_help(app: App):
     """测试帮助"""
     from nonebot import get_driver

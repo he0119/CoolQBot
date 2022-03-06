@@ -5,12 +5,13 @@
 import inspect
 from dataclasses import dataclass
 from functools import reduce
-from typing import Optional, cast
+from typing import TYPE_CHECKING, Optional, cast
 
 from nonebot import get_loaded_plugins
-from nonebot.dependencies import Dependent
-from nonebot.matcher import Matcher
 from nonebot.rule import CommandRule
+
+if TYPE_CHECKING:
+    from nonebot.matcher import Matcher
 
 
 @dataclass
@@ -25,10 +26,27 @@ class CommandInfo:
 _commands: Optional[list[CommandInfo]] = None
 
 
-def extract_command_info(matcher: Matcher) -> Optional[CommandInfo]:
+def sort_commands(cmds: list[tuple[str, ...]]) -> list[tuple[str, ...]]:
+    """排序命令
+
+    确保英文名字在前，中文名字在后
+    命令越长越靠前
+    """
+    return sorted(
+        cmds,
+        key=lambda x: (
+            len("".join(x).encode("ascii", "ignore")),  # 英文在前
+            len(x),  # 命令越长越靠前
+            len("".join(x)),  # 命令字数越长越靠前
+        ),
+        reverse=True,
+    )
+
+
+def extract_command_info(matcher: "Matcher") -> Optional[CommandInfo]:
     """从 Matcher 中提取命令的数据"""
-    checkers: set[Dependent] = matcher.rule.checkers
-    command_handler: Optional[Dependent] = next(
+    checkers = matcher.rule.checkers
+    command_handler = next(
         filter(lambda x: isinstance(x.call, CommandRule), checkers), None
     )
     if not command_handler:
@@ -40,9 +58,7 @@ def extract_command_info(matcher: Matcher) -> Optional[CommandInfo]:
     help = inspect.cleandoc(help)
 
     command = cast(CommandRule, command_handler.call)
-    # 确保英文名字在前，中文名字在后
-    # 命令越长越靠前
-    cmds: list[tuple[str]] = sorted(command.cmds)
+    cmds = sort_commands(command.cmds)
 
     name = ".".join(cmds[0])
     if len(cmds) > 1:
