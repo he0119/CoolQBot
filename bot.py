@@ -1,12 +1,14 @@
 import nonebot
-from nonebot.adapters.onebot.v11 import Adapter
+from nonebot.adapters.onebot.v11 import Adapter as OneBotV11Adapter
+from nonebot.adapters.qqguild import Adapter as QQGuildAdapter
 from nonebot.log import logger
 
 nonebot.init()
 app = nonebot.get_asgi()
 
 driver = nonebot.get_driver()
-driver.register_adapter(Adapter)
+driver.register_adapter(OneBotV11Adapter)
+driver.register_adapter(QQGuildAdapter)
 
 # 加载插件
 nonebot.load_from_toml("pyproject.toml")
