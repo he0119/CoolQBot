@@ -1,7 +1,9 @@
 """ 天气插件
 """
+from typing import Optional
+
 from nonebot import on_command
-from nonebot.adapters.onebot.v11 import Message
+from nonebot.adapters import Message
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, CommandArg
 
@@ -39,11 +41,11 @@ async def weather_handle(location: str = ArgPlainText()):
     if not location:
         await weather_cmd.reject("要查询的城市名称不能为空呢，请重新输入！")
 
-    weather_report = await get_weather_of_location(*location.split())
+    weather_report = await get_weather_of_location(*location.split()[:2])
     await weather_cmd.finish(weather_report)
 
 
-async def get_weather_of_location(location: str, adm: str = None, *args) -> str:
+async def get_weather_of_location(location: str, adm: Optional[str] = None) -> str:
     """根据城市名与城市所属行政区划获取天气数据"""
     # 艾欧泽亚的天气
     str_data = eorzean_weather(location)
