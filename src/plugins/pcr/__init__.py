@@ -8,7 +8,7 @@ from nonebot import CommandGroup
 
 from .data import calendar
 
-pcr = CommandGroup("pcr")
+pcr = CommandGroup("pcr", block=True)
 
 # region 日程表
 calendar_cmd = pcr.command("calendar", aliases={("pcr", "日程表"), ("pcr", "日程")})

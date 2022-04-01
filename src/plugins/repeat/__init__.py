@@ -28,7 +28,7 @@ from .recorder import recorder_obj
 from .repeat_rule import need_repeat
 from .status import get_status
 
-repeat = CommandGroup("repeat")
+repeat = CommandGroup("repeat", block=True)
 
 
 # region 自动保存数据

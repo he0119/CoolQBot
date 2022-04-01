@@ -11,7 +11,7 @@ from nonebot.params import ArgPlainText, CommandArg
 from .api import Genshin
 from .config import get_cookie, set_cookie
 
-genshin = CommandGroup("ys")
+genshin = CommandGroup("ys", block=True)
 
 # region 绑定账号
 bind_cmd = genshin.command(
