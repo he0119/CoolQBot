@@ -22,7 +22,7 @@ feedparser = "^6.0.2"
 pillow = "^9.0.0"
 psutil = "^5.8.0"
 playwright = "^1.18.2"
-nonebot-plugin-memes = "0.2.2.2"
+nonebot-plugin-memes = "0.2.3"
 nonebot-plugin-petpet = "0.2.13"
 
 [tool.poetry.dev-dependencies]
