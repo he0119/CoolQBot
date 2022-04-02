@@ -36,7 +36,7 @@ pytest-xdist = "^2.5.0"
 pre-commit = "^2.17.0"
 
 [tool.nonebot]
-plugin_dirs = ["src/plugins"]
+plugin_dirs = ["src/plugins", "src/web"]
 plugins = [
     "nonebot_plugin_apscheduler",
     "nonebot_plugin_sentry",
