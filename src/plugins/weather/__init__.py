@@ -10,7 +10,7 @@ from nonebot.params import ArgPlainText, CommandArg
 from .eorzean_api import eorzean_weather
 from .heweather_api import heweather
 
-weather_cmd = on_command("weather", aliases={"天气"}, block=True)
+weather_cmd = on_command("weather", aliases={"天气"})
 weather_cmd.__doc__ = """
 天气预报
 

@@ -21,7 +21,7 @@ from .gate import get_direction
 from .nuannuan import get_latest_nuannuan
 from .universalis_api import get_item_price
 
-ff14 = CommandGroup("ff14", block=True)
+ff14 = CommandGroup("ff14")
 
 # region 藏宝选门
 gate_cmd = ff14.command("gate", aliases={"gate"})

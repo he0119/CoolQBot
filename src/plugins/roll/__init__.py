@@ -15,7 +15,7 @@ from .rand import get_rand
 from .roll import roll_dices
 
 # region roll
-roll_cmd = on_command("roll", block=True)
+roll_cmd = on_command("roll")
 roll_cmd.__doc__ = """
 NGA 风格 ROLL 点
 
@@ -69,7 +69,7 @@ async def roll_handle(input: str = Depends(get_roll_input)):
 
 # endregion
 # region rand
-rand_cmd = on_command("rand", block=True)
+rand_cmd = on_command("rand")
 rand_cmd.__doc__ = """
 掷骰子/概率
 

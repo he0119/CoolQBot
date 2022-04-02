@@ -8,7 +8,7 @@ from nonebot.params import CommandArg
 
 from .commands import get_command_help, get_command_list
 
-help_cmd = on_command("help", aliases={"帮助"}, block=True)
+help_cmd = on_command("help", aliases={"帮助"})
 help_cmd.__doc__ = """
 获取帮助
 
