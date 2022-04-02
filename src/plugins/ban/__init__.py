@@ -68,14 +68,14 @@ ban_cmd.__doc__ = """
 
 @ban_cmd.handle()
 async def ban_handle_first_receive(
-    state: T_State, bot: Bot, arg: Message = CommandArg()
+    state: T_State, bot: Bot, args: Message = CommandArg()
 ):
     """获取需要的参数"""
     # 如果没有获取机器人在群中的职位，则获取
     if not _bot_role:
         await refresh_bot_role(bot)
 
-    plaintext = arg.extract_plain_text()
+    plaintext = args.extract_plain_text().strip()
     if plaintext and plaintext.isdigit():
         state["duration"] = int(plaintext)
 

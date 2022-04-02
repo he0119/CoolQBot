@@ -4,11 +4,12 @@ NGA 风格 ROLL 点
 掷骰子
 """
 import re
+from typing import Union
 
 from nonebot import on_command
-from nonebot.adapters.onebot.v11 import Message
-from nonebot.matcher import Matcher
-from nonebot.params import ArgPlainText, CommandArg, Depends
+from nonebot.adapters import Message
+from nonebot.params import Arg, CommandArg, Depends
+from nonebot.typing import T_State
 
 from .rand import get_rand
 from .roll import roll_dices
@@ -32,18 +33,22 @@ def check_roll_syntax(input: str) -> bool:
 
 
 @roll_cmd.handle()
-async def roll_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
-    input = arg.extract_plain_text()
+async def roll_handle_first_receive(state: T_State, args: Message = CommandArg()):
+    plaintext = args.extract_plain_text().strip()
 
     # 如果有输入，则直接检查，出错就直接提示并结束对话
-    if input and not check_roll_syntax(input):
+    if plaintext and not check_roll_syntax(plaintext):
         await roll_cmd.finish("请输入正确的参数 ~>_<~")
-    if input:
-        matcher.set_arg("input", arg)
+
+    if plaintext:
+        state["input"] = plaintext
 
 
-async def get_roll_input(input: str = ArgPlainText()) -> str:
+async def get_roll_input(input: Union[str, Message] = Arg()) -> str:
     """检查输入是否能满足要求"""
+    if isinstance(input, Message):
+        input = input.extract_plain_text().strip()
+
     if not input:
         await roll_cmd.reject("ROLL 点方式不能为空呢，请重新输入")
 
@@ -76,8 +81,10 @@ rand_cmd.__doc__ = """
 
 
 @rand_cmd.handle()
-async def rand_handle(arg: Message = CommandArg()):
-    str_data = get_rand(arg.extract_plain_text())
+async def rand_handle(args: Message = CommandArg()):
+    plaintext = args.extract_plain_text().strip()
+
+    str_data = get_rand(plaintext)
     await rand_cmd.finish(str_data, at_sender=True)
 
 

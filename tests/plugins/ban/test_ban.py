@@ -6,7 +6,13 @@ from tests.fake import fake_group_message_event
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("sender", [{"role": "admin"}, {"role": "member"}])
+@pytest.mark.parametrize(
+    "sender",
+    [
+        pytest.param({"role": "admin"}, id="admin"),
+        pytest.param({"role": "member"}, id="member"),
+    ],
+)
 @pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_owner(
     app: App,
@@ -17,9 +23,7 @@ async def test_ban_group_bot_is_owner(
 
     机器人为群主，禁言对象为管理员或普通群员（一个群不可能有两个群主）
     """
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Bot, Message
 
     from src.plugins.ban import EXPR_OK, ban_cmd
 
@@ -27,8 +31,7 @@ async def test_ban_group_bot_is_owner(
     render_expression.return_value = Message("test")
 
     async with app.test_matcher(ban_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot(base=Bot, self_id="1")
         event = fake_group_message_event(message=Message("/ban 1"), sender=sender)
 
         ctx.receive_event(bot, event)
@@ -51,7 +54,12 @@ async def test_ban_group_bot_is_owner(
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "sender", [{"role": "owner"}, {"role": "admin"}, {"role": "member"}]
+    "sender",
+    [
+        pytest.param({"role": "owner"}, id="owner"),
+        pytest.param({"role": "admin"}, id="admin"),
+        pytest.param({"role": "member"}, id="member"),
+    ],
 )
 @pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_admin(
@@ -63,9 +71,7 @@ async def test_ban_group_bot_is_admin(
 
     机器人为管理员，禁言对象为群主，管理员或普通群员
     """
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message, MessageSegment
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
     from src.plugins.ban import EXPR_NEED_HELP, EXPR_OK, EXPR_OWNER, ban_cmd
 
@@ -73,8 +79,7 @@ async def test_ban_group_bot_is_admin(
     render_expression.return_value = Message("test")
 
     async with app.test_matcher(ban_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot(base=Bot, self_id="1")
         event = fake_group_message_event(message=Message("/ban 1"), sender=sender)
 
         ctx.receive_event(bot, event)
@@ -117,7 +122,12 @@ async def test_ban_group_bot_is_admin(
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "sender", [{"role": "owner"}, {"role": "admin"}, {"role": "member"}]
+    "sender",
+    [
+        pytest.param({"role": "owner"}, id="owner"),
+        pytest.param({"role": "admin"}, id="admin"),
+        pytest.param({"role": "member"}, id="member"),
+    ],
 )
 @pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_member(
@@ -129,9 +139,7 @@ async def test_ban_group_bot_is_member(
 
     机器人为管理员，禁言对象为群主，管理员或普通群员
     """
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message, MessageSegment
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
     from src.plugins.ban import EXPR_NEED_HELP, EXPR_OWNER, ban_cmd
 
@@ -139,8 +147,7 @@ async def test_ban_group_bot_is_member(
     render_expression.return_value = Message("test")
 
     async with app.test_matcher(ban_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot(base=Bot, self_id="1")
         event = fake_group_message_event(message=Message("/ban 1"), sender=sender)
 
         ctx.receive_event(bot, event)
@@ -173,7 +180,13 @@ async def test_ban_group_bot_is_member(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("sender", [{"role": "member"}, {"role": "admin"}])
+@pytest.mark.parametrize(
+    "sender",
+    [
+        pytest.param({"role": "admin"}, id="admin"),
+        pytest.param({"role": "member"}, id="member"),
+    ],
+)
 @pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_get_arg(
     app: App,
@@ -184,9 +197,7 @@ async def test_ban_group_get_arg(
 
     机器人为普通群员，禁言对象为管理员或普通群员
     """
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Bot, Message
 
     from src.plugins.ban import EXPR_OK, ban_cmd
 
@@ -194,8 +205,7 @@ async def test_ban_group_get_arg(
     render_expression.return_value = Message("test")
 
     async with app.test_matcher(ban_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot(base=Bot, self_id="1")
         event = fake_group_message_event(message=Message("/ban"), sender=sender)
         next_event = fake_group_message_event(message=Message("1"), sender=sender)
 
@@ -226,13 +236,8 @@ async def test_ban_group_get_arg_invalid(
     app: App,
     mocker: MockerFixture,
 ):
-    """测试群聊天，获取参数禁言 1 分钟，第一次参数错误
-
-    机器人为普通群员，禁言对象为管理员或普通群员
-    """
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    """测试群聊天，获取参数禁言 1 分钟，第一次参数错误"""
+    from nonebot.adapters.onebot.v11 import Bot, Message
 
     from src.plugins.ban import EXPR_OK, ban_cmd
 
@@ -241,8 +246,7 @@ async def test_ban_group_get_arg_invalid(
     sender = {"role": "member"}
 
     async with app.test_matcher(ban_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot(base=Bot, self_id="1")
         event = fake_group_message_event(message=Message("/ban"), sender=sender)
         next_event = fake_group_message_event(message=Message("a"), sender=sender)
         final_event = fake_group_message_event(message=Message("1"), sender=sender)

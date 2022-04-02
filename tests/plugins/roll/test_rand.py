@@ -12,9 +12,7 @@ async def test_rand(
     mocker: MockerFixture,
 ):
     """测试点数"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.roll import rand_cmd
 
@@ -22,8 +20,7 @@ async def test_rand(
     randint.return_value = 1
 
     async with app.test_matcher(rand_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/rand"))
 
         ctx.receive_event(bot, event)
@@ -40,9 +37,7 @@ async def test_rand_probability(
     mocker: MockerFixture,
 ):
     """测试概率"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.roll import rand_cmd
 
@@ -50,8 +45,7 @@ async def test_rand_probability(
     randint.return_value = 1
 
     async with app.test_matcher(rand_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/rand 今天是晴天的概率"))
 
         ctx.receive_event(bot, event)
