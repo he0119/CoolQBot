@@ -12,9 +12,7 @@ async def test_roll(
     mocker: MockerFixture,
 ):
     """测试点数"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.roll import roll_cmd
 
@@ -22,8 +20,7 @@ async def test_roll(
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/roll d100"))
 
         ctx.receive_event(bot, event)
@@ -40,9 +37,7 @@ async def test_roll_get_arg(
     mocker: MockerFixture,
 ):
     """测试点数，获取参数"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.roll import roll_cmd
 
@@ -50,8 +45,7 @@ async def test_roll_get_arg(
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/roll"))
         next_event = fake_group_message_event(message=Message("d100"))
 
@@ -76,9 +70,7 @@ async def test_roll_invalid(
     mocker: MockerFixture,
 ):
     """测试点数"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.roll import roll_cmd
 
@@ -86,8 +78,7 @@ async def test_roll_invalid(
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/roll d100a"))
 
         ctx.receive_event(bot, event)
@@ -104,9 +95,7 @@ async def test_roll_complex(
     mocker: MockerFixture,
 ):
     """测试点数，复杂点的输入"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.roll import roll_cmd
 
@@ -114,8 +103,7 @@ async def test_roll_complex(
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/roll d100+2d50"))
 
         ctx.receive_event(bot, event)
