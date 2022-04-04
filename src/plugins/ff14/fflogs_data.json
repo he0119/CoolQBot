@@ -1,6 +1,75 @@
 {
   "boss": [
     {
+      "name": "佐迪亚克暝暗歼灭战",
+      "nicknames": [
+        "极佐迪亚克",
+        "极黑",
+        "佐爹",
+        "极爹"
+      ],
+      "zone": 42,
+      "encounter": 1058,
+      "difficulty": 100
+    },
+    {
+      "name": "海德林晖光歼灭战",
+      "nicknames": [
+        "极海德林",
+        "极白",
+        "海妈",
+        "极妈"
+      ],
+      "zone": 42,
+      "encounter": 1059,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 边境之狱1",
+      "nicknames": [
+        "p1"
+      ],
+      "zone": 44,
+      "encounter": 78,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 边境之狱2",
+      "nicknames": [
+        "p2"
+      ],
+      "zone": 44,
+      "encounter": 79,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 边境之狱3",
+      "nicknames": [
+        "p3"
+      ],
+      "zone": 44,
+      "encounter": 80,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 边境之狱4（门神）",
+      "nicknames": [
+        "p4门神"
+      ],
+      "zone": 44,
+      "encounter": 81,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 边境之狱4",
+      "nicknames": [
+        "p4"
+      ],
+      "zone": 44,
+      "encounter": 82,
+      "difficulty": 100
+    },
+    {
       "name": "提坦妮雅歼殛战",
       "nicknames": [
         "缇坦妮雅",
