@@ -30,8 +30,8 @@ class UniversalisListingItem(BaseModel):
     lastReviewTime: datetime
     pricePerUnit: int
     quantity: int
-    # 如果查询时提供的服务器名称而不是大区名称，这一项是空
     worldName: Optional[str]
+    """如果查询时提供的服务器名称而不是大区名称，这一项是空"""
     hq: bool
 
 
@@ -76,8 +76,9 @@ async def get_item_price(name: str, world_or_dc: str) -> str:
             )
         if items_info:
             items_info.insert(0, f"{name} 在市场的价格是:")
+            # 使用本地时区
             items_info.append(
-                f'数据更新时间: {data.lastUploadTime.strftime("%Y年%m月%d日 %H时%M分")}'
+                f'数据更新时间: {data.lastUploadTime.astimezone().strftime("%Y年%m月%d日 %H时%M分")}'
             )
             return "\n".join(items_info)
         return f"抱歉，没有找到 {name} 的价格。"
