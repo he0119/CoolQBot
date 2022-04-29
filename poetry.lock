@@ -1237,7 +1237,7 @@ full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.619"
+version = "3.0.627"
 description = "Tencent Cloud SDK for Python"
 category = "main"
 optional = false
@@ -1435,7 +1435,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "8cf80881b50b10c5f6b9c9a6ac0f85ab21a79dd22753325b3ffa5c03dfb510b8"
+content-hash = "91c26771e24cd2b1d54ff8a7bd3b16fae2988e89cf13e5f1e356e6332202d4d0"
 
 [metadata.files]
 aiocache = [
@@ -2282,8 +2282,8 @@ starlette = [
     {file = "starlette-0.17.1.tar.gz", hash = "sha256:57eab3cc975a28af62f6faec94d355a410634940f10b30d68d31cb5ec1b44ae8"},
 ]
 tencentcloud-sdk-python = [
-    {file = "tencentcloud-sdk-python-3.0.619.tar.gz", hash = "sha256:39a6f69a8346dc9015e0f91c7b1bd9c7d815dcb747762a99bc0595526cc5cadc"},
-    {file = "tencentcloud_sdk_python-3.0.619-py2.py3-none-any.whl", hash = "sha256:f4a5c03c15b668ccfdf6406caf177a1102e1840758098d5e9d66ae74f6a5a862"},
+    {file = "tencentcloud-sdk-python-3.0.627.tar.gz", hash = "sha256:476b89fdccf2bba3fc59bc9dff3fbd50ac4c6231b8af11859dbcc35a9798e86a"},
+    {file = "tencentcloud_sdk_python-3.0.627-py2.py3-none-any.whl", hash = "sha256:2cf5c7d4f9071467e1d729bf4c0b518b19f80a2df5d1195c6836473aa6516616"},
 ]
 tinydb = [
     {file = "tinydb-4.7.0-py3-none-any.whl", hash = "sha256:e2cdf6e2dad49813e9b5fceb3c7943387309a8738125fbff0b58d248a033f7a9"},
