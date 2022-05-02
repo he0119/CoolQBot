@@ -70,6 +70,51 @@
       "difficulty": 100
     },
     {
+      "name": "零式万魔殿 边境之狱1",
+      "nicknames": [
+        "p1s"
+      ],
+      "zone": 44,
+      "encounter": 78,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 边境之狱2",
+      "nicknames": [
+        "p2s"
+      ],
+      "zone": 44,
+      "encounter": 79,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 边境之狱3",
+      "nicknames": [
+        "p3s"
+      ],
+      "zone": 44,
+      "encounter": 80,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 边境之狱4（门神）",
+      "nicknames": [
+        "p4s门神"
+      ],
+      "zone": 44,
+      "encounter": 81,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 边境之狱4",
+      "nicknames": [
+        "p4s"
+      ],
+      "zone": 44,
+      "encounter": 82,
+      "difficulty": 0
+    },
+    {
       "name": "提坦妮雅歼殛战",
       "nicknames": [
         "缇坦妮雅",
