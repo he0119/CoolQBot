@@ -27,7 +27,7 @@ class JobInfo:
 
 
 FFLOGS_DATA = DATA.network_file(
-    "https://cdn.jsdelivr.net/gh/he0119/coolqbot@master/src/plugins/ff14/fflogs_data.json",
+    "https://raw.fastgit.org/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json",
     "fflogs_data.json",
 )
 
