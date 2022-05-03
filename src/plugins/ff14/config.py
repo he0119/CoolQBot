@@ -35,6 +35,12 @@ class Config(BaseSettings):
         DATA.config.set("fflogs_enable_cache", v)
         return v
 
+    @validator("fflogs_cache_boss", always=True, allow_reuse=True)
+    def fflogs_cache_boss_validator(cls, v):
+        """验证并保存配置"""
+        DATA.config.set("fflogs_cache_boss", v)
+        return v
+
     class Config:
         extra = "ignore"
         validate_assignment = True

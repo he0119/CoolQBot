@@ -8,7 +8,7 @@ import asyncio
 import json
 import math
 from datetime import datetime, timedelta
-from typing import List, Literal
+from typing import List, Literal, cast
 
 import httpx
 from nonebot.log import logger
@@ -16,9 +16,10 @@ from nonebot_plugin_apscheduler import scheduler
 
 from .config import DATA, plugin_config
 from .fflogs_data import (
+    FFLOGS_DATA,
+    FFlogsModel,
     get_boss_info_by_nickname,
     get_job_info_by_nickname,
-    get_jobs_info,
 )
 
 
@@ -90,9 +91,10 @@ class FFLogs:
 
     async def cache_data(self) -> None:
         """缓存数据"""
-        jobs = await get_jobs_info()
+        data = await FFLOGS_DATA.data
+        data = cast(FFlogsModel, data)
         for boss in plugin_config.fflogs_cache_boss:
-            for job in jobs:
+            for job in data.job:
                 await self.dps(boss, job.name)
                 logger.info(f"{boss} {job.name}的数据缓存完成。")
                 await asyncio.sleep(30)
@@ -283,7 +285,7 @@ class FFLogs:
         return reply
 
     def set_character(
-        self, user_id: int, character_name: str, server_name: str
+        self, user_id: str, character_name: str, server_name: str
     ) -> None:
         """设置 QQ号 与 最终幻想14 用户名和服务器名"""
         self.characters[user_id] = [character_name, server_name]

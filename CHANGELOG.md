@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 添加原神实时便笺查询
 - 添加数据库插件
 - 添加词云插件
+- FFLogs 添加设置缓存的命令
 
 ### Changed
 
