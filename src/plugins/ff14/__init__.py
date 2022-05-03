@@ -3,11 +3,11 @@
 藏宝选门
 FFLogs
 """
-from typing import Literal
+from typing import Literal, cast
 
 import httpx
 from nonebot import CommandGroup
-from nonebot.adapters.onebot.v11 import Message, MessageEvent
+from nonebot.adapters import Event, Message
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, CommandArg, Depends
 
@@ -16,7 +16,7 @@ from src.utils.helpers import strtobool
 from ..help.commands import get_command_help
 from .config import DATA, global_config, plugin_config
 from .fflogs_api import fflogs
-from .fflogs_data import FFLOGS_DATA
+from .fflogs_data import FFLOGS_DATA, FFlogsModel
 from .gate import get_direction
 from .nuannuan import get_latest_nuannuan
 from .universalis_api import get_item_price
@@ -88,12 +88,12 @@ fflogs_cmd.__doc__ = """
 
 
 @fflogs_cmd.handle()
-async def fflogs_handle(event: MessageEvent, arg: Message = CommandArg()):
+async def fflogs_handle(event: Event, arg: Message = CommandArg()):
     argv = arg.extract_plain_text().split()
     if not argv:
         await fflogs_cmd.finish(get_command_help("ff14.dps"))
 
-    user_id = event.user_id
+    user_id = event.get_user_id()
 
     # 设置 Token
     if argv[0] == "token" and len(argv) == 2:
@@ -118,7 +118,9 @@ async def fflogs_handle(event: MessageEvent, arg: Message = CommandArg()):
 
     if argv[0] == "update" and len(argv) == 1:
         await FFLOGS_DATA.update()
-        await fflogs_cmd.finish("副本数据更新成功")
+        data = await FFLOGS_DATA.data
+        data = cast(FFlogsModel, data)
+        await fflogs_cmd.finish(f"副本数据更新成功，当前版本为 {data.version}。")
 
     # 缓存相关设置
     if argv[0] == "cache":
@@ -180,7 +182,7 @@ async def fflogs_handle(event: MessageEvent, arg: Message = CommandArg()):
         elif "[CQ:at,qq=" in argv[1]:
             # @他人的格式
             # [CQ:at,qq=12345678]
-            user_id = int(argv[1][10:-1])
+            user_id = argv[1][10:-1]
             reply = await get_character_dps_by_user_id(argv[0], user_id)
         else:
             reply = await fflogs.dps(*argv)  # type:ignore
@@ -199,7 +201,7 @@ async def fflogs_handle(event: MessageEvent, arg: Message = CommandArg()):
     await fflogs_cmd.finish(get_command_help("ff14.dps"))
 
 
-async def get_character_dps_by_user_id(boss_nickname: str, user_id: int):
+async def get_character_dps_by_user_id(boss_nickname: str, user_id: str):
     """通过 BOSS 名称和 QQ 号来获取角色的 DPS 数据"""
     if user_id not in fflogs.characters:
         return "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me <角色名> <服务器名>\n绑定自己的角色。"
@@ -248,19 +250,21 @@ price_cmd.__doc__ = """
 
 
 @price_cmd.handle()
-async def price_handle(event: MessageEvent, args: Message = CommandArg()):
+async def price_handle(event: Event, args: Message = CommandArg()):
     """查价"""
     argv = args.extract_plain_text().split()
+
+    user_id = event.get_user_id()
 
     if len(argv) == 0:
         await price_cmd.finish(get_command_help("ff14.price"))
 
     if len(argv) == 1 and argv[0] == "默认值":
-        world_or_dc = DATA.config.get(f"price-default-{event.user_id}", "猫小胖")
+        world_or_dc = DATA.config.get(f"price-default-{user_id}", "猫小胖")
         await price_cmd.finish(f"当前设置的默认值为：{world_or_dc}")
 
     if len(argv) == 2 and argv[0] == "默认值":
-        DATA.config.set(f"price-default-{event.user_id}", argv[1])
+        DATA.config.set(f"price-default-{user_id}", argv[1])
         await price_cmd.finish("查询区域默认值设置成功！")
 
     if len(argv) > 0:
@@ -268,7 +272,7 @@ async def price_handle(event: MessageEvent, args: Message = CommandArg()):
         if len(argv) >= 2:
             world_or_dc = argv[1]
         else:
-            world_or_dc = DATA.config.get(f"price-default-{event.user_id}", "猫小胖")
+            world_or_dc = DATA.config.get(f"price-default-{user_id}", "猫小胖")
 
         try:
             reply = await get_item_price(name, world_or_dc)
