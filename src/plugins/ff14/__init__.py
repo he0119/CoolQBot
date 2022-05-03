@@ -124,18 +124,39 @@ async def fflogs_handle(event: Event, arg: Message = CommandArg()):
 
     # 缓存相关设置
     if argv[0] == "cache":
-        # 检查是否是超级用户
-        if user_id not in global_config.superusers:
-            await fflogs_cmd.finish("抱歉，你没有权限设置缓存。")
         if len(argv) == 2:
+            if argv[1] == "list":
+                if not plugin_config.fflogs_cache_boss:
+                    await fflogs_cmd.finish("当前没有缓存副本。")
+                await fflogs_cmd.finish(
+                    "当前缓存的副本有：\n" + "\n".join(plugin_config.fflogs_cache_boss)
+                )
+            # 检查是否是超级用户
+            if user_id not in global_config.superusers:
+                await fflogs_cmd.finish("抱歉，你没有权限设置缓存。")
             if strtobool(argv[1]):
                 if not fflogs.is_cache_enabled:
                     fflogs.enable_cache()
-                await fflogs_cmd.finish("已开始定时缓存")
+                await fflogs_cmd.finish("已开始定时缓存。")
             else:
                 if fflogs.is_cache_enabled:
                     fflogs.disable_cache()
-                await fflogs_cmd.finish("已停止定时缓存")
+                await fflogs_cmd.finish("已停止定时缓存。")
+        if len(argv) == 3:
+            if argv[1] == "add":
+                if not plugin_config.fflogs_cache_boss:
+                    plugin_config.fflogs_cache_boss = []
+                plugin_config.fflogs_cache_boss.append(argv[2])
+                # 触发 validator
+                plugin_config.fflogs_cache_boss = plugin_config.fflogs_cache_boss
+                await fflogs_cmd.finish(f"已添加副本 {argv[2]}。")
+            elif argv[1] == "del":
+                if argv[2] in plugin_config.fflogs_cache_boss:
+                    plugin_config.fflogs_cache_boss.remove(argv[2])
+                    plugin_config.fflogs_cache_boss = plugin_config.fflogs_cache_boss
+                    await fflogs_cmd.finish(f"已删除副本 {argv[2]}。")
+                else:
+                    await fflogs_cmd.finish(f"没有缓存 {argv[2]}，无法删除。")
         else:
             if fflogs.is_cache_enabled:
                 await fflogs_cmd.finish("定时缓存开启中")
