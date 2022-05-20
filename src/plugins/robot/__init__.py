@@ -21,7 +21,7 @@ async def robot_rule(event: MessageEvent) -> bool:
     return True
 
 
-robot_message = on_message(rule=to_me() & Rule(robot_rule), priority=5, block=True)
+robot_message = on_message(rule=to_me() & robot_rule, priority=5, block=True)
 
 # 无法获取机器人回复时的表达
 EXPR_DONT_UNDERSTAND = (
