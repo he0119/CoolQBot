@@ -2,7 +2,7 @@
 """
 from nonebot import on_message
 from nonebot.adapters.onebot.v11.event import MessageEvent
-from nonebot.rule import Rule, to_me
+from nonebot.rule import to_me
 
 from src.utils.helpers import render_expression
 
