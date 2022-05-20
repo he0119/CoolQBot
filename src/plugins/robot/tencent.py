@@ -22,8 +22,7 @@ async def call_tencent_api(text: str) -> Optional[str]:
         plugin_config.tencent_ai_secret_id,
         plugin_config.tencent_ai_secret_key,
     )
-    httpProfile = HttpProfile()
-    httpProfile.endpoint = "nlp.tencentcloudapi.com"
+    httpProfile = HttpProfile(endpoint="nlp.tencentcloudapi.com")
 
     clientProfile = ClientProfile()
     clientProfile.httpProfile = httpProfile
