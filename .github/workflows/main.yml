@@ -58,7 +58,7 @@ jobs:
           VERSION: ${{ needs.test.outputs.version }}
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: he0119/coolqbot
       - name: Set up QEMU
