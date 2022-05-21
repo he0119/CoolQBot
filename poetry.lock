@@ -666,7 +666,7 @@ pydantic = ">=1.9.0,<2.0.0"
 
 [[package]]
 name = "nonebot-bison"
-version = "0.5.2"
+version = "0.5.3"
 description = "Subscribe message from social medias"
 category = "main"
 optional = false
@@ -678,11 +678,11 @@ apscheduler = ">=3.7.0,<4.0.0"
 bs4 = ">=0.0.1,<0.0.2"
 expiringdict = ">=1.2.1,<2.0.0"
 feedparser = ">=6.0.2,<7.0.0"
-httpx = ">=0.16.1,<1.0.0"
+httpx = ">=0.16.1"
 nonebot-adapter-onebot = ">=2.0.0-beta.1,<3.0.0"
 nonebot-plugin-htmlrender = ">=0.0.4,<0.0.5"
 nonebot2 = ">=2.0.0-beta.2,<3.0.0"
-pillow = ">=8.1.0,<9.0.0"
+pillow = ">=8.1,<10.0"
 pyjwt = ">=2.1.0,<3.0.0"
 python-socketio = ">=5.4.0,<6.0.0"
 tinydb = ">=4.3.0,<5.0.0"
@@ -812,7 +812,7 @@ sentry-sdk = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.1.1"
+version = "0.1.2"
 description = "适用于 NoneBot2 的词云插件"
 category = "main"
 optional = false
@@ -824,7 +824,6 @@ jieba = ">=0.42.1,<0.43.0"
 nonebot-adapter-onebot = ">=2.0.0-beta.1,<3.0.0"
 nonebot-plugin-chatrecorder = ">=0.1.5,<0.2.0"
 nonebot2 = {version = ">=2.0.0-beta.2,<3.0.0", extras = ["httpx"]}
-numpy = {version = ">=1.22.1,<2.0.0", markers = "python_version >= \"3.8\""}
 typing-extensions = ">=4.0.1,<5.0.0"
 tzdata = ">=2021.5,<2022.0"
 wordcloud = ">=1.8.1,<2.0.0"
@@ -1646,7 +1645,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "0fe5103100c629db8c9861df109c81ce788f3ae3bb1e4fa00843be14355a00ae"
+content-hash = "d42eed879af4e80af67978bd982365d2bf6975171f9fabb1197725af3764e294"
 
 [metadata.files]
 aiocache = [
@@ -2175,8 +2174,8 @@ nonebot-adapter-qqguild = [
     {file = "nonebot_adapter_qqguild-0.1.1-py3-none-any.whl", hash = "sha256:32d18d51ca1f02e2513e89d19e6efd074a53a9debe9a3922a18d1d349ff732c8"},
 ]
 nonebot-bison = [
-    {file = "nonebot-bison-0.5.2.tar.gz", hash = "sha256:a365c3cf2cad13f2e5aecf9176547912794deb08f06f81b8082be10dd7c9d813"},
-    {file = "nonebot_bison-0.5.2-py3-none-any.whl", hash = "sha256:db9cdc01e284170db4251aea0a9eb7bb6bf52fea6b52ec4c9c9d0156887fc015"},
+    {file = "nonebot-bison-0.5.3.tar.gz", hash = "sha256:4bff8886c99d719ca01b6559de43eed084075eb3044af6c4e742cd5d7f2a6d30"},
+    {file = "nonebot_bison-0.5.3-py3-none-any.whl", hash = "sha256:d8c61d83ab14b4818be44630da392cec3073b2b2ac8735214aea152b2b0deb2a"},
 ]
 nonebot-plugin-apscheduler = [
     {file = "nonebot-plugin-apscheduler-0.1.2.tar.gz", hash = "sha256:1765336cd388dde15f723ed12dbca942b04e4c25d5d7786878e447b09e68b909"},
@@ -2211,8 +2210,8 @@ nonebot-plugin-sentry = [
     {file = "nonebot_plugin_sentry-0.2.2-py3-none-any.whl", hash = "sha256:cc7aab8a258aa1931bd4fdab36672e6e99f645d438c6c24999688a8422ba0dd3"},
 ]
 nonebot-plugin-wordcloud = [
-    {file = "nonebot-plugin-wordcloud-0.1.1.tar.gz", hash = "sha256:4ec0db58d087a3eb782271f03310de57ff82f0afd6f472fcb570c15f4d8567de"},
-    {file = "nonebot_plugin_wordcloud-0.1.1-py3-none-any.whl", hash = "sha256:8127f710e5814780b0cee3a452d113916ac60689e512d9ac904abcbd12a56a8d"},
+    {file = "nonebot-plugin-wordcloud-0.1.2.tar.gz", hash = "sha256:8747e3eaec1e7ccc3a9258445e55f50d0f4c40da1a49e38ee9274154a85cb12e"},
+    {file = "nonebot_plugin_wordcloud-0.1.2-py3-none-any.whl", hash = "sha256:177f57c5ea2c04c6c634a623959fd185b69b3919aa8e3fdd75bbfbc6d1b87d79"},
 ]
 nonebot2 = [
     {file = "nonebot2-2.0.0b3-py3-none-any.whl", hash = "sha256:00f2ea63d5f2c665428bec4b7a33301f6b1b483d5635d2a3241f0a1ab3b5b2ea"},
