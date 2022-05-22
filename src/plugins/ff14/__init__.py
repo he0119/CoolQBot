@@ -3,11 +3,13 @@
 藏宝选门
 FFLogs
 """
-from typing import Literal, cast
+from typing import Any, Literal, cast
 
 import httpx
 from nonebot import CommandGroup
-from nonebot.adapters import Event, Message
+from nonebot.adapters import Event, Message, MessageSegment
+from nonebot.adapters.onebot.v11 import Message as OneBotV11Message
+from nonebot.adapters.qqguild import Message as QQGuildMessage
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, CommandArg, Depends
 
@@ -88,8 +90,17 @@ fflogs_cmd.__doc__ = """
 
 
 @fflogs_cmd.handle()
-async def fflogs_handle(event: Event, arg: Message = CommandArg()):
-    argv = arg.extract_plain_text().split()
+async def fflogs_handle(event: Event, args: Message = CommandArg()):
+    argv: list[Any] = args.extract_plain_text().split()
+
+    at_message = None
+    if isinstance(args, OneBotV11Message):
+        at_message = args["at"]
+    elif isinstance(args, QQGuildMessage):
+        at_message = args["mention_user"]
+    if at_message:
+        argv.append(at_message[0])
+
     if not argv:
         await fflogs_cmd.finish(get_command_help("ff14.dps"))
 
@@ -172,12 +183,13 @@ async def fflogs_handle(event: Event, arg: Message = CommandArg()):
             f"你当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}"
         )
 
-    if "[CQ:at,qq=" in argv[0] and len(argv) == 1:
-        user_id = int(argv[0][10:-1])
+    if isinstance(argv[0], MessageSegment) and len(argv) == 1:
+        user_id = argv[0].data["user_id"]
         if user_id not in fflogs.characters:
             await fflogs_cmd.finish("抱歉，该用户没有绑定最终幻想14的角色。")
         await fflogs_cmd.finish(
-            f"[CQ:at,qq={user_id}] 当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}"
+            argv[0]
+            + f"当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}"
         )
 
     if argv[0] == "me" and len(argv) == 3:
@@ -198,12 +210,11 @@ async def fflogs_handle(event: Event, arg: Message = CommandArg()):
         # <BOSS名> me
         # <BOSS名> <@他人>
         # <BOSS名> <职业名>
-        if argv[1].lower() == "me":
-            data = await get_character_dps_by_user_id(argv[0], user_id)
-        elif "[CQ:at,qq=" in argv[1]:
+        if isinstance(argv[1], MessageSegment):
             # @他人的格式
-            # [CQ:at,qq=12345678]
-            user_id = argv[1][10:-1]
+            user_id = argv[1].data["user_id"]
+            data = await get_character_dps_by_user_id(argv[0], user_id)
+        elif argv[1].lower() == "me":
             data = await get_character_dps_by_user_id(argv[0], user_id)
         else:
             data = await fflogs.dps(*argv)  # type:ignore
