@@ -17,10 +17,11 @@ from nonebot_plugin_apscheduler import scheduler
 from .config import DATA, plugin_config
 from .fflogs_data import (
     FFLOGS_DATA,
-    FFlogsModel,
+    FFlogsDataModel,
     get_boss_info_by_nickname,
     get_job_info_by_nickname,
 )
+from .fflogs_models import FFLogsClasses, FFLogsZones
 
 
 class DataException(Exception):
@@ -92,7 +93,7 @@ class FFLogs:
     async def cache_data(self) -> None:
         """缓存数据"""
         data = await FFLOGS_DATA.data
-        data = cast(FFlogsModel, data)
+        data = cast(FFlogsDataModel, data)
         for boss in plugin_config.fflogs_cache_boss:
             for job in data.job:
                 await self.dps(boss, job.name)
@@ -227,17 +228,19 @@ class FFLogs:
 
         return ranking
 
-    async def zones(self):
+    async def zones(self) -> FFLogsZones:
         """副本"""
         url = f"{self.base_url}/zones?api_key={plugin_config.fflogs_token}"
         data = await self._http(url)
-        return data
+        zones = FFLogsZones.parse_obj(data)
+        return zones
 
-    async def classes(self):
+    async def classes(self) -> FFLogsClasses:
         """职业"""
         url = f"{self.base_url}/classes?api_key={plugin_config.fflogs_token}"
         data = await self._http(url)
-        return data
+        classes = FFLogsClasses.parse_obj(data)
+        return classes
 
     async def dps(
         self,

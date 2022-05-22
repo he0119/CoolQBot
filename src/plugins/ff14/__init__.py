@@ -16,7 +16,7 @@ from src.utils.helpers import strtobool
 from ..help.commands import get_command_help
 from .config import DATA, global_config, plugin_config
 from .fflogs_api import fflogs
-from .fflogs_data import FFLOGS_DATA, FFlogsModel
+from .fflogs_data import FFLOGS_DATA, FFlogsDataModel
 from .gate import get_direction
 from .nuannuan import get_latest_nuannuan
 from .universalis_api import get_item_price
@@ -119,7 +119,7 @@ async def fflogs_handle(event: Event, arg: Message = CommandArg()):
     if argv[0] == "update" and len(argv) == 1:
         await FFLOGS_DATA.update()
         data = await FFLOGS_DATA.data
-        data = cast(FFlogsModel, data)
+        data = cast(FFlogsDataModel, data)
         await fflogs_cmd.finish(f"副本数据更新成功，当前版本为 {data.version}。")
 
     # 缓存相关设置
@@ -185,13 +185,13 @@ async def fflogs_handle(event: Event, arg: Message = CommandArg()):
         await fflogs_cmd.finish("角色绑定成功！")
 
     if argv[0] == "classes" and len(argv) == 1:
-        reply = await fflogs.classes()
-        await fflogs_cmd.finish(str(reply))
+        data = await fflogs.classes()
+        await fflogs_cmd.finish(str(data.dict()["__root__"]))
 
     if argv[0] == "zones" and len(argv) == 2:
-        reply = await fflogs.zones()
-        if reply:
-            await fflogs_cmd.finish(str(reply[int(argv[1])]))
+        data = await fflogs.zones()
+        zones = next(filter(lambda x: str(x.id) == argv[1], data))
+        await fflogs_cmd.finish(str(zones.dict()))
 
     # 判断查询排行是指个人还是特定职业
     if len(argv) == 2:
@@ -199,25 +199,25 @@ async def fflogs_handle(event: Event, arg: Message = CommandArg()):
         # <BOSS名> <@他人>
         # <BOSS名> <职业名>
         if argv[1].lower() == "me":
-            reply = await get_character_dps_by_user_id(argv[0], user_id)
+            data = await get_character_dps_by_user_id(argv[0], user_id)
         elif "[CQ:at,qq=" in argv[1]:
             # @他人的格式
             # [CQ:at,qq=12345678]
             user_id = argv[1][10:-1]
-            reply = await get_character_dps_by_user_id(argv[0], user_id)
+            data = await get_character_dps_by_user_id(argv[0], user_id)
         else:
-            reply = await fflogs.dps(*argv)  # type:ignore
-        await fflogs_cmd.finish(reply)
+            data = await fflogs.dps(*argv)  # type:ignore
+        await fflogs_cmd.finish(data)
 
     if len(argv) == 3:
         # <BOSS名> <职业名> <DPS种类>
         # <BOSS名> <角色名> <服务器名>
         argv[2] = argv[2].lower()
         if argv[2] in ["adps", "rdps", "pdps"]:
-            reply = await fflogs.dps(*argv)  # type:ignore
+            data = await fflogs.dps(*argv)  # type:ignore
         else:
-            reply = await fflogs.character_dps(*argv)  # type:ignore
-        await fflogs_cmd.finish(reply)
+            data = await fflogs.character_dps(*argv)  # type:ignore
+        await fflogs_cmd.finish(data)
 
     await fflogs_cmd.finish(get_command_help("ff14.dps"))
 
