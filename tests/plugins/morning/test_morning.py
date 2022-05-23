@@ -160,8 +160,7 @@ async def test_morning_today(
 
     mocked_date.today.assert_called()
     get.assert_called_once_with(
-        "https://raw.fastgit.org/he0119/CoolQBot/master/src/plugins/morning/holidays.json",
-        timeout=30,
+        "https://raw.fastgit.org/he0119/CoolQBot/master/src/plugins/morning/holidays.json"
     )
     render_expression.assert_called_once_with(
         EXPR_MORNING,
