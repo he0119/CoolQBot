@@ -2,7 +2,7 @@
 
 副本与职业数据
 """
-from typing import Optional, cast
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -52,7 +52,6 @@ async def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:
     :returns: 返回包含 `name`, `zone`, `encounter`, `difficulty` 信息的数据类，如果找不到返回 None
     """
     data = await FFLOGS_DATA.data
-    data = cast(FFlogsDataModel, data)
     for boss in data.boss:
         if name.lower() in [boss.name, *boss.nicknames]:
             return boss
@@ -66,7 +65,6 @@ async def get_job_info_by_nickname(name: str) -> Optional[JobInfo]:
     :returns: 返回包含 `name`, `spec` 信息的数据类，如果找不到返回 None
     """
     data = await FFLOGS_DATA.data
-    data = cast(FFlogsDataModel, data)
     for job in data.job:
         if name.lower() in [job.name, *job.nicknames]:
             return job

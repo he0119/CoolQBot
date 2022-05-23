@@ -3,7 +3,7 @@
 藏宝选门
 FFLogs
 """
-from typing import Any, Literal, cast
+from typing import Any, Literal
 
 import httpx
 from nonebot import CommandGroup
@@ -130,7 +130,6 @@ async def fflogs_handle(event: Event, args: Message = CommandArg()):
     if argv[0] == "update" and len(argv) == 1:
         await FFLOGS_DATA.update()
         data = await FFLOGS_DATA.data
-        data = cast(FFlogsDataModel, data)
         await fflogs_cmd.finish(f"副本数据更新成功，当前版本为 {data.version}。")
 
     # 缓存相关设置
