@@ -5,7 +5,7 @@ import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event, fake_qqguild_message_event
 
 
 @pytest.mark.asyncio
@@ -153,6 +153,54 @@ async def test_dps_at_user(app: App, mocker: MockerFixture):
         bot = ctx.create_bot()
         event = fake_group_message_event(
             message=Message("/dps e1s" + MessageSegment.at(10000))
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "test", "")
+        ctx.should_finished()
+
+    mock.assert_awaited_once_with("e1s", "10000")
+
+
+@pytest.mark.asyncio
+async def test_dps_at_user_qqguild(app: App, mocker: MockerFixture):
+    """测试 FFLOGS，测试 @ 用户的情况，QQ频道"""
+    from nonebot import require
+
+    require("src.plugins.ff14")
+    from nonebot.adapters.qqguild import Message, MessageSegment
+
+    from src.plugins.ff14 import fflogs, fflogs_cmd, plugin_config
+
+    plugin_config.fflogs_token = "test"
+    fflogs.set_character("10000", "name", "server")
+
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot()
+        event = fake_qqguild_message_event(
+            _message=Message("/dps" + MessageSegment.mention_user(10000))
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            MessageSegment.mention_user(10000) + "当前绑定的角色：\n角色：name\n服务器：server",
+            "",
+        )
+        ctx.should_finished()
+
+    mock = mocker.patch("src.plugins.ff14.get_character_dps_by_user_id")
+    mock = cast(AsyncMock, mock)
+
+    async def test(a, b):
+        return "test"
+
+    mock.side_effect = test
+
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot()
+        event = fake_qqguild_message_event(
+            _message=Message("/dps e1s" + MessageSegment.mention_user(10000))
         )
 
         ctx.receive_event(bot, event)
