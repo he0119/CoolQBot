@@ -15,6 +15,7 @@ RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim
 
 ENV TZ Asia/Shanghai
+ENV SENTRY_RELEASE=version
 
 WORKDIR /app
 
