@@ -1,17 +1,16 @@
-from typing import TYPE_CHECKING, Literal
+from datetime import datetime
+from typing import TYPE_CHECKING, Literal, Optional
 
 if TYPE_CHECKING:
     from nonebot.adapters.onebot.v11 import GroupMessageEvent, PrivateMessageEvent
+    from nonebot.adapters.qqguild import MessageEvent
 
 
 def fake_group_message_event(**field) -> "GroupMessageEvent":
     from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
     from nonebot.adapters.onebot.v11.event import Sender
-    from pydantic import create_model
 
-    _Fake = create_model("_Fake", __base__=GroupMessageEvent)
-
-    class FakeEvent(_Fake):
+    class FakeEvent(GroupMessageEvent):
         time: int = 1000000
         self_id: int = 1
         post_type: Literal["message"] = "message"
@@ -39,11 +38,8 @@ def fake_group_message_event(**field) -> "GroupMessageEvent":
 def fake_private_message_event(**field) -> "PrivateMessageEvent":
     from nonebot.adapters.onebot.v11 import Message, PrivateMessageEvent
     from nonebot.adapters.onebot.v11.event import Sender
-    from pydantic import create_model
 
-    _Fake = create_model("_Fake", __base__=PrivateMessageEvent)
-
-    class FakeEvent(_Fake):
+    class FakeEvent(PrivateMessageEvent):
         time: int = 1000000
         self_id: int = 1
         post_type: Literal["message"] = "message"
@@ -59,5 +55,15 @@ def fake_private_message_event(**field) -> "PrivateMessageEvent":
 
         class Config:
             extra = "forbid"
+
+    return FakeEvent(**field)
+
+
+def fake_qqguild_message_event(**field) -> "MessageEvent":
+    from nonebot.adapters.qqguild.api.model import User
+    from nonebot.adapters.qqguild.event import MessageCreateEvent
+
+    class FakeEvent(MessageCreateEvent):
+        author: Optional[User] = User(id=1)
 
     return FakeEvent(**field)

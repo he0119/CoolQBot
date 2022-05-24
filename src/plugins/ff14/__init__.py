@@ -3,11 +3,16 @@
 藏宝选门
 FFLogs
 """
-from typing import Literal, cast
+from dataclasses import dataclass
+from typing import Any, Literal
 
 import httpx
 from nonebot import CommandGroup
-from nonebot.adapters import Event, Message
+from nonebot.adapters import Event, Message, MessageSegment
+from nonebot.adapters.onebot.v11 import Message as OneBotV11Message
+from nonebot.adapters.onebot.v11 import MessageSegment as OneBotV11MessageSegment
+from nonebot.adapters.qqguild import Message as QQGuildMessage
+from nonebot.adapters.qqguild import MessageSegment as QQGuildMessageSegment
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, CommandArg, Depends
 
@@ -16,7 +21,7 @@ from src.utils.helpers import strtobool
 from ..help.commands import get_command_help
 from .config import DATA, global_config, plugin_config
 from .fflogs_api import fflogs
-from .fflogs_data import FFLOGS_DATA, FFlogsModel
+from .fflogs_data import FFLOGS_DATA
 from .gate import get_direction
 from .nuannuan import get_latest_nuannuan
 from .universalis_api import get_item_price
@@ -87,9 +92,31 @@ fflogs_cmd.__doc__ = """
 """
 
 
+@dataclass
+class User:
+    platform: str
+    user_id: str
+
+    def at(self) -> MessageSegment:
+        if self.platform == "qq":
+            return OneBotV11MessageSegment.at(self.user_id)
+        return QQGuildMessageSegment.mention_user(int(self.user_id))
+
+
 @fflogs_cmd.handle()
-async def fflogs_handle(event: Event, arg: Message = CommandArg()):
-    argv = arg.extract_plain_text().split()
+async def fflogs_handle(event: Event, args: Message = CommandArg()):
+    argv: list[Any] = args.extract_plain_text().split()
+
+    at_message = None
+    if isinstance(args, OneBotV11Message):
+        at_message = args["at"]
+        if at_message:
+            argv.append(User("qq", at_message[0].data["qq"]))
+    elif isinstance(args, QQGuildMessage):
+        at_message = args["mention_user"]
+        if at_message:
+            argv.append(User("qqguild", at_message[0].data["user_id"]))
+
     if not argv:
         await fflogs_cmd.finish(get_command_help("ff14.dps"))
 
@@ -119,7 +146,6 @@ async def fflogs_handle(event: Event, arg: Message = CommandArg()):
     if argv[0] == "update" and len(argv) == 1:
         await FFLOGS_DATA.update()
         data = await FFLOGS_DATA.data
-        data = cast(FFlogsModel, data)
         await fflogs_cmd.finish(f"副本数据更新成功，当前版本为 {data.version}。")
 
     # 缓存相关设置
@@ -172,12 +198,13 @@ async def fflogs_handle(event: Event, arg: Message = CommandArg()):
             f"你当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}"
         )
 
-    if "[CQ:at,qq=" in argv[0] and len(argv) == 1:
-        user_id = int(argv[0][10:-1])
+    if isinstance(argv[0], User) and len(argv) == 1:
+        user_id = argv[0].user_id
         if user_id not in fflogs.characters:
             await fflogs_cmd.finish("抱歉，该用户没有绑定最终幻想14的角色。")
         await fflogs_cmd.finish(
-            f"[CQ:at,qq={user_id}] 当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}"
+            argv[0].at()
+            + f"当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}"
         )
 
     if argv[0] == "me" and len(argv) == 3:
@@ -185,39 +212,38 @@ async def fflogs_handle(event: Event, arg: Message = CommandArg()):
         await fflogs_cmd.finish("角色绑定成功！")
 
     if argv[0] == "classes" and len(argv) == 1:
-        reply = await fflogs.classes()
-        await fflogs_cmd.finish(str(reply))
+        data = await fflogs.classes()
+        await fflogs_cmd.finish(str(data.dict()["__root__"]))
 
     if argv[0] == "zones" and len(argv) == 2:
-        reply = await fflogs.zones()
-        if reply:
-            await fflogs_cmd.finish(str(reply[int(argv[1])]))
+        data = await fflogs.zones()
+        zones = next(filter(lambda x: str(x.id) == argv[1], data))
+        await fflogs_cmd.finish(str(zones.dict()))
 
     # 判断查询排行是指个人还是特定职业
     if len(argv) == 2:
         # <BOSS名> me
         # <BOSS名> <@他人>
         # <BOSS名> <职业名>
-        if argv[1].lower() == "me":
-            reply = await get_character_dps_by_user_id(argv[0], user_id)
-        elif "[CQ:at,qq=" in argv[1]:
+        if isinstance(argv[1], User):
             # @他人的格式
-            # [CQ:at,qq=12345678]
-            user_id = argv[1][10:-1]
-            reply = await get_character_dps_by_user_id(argv[0], user_id)
+            user_id = argv[1].user_id
+            data = await get_character_dps_by_user_id(argv[0], user_id)
+        elif argv[1].lower() == "me":
+            data = await get_character_dps_by_user_id(argv[0], user_id)
         else:
-            reply = await fflogs.dps(*argv)  # type:ignore
-        await fflogs_cmd.finish(reply)
+            data = await fflogs.dps(*argv)  # type:ignore
+        await fflogs_cmd.finish(data)
 
     if len(argv) == 3:
         # <BOSS名> <职业名> <DPS种类>
         # <BOSS名> <角色名> <服务器名>
         argv[2] = argv[2].lower()
         if argv[2] in ["adps", "rdps", "pdps"]:
-            reply = await fflogs.dps(*argv)  # type:ignore
+            data = await fflogs.dps(*argv)  # type:ignore
         else:
-            reply = await fflogs.character_dps(*argv)  # type:ignore
-        await fflogs_cmd.finish(reply)
+            data = await fflogs.character_dps(*argv)  # type:ignore
+        await fflogs_cmd.finish(data)
 
     await fflogs_cmd.finish(get_command_help("ff14.dps"))
 

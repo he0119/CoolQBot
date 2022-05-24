@@ -22,12 +22,12 @@ def app(
     config.datastore_data_dir = tmp_path / "data"
 
     # 加载插件
-    # 默认加载所有插件
     if param:
-        for plugin in param:
-            nonebot.load_plugin(plugin)
-    else:
-        nonebot.load_from_toml("pyproject.toml")
+        if param == "all":
+            nonebot.load_from_toml("pyproject.toml")
+        else:
+            for plugin in param:
+                nonebot.load_plugin(plugin)
 
     return App(monkeypatch)
 
