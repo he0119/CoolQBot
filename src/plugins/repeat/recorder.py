@@ -170,7 +170,7 @@ class Recorder:
     def _load_data(self):
         """加载数据"""
         if not DATA.exists(self._name):
-            logger.error(f"{self._name} does not exist!")
+            logger.warning(f"{self._name} 复读记录文件不存在！")
             return
 
         data = DATA.load_pkl(self._name)
