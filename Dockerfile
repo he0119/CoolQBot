@@ -22,7 +22,7 @@ WORKDIR /app
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends fonts-noto \
+    && apt-get install -y --no-install-recommends fonts-noto fonts-noto-cjk fonts-noto-color-emoji \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 
