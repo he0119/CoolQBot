@@ -766,7 +766,7 @@ uvicorn = ">=0.17.6,<0.18.0"
 
 [[package]]
 name = "nonebot-plugin-imageutils"
-version = "0.1.4.4"
+version = "0.1.5"
 description = "Nonebot2 PIL工具插件"
 category = "main"
 optional = false
@@ -812,7 +812,7 @@ Pillow = ">=8.2.0"
 
 [[package]]
 name = "nonebot-plugin-petpet"
-version = "0.3.2"
+version = "0.3.3"
 description = "Nonebot2 plugin for making fun pictures"
 category = "main"
 optional = false
@@ -822,7 +822,7 @@ python-versions = ">=3.7.3,<4.0.0"
 httpx = ">=0.19.0"
 imageio = ">=2.12.0,<3.0.0"
 nonebot-adapter-onebot = ">=2.0.0-beta.1,<3.0.0"
-nonebot-plugin-imageutils = ">=0.1.4,<0.2.0"
+nonebot-plugin-imageutils = ">=0.1.5,<0.2.0"
 nonebot2 = ">=2.0.0-beta.1,<3.0.0"
 Pillow = ">=9.0.0,<10.0.0"
 
@@ -1676,7 +1676,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "3652b218cb69b66e3ec79a89c44fdbce40acb6505c046ab8a48274c84b0fd91b"
+content-hash = "d7cdf1f7956a35186dff5af2e3727515a15180cc2bdecf487bd0edbcffb1ee3e"
 
 [metadata.files]
 aiocache = [
@@ -2283,8 +2283,8 @@ nonebot-plugin-htmlrender = [
     {file = "nonebot_plugin_htmlrender-0.0.4.8-py3-none-any.whl", hash = "sha256:4ed625be82dfdf469864b32a6e129e43b91e863f25b1fdbc8c936418dbd6126e"},
 ]
 nonebot-plugin-imageutils = [
-    {file = "nonebot_plugin_imageutils-0.1.4.4-py3-none-any.whl", hash = "sha256:4ab37727ef810ff86ad0d27625f00d4be4c3ed4f907465890c1d8da94487d6a2"},
-    {file = "nonebot_plugin_imageutils-0.1.4.4.tar.gz", hash = "sha256:77fd2267eadddbe10418b75ba6b5638c2855acfe2847361d494327b220a2c8b8"},
+    {file = "nonebot_plugin_imageutils-0.1.5-py3-none-any.whl", hash = "sha256:c8cdc7dfa086f01f57feb9ffd077923e6a7c556bc1cba8b1ac0d10defc60baca"},
+    {file = "nonebot_plugin_imageutils-0.1.5.tar.gz", hash = "sha256:1e7ccc8b8b06a1f3acf96f9efe356fa50f3aa522a5a20a6a092ceb73584162dd"},
 ]
 nonebot-plugin-localstore = [
     {file = "nonebot-plugin-localstore-0.1.0.tar.gz", hash = "sha256:6d264cf8adcc4a470b496a78384eafd6ffd13bb8b7e14125e38e641748d2ee79"},
@@ -2295,8 +2295,8 @@ nonebot-plugin-memes = [
     {file = "nonebot_plugin_memes-0.2.3.1.tar.gz", hash = "sha256:58737ee0422db4ad3c00f780a4d4c21acb6b1a10dcf29caaab7dafa5b579331b"},
 ]
 nonebot-plugin-petpet = [
-    {file = "nonebot_plugin_petpet-0.3.2-py3-none-any.whl", hash = "sha256:6cb916f6b1f95e8f0816b4c5e4a998fc104365e87f19b9022f0f3b0ec9363479"},
-    {file = "nonebot_plugin_petpet-0.3.2.tar.gz", hash = "sha256:60f0e86ce095c1ada4a178121c58d218a8c68a892785c996b189c29600cdd69b"},
+    {file = "nonebot_plugin_petpet-0.3.3-py3-none-any.whl", hash = "sha256:3a477cb220e1196fbc77fcd1e7fa0e7da854052651c73da268ef0559cf8e3b3f"},
+    {file = "nonebot_plugin_petpet-0.3.3.tar.gz", hash = "sha256:0fc7dc38516a663d21543741eb3fab0b304f12049fbef17383ad481cee5f6155"},
 ]
 nonebot-plugin-sentry = [
     {file = "nonebot-plugin-sentry-0.2.2.tar.gz", hash = "sha256:e042e773e1d533d9bb5deb81cc0e9a0d78800e43c5093475d65d8c91308f98f7"},
