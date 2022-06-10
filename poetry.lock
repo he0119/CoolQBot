@@ -813,7 +813,7 @@ Pillow = ">=8.2.0"
 
 [[package]]
 name = "nonebot-plugin-petpet"
-version = "0.3.4"
+version = "0.3.5"
 description = "Nonebot2 plugin for making fun pictures"
 category = "main"
 optional = false
@@ -1677,7 +1677,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "66466305aea781cb587e6979053d3d108098dd54bac0caab50969d1e9addcc78"
+content-hash = "de9c2278b9bb141c344eade75ef0446228c0615482b23c92a9c3e2a75877b034"
 
 [metadata.files]
 aiocache = [
@@ -2296,8 +2296,8 @@ nonebot-plugin-memes = [
     {file = "nonebot_plugin_memes-0.2.3.1.tar.gz", hash = "sha256:58737ee0422db4ad3c00f780a4d4c21acb6b1a10dcf29caaab7dafa5b579331b"},
 ]
 nonebot-plugin-petpet = [
-    {file = "nonebot_plugin_petpet-0.3.4-py3-none-any.whl", hash = "sha256:a939bcf560257eeccd9cc0073c5df587711b2fde5b9d9fbf1fa26f80bece66ba"},
-    {file = "nonebot_plugin_petpet-0.3.4.tar.gz", hash = "sha256:8c0041d45f1788c0ed64e42aa525834ba37f0ac249a72e4dbd0087fe0dd7009a"},
+    {file = "nonebot_plugin_petpet-0.3.5-py3-none-any.whl", hash = "sha256:8c41de445d6380c5f87fce0e3b79662ef0095f5dfe5ad0e76ab4368c85b3d038"},
+    {file = "nonebot_plugin_petpet-0.3.5.tar.gz", hash = "sha256:af7527be08f45d1c0205c0efbe83519710e4ac6042186ab148ec38f186947fa7"},
 ]
 nonebot-plugin-sentry = [
     {file = "nonebot-plugin-sentry-0.2.2.tar.gz", hash = "sha256:e042e773e1d533d9bb5deb81cc0e9a0d78800e43c5093475d65d8c91308f98f7"},
