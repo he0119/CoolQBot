@@ -12,7 +12,7 @@ ENV PATH="${PATH}:/root/.local/bin"
 
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim
 
 ENV TZ Asia/Shanghai
 ENV SENTRY_RELEASE=version
@@ -22,12 +22,13 @@ WORKDIR /app
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 
 RUN apt-get update \
-    && apt-get install -y fonts-noto \
-    && locale-gen zh_CN zh_CN.UTF-8 \
-    && update-locale LANG="zh_CN.UTF-8" LC_ALL="zh_CN.UTF-8" \
+    && apt-get install -y locales fontconfig fonts-noto \
     && fc-cache -fv \
+    && locale-gen zh_CN zh_CN.UTF-8 \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
+
+ENV LANG="zh_CN.UTF-8" LC_ALL="zh_CN.UTF-8"
 
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
