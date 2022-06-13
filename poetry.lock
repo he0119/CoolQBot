@@ -1,18 +1,4 @@
 [[package]]
-name = "aiocache"
-version = "0.11.1"
-description = "multi backend asyncio cache"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.extras]
-dev = ["asynctest (>=0.11.0)", "codecov", "coverage", "flake8", "ipdb", "marshmallow", "pystache", "pytest", "pytest-asyncio", "pytest-mock", "sphinx", "sphinx-autobuild", "sphinx-rtd-theme", "black"]
-memcached = ["aiomcache (>=0.5.2)"]
-msgpack = ["msgpack (>=0.5.5)"]
-redis = ["aioredis (>=0.3.3)", "aioredis (>=1.0.0)"]
-
-[[package]]
 name = "aiofiles"
 version = "0.8.0"
 description = "File support for asyncio."
@@ -795,21 +781,19 @@ nonebot2 = ">=2.0.0-alpha.8,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-memes"
-version = "0.2.3.1"
+version = "0.3.1"
 description = "Nonebot2 plugin for making memes"
 category = "main"
 optional = false
 python-versions = ">=3.7.3,<4.0.0"
 
 [package.dependencies]
-aiocache = ">=0.11.0"
-emoji = ">=1.7.0,<2.0.0"
-fonttools = ">=4.31.2,<5.0.0"
 httpx = ">=0.19.0"
 imageio = ">=2.12.0,<3.0.0"
 nonebot-adapter-onebot = ">=2.0.0-beta.1,<3.0.0"
+nonebot-plugin-imageutils = ">=0.1.6,<0.2.0"
 nonebot2 = ">=2.0.0-beta.1,<3.0.0"
-Pillow = ">=8.2.0"
+Pillow = ">=9.0.0,<10.0.0"
 
 [[package]]
 name = "nonebot-plugin-petpet"
@@ -1677,13 +1661,9 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "b4af9d0c5b425d2cd379100580398501d0d3beb6192462a483d8f1e9850a09ad"
+content-hash = "9811bbb3fa37c95d9c2094e69fdaafd984f40a3c72b109cfde26693636ff4f95"
 
 [metadata.files]
-aiocache = [
-    {file = "aiocache-0.11.1-py2.py3-none-any.whl", hash = "sha256:e55c7caaa5753794fd301c3a2e592737fa1d036db9f8d04ae154facdfb48a157"},
-    {file = "aiocache-0.11.1.tar.gz", hash = "sha256:f2ebe0b05cec45782e7b5ea0bb74640f157dd4bb1028b4565364dda9fe33be7f"},
-]
 aiofiles = [
     {file = "aiofiles-0.8.0-py3-none-any.whl", hash = "sha256:7a973fc22b29e9962d0897805ace5856e6a566ab1f0c8e5c91ff6c866519c937"},
     {file = "aiofiles-0.8.0.tar.gz", hash = "sha256:8334f23235248a3b2e83b2c3a78a22674f39969b96397126cc93664d9a901e59"},
@@ -2292,8 +2272,8 @@ nonebot-plugin-localstore = [
     {file = "nonebot_plugin_localstore-0.1.0-py3-none-any.whl", hash = "sha256:a5be70a32f24d92561120881b883e4583c7aecec9703399cc6eef4618e5ee933"},
 ]
 nonebot-plugin-memes = [
-    {file = "nonebot_plugin_memes-0.2.3.1-py3-none-any.whl", hash = "sha256:c5cc431e6011991770a433904e61864a7a24213d25f0f6146e50e93d411ee6b2"},
-    {file = "nonebot_plugin_memes-0.2.3.1.tar.gz", hash = "sha256:58737ee0422db4ad3c00f780a4d4c21acb6b1a10dcf29caaab7dafa5b579331b"},
+    {file = "nonebot_plugin_memes-0.3.1-py3-none-any.whl", hash = "sha256:be4c66ce415ea4933cdb2e509a87e6f02204c2841383459187eee23dfd6d6e2f"},
+    {file = "nonebot_plugin_memes-0.3.1.tar.gz", hash = "sha256:2eff9f85807fcb0d8c5f273e705c0f2adc98f2e1b4454dee130655b9b9838bd3"},
 ]
 nonebot-plugin-petpet = [
     {file = "nonebot_plugin_petpet-0.3.5-py3-none-any.whl", hash = "sha256:8c41de445d6380c5f87fce0e3b79662ef0095f5dfe5ad0e76ab4368c85b3d038"},
