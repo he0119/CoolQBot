@@ -22,7 +22,10 @@ WORKDIR /app
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends fonts-noto fonts-noto-cjk fonts-noto-color-emoji \
+    && apt-get install -y fonts-noto \
+    && sudo locale-gen zh_CN zh_CN.UTF-8 \
+    && sudo update-locale LC_ALL=zh_CN.UTF-8 LANG=zh_CN.UTF-8 \
+    && fc-cache -fv \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 
