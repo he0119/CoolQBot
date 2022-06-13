@@ -22,7 +22,7 @@ WORKDIR /app
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 
 RUN apt-get update \
-    && apt-get install -y locales fonts-noto \
+    && apt-get install -y locales language-pack-zh-hans fonts-noto \
     && locale-gen zh_CN zh_CN.UTF-8 \
     && update-locale LC_ALL=zh_CN.UTF-8 LANG=zh_CN.UTF-8 \
     && fc-cache -fv \
