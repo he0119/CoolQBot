@@ -21,8 +21,9 @@ WORKDIR /app
 
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 
+# && apt-get install -y --no-install-recommends vi \
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends vi \
+    && apt-get upgrade -y \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 
