@@ -5,6 +5,7 @@ from operator import itemgetter
 
 from nonebot.adapters.onebot.v11 import Bot
 
+from .config import plugin_config
 from .recorder import recorder_obj
 
 
@@ -16,6 +17,9 @@ async def get_rank(
     group_id: int,
 ) -> str:
     """获取排行榜"""
+    if group_id not in plugin_config.group_id:
+        return "该群未开启复读功能，无法获取排行榜。"
+
     repeat_list = recorder_obj.repeat_list(group_id)
     msg_number_list = recorder_obj.msg_number_list(group_id)
 

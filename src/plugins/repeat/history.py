@@ -4,13 +4,18 @@ from calendar import monthrange
 from datetime import datetime
 from typing import Tuple
 
-from .config import DATA
+from nonebot.adapters.onebot.v11 import Bot
+
+from .config import DATA, plugin_config
 from .rank import Ranking
 from .recorder import Recorder, get_history_pkl_name, recorder_obj
 
 
-async def get_history(year: int, month: int, day: int, group_id: int) -> str:
+async def get_history(bot: Bot, year: int, month: int, day: int, group_id: int) -> str:
     """获取历史数据"""
+    if group_id not in plugin_config.group_id:
+        return "该群未开启复读功能，无法获取历史排行榜。"
+
     str_data = ""
     now = datetime.now()
     is_valid, message = is_valid_date(year, month, day, now)
@@ -46,6 +51,7 @@ async def get_history(year: int, month: int, day: int, group_id: int) -> str:
     display_total_number = True
 
     ranking = Ranking(
+        bot,
         group_id,
         display_number,
         minimal_msg_number,
