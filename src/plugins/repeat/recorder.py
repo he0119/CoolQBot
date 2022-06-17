@@ -88,10 +88,6 @@ class Recorder:
         # 机器人状态
         # 启动时间
         self.start_time = datetime.now()
-        # 酷Q 状态
-        self.coolq_status = False
-        # 是否需要发送问好
-        self.send_hello = False
 
         self._load_data()
 
