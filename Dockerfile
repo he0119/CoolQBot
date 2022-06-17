@@ -14,15 +14,16 @@ RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9-slim
 
-ENV TZ Asia/Shanghai
+ENV TZ=Asia/Shanghai
 ENV SENTRY_RELEASE=version
 
 WORKDIR /app
 
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 
+# && apt-get install -y --no-install-recommends vi \
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends git \
+    && apt-get upgrade -y \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 
