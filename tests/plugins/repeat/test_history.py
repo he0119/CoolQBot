@@ -1,11 +1,14 @@
+from datetime import datetime
+
 import pytest
 from nonebug import App
+from pytest_mock import MockerFixture
 
 from tests.fake import fake_group_message_event
 
 
 @pytest.mark.asyncio
-async def test_history(app: App):
+async def test_history(app: App, mocker: MockerFixture):
     """测试历史"""
     from nonebot import require
 
@@ -13,6 +16,10 @@ async def test_history(app: App):
     from nonebot.adapters.onebot.v11 import Bot, Message
 
     from src.plugins.repeat import history_cmd, plugin_config, recorder_obj
+
+    mocked_datetime = mocker.patch("src.plugins.repeat.history.datetime")
+    mocked_datetime.now.return_value = datetime(2020, 1, 2)
+    mocked_datetime.return_value = datetime(2020, 1, 1)
 
     plugin_config.group_id = [10000]
     recorder_obj._msg_number_list = {10000: {1: {10: 100}}}
@@ -24,12 +31,24 @@ async def test_history(app: App):
         event = fake_group_message_event(message=Message("/history 2020-1-0"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "2020 年 1 月的数据不存在，请换个试试吧 0.0", True)
+        ctx.should_call_api(
+            "get_group_member_info",
+            data={"group_id": 10000, "user_id": 10, "no_cache": True},
+            result={"card": "test"},
+        )
+        ctx.should_call_send(
+            event,
+            "2020 年 1 月数据\nLove Love Ranking\ntest(100)：10.00%\n\n复读次数排行榜\ntest(100)：10次",
+            True,
+        )
         ctx.should_finished()
+
+    mocked_datetime.now.assert_called_once()
+    mocked_datetime.assert_called_once_with(year=2020, month=1, day=1)
 
 
 @pytest.mark.asyncio
-async def test_history_get_arg(app: App):
+async def test_history_get_arg(app: App, mocker: MockerFixture):
     """请求参数"""
     from nonebot import require
 
@@ -37,6 +56,10 @@ async def test_history_get_arg(app: App):
     from nonebot.adapters.onebot.v11 import Bot, Message
 
     from src.plugins.repeat import history_cmd, plugin_config, recorder_obj
+
+    mocked_datetime = mocker.patch("src.plugins.repeat.history.datetime")
+    mocked_datetime.now.return_value = datetime(2020, 1, 2)
+    mocked_datetime.return_value = datetime(2020, 1, 1)
 
     plugin_config.group_id = [10000]
     recorder_obj._msg_number_list = {10000: {1: {10: 100}}}
@@ -60,7 +83,19 @@ async def test_history_get_arg(app: App):
         ctx.should_call_send(month_event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True)
 
         ctx.receive_event(bot, day_event)
-        ctx.should_call_send(day_event, "2020 年 1 月的数据不存在，请换个试试吧 0.0", True)
+        ctx.should_call_api(
+            "get_group_member_info",
+            data={"group_id": 10000, "user_id": 10, "no_cache": True},
+            result={"card": "test"},
+        )
+        ctx.should_call_send(
+            day_event,
+            "2020 年 1 月数据\nLove Love Ranking\ntest(100)：10.00%\n\n复读次数排行榜\ntest(100)：10次",
+            True,
+        )
+
+    mocked_datetime.now.assert_called_once()
+    mocked_datetime.assert_called_once_with(year=2020, month=1, day=1)
 
 
 @pytest.mark.asyncio
