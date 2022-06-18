@@ -272,12 +272,14 @@ async def history_handle_first_receive(state: T_State, arg: Message = CommandArg
     parameterless=[Depends(parse_int("day"))],
 )
 async def history_handle_group_message(
+    bot: Bot,
     event: GroupMessageEvent,
     year: int = Arg(),
     month: int = Arg(),
     day: int = Arg(),
 ):
     res = await get_history(
+        bot,
         year=year,
         month=month,
         day=day,
@@ -307,6 +309,7 @@ async def history_handle_group_message(
     parameterless=[Depends(parse_int("group_id"))],
 )
 async def history_handle_private_message(
+    bot: Bot,
     event: PrivateMessageEvent,
     year: int = Arg(),
     month: int = Arg(),
@@ -314,6 +317,7 @@ async def history_handle_private_message(
     group_id: int = Arg(),
 ):
     res = await get_history(
+        bot=bot,
         year=year,
         month=month,
         day=day,

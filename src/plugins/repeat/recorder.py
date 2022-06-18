@@ -88,10 +88,6 @@ class Recorder:
         # 机器人状态
         # 启动时间
         self.start_time = datetime.now()
-        # 酷Q 状态
-        self.coolq_status = False
-        # 是否需要发送问好
-        self.send_hello = False
 
         self._load_data()
 
@@ -170,7 +166,7 @@ class Recorder:
     def _load_data(self):
         """加载数据"""
         if not DATA.exists(self._name):
-            logger.error(f"{self._name} does not exist!")
+            logger.warning(f"{self._name} 复读记录文件不存在！")
             return
 
         data = DATA.load_pkl(self._name)
