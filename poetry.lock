@@ -644,7 +644,7 @@ python-versions = "*"
 
 [[package]]
 name = "nonebot-adapter-onebot"
-version = "2.1.0"
+version = "2.1.1"
 description = "OneBot(CQHTTP) adapter for nonebot2"
 category = "main"
 optional = false
@@ -1661,7 +1661,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "c55288fd74ca2177b45c6ff6628a85b7b6c2649ee88ed0b176d4ef076e0d1303"
+content-hash = "ce3e3f4c084ffbb37a8bd9d6017a49f17eca1739c81d078e23e534c5c5ddad77"
 
 [metadata.files]
 aiofiles = [
@@ -2236,8 +2236,8 @@ nodeenv = [
     {file = "nodeenv-1.6.0.tar.gz", hash = "sha256:3ef13ff90291ba2a4a7a4ff9a979b63ffdd00a464dbe04acf0ea6471517a4c2b"},
 ]
 nonebot-adapter-onebot = [
-    {file = "nonebot-adapter-onebot-2.1.0.tar.gz", hash = "sha256:b3696235581a25f52dec8744b82102bf138637845d1bbaaf305b9e89423a562f"},
-    {file = "nonebot_adapter_onebot-2.1.0-py3-none-any.whl", hash = "sha256:c1b4efd6a7ec22430897ba0e0698d58a95b2e28fe39c37271131c796ca366186"},
+    {file = "nonebot-adapter-onebot-2.1.1.tar.gz", hash = "sha256:d00036883dd8b8685f0eea68b7ada9c3b1ba9de8b39f5c33e81d36a444afe02a"},
+    {file = "nonebot_adapter_onebot-2.1.1-py3-none-any.whl", hash = "sha256:1a825b21fc7315c11d335276a932811352ac70e7031e86b5595121185c951c77"},
 ]
 nonebot-adapter-qqguild = [
     {file = "nonebot-adapter-qqguild-0.1.1.tar.gz", hash = "sha256:d9f9fa637055fdc86d1185e190fc98ccc916b130c9a98b32c9b4d1647e74c604"},
