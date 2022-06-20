@@ -10,7 +10,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/bot.py",
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "envFile": "${workspaceFolder}/.env.dev"
         },
         {
             "name": "CoolQBot Test",
@@ -19,7 +20,8 @@
             "module": "pytest",
             "args": ["-s"],
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "envFile": "${workspaceFolder}/.env.dev"
         }
     ]
 }
