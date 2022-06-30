@@ -7,7 +7,6 @@ services:
     restart: always
     volumes:
       - "./data:/app/data"
-      - './.env.prod:/app/.env.prod'
     ports:
       - "8080:8080" # 映射端口到宿主机 宿主机端口:容器端口
     env_file:
