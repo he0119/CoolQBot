@@ -22,7 +22,7 @@
 # 首先克隆代码到本地
 git clone https://github.com/he0119/CoolQBot.git
 # 配置机器人通用配置
-vim .env.prod
+vim .env
 # 安装机器人所需依赖
 poetry install
 # 运行机器人
@@ -37,7 +37,7 @@ nb run
 
 如果你的计算机上安装有 [Docker](https://www.docker.com/get-started) 并且拥有 [Docker Compose](https://docs.docker.com/compose/install/)。
 
-你不需要执行上面的步骤，请直接将仓库中的 `docker-compose.yml` 文件放置在一个你想存放机器人的文件夹内。
+你不需要执行上面的步骤，请直接将仓库中的 `docker-compose.yml` 和 `.env` 文件放置在一个你想存放机器人的文件夹内。
 
 ```shell
 # 然后配置 go-cqhttp，请参考上面的文档
