@@ -19,7 +19,7 @@ nonebot-plugin-wordcloud = "0.2.2"
 tencentcloud-sdk-python = "^3.0.593"
 psutil = "^5.8.0"
 nonebot-plugin-memes = "0.3.2"
-nonebot-plugin-petpet = "0.3.5"
+nonebot-plugin-petpet = "0.3.6"
 nonebot-bison = "0.5.4"
 
 [tool.poetry.dev-dependencies]
