@@ -18,7 +18,6 @@ from nonebot.params import ArgPlainText, CommandArg, Depends
 
 from src.utils.helpers import strtobool
 
-from ..help.commands import get_command_help
 from .config import DATA, global_config, plugin_config
 from .fflogs_api import fflogs
 from .fflogs_data import FFLOGS_DATA
@@ -118,7 +117,7 @@ async def fflogs_handle(event: Event, args: Message = CommandArg()):
             argv.append(User("qqguild", at_message[0].data["user_id"]))
 
     if not argv:
-        await fflogs_cmd.finish(get_command_help("ff14.dps"))
+        await fflogs_cmd.finish()
 
     user_id = event.get_user_id()
 
@@ -245,8 +244,6 @@ async def fflogs_handle(event: Event, args: Message = CommandArg()):
             data = await fflogs.character_dps(*argv)  # type:ignore
         await fflogs_cmd.finish(data)
 
-    await fflogs_cmd.finish(get_command_help("ff14.dps"))
-
 
 async def get_character_dps_by_user_id(boss_nickname: str, user_id: str):
     """通过 BOSS 名称和 QQ 号来获取角色的 DPS 数据"""
@@ -304,7 +301,7 @@ async def price_handle(event: Event, args: Message = CommandArg()):
     user_id = event.get_user_id()
 
     if len(argv) == 0:
-        await price_cmd.finish(get_command_help("ff14.price"))
+        await price_cmd.finish()
 
     if len(argv) == 1 and argv[0] == "默认值":
         world_or_dc = DATA.config.get(f"price-default-{user_id}", "猫小胖")

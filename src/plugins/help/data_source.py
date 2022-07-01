@@ -1,10 +1,9 @@
-""" 命令信息
+""" 帮助数据
 
-通过命令的 __doc__ 获取命令信息
+获取插件的帮助信息，并通过子插件的形式获取二级菜单
 """
 import inspect
 from dataclasses import dataclass
-from functools import reduce
 from typing import TYPE_CHECKING, Optional, cast
 
 from nonebot import get_loaded_plugins
@@ -12,6 +11,7 @@ from nonebot.rule import CommandRule
 
 if TYPE_CHECKING:
     from nonebot.matcher import Matcher
+    from nonebot.plugin import Plugin
 
 
 @dataclass
@@ -23,7 +23,7 @@ class CommandInfo:
     help: str
 
 
-_commands: Optional[list[CommandInfo]] = None
+_plugins: Optional[dict[str, "Plugin"]] = None
 
 
 def sort_commands(cmds: list[tuple[str, ...]]) -> list[tuple[str, ...]]:
@@ -68,46 +68,37 @@ def extract_command_info(matcher: "Matcher") -> Optional[CommandInfo]:
     return CommandInfo(name=name, aliases=aliases, help=help)
 
 
-def get_commands() -> list[CommandInfo]:
-    """获取所有命令的信息
-
-    并保存，方便下次使用
-    """
-    global _commands
-    if _commands is None:
-        plugins = get_loaded_plugins()
-        matchers = reduce(lambda x, y: x.union(y.matcher), plugins, set())
-        commands = []
-        for matcher in matchers:
-            command = extract_command_info(matcher)
-            if command:
-                commands.append(command)
-        _commands = commands
-    return _commands
+def get_plugins() -> dict[str, "Plugin"]:
+    global _plugins
+    if _plugins is None:
+        # 仅获取适配了元信息的插件
+        plugins = filter(lambda x: x.metadata is not None, get_loaded_plugins())
+        _plugins = {x.metadata.name: x for x in plugins}  # type: ignore
+    return _plugins
 
 
-def get_command_help(name: str) -> Optional[str]:
-    """通过命令名字获取命令的帮助"""
-    commands = get_commands()
-    command = next(
-        filter(lambda x: x.name == name or name in x.aliases, commands), None
+def get_plugin_list() -> str:
+    # 仅获取适配了元信息的插件
+    plugins = get_plugins()
+
+    docs = "插件列表：\n"
+    docs += "\n".join(
+        sorted(
+            map(
+                lambda x: f"{x.metadata.name} # {x.metadata.description}",  # type: ignore
+                plugins.values(),
+            )
+        )
     )
-    if command:
-        return command.help
+    return docs
+
+
+def get_plugin_help(name: str) -> Optional[str]:
+    """通过插件获取命令的帮助"""
+    plugins = get_plugins()
+
+    plugin = plugins.get(name)
+    if plugin:
+        return f"{name}\n\n{plugin.metadata.usage}"  # type: ignore
     else:
         return None
-
-
-def format_name_aliases(command: CommandInfo) -> str:
-    """格式化命令名称"""
-    if command.aliases:
-        return f'{command.name}({", ".join(command.aliases)})'
-    else:
-        return command.name
-
-
-def get_command_list() -> str:
-    commands = get_commands()
-    docs = "命令（别名）列表：\n"
-    docs += "\n".join(sorted(map(format_name_aliases, commands)))
-    return docs
