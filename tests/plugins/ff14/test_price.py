@@ -38,12 +38,14 @@ def mocked_get(url: str):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
 async def test_price(app: App, mocker: MockerFixture):
     """测试查价"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.ff14 import price_cmd
+    require("src.plugins.ff14")
+
+    from src.plugins.ff14.plugins.price import price_cmd
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
@@ -68,12 +70,14 @@ async def test_price(app: App, mocker: MockerFixture):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
 async def test_price_default(app: App, mocker: MockerFixture):
     """测试查价，默认值"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.ff14 import price_cmd
+    require("src.plugins.ff14")
+
+    from src.plugins.ff14.plugins.price import price_cmd
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
@@ -122,12 +126,14 @@ async def test_price_default(app: App, mocker: MockerFixture):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
 async def test_price_item_not_found(app: App, mocker: MockerFixture):
     """测试查价，物品不存在"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.ff14 import price_cmd
+    require("src.plugins.ff14")
+
+    from src.plugins.ff14.plugins.price import price_cmd
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
@@ -147,12 +153,14 @@ async def test_price_item_not_found(app: App, mocker: MockerFixture):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
 async def test_price_world_not_found(app: App, mocker: MockerFixture):
     """测试查价，服务器/大区不存在"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.ff14 import price_cmd
+    require("src.plugins.ff14")
+
+    from src.plugins.ff14.plugins.price import price_cmd
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
@@ -177,12 +185,14 @@ async def test_price_world_not_found(app: App, mocker: MockerFixture):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
 async def test_price_help(app: App):
     """测试查价，参数不足两个的情况"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.ff14 import price_cmd
+    require("src.plugins.ff14")
+
+    from src.plugins.ff14.plugins.price import price_cmd
 
     async with app.test_matcher(price_cmd) as ctx:
         bot = ctx.create_bot()

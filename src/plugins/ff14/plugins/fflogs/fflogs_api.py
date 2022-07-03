@@ -14,7 +14,7 @@ import httpx
 from nonebot.log import logger
 from nonebot_plugin_apscheduler import scheduler
 
-from .config import DATA, plugin_config
+from ... import DATA, plugin_config
 from .fflogs_data import (
     FFLOGS_DATA,
     FFlogsDataModel,
