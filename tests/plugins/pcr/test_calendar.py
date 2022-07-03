@@ -27,16 +27,12 @@ def mocked_get(url: str):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.pcr",)], indirect=True)
-async def test_calendar(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_calendar(app: App, mocker: MockerFixture):
     """测试日程"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
+    require("src.plugins.pcr")
     from src.plugins.pcr import calendar_cmd
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
@@ -45,9 +41,8 @@ async def test_calendar(
     mocked_datetime.strptime = datetime.strptime
 
     async with app.test_matcher(calendar_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
-        event = fake_group_message_event(message=Message("/pcr.calendar"))
+        bot = ctx.create_bot()
+        event = fake_group_message_event(message=Message("/公主连结日程表"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
