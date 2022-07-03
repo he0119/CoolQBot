@@ -6,12 +6,12 @@ from nonebot_plugin_datastore import PluginData
 DATA = PluginData("genshin")
 
 
-def get_cookie(user_id: int) -> str:
+def get_cookie(user_id: str) -> str:
     """获取用户的 cookie"""
     return DATA.config.get(f"cookie-{user_id}", "")
 
 
-def set_cookie(user_id: int, cookie: str) -> None:
+def set_cookie(user_id: str, cookie: str) -> None:
     """设置用户的 cookie"""
     DATA.config.set(f"cookie-{user_id}", cookie)
 

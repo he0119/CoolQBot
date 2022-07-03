@@ -5,12 +5,14 @@ from tests.fake import fake_private_message_event
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.genshin",)], indirect=True)
 async def test_bind(app: App):
     """测试原神绑定账号"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.genshin import bind_cmd
+    require("src.plugins.genshin")
+
+    from src.plugins.genshin.plugins.bind import bind_cmd
 
     async with app.test_matcher(bind_cmd) as ctx:
         bot = ctx.create_bot()
@@ -22,12 +24,14 @@ async def test_bind(app: App):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.genshin",)], indirect=True)
 async def test_bind_get_arg(app: App):
     """测试原神绑定账号"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.genshin import bind_cmd
+    require("src.plugins.genshin")
+
+    from src.plugins.genshin.plugins.bind import bind_cmd
 
     async with app.test_matcher(bind_cmd) as ctx:
         bot = ctx.create_bot()

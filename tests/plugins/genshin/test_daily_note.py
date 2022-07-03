@@ -41,18 +41,17 @@ def mocked_get(url: str, **kwargs):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.genshin",)], indirect=True)
-async def test_daily_note(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_daily_note(app: App, mocker: MockerFixture):
     """测试原神实时便笺"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.genshin import daily_note_cmd
-    from src.plugins.genshin.config import set_cookie
+    require("src.plugins.genshin")
 
-    set_cookie(10, "test")
+    from src.plugins.genshin.config import set_cookie
+    from src.plugins.genshin.plugins.daily_note import daily_note_cmd
+
+    set_cookie("10", "test")
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
@@ -72,18 +71,17 @@ async def test_daily_note(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.genshin",)], indirect=True)
-async def test_daily_note_full(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_daily_note_full(app: App, mocker: MockerFixture):
     """测试原神实时便笺，体力满的情况"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.genshin import daily_note_cmd
-    from src.plugins.genshin.config import set_cookie
+    require("src.plugins.genshin")
 
-    set_cookie(10, "full")
+    from src.plugins.genshin.config import set_cookie
+    from src.plugins.genshin.plugins.daily_note import daily_note_cmd
+
+    set_cookie("10", "full")
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
@@ -103,12 +101,14 @@ async def test_daily_note_full(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.genshin",)], indirect=True)
 async def test_daily_note_not_bind(app: App):
     """测试原神实时便笺，未绑定账号"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.genshin import daily_note_cmd
+    require("src.plugins.genshin")
+
+    from src.plugins.genshin.plugins.daily_note import daily_note_cmd
 
     async with app.test_matcher(daily_note_cmd) as ctx:
         bot = ctx.create_bot()
