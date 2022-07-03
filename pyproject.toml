@@ -21,6 +21,7 @@ psutil = "^5.8.0"
 nonebot-plugin-memes = "0.3.3"
 nonebot-plugin-petpet = "0.3.6"
 nonebot-bison = "0.5.4"
+nonebot-plugin-treehelp = "^0.0.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"

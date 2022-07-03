@@ -827,7 +827,7 @@ sentry-sdk = ">=1.0.0,<2.0.0"
 name = "nonebot-plugin-treehelp"
 version = "0.0.1"
 description = "适用于 Nonebot2 的树形帮助插件"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "^3.7.3"
 develop = true
@@ -1678,7 +1678,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "a78dd7b2bc7526f1753fea43146faaebdf434b4dd96d479e866d1bfac25e146f"
+content-hash = "addd502ce799edd936b42a401bc92f45466d285f450365e8cfdc6f9198348cce"
 
 [metadata.files]
 aiofiles = [
