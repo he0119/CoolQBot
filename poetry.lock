@@ -829,15 +829,10 @@ version = "0.0.1"
 description = "适用于 Nonebot2 的树形帮助插件"
 category = "main"
 optional = false
-python-versions = "^3.7.3"
-develop = true
+python-versions = ">=3.7.3,<4.0.0"
 
 [package.dependencies]
-nonebot2 = "^2.0.0-beta.4"
-
-[package.source]
-type = "directory"
-url = "../nonebot-plugin-treehelp"
+nonebot2 = ">=2.0.0-beta.4,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
@@ -1468,7 +1463,7 @@ full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.668"
+version = "3.0.669"
 description = "Tencent Cloud SDK for Python"
 category = "main"
 optional = false
@@ -1678,7 +1673,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "497c7e1c8fe2c674d6efe5bfede69df26d7825633e55868b8f70e884b53073cd"
+content-hash = "302affc5e23c66ece8f3815bc79c5e96d7e16ac672de7e9bf1a1d76730425c00"
 
 [metadata.files]
 aiofiles = [
@@ -2301,7 +2296,10 @@ nonebot-plugin-sentry = [
     {file = "nonebot-plugin-sentry-0.2.2.tar.gz", hash = "sha256:e042e773e1d533d9bb5deb81cc0e9a0d78800e43c5093475d65d8c91308f98f7"},
     {file = "nonebot_plugin_sentry-0.2.2-py3-none-any.whl", hash = "sha256:cc7aab8a258aa1931bd4fdab36672e6e99f645d438c6c24999688a8422ba0dd3"},
 ]
-nonebot-plugin-treehelp = []
+nonebot-plugin-treehelp = [
+    {file = "nonebot-plugin-treehelp-0.0.1.tar.gz", hash = "sha256:82a3b1fed0f4552991a2edfe54c67ebb0a492a9bc660d0a12ee9bf01f2f84c14"},
+    {file = "nonebot_plugin_treehelp-0.0.1-py3-none-any.whl", hash = "sha256:537b500244e4783c3be7a0185f1521c10469b4930720104c9745a0e5446b78c4"},
+]
 nonebot-plugin-wordcloud = [
     {file = "nonebot-plugin-wordcloud-0.2.3.tar.gz", hash = "sha256:e4f0abfd8b1a6f8105bc2214152eeb8c5e126bb3ff07c4652529cc160c3aa871"},
     {file = "nonebot_plugin_wordcloud-0.2.3-py3-none-any.whl", hash = "sha256:85406300b6d45dbe9595daaff223496c127fc6d75d8d288fed364aae141ed6af"},
@@ -2703,8 +2701,8 @@ starlette = [
     {file = "starlette-0.19.1.tar.gz", hash = "sha256:c6d21096774ecb9639acad41b86b7706e52ba3bf1dc13ea4ed9ad593d47e24c7"},
 ]
 tencentcloud-sdk-python = [
-    {file = "tencentcloud-sdk-python-3.0.668.tar.gz", hash = "sha256:6f161eb6610014a71721702569c64f00e573f7937036e1817137796216906147"},
-    {file = "tencentcloud_sdk_python-3.0.668-py2.py3-none-any.whl", hash = "sha256:7e743f861353db56d40c33eff6f58096cb1c2a46667e97d30715cf0e6cc31d7a"},
+    {file = "tencentcloud-sdk-python-3.0.669.tar.gz", hash = "sha256:4567473525d30c96b68f796a5537aec5764d1984ec99735f0b31c179c0dc507e"},
+    {file = "tencentcloud_sdk_python-3.0.669-py2.py3-none-any.whl", hash = "sha256:c7cc6f4a01bbb8c6d4e6b28a9c2848ed28e8cfc6f0942635d4ef4982ffe9f4da"},
 ]
 tinydb = [
     {file = "tinydb-4.7.0-py3-none-any.whl", hash = "sha256:e2cdf6e2dad49813e9b5fceb3c7943387309a8738125fbff0b58d248a033f7a9"},

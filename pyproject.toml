@@ -31,7 +31,6 @@ pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"
 pytest-xdist = "^2.5.0"
 pre-commit = "^2.19.0"
-nonebot-plugin-treehelp = { path = "../nonebot-plugin-treehelp/", develop = true }
 
 [tool.nonebot]
 plugin_dirs = ["src/plugins"]
