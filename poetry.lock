@@ -841,7 +841,7 @@ url = "../nonebot-plugin-treehelp"
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.2.2"
+version = "0.2.3"
 description = "适用于 NoneBot2 的词云插件"
 category = "main"
 optional = false
@@ -852,7 +852,7 @@ emoji = ">=1.6.3,<2.0.0"
 jieba = ">=0.42.1,<0.43.0"
 nonebot-adapter-onebot = ">=2.0.0-beta.1,<3.0.0"
 nonebot-plugin-chatrecorder = ">=0.1.5,<0.2.0"
-nonebot2 = {version = ">=2.0.0-beta.2,<3.0.0", extras = ["httpx"]}
+nonebot2 = ">=2.0.0-beta.4,<3.0.0"
 tzdata = "*"
 wordcloud = ">=1.8.1,<2.0.0"
 
@@ -1678,7 +1678,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "addd502ce799edd936b42a401bc92f45466d285f450365e8cfdc6f9198348cce"
+content-hash = "497c7e1c8fe2c674d6efe5bfede69df26d7825633e55868b8f70e884b53073cd"
 
 [metadata.files]
 aiofiles = [
@@ -2303,8 +2303,8 @@ nonebot-plugin-sentry = [
 ]
 nonebot-plugin-treehelp = []
 nonebot-plugin-wordcloud = [
-    {file = "nonebot-plugin-wordcloud-0.2.2.tar.gz", hash = "sha256:6adeaa30537602f91e81b3fd0e3e2847968b119eb07e6b5d135ee30ef4401df4"},
-    {file = "nonebot_plugin_wordcloud-0.2.2-py3-none-any.whl", hash = "sha256:cee921af042650ae15d5f3365352754220a615d588e6dc52c5c538182cbdbd31"},
+    {file = "nonebot-plugin-wordcloud-0.2.3.tar.gz", hash = "sha256:e4f0abfd8b1a6f8105bc2214152eeb8c5e126bb3ff07c4652529cc160c3aa871"},
+    {file = "nonebot_plugin_wordcloud-0.2.3-py3-none-any.whl", hash = "sha256:85406300b6d45dbe9595daaff223496c127fc6d75d8d288fed364aae141ed6af"},
 ]
 nonebot2 = [
     {file = "nonebot2-2.0.0b4-py3-none-any.whl", hash = "sha256:3029cdb657ec48c6aaa046e1b712e7a0ebe5d0010208dff95b5ccbe461d1ed4e"},
