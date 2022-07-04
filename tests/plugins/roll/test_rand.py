@@ -29,7 +29,6 @@ async def test_rand(app: App, mocker: MockerFixture):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.roll",)], indirect=True)
 async def test_rand_probability(app: App, mocker: MockerFixture):
     """测试概率"""
     from nonebot import require

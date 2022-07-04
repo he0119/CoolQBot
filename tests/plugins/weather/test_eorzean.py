@@ -6,24 +6,22 @@ from tests.fake import fake_group_message_event
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.weather",)], indirect=True)
 async def test_eorzean(
     app: App,
     mocker: MockerFixture,
 ):
     """测试艾欧泽亚天气"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
+    require("src.plugins.weather")
     from src.plugins.weather import weather_cmd
 
     mocked_time = mocker.patch("src.plugins.weather.eorzean_api.time")
     mocked_time.time.return_value = 1641619586
 
     async with app.test_matcher(weather_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/天气 利姆萨·罗敏萨"))
 
         ctx.receive_event(bot, event)

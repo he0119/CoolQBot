@@ -34,7 +34,6 @@ def mocked_get(url: str, **kwargs):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.morning",)], indirect=True)
 async def test_morning_enabled(app: App):
     """测试每日早安已开启的情况"""
     from nonebot import require
@@ -55,7 +54,6 @@ async def test_morning_enabled(app: App):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.morning",)], indirect=True)
 async def test_morning_not_enabled(app: App):
     """测试每日早安关闭的情况"""
     from nonebot import require
