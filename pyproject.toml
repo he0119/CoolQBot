@@ -21,6 +21,7 @@ psutil = "^5.8.0"
 nonebot-plugin-memes = "0.3.3"
 nonebot-plugin-petpet = "0.3.6"
 nonebot-bison = "0.5.4"
+nonebot-plugin-treehelp = "^0.0.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
@@ -36,11 +37,12 @@ plugin_dirs = ["src/plugins"]
 plugins = [
     "nonebot_plugin_apscheduler",
     "nonebot_plugin_sentry",
+    "nonebot_plugin_treehelp",
     "nonebot_plugin_datastore",
     "nonebot_plugin_wordcloud",
     "nonebot_plugin_memes",
     "nonebot_plugin_petpet",
-    "nonebot_bison"
+    "nonebot_bison",
 ]
 
 [tool.black]

@@ -13,7 +13,6 @@ from tests.fake import fake_group_message_event
         pytest.param({"role": "member"}, id="member"),
     ],
 )
-@pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_owner(
     app: App,
     mocker: MockerFixture,
@@ -23,8 +22,10 @@ async def test_ban_group_bot_is_owner(
 
     机器人为群主，禁言对象为管理员或普通群员（一个群不可能有两个群主）
     """
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Bot, Message
 
+    require("src.plugins.ban")
     from src.plugins.ban import EXPR_OK, ban_cmd
 
     render_expression = mocker.patch("src.plugins.ban.render_expression")
@@ -61,7 +62,6 @@ async def test_ban_group_bot_is_owner(
         pytest.param({"role": "member"}, id="member"),
     ],
 )
-@pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_admin(
     app: App,
     mocker: MockerFixture,
@@ -71,8 +71,10 @@ async def test_ban_group_bot_is_admin(
 
     机器人为管理员，禁言对象为群主，管理员或普通群员
     """
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
+    require("src.plugins.ban")
     from src.plugins.ban import EXPR_NEED_HELP, EXPR_OK, EXPR_OWNER, ban_cmd
 
     render_expression = mocker.patch("src.plugins.ban.render_expression")
@@ -129,7 +131,6 @@ async def test_ban_group_bot_is_admin(
         pytest.param({"role": "member"}, id="member"),
     ],
 )
-@pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_bot_is_member(
     app: App,
     mocker: MockerFixture,
@@ -139,8 +140,10 @@ async def test_ban_group_bot_is_member(
 
     机器人为管理员，禁言对象为群主，管理员或普通群员
     """
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
+    require("src.plugins.ban")
     from src.plugins.ban import EXPR_NEED_HELP, EXPR_OWNER, ban_cmd
 
     render_expression = mocker.patch("src.plugins.ban.render_expression")
@@ -187,7 +190,6 @@ async def test_ban_group_bot_is_member(
         pytest.param({"role": "member"}, id="member"),
     ],
 )
-@pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_get_arg(
     app: App,
     mocker: MockerFixture,
@@ -197,8 +199,10 @@ async def test_ban_group_get_arg(
 
     机器人为普通群员，禁言对象为管理员或普通群员
     """
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Bot, Message
 
+    require("src.plugins.ban")
     from src.plugins.ban import EXPR_OK, ban_cmd
 
     render_expression = mocker.patch("src.plugins.ban.render_expression")
@@ -231,14 +235,15 @@ async def test_ban_group_get_arg(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.ban",)], indirect=True)
 async def test_ban_group_get_arg_invalid(
     app: App,
     mocker: MockerFixture,
 ):
     """测试群聊天，获取参数禁言 1 分钟，第一次参数错误"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Bot, Message
 
+    require("src.plugins.ban")
     from src.plugins.ban import EXPR_OK, ban_cmd
 
     render_expression = mocker.patch("src.plugins.ban.render_expression")

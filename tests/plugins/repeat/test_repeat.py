@@ -8,19 +8,18 @@ from tests.fake import fake_group_message_event
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.repeat",)], indirect=True)
-async def test_repeat(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_repeat(app: App, mocker: MockerFixture):
     """测试复读"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.repeat import plugin_config, recorder_obj, repeat_message
+    require("src.plugins.repeat")
+    from src.plugins.repeat import plugin_config, recorder_obj
+    from src.plugins.repeat.plugins.basic import repeat_message
 
-    mocked_rule_datetime = mocker.patch("src.plugins.repeat.repeat_rule.datetime")
+    mocked_rule_datetime = mocker.patch(
+        "src.plugins.repeat.plugins.basic.repeat_rule.datetime"
+    )
     mocked_rule_datetime.now.return_value = datetime(2021, 1, 1, 0, 0, 0)
     mocked_recorder_datetime = mocker.patch("src.plugins.repeat.recorder.datetime")
     mocked_recorder_datetime.now.side_effect = [
@@ -29,7 +28,9 @@ async def test_repeat(
         datetime(2021, 1, 1, 2, 0, 0),  # reset_last_message_on
         datetime(2021, 1, 1, 3, 0, 0),  # add_repeat_list
     ]
-    mocked_random = mocker.patch("src.plugins.repeat.repeat_rule.secrets.SystemRandom")
+    mocked_random = mocker.patch(
+        "src.plugins.repeat.plugins.basic.repeat_rule.secrets.SystemRandom"
+    )
     mocked_random().randint.return_value = 1
 
     plugin_config.group_id = [10000]
@@ -38,8 +39,7 @@ async def test_repeat(
     mocked_recorder_datetime.now.assert_called_once()
 
     async with app.test_matcher(repeat_message) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("123"))
 
         ctx.receive_event(bot, event)
@@ -52,20 +52,19 @@ async def test_repeat(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.repeat",)], indirect=True)
 async def test_repeat_enabled(app: App):
     """测试复读已开启的情况"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.repeat import plugin_config, repeat_cmd
+    require("src.plugins.repeat")
+    from src.plugins.repeat import plugin_config
+    from src.plugins.repeat.plugins.basic import repeat_cmd
 
     plugin_config.group_id = [10000]
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/repeat"))
 
         ctx.receive_event(bot, event)
@@ -74,18 +73,17 @@ async def test_repeat_enabled(app: App):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.repeat",)], indirect=True)
 async def test_repeat_not_enabled(app: App):
     """测试复读关闭的情况"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.repeat import repeat_cmd
+    require("src.plugins.repeat")
+    from src.plugins.repeat import plugin_config
+    from src.plugins.repeat.plugins.basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/repeat"))
 
         ctx.receive_event(bot, event)
@@ -94,20 +92,19 @@ async def test_repeat_not_enabled(app: App):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.repeat",)], indirect=True)
 async def test_repeat_enable(app: App):
     """测试复读，在群里启用的情况"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.repeat import plugin_config, repeat_cmd
+    require("src.plugins.repeat")
+    from src.plugins.repeat import plugin_config
+    from src.plugins.repeat.plugins.basic import repeat_cmd
 
     assert plugin_config.group_id == []
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/repeat 1"))
 
         ctx.receive_event(bot, event)
@@ -118,22 +115,21 @@ async def test_repeat_enable(app: App):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.repeat",)], indirect=True)
 async def test_repeat_disable(app: App):
     """测试复读，在群里关闭的情况"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.repeat import plugin_config, repeat_cmd
+    require("src.plugins.repeat")
+    from src.plugins.repeat import plugin_config
+    from src.plugins.repeat.plugins.basic import repeat_cmd
 
     plugin_config.group_id = [10000]
 
     assert plugin_config.group_id == [10000]
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/repeat 0"))
 
         ctx.receive_event(bot, event)

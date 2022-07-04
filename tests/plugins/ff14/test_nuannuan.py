@@ -9,17 +9,14 @@ from tests.fake import fake_group_message_event
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.ff14",)], indirect=True)
-async def test_nuannuan(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_nuannuan(app: App, mocker: MockerFixture):
     """测试时尚品鉴"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.ff14 import nuannuan_cmd
+    require("src.plugins.ff14")
+
+    from src.plugins.ff14.plugins.nuannuan import nuannuan_cmd
 
     with open(Path(__file__).parent / "nuannuan.json", "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -29,8 +26,7 @@ async def test_nuannuan(
     async_client.return_value = r
 
     async with app.test_matcher(nuannuan_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/时尚品鉴"))
 
         ctx.receive_event(bot, event)

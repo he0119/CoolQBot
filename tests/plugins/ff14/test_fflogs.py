@@ -16,7 +16,7 @@ async def test_dps_missing_token(app: App):
     require("src.plugins.ff14")
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.ff14 import fflogs_cmd
+    from src.plugins.ff14.plugins.fflogs import fflogs_cmd
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
@@ -26,7 +26,7 @@ async def test_dps_missing_token(app: App):
         ctx.should_call_send(
             event,
             "对不起，Token 未设置，无法查询数据。\n请先使用命令\n/dps token <token>\n配置好 Token 后再尝试查询数据。",
-            "result",
+            True,
         )
         ctx.should_finished()
 
@@ -39,20 +39,33 @@ async def test_dps_help(app: App, mocker: MockerFixture):
     require("src.plugins.ff14")
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.ff14 import fflogs_cmd
+    from src.plugins.ff14.plugins.fflogs import (
+        __plugin_meta__,
+        fflogs_cmd,
+        plugin_config,
+    )
 
-    get_command_help = mocker.patch("src.plugins.ff14.get_command_help")
-    get_command_help.return_value = Message("test")
+    plugin_config.fflogs_token = "test"
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/dps"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, Message("test"), "")
+        ctx.should_call_send(
+            event, f"{__plugin_meta__.name}\n\n{__plugin_meta__.usage}", True
+        )
         ctx.should_finished()
 
-    get_command_help.assert_called_once_with("ff14.dps")
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot()
+        event = fake_group_message_event(message=Message("/dps test"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event, f"{__plugin_meta__.name}\n\n{__plugin_meta__.usage}", True
+        )
+        ctx.should_finished()
 
 
 @pytest.mark.asyncio
@@ -63,7 +76,7 @@ async def test_dps_cache(app: App):
     require("src.plugins.ff14")
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.ff14 import fflogs_cmd, plugin_config
+    from src.plugins.ff14.plugins.fflogs import fflogs_cmd, plugin_config
 
     plugin_config.fflogs_token = "test"
 
@@ -124,7 +137,7 @@ async def test_dps_at_user(app: App, mocker: MockerFixture):
     require("src.plugins.ff14")
     from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
-    from src.plugins.ff14 import fflogs, fflogs_cmd, plugin_config
+    from src.plugins.ff14.plugins.fflogs import fflogs, fflogs_cmd, plugin_config
 
     plugin_config.fflogs_token = "test"
     fflogs.set_character("10000", "name", "server")
@@ -141,7 +154,7 @@ async def test_dps_at_user(app: App, mocker: MockerFixture):
         )
         ctx.should_finished()
 
-    mock = mocker.patch("src.plugins.ff14.get_character_dps_by_user_id")
+    mock = mocker.patch("src.plugins.ff14.plugins.fflogs.get_character_dps_by_user_id")
     mock = cast(AsyncMock, mock)
 
     async def test(a, b):
@@ -170,7 +183,7 @@ async def test_dps_at_user_qqguild(app: App, mocker: MockerFixture):
     require("src.plugins.ff14")
     from nonebot.adapters.qqguild import Message, MessageSegment
 
-    from src.plugins.ff14 import fflogs, fflogs_cmd, plugin_config
+    from src.plugins.ff14.plugins.fflogs import fflogs, fflogs_cmd, plugin_config
 
     plugin_config.fflogs_token = "test"
     fflogs.set_character("10000", "name", "server")
@@ -189,7 +202,7 @@ async def test_dps_at_user_qqguild(app: App, mocker: MockerFixture):
         )
         ctx.should_finished()
 
-    mock = mocker.patch("src.plugins.ff14.get_character_dps_by_user_id")
+    mock = mocker.patch("src.plugins.ff14.plugins.fflogs.get_character_dps_by_user_id")
     mock = cast(AsyncMock, mock)
 
     async def test(a, b):

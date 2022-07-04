@@ -34,20 +34,18 @@ def mocked_get(url: str, **kwargs):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.morning",)], indirect=True)
 async def test_morning_enabled(app: App):
     """测试每日早安已开启的情况"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.morning import morning_cmd, plugin_config
+    require("src.plugins.morning")
+    from src.plugins.morning.plugins.morning_greeting import morning_cmd, plugin_config
 
     plugin_config.morning_group_id = [10000]
 
     async with app.test_matcher(morning_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/morning"))
 
         ctx.receive_event(bot, event)
@@ -56,18 +54,16 @@ async def test_morning_enabled(app: App):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.morning",)], indirect=True)
 async def test_morning_not_enabled(app: App):
     """测试每日早安关闭的情况"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.morning import morning_cmd
+    require("src.plugins.morning")
+    from src.plugins.morning.plugins.morning_greeting import morning_cmd, plugin_config
 
     async with app.test_matcher(morning_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/morning"))
 
         ctx.receive_event(bot, event)
@@ -76,20 +72,18 @@ async def test_morning_not_enabled(app: App):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.morning",)], indirect=True)
 async def test_morning_enable(app: App):
     """测试每日早安已，在群里启用的情况"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.morning import morning_cmd, plugin_config
+    require("src.plugins.morning")
+    from src.plugins.morning.plugins.morning_greeting import morning_cmd, plugin_config
 
     assert plugin_config.morning_group_id == []
 
     async with app.test_matcher(morning_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/morning 1"))
 
         ctx.receive_event(bot, event)
@@ -100,22 +94,20 @@ async def test_morning_enable(app: App):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.morning",)], indirect=True)
 async def test_morning_disable(app: App):
     """测试每日早安，在群里关闭的情况"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.morning import morning_cmd, plugin_config
+    require("src.plugins.morning")
+    from src.plugins.morning.plugins.morning_greeting import morning_cmd, plugin_config
 
     plugin_config.morning_group_id = [10000]
 
     assert plugin_config.morning_group_id == [10000]
 
     async with app.test_matcher(morning_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/morning 0"))
 
         ctx.receive_event(bot, event)
@@ -126,28 +118,27 @@ async def test_morning_disable(app: App):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.morning",)], indirect=True)
-async def test_morning_today(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_morning_today(app: App, mocker: MockerFixture):
     """测试每日早安，查询今日早安的情况"""
-    from nonebot import get_driver
-    from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
-    from nonebug.mixin.call_api.fake import make_fake_adapter, make_fake_bot
+    from nonebot import require
+    from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.morning import morning_cmd
-    from src.plugins.morning.data import EXPR_MORNING
+    require("src.plugins.morning")
+    from src.plugins.morning.plugins.morning_greeting import morning_cmd
+    from src.plugins.morning.plugins.morning_greeting.data_source import EXPR_MORNING
 
-    mocked_date = mocker.patch("src.plugins.morning.data.date")
+    mocked_date = mocker.patch(
+        "src.plugins.morning.plugins.morning_greeting.data_source.date"
+    )
     mocked_date.today.return_value = date(2022, 1, 1)
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
-    render_expression = mocker.patch("src.plugins.morning.data.render_expression")
+    render_expression = mocker.patch(
+        "src.plugins.morning.plugins.morning_greeting.data_source.render_expression"
+    )
     render_expression.return_value = Message("test")
 
     async with app.test_matcher(morning_cmd) as ctx:
-        adapter = make_fake_adapter(Adapter)(get_driver(), ctx)
-        bot = make_fake_bot(Bot)(adapter, "1")
+        bot = ctx.create_bot()
         event = fake_group_message_event(message=Message("/morning today"))
 
         ctx.receive_event(bot, event)

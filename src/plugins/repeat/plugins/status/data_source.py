@@ -6,8 +6,7 @@ from typing import Optional
 import psutil
 from dateutil.relativedelta import relativedelta
 
-from .config import plugin_config
-from .recorder import recorder_obj
+from ... import plugin_config, recorder_obj
 
 
 def get_status(group_id: Optional[int]) -> str:

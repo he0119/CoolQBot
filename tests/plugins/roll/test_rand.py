@@ -6,17 +6,15 @@ from tests.fake import fake_group_message_event
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.roll",)], indirect=True)
-async def test_rand(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_rand(app: App, mocker: MockerFixture):
     """测试点数"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.roll import rand_cmd
+    require("src.plugins.roll")
+    from src.plugins.roll.plugins.rand import rand_cmd
 
-    randint = mocker.patch("src.plugins.roll.rand.randint")
+    randint = mocker.patch("src.plugins.roll.plugins.rand.data_source.randint")
     randint.return_value = 1
 
     async with app.test_matcher(rand_cmd) as ctx:
@@ -31,17 +29,15 @@ async def test_rand(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.roll",)], indirect=True)
-async def test_rand_probability(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_rand_probability(app: App, mocker: MockerFixture):
     """测试概率"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.roll import rand_cmd
+    require("src.plugins.roll")
+    from src.plugins.roll.plugins.rand import rand_cmd
 
-    randint = mocker.patch("src.plugins.roll.rand.randint")
+    randint = mocker.patch("src.plugins.roll.plugins.rand.data_source.randint")
     randint.return_value = 1
 
     async with app.test_matcher(rand_cmd) as ctx:

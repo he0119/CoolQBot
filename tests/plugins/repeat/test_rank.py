@@ -11,7 +11,8 @@ async def test_rank(app: App):
     from nonebot.adapters.onebot.v11 import Bot, Message
 
     require("src.plugins.repeat")
-    from src.plugins.repeat import plugin_config, rank_cmd, recorder_obj
+    from src.plugins.repeat import plugin_config, recorder_obj
+    from src.plugins.repeat.plugins.rank import rank_cmd
 
     plugin_config.group_id = [10000]
     recorder_obj._msg_number_list = {10000: {1: {10: 100}}}
@@ -40,7 +41,8 @@ async def test_rank_limit(app: App):
     from nonebot.adapters.onebot.v11 import Bot, Message
 
     require("src.plugins.repeat")
-    from src.plugins.repeat import plugin_config, rank_cmd, recorder_obj
+    from src.plugins.repeat import plugin_config, recorder_obj
+    from src.plugins.repeat.plugins.rank import rank_cmd
 
     plugin_config.group_id = [10000]
     recorder_obj._msg_number_list = {10000: {1: {10: 100}}}
@@ -71,8 +73,8 @@ async def test_rank_private(app: App):
     from nonebot.adapters.onebot.v11 import Bot, Message
 
     require("src.plugins.repeat")
-
-    from src.plugins.repeat import plugin_config, rank_cmd, recorder_obj
+    from src.plugins.repeat import plugin_config, recorder_obj
+    from src.plugins.repeat.plugins.rank import rank_cmd
 
     plugin_config.group_id = [10000]
     recorder_obj._msg_number_list = {10000: {1: {10: 100}}}
@@ -104,7 +106,7 @@ async def test_rank_not_enabled(app: App):
     from nonebot.adapters.onebot.v11 import Bot, Message
 
     require("src.plugins.repeat")
-    from src.plugins.repeat import rank_cmd
+    from src.plugins.repeat.plugins.rank import rank_cmd
 
     async with app.test_matcher(rank_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)

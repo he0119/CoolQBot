@@ -11,9 +11,17 @@ from nonebot.adapters.onebot.v11.event import (
     PrivateMessageEvent,
 )
 from nonebot.params import Arg, CommandArg, Depends
+from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
 from src.utils.helpers import parse_int, render_expression
+
+__plugin_meta__ = PluginMetadata(
+    name="自主禁言",
+    description="禁言自己或解除自己的禁言",
+    usage="禁言自己，单位为分钟\n/ban 30 (禁言 30 分钟)\n解除禁言\n/ban 0\n如果私聊，则需要再提供群号",
+)
+
 
 # region 禁言
 EXPR_OK = (
@@ -55,15 +63,6 @@ def get_ban_type(bot_role: str, sender_role: str) -> BanType:
 
 
 ban_cmd = on_command("ban", aliases={"禁言"})
-ban_cmd.__doc__ = """
-自主禁言
-
-禁言自己，单位为分钟
-/ban 30 (禁言 30 分钟)
-解除禁言
-/ban 0
-如果私聊，则需要再提供群号
-"""
 
 
 @ban_cmd.handle()

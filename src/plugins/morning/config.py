@@ -1,4 +1,3 @@
-from nonebot import get_driver
 from nonebot_plugin_datastore import PluginData
 from pydantic import BaseSettings, validator
 
@@ -31,7 +30,3 @@ class Config(BaseSettings):
     class Config:
         extra = "ignore"
         validate_assignment = True
-
-
-global_config = get_driver().config
-plugin_config = Config.parse_obj(global_config)

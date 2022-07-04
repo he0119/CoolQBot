@@ -4,10 +4,18 @@ from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Message
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, CommandArg, Depends
+from nonebot.plugin import PluginMetadata
 
 from src.utils.helpers import render_expression
 
 from .netease import call_netease_api
+
+__plugin_meta__ = PluginMetadata(
+    name="音乐",
+    description="通过网易云音乐点歌",
+    usage="参数为歌曲相关信息\n/music Sagitta luminis\n如果仅凭歌曲名称无法获得正确歌曲时\n可以尝试在后面加上歌手名称或其他信息\n/music Sagitta luminis 梶浦由記",
+)
+
 
 # 无法获取歌曲时的回答
 EXPR_NOT_FOUND = (
@@ -17,15 +25,6 @@ EXPR_NOT_FOUND = (
 )
 
 music_cmd = on_command("music", aliases={"点歌"})
-music_cmd.__doc__ = """
-点歌
-
-参数为歌曲相关信息
-/music Sagitta luminis
-如果仅凭歌曲名称无法获得正确歌曲时
-可以尝试在后面加上歌手名称或其他信息
-/music Sagitta luminis 梶浦由記
-"""
 
 
 @music_cmd.handle()
