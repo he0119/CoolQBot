@@ -6,17 +6,15 @@ from tests.fake import fake_group_message_event
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.roll",)], indirect=True)
-async def test_roll(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_roll(app: App, mocker: MockerFixture):
     """测试点数"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.roll import roll_cmd
+    require("src.plugins.roll")
+    from src.plugins.roll.plugins.nga_roll import roll_cmd
 
-    randint = mocker.patch("src.plugins.roll.roll.randint")
+    randint = mocker.patch("src.plugins.roll.plugins.nga_roll.data_source.randint")
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
@@ -31,17 +29,15 @@ async def test_roll(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.roll",)], indirect=True)
-async def test_roll_get_arg(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_roll_get_arg(app: App, mocker: MockerFixture):
     """测试点数，获取参数"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.roll import roll_cmd
+    require("src.plugins.roll")
+    from src.plugins.roll.plugins.nga_roll import roll_cmd
 
-    randint = mocker.patch("src.plugins.roll.roll.randint")
+    randint = mocker.patch("src.plugins.roll.plugins.nga_roll.data_source.randint")
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
@@ -64,17 +60,15 @@ async def test_roll_get_arg(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.roll",)], indirect=True)
-async def test_roll_invalid(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_roll_invalid(app: App, mocker: MockerFixture):
     """测试点数"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.roll import roll_cmd
+    require("src.plugins.roll")
+    from src.plugins.roll.plugins.nga_roll import roll_cmd
 
-    randint = mocker.patch("src.plugins.roll.roll.randint")
+    randint = mocker.patch("src.plugins.roll.plugins.nga_roll.data_source.randint")
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
@@ -89,17 +83,15 @@ async def test_roll_invalid(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("app", [("src.plugins.roll",)], indirect=True)
-async def test_roll_complex(
-    app: App,
-    mocker: MockerFixture,
-):
+async def test_roll_complex(app: App, mocker: MockerFixture):
     """测试点数，复杂点的输入"""
+    from nonebot import require
     from nonebot.adapters.onebot.v11 import Message
 
-    from src.plugins.roll import roll_cmd
+    require("src.plugins.roll")
+    from src.plugins.roll.plugins.nga_roll import roll_cmd
 
-    randint = mocker.patch("src.plugins.roll.roll.randint")
+    randint = mocker.patch("src.plugins.roll.plugins.nga_roll.data_source.randint")
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
@@ -117,7 +109,7 @@ async def test_roll_complex(
 
     randint.assert_has_calls(
         [
-            mocker.call(1, 100),
+            mocker.call(1, 100),  # type: ignore
             mocker.call(1, 50),
             mocker.call(1, 50),
         ]

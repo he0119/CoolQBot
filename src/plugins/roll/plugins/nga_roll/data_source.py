@@ -1,5 +1,4 @@
-""" NGA 风格 ROLL 点插件
-"""
+""" NGA 风格 ROLL 点插件 """
 import re
 from random import randint
 
