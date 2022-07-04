@@ -10,8 +10,8 @@ from .config import get_cookie, set_cookie
 
 __plugin_meta__ = PluginMetadata(
     name="原神",
-    description="与原神相关的功能",
-    usage="与原神相关的功能",
+    description="与原神有关的功能",
+    usage="与原神有关的功能",
 )
 
 

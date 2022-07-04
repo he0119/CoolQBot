@@ -13,8 +13,8 @@ from .config import DATA, Config
 
 __plugin_meta__ = PluginMetadata(
     name="复读",
-    description="复读相关的功能",
-    usage="复读相关的功能",
+    description="与复读有关的功能",
+    usage="与复读有关的功能",
 )
 
 _sub_plugins = set()

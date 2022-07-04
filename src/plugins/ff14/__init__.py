@@ -11,8 +11,8 @@ from .config import DATA, Config
 
 __plugin_meta__ = PluginMetadata(
     name="最终幻想XIV",
-    description="与最终幻想XIV相关的功能",
-    usage="与最终幻想XIV相关的功能",
+    description="与最终幻想XIV有关的功能",
+    usage="与最终幻想XIV有关的功能",
 )
 
 ff14 = CommandGroup("ff14")
