@@ -8,14 +8,9 @@ from typing import Dict
 
 from nonebot.log import logger
 
-from .config import DATA, plugin_config
+from . import DATA, plugin_config
 
 VERSION = "1"
-
-
-def get_history_pkl_name(dt: datetime):
-    time_str = dt.strftime("%Y-%m")
-    return f"{time_str}.pkl"
 
 
 def update(data: Dict, group_id: int):
@@ -209,7 +204,7 @@ class Recorder:
     def save_data_to_history(self):
         """保存数据到历史文件夹"""
         date = datetime.now() - timedelta(hours=1)
-        DATA.dump_pkl(self.get_data(), get_history_pkl_name(date))
+        DATA.dump_pkl(self.get_data(), self.get_history_pkl_name(date))
 
     def get_data(self):
         """获取当前数据
@@ -233,5 +228,7 @@ class Recorder:
         self._repeat_list = {group_id: {} for group_id in plugin_config.group_id}
         self._msg_number_list = {group_id: {} for group_id in plugin_config.group_id}
 
-
-recorder_obj = Recorder("recorder.pkl")
+    @staticmethod
+    def get_history_pkl_name(dt: datetime):
+        time_str = dt.strftime("%Y-%m")
+        return f"{time_str}.pkl"

@@ -1,13 +1,11 @@
-""" 复读
-"""
+""" 复读 """
 import secrets
 from datetime import datetime, timedelta
 
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.log import logger
 
-from .config import plugin_config
-from .recorder import recorder_obj
+from ... import plugin_config, recorder_obj
 
 
 def need_repeat(event: GroupMessageEvent) -> bool:

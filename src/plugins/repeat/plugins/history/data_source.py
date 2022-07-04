@@ -6,9 +6,8 @@ from typing import Tuple
 
 from nonebot.adapters.onebot.v11 import Bot
 
-from .config import DATA, plugin_config
-from .rank import Ranking
-from .recorder import Recorder, get_history_pkl_name, recorder_obj
+from ... import DATA, Recorder, plugin_config, recorder_obj
+from ..rank.data_source import Ranking
 
 
 async def get_history(bot: Bot, year: int, month: int, day: int, group_id: int) -> str:
@@ -29,7 +28,7 @@ async def get_history(bot: Bot, year: int, month: int, day: int, group_id: int) 
     if year == now.year and month == now.month:
         history_data = recorder_obj
     else:
-        history_filename = get_history_pkl_name(date)
+        history_filename = Recorder.get_history_pkl_name(date)
         if not DATA.exists(history_filename):
             if day:
                 str_data = f"{date.year} 年 {date.month} 月 {day} 日的数据不存在，请换个试试吧 ~>_<~"

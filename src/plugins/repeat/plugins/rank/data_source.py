@@ -5,8 +5,7 @@ from operator import itemgetter
 
 from nonebot.adapters.onebot.v11 import Bot
 
-from .config import plugin_config
-from .recorder import recorder_obj
+from ... import plugin_config, recorder_obj
 
 
 async def get_rank(
