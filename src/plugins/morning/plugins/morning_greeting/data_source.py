@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from typing import Optional, TypedDict
 
 from dateutil import parser
@@ -6,23 +6,7 @@ from nonebot.adapters.onebot.v11 import Message
 
 from src.utils.helpers import render_expression
 
-from .config import DATA
-
-
-def get_first_connect_message():
-    """根据当前时间返回对应消息"""
-    hour = datetime.now().hour
-
-    if hour > 18 or hour < 6:
-        return "晚上好呀！"
-
-    if hour > 13:
-        return "下午好呀！"
-
-    if hour > 11:
-        return "中午好呀！"
-
-    return "早上好呀！"
+from ... import DATA
 
 
 class HolidayInfo(TypedDict):
