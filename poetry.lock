@@ -321,7 +321,7 @@ testing = ["covdefaults (>=1.2.0)", "coverage (>=4)", "pytest (>=4)", "pytest-co
 
 [[package]]
 name = "fonttools"
-version = "4.33.3"
+version = "4.34.2"
 description = "Tools to manipulate font files"
 category = "main"
 optional = false
@@ -703,7 +703,7 @@ nonebot2 = ">=2.0.0-alpha.8,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-chatrecorder"
-version = "0.1.7"
+version = "0.1.8"
 description = "适用于 Nonebot2 的聊天记录插件"
 category = "main"
 optional = false
@@ -836,7 +836,7 @@ nonebot2 = ">=2.0.0-beta.4,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.2.3"
+version = "0.2.4"
 description = "适用于 NoneBot2 的词云插件"
 category = "main"
 optional = false
@@ -846,7 +846,7 @@ python-versions = ">=3.8,<4.0"
 emoji = ">=1.6.3,<2.0.0"
 jieba = ">=0.42.1,<0.43.0"
 nonebot-adapter-onebot = ">=2.0.0-beta.1,<3.0.0"
-nonebot-plugin-chatrecorder = ">=0.1.5,<0.2.0"
+nonebot-plugin-chatrecorder = ">=0.1.8,<0.2.0"
 nonebot2 = ">=2.0.0-beta.4,<3.0.0"
 tzdata = "*"
 wordcloud = ">=1.8.1,<2.0.0"
@@ -1161,7 +1161,7 @@ pytest = ">=3.10"
 
 [[package]]
 name = "pytest-mock"
-version = "3.8.1"
+version = "3.8.2"
 description = "Thin-wrapper around the mock package for easier use with pytest"
 category = "dev"
 optional = false
@@ -1215,7 +1215,7 @@ cli = ["click (>=5.0)"]
 
 [[package]]
 name = "python-engineio"
-version = "4.3.2"
+version = "4.3.3"
 description = "Engine.IO server and client for Python"
 category = "main"
 optional = false
@@ -1238,7 +1238,7 @@ Markdown = ">=3.0"
 
 [[package]]
 name = "python-socketio"
-version = "5.6.0"
+version = "5.7.0"
 description = "Socket.IO server and client for Python"
 category = "main"
 optional = false
@@ -1463,7 +1463,7 @@ full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.669"
+version = "3.0.672"
 description = "Tencent Cloud SDK for Python"
 category = "main"
 optional = false
@@ -1498,7 +1498,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "tomlkit"
-version = "0.11.0"
+version = "0.11.1"
 description = "Style preserving TOML library"
 category = "main"
 optional = false
@@ -1673,7 +1673,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "302affc5e23c66ece8f3815bc79c5e96d7e16ac672de7e9bf1a1d76730425c00"
+content-hash = "c1314cf10df4157b8e648841afbcc1e0928824637f670b660ea3106490abc21c"
 
 [metadata.files]
 aiofiles = [
@@ -1842,8 +1842,8 @@ filelock = [
     {file = "filelock-3.7.1.tar.gz", hash = "sha256:3a0fd85166ad9dbab54c9aec96737b744106dc5f15c0b09a6744a445299fcf04"},
 ]
 fonttools = [
-    {file = "fonttools-4.33.3-py3-none-any.whl", hash = "sha256:f829c579a8678fa939a1d9e9894d01941db869de44390adb49ce67055a06cc2a"},
-    {file = "fonttools-4.33.3.zip", hash = "sha256:c0fdcfa8ceebd7c1b2021240bd46ef77aa8e7408cf10434be55df52384865f8e"},
+    {file = "fonttools-4.34.2-py3-none-any.whl", hash = "sha256:c6c5a896c9760132614caa57b444ee5b4719c08f84b304bf8ce9295edfb7cbc3"},
+    {file = "fonttools-4.34.2.zip", hash = "sha256:3fb3bef8e743dad8fe96e12a47a9ce9bd367ac0a24c089256615518c88309dbd"},
 ]
 greenlet = [
     {file = "greenlet-1.1.2-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:58df5c2a0e293bf665a51f8a100d3e9956febfbf1d9aaf8c0677cf70218910c6"},
@@ -2265,8 +2265,8 @@ nonebot-plugin-apscheduler = [
     {file = "nonebot_plugin_apscheduler-0.1.3-py3-none-any.whl", hash = "sha256:76456f625089045c9f2f8943e90c009841afd461b9dc51e9de21169bbd1b2677"},
 ]
 nonebot-plugin-chatrecorder = [
-    {file = "nonebot_plugin_chatrecorder-0.1.7-py3-none-any.whl", hash = "sha256:833058522748e9083c6c437d9ad894d9f80eb1e318bcadf29171f7e890191764"},
-    {file = "nonebot_plugin_chatrecorder-0.1.7.tar.gz", hash = "sha256:746b0ea42632351dc07736435ff3c9aaa07c4ba7ef94e87cf848ff630039e465"},
+    {file = "nonebot_plugin_chatrecorder-0.1.8-py3-none-any.whl", hash = "sha256:c370f8f498cb899624d1c325b97cf58f9ebfdbe6897d93f9a5fc53959358cd83"},
+    {file = "nonebot_plugin_chatrecorder-0.1.8.tar.gz", hash = "sha256:a1ce02733148b0099390af88d0d7234c704126317f5488e51f7db26e3aaaa5aa"},
 ]
 nonebot-plugin-datastore = [
     {file = "nonebot-plugin-datastore-0.3.1.tar.gz", hash = "sha256:d18f29918ff41f657b59f6221913947553178f93ca367db79480f725cd312240"},
@@ -2301,8 +2301,8 @@ nonebot-plugin-treehelp = [
     {file = "nonebot_plugin_treehelp-0.0.1-py3-none-any.whl", hash = "sha256:537b500244e4783c3be7a0185f1521c10469b4930720104c9745a0e5446b78c4"},
 ]
 nonebot-plugin-wordcloud = [
-    {file = "nonebot-plugin-wordcloud-0.2.3.tar.gz", hash = "sha256:e4f0abfd8b1a6f8105bc2214152eeb8c5e126bb3ff07c4652529cc160c3aa871"},
-    {file = "nonebot_plugin_wordcloud-0.2.3-py3-none-any.whl", hash = "sha256:85406300b6d45dbe9595daaff223496c127fc6d75d8d288fed364aae141ed6af"},
+    {file = "nonebot-plugin-wordcloud-0.2.4.tar.gz", hash = "sha256:961decfd372abb3f34235a850aa4c8b046bd67dba3d28ad019c9a7f43ae517e3"},
+    {file = "nonebot_plugin_wordcloud-0.2.4-py3-none-any.whl", hash = "sha256:d8dd0ffd057bf416aff0c915e437c77bfb1fcc179fc6798e6cdf25bdac12b762"},
 ]
 nonebot2 = [
     {file = "nonebot2-2.0.0b4-py3-none-any.whl", hash = "sha256:3029cdb657ec48c6aaa046e1b712e7a0ebe5d0010208dff95b5ccbe461d1ed4e"},
@@ -2549,8 +2549,8 @@ pytest-forked = [
     {file = "pytest_forked-1.4.0-py3-none-any.whl", hash = "sha256:bbbb6717efc886b9d64537b41fb1497cfaf3c9601276be8da2cccfea5a3c8ad8"},
 ]
 pytest-mock = [
-    {file = "pytest-mock-3.8.1.tar.gz", hash = "sha256:2c6d756d5d3bf98e2e80797a959ca7f81f479e7d1f5f571611b0fdd6d1745240"},
-    {file = "pytest_mock-3.8.1-py3-none-any.whl", hash = "sha256:d989f11ca4a84479e288b0cd1e6769d6ad0d3d7743dcc75e460d1416a5f2135a"},
+    {file = "pytest-mock-3.8.2.tar.gz", hash = "sha256:77f03f4554392558700295e05aed0b1096a20d4a60a4f3ddcde58b0c31c8fca2"},
+    {file = "pytest_mock-3.8.2-py3-none-any.whl", hash = "sha256:8a9e226d6c0ef09fcf20c94eb3405c388af438a90f3e39687f84166da82d5948"},
 ]
 pytest-xdist = [
     {file = "pytest-xdist-2.5.0.tar.gz", hash = "sha256:4580deca3ff04ddb2ac53eba39d76cb5dd5edeac050cb6fbc768b0dd712b4edf"},
@@ -2565,16 +2565,16 @@ python-dotenv = [
     {file = "python_dotenv-0.20.0-py3-none-any.whl", hash = "sha256:d92a187be61fe482e4fd675b6d52200e7be63a12b724abbf931a40ce4fa92938"},
 ]
 python-engineio = [
-    {file = "python-engineio-4.3.2.tar.gz", hash = "sha256:e02f8d6686663408533726be2d4ceb403914fd17285d247791c6a91623777bdd"},
-    {file = "python_engineio-4.3.2-py3-none-any.whl", hash = "sha256:cd3dfa8a939471db60d2704ab0108493c827f399ed5f59c8217e3c3b02c9ea64"},
+    {file = "python-engineio-4.3.3.tar.gz", hash = "sha256:18474c452894c60590b2d2339d6c81b93fb9857f1be271a2e91fb2707eb4095d"},
+    {file = "python_engineio-4.3.3-py3-none-any.whl", hash = "sha256:e660fcbac7497f105310d933987d3a82d2e677240a6b493c0a514aa7f91d3b07"},
 ]
 python-markdown-math = [
     {file = "python-markdown-math-0.8.tar.gz", hash = "sha256:8564212af679fc18d53f38681f16080fcd3d186073f23825c7ce86fadd3e3635"},
     {file = "python_markdown_math-0.8-py3-none-any.whl", hash = "sha256:c685249d84b5b697e9114d7beb352bd8ca2e07fd268fd4057ffca888c14641e5"},
 ]
 python-socketio = [
-    {file = "python-socketio-5.6.0.tar.gz", hash = "sha256:f1f2eabdea500dbcb384902418cacedd98b7fe4d0fed818415ddf8af10e428fa"},
-    {file = "python_socketio-5.6.0-py3-none-any.whl", hash = "sha256:41d6d93831aac6e0e4917dee2a1d0a0fadaa3fb362d34fc14e98c379e6f20503"},
+    {file = "python-socketio-5.7.0.tar.gz", hash = "sha256:82e3c45baa51f2180f176e5e1c4232a4452f7545a3fe3156d093fa7e5890e816"},
+    {file = "python_socketio-5.7.0-py3-none-any.whl", hash = "sha256:874eeba29129618b30189ecb277e2d5e646c39e50b1a997289c0473ee6c1f5c8"},
 ]
 pytz = [
     {file = "pytz-2022.1-py2.py3-none-any.whl", hash = "sha256:e68985985296d9a66a881eb3193b0906246245294a881e7c8afe623866ac6a5c"},
@@ -2701,8 +2701,8 @@ starlette = [
     {file = "starlette-0.19.1.tar.gz", hash = "sha256:c6d21096774ecb9639acad41b86b7706e52ba3bf1dc13ea4ed9ad593d47e24c7"},
 ]
 tencentcloud-sdk-python = [
-    {file = "tencentcloud-sdk-python-3.0.669.tar.gz", hash = "sha256:4567473525d30c96b68f796a5537aec5764d1984ec99735f0b31c179c0dc507e"},
-    {file = "tencentcloud_sdk_python-3.0.669-py2.py3-none-any.whl", hash = "sha256:c7cc6f4a01bbb8c6d4e6b28a9c2848ed28e8cfc6f0942635d4ef4982ffe9f4da"},
+    {file = "tencentcloud-sdk-python-3.0.672.tar.gz", hash = "sha256:a2b203d32819a5def65ef19d69b833cf8a115f6fdfe370f73aba0d8b325255a7"},
+    {file = "tencentcloud_sdk_python-3.0.672-py2.py3-none-any.whl", hash = "sha256:3d7eadea72e0c351af37535c93e486b01f9fbe9b243e054dc0a59e97273b67b0"},
 ]
 tinydb = [
     {file = "tinydb-4.7.0-py3-none-any.whl", hash = "sha256:e2cdf6e2dad49813e9b5fceb3c7943387309a8738125fbff0b58d248a033f7a9"},
@@ -2717,8 +2717,8 @@ tomli = [
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 tomlkit = [
-    {file = "tomlkit-0.11.0-py3-none-any.whl", hash = "sha256:0f4050db66fd445b885778900ce4dd9aea8c90c4721141fde0d6ade893820ef1"},
-    {file = "tomlkit-0.11.0.tar.gz", hash = "sha256:71ceb10c0eefd8b8f11fe34e8a51ad07812cb1dc3de23247425fbc9ddc47b9dd"},
+    {file = "tomlkit-0.11.1-py3-none-any.whl", hash = "sha256:1c5bebdf19d5051e2e1de6cf70adfc5948d47221f097fcff7a3ffc91e953eaf5"},
+    {file = "tomlkit-0.11.1.tar.gz", hash = "sha256:61901f81ff4017951119cd0d1ed9b7af31c821d6845c8c477587bbdcd5e5854e"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.3.0-py3-none-any.whl", hash = "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02"},
