@@ -30,7 +30,7 @@ nonebug = "^0.2.0"
 pytest-cov = "^3.0.0"
 pytest-mock = "^3.6.1"
 pytest-xdist = "^2.5.0"
-pre-commit = "^2.19.0"
+pre-commit = "^2.20.0"
 
 [tool.nonebot]
 plugin_dirs = ["src/plugins"]
