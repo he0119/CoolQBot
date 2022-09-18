@@ -24,6 +24,9 @@ async def get_all_post():
             "https://api.bilibili.com/x/space/arc/search",
             params=params,
             timeout=4.0,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.42"
+            },
         )
         rjson = r.json()
         if rjson["code"] == 0:
