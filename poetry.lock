@@ -691,7 +691,7 @@ pydantic = ">=1.9.0,<2.0.0"
 
 [[package]]
 name = "nonebot-bison"
-version = "0.5.4"
+version = "0.5.5"
 description = "Subscribe message from social medias"
 category = "main"
 optional = false
@@ -1710,7 +1710,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "5f1d6b4169887092df1e6fc4c7fa5e2be2c85335f30cd03d31d56b42608a1495"
+content-hash = "5fd67cce83b57a3ff3d5bd28b19b5ae2faa4adda0e1c1a91dc70fc80a9b58f3f"
 
 [metadata.files]
 aiofiles = [
@@ -2410,8 +2410,8 @@ nonebot-adapter-qqguild = [
     {file = "nonebot_adapter_qqguild-0.1.1-py3-none-any.whl", hash = "sha256:32d18d51ca1f02e2513e89d19e6efd074a53a9debe9a3922a18d1d349ff732c8"},
 ]
 nonebot-bison = [
-    {file = "nonebot-bison-0.5.4.tar.gz", hash = "sha256:301e34305e5e6658db93ce29c1d64df4fc4a4e88d3639c356781cdb3154309a4"},
-    {file = "nonebot_bison-0.5.4-py3-none-any.whl", hash = "sha256:f4b54c6978ea8b733afe7a95638347f8e7568ca6845b3a93bb65f95971ade950"},
+    {file = "nonebot-bison-0.5.5.tar.gz", hash = "sha256:2be57e1b86e9e84e49699ee4a2dd8a709928d82bdf2d4ff1a36572a100e418ae"},
+    {file = "nonebot_bison-0.5.5-py3-none-any.whl", hash = "sha256:5f946317108cc7cf4fb43d4a03081d54611cc7d0a4e18f4091713512cd93f65c"},
 ]
 nonebot-plugin-apscheduler = [
     {file = "nonebot-plugin-apscheduler-0.2.0.tar.gz", hash = "sha256:7b63e99a611b657533b48fcf1f8c6627c18c2eb3fa820a906cd4ec4666c0ceb0"},
