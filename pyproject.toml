@@ -8,7 +8,7 @@ repository = "https://github.com/he0119/CoolQBot"
 version = "0.15.3"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 nonebot2 = { extras = ["httpx", "websockets"], version = "^2.0.0-rc.1" }
 nonebot-adapter-onebot = "^2.1.0"
 nonebot-adapter-qqguild = "^0.1.0"
@@ -21,7 +21,7 @@ tencentcloud-sdk-python = "^3.0.593"
 psutil = "^5.8.0"
 nonebot-plugin-memes = "0.3.5"
 nonebot-plugin-petpet = "0.3.13"
-nonebot-bison = "0.5.5"
+nonebot-bison = "0.6.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.10.0"
