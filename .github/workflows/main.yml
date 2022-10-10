@@ -27,7 +27,7 @@ jobs:
       - name: Set up Python
         uses: he0119/setup-python@main
         with:
-          python-version: 3.10
+          python-version: '3.10'
       - name: Install prerequisites
         run: poetry install
       - name: Run tests
