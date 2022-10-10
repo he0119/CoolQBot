@@ -35,4 +35,4 @@ RUN rm requirements.txt
 COPY bot.py pyproject.toml .env /app/
 COPY src /app/src/
 
-CMD ["gunicorn", "bot:app"]
+CMD ["gunicorn", "bot:app", "-k", "uvicorn.workers.UvicornWorker"]
