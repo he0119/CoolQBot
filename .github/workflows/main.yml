@@ -98,8 +98,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script_stop: true
           script: |
-            cd coolqbot/dev
-            sed -i "s#he0119/coolqbot:.*#he0119/coolqbot:master#g" docker-compose.yml
+            cd ${{ secrets.COOLQBOT_ROOT }}
             sudo docker-compose pull
             sudo docker-compose down
             sudo docker-compose up -d
@@ -113,17 +112,13 @@ jobs:
     steps:
       - name: Deploy to server
         uses: appleboy/ssh-action@master
-        env:
-          TAG_NAME: ${{ github.event.release.tag_name }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script_stop: true
-          envs: TAG_NAME
           script: |
-            cd coolqbot/prod
-            sed -i "s#he0119/coolqbot:.*#he0119/coolqbot:$TAG_NAME#g" docker-compose.yml
+            cd ${{ secrets.COOLQBOT_ROOT }}
             sudo docker-compose pull
             sudo docker-compose down
             sudo docker-compose up -d
