@@ -813,7 +813,7 @@ nonebot2 = ">=2.0.0-rc.1,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-memes"
-version = "0.3.5"
+version = "0.3.6"
 description = "Nonebot2 plugin for making memes"
 category = "main"
 optional = false
@@ -1708,7 +1708,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "2c6fd7782da779bf0af578e012a4cee85610eb74c0784ee3d51550792748a84b"
+content-hash = "573978a55766c5fb212a0ed999e9121c93bd9775c6e6b0368b9b5762227fde66"
 
 [metadata.files]
 aiofiles = [
@@ -2438,8 +2438,8 @@ nonebot-plugin-localstore = [
     {file = "nonebot_plugin_localstore-0.2.0-py3-none-any.whl", hash = "sha256:90cd37a878c75f7fd40a142ee3ddaae29656605c7b411095ca7252076ba40df3"},
 ]
 nonebot-plugin-memes = [
-    {file = "nonebot_plugin_memes-0.3.5-py3-none-any.whl", hash = "sha256:51221fb69bc43a6eabbc1a4e1fce153fe9c19bb3aaa578c0f139de2677ff94e0"},
-    {file = "nonebot_plugin_memes-0.3.5.tar.gz", hash = "sha256:0de500c4b1706db5c08e6e7f2eee941e5bc04a1300153bd6d7d8710969ba8e27"},
+    {file = "nonebot_plugin_memes-0.3.6-py3-none-any.whl", hash = "sha256:9dbb153fbf5b885905fc9ec50852520521abdeff9e61a54113255aeda8b400db"},
+    {file = "nonebot_plugin_memes-0.3.6.tar.gz", hash = "sha256:e2d1f2508bfbad0399767f22375063b0d8578d4f0396e3b6495f9da592b1ef46"},
 ]
 nonebot-plugin-petpet = [
     {file = "nonebot_plugin_petpet-0.3.14-py3-none-any.whl", hash = "sha256:be9f655d9a5d46ad512f5600a76cd579e826e69556e3038df85b6a46b9739e80"},
