@@ -784,16 +784,17 @@ python-markdown-math = ">=0.8,<0.9"
 
 [[package]]
 name = "nonebot-plugin-imageutils"
-version = "0.1.8.1"
+version = "0.1.13"
 description = "Nonebot2 PIL工具插件"
 category = "main"
 optional = false
-python-versions = ">=3.7.3,<4.0.0"
+python-versions = ">=3.8,<4.0"
 
 [package.dependencies]
 bbcode = ">=1.1.0,<2.0.0"
 fonttools = ">=4.0.0,<5.0.0"
 httpx = ">=0.19.0"
+loguru = ">=0.6.0,<0.7.0"
 matplotlib = ">=3.0.0,<4.0.0"
 nonebot2 = ">=2.0.0-beta.1,<3.0.0"
 numpy = ">=1.20.0,<2.0.0"
@@ -813,17 +814,17 @@ nonebot2 = ">=2.0.0-rc.1,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-memes"
-version = "0.3.5"
+version = "0.3.8"
 description = "Nonebot2 plugin for making memes"
 category = "main"
 optional = false
-python-versions = ">=3.7.3,<4.0.0"
+python-versions = ">=3.8,<4.0"
 
 [package.dependencies]
 httpx = ">=0.19.0"
 imageio = ">=2.12.0,<3.0.0"
 nonebot-adapter-onebot = ">=2.0.0-beta.1,<3.0.0"
-nonebot-plugin-imageutils = ">=0.1.6,<0.2.0"
+nonebot-plugin-imageutils = ">=0.1.13,<0.2.0"
 nonebot2 = ">=2.0.0-beta.4,<3.0.0"
 Pillow = ">=9.0.0,<10.0.0"
 
@@ -1708,7 +1709,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "2c6fd7782da779bf0af578e012a4cee85610eb74c0784ee3d51550792748a84b"
+content-hash = "217f63f90eebc90987544afbc4008c43337869d6722ad3c6b3aef48def5c5a7d"
 
 [metadata.files]
 aiofiles = [
@@ -2430,16 +2431,16 @@ nonebot-plugin-htmlrender = [
     {file = "nonebot_plugin_htmlrender-0.1.1-py3-none-any.whl", hash = "sha256:107f0726e93e94ab5fe86090226a8b7b8a39c73098da406373b8b34408985bd9"},
 ]
 nonebot-plugin-imageutils = [
-    {file = "nonebot_plugin_imageutils-0.1.8.1-py3-none-any.whl", hash = "sha256:d5f0b7465e6cffff42ae18b246c3a9ba67bd45692145fa2286a76f4d066557ae"},
-    {file = "nonebot_plugin_imageutils-0.1.8.1.tar.gz", hash = "sha256:9c1a547eb97e3b58c3fdc12a6eba017d279bffb1a16d1040c568cd56a4fe6ba4"},
+    {file = "nonebot_plugin_imageutils-0.1.13-py3-none-any.whl", hash = "sha256:ed7778236f062960a98f797c3d4cee51a139fbc0f9628985afb210f911b894d5"},
+    {file = "nonebot_plugin_imageutils-0.1.13.tar.gz", hash = "sha256:4f4924196f47443b69639f00994a9268c4ceb7cfdcd5c021e4297610d6bfc0e4"},
 ]
 nonebot-plugin-localstore = [
     {file = "nonebot-plugin-localstore-0.2.0.tar.gz", hash = "sha256:f8a922c834440604bc10b3a7661aa1dcc00a92d36ea44096fd391f45a4c7b19a"},
     {file = "nonebot_plugin_localstore-0.2.0-py3-none-any.whl", hash = "sha256:90cd37a878c75f7fd40a142ee3ddaae29656605c7b411095ca7252076ba40df3"},
 ]
 nonebot-plugin-memes = [
-    {file = "nonebot_plugin_memes-0.3.5-py3-none-any.whl", hash = "sha256:51221fb69bc43a6eabbc1a4e1fce153fe9c19bb3aaa578c0f139de2677ff94e0"},
-    {file = "nonebot_plugin_memes-0.3.5.tar.gz", hash = "sha256:0de500c4b1706db5c08e6e7f2eee941e5bc04a1300153bd6d7d8710969ba8e27"},
+    {file = "nonebot_plugin_memes-0.3.8-py3-none-any.whl", hash = "sha256:d36bdebf997f2adaf2a12df54fa2d0d1f9c8d4a21514a022a27de0d2b3ac7107"},
+    {file = "nonebot_plugin_memes-0.3.8.tar.gz", hash = "sha256:fef92fdf55acc3e40498a629d6ad886acf4992ef67eecf28af785d5231ee0b1f"},
 ]
 nonebot-plugin-petpet = [
     {file = "nonebot_plugin_petpet-0.3.14-py3-none-any.whl", hash = "sha256:be9f655d9a5d46ad512f5600a76cd579e826e69556e3038df85b6a46b9739e80"},
