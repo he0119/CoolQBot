@@ -91,7 +91,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request' }}
     steps:
       - name: Deploy to server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@cc051b07ed0666619f6ea5703319edf00d06be13
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -109,7 +109,7 @@ jobs:
     if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
     steps:
       - name: Deploy to server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@cc051b07ed0666619f6ea5703319edf00d06be13
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
