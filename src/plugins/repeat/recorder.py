@@ -13,7 +13,7 @@ from . import DATA, plugin_config
 VERSION = "1"
 
 
-def update(data: Dict, group_id: int):
+def update(data: dict, group_id: int):
     """升级脚本
 
     升级 0.8.1 及以前版本的 recorder 数据。
@@ -25,7 +25,7 @@ def update(data: Dict, group_id: int):
         return update_old_2(data, group_id)
 
 
-def update_old_1(data: Dict, group_id: int):
+def update_old_1(data: dict, group_id: int):
     """升级 0.7.0 之前版本的数据"""
     new_data = {}
     # 添加版本信息
@@ -49,7 +49,7 @@ def update_old_1(data: Dict, group_id: int):
     return new_data
 
 
-def update_old_2(data: Dict, group_id: int):
+def update_old_2(data: dict, group_id: int):
     """升级 0.7.0-0.8.1 版本的 recorder 数据"""
     new_data = {}
     # 添加版本信息

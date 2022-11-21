@@ -68,7 +68,7 @@ class Genshin:
         md5.update(text.encode())
         return md5.hexdigest()
 
-    def get_ds(self, data: Optional[Any] = None, params: Optional[dict] = None) -> str:
+    def get_ds(self, data: Any | None = None, params: dict | None = None) -> str:
         """生成 ds"""
         salt = "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs"
         t = str(int(time.time()))
@@ -80,10 +80,10 @@ class Genshin:
 
     def get_ua(
         self,
-        referer: Optional[str] = None,
+        referer: str | None = None,
         with_ds: bool = False,
-        data: Optional[Any] = None,
-        params: Optional[dict] = None,
+        data: Any | None = None,
+        params: dict | None = None,
     ):
         """获取 UA"""
         ua = {
@@ -104,7 +104,7 @@ class Genshin:
             )
         return ua
 
-    async def get_game_role(self) -> Optional[GameRole]:
+    async def get_game_role(self) -> GameRole | None:
         """获取角色信息"""
         url = "https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_cn"
 
@@ -116,7 +116,7 @@ class Genshin:
                 if role.region == "cn_gf01":
                     return role
 
-    async def get_daily_note(self, role: GameRole) -> Optional[DailyNote]:
+    async def get_daily_note(self, role: GameRole) -> DailyNote | None:
         """获取实时便笺信息"""
         url = (
             "https://api-takumi-record.mihoyo.com/game_record/app/genshin/api/dailyNote"

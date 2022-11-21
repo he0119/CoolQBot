@@ -37,7 +37,7 @@ async def roll_handle_first_receive(state: T_State, args: Message = CommandArg()
         state["input"] = plaintext
 
 
-async def get_roll_input(input: Union[str, Message] = Arg()) -> str:
+async def get_roll_input(input: str | Message = Arg()) -> str:
     """检查输入是否能满足要求"""
     if isinstance(input, Message):
         input = input.extract_plain_text().strip()

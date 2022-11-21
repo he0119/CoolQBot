@@ -120,7 +120,7 @@ class FFLogs:
 
     async def _get_one_day_ranking(
         self, boss: int, difficulty: int, job: int, date: datetime
-    ) -> List:
+    ) -> list:
         """获取指定 boss，指定职业，指定一天中的排名数据"""
         # 查看是否有缓存
         cache_name = f'{boss}_{difficulty}_{job}_{date.strftime("%Y%m%d")}.pkl'
@@ -163,7 +163,7 @@ class FFLogs:
         job: int,
         dps_type: Literal["rdps", "adps", "pdps"],
         date: datetime,
-    ) -> List:
+    ) -> list:
         date = datetime(year=date.year, month=date.month, day=date.day)
 
         rankings = []

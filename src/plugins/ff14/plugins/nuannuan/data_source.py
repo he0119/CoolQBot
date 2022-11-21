@@ -35,7 +35,7 @@ async def get_all_post():
             return []
 
 
-async def get_latest_nuannuan() -> Optional[str]:
+async def get_latest_nuannuan() -> str | None:
     """获取最新时尚品鉴"""
     cards = await get_all_post()
     if not cards:

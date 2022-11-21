@@ -38,7 +38,7 @@ async def weather_handle(location: str = ArgPlainText()):
     await weather_cmd.finish(weather_report)
 
 
-async def get_weather_of_location(location: str, adm: Optional[str] = None) -> str:
+async def get_weather_of_location(location: str, adm: str | None = None) -> str:
     """根据城市名与城市所属行政区划获取天气数据"""
     # 艾欧泽亚的天气
     str_data = eorzean_weather(location)

@@ -30,7 +30,7 @@ class UniversalisListingItem(BaseModel):
     lastReviewTime: datetime
     pricePerUnit: int
     quantity: int
-    worldName: Optional[str]
+    worldName: str | None
     """如果查询时提供的服务器名称而不是大区名称，这一项是空"""
     hq: bool
 
@@ -41,7 +41,7 @@ class UniversalisCurrentlyShown(BaseModel):
     listings: list[UniversalisListingItem]
 
 
-async def search_item_id_by_name(name: str) -> Optional[int]:
+async def search_item_id_by_name(name: str) -> int | None:
     """通过物品名称获取物品 ID"""
     async with httpx.AsyncClient() as client:
         r = await client.get(f"https://cafemaker.wakingsands.com/search?string={name}")

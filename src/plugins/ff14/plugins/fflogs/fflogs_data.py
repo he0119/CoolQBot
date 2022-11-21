@@ -45,7 +45,7 @@ FFLOGS_DATA = DATA.network_file(
 )
 
 
-async def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:
+async def get_boss_info_by_nickname(name: str) -> BossInfo | None:
     """根据昵称获取 BOSS 的相关信息
 
     :param name: BOSS 的昵称
@@ -58,7 +58,7 @@ async def get_boss_info_by_nickname(name: str) -> Optional[BossInfo]:
     return None
 
 
-async def get_job_info_by_nickname(name: str) -> Optional[JobInfo]:
+async def get_job_info_by_nickname(name: str) -> JobInfo | None:
     """根据昵称获取职业的相关信息
 
     :param name: 职业的昵称
