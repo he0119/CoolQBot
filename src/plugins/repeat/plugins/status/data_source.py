@@ -9,7 +9,7 @@ from dateutil.relativedelta import relativedelta
 from ... import plugin_config, recorder_obj
 
 
-def get_status(group_id: Optional[int]) -> str:
+def get_status(group_id: int | None) -> str:
     """获取机器人运行状态，具体如下
 
     近十分钟群内聊天数量

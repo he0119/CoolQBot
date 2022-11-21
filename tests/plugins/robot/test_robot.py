@@ -4,7 +4,6 @@ from nonebug import App
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.asyncio
 async def test_command(app: App):
     """测试机器人收到命令的情况
 

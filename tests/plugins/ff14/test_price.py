@@ -18,26 +18,25 @@ def mocked_get(url: str):
 
     test_dir = Path(__file__).parent
     if url == "https://cafemaker.wakingsands.com/search?string=萨维奈舞裙":
-        with open(test_dir / "price_search.json", "r", encoding="utf-8") as f:
+        with open(test_dir / "price_search.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
     if url == "https://cafemaker.wakingsands.com/search?string=未命名":
-        with open(test_dir / "price_search_not_found.json", "r", encoding="utf-8") as f:
+        with open(test_dir / "price_search_not_found.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
     if url == "https://universalis.app/api/v2/猫小胖/10393?listings=6":
-        with open(test_dir / "price_10393.json", "r", encoding="utf-8") as f:
+        with open(test_dir / "price_10393.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
     if url == "https://universalis.app/api/v2/静语/10393?listings=6":
-        with open(test_dir / "price_10393_not_found.json", "r", encoding="utf-8") as f:
+        with open(test_dir / "price_10393_not_found.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
 
     return MockResponse({})
 
 
-@pytest.mark.asyncio
 async def test_price(app: App, mocker: MockerFixture):
     """测试查价"""
     from nonebot import require
@@ -69,7 +68,6 @@ async def test_price(app: App, mocker: MockerFixture):
     )
 
 
-@pytest.mark.asyncio
 async def test_price_default(app: App, mocker: MockerFixture):
     """测试查价，默认值"""
     from nonebot import require
@@ -125,7 +123,6 @@ async def test_price_default(app: App, mocker: MockerFixture):
     )
 
 
-@pytest.mark.asyncio
 async def test_price_item_not_found(app: App, mocker: MockerFixture):
     """测试查价，物品不存在"""
     from nonebot import require
@@ -152,7 +149,6 @@ async def test_price_item_not_found(app: App, mocker: MockerFixture):
     get.assert_called_once_with("https://cafemaker.wakingsands.com/search?string=未命名")
 
 
-@pytest.mark.asyncio
 async def test_price_world_not_found(app: App, mocker: MockerFixture):
     """测试查价，服务器/大区不存在"""
     from nonebot import require
@@ -184,7 +180,6 @@ async def test_price_world_not_found(app: App, mocker: MockerFixture):
     )
 
 
-@pytest.mark.asyncio
 async def test_price_help(app: App):
     """测试查价，参数不足两个的情况"""
     from nonebot import require

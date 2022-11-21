@@ -73,7 +73,7 @@ async def get_history(bot: Bot, year: int, month: int, day: int, group_id: int) 
     return str_data
 
 
-def is_valid_date(year: int, month: int, day: int, now: datetime) -> Tuple[bool, str]:
+def is_valid_date(year: int, month: int, day: int, now: datetime) -> tuple[bool, str]:
     """确认输入日期是否合法"""
     if not year and year != 0:
         return False, "请输入年份！"

@@ -5,7 +5,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.asyncio
 async def test_rand(app: App, mocker: MockerFixture):
     """测试点数"""
     from nonebot import require
@@ -28,7 +27,6 @@ async def test_rand(app: App, mocker: MockerFixture):
     randint.assert_called_once_with(0, 100)
 
 
-@pytest.mark.asyncio
 async def test_rand_probability(app: App, mocker: MockerFixture):
     """测试概率"""
     from nonebot import require

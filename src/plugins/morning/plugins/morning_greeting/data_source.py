@@ -39,7 +39,7 @@ HOLIDAYS_DATA = DATA.network_file(
 )
 
 
-async def get_recent_holiday() -> Optional[HolidayInfo]:
+async def get_recent_holiday() -> HolidayInfo | None:
     """获取最近的节假日
 
     返回最近的节假日信息
@@ -60,7 +60,7 @@ async def get_recent_holiday() -> Optional[HolidayInfo]:
             return holiday
 
 
-async def get_recent_workday() -> Optional[HolidayInfo]:
+async def get_recent_workday() -> HolidayInfo | None:
     """获取最近的节假日调休
 
     返回最近的节假日调休信息

@@ -18,9 +18,9 @@ class Brackets(BaseModel):
 class Partition(BaseModel):
     name: str
     compact: str
-    area: Optional[int] = None
-    default: Optional[bool] = None
-    filtered_name: Optional[str] = None
+    area: int | None = None
+    default: bool | None = None
+    filtered_name: str | None = None
 
 
 class Zones(BaseModel):
@@ -29,7 +29,7 @@ class Zones(BaseModel):
     frozen: bool
     encounters: list[Encounter]
     brackets: Brackets
-    partitions: Optional[list[Partition]] = None
+    partitions: list[Partition] | None = None
 
 
 class FFLogsZones(BaseModel):

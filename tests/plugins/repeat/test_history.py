@@ -7,7 +7,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.asyncio
 async def test_history(app: App, mocker: MockerFixture):
     """测试历史"""
     from nonebot import require
@@ -50,7 +49,6 @@ async def test_history(app: App, mocker: MockerFixture):
     mocked_datetime.assert_called_once_with(year=2020, month=1, day=1)
 
 
-@pytest.mark.asyncio
 async def test_history_get_arg(app: App, mocker: MockerFixture):
     """请求参数"""
     from nonebot import require
@@ -104,7 +102,6 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
     mocked_datetime.assert_called_once_with(year=2020, month=1, day=1)
 
 
-@pytest.mark.asyncio
 async def test_history_get_invalid_args(app: App):
     """参数错误的情况"""
     from nonebot import require
@@ -143,7 +140,6 @@ async def test_history_get_invalid_args(app: App):
         ctx.should_call_send(day_event, "2020 年 1 月的数据不存在，请换个试试吧 0.0", True)
 
 
-@pytest.mark.asyncio
 async def test_history_not_enabled(app: App):
     """没有启用复读的情况"""
     from nonebot import require

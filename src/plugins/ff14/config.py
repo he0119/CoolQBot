@@ -20,7 +20,7 @@ class Config(BaseSettings):
     fflogs_cache_minute: int = DATA.config.get("fflogs_cache_minute", 30)
     fflogs_cache_second: int = DATA.config.get("fflogs_cache_second", 0)
     # 需要缓存的副本
-    fflogs_cache_boss: List[str] = DATA.config.get("fflogs_cache_boss", [])
+    fflogs_cache_boss: list[str] = DATA.config.get("fflogs_cache_boss", [])
 
     @validator("fflogs_token", always=True, allow_reuse=True)
     def fflogs_token_validator(cls, v):

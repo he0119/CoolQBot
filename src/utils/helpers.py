@@ -1,13 +1,13 @@
 import random
+from collections.abc import Sequence
 from datetime import timedelta
-from typing import Sequence, Union
 
 from nonebot.adapters.onebot.v11 import Message
 from nonebot.matcher import Matcher
 from nonebot.params import Arg
 from nonebot.typing import T_State
 
-from .typing import Expression_T
+from .typing import Expression_T  # type: ignore
 
 
 def render_expression(expr: Expression_T, *args, **kwargs) -> Message:
@@ -44,7 +44,7 @@ def parse_int(key: str):
     """解析数字，并将结果存入 state 中"""
 
     async def _key_parser(
-        matcher: Matcher, state: T_State, input: Union[int, Message] = Arg(key)
+        matcher: Matcher, state: T_State, input: int | Message = Arg(key)
     ):
         if isinstance(input, int):
             return
@@ -60,7 +60,7 @@ def parse_int(key: str):
 def parse_bool(key: str):
     """解析布尔值，并将结果存入 state 中"""
 
-    async def _key_parser(state: T_State, input: Union[bool, Message] = Arg(key)):
+    async def _key_parser(state: T_State, input: bool | Message = Arg(key)):
         if isinstance(input, bool):
             return
 

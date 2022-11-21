@@ -8,7 +8,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event, fake_qqguild_message_event
 
 
-@pytest.mark.asyncio
 async def test_dps_missing_token(app: App):
     """测试 FFLOGS，缺少 Token 的情况"""
     from nonebot import require
@@ -31,7 +30,6 @@ async def test_dps_missing_token(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_dps_help(app: App, mocker: MockerFixture):
     """测试 FFLOGS，直接发送 /dps 命令的情况"""
     from nonebot import require
@@ -68,7 +66,6 @@ async def test_dps_help(app: App, mocker: MockerFixture):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_dps_cache(app: App):
     """测试 FFLOGS，设置缓存的情况"""
     from nonebot import require
@@ -129,7 +126,6 @@ async def test_dps_cache(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_dps_at_user(app: App, mocker: MockerFixture):
     """测试 FFLOGS，测试 @ 用户的情况"""
     from nonebot import require
@@ -175,7 +171,6 @@ async def test_dps_at_user(app: App, mocker: MockerFixture):
     mock.assert_awaited_once_with("e1s", "10000")
 
 
-@pytest.mark.asyncio
 async def test_dps_at_user_qqguild(app: App, mocker: MockerFixture):
     """测试 FFLOGS，测试 @ 用户的情况，QQ频道"""
     from nonebot import require

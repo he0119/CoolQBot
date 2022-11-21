@@ -64,6 +64,6 @@ def fake_qqguild_message_event(**field) -> "MessageEvent":
     from nonebot.adapters.qqguild.event import MessageCreateEvent
 
     class FakeEvent(MessageCreateEvent):
-        author: Optional[User] = User(id=1)
+        author: User | None = User(id=1)
 
     return FakeEvent(**field)

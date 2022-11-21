@@ -4,7 +4,6 @@ from nonebug import App
 from tests.fake import fake_private_message_event
 
 
-@pytest.mark.asyncio
 async def test_bind(app: App):
     """测试原神绑定账号"""
     from nonebot import require
@@ -23,7 +22,6 @@ async def test_bind(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_bind_get_arg(app: App):
     """测试原神绑定账号"""
     from nonebot import require

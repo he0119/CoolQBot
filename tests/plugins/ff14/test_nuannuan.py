@@ -8,7 +8,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.asyncio
 async def test_nuannuan(app: App, mocker: MockerFixture):
     """测试时尚品鉴"""
     from nonebot import require
@@ -18,7 +17,7 @@ async def test_nuannuan(app: App, mocker: MockerFixture):
 
     from src.plugins.ff14.plugins.nuannuan import nuannuan_cmd
 
-    with open(Path(__file__).parent / "nuannuan.json", "r", encoding="utf-8") as f:
+    with open(Path(__file__).parent / "nuannuan.json", encoding="utf-8") as f:
         data = json.load(f)
     async_client = mocker.patch("httpx.AsyncClient.get")
     r = mocker.MagicMock()

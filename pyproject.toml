@@ -23,14 +23,15 @@ nonebot-plugin-memes = "0.3.8"
 nonebot-plugin-petpet = "0.3.15"
 nonebot-bison = "0.6.1"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
 isort = "^5.10.1"
-nonebug = "^0.2.0"
+nonebug = "^0.2.2"
 pytest-cov = "^4.0.0"
 pytest-mock = "^3.6.1"
-pytest-xdist = "^2.5.0"
+pytest-xdist = "^3.0.2"
 pre-commit = "^2.19.0"
+pytest-asyncio = "^0.20.2"
 
 [tool.nonebot]
 plugin_dirs = ["src/plugins"]
@@ -52,6 +53,9 @@ line-length = 88
 profile = "black"
 line_length = 88
 skip_gitignore = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"

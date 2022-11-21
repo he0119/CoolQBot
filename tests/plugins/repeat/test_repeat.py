@@ -7,7 +7,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.asyncio
 async def test_repeat(app: App, mocker: MockerFixture):
     """测试复读"""
     from nonebot import require
@@ -51,7 +50,6 @@ async def test_repeat(app: App, mocker: MockerFixture):
     assert recorder_obj.repeat_list(10000) == {10: 1}
 
 
-@pytest.mark.asyncio
 async def test_repeat_enabled(app: App):
     """测试复读已开启的情况"""
     from nonebot import require
@@ -72,7 +70,6 @@ async def test_repeat_enabled(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_repeat_not_enabled(app: App):
     """测试复读关闭的情况"""
     from nonebot import require
@@ -91,7 +88,6 @@ async def test_repeat_not_enabled(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_repeat_enable(app: App):
     """测试复读，在群里启用的情况"""
     from nonebot import require
@@ -114,7 +110,6 @@ async def test_repeat_enable(app: App):
     assert plugin_config.group_id == [10000]
 
 
-@pytest.mark.asyncio
 async def test_repeat_disable(app: App):
     """测试复读，在群里关闭的情况"""
     from nonebot import require

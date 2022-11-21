@@ -23,28 +23,27 @@ def mocked_get(url: str):
         or url
         == "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&adm=%E5%9B%9B%E5%B7%9D&key=1234567890"
     ):
-        with open(test_dir / "lookup.json", "r", encoding="utf-8") as f:
+        with open(test_dir / "lookup.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
     if (
         url
         == "https://devapi.qweather.com/v7/weather/now?location=101270101&key=1234567890"
     ):
-        with open(test_dir / "now.json", "r", encoding="utf-8") as f:
+        with open(test_dir / "now.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
     if (
         url
         == "https://devapi.qweather.com/v7/weather/3d?location=101270101&key=1234567890"
     ):
-        with open(test_dir / "3d.json", "r", encoding="utf-8") as f:
+        with open(test_dir / "3d.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
 
     return MockResponse({})
 
 
-@pytest.mark.asyncio
 async def test_heweather(app: App, mocker: MockerFixture):
     """测试和风天气"""
     from nonebot import require
@@ -85,7 +84,6 @@ async def test_heweather(app: App, mocker: MockerFixture):
     )
 
 
-@pytest.mark.asyncio
 async def test_heweather_with_adm(app: App, mocker: MockerFixture):
     """测试和风天气，带行政区划"""
     from nonebot import require
@@ -126,7 +124,6 @@ async def test_heweather_with_adm(app: App, mocker: MockerFixture):
     )
 
 
-@pytest.mark.asyncio
 async def test_heweather_with_three_args(app: App, mocker: MockerFixture):
     """测试和风天气，输入三个参数"""
     from nonebot import require

@@ -22,14 +22,13 @@ def mocked_get(url: str, **kwargs):
 
     test_dir = Path(__file__).parent
     if url == "http://netease:3000/search?keywords=test":
-        with open(test_dir / "netease.json", "r", encoding="utf-8") as f:
+        with open(test_dir / "netease.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
 
     return MockResponse({})
 
 
-@pytest.mark.asyncio
 async def test_music(app: App, mocker: MockerFixture):
     """测试音乐"""
     from nonebot import require
@@ -51,7 +50,6 @@ async def test_music(app: App, mocker: MockerFixture):
     get.assert_called_once_with("http://netease:3000/search?keywords=test")
 
 
-@pytest.mark.asyncio
 async def test_music_get_arg(
     app: App,
     mocker: MockerFixture,

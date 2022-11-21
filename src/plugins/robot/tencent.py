@@ -16,7 +16,7 @@ from tencentcloud.nlp.v20190408 import models, nlp_client
 from .config import global_config, plugin_config
 
 
-async def call_tencent_api(text: str) -> Optional[str]:
+async def call_tencent_api(text: str) -> str | None:
     """调用腾讯机器人的 API 获取回复"""
     cred = credential.Credential(
         plugin_config.tencent_ai_secret_id,

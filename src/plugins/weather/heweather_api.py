@@ -8,7 +8,7 @@ import httpx
 from .config import plugin_config
 
 
-async def get(url: str) -> Dict:
+async def get(url: str) -> dict:
     """请求 API 并自动在后面加上 key"""
     async with httpx.AsyncClient() as client:
         resp = await client.get(url + f"&key={plugin_config.heweather_key}")
@@ -16,8 +16,8 @@ async def get(url: str) -> Dict:
 
 
 async def lookup_location(
-    location: str, adm: Optional[str] = None
-) -> Optional[Tuple[str, str]]:
+    location: str, adm: str | None = None
+) -> tuple[str, str] | None:
     """根据地名和行政区名查询地点的ID和展示的名称
 
     '101270101', '中国 四川省 成都'
@@ -87,7 +87,7 @@ async def daily(location_id: str) -> str:
     return "\n".join(daily_text)
 
 
-async def heweather(location: str, adm: Optional[str] = None) -> Optional[str]:
+async def heweather(location: str, adm: str | None = None) -> str | None:
     """和风天气 API"""
     if not plugin_config.heweather_key:
         return None

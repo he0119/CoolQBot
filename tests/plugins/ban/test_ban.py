@@ -5,7 +5,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "sender",
     [
@@ -53,7 +52,6 @@ async def test_ban_group_bot_is_owner(
     render_expression.assert_called_once_with(EXPR_OK, duration=1)
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "sender",
     [
@@ -122,7 +120,6 @@ async def test_ban_group_bot_is_admin(
         render_expression.assert_called_once_with(EXPR_OK, duration=1)
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "sender",
     [
@@ -182,7 +179,6 @@ async def test_ban_group_bot_is_member(
         )
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "sender",
     [
@@ -234,7 +230,6 @@ async def test_ban_group_get_arg(
     render_expression.assert_called_once_with(EXPR_OK, duration=1)
 
 
-@pytest.mark.asyncio
 async def test_ban_group_get_arg_invalid(
     app: App,
     mocker: MockerFixture,

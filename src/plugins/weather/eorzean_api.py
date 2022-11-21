@@ -33,7 +33,7 @@ def forecastTarget(date: int):
     return step2 % 100
 
 
-def calc_eorzean_weather(date: int, location: str) -> Optional[str]:
+def calc_eorzean_weather(date: int, location: str) -> str | None:
     """计算艾欧泽亚天气"""
     weatherRate = {}
 
@@ -53,7 +53,7 @@ def calc_eorzean_weather(date: int, location: str) -> Optional[str]:
             return weather
 
 
-def eorzean_weather(location: str) -> Optional[str]:
+def eorzean_weather(location: str) -> str | None:
     """艾欧泽亚天气
 
     利姆萨·罗敏萨

@@ -8,7 +8,7 @@ import httpx
 from nonebot.adapters.onebot.v11 import MessageSegment
 
 
-async def call_netease_api(name: str) -> Optional[MessageSegment]:
+async def call_netease_api(name: str) -> MessageSegment | None:
     """网易云搜索 API"""
     if not name:
         return None

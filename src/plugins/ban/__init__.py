@@ -175,7 +175,7 @@ async def ban_handle_private_message(
         await ban_cmd.finish(render_expression(EXPR_OK, duration=duration))
 
 
-async def get_owner_id(group_id: int, bot: Bot) -> Optional[int]:
+async def get_owner_id(group_id: int, bot: Bot) -> int | None:
     """获取群主 QQ 号"""
     group_member_list = await bot.get_group_member_list(group_id=group_id)
     for member in group_member_list:
