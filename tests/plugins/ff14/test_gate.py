@@ -5,7 +5,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.asyncio
 async def test_gete(app: App, mocker: MockerFixture):
     """测试藏宝选门，两个门的情况"""
     from nonebot import require
@@ -35,7 +34,6 @@ async def test_gete(app: App, mocker: MockerFixture):
     render_expression.assert_called_once_with(EXPR_GATE, direction="左边")
 
 
-@pytest.mark.asyncio
 async def test_gete_ask_arg(app: App, mocker: MockerFixture):
     """测试藏宝选门，两个门的情况"""
     from nonebot import require
@@ -68,7 +66,6 @@ async def test_gete_ask_arg(app: App, mocker: MockerFixture):
     render_expression.assert_called_once_with(EXPR_GATE, direction="左边")
 
 
-@pytest.mark.asyncio
 async def test_gete_ask_arg_error(app: App, mocker: MockerFixture):
     """测试藏宝选门，两个门的情况，第一次输入错误"""
     from nonebot import require

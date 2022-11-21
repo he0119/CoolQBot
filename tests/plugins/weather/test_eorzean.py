@@ -5,7 +5,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.asyncio
 async def test_eorzean(
     app: App,
     mocker: MockerFixture,

@@ -19,14 +19,13 @@ def mocked_get(url: str):
 
     test_dir = Path(__file__).parent
     if url == "https://pcrbot.github.io/calendar-updater-action/cn.json":
-        with open(test_dir / "cn.json", "r", encoding="utf-8") as f:
+        with open(test_dir / "cn.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
 
     return MockResponse({})
 
 
-@pytest.mark.asyncio
 async def test_calendar(app: App, mocker: MockerFixture):
     """测试日程"""
     from nonebot import require

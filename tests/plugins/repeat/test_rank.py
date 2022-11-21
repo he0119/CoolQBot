@@ -4,7 +4,6 @@ from nonebug import App
 from tests.fake import fake_group_message_event, fake_private_message_event
 
 
-@pytest.mark.asyncio
 async def test_rank(app: App):
     """测试排行榜"""
     from nonebot import require
@@ -34,7 +33,6 @@ async def test_rank(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_rank_limit(app: App):
     """不限制最低次数"""
     from nonebot import require
@@ -66,7 +64,6 @@ async def test_rank_limit(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_rank_private(app: App):
     """私聊获取排行榜"""
     from nonebot import require
@@ -99,7 +96,6 @@ async def test_rank_private(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_rank_not_enabled(app: App):
     """没有启用复读的情况"""
     from nonebot import require

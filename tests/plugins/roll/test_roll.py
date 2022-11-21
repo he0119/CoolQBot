@@ -5,7 +5,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.asyncio
 async def test_roll(app: App, mocker: MockerFixture):
     """测试点数"""
     from nonebot import require
@@ -28,7 +27,6 @@ async def test_roll(app: App, mocker: MockerFixture):
     randint.assert_called_once_with(1, 100)
 
 
-@pytest.mark.asyncio
 async def test_roll_get_arg(app: App, mocker: MockerFixture):
     """测试点数，获取参数"""
     from nonebot import require
@@ -59,7 +57,6 @@ async def test_roll_get_arg(app: App, mocker: MockerFixture):
     randint.assert_called_once_with(1, 100)
 
 
-@pytest.mark.asyncio
 async def test_roll_invalid(app: App, mocker: MockerFixture):
     """测试点数"""
     from nonebot import require
@@ -82,7 +79,6 @@ async def test_roll_invalid(app: App, mocker: MockerFixture):
     randint.assert_not_called()
 
 
-@pytest.mark.asyncio
 async def test_roll_complex(app: App, mocker: MockerFixture):
     """测试点数，复杂点的输入"""
     from nonebot import require

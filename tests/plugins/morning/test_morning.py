@@ -26,14 +26,13 @@ def mocked_get(url: str, **kwargs):
         url
         == "https://raw.fastgit.org/he0119/CoolQBot/master/src/plugins/morning/holidays.json"
     ):
-        with open(test_dir / "holidays.json", "r", encoding="utf-8") as f:
+        with open(test_dir / "holidays.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
 
     return MockResponse({})
 
 
-@pytest.mark.asyncio
 async def test_morning_enabled(app: App):
     """测试每日早安已开启的情况"""
     from nonebot import require
@@ -53,7 +52,6 @@ async def test_morning_enabled(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_morning_not_enabled(app: App):
     """测试每日早安关闭的情况"""
     from nonebot import require
@@ -71,7 +69,6 @@ async def test_morning_not_enabled(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_morning_enable(app: App):
     """测试每日早安已，在群里启用的情况"""
     from nonebot import require
@@ -93,7 +90,6 @@ async def test_morning_enable(app: App):
     assert plugin_config.morning_group_id == [10000]
 
 
-@pytest.mark.asyncio
 async def test_morning_disable(app: App):
     """测试每日早安，在群里关闭的情况"""
     from nonebot import require
@@ -117,7 +113,6 @@ async def test_morning_disable(app: App):
     assert plugin_config.morning_group_id == []
 
 
-@pytest.mark.asyncio
 async def test_morning_today(app: App, mocker: MockerFixture):
     """测试每日早安，查询今日早安的情况"""
     from nonebot import require

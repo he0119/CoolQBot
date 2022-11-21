@@ -21,7 +21,7 @@ def mocked_get(url: str, **kwargs):
         url
         == "https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_cn"
     ):
-        with open(test_dir / "game_roles.json", "r", encoding="utf-8") as f:
+        with open(test_dir / "game_roles.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
     if (
@@ -29,10 +29,10 @@ def mocked_get(url: str, **kwargs):
         == "https://api-takumi-record.mihoyo.com/game_record/app/genshin/api/dailyNote"
     ):
         if kwargs["headers"]["Cookie"] == "full":
-            with open(test_dir / "daily_note_full.json", "r", encoding="utf-8") as f:
+            with open(test_dir / "daily_note_full.json", encoding="utf-8") as f:
                 data = json.load(f)
         else:
-            with open(test_dir / "daily_note.json", "r", encoding="utf-8") as f:
+            with open(test_dir / "daily_note.json", encoding="utf-8") as f:
                 data = json.load(f)
 
         return MockResponse(data)
@@ -40,7 +40,6 @@ def mocked_get(url: str, **kwargs):
     return MockResponse({})
 
 
-@pytest.mark.asyncio
 async def test_daily_note(app: App, mocker: MockerFixture):
     """测试原神实时便笺"""
     from nonebot import require
@@ -70,7 +69,6 @@ async def test_daily_note(app: App, mocker: MockerFixture):
     assert get.call_count == 2
 
 
-@pytest.mark.asyncio
 async def test_daily_note_full(app: App, mocker: MockerFixture):
     """测试原神实时便笺，体力满的情况"""
     from nonebot import require
@@ -100,7 +98,6 @@ async def test_daily_note_full(app: App, mocker: MockerFixture):
     assert get.call_count == 2
 
 
-@pytest.mark.asyncio
 async def test_daily_note_not_bind(app: App):
     """测试原神实时便笺，未绑定账号"""
     from nonebot import require

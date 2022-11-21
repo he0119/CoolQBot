@@ -4,7 +4,6 @@ from nonebug import App
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.asyncio
 async def test_hello_enabled(app: App):
     """测试启动问候已开启的情况"""
     from nonebot import require
@@ -24,7 +23,6 @@ async def test_hello_enabled(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_hello_not_enabled(app: App):
     """测试启动问候关闭的情况"""
     from nonebot import require
@@ -42,7 +40,6 @@ async def test_hello_not_enabled(app: App):
         ctx.should_finished()
 
 
-@pytest.mark.asyncio
 async def test_hello_enable(app: App):
     """测试启动问候，在群里启用的情况"""
     from nonebot import require
@@ -64,7 +61,6 @@ async def test_hello_enable(app: App):
     assert plugin_config.hello_group_id == [10000]
 
 
-@pytest.mark.asyncio
 async def test_hello_disable(app: App):
     """测试启动问候，在群里关闭的情况"""
     from nonebot import require

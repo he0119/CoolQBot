@@ -5,7 +5,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("app", [("src.plugins.robot",)], indirect=True)
 async def test_tencent(app: App, mocker: MockerFixture):
     """测试腾讯闲聊机器人"""
@@ -29,7 +28,6 @@ async def test_tencent(app: App, mocker: MockerFixture):
     call_tencent_api.assert_called_once_with("你好")
 
 
-@pytest.mark.asyncio
 async def test_tencent_empty_word(app: App, mocker: MockerFixture):
     """测试腾讯闲聊机器人，空字符串"""
     from nonebot import require
