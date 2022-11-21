@@ -1,14 +1,13 @@
 import random
-from datetime import timedelta
-from typing import Union
 from collections.abc import Sequence
+from datetime import timedelta
 
 from nonebot.adapters.onebot.v11 import Message
 from nonebot.matcher import Matcher
 from nonebot.params import Arg
 from nonebot.typing import T_State
 
-from .typing import Expression_T
+from .typing import Expression_T  # type: ignore
 
 
 def render_expression(expr: Expression_T, *args, **kwargs) -> Message:
