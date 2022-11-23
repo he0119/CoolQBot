@@ -706,7 +706,7 @@ pydantic = ">=1.9.0,<2.0.0"
 
 [[package]]
 name = "nonebot-bison"
-version = "0.6.1"
+version = "0.6.2"
 description = "Subscribe message from social medias"
 category = "main"
 optional = false
@@ -722,7 +722,7 @@ feedparser = ">=6.0.2,<7.0.0"
 httpx = ">=0.16.1"
 nonebot-adapter-onebot = ">=2.0.0-beta.1,<3.0.0"
 nonebot-plugin-datastore = ">=0.4.0,<0.5.0"
-nonebot-plugin-htmlrender = ">=0.1.1,<0.2.0"
+nonebot-plugin-htmlrender = ">=0.2.0"
 nonebot2 = ">=2.0.0-rc.1,<3.0.0"
 pillow = ">=8.1,<10.0"
 pyjwt = ">=2.1.0,<3.0.0"
@@ -770,11 +770,11 @@ sqlmodel = ">=0.0.8,<0.1.0"
 
 [[package]]
 name = "nonebot-plugin-htmlrender"
-version = "0.1.1"
+version = "0.2.0.1"
 description = "通过浏览器渲染图片"
 category = "main"
 optional = false
-python-versions = ">=3.7.3,<4.0.0"
+python-versions = ">=3.8,<4.0"
 
 [package.dependencies]
 aiofiles = ">=0.8.0,<0.9.0"
@@ -1331,7 +1331,7 @@ idna2008 = ["idna"]
 
 [[package]]
 name = "sentry-sdk"
-version = "1.11.0"
+version = "1.11.1"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = false
@@ -1497,7 +1497,7 @@ full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.776"
+version = "3.0.778"
 description = "Tencent Cloud SDK for Python"
 category = "main"
 optional = false
@@ -1693,7 +1693,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "7063945bb24bf9457e90ebf38436dd45acb32144a85e67066794c9681e670a5a"
+content-hash = "e5664acd92851efce8001f393c01a8a0aabadfd5eb02aeabd8679e926a836920"
 
 [metadata.files]
 aiofiles = [
@@ -2402,8 +2402,8 @@ nonebot-adapter-qqguild = [
     {file = "nonebot_adapter_qqguild-0.1.1-py3-none-any.whl", hash = "sha256:32d18d51ca1f02e2513e89d19e6efd074a53a9debe9a3922a18d1d349ff732c8"},
 ]
 nonebot-bison = [
-    {file = "nonebot-bison-0.6.1.tar.gz", hash = "sha256:05eaab2f193851323297eec7e77a03a39a82321bb985b743e06a5d3ed6cb2ba6"},
-    {file = "nonebot_bison-0.6.1-py3-none-any.whl", hash = "sha256:f48f88af310c7b3bf45921d7b4bd964cc6401089128925428b3e98cfa06a86ee"},
+    {file = "nonebot_bison-0.6.2-py3-none-any.whl", hash = "sha256:02cdef39a62b07adbef7943413ef6dc987351f7f74406bd7a531b33c2a5c1ede"},
+    {file = "nonebot_bison-0.6.2.tar.gz", hash = "sha256:eb4fafab6ce36c1c0f8991ea90bb6fab7b038bdcc6cac738c401f15cf78e55dd"},
 ]
 nonebot-plugin-apscheduler = [
     {file = "nonebot-plugin-apscheduler-0.2.0.tar.gz", hash = "sha256:7b63e99a611b657533b48fcf1f8c6627c18c2eb3fa820a906cd4ec4666c0ceb0"},
@@ -2418,8 +2418,8 @@ nonebot-plugin-datastore = [
     {file = "nonebot_plugin_datastore-0.4.0-py3-none-any.whl", hash = "sha256:34cf6c61ad9073650e3cb722ea4d89eb782ab3bb5013ee7d2b9976dd1925c5e4"},
 ]
 nonebot-plugin-htmlrender = [
-    {file = "nonebot-plugin-htmlrender-0.1.1.tar.gz", hash = "sha256:509bc2906936e71f57f20023ac658d3639898724d0a472b0c65a9c6c6bd571ff"},
-    {file = "nonebot_plugin_htmlrender-0.1.1-py3-none-any.whl", hash = "sha256:107f0726e93e94ab5fe86090226a8b7b8a39c73098da406373b8b34408985bd9"},
+    {file = "nonebot-plugin-htmlrender-0.2.0.1.tar.gz", hash = "sha256:a6eb0b22dc66040c215cf60961bc1aec3d1670a4ba70a40b3c0590718a9525ba"},
+    {file = "nonebot_plugin_htmlrender-0.2.0.1-py3-none-any.whl", hash = "sha256:ba3d03688c1b680bc44e87aa60f5adcf5bab0421458a31ed7a3aa7cfd8fca42b"},
 ]
 nonebot-plugin-imageutils = [
     {file = "nonebot_plugin_imageutils-0.1.13.3-py3-none-any.whl", hash = "sha256:a847f5323b4616c4e35428f5851aaf7ff30f4fbb9c03da1da516fb7671bafa85"},
@@ -2764,8 +2764,8 @@ rfc3986 = [
     {file = "rfc3986-1.5.0.tar.gz", hash = "sha256:270aaf10d87d0d4e095063c65bf3ddbc6ee3d0b226328ce21e036f946e421835"},
 ]
 sentry-sdk = [
-    {file = "sentry-sdk-1.11.0.tar.gz", hash = "sha256:e7b78a1ddf97a5f715a50ab8c3f7a93f78b114c67307785ee828ef67a5d6f117"},
-    {file = "sentry_sdk-1.11.0-py2.py3-none-any.whl", hash = "sha256:f467e6c7fac23d4d42bc83eb049c400f756cd2d65ab44f0cc1165d0c7c3d40bc"},
+    {file = "sentry-sdk-1.11.1.tar.gz", hash = "sha256:675f6279b6bb1fea09fd61751061f9a90dca3b5929ef631dd50dc8b3aeb245e9"},
+    {file = "sentry_sdk-1.11.1-py2.py3-none-any.whl", hash = "sha256:8b4ff696c0bdcceb3f70bbb87a57ba84fd3168b1332d493fcd16c137f709578c"},
 ]
 setuptools = [
     {file = "setuptools-65.6.0-py3-none-any.whl", hash = "sha256:6211d2f5eddad8757bd0484923ca7c0a6302ebc4ab32ea5e94357176e0ca0840"},
@@ -2846,8 +2846,8 @@ starlette = [
     {file = "starlette-0.19.1.tar.gz", hash = "sha256:c6d21096774ecb9639acad41b86b7706e52ba3bf1dc13ea4ed9ad593d47e24c7"},
 ]
 tencentcloud-sdk-python = [
-    {file = "tencentcloud-sdk-python-3.0.776.tar.gz", hash = "sha256:535f2be510079a9bafd44c0c1ec6b14fc1b32a57d5e08f0e25406bac18273d36"},
-    {file = "tencentcloud_sdk_python-3.0.776-py2.py3-none-any.whl", hash = "sha256:1ef0cf8c8b315297db53e1437ee6510100a096f6684c61e4427723d8a0d4ccf9"},
+    {file = "tencentcloud-sdk-python-3.0.778.tar.gz", hash = "sha256:ed79534df306dfdf88aa1f9ccd7e81e70a301d970f2cfb59659329012a68b277"},
+    {file = "tencentcloud_sdk_python-3.0.778-py2.py3-none-any.whl", hash = "sha256:a42991f323f6feb6d40c6c45c14649279f70799ce4c85b8690263f6f863e0d74"},
 ]
 tinydb = [
     {file = "tinydb-4.7.0-py3-none-any.whl", hash = "sha256:e2cdf6e2dad49813e9b5fceb3c7943387309a8738125fbff0b58d248a033f7a9"},
