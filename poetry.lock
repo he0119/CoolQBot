@@ -157,7 +157,6 @@ click = ">=8.0.0"
 mypy-extensions = ">=0.4.3"
 pathspec = ">=0.9.0"
 platformdirs = ">=2"
-tomli = {version = ">=1.1.0", markers = "python_full_version < \"3.11.0a7\""}
 
 [package.extras]
 colorama = ["colorama (>=0.4.3)"]
@@ -248,9 +247,6 @@ category = "dev"
 optional = false
 python-versions = ">=3.7"
 
-[package.dependencies]
-tomli = {version = "*", optional = true, markers = "python_full_version <= \"3.11.0a6\" and extra == \"toml\""}
-
 [package.extras]
 toml = ["tomli"]
 
@@ -280,17 +276,6 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [package.extras]
 dev = ["coverage", "coveralls", "pytest"]
-
-[[package]]
-name = "exceptiongroup"
-version = "1.0.4"
-description = "Backport of PEP 654 (exception groups)"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[package.extras]
-test = ["pytest (>=6)"]
 
 [[package]]
 name = "execnet"
@@ -493,35 +478,6 @@ description = "Internationalized Domain Names in Applications (IDNA)"
 category = "main"
 optional = false
 python-versions = ">=3.5"
-
-[[package]]
-name = "imageio"
-version = "2.22.4"
-description = "Library for reading and writing a wide range of image, video, scientific, and volumetric data formats."
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-numpy = "*"
-pillow = ">=8.3.2"
-
-[package.extras]
-all-plugins = ["astropy", "av (!=10.0.0)", "imageio-ffmpeg", "opencv-python", "psutil", "tifffile"]
-all-plugins-pypy = ["av (!=10.0.0)", "imageio-ffmpeg", "psutil", "tifffile"]
-build = ["wheel"]
-dev = ["black", "flake8", "fsspec[github]", "invoke", "pytest", "pytest-cov"]
-docs = ["numpydoc", "pydata-sphinx-theme", "sphinx"]
-ffmpeg = ["imageio-ffmpeg", "psutil"]
-fits = ["astropy"]
-full = ["astropy", "av (!=10.0.0)", "black", "flake8", "fsspec[github]", "gdal", "imageio-ffmpeg", "invoke", "itk", "numpydoc", "opencv-python", "psutil", "pydata-sphinx-theme", "pytest", "pytest-cov", "sphinx", "tifffile", "wheel"]
-gdal = ["gdal"]
-itk = ["itk"]
-linting = ["black", "flake8"]
-opencv = ["opencv-python"]
-pyav = ["av (!=10.0.0)"]
-test = ["fsspec[github]", "invoke", "pytest", "pytest-cov"]
-tifffile = ["tifffile"]
 
 [[package]]
 name = "iniconfig"
@@ -818,7 +774,7 @@ nonebot2 = ">=2.0.0-rc.1,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-memes"
-version = "0.3.8"
+version = "0.3.9"
 description = "Nonebot2 plugin for making memes"
 category = "main"
 optional = false
@@ -826,7 +782,6 @@ python-versions = ">=3.8,<4.0"
 
 [package.dependencies]
 httpx = ">=0.19.0"
-imageio = ">=2.12.0,<3.0.0"
 nonebot-adapter-onebot = ">=2.0.0-beta.1,<3.0.0"
 nonebot-plugin-imageutils = ">=0.1.13,<0.2.0"
 nonebot2 = ">=2.0.0-beta.4,<3.0.0"
@@ -1140,11 +1095,9 @@ python-versions = ">=3.7"
 [package.dependencies]
 attrs = ">=19.2.0"
 colorama = {version = "*", markers = "sys_platform == \"win32\""}
-exceptiongroup = {version = ">=1.0.0rc8", markers = "python_version < \"3.11\""}
 iniconfig = "*"
 packaging = "*"
 pluggy = ">=0.12,<2.0"
-tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "xmlschema"]
@@ -1692,8 +1645,8 @@ multidict = ">=4.0"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.10"
-content-hash = "e5664acd92851efce8001f393c01a8a0aabadfd5eb02aeabd8679e926a836920"
+python-versions = "~3.11"
+content-hash = "6ba2667114a027a863cb7b0114e5923f9c30da1a7dfc3160f9873c0a67b6eb8c"
 
 [metadata.files]
 aiofiles = [
@@ -1919,10 +1872,6 @@ distlib = [
 emoji = [
     {file = "emoji-2.2.0.tar.gz", hash = "sha256:a2986c21e4aba6b9870df40ef487a17be863cb7778dcf1c01e25917b7cd210bb"},
 ]
-exceptiongroup = [
-    {file = "exceptiongroup-1.0.4-py3-none-any.whl", hash = "sha256:542adf9dea4055530d6e1279602fa5cb11dab2395fa650b8674eaec35fc4a828"},
-    {file = "exceptiongroup-1.0.4.tar.gz", hash = "sha256:bd14967b79cd9bdb54d97323216f8fdf533e278df937aa2a90089e7d6e06e5ec"},
-]
 execnet = [
     {file = "execnet-1.9.0-py2.py3-none-any.whl", hash = "sha256:a295f7cc774947aac58dde7fdc85f4aa00c42adf5d8f5468fc630c1acf30a142"},
     {file = "execnet-1.9.0.tar.gz", hash = "sha256:8f694f3ba9cc92cab508b152dcfe322153975c29bda272e2fd7f3f00f36e47c5"},
@@ -2083,10 +2032,6 @@ identify = [
 idna = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
     {file = "idna-3.4.tar.gz", hash = "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"},
-]
-imageio = [
-    {file = "imageio-2.22.4-py3-none-any.whl", hash = "sha256:bb173f8af27e4921f59539c4d45068fcedb892e58261fce8253f31c9a0ff9ccf"},
-    {file = "imageio-2.22.4.tar.gz", hash = "sha256:0fae027addf02bc89c73a56cc157ad84557f8b8b84aa19b4cb706fefca2d88ff"},
 ]
 iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
@@ -2430,8 +2375,8 @@ nonebot-plugin-localstore = [
     {file = "nonebot_plugin_localstore-0.2.0-py3-none-any.whl", hash = "sha256:90cd37a878c75f7fd40a142ee3ddaae29656605c7b411095ca7252076ba40df3"},
 ]
 nonebot-plugin-memes = [
-    {file = "nonebot_plugin_memes-0.3.8-py3-none-any.whl", hash = "sha256:d36bdebf997f2adaf2a12df54fa2d0d1f9c8d4a21514a022a27de0d2b3ac7107"},
-    {file = "nonebot_plugin_memes-0.3.8.tar.gz", hash = "sha256:fef92fdf55acc3e40498a629d6ad886acf4992ef67eecf28af785d5231ee0b1f"},
+    {file = "nonebot_plugin_memes-0.3.9-py3-none-any.whl", hash = "sha256:f415e3dc84dbcb036a3217744a434549125a1342ff39d1104813dd41f2cec69e"},
+    {file = "nonebot_plugin_memes-0.3.9.tar.gz", hash = "sha256:10af83ede945be4773a60b73bb1b5f77a4cc1021c54c007bdb10c7f90a3ccc0d"},
 ]
 nonebot-plugin-petpet = [
     {file = "nonebot_plugin_petpet-0.3.16-py3-none-any.whl", hash = "sha256:767eb3e2fa0e09a24fbc6921d85a97c470a8ab79f0c55cb2c315eae59a1533a2"},
