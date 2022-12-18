@@ -3,9 +3,10 @@ from typing import cast
 
 from nonebot import CommandGroup
 from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message, MessageSegment
+from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
 from nonebot.matcher import Matcher
 from nonebot.params import Arg, ArgPlainText, CommandArg, Depends
-from nonebot.permission import USER
+from nonebot.permission import SUPERUSER, USER
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
@@ -21,7 +22,7 @@ __plugin_meta__ = PluginMetadata(
 
 hospital_service = Hospital()
 
-hospital = CommandGroup("hospital")
+hospital = CommandGroup("hospital", permission=GROUP_OWNER | GROUP_ADMIN | SUPERUSER)
 
 room_cmd = hospital.command("room", aliases={"查房", "赛博查房"})
 
