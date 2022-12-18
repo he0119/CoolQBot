@@ -20,7 +20,7 @@ nonebot-plugin-treehelp = "^0.0.1"
 tencentcloud-sdk-python = "^3.0.593"
 psutil = "^5.8.0"
 nonebot-plugin-memes = "0.3.9"
-nonebot-plugin-petpet = "0.3.17.1"
+nonebot-plugin-petpet = "0.3.18"
 nonebot-bison = "0.6.3"
 
 [tool.poetry.group.dev.dependencies]
