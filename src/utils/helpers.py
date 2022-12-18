@@ -2,7 +2,7 @@ import random
 from collections.abc import Sequence
 from datetime import timedelta
 
-from nonebot.adapters.onebot.v11 import Message
+from nonebot.adapters.onebot.v11 import Bot, Message
 from nonebot.matcher import Matcher
 from nonebot.params import Arg
 from nonebot.typing import T_State
@@ -92,3 +92,16 @@ def timedelta_to_chinese(timedelta: timedelta) -> str:
     if seconds:
         time_str += f"{seconds}秒"
     return time_str
+
+
+async def get_nikcname(user_id: int, group_id: int, bot: Bot):
+    """输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称"""
+    try:
+        msg = await bot.get_group_member_info(group_id=group_id, user_id=user_id)
+        if msg["card"]:
+            return msg["card"]
+        return msg["nickname"]
+    except:
+        # 如果不在群里的话(因为有可能会退群)
+        msg = await bot.get_stranger_info(user_id=user_id)
+        return msg["nickname"]
