@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import cast
 
 from nonebot_plugin_datastore import create_session
 from sqlmodel import select
@@ -44,3 +44,20 @@ class Hospital:
             statement = select(Patient).where(Patient.discharged_at == None)
             results = await session.exec(statement)  # type: ignore
             return results.all()  # type: ignore
+
+    async def add_record(self, user_id: str, content: str) -> None:
+        async with create_session() as session:
+            statement = (
+                select(Patient)
+                .where(Patient.user_id == user_id)
+                .where(Patient.discharged_at == None)
+            )
+            results = await session.exec(statement)  # type: ignore
+            patient = results.first()
+            if patient is None:
+                raise ValueError("病人未入院")
+
+            patient = cast(Patient, patient)
+            record = Record(content=content, patient=patient)
+            session.add(record)
+            await session.commit()

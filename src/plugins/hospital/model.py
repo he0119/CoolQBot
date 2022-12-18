@@ -19,9 +19,6 @@ class Patient(SQLModel, table=True):
     def discharge(self) -> None:
         self.discharged_at = datetime.now()
 
-    # def add_record(self, content: str) -> None:
-    #     self.records.append(Record(content=content))
-
 
 class Record(SQLModel, table=True):
     """病历"""
