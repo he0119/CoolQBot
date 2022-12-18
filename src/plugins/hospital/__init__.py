@@ -2,13 +2,22 @@
 from typing import cast
 
 from nonebot import CommandGroup
-from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message, MessageSegment
+from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message, MessageSegment
 from nonebot.matcher import Matcher
 from nonebot.params import Arg, ArgPlainText, CommandArg, Depends
 from nonebot.permission import USER
+from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
+from src.utils.helpers import get_nikcname
+
 from .data_source import Hospital
+
+__plugin_meta__ = PluginMetadata(
+    name="赛博医院",
+    description="管理病人与记录病人的病情",
+    usage="查看入院病人列表\n/查房\n查房并记录病情\n/查房 @病人\n病人入院\n/入院 @病人\n病人出院\n/出院 @病人\n查看病历\n/病历 @病人",
+)
 
 hospital_service = Hospital()
 
@@ -33,6 +42,7 @@ async def _(matcher: Matcher, user_id: str = Arg(), group_id: str = Arg()):
 
 @room_cmd.handle()
 async def _(
+    bot: Bot,
     event: GroupMessageEvent,
     state: T_State,
     user_id: str | None = Depends(user_id),
@@ -48,14 +58,18 @@ async def _(
         patients = await hospital_service.get_patients()
         if not patients:
             await room_cmd.finish("当前没有住院病人")
-        await room_cmd.finish(
-            "\n".join(
-                f"{patient.user_id} 入院时间： {patient.admitted_at}" for patient in patients
+
+        patient_infos = []
+        for patient in patients:
+            nikcname = await get_nikcname(int(patient.user_id), event.group_id, bot)
+            patient_infos.append(
+                f"{nikcname} 入院时间：{patient.admitted_at:%Y-%m-%d %H:%M}"
             )
-        )
+
+        await room_cmd.finish("\n".join(patient_infos))
 
 
-@room_cmd.got("content", prompt=Message.template("{at} 请问你现在有什么不适吗？"))
+@room_cmd.got("content", prompt=Message.template("{at}请问你现在有什么不适吗？"))
 async def _(user_id: str = Arg(), content: str = ArgPlainText()):
     await hospital_service.add_record(user_id, content)
     await room_cmd.finish("记录成功", at_sender=True)
@@ -71,9 +85,9 @@ async def _(user_id: str | None = Depends(user_id)):
 
     try:
         await hospital_service.admit_patient(user_id)
-        await admit_cmd.finish(f"{user_id} 入院成功")
+        await admit_cmd.finish(MessageSegment.at(user_id) + "入院成功")
     except ValueError:
-        await admit_cmd.finish(f"病人 {user_id} 已入院")
+        await admit_cmd.finish(MessageSegment.at(user_id) + "已入院")
 
 
 discharge_cmd = hospital.command("discharge", aliases={"出院", "赛博出院"})
@@ -86,9 +100,9 @@ async def _(user_id: str | None = Depends(user_id)):
 
     try:
         await hospital_service.discharge_patient(user_id)
-        await discharge_cmd.finish(f"{user_id} 出院成功")
+        await discharge_cmd.finish(MessageSegment.at(user_id) + "出院成功")
     except ValueError:
-        await discharge_cmd.finish(f"病人 {user_id} 未入院")
+        await discharge_cmd.finish(MessageSegment.at(user_id) + "未入院")
 
 
 record_cmd = hospital.command("record", aliases={"病历", "赛博病历"})
@@ -99,10 +113,15 @@ async def _(user_id: str | None = Depends(user_id)):
     if not user_id:
         await discharge_cmd.finish("请 @ 需要查看记录的病人")
 
-    records = await hospital_service.get_records(user_id)
+    try:
+        records = await hospital_service.get_records(user_id)
+    except ValueError:
+        await record_cmd.finish(MessageSegment.at(user_id) + "未入院")
     if not records:
-        await record_cmd.finish(f"病人 {user_id} 没有记录")
+        await record_cmd.finish(MessageSegment.at(user_id) + "暂时没有记录")
 
     await record_cmd.finish(
-        "\n".join(f"{record.content} 时间： {record.time}" for record in records)
+        "\n".join(
+            f"{record.time::%Y-%m-%d %H:%M} {record.content}" for record in records
+        )
     )
