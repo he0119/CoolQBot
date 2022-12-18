@@ -47,15 +47,19 @@ async def _(
     state: T_State,
     user_id: str | None = Depends(user_id),
 ):
+    group_id = str(event.group_id)
+
     if user_id:
         state["at"] = MessageSegment.at(user_id)
         state["user_id"] = user_id
-        state["group_id"] = str(event.group_id)
-        patient = await hospital_service.get_patient(state["user_id"])
+        state["group_id"] = group_id
+        patient = await hospital_service.get_patient(
+            state["user_id"], state["group_id"]
+        )
         if not patient:
             await room_cmd.finish(state["at"] + " 未入院")
     else:
-        patients = await hospital_service.get_patients()
+        patients = await hospital_service.get_patients(group_id)
         if not patients:
             await room_cmd.finish("当前没有住院病人")
 
@@ -70,8 +74,8 @@ async def _(
 
 
 @room_cmd.got("content", prompt=Message.template("{at}请问你现在有什么不适吗？"))
-async def _(user_id: str = Arg(), content: str = ArgPlainText()):
-    await hospital_service.add_record(user_id, content)
+async def _(user_id: str = Arg(), group_id: str = Arg(), content: str = ArgPlainText()):
+    await hospital_service.add_record(user_id, group_id, content)
     await room_cmd.finish("记录成功", at_sender=True)
 
 
@@ -79,12 +83,12 @@ admit_cmd = hospital.command("admit", aliases={"入院", "赛博入院"})
 
 
 @admit_cmd.handle()
-async def _(user_id: str | None = Depends(user_id)):
+async def _(event: GroupMessageEvent, user_id: str | None = Depends(user_id)):
     if not user_id:
         await admit_cmd.finish("请 @ 需要入院的病人")
 
     try:
-        await hospital_service.admit_patient(user_id)
+        await hospital_service.admit_patient(user_id, str(event.group_id))
         await admit_cmd.finish(MessageSegment.at(user_id) + "入院成功")
     except ValueError:
         await admit_cmd.finish(MessageSegment.at(user_id) + "已入院")
@@ -94,12 +98,12 @@ discharge_cmd = hospital.command("discharge", aliases={"出院", "赛博出院"}
 
 
 @discharge_cmd.handle()
-async def _(user_id: str | None = Depends(user_id)):
+async def _(event: GroupMessageEvent, user_id: str | None = Depends(user_id)):
     if not user_id:
         await discharge_cmd.finish("请 @ 需要出院的病人")
 
     try:
-        await hospital_service.discharge_patient(user_id)
+        await hospital_service.discharge_patient(user_id, str(event.group_id))
         await discharge_cmd.finish(MessageSegment.at(user_id) + "出院成功")
     except ValueError:
         await discharge_cmd.finish(MessageSegment.at(user_id) + "未入院")
@@ -109,19 +113,21 @@ record_cmd = hospital.command("record", aliases={"病历", "赛博病历"})
 
 
 @record_cmd.handle()
-async def _(user_id: str | None = Depends(user_id)):
+async def _(event: GroupMessageEvent, user_id: str | None = Depends(user_id)):
     if not user_id:
         await discharge_cmd.finish("请 @ 需要查看记录的病人")
 
     try:
-        records = await hospital_service.get_records(user_id)
+        records = await hospital_service.get_records(user_id, str(event.group_id))
     except ValueError:
         await record_cmd.finish(MessageSegment.at(user_id) + "未入院")
     if not records:
         await record_cmd.finish(MessageSegment.at(user_id) + "暂时没有记录")
 
+    msg = MessageSegment.at(user_id) + "\n"
     await record_cmd.finish(
-        "\n".join(
-            f"{record.time::%Y-%m-%d %H:%M} {record.content}" for record in records
+        msg
+        + "\n".join(
+            f"{record.time:%Y-%m-%d %H:%M} {record.content}" for record in records
         )
     )

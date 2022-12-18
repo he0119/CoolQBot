@@ -11,6 +11,7 @@ class Patient(SQLModel, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     user_id: str
+    group_id: str
     records: list["Record"] | None = Relationship(back_populates="patient")
     admitted_at: datetime = Field(default_factory=datetime.now)
     discharged_at: datetime | None = None
