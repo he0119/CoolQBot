@@ -67,9 +67,13 @@ async def _(
         patient_infos = []
         for patient in patients:
             nikcname = await get_nikcname(int(patient.user_id), event.group_id, bot)
-            patient_infos.append(
-                f"{nikcname} 入院时间：{patient.admitted_at:%Y-%m-%d %H:%M}"
-            )
+            patient_info = f"{nikcname} 入院时间：{patient.admitted_at:%Y-%m-%d %H:%M}"
+            latest_record = patient.records[-1] if patient.records else None
+            if latest_record:
+                patient_info += f" 上次查房时间：{latest_record.time:%Y-%m-%d %H:%M}"
+            else:
+                patient_info += " 上次查房时间：无"
+            patient_infos.append(patient_info)
 
         await room_cmd.finish("\n".join(patient_infos))
 

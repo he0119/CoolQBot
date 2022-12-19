@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - FFLogs 添加设置缓存的命令
 - 适配插件元信息
 - 使用 nonebot-plugin-treehelp 生成插件帮助
+- 添加赛博医院，支持入院，出院和查房
 
 ### Changed
 

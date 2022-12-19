@@ -47,7 +47,7 @@ class Hospital:
                 select(Patient)
                 .where(Patient.group_id == group_id)
                 .where(Patient.discharged_at == None)
-            )
+            ).options(selectinload(Patient.records))
             results = await session.exec(statement)  # type: ignore
             return results.all()  # type: ignore
 
