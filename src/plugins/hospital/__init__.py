@@ -17,14 +17,14 @@ from .data_source import Hospital
 __plugin_meta__ = PluginMetadata(
     name="赛博医院",
     description="管理病人与记录病人的病情",
-    usage="查看入院病人列表\n/查房\n查房并记录病情\n/查房 @病人\n病人入院\n/入院 @病人\n病人出院\n/出院 @病人\n查看病历\n/病历 @病人",
+    usage="查看入院病人列表\n/查房\n查房并记录病情\n/查房 @病人\n直接记录病情\n/查房 @病人 症状\n病人入院\n/入院 @病人\n病人出院\n/出院 @病人\n查看病历\n/病历 @病人",
 )
 
 hospital_service = Hospital()
 
 hospital = CommandGroup("hospital", permission=GROUP_OWNER | GROUP_ADMIN | SUPERUSER)
 
-room_cmd = hospital.command("room", aliases={"查房", "赛博查房"})
+rounds_cmd = hospital.command("rounds", aliases={"查房", "赛博查房"})
 
 
 async def user_id(args: Message = CommandArg()) -> str | None:
@@ -34,23 +34,31 @@ async def user_id(args: Message = CommandArg()) -> str | None:
         return at_message.data["qq"]
 
 
-@room_cmd.permission_updater
+async def get_content(args: Message = CommandArg()) -> Message | None:
+    if content := args["text"]:
+        return content
+
+
+@rounds_cmd.permission_updater
 async def _(matcher: Matcher, user_id: str = Arg(), group_id: str = Arg()):
     if user_id and group_id:
         return USER(f"group_{group_id}_{user_id}")
     return matcher.permission
 
 
-@room_cmd.handle()
+@rounds_cmd.handle()
 async def _(
     bot: Bot,
     event: GroupMessageEvent,
     state: T_State,
     user_id: str | None = Depends(user_id),
+    content: Message | None = Depends(get_content),
 ):
     group_id = str(event.group_id)
 
     if user_id:
+        if content:
+            state["content"] = content
         state["at"] = MessageSegment.at(user_id)
         state["user_id"] = user_id
         state["group_id"] = group_id
@@ -58,11 +66,11 @@ async def _(
             state["user_id"], state["group_id"]
         )
         if not patient:
-            await room_cmd.finish(state["at"] + " 未入院")
+            await rounds_cmd.finish(state["at"] + " 未入院")
     else:
         patients = await hospital_service.get_patients(group_id)
         if not patients:
-            await room_cmd.finish("当前没有住院病人")
+            await rounds_cmd.finish("当前没有住院病人")
 
         patient_infos = []
         for patient in patients:
@@ -75,13 +83,13 @@ async def _(
                 patient_info += " 上次查房时间：无"
             patient_infos.append(patient_info)
 
-        await room_cmd.finish("\n".join(patient_infos))
+        await rounds_cmd.finish("\n".join(patient_infos))
 
 
-@room_cmd.got("content", prompt=Message.template("{at}请问你现在有什么不适吗？"))
+@rounds_cmd.got("content", prompt=Message.template("{at}请问你现在有什么不适吗？"))
 async def _(user_id: str = Arg(), group_id: str = Arg(), content: str = ArgPlainText()):
     await hospital_service.add_record(user_id, group_id, content)
-    await room_cmd.finish("记录成功", at_sender=True)
+    await rounds_cmd.finish(MessageSegment.at(user_id) + "记录成功")
 
 
 admit_cmd = hospital.command("admit", aliases={"入院", "赛博入院"})

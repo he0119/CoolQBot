@@ -1,6 +1,5 @@
 {
   "python.analysis.typeCheckingMode": "basic",
-  "git.detectSubmodules": false,
   "python.testing.pytestArgs": [
     "tests",
     "-n",
