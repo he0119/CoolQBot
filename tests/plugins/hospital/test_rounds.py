@@ -1,13 +1,16 @@
+from typing import TYPE_CHECKING
+
 import pytest
 from nonebug import App
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 from tests.fake import fake_group_message_event
 
+if TYPE_CHECKING:
+    from sqlmodel.ext.asyncio.session import AsyncSession
 
-@pytest.mark.skip(reason="sqlalchemy.exc.InvalidRequestError")
+
 @pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
-async def test_rounds(app: App, session: AsyncSession):
+async def test_rounds(app: App, session: "AsyncSession"):
     """测试查房"""
     from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
@@ -44,9 +47,8 @@ async def test_rounds(app: App, session: AsyncSession):
         ctx.should_finished()
 
 
-@pytest.mark.skip(reason="sqlalchemy.exc.InvalidRequestError")
 @pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
-async def test_rounds_with_record(app: App, session: AsyncSession):
+async def test_rounds_with_record(app: App, session: "AsyncSession"):
     """测试查房并录入病情"""
     from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 

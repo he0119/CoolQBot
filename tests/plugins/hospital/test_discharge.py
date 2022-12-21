@@ -1,13 +1,16 @@
+from typing import TYPE_CHECKING
+
 import pytest
 from nonebug import App
-from sqlmodel.ext.asyncio.session import AsyncSession
+
+if TYPE_CHECKING:
+    from sqlmodel.ext.asyncio.session import AsyncSession
 
 from tests.fake import fake_group_message_event
 
 
-@pytest.mark.skip(reason="sqlalchemy.exc.InvalidRequestError")
 @pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
-async def test_discharge(app: App, session: AsyncSession):
+async def test_discharge(app: App, session: "AsyncSession"):
     """测试病人出院"""
     from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
