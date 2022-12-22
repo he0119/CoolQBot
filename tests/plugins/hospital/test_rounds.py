@@ -46,6 +46,45 @@ async def test_rounds(app: App, session: "AsyncSession"):
         ctx.should_call_send(event, MessageSegment.at(123456) + "记录成功", True)
         ctx.should_finished()
 
+    async with app.test_matcher(rounds_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event(
+            message=Message("/查房") + MessageSegment.at(123456) + " ",
+            sender={"role": "admin"},
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, MessageSegment.at(123456) + "请问你现在有什么不适吗？", True)
+        ctx.should_rejected()
+
+        event = fake_group_message_event(message=Message("头疼"), user_id=123456)
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, MessageSegment.at(123456) + "记录成功", True)
+        ctx.should_finished()
+
+    async with app.test_matcher(rounds_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event(
+            message=Message("/查房") + MessageSegment.at(123456),
+            sender={"role": "admin"},
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, MessageSegment.at(123456) + "请问你现在有什么不适吗？", True)
+        ctx.should_rejected()
+
+        event = fake_group_message_event(
+            message=" " + MessageSegment.at(123456), user_id=123456
+        )
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, MessageSegment.at(123456) + "症状不能为空，请重新输入", True)
+        ctx.should_rejected()
+
+        event = fake_group_message_event(message=Message("头疼"), user_id=123456)
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, MessageSegment.at(123456) + "记录成功", True)
+        ctx.should_finished()
+
 
 @pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
 async def test_rounds_with_record(app: App, session: "AsyncSession"):

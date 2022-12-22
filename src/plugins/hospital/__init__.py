@@ -36,7 +36,8 @@ async def user_id(args: Message = CommandArg()) -> str | None:
 
 async def get_content(args: Message = CommandArg()) -> Message | None:
     if content := args["text"]:
-        return content
+        if content.extract_plain_text().strip():
+            return content
 
 
 @rounds_cmd.permission_updater
@@ -88,6 +89,9 @@ async def _(
 
 @rounds_cmd.got("content", prompt=Message.template("{at}请问你现在有什么不适吗？"))
 async def _(user_id: str = Arg(), group_id: str = Arg(), content: str = ArgPlainText()):
+    if not content.strip():
+        await rounds_cmd.reject(MessageSegment.at(user_id) + "症状不能为空，请重新输入")
+
     await hospital_service.add_record(user_id, group_id, content)
     await rounds_cmd.finish(MessageSegment.at(user_id) + "记录成功")
 
