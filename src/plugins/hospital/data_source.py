@@ -13,6 +13,7 @@ class Hospital:
             statement = (
                 select(Patient)
                 .where(Patient.user_id == user_id)
+                .where(Patient.group_id == group_id)
                 .where(Patient.discharged_at == None)
             )
             results = await session.exec(statement)  # type: ignore
