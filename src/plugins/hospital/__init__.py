@@ -27,7 +27,7 @@ hospital = CommandGroup("hospital", permission=GROUP_OWNER | GROUP_ADMIN | SUPER
 rounds_cmd = hospital.command("rounds", aliases={"查房", "赛博查房"})
 
 
-async def user_id(args: Message = CommandArg()) -> str | None:
+async def get_user_id(args: Message = CommandArg()) -> str | None:
     if at_message := args["at"]:
         at_message = at_message[0]
         at_message = cast(MessageSegment, at_message)
@@ -52,7 +52,7 @@ async def _(
     bot: Bot,
     event: GroupMessageEvent,
     state: T_State,
-    user_id: str | None = Depends(user_id),
+    user_id: str | None = Depends(get_user_id),
     content: Message | None = Depends(get_content),
 ):
     group_id = str(event.group_id)
@@ -63,13 +63,13 @@ async def _(
         state["at"] = MessageSegment.at(user_id)
         state["user_id"] = user_id
         state["group_id"] = group_id
-        patient = await hospital_service.get_patient(
+        patient = await hospital_service.get_admitted_patient(
             state["user_id"], state["group_id"]
         )
         if not patient:
             await rounds_cmd.finish(state["at"] + " 未入院")
     else:
-        patients = await hospital_service.get_patients(group_id)
+        patients = await hospital_service.get_admitted_patients(group_id)
         if not patients:
             await rounds_cmd.finish("当前没有住院病人")
 
@@ -100,7 +100,7 @@ admit_cmd = hospital.command("admit", aliases={"入院", "赛博入院"})
 
 
 @admit_cmd.handle()
-async def _(event: GroupMessageEvent, user_id: str | None = Depends(user_id)):
+async def _(event: GroupMessageEvent, user_id: str | None = Depends(get_user_id)):
     if not user_id:
         await admit_cmd.finish("请 @ 需要入院的病人")
 
@@ -115,7 +115,7 @@ discharge_cmd = hospital.command("discharge", aliases={"出院", "赛博出院"}
 
 
 @discharge_cmd.handle()
-async def _(event: GroupMessageEvent, user_id: str | None = Depends(user_id)):
+async def _(event: GroupMessageEvent, user_id: str | None = Depends(get_user_id)):
     if not user_id:
         await discharge_cmd.finish("请 @ 需要出院的病人")
 
@@ -130,7 +130,7 @@ record_cmd = hospital.command("record", aliases={"病历", "赛博病历"})
 
 
 @record_cmd.handle()
-async def _(event: GroupMessageEvent, user_id: str | None = Depends(user_id)):
+async def _(event: GroupMessageEvent, user_id: str | None = Depends(get_user_id)):
     if not user_id:
         await discharge_cmd.finish("请 @ 需要查看记录的病人")
 
@@ -148,3 +148,37 @@ async def _(event: GroupMessageEvent, user_id: str | None = Depends(user_id)):
             f"{record.time:%Y-%m-%d %H:%M} {record.content}" for record in records
         )
     )
+
+
+history_cmd = hospital.command("history", aliases={"入院记录", "赛博入院记录"})
+
+
+@history_cmd.handle()
+async def _(
+    bot: Bot, event: GroupMessageEvent, user_id: str | None = Depends(get_user_id)
+):
+    if not user_id:
+        patients = await hospital_service.patient_count(str(event.group_id))
+        if not patients:
+            await history_cmd.finish("没有住院病人")
+
+        patient_infos = []
+        for user_id, count in patients:
+            nikcname = await get_nikcname(int(user_id), event.group_id, bot)
+            patient_infos.append(f"{nikcname} 入院次数：{count}")
+        await history_cmd.finish("\n".join(patient_infos))
+
+    patients = await hospital_service.get_patient(user_id, str(event.group_id))
+    if not patients:
+        await history_cmd.finish(MessageSegment.at(user_id) + "从未入院")
+
+    patient_info = []
+    for patient in patients:
+        info = f"入院时间：{patient.admitted_at:%Y-%m-%d %H:%M}"
+        if patient.discharged_at:
+            info += f" 出院时间：{patient.discharged_at:%Y-%m-%d %H:%M}"
+        else:
+            info += " 出院时间：未出院"
+        patient_info.append(info)
+
+    await history_cmd.finish(MessageSegment.at(user_id) + "\n".join(patient_info))
