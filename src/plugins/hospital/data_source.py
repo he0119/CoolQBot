@@ -2,7 +2,7 @@ from typing import cast
 
 from nonebot_plugin_datastore import create_session
 from sqlalchemy.orm import selectinload
-from sqlmodel import select
+from sqlmodel import func, select
 
 from .model import Patient, Record
 
@@ -41,7 +41,8 @@ class Hospital:
             session.add(patient)
             await session.commit()
 
-    async def get_patients(self, group_id: str) -> list[Patient]:
+    async def get_admitted_patients(self, group_id: str) -> list[Patient]:
+        """获取所有入院病人"""
         async with create_session() as session:
             statement = (
                 select(Patient)
@@ -51,7 +52,8 @@ class Hospital:
             results = await session.exec(statement)  # type: ignore
             return results.all()  # type: ignore
 
-    async def get_patient(self, user_id: str, group_id: str) -> Patient | None:
+    async def get_admitted_patient(self, user_id: str, group_id: str) -> Patient | None:
+        """获取入院病人"""
         async with create_session() as session:
             statement = (
                 select(Patient)
@@ -94,3 +96,25 @@ class Hospital:
             record = Record(content=content, patient=patient)
             session.add(record)
             await session.commit()
+
+    async def patient_count(self, group_id: str) -> list[tuple[str, int]]:
+        """统计病人住院次数"""
+        async with create_session() as session:
+            statement = (
+                select(Patient.user_id, func.count("*"))  # type: ignore
+                .group_by(Patient.user_id)
+                .where(Patient.group_id == group_id)
+            )
+            results = await session.exec(statement)  # type: ignore
+            return results.all()
+
+    async def get_patient(self, user_id: str, group_id: str) -> list[Patient]:
+        """获取病人所有住院记录"""
+        async with create_session() as session:
+            statement = (
+                select(Patient)
+                .where(Patient.user_id == user_id)
+                .where(Patient.group_id == group_id)
+            )
+            results = await session.exec(statement)  # type: ignore
+            return results.all()
