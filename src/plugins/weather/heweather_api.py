@@ -1,6 +1,5 @@
 """ 和风天气
 """
-from typing import Dict, Optional, Tuple
 from urllib.parse import urlencode
 
 import httpx

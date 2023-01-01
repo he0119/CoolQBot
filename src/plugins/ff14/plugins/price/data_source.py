@@ -6,7 +6,6 @@ https://github.com/thewakingsands/cafemaker/wiki
 """
 
 from datetime import datetime
-from typing import Optional
 
 import httpx
 from pydantic import BaseModel

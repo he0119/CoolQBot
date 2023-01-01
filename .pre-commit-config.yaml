@@ -5,6 +5,12 @@ ci:
   autoupdate_schedule: weekly
   autoupdate_commit_msg: "chore: auto update by pre-commit hooks"
 repos:
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.0.0-alpha.4
+    hooks:
+      - id: prettier
+        types_or: [markdown]
+
   - repo: https://github.com/pycqa/isort
     rev: 5.11.1
     hooks:
@@ -21,8 +27,8 @@ repos:
       - id: pyupgrade
         args: [--py310-plus]
 
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0-alpha.4
+  - repo: https://github.com/hadialqattan/pycln
+    rev: v2.1.2
     hooks:
-      - id: prettier
-        types_or: [markdown]
+      - id: pycln
+        args: [--config, pyproject.toml]

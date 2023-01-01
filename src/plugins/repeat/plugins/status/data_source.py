@@ -1,7 +1,6 @@
 """ 运行状态
 """
 from datetime import datetime
-from typing import Optional
 
 import psutil
 from dateutil.relativedelta import relativedelta

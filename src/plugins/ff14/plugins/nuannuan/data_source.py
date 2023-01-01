@@ -1,6 +1,5 @@
 """ 时尚品鉴 """
 import re
-from typing import Optional
 
 import httpx
 

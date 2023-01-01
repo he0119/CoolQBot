@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 from dateutil import parser
 from nonebot.adapters.onebot.v11 import Message

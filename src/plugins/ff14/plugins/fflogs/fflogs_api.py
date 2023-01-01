@@ -8,7 +8,7 @@ import asyncio
 import json
 import math
 from datetime import datetime, timedelta
-from typing import List, Literal, cast
+from typing import Literal, cast
 
 import httpx
 from nonebot.log import logger
