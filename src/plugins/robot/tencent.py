@@ -6,7 +6,6 @@ https://console.cloud.tencent.com/nlp
 https://cloud.tencent.com/document/api/271/39416
 """
 import json
-from typing import Optional
 
 from tencentcloud.common import credential
 from tencentcloud.common.profile.client_profile import ClientProfile
@@ -40,5 +39,6 @@ async def call_tencent_api(text: str) -> str | None:
         nickname: str = list(global_config.nickname)[0]
         msg = msg.replace("腾讯小龙女", nickname)
         msg = msg.replace("小龙女", nickname)
+        msg = msg.replace("姑姑", "我")
 
         return msg

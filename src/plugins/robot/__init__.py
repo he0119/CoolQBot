@@ -1,7 +1,7 @@
 """ 机器人插件
 """
 from nonebot import on_message
-from nonebot.adapters.onebot.v11.event import MessageEvent
+from nonebot.adapters import Event
 from nonebot.rule import to_me
 
 from src.utils.helpers import render_expression
@@ -10,7 +10,7 @@ from .config import global_config
 from .tencent import call_tencent_api
 
 
-async def robot_rule(event: MessageEvent) -> bool:
+async def robot_rule(event: Event) -> bool:
     msg = event.get_plaintext()
 
     # 如果消息是命令，则忽略
@@ -33,7 +33,7 @@ EXPR_DONT_UNDERSTAND = (
 
 
 @robot_message.handle()
-async def robot_handle(event: MessageEvent):
+async def robot_handle(event: Event):
     msg = event.get_plaintext()
 
     # 通过封装的函数获取机器人的回复
