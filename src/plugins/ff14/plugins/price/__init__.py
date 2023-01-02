@@ -43,9 +43,6 @@ async def price_handle(event: Event, args: Message = CommandArg()):
         try:
             reply = await get_item_price(name, world_or_dc)
         except httpx.HTTPError:
-            reply = "抱歉，网络出错，请稍后再试。"
+            reply = "抱歉，网络出错，无法获取物品价格，请稍后再试。"
 
         await price_cmd.finish(reply)
-
-
-# endregion

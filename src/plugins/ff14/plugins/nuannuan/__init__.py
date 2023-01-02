@@ -20,6 +20,3 @@ async def nuannuan_handle():
         await nuannuan_cmd.finish(latest)
     else:
         await nuannuan_cmd.finish("抱歉，没有找到最新的满分攻略。")
-
-
-# endregion
