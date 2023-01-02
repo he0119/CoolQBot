@@ -13,7 +13,11 @@ from .netease import call_netease_api
 __plugin_meta__ = PluginMetadata(
     name="音乐",
     description="通过网易云音乐点歌",
-    usage="参数为歌曲相关信息\n/music Sagitta luminis\n如果仅凭歌曲名称无法获得正确歌曲时\n可以尝试在后面加上歌手名称或其他信息\n/music Sagitta luminis 梶浦由記",
+    usage="""参数为歌曲相关信息
+/music Sagitta luminis
+如果仅凭歌曲名称无法获得正确歌曲时
+可以尝试在后面加上歌手名称或其他信息
+/music Sagitta luminis 梶浦由記""",
 )
 
 

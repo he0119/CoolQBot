@@ -15,7 +15,18 @@ from .data_source import HOLIDAYS_DATA, get_moring_message
 __plugin_meta__ = PluginMetadata(
     name="每日早安",
     description="早上好，什么时候放假呢？",
-    usage="开启时会在每天早晨发送早安信息\n\n查看当前群是否开启每日早安功能\n/morning\n开启每日早安功能\n/morning on\n关闭每日早安功能\n/morning off\n更新节假日数据\n/morning update\n获取今天的问好\n/morning today",
+    usage="""开启时会在每天早晨发送早安信息
+
+查看当前群是否开启每日早安功能
+/morning
+开启每日早安功能
+/morning on
+关闭每日早安功能
+/morning off
+更新节假日数据
+/morning update
+获取今天的问好
+/morning today""",
 )
 
 

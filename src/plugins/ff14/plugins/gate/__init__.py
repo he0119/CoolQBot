@@ -12,7 +12,9 @@ from .data_source import get_direction
 __plugin_meta__ = PluginMetadata(
     name="藏宝选门",
     description="告诉我该选哪个门吧",
-    usage="选择门的数量\n/gate 2\n/gate 3",
+    usage="""选择门的数量
+/gate 2
+/gate 3""",
 )
 
 gate_cmd = ff14.command("gate", aliases={"gate"})

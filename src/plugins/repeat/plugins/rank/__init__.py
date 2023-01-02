@@ -19,7 +19,12 @@ from .data_source import get_rank
 __plugin_meta__ = PluginMetadata(
     name="复读排行榜",
     description="查看复读排行榜",
-    usage="获取当前的排行榜（默认显示前三名）\n/rank\n限制进入排行榜所需发送消息的数量\n/rank n30\n限制显示的人数\n/rank 3n30",
+    usage="""获取当前的排行榜（默认显示前三名）
+/rank
+限制进入排行榜所需发送消息的数量
+/rank n30
+限制显示的人数
+/rank 3n30""",
 )
 
 rank_cmd = repeat.command("rank", aliases={"rank", "排行榜"})
@@ -117,6 +122,3 @@ async def rank_handle_private_message(
         group_id=int(group_id),
     )
     await rank_cmd.finish(res)
-
-
-# endregion

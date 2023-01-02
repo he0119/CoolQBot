@@ -9,7 +9,10 @@ from .data_source import get_rand
 __plugin_meta__ = PluginMetadata(
     name="掷骰子",
     description="获得一个点数或者概率",
-    usage="获得 0-100 的点数\n/rand\n获得一件事情的概率\n/rand 今天捐钱的概率",
+    usage="""获得 0-100 的点数
+/rand
+获得一件事情的概率
+/rand 今天捐钱的概率""",
 )
 
 rand_cmd = on_command("rand")

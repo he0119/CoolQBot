@@ -19,7 +19,10 @@ from .data_source import get_history
 __plugin_meta__ = PluginMetadata(
     name="复读历史",
     description="查看历史复读数据",
-    usage="显示2020年1月的数据\n/history 2020-1\n显示2020年1月1日的数据\n/history 2020-1-1",
+    usage="""显示2020年1月的数据
+/history 2020-1
+显示2020年1月1日的数据
+/history 2020-1-1""",
 )
 
 history_cmd = repeat.command("history", aliases={"history", "历史", "复读历史"})

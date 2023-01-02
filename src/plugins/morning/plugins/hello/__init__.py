@@ -15,7 +15,14 @@ from .data_source import get_first_connect_message
 __plugin_meta__ = PluginMetadata(
     name="启动问候",
     description="启动时发送问候",
-    usage="开启时会在每天机器人第一次启动时发送问候\n\n查看当前群是否开启启动问候\n/hello\n开启启动问候功能\n/hello on\n关闭启动问候功能\n/hello off",
+    usage="""开启时会在每天机器人第一次启动时发送问候
+
+查看当前群是否开启启动问候
+/hello
+开启启动问候功能
+/hello on
+关闭启动问候功能
+/hello off""",
 )
 
 driver = nonebot.get_driver()

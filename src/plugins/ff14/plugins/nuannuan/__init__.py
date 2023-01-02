@@ -7,7 +7,8 @@ from .data_source import get_latest_nuannuan
 __plugin_meta__ = PluginMetadata(
     name="时尚品鉴",
     description="获取最新的满分攻略",
-    usage="获取最新的满分攻略\n/时尚品鉴",
+    usage="""获取最新的满分攻略
+/时尚品鉴""",
 )
 nuannuan_cmd = ff14.command("nuannuan", aliases={"时尚品鉴"})
 
