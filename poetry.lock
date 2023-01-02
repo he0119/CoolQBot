@@ -1371,22 +1371,6 @@ msgpack = ">=1.0.3,<2.0.0"
 nonebot2 = ">=2.0.0-beta.3,<3.0.0"
 
 [[package]]
-name = "nonebot-adapter-qqguild"
-version = "0.1.2"
-description = "QQ Guild adapter for nonebot2"
-category = "main"
-optional = false
-python-versions = ">=3.8,<4.0"
-files = [
-    {file = "nonebot_adapter_qqguild-0.1.2-py3-none-any.whl", hash = "sha256:c23f54f55c36a5c09df8d90b046f40449ca156be7dcf9901fb1c69aa4b275802"},
-    {file = "nonebot_adapter_qqguild-0.1.2.tar.gz", hash = "sha256:9723777aa5ffc411e10e17a5d53ddd10aa7b462b9bf17484df3fb10ecb71d065"},
-]
-
-[package.dependencies]
-nonebot2 = ">=2.0.0-beta.1,<3.0.0"
-pydantic = ">=1.9.0,<2.0.0"
-
-[[package]]
 name = "nonebot-bison"
 version = "0.6.3"
 description = "Subscribe message from social medias"
@@ -3103,4 +3087,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "4e9e378a0fd6afc7c578535e8795b30e3e83fe7e33fbd6d175b734c305a92cc8"
+content-hash = "4aa40c7116393cd53a63363a2cb176a583523d6faec78b7b1ff66082f8ab7800"
