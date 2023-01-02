@@ -1,7 +1,6 @@
 """ 自主禁言
 """
 from enum import Enum
-from typing import Optional
 
 from nonebot import on_command, on_notice
 from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
@@ -19,7 +18,11 @@ from src.utils.helpers import parse_int, render_expression
 __plugin_meta__ = PluginMetadata(
     name="自主禁言",
     description="禁言自己或解除自己的禁言",
-    usage="禁言自己，单位为分钟\n/ban 30 (禁言 30 分钟)\n解除禁言\n/ban 0\n如果私聊，则需要再提供群号",
+    usage="""禁言自己，单位为分钟
+/ban 30 (禁言 30 分钟)
+解除禁言
+/ban 0
+如果私聊，则需要再提供群号""",
 )
 
 

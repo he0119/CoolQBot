@@ -16,7 +16,12 @@ from .repeat_rule import need_repeat
 __plugin_meta__ = PluginMetadata(
     name="复读功能",
     description="查看与设置复读功能",
-    usage="查看当前群是否启用复读功能\n/repeat\n启用复读功能\n/repeat on\n关闭复读功能\n/repeat off",
+    usage="""查看当前群是否启用复读功能
+/repeat
+启用复读功能
+/repeat on
+关闭复读功能
+/repeat off""",
 )
 
 # region 自动保存数据

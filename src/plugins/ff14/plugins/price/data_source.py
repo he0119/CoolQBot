@@ -6,7 +6,6 @@ https://github.com/thewakingsands/cafemaker/wiki
 """
 
 from datetime import datetime
-from typing import Optional
 
 import httpx
 from pydantic import BaseModel
@@ -53,8 +52,12 @@ async def search_item_id_by_name(name: str) -> int | None:
 
 
 async def get_item_price(name: str, world_or_dc: str) -> str:
-    """通过物品 ID 获取物品价格"""
-    item_id = await search_item_id_by_name(name)
+    """通过物品名称获取物品价格"""
+    try:
+        item_id = await search_item_id_by_name(name)
+    except httpx.HTTPError:
+        return f"抱歉，网络出错，无法获取物品 ID，请稍后再试。"
+
     if not item_id:
         return f"抱歉，没有找到 {name}，请检查物品名称是否正确。"
 

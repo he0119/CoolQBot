@@ -8,7 +8,7 @@ import random
 import time
 from datetime import timedelta
 from inspect import cleandoc
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlencode
 
 import httpx

@@ -8,7 +8,8 @@ from .data_source import get_status
 __plugin_meta__ = PluginMetadata(
     name="状态",
     description="查看机器人状态",
-    usage="获取当前的机器人状态\n/status",
+    usage="""获取当前的机器人状态
+/status""",
 )
 status_cmd = repeat.command("status", aliases={"status", "状态"})
 

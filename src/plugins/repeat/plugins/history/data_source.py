@@ -2,7 +2,6 @@
 """
 from calendar import monthrange
 from datetime import datetime
-from typing import Tuple
 
 from nonebot.adapters.onebot.v11 import Bot
 

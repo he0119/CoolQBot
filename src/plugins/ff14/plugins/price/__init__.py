@@ -10,7 +10,14 @@ from .data_source import get_item_price
 __plugin_meta__ = PluginMetadata(
     name="查价",
     description="查询服务器中的价格",
-    usage="查询大区中的最低价格\n/查价 萨维奈舞裙 猫小胖\n查询服务器中的最低价格\n/查价 萨维奈舞裙 静语庄园\n设置默认查询的区域\n/查价 默认值 静语庄园\n查询当前设置的默认值\n/查价 默认值",
+    usage="""查询大区中的最低价格
+/查价 萨维奈舞裙 猫小胖
+查询服务器中的最低价格
+/查价 萨维奈舞裙 静语庄园
+设置默认查询的区域
+/查价 默认值 静语庄园
+查询当前设置的默认值
+/查价 默认值""",
 )
 price_cmd = ff14.command("price", aliases={"查价"})
 
@@ -43,9 +50,6 @@ async def price_handle(event: Event, args: Message = CommandArg()):
         try:
             reply = await get_item_price(name, world_or_dc)
         except httpx.HTTPError:
-            reply = "抱歉，网络出错，请稍后再试。"
+            reply = "抱歉，网络出错，无法获取物品价格，请稍后再试。"
 
         await price_cmd.finish(reply)
-
-
-# endregion

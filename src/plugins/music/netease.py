@@ -2,7 +2,6 @@
 
 https://github.com/Binaryify/NeteaseCloudMusicApi
 """
-from typing import Optional
 
 import httpx
 from nonebot.adapters.onebot.v11 import MessageSegment

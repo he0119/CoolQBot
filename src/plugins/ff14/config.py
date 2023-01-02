@@ -1,6 +1,5 @@
 """ 配置文件
 """
-from typing import List
 
 from nonebot_plugin_datastore import PluginData
 from pydantic import BaseSettings, validator

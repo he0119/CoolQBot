@@ -2,7 +2,6 @@
 
 副本与职业数据
 """
-from typing import Optional
 
 from pydantic import BaseModel
 

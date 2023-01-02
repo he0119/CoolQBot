@@ -4,7 +4,6 @@
 如果遇到老版本数据，则自动升级
 """
 from datetime import datetime, timedelta
-from typing import Dict
 
 from nonebot.log import logger
 

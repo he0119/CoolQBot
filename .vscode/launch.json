@@ -11,6 +11,7 @@
       "program": "${workspaceFolder}/bot.py",
       "console": "integratedTerminal",
       "justMyCode": false,
+      "envFile": "${workspaceFolder}/.env.prod"
     },
     {
       "name": "CoolQBot Test",

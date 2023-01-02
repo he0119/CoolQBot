@@ -1,11 +1,10 @@
 from typing import cast
 from unittest.mock import AsyncMock
 
-import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event, fake_qqguild_message_event
+from tests.fake import fake_channel_message_event, fake_group_message_event
 
 
 async def test_dps_missing_token(app: App):
@@ -176,7 +175,7 @@ async def test_dps_at_user_qqguild(app: App, mocker: MockerFixture):
     from nonebot import require
 
     require("src.plugins.ff14")
-    from nonebot.adapters.qqguild import Message, MessageSegment
+    from nonebot.adapters.onebot.v12 import Message, MessageSegment
 
     from src.plugins.ff14.plugins.fflogs import fflogs, fflogs_cmd, plugin_config
 
@@ -185,14 +184,14 @@ async def test_dps_at_user_qqguild(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_qqguild_message_event(
-            _message=Message("/dps" + MessageSegment.mention_user(10000))
+        event = fake_channel_message_event(
+            message=Message("/dps" + MessageSegment.mention("10000"))
         )
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            MessageSegment.mention_user(10000) + "当前绑定的角色：\n角色：name\n服务器：server",
+            MessageSegment.mention("10000") + "当前绑定的角色：\n角色：name\n服务器：server",
             "",
         )
         ctx.should_finished()
@@ -207,8 +206,8 @@ async def test_dps_at_user_qqguild(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_qqguild_message_event(
-            _message=Message("/dps e1s" + MessageSegment.mention_user(10000))
+        event = fake_channel_message_event(
+            message=Message("/dps e1s" + MessageSegment.mention("10000"))
         )
 
         ctx.receive_event(bot, event)

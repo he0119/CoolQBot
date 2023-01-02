@@ -1,7 +1,5 @@
 """ 天气插件
 """
-from typing import Optional
-
 from nonebot import on_command
 from nonebot.adapters import Message
 from nonebot.matcher import Matcher
@@ -14,7 +12,16 @@ from .heweather_api import heweather
 __plugin_meta__ = PluginMetadata(
     name="天气",
     description="查询天气预报（包括艾欧泽亚）",
-    usage="查询天气\n/weather 成都\n也支持英文\n/weather chengdu\n还支持外国\n/weather Tokyo\n甚至支持最终幻想XIV\n/weather 格里达尼亚\n如果查询结果不对，还可以指定城市所属行政区划\n/weather 西安 黑龙江",
+    usage="""查询天气
+/weather 成都
+也支持英文
+/weather chengdu
+还支持外国
+/weather Tokyo
+甚至支持最终幻想XIV
+/weather 格里达尼亚
+如果查询结果不对，还可以指定城市所属行政区划
+/weather 西安 黑龙江""",
 )
 
 weather_cmd = on_command("weather", aliases={"天气"})

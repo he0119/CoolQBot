@@ -1,6 +1,5 @@
 """ ROLL 点 """
 import re
-from typing import Union
 
 from nonebot import on_command
 from nonebot.adapters import Message
@@ -13,7 +12,10 @@ from .data_source import roll_dices
 __plugin_meta__ = PluginMetadata(
     name="ROLL 点",
     description="NGA 风格 ROLL 点",
-    usage="roll 一次点数100\n/roll d100\nroll 两次点数100和两次点数50\n/roll 2d100+2d50",
+    usage="""roll 一次点数100
+/roll d100
+roll 两次点数100和两次点数50
+/roll 2d100+2d50""",
 )
 
 roll_cmd = on_command("roll")

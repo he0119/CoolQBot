@@ -2,15 +2,12 @@
 
 查询副本输出数据。
 """
-from dataclasses import dataclass
-from typing import Any
+from typing import cast
 
 from nonebot.adapters import Event, Message, MessageSegment
 from nonebot.adapters.onebot.v11 import Message as OneBotV11Message
-from nonebot.adapters.onebot.v11 import MessageSegment as OneBotV11MessageSegment
-from nonebot.adapters.qqguild import Message as QQGuildMessage
-from nonebot.adapters.qqguild import MessageSegment as QQGuildMessageSegment
-from nonebot.params import CommandArg
+from nonebot.adapters.onebot.v12 import Message as OneBotV12Message
+from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata
 
 from src.utils.helpers import strtobool
@@ -22,41 +19,56 @@ from .fflogs_data import FFLOGS_DATA
 __plugin_meta__ = PluginMetadata(
     name="FFLogs",
     description="副本输出查询",
-    usage="更新副本数据\n/dps update\n\n查询输出排行榜：\n/dps 副本名 职业 DPS种类（支持 rdps adps pdps，留空默认为 rdps）\n查询指定角色的排名：\n/dps 副本名 角色名 服务器名\n也可直接查询自己绑定角色的排名：\n/dps 副本名 me\n或查询他人绑定的角色排名\n/dps 副本名 @他人\n查询当前QQ号绑定的角色\n/dps me\n绑定自己的角色\n/dps me 角色名 服务器名\n查询他人绑定的角色\n/dps @他人",
+    usage="""更新副本数据
+/dps update
+
+查询输出排行榜：
+/dps 副本名 职业 DPS种类（支持 rdps adps pdps，留空默认为 rdps）
+查询指定角色的排名：
+/dps 副本名 角色名 服务器名
+也可直接查询自己绑定角色的排名：
+/dps 副本名 me
+或查询他人绑定的角色排名
+/dps 副本名 @他人
+查询当前QQ号绑定的角色
+/dps me
+绑定自己的角色
+/dps me 角色名 服务器名
+查询他人绑定的角色
+/dps @他人""",
 )
 
 fflogs_cmd = ff14.command("dps", aliases={"dps"})
 
 
-@dataclass
-class User:
-    platform: str
-    user_id: str
-
-    def at(self) -> MessageSegment:
-        if self.platform == "qq":
-            return OneBotV11MessageSegment.at(self.user_id)
-        return QQGuildMessageSegment.mention_user(int(self.user_id))
+async def get_user(
+    args: Message = CommandArg(),
+) -> tuple[str, MessageSegment] | None:
+    """获取提到的用户信息"""
+    if isinstance(args, OneBotV11Message) and (at := args["at"]):
+        at = at[0]
+        at = cast(MessageSegment, at)
+        return at.data["qq"], at
+    if isinstance(args, OneBotV12Message) and (mention := args["mention"]):
+        mention = mention[0]
+        mention = cast(MessageSegment, mention)
+        return mention.data["user_id"], mention
 
 
 @fflogs_cmd.handle()
-async def fflogs_handle(event: Event, args: Message = CommandArg()):
-    argv: list[Any] = args.extract_plain_text().split()
+async def fflogs_handle(
+    event: Event,
+    args: Message = CommandArg(),
+    at_user: tuple[str, MessageSegment] | None = Depends(get_user),
+):
+    user_id = event.get_user_id()
 
-    at_message = None
-    if isinstance(args, OneBotV11Message):
-        at_message = args["at"]
-        if at_message:
-            argv.append(User("qq", at_message[0].data["qq"]))
-    elif isinstance(args, QQGuildMessage):
-        at_message = args["mention_user"]
-        if at_message:
-            argv.append(User("qqguild", at_message[0].data["user_id"]))
+    argv: list[str | MessageSegment] = list(args.extract_plain_text().split())
+    if at_user:
+        argv.append(at_user[1])
 
     if not argv:
         await fflogs_cmd.finish(f"{__plugin_meta__.name}\n\n{__plugin_meta__.usage}")
-
-    user_id = event.get_user_id()
 
     # 设置 Token
     if argv[0] == "token" and len(argv) == 2:
@@ -64,7 +76,7 @@ async def fflogs_handle(event: Event, args: Message = CommandArg()):
         if user_id not in global_config.superusers:
             await fflogs_cmd.finish("抱歉，你没有权限修改 Token。")
 
-        plugin_config.fflogs_token = argv[1]
+        plugin_config.fflogs_token = str(argv[1])
         await fflogs_cmd.finish("Token 设置完成。")
 
     # 检查 Token 是否设置
@@ -96,7 +108,7 @@ async def fflogs_handle(event: Event, args: Message = CommandArg()):
             # 检查是否是超级用户
             if user_id not in global_config.superusers:
                 await fflogs_cmd.finish("抱歉，你没有权限设置缓存。")
-            if strtobool(argv[1]):
+            if strtobool(str(argv[1])):
                 if not fflogs.is_cache_enabled:
                     fflogs.enable_cache()
                 await fflogs_cmd.finish("已开始定时缓存。")
@@ -108,7 +120,7 @@ async def fflogs_handle(event: Event, args: Message = CommandArg()):
             if argv[1] == "add":
                 if not plugin_config.fflogs_cache_boss:
                     plugin_config.fflogs_cache_boss = []
-                plugin_config.fflogs_cache_boss.append(argv[2])
+                plugin_config.fflogs_cache_boss.append(str(argv[2]))
                 # 触发 validator
                 plugin_config.fflogs_cache_boss = plugin_config.fflogs_cache_boss
                 await fflogs_cmd.finish(f"已添加副本 {argv[2]}。")
@@ -128,24 +140,26 @@ async def fflogs_handle(event: Event, args: Message = CommandArg()):
     if argv[0] == "me" and len(argv) == 1:
         if user_id not in fflogs.characters:
             await fflogs_cmd.finish(
-                "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。"
+                "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。",
+                at_sender=True,
             )
         await fflogs_cmd.finish(
-            f"你当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}"
+            f"你当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}",
+            at_sender=True,
         )
 
-    if isinstance(argv[0], User) and len(argv) == 1:
-        user_id = argv[0].user_id
+    if isinstance(argv[0], MessageSegment) and at_user and len(argv) == 1:
+        user_id = at_user[0]
         if user_id not in fflogs.characters:
-            await fflogs_cmd.finish("抱歉，该用户没有绑定最终幻想14的角色。")
+            await fflogs_cmd.finish("抱歉，该用户没有绑定最终幻想14的角色。", at_sender=True)
         await fflogs_cmd.finish(
-            argv[0].at()
+            at_user[1]
             + f"当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}"
         )
 
     if argv[0] == "me" and len(argv) == 3:
-        fflogs.set_character(user_id, argv[1], argv[2])
-        await fflogs_cmd.finish("角色绑定成功！")
+        fflogs.set_character(user_id, str(argv[1]), str(argv[2]))
+        await fflogs_cmd.finish("角色绑定成功！", at_sender=True)
 
     if argv[0] == "classes" and len(argv) == 1:
         data = await fflogs.classes()
@@ -161,11 +175,18 @@ async def fflogs_handle(event: Event, args: Message = CommandArg()):
         # <BOSS名> me
         # <BOSS名> <@他人>
         # <BOSS名> <职业名>
-        if not isinstance(argv[0], User) and isinstance(argv[1], User):
+        if (
+            not isinstance(argv[0], MessageSegment)
+            and isinstance(argv[1], MessageSegment)
+            and at_user
+        ):
             # @他人的格式
-            user_id = argv[1].user_id
-            data = await get_character_dps_by_user_id(argv[0], user_id)
-        elif not isinstance(argv[0], User) and argv[1].lower() == "me":
+            data = await get_character_dps_by_user_id(argv[0], at_user[0])
+        elif (
+            not isinstance(argv[0], MessageSegment)
+            and isinstance(argv[1], str)
+            and argv[1].lower() == "me"
+        ):
             data = await get_character_dps_by_user_id(argv[0], user_id)
         else:
             data = await fflogs.dps(*argv)  # type:ignore
@@ -174,7 +195,7 @@ async def fflogs_handle(event: Event, args: Message = CommandArg()):
     if len(argv) == 3:
         # <BOSS名> <职业名> <DPS种类>
         # <BOSS名> <角色名> <服务器名>
-        argv[2] = argv[2].lower()
+        argv[2] = str(argv[2]).lower()
         if argv[2] in ["adps", "rdps", "pdps"]:
             data = await fflogs.dps(*argv)  # type:ignore
         else:
@@ -192,6 +213,3 @@ async def get_character_dps_by_user_id(boss_nickname: str, user_id: str):
         boss_nickname,
         *fflogs.characters[user_id],
     )
-
-
-# endregion
