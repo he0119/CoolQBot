@@ -10,7 +10,7 @@ from nonebot.permission import SUPERUSER, USER
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
-from src.utils.helpers import get_nikcname
+from src.utils.helpers import MentionedUser, get_mentioned_user, get_nickname
 
 from .data_source import Hospital
 
@@ -44,13 +44,6 @@ hospital = CommandGroup("hospital", permission=GROUP_OWNER | GROUP_ADMIN | SUPER
 rounds_cmd = hospital.command("rounds", aliases={"查房", "赛博查房"})
 
 
-async def get_user_id(args: Message = CommandArg()) -> str | None:
-    if at_message := args["at"]:
-        at_message = at_message[0]
-        at_message = cast(MessageSegment, at_message)
-        return at_message.data["qq"]
-
-
 async def get_content(args: Message = CommandArg()) -> Message | None:
     if content := args["text"]:
         if content.extract_plain_text().strip():
@@ -69,16 +62,16 @@ async def _(
     bot: Bot,
     event: GroupMessageEvent,
     state: T_State,
-    user_id: str | None = Depends(get_user_id),
+    mentioned_user: MentionedUser | None = Depends(get_mentioned_user),
     content: Message | None = Depends(get_content),
 ):
     group_id = str(event.group_id)
 
-    if user_id:
+    if mentioned_user:
         if content:
             state["content"] = content
-        state["at"] = MessageSegment.at(user_id)
-        state["user_id"] = user_id
+        state["at"] = mentioned_user.segment
+        state["user_id"] = mentioned_user.id
         state["group_id"] = group_id
         patient = await hospital_service.get_admitted_patient(
             state["user_id"], state["group_id"]
@@ -92,7 +85,7 @@ async def _(
 
         patient_infos = []
         for patient in patients:
-            nikcname = await get_nikcname(int(patient.user_id), event.group_id, bot)
+            nikcname = await get_nickname(bot, patient.user_id, patient.group_id)
             patient_info = f"{nikcname} 入院时间：{patient.admitted_at:%Y-%m-%d %H:%M}"
             latest_record = patient.records[-1] if patient.records else None
             if latest_record:
@@ -117,48 +110,59 @@ admit_cmd = hospital.command("admit", aliases={"入院", "赛博入院"})
 
 
 @admit_cmd.handle()
-async def _(event: GroupMessageEvent, user_id: str | None = Depends(get_user_id)):
-    if not user_id:
+async def _(
+    event: GroupMessageEvent,
+    mentioned_user: MentionedUser | None = Depends(get_mentioned_user),
+):
+    if not mentioned_user:
         await admit_cmd.finish("请 @ 需要入院的病人")
 
     try:
-        await hospital_service.admit_patient(user_id, str(event.group_id))
-        await admit_cmd.finish(MessageSegment.at(user_id) + "入院成功")
+        await hospital_service.admit_patient(mentioned_user.id, str(event.group_id))
+        await admit_cmd.finish(mentioned_user.segment + "入院成功")
     except ValueError:
-        await admit_cmd.finish(MessageSegment.at(user_id) + "已入院")
+        await admit_cmd.finish(mentioned_user.segment + "已入院")
 
 
 discharge_cmd = hospital.command("discharge", aliases={"出院", "赛博出院"})
 
 
 @discharge_cmd.handle()
-async def _(event: GroupMessageEvent, user_id: str | None = Depends(get_user_id)):
-    if not user_id:
+async def _(
+    event: GroupMessageEvent,
+    mentioned_user: MentionedUser | None = Depends(get_mentioned_user),
+):
+    if not mentioned_user:
         await discharge_cmd.finish("请 @ 需要出院的病人")
 
     try:
-        await hospital_service.discharge_patient(user_id, str(event.group_id))
-        await discharge_cmd.finish(MessageSegment.at(user_id) + "出院成功")
+        await hospital_service.discharge_patient(mentioned_user.id, str(event.group_id))
+        await discharge_cmd.finish(mentioned_user.segment + "出院成功")
     except ValueError:
-        await discharge_cmd.finish(MessageSegment.at(user_id) + "未入院")
+        await discharge_cmd.finish(mentioned_user.segment + "未入院")
 
 
 record_cmd = hospital.command("record", aliases={"病历", "赛博病历"})
 
 
 @record_cmd.handle()
-async def _(event: GroupMessageEvent, user_id: str | None = Depends(get_user_id)):
-    if not user_id:
+async def _(
+    event: GroupMessageEvent,
+    mentioned_user: MentionedUser | None = Depends(get_mentioned_user),
+):
+    if not mentioned_user:
         await discharge_cmd.finish("请 @ 需要查看记录的病人")
 
     try:
-        records = await hospital_service.get_records(user_id, str(event.group_id))
+        records = await hospital_service.get_records(
+            mentioned_user.id, str(event.group_id)
+        )
     except ValueError:
-        await record_cmd.finish(MessageSegment.at(user_id) + "未入院")
+        await record_cmd.finish(mentioned_user.segment + "未入院")
     if not records:
-        await record_cmd.finish(MessageSegment.at(user_id) + "暂时没有记录")
+        await record_cmd.finish(mentioned_user.segment + "暂时没有记录")
 
-    msg = MessageSegment.at(user_id) + "\n"
+    msg = mentioned_user.segment + "\n"
     await record_cmd.finish(
         msg
         + "\n".join(
@@ -172,22 +176,30 @@ history_cmd = hospital.command("history", aliases={"入院记录", "赛博入院
 
 @history_cmd.handle()
 async def _(
-    bot: Bot, event: GroupMessageEvent, user_id: str | None = Depends(get_user_id)
+    bot: Bot,
+    event: GroupMessageEvent,
+    mentioned_user: MentionedUser | None = Depends(get_mentioned_user),
 ):
-    if not user_id:
+    if not mentioned_user:
         patients = await hospital_service.patient_count(str(event.group_id))
         if not patients:
             await history_cmd.finish("没有住院病人")
 
         patient_infos = []
         for user_id, count in patients:
-            nikcname = await get_nikcname(int(user_id), event.group_id, bot)
+            nikcname = await get_nickname(
+                bot,
+                user_id,
+                str(event.group_id),
+            )
             patient_infos.append(f"{nikcname} 入院次数：{count}")
         await history_cmd.finish("\n".join(patient_infos))
 
-    patients = await hospital_service.get_patient(user_id, str(event.group_id))
+    patients = await hospital_service.get_patient(
+        mentioned_user.id, str(event.group_id)
+    )
     if not patients:
-        await history_cmd.finish(MessageSegment.at(user_id) + "从未入院")
+        await history_cmd.finish(mentioned_user.segment + "从未入院")
 
     patient_info = []
     for patient in patients:
@@ -198,4 +210,4 @@ async def _(
             info += " 出院时间：未出院"
         patient_info.append(info)
 
-    await history_cmd.finish(MessageSegment.at(user_id) + "\n".join(patient_info))
+    await history_cmd.finish(mentioned_user.segment + "\n".join(patient_info))

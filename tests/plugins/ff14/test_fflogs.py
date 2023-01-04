@@ -170,8 +170,8 @@ async def test_dps_at_user(app: App, mocker: MockerFixture):
     mock.assert_awaited_once_with("e1s", "10000")
 
 
-async def test_dps_at_user_qqguild(app: App, mocker: MockerFixture):
-    """测试 FFLOGS，测试 @ 用户的情况，QQ频道"""
+async def test_dps_at_user_channel(app: App, mocker: MockerFixture):
+    """测试 FFLOGS，测试 @ 用户的情况，onebot v12 频道"""
     from nonebot import require
 
     require("src.plugins.ff14")
