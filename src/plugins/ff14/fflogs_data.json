@@ -1,6 +1,132 @@
 {
-  "version": "6.05",
+  "version": "6.2",
   "boss": [
+    {
+      "name": "究极神兵幻巧战",
+      "nicknames": [
+        "幻神兵"
+      ],
+      "zone": 46,
+      "encounter": 3004,
+      "difficulty": 100
+    },
+    {
+      "name": "萨菲洛特幻巧战",
+      "nicknames": [
+        "幻魔神"
+      ],
+      "zone": 46,
+      "encounter": 3005,
+      "difficulty": 100
+    },
+    {
+      "name": "终极之战",
+      "nicknames": [
+        "极小鸟"
+      ],
+      "zone": 42,
+      "encounter": 1063,
+      "difficulty": 100
+    },
+    {
+      "name": "巴尔巴莉希娅歼殛战",
+      "nicknames": [
+        "极巴"
+      ],
+      "zone": 50,
+      "encounter": 1066,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 炼净之狱1",
+      "nicknames": [
+        "p5"
+      ],
+      "zone": 49,
+      "encounter": 83,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 炼净之狱2",
+      "nicknames": [
+        "p6"
+      ],
+      "zone": 49,
+      "encounter": 84,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 炼净之狱3",
+      "nicknames": [
+        "p7"
+      ],
+      "zone": 49,
+      "encounter": 85,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 炼净之狱4（门神）",
+      "nicknames": [
+        "p8门神"
+      ],
+      "zone": 49,
+      "encounter": 86,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 炼净之狱4",
+      "nicknames": [
+        "p8"
+      ],
+      "zone": 49,
+      "encounter": 87,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 炼净之狱1",
+      "nicknames": [
+        "p5s"
+      ],
+      "zone": 49,
+      "encounter": 83,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 炼净之狱2",
+      "nicknames": [
+        "p6s"
+      ],
+      "zone": 49,
+      "encounter": 84,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 炼净之狱3",
+      "nicknames": [
+        "p7s"
+      ],
+      "zone": 49,
+      "encounter": 85,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 炼净之狱4（门神）",
+      "nicknames": [
+        "p8s门神"
+      ],
+      "zone": 49,
+      "encounter": 86,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 炼净之狱4",
+      "nicknames": [
+        "p8s"
+      ],
+      "zone": 49,
+      "encounter": 87,
+      "difficulty": 0
+    },
     {
       "name": "佐迪亚克暝暗歼灭战",
       "nicknames": [
