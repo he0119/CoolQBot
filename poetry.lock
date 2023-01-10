@@ -1451,6 +1451,23 @@ nonebot2 = {version = ">=2.0.0-rc.1,<3.0.0", extras = ["httpx"]}
 sqlmodel = ">=0.0.8,<0.1.0"
 
 [[package]]
+name = "nonebot-plugin-gscode"
+version = "0.1.5"
+description = "Genshin live codes plugin for NoneBot2"
+category = "main"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "nonebot_plugin_gscode-0.1.5-py3-none-any.whl", hash = "sha256:d2a71375df4736878a560707a45a8bf430ba46d094491060653cbd35c99d1c96"},
+    {file = "nonebot_plugin_gscode-0.1.5.tar.gz", hash = "sha256:3b65c7560284a345ff146c6c594ba8fd127198ba9c696a925c1e10886ad117c0"},
+]
+
+[package.dependencies]
+httpx = ">=0.20.0,<1.0.0"
+nonebot-adapter-onebot = ">=2.0.0b1"
+nonebot2 = ">=2.0.0a16"
+
+[[package]]
 name = "nonebot-plugin-htmlrender"
 version = "0.2.0.1"
 description = "通过浏览器渲染图片"
@@ -3087,4 +3104,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "4aa40c7116393cd53a63363a2cb176a583523d6faec78b7b1ff66082f8ab7800"
+content-hash = "afc2238400deb5600641ab3e46ab6edb1c21b13a8b15dd897def629bccbb5f83"
