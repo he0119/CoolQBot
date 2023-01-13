@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 适配 NoneBot2(beta1)
 - 将 FFlogs 缓存数据存放至缓存目录
 - 直接使用 nonebot-bison 0.5.2 版本
+- 利用 eorzeaenv 计算艾欧泽亚天气
 
 ### Removed
 
