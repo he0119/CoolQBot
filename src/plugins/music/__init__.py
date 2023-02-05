@@ -18,6 +18,9 @@ __plugin_meta__ = PluginMetadata(
 如果仅凭歌曲名称无法获得正确歌曲时
 可以尝试在后面加上歌手名称或其他信息
 /music Sagitta luminis 梶浦由記""",
+    extra={
+        "adapters": ["OneBot V11"],
+    },
 )
 
 

@@ -23,6 +23,9 @@ __plugin_meta__ = PluginMetadata(
 /hello on
 关闭启动问候功能
 /hello off""",
+    extra={
+        "adapters": ["OneBot V11"],
+    },
 )
 
 driver = nonebot.get_driver()
