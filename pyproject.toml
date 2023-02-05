@@ -27,7 +27,7 @@ eorzeaenv = "^2.2.8"
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
 isort = "^5.10.1"
-nonebug = "^0.2.2"
+nonebug = "^0.2.3"
 pytest-cov = "^4.0.0"
 pytest-mock = "^3.6.1"
 pytest-xdist = "^3.0.2"
