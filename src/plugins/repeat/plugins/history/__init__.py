@@ -23,6 +23,9 @@ __plugin_meta__ = PluginMetadata(
 /history 2020-1
 显示2020年1月1日的数据
 /history 2020-1-1""",
+    extra={
+        "adapters": ["OneBot V11"],
+    },
 )
 
 history_cmd = repeat.command("history", aliases={"history", "历史", "复读历史"})

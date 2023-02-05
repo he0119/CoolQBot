@@ -27,6 +27,9 @@ __plugin_meta__ = PluginMetadata(
 /morning update
 获取今天的问好
 /morning today""",
+    extra={
+        "adapters": ["OneBot V11"],
+    },
 )
 
 

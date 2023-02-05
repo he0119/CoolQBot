@@ -10,6 +10,9 @@ __plugin_meta__ = PluginMetadata(
     description="查看机器人状态",
     usage="""获取当前的机器人状态
 /status""",
+    extra={
+        "adapters": ["OneBot V11"],
+    },
 )
 status_cmd = repeat.command("status", aliases={"status", "状态"})
 

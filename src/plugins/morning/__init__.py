@@ -12,6 +12,9 @@ __plugin_meta__ = PluginMetadata(
     name="问好",
     description="早上好下午好晚上好",
     usage="",
+    extra={
+        "adapters": ["OneBot V11"],
+    },
 )
 
 _sub_plugins = set()

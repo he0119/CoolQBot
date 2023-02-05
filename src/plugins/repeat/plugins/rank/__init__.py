@@ -25,6 +25,9 @@ __plugin_meta__ = PluginMetadata(
 /rank n30
 限制显示的人数
 /rank 3n30""",
+    extra={
+        "adapters": ["OneBot V11"],
+    },
 )
 
 rank_cmd = repeat.command("rank", aliases={"rank", "排行榜"})

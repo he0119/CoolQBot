@@ -22,6 +22,9 @@ __plugin_meta__ = PluginMetadata(
 /repeat on
 关闭复读功能
 /repeat off""",
+    extra={
+        "adapters": ["OneBot V11"],
+    },
 )
 
 # region 自动保存数据

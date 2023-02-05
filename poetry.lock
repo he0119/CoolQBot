@@ -1692,18 +1692,18 @@ sentry-sdk = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "nonebot-plugin-treehelp"
-version = "0.0.1"
+version = "0.0.2"
 description = "适用于 Nonebot2 的树形帮助插件"
 category = "main"
 optional = false
-python-versions = ">=3.7.3,<4.0.0"
+python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot-plugin-treehelp-0.0.1.tar.gz", hash = "sha256:82a3b1fed0f4552991a2edfe54c67ebb0a492a9bc660d0a12ee9bf01f2f84c14"},
-    {file = "nonebot_plugin_treehelp-0.0.1-py3-none-any.whl", hash = "sha256:537b500244e4783c3be7a0185f1521c10469b4930720104c9745a0e5446b78c4"},
+    {file = "nonebot_plugin_treehelp-0.0.2-py3-none-any.whl", hash = "sha256:967ee25ebfa37f960f609400fc669b7fc28f25884d0648bf6bf42dfe0d3eda9f"},
+    {file = "nonebot_plugin_treehelp-0.0.2.tar.gz", hash = "sha256:d90aae78b4d598f71db8cb14bfa1ca12af3da6cddf4be97796ca855745460f17"},
 ]
 
 [package.dependencies]
-nonebot2 = ">=2.0.0-beta.4,<3.0.0"
+nonebot2 = ">=2.0.0-beta.5,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
@@ -3304,4 +3304,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "950619efcdc2ffffb0a1004b00675c1d9c21221094f0b28de0ce514e963a17d0"
+content-hash = "5d4c763b1983c2230344f705aba761d78dcd583e217aae586737efaf2d44e0ea"
