@@ -29,25 +29,25 @@ poetry install
 nb run
 ```
 
-第一次运行之后会在当前文件夹下创建 `data` 文件夹并生成各个插件的默认配置。
+第一次运行之后会在 `nb datastore dir` 命令输出的文件夹下创建文件夹并生成各个插件的默认配置。
 
 请按需进行调整之后重新运行机器人便可使用。
 
 ### Docker
 
-如果你的计算机上安装有 [Docker](https://www.docker.com/get-started) 并且拥有 [Docker Compose](https://docs.docker.com/compose/install/)。
+如果你的计算机上安装有 [Docker](https://www.docker.com/get-started)。
 
 你不需要执行上面的步骤，请直接将仓库中的 `docker-compose.yml` 和 `.env` 文件放置在一个你想存放机器人的文件夹内。
 
 ```shell
 # 然后配置 go-cqhttp，请参考上面的文档
 # 以下是单独运行 go-cqhttp 的命令
-sudo docker run -it --rm -v $PWD/cqhttp:/data pcrbot/gocqhttp:latest
+sudo docker run -it --rm -v $PWD/cqdata:/data ghcr.io/mrs4s/go-cqhttp:latest
 ```
 
-完成 `go-cqhttp` 配置之后在 `docker-compose.yml` 文件所在目录下运行 `sudo docker-compose up -d`，便可启动机器人。
+完成 `go-cqhttp` 配置之后在 `docker-compose.yml` 文件所在目录下运行 `sudo docker compose up -d`，便可启动机器人。
 
-修改完机器人相关配置之后运行 `sudo docker-compose restart` 重启机器人应用配置。
+修改完机器人相关配置之后运行 `sudo docker compose restart` 重启机器人应用配置。
 
 推荐使用 `Docker` 部署，因为机器人的音乐插件依赖于 [netease_cloud_music_api](https://github.com/Binaryify/NeteaseCloudMusicApi)。
 
