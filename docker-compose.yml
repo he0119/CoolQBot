@@ -1,35 +1,43 @@
-version: "3"
 services:
-  # 其他配置参考 https://hub.docker.com/r/tiangolo/uvicorn-gunicorn-fastapi/
   coolqbot:
-    image: he0119/coolqbot:latest
+    image: he0119/coolqbot
     container_name: coolqbot
     restart: always
     volumes:
       - "./data:/app/data"
     ports:
-      - "8080:8080" # 映射端口到宿主机 宿主机端口:容器端口
+      - "8080:8080"
     env_file:
-      - ".env" # fastapi 使用的环境变量文件
+      - ".env"
     environment:
-      - ENVIRONMENT=prod # 配置 nonebot 运行环境，此项会被 .env 文件覆盖
       - APP_MODULE=bot:app # 配置 asgi 入口
       - MAX_WORKERS=1 # 如果你有多个QQ，且存在 self_id 指定，多个 worker 会导致无法找到其他 websocket 连接
-    depends_on:
-      - cqhttp
-      - netease
+
+  cqhttp:
+    image: ghcr.io/mrs4s/go-cqhttp
+    container_name: cqhttp
+    restart: always
+    volumes:
+      - ./cqdata:/data
+  walle-k:
+    image: ghcr.io/he0119/walle-k
+    container_name: walle-k
+    restart: always
+    volumes:
+      - ./walle-k:/data
+  teydacore:
+    image: ghcr.io/he0119/teydacore
+    container_name: teydacore
+    restart: always
+    env_file:
+      - ".env.prod"
+
   netease:
-    image: binaryify/netease_cloud_music_api:latest
+    image: binaryify/netease_cloud_music_api
     container_name: netease
     restart: always
     environment:
       - HOST=0.0.0.0
-  cqhttp:
-    image: ghcr.io/mrs4s/go-cqhttp:master
-    container_name: cqhttp
-    restart: always
-    volumes:
-      - ./cqhttp:/data
   rsshub:
     image: diygod/rsshub
     container_name: rsshub
