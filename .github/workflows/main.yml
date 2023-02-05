@@ -98,9 +98,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script_stop: true
-          script: |
-            cd ${{ secrets.COOLQBOT_ROOT }}
-            sudo ./deploy.sh
+          script: sudo ${{ secrets.COOLQBOT_ROOT }}/deploy.sh
 
   deploy_prod:
     name: Deploy Prod
@@ -117,9 +115,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script_stop: true
-          script: |
-            cd ${{ secrets.COOLQBOT_ROOT }}
-            sudo ./deploy.sh
+          script: sudo ${{ secrets.COOLQBOT_ROOT }}/deploy.sh
 
   sentry_release:
     name: Sentry Release
