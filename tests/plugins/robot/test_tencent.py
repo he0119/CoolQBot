@@ -2,7 +2,7 @@ import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 @pytest.mark.parametrize("app", [("src.plugins.robot",)], indirect=True)
@@ -19,7 +19,7 @@ async def test_tencent(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(robot_message) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("你好"), to_me=True)
+        event = fake_group_message_event_v11(message=Message("你好"), to_me=True)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "test", True)
@@ -41,7 +41,7 @@ async def test_tencent_empty_word(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(robot_message) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message(), to_me=True)
+        event = fake_group_message_event_v11(message=Message(), to_me=True)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "test", True)

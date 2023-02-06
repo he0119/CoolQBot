@@ -1,8 +1,7 @@
-import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 async def test_gete(app: App, mocker: MockerFixture):
@@ -24,7 +23,7 @@ async def test_gete(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(gate_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/gate 2"))
+        event = fake_group_message_event_v11(message=Message("/gate 2"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, Message("test"), "result", at_sender=True)
@@ -53,8 +52,8 @@ async def test_gete_ask_arg(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(gate_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/gate"))
-        next_event = fake_group_message_event(message=Message("2"))
+        event = fake_group_message_event_v11(message=Message("/gate"))
+        next_event = fake_group_message_event_v11(message=Message("2"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "总共有多少个门呢？", "result")
@@ -85,9 +84,9 @@ async def test_gete_ask_arg_error(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(gate_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/gate"))
-        next_event = fake_group_message_event(message=Message("4"))
-        final_event = fake_group_message_event(message=Message("2"))
+        event = fake_group_message_event_v11(message=Message("/gate"))
+        next_event = fake_group_message_event_v11(message=Message("4"))
+        final_event = fake_group_message_event_v11(message=Message("2"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "总共有多少个门呢？", "result")

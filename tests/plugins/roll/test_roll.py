@@ -2,7 +2,7 @@ import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 async def test_roll(app: App, mocker: MockerFixture):
@@ -18,7 +18,7 @@ async def test_roll(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(roll_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/roll d100"))
+        event = fake_group_message_event_v11(message=Message("/roll d100"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "d100=d100(1)=1", "result", at_sender=True)
@@ -40,8 +40,8 @@ async def test_roll_get_arg(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(roll_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/roll"))
-        next_event = fake_group_message_event(message=Message("d100"))
+        event = fake_group_message_event_v11(message=Message("/roll"))
+        next_event = fake_group_message_event_v11(message=Message("d100"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -70,7 +70,7 @@ async def test_roll_invalid(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(roll_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/roll d100a"))
+        event = fake_group_message_event_v11(message=Message("/roll d100a"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "请输入正确的参数 ~>_<~", "result")
@@ -92,7 +92,7 @@ async def test_roll_complex(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(roll_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/roll d100+2d50"))
+        event = fake_group_message_event_v11(message=Message("/roll d100+2d50"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(

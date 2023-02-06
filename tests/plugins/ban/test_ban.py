@@ -2,7 +2,7 @@ import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 @pytest.mark.parametrize(
@@ -32,7 +32,7 @@ async def test_ban_group_bot_is_owner(
 
     async with app.test_matcher(ban_cmd) as ctx:
         bot = ctx.create_bot(base=Bot, self_id="1")
-        event = fake_group_message_event(message=Message("/ban 1"), sender=sender)
+        event = fake_group_message_event_v11(message=Message("/ban 1"), sender=sender)
 
         ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
@@ -80,7 +80,7 @@ async def test_ban_group_bot_is_admin(
 
     async with app.test_matcher(ban_cmd) as ctx:
         bot = ctx.create_bot(base=Bot, self_id="1")
-        event = fake_group_message_event(message=Message("/ban 1"), sender=sender)
+        event = fake_group_message_event_v11(message=Message("/ban 1"), sender=sender)
 
         ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
@@ -148,7 +148,7 @@ async def test_ban_group_bot_is_member(
 
     async with app.test_matcher(ban_cmd) as ctx:
         bot = ctx.create_bot(base=Bot, self_id="1")
-        event = fake_group_message_event(message=Message("/ban 1"), sender=sender)
+        event = fake_group_message_event_v11(message=Message("/ban 1"), sender=sender)
 
         ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
@@ -206,8 +206,8 @@ async def test_ban_group_get_arg(
 
     async with app.test_matcher(ban_cmd) as ctx:
         bot = ctx.create_bot(base=Bot, self_id="1")
-        event = fake_group_message_event(message=Message("/ban"), sender=sender)
-        next_event = fake_group_message_event(message=Message("1"), sender=sender)
+        event = fake_group_message_event_v11(message=Message("/ban"), sender=sender)
+        next_event = fake_group_message_event_v11(message=Message("1"), sender=sender)
 
         ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
@@ -247,9 +247,9 @@ async def test_ban_group_get_arg_invalid(
 
     async with app.test_matcher(ban_cmd) as ctx:
         bot = ctx.create_bot(base=Bot, self_id="1")
-        event = fake_group_message_event(message=Message("/ban"), sender=sender)
-        next_event = fake_group_message_event(message=Message("a"), sender=sender)
-        final_event = fake_group_message_event(message=Message("1"), sender=sender)
+        event = fake_group_message_event_v11(message=Message("/ban"), sender=sender)
+        next_event = fake_group_message_event_v11(message=Message("a"), sender=sender)
+        final_event = fake_group_message_event_v11(message=Message("1"), sender=sender)
 
         ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])

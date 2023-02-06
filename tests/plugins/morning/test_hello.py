@@ -1,7 +1,7 @@
 import pytest
 from nonebug import App
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 async def test_hello_enabled(app: App):
@@ -16,7 +16,7 @@ async def test_hello_enabled(app: App):
 
     async with app.test_matcher(hello_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/hello"))
+        event = fake_group_message_event_v11(message=Message("/hello"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "启动问候功能开启中", "result")
@@ -33,7 +33,7 @@ async def test_hello_not_enabled(app: App):
 
     async with app.test_matcher(hello_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/hello"))
+        event = fake_group_message_event_v11(message=Message("/hello"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "启动问候功能关闭中", "result")
@@ -52,7 +52,7 @@ async def test_hello_enable(app: App):
 
     async with app.test_matcher(hello_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/hello 1"))
+        event = fake_group_message_event_v11(message=Message("/hello 1"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群开启启动问候功能", "result")
@@ -75,7 +75,7 @@ async def test_hello_disable(app: App):
 
     async with app.test_matcher(hello_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/hello 0"))
+        event = fake_group_message_event_v11(message=Message("/hello 0"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭启动问候功能", "result")

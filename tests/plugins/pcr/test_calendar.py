@@ -6,7 +6,7 @@ import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 def mocked_get(url: str):
@@ -41,7 +41,7 @@ async def test_calendar(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(calendar_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/公主连结日程表"))
+        event = fake_group_message_event_v11(message=Message("/公主连结日程表"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(

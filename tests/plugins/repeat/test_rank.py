@@ -1,7 +1,7 @@
 import pytest
 from nonebug import App
 
-from tests.fake import fake_group_message_event, fake_private_message_event
+from tests.fake import fake_group_message_event_v11, fake_private_message_event_v11
 
 
 async def test_rank(app: App):
@@ -19,7 +19,7 @@ async def test_rank(app: App):
 
     async with app.test_matcher(rank_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(message=Message("/rank"))
+        event = fake_group_message_event_v11(message=Message("/rank"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_api(
@@ -48,7 +48,7 @@ async def test_rank_limit(app: App):
 
     async with app.test_matcher(rank_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(message=Message("/rank n0"))
+        event = fake_group_message_event_v11(message=Message("/rank n0"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_api(
@@ -79,8 +79,8 @@ async def test_rank_private(app: App):
 
     async with app.test_matcher(rank_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_private_message_event(message=Message("/rank"))
-        next_event = fake_private_message_event(message=Message("10000"))
+        event = fake_private_message_event_v11(message=Message("/rank"))
+        next_event = fake_private_message_event_v11(message=Message("10000"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "请问你想查询哪个群？", True)
@@ -106,7 +106,7 @@ async def test_rank_not_enabled(app: App):
 
     async with app.test_matcher(rank_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(message=Message("/rank"))
+        event = fake_group_message_event_v11(message=Message("/rank"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "该群未开启复读功能，无法获取排行榜。", True)

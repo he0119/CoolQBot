@@ -1,16 +1,22 @@
 import random
 from collections.abc import Sequence
 from datetime import timedelta
+from typing import cast
 
-from nonebot.adapters.onebot.v11 import Bot, Message
+from nonebot.adapters import Bot, Message, MessageSegment
+from nonebot.adapters.onebot.v11 import Bot as OneBotV11Bot
+from nonebot.adapters.onebot.v11 import Message as OneBotV11Message
+from nonebot.adapters.onebot.v12 import Bot as OneBotV12Bot
+from nonebot.adapters.onebot.v12 import Message as OneBotV12Message
 from nonebot.matcher import Matcher
-from nonebot.params import Arg
+from nonebot.params import Arg, CommandArg
 from nonebot.typing import T_State
+from pydantic import BaseModel
 
 from .typing import Expression_T  # type: ignore
 
 
-def render_expression(expr: Expression_T, *args, **kwargs) -> Message:
+def render_expression(expr: Expression_T, *args, **kwargs) -> str:
     """Render an expression to message string.
 
     :param expr: expression to render
@@ -25,7 +31,7 @@ def render_expression(expr: Expression_T, *args, **kwargs) -> Message:
         result = random.choice(expr)
     else:
         result = expr
-    return Message(result.format(*args, **kwargs))
+    return result.format(*args, **kwargs)
 
 
 def strtobool(val: str) -> bool:
@@ -94,14 +100,41 @@ def timedelta_to_chinese(timedelta: timedelta) -> str:
     return time_str
 
 
-async def get_nikcname(user_id: int, group_id: int, bot: Bot):
+async def get_nickname(bot: Bot, user_id: str, group_id: str | None = None):
     """输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称"""
-    try:
-        msg = await bot.get_group_member_info(group_id=group_id, user_id=user_id)
-        if msg["card"]:
-            return msg["card"]
-        return msg["nickname"]
-    except:
+    if isinstance(bot, OneBotV11Bot):
+        if group_id:
+            try:
+                msg = await bot.get_group_member_info(
+                    group_id=int(group_id), user_id=int(user_id)
+                )
+                if msg["card"]:
+                    return msg["card"]
+                return msg["nickname"]
+            except:
+                pass
         # 如果不在群里的话(因为有可能会退群)
-        msg = await bot.get_stranger_info(user_id=user_id)
+        msg = await bot.get_stranger_info(user_id=int(user_id))
         return msg["nickname"]
+    elif isinstance(bot, OneBotV12Bot):
+        user = await bot.get_user_info(user_id=user_id)
+        if user["user_displayname"]:
+            return user["user_displayname"]
+        return user["user_name"]
+
+
+class MentionedUser(BaseModel):
+    id: str
+    segment: MessageSegment
+
+
+async def get_mentioned_user(args: Message = CommandArg()) -> MentionedUser | None:
+    """获取提到的用户信息"""
+    if isinstance(args, OneBotV11Message) and (at := args["at"]):
+        at = at[0]
+        at = cast(MessageSegment, at)
+        return MentionedUser(id=at.data["qq"], segment=at)
+    if isinstance(args, OneBotV12Message) and (mention := args["mention"]):
+        mention = mention[0]
+        mention = cast(MessageSegment, mention)
+        return MentionedUser(id=mention.data["user_id"], segment=mention)

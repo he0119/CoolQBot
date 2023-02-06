@@ -2,15 +2,11 @@
 
 查询副本输出数据。
 """
-from typing import cast
-
 from nonebot.adapters import Event, Message, MessageSegment
-from nonebot.adapters.onebot.v11 import Message as OneBotV11Message
-from nonebot.adapters.onebot.v12 import Message as OneBotV12Message
 from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata
 
-from src.utils.helpers import strtobool
+from src.utils.helpers import MentionedUser, get_mentioned_user, strtobool
 
 from ... import ff14, global_config, plugin_config
 from .fflogs_api import fflogs
@@ -44,31 +40,17 @@ __plugin_meta__ = PluginMetadata(
 fflogs_cmd = ff14.command("dps", aliases={"dps"})
 
 
-async def get_user(
-    args: Message = CommandArg(),
-) -> tuple[str, MessageSegment] | None:
-    """获取提到的用户信息"""
-    if isinstance(args, OneBotV11Message) and (at := args["at"]):
-        at = at[0]
-        at = cast(MessageSegment, at)
-        return at.data["qq"], at
-    if isinstance(args, OneBotV12Message) and (mention := args["mention"]):
-        mention = mention[0]
-        mention = cast(MessageSegment, mention)
-        return mention.data["user_id"], mention
-
-
 @fflogs_cmd.handle()
 async def fflogs_handle(
     event: Event,
     args: Message = CommandArg(),
-    at_user: tuple[str, MessageSegment] | None = Depends(get_user),
+    mentioned_user: MentionedUser | None = Depends(get_mentioned_user),
 ):
     user_id = event.get_user_id()
 
     argv: list[str | MessageSegment] = list(args.extract_plain_text().split())
-    if at_user:
-        argv.append(at_user[1])
+    if mentioned_user:
+        argv.append(mentioned_user.segment)
 
     if not argv:
         await fflogs_cmd.finish(f"{__plugin_meta__.name}\n\n{__plugin_meta__.usage}")
@@ -151,12 +133,12 @@ async def fflogs_handle(
             at_sender=True,
         )
 
-    if isinstance(argv[0], MessageSegment) and at_user and len(argv) == 1:
-        user_id = at_user[0]
+    if isinstance(argv[0], MessageSegment) and mentioned_user and len(argv) == 1:
+        user_id = mentioned_user.id
         if user_id not in fflogs.characters:
             await fflogs_cmd.finish("抱歉，该用户没有绑定最终幻想14的角色。", at_sender=True)
         await fflogs_cmd.finish(
-            at_user[1]
+            mentioned_user.segment
             + f"当前绑定的角色：\n角色：{fflogs.characters[user_id][0]}\n服务器：{fflogs.characters[user_id][1]}"
         )
 
@@ -181,10 +163,10 @@ async def fflogs_handle(
         if (
             not isinstance(argv[0], MessageSegment)
             and isinstance(argv[1], MessageSegment)
-            and at_user
+            and mentioned_user
         ):
             # @他人的格式
-            data = await get_character_dps_by_user_id(argv[0], at_user[0])
+            data = await get_character_dps_by_user_id(argv[0], mentioned_user.id)
         elif (
             not isinstance(argv[0], MessageSegment)
             and isinstance(argv[1], str)

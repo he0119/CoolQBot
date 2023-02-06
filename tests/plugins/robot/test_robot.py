@@ -1,7 +1,7 @@
 import pytest
 from nonebug import App
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 async def test_command(app: App):
@@ -17,6 +17,6 @@ async def test_command(app: App):
 
     async with app.test_matcher(robot_message) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("test"))
+        event = fake_group_message_event_v11(message=Message("test"))
 
         ctx.receive_event(bot, event)

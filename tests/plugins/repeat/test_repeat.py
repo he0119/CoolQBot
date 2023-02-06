@@ -4,7 +4,7 @@ import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 async def test_repeat(app: App, mocker: MockerFixture):
@@ -39,7 +39,7 @@ async def test_repeat(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(repeat_message) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("123"))
+        event = fake_group_message_event_v11(message=Message("123"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, event.message, "result")
@@ -63,7 +63,7 @@ async def test_repeat_enabled(app: App):
 
     async with app.test_matcher(repeat_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/repeat"))
+        event = fake_group_message_event_v11(message=Message("/repeat"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "复读功能开启中", "result")
@@ -81,7 +81,7 @@ async def test_repeat_not_enabled(app: App):
 
     async with app.test_matcher(repeat_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/repeat"))
+        event = fake_group_message_event_v11(message=Message("/repeat"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "复读功能关闭中", "result")
@@ -101,7 +101,7 @@ async def test_repeat_enable(app: App):
 
     async with app.test_matcher(repeat_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/repeat 1"))
+        event = fake_group_message_event_v11(message=Message("/repeat 1"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群开启复读功能", "result")
@@ -125,7 +125,7 @@ async def test_repeat_disable(app: App):
 
     async with app.test_matcher(repeat_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/repeat 0"))
+        event = fake_group_message_event_v11(message=Message("/repeat 0"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭复读功能", "result")
