@@ -2,7 +2,7 @@ import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 async def test_rand(app: App, mocker: MockerFixture):
@@ -18,7 +18,7 @@ async def test_rand(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(rand_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/rand"))
+        event = fake_group_message_event_v11(message=Message("/rand"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你的点数是 1", "result", at_sender=True)
@@ -40,7 +40,7 @@ async def test_rand_probability(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(rand_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/rand 今天是晴天的概率"))
+        event = fake_group_message_event_v11(message=Message("/rand 今天是晴天的概率"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "今天是晴天的概率是 1%", "result", at_sender=True)

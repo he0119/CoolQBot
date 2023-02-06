@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import pytest
 from nonebug import App
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 if TYPE_CHECKING:
     from sqlmodel.ext.asyncio.session import AsyncSession
@@ -44,7 +44,7 @@ async def test_history(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/入院记录"), sender={"role": "admin"}
         )
 
@@ -64,7 +64,7 @@ async def test_history(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/入院记录") + MessageSegment.at("123456"),
             sender={"role": "admin"},
         )
@@ -79,7 +79,7 @@ async def test_history(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/入院记录") + MessageSegment.at("1"),
             sender={"role": "admin"},
         )
@@ -102,7 +102,7 @@ async def test_history_empty(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/入院记录"), sender={"role": "admin"}
         )
 

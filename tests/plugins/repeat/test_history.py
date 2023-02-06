@@ -4,7 +4,7 @@ import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 async def test_history(app: App, mocker: MockerFixture):
@@ -30,7 +30,7 @@ async def test_history(app: App, mocker: MockerFixture):
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
 
-        event = fake_group_message_event(message=Message("/history 2020-1-0"))
+        event = fake_group_message_event_v11(message=Message("/history 2020-1-0"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_api(
@@ -71,11 +71,11 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(message=Message("/history"))
+        event = fake_group_message_event_v11(message=Message("/history"))
 
-        year_event = fake_group_message_event(message=Message("2020"))
-        month_event = fake_group_message_event(message=Message("1"))
-        day_event = fake_group_message_event(message=Message("0"))
+        year_event = fake_group_message_event_v11(message=Message("2020"))
+        month_event = fake_group_message_event_v11(message=Message("1"))
+        day_event = fake_group_message_event_v11(message=Message("0"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你请输入你要查询的年份", True)
@@ -116,12 +116,12 @@ async def test_history_get_invalid_args(app: App):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(message=Message("/history"))
+        event = fake_group_message_event_v11(message=Message("/history"))
 
-        year_event = fake_group_message_event(message=Message("2020"))
-        invalid_month_event = fake_group_message_event(message=Message("test"))
-        month_event = fake_group_message_event(message=Message("1"))
-        day_event = fake_group_message_event(message=Message("0"))
+        year_event = fake_group_message_event_v11(message=Message("2020"))
+        invalid_month_event = fake_group_message_event_v11(message=Message("test"))
+        month_event = fake_group_message_event_v11(message=Message("1"))
+        day_event = fake_group_message_event_v11(message=Message("0"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你请输入你要查询的年份", True)
@@ -150,7 +150,7 @@ async def test_history_not_enabled(app: App):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(message=Message("/history 2020-1-0"))
+        event = fake_group_message_event_v11(message=Message("/history 2020-1-0"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "该群未开启复读功能，无法获取历史排行榜。", True)

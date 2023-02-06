@@ -5,7 +5,7 @@ import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 def mocked_get(url: str, **kwargs):
@@ -41,7 +41,7 @@ async def test_music(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(music_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/music test"))
+        event = fake_group_message_event_v11(message=Message("/music test"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.music("163", 1825190456), "result")
@@ -65,11 +65,11 @@ async def test_music_get_arg(
 
     async with app.test_matcher(music_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/music"))
-        next_event = fake_group_message_event(
+        event = fake_group_message_event_v11(message=Message("/music"))
+        next_event = fake_group_message_event_v11(
             message=Message(MessageSegment.image("12"))
         )
-        final_event = fake_group_message_event(message=Message("test"))
+        final_event = fake_group_message_event_v11(message=Message("test"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你想听哪首歌呢？", "result")

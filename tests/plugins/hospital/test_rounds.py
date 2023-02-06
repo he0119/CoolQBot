@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import pytest
 from nonebug import App
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 if TYPE_CHECKING:
     from sqlmodel.ext.asyncio.session import AsyncSession
@@ -19,7 +19,7 @@ async def test_rounds(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(rounds_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/查房"), sender={"role": "admin"}
         )
 
@@ -33,7 +33,7 @@ async def test_rounds(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(rounds_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/查房") + MessageSegment.at(123456), sender={"role": "admin"}
         )
 
@@ -41,14 +41,14 @@ async def test_rounds(app: App, session: "AsyncSession"):
         ctx.should_call_send(event, MessageSegment.at(123456) + "请问你现在有什么不适吗？", True)
         ctx.should_rejected()
 
-        event = fake_group_message_event(message=Message("头疼"), user_id=123456)
+        event = fake_group_message_event_v11(message=Message("头疼"), user_id=123456)
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.at(123456) + "记录成功", True)
         ctx.should_finished()
 
     async with app.test_matcher(rounds_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/查房") + MessageSegment.at(123456) + " ",
             sender={"role": "admin"},
         )
@@ -57,14 +57,14 @@ async def test_rounds(app: App, session: "AsyncSession"):
         ctx.should_call_send(event, MessageSegment.at(123456) + "请问你现在有什么不适吗？", True)
         ctx.should_rejected()
 
-        event = fake_group_message_event(message=Message("头疼"), user_id=123456)
+        event = fake_group_message_event_v11(message=Message("头疼"), user_id=123456)
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.at(123456) + "记录成功", True)
         ctx.should_finished()
 
     async with app.test_matcher(rounds_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/查房") + MessageSegment.at(123456),
             sender={"role": "admin"},
         )
@@ -73,14 +73,14 @@ async def test_rounds(app: App, session: "AsyncSession"):
         ctx.should_call_send(event, MessageSegment.at(123456) + "请问你现在有什么不适吗？", True)
         ctx.should_rejected()
 
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=" " + MessageSegment.at(123456), user_id=123456
         )
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.at(123456) + "症状不能为空，请重新输入", True)
         ctx.should_rejected()
 
-        event = fake_group_message_event(message=Message("头疼"), user_id=123456)
+        event = fake_group_message_event_v11(message=Message("头疼"), user_id=123456)
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.at(123456) + "记录成功", True)
         ctx.should_finished()
@@ -100,7 +100,7 @@ async def test_rounds_with_record(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(rounds_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/查房")
             + MessageSegment.at(123456)
             + MessageSegment.text("咳嗽"),

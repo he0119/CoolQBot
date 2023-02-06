@@ -6,7 +6,7 @@ import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 def mocked_get(url: str, **kwargs):
@@ -45,7 +45,7 @@ async def test_morning_enabled(app: App):
 
     async with app.test_matcher(morning_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/morning"))
+        event = fake_group_message_event_v11(message=Message("/morning"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "每日早安功能开启中", "result")
@@ -62,7 +62,7 @@ async def test_morning_not_enabled(app: App):
 
     async with app.test_matcher(morning_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/morning"))
+        event = fake_group_message_event_v11(message=Message("/morning"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "每日早安功能关闭中", "result")
@@ -81,7 +81,7 @@ async def test_morning_enable(app: App):
 
     async with app.test_matcher(morning_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/morning 1"))
+        event = fake_group_message_event_v11(message=Message("/morning 1"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群开启每日早安功能", "result")
@@ -104,7 +104,7 @@ async def test_morning_disable(app: App):
 
     async with app.test_matcher(morning_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/morning 0"))
+        event = fake_group_message_event_v11(message=Message("/morning 0"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭每日早安功能", "result")
@@ -134,7 +134,7 @@ async def test_morning_today(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(morning_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/morning today"))
+        event = fake_group_message_event_v11(message=Message("/morning today"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(

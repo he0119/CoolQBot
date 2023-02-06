@@ -6,7 +6,7 @@ from nonebug import App
 if TYPE_CHECKING:
     from sqlmodel.ext.asyncio.session import AsyncSession
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 @pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
@@ -19,7 +19,7 @@ async def test_discharge(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(discharge_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/出院"), sender={"role": "admin"}
         )
 
@@ -29,7 +29,7 @@ async def test_discharge(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(discharge_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/出院") + MessageSegment.at(123456), sender={"role": "admin"}
         )
 
@@ -43,7 +43,7 @@ async def test_discharge(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(discharge_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/出院") + MessageSegment.at(123456), sender={"role": "admin"}
         )
 
@@ -53,7 +53,7 @@ async def test_discharge(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(discharge_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/出院") + MessageSegment.at(123456), sender={"role": "admin"}
         )
 

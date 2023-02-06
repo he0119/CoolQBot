@@ -1,11 +1,10 @@
 import json
 from pathlib import Path
 
-import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_group_message_event
+from tests.fake import fake_group_message_event_v11
 
 
 def mocked_get(url: str):
@@ -50,7 +49,7 @@ async def test_price(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(price_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/查价 萨维奈舞裙 猫小胖"))
+        event = fake_group_message_event_v11(message=Message("/查价 萨维奈舞裙 猫小胖"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -81,7 +80,7 @@ async def test_price_default(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(price_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/查价 默认值"))
+        event = fake_group_message_event_v11(message=Message("/查价 默认值"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "当前设置的默认值为：猫小胖", True)
@@ -89,7 +88,7 @@ async def test_price_default(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(price_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/查价 萨维奈舞裙"))
+        event = fake_group_message_event_v11(message=Message("/查价 萨维奈舞裙"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -101,7 +100,7 @@ async def test_price_default(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(price_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/查价 默认值 静语庄园"))
+        event = fake_group_message_event_v11(message=Message("/查价 默认值 静语庄园"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "查询区域默认值设置成功！", True)
@@ -109,7 +108,7 @@ async def test_price_default(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(price_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/查价 默认值"))
+        event = fake_group_message_event_v11(message=Message("/查价 默认值"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "当前设置的默认值为：静语庄园", True)
@@ -136,7 +135,7 @@ async def test_price_item_not_found(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(price_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/查价 未命名 猫小胖"))
+        event = fake_group_message_event_v11(message=Message("/查价 未命名 猫小胖"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -162,7 +161,7 @@ async def test_price_world_not_found(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(price_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/查价 萨维奈舞裙 静语"))
+        event = fake_group_message_event_v11(message=Message("/查价 萨维奈舞裙 静语"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -191,7 +190,7 @@ async def test_price_help(app: App):
 
     async with app.test_matcher(price_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/查价"))
+        event = fake_group_message_event_v11(message=Message("/查价"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(

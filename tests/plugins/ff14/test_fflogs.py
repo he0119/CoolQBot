@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 from nonebug import App
 from pytest_mock import MockerFixture
 
-from tests.fake import fake_channel_message_event, fake_group_message_event
+from tests.fake import fake_channel_message_event_v12, fake_group_message_event_v11
 
 
 async def test_dps_missing_token(app: App):
@@ -18,7 +18,7 @@ async def test_dps_missing_token(app: App):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/dps me"))
+        event = fake_group_message_event_v11(message=Message("/dps me"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -46,7 +46,7 @@ async def test_dps_help(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/dps"))
+        event = fake_group_message_event_v11(message=Message("/dps"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -56,7 +56,7 @@ async def test_dps_help(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/dps test"))
+        event = fake_group_message_event_v11(message=Message("/dps test"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -78,7 +78,7 @@ async def test_dps_cache(app: App):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/dps cache list"))
+        event = fake_group_message_event_v11(message=Message("/dps cache list"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "当前没有缓存副本。", True)
@@ -86,7 +86,7 @@ async def test_dps_cache(app: App):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/dps cache add p1s"))
+        event = fake_group_message_event_v11(message=Message("/dps cache add p1s"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已添加副本 p1s。", True)
@@ -94,7 +94,7 @@ async def test_dps_cache(app: App):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/dps cache list"))
+        event = fake_group_message_event_v11(message=Message("/dps cache list"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "当前缓存的副本有：\np1s", True)
@@ -102,7 +102,7 @@ async def test_dps_cache(app: App):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/dps cache del p2s"))
+        event = fake_group_message_event_v11(message=Message("/dps cache del p2s"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "没有缓存 p2s，无法删除。", True)
@@ -110,7 +110,7 @@ async def test_dps_cache(app: App):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/dps cache del p1s"))
+        event = fake_group_message_event_v11(message=Message("/dps cache del p1s"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已删除副本 p1s。", True)
@@ -118,7 +118,7 @@ async def test_dps_cache(app: App):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(message=Message("/dps cache list"))
+        event = fake_group_message_event_v11(message=Message("/dps cache list"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "当前没有缓存副本。", True)
@@ -139,7 +139,7 @@ async def test_dps_at_user(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/dps" + MessageSegment.at(10000))
         )
 
@@ -159,7 +159,7 @@ async def test_dps_at_user(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_group_message_event(
+        event = fake_group_message_event_v11(
             message=Message("/dps e1s" + MessageSegment.at(10000))
         )
 
@@ -184,7 +184,7 @@ async def test_dps_at_user_channel(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_channel_message_event(
+        event = fake_channel_message_event_v12(
             message=Message("/dps" + MessageSegment.mention("10000"))
         )
 
@@ -206,7 +206,7 @@ async def test_dps_at_user_channel(app: App, mocker: MockerFixture):
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot()
-        event = fake_channel_message_event(
+        event = fake_channel_message_event_v12(
             message=Message("/dps e1s" + MessageSegment.mention("10000"))
         )
 
