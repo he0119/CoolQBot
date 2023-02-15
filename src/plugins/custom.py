@@ -39,7 +39,10 @@ async def send(
     full_message += message
     params.setdefault("message", full_message)
 
-    # 传递 event_id，用来支持频道的被动消息
-    params.setdefault("event_id", event.id)
+    if bot.platform == "qqguild":
+        # 传递 event_id，用来支持频道的被动消息
+        params.setdefault("event_id", event_dict["id"])
+        # 传递 guild_id，以支持私信的被动消息
+        params.setdefault("guild_id", event_dict["guild_id"])
 
     return await bot.send_message(**params)
