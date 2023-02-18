@@ -27,6 +27,7 @@ __plugin_meta__ = PluginMetadata(
     },
 )
 
+
 # region 自动保存数据
 @scheduler.scheduled_job("interval", minutes=1, id="save_recorder")
 async def save_recorder():
