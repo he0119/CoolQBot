@@ -148,12 +148,12 @@ async def fflogs_handle(
 
     if argv[0] == "classes" and len(argv) == 1:
         data = await fflogs.classes()
-        await fflogs_cmd.finish(str(data.dict()["__root__"]))
+        await fflogs_cmd.finish(str(data))
 
     if argv[0] == "zones" and len(argv) == 2:
         data = await fflogs.zones()
         zones = next(filter(lambda x: str(x.id) == argv[1], data))
-        await fflogs_cmd.finish(str(zones.dict()))
+        await fflogs_cmd.finish(str(zones))
 
     # 判断查询排行是指个人还是特定职业
     if len(argv) == 2:
@@ -181,7 +181,7 @@ async def fflogs_handle(
         # <BOSS名> <职业名> <DPS种类>
         # <BOSS名> <角色名> <服务器名>
         argv[2] = str(argv[2]).lower()
-        if argv[2] in ["adps", "rdps", "pdps"]:
+        if argv[2] in ["adps", "rdps", "pdps", "ndps"]:
             data = await fflogs.dps(*argv)  # type:ignore
         else:
             data = await fflogs.character_dps(*argv)  # type:ignore

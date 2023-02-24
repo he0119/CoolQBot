@@ -1,4 +1,28 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+
+class BossInfo(BaseModel):
+    """BOSS 的信息"""
+
+    name: str
+    nicknames: list[str]
+    zone: int
+    encounter: int
+    difficulty: int
+
+
+class JobInfo(BaseModel):
+    """职业的信息"""
+
+    name: str
+    nicknames: list[str]
+    spec: int
+
+
+class FFlogsDataModel(BaseModel):
+    version: str
+    boss: list[BossInfo]
+    job: list[JobInfo]
 
 
 class Encounter(BaseModel):
@@ -30,16 +54,6 @@ class Zones(BaseModel):
     partitions: list[Partition] | None = None
 
 
-class FFLogsZones(BaseModel):
-    __root__: list[Zones]
-
-    def __iter__(self):
-        return iter(self.__root__)
-
-    def __getitem__(self, item):
-        return self.__root__[item]
-
-
 class Spec(BaseModel):
     id: int
     name: str
@@ -51,11 +65,51 @@ class Class(BaseModel):
     specs: list[Spec]
 
 
-class FFLogsClasses(BaseModel):
-    __root__: list[Class]
+class Ranking(BaseModel):
+    name: str
+    class_: int = Field(..., alias="class")
+    spec: int
+    total: float
+    duration: int
+    startTime: int
+    fightID: int
+    reportID: str
+    guildName: str | None
+    serverName: str
+    regionName: str
+    hidden: bool
+    patch: float
+    aDPS: float
+    rDPS: float
+    nDPS: float
+    pDPS: float
+    rank: int
 
-    def __iter__(self):
-        return iter(self.__root__)
 
-    def __getitem__(self, item):
-        return self.__root__[item]
+class FFLogsRanking(BaseModel):
+    page: int
+    hasMorePages: bool
+    count: int
+    rankings: list[Ranking]
+
+
+class CharacterRanking(BaseModel):
+    encounterID: int
+    encounterName: str
+    class_: str = Field(..., alias="class")
+    spec: str
+    rank: int
+    outOf: int
+    duration: int
+    startTime: int
+    reportID: str
+    fightID: int
+    difficulty: int
+    size: int
+    characterID: int
+    characterName: str
+    server: str
+    percentile: float
+    ilvlKeyOrPatch: float
+    total: float
+    estimated: bool
