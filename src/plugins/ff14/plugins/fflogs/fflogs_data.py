@@ -2,34 +2,8 @@
 
 副本与职业数据
 """
-
-from pydantic import BaseModel
-
 from ... import DATA
-
-
-class BossInfo(BaseModel):
-    """BOSS 的信息"""
-
-    name: str
-    nicknames: list[str]
-    zone: int
-    encounter: int
-    difficulty: int
-
-
-class JobInfo(BaseModel):
-    """职业的信息"""
-
-    name: str
-    nicknames: list[str]
-    spec: int
-
-
-class FFlogsDataModel(BaseModel):
-    version: str
-    boss: list[BossInfo]
-    job: list[JobInfo]
+from .fflogs_models import BossInfo, FFlogsDataModel, JobInfo
 
 
 def parse_data(data: dict) -> FFlogsDataModel:

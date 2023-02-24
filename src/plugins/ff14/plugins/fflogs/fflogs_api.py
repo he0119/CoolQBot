@@ -13,6 +13,7 @@ from typing import Literal, cast
 import httpx
 from nonebot.log import logger
 from nonebot_plugin_apscheduler import scheduler
+from pydantic import ValidationError, parse_obj_as
 
 from ... import DATA, plugin_config
 from .fflogs_data import (
@@ -21,7 +22,7 @@ from .fflogs_data import (
     get_boss_info_by_nickname,
     get_job_info_by_nickname,
 )
-from .fflogs_models import FFLogsClasses, FFLogsZones
+from .fflogs_models import CharacterRanking, Class, FFLogsRanking, Ranking, Zones
 
 
 class DataException(Exception):
@@ -120,16 +121,20 @@ class FFLogs:
 
     async def _get_one_day_ranking(
         self, boss: int, difficulty: int, job: int, date: datetime
-    ) -> list:
+    ) -> list[Ranking]:
         """获取指定 boss，指定职业，指定一天中的排名数据"""
         # 查看是否有缓存
         cache_name = f'{boss}_{difficulty}_{job}_{date.strftime("%Y%m%d")}.pkl'
         if DATA.exists(cache_name, cache=True):
-            return DATA.load_pkl(cache_name, cache=True)
+            data = DATA.load_pkl(cache_name, cache=True)
+            # 为了兼容以前的数据，以前的数据是字典格式
+            if len(data) > 0 and isinstance(data[0], dict):
+                return parse_obj_as(list[Ranking], data)
+            return data
 
         page = 1
         hasMorePages = True
-        rankings = []
+        rankings: list[Ranking] = []
 
         end_date = date + timedelta(days=1)
         # 转换成 API 支持的时间戳格式
@@ -141,17 +146,19 @@ class FFLogs:
             rankings_url = f"{self.base_url}/rankings/encounter/{boss}?metric=rdps&difficulty={difficulty}&spec={job}&page={page}&filter=date.{start_timestamp}.{end_timestamp}&api_key={plugin_config.fflogs_token}"
 
             res = await self._http(rankings_url)
-
-            if not res:
+            try:
+                ranking = FFLogsRanking.parse_obj(res)
+            except ValidationError:
                 raise DataException("服务器没有正确返回数据")
 
-            hasMorePages = res["hasMorePages"]
-            rankings += res["rankings"]
+            hasMorePages = ranking.hasMorePages
+            rankings += ranking.rankings
             page += 1
 
         # 如果获取数据的日期不是当天，则缓存数据
         # 因为今天的数据可能还会增加，不能先缓存
         if end_date < datetime.now():
+            # 为了兼容以前的版本，这里将数据转换成 dict
             DATA.dump_pkl(rankings, cache_name, cache=True)
 
         return rankings
@@ -161,33 +168,38 @@ class FFLogs:
         boss: int,
         difficulty: int,
         job: int,
-        dps_type: Literal["rdps", "adps", "pdps"],
+        dps_type: Literal["rdps", "adps", "pdps", "ndps"],
         date: datetime,
-    ) -> list:
+    ) -> list[float]:
         date = datetime(year=date.year, month=date.month, day=date.day)
 
-        rankings = []
+        rankings: list[Ranking] = []
         for _ in range(plugin_config.fflogs_range):
             rankings += await self._get_one_day_ranking(boss, difficulty, job, date)
             date -= timedelta(days=1)
 
         # 根据 DPS 类型进行排序，并提取数据
+        dps_rankings = []
         if dps_type == "rdps":
-            rankings.sort(key=lambda x: x["total"], reverse=True)
-            rankings = [i["total"] for i in rankings]
+            rankings.sort(key=lambda x: x.rDPS, reverse=True)
+            dps_rankings = [i.rDPS for i in rankings]
 
         if dps_type == "adps":
-            rankings.sort(key=lambda x: x["otherAmount"], reverse=True)
-            rankings = [i["otherAmount"] for i in rankings]
+            rankings.sort(key=lambda x: x.aDPS, reverse=True)
+            dps_rankings = [i.aDPS for i in rankings]
 
         if dps_type == "pdps":
-            rankings.sort(key=lambda x: x["rawDPS"], reverse=True)
-            rankings = [i["rawDPS"] for i in rankings]
+            rankings.sort(key=lambda x: x.pDPS, reverse=True)
+            dps_rankings = [i.pDPS for i in rankings]
 
-        if not rankings:
+        if dps_type == "ndps":
+            rankings.sort(key=lambda x: x.nDPS, reverse=True)
+            dps_rankings = [i.nDPS for i in rankings]
+
+        if not dps_rankings:
             raise DataException("网站里没有数据")
 
-        return rankings
+        return dps_rankings
 
     async def _get_character_ranking(
         self,
@@ -196,7 +208,7 @@ class FFLogs:
         zone: int,
         encounter: int,
         difficulty: int,
-        metric: Literal["rdps", "adps", "pdps"],
+        metric: Literal["rdps", "adps", "pdps", "ndps"],
     ):
         """查询指定角色的 DPS
 
@@ -215,38 +227,43 @@ class FFLogs:
         if "hidden" in res:
             raise DataException("角色数据被隐藏")
 
+        try:
+            rankings = parse_obj_as(list[CharacterRanking], res)
+        except ValidationError:
+            raise DataException("服务器没有正确返回数据")
+
         # 提取所需的数据
         # 零式副本的难度是 101，普通的则是 100
         # 极神也是 100
         if difficulty == 0:
-            ranking = [i for i in res if i["difficulty"] == 101]
+            ranking = [i for i in rankings if i.difficulty == 101]
         else:
-            ranking = [i for i in res if i["difficulty"] == 100]
+            ranking = [i for i in rankings if i.difficulty == 100]
 
         if not ranking:
             raise DataException("网站里没有数据")
 
         return ranking
 
-    async def zones(self) -> FFLogsZones:
+    async def zones(self) -> list[Zones]:
         """副本"""
         url = f"{self.base_url}/zones?api_key={plugin_config.fflogs_token}"
         data = await self._http(url)
-        zones = FFLogsZones.parse_obj(data)
+        zones = parse_obj_as(list[Zones], data)
         return zones
 
-    async def classes(self) -> FFLogsClasses:
+    async def classes(self) -> list[Class]:
         """职业"""
         url = f"{self.base_url}/classes?api_key={plugin_config.fflogs_token}"
         data = await self._http(url)
-        classes = FFLogsClasses.parse_obj(data)
+        classes = parse_obj_as(list[Class], data)
         return classes
 
     async def dps(
         self,
         boss_nickname: str,
         job_nickname: str,
-        dps_type: Literal["rdps", "adps", "pdps"] = "rdps",
+        dps_type: Literal["rdps", "adps", "pdps", "ndps"] = "rdps",
     ) -> str:
         """查询 DPS 百分比排名
 
@@ -262,8 +279,8 @@ class FFLogs:
         if not job:
             return f"找不到 {job_nickname} 的数据，请换个名字试试"
 
-        if dps_type not in ["adps", "rdps", "pdps"]:
-            return f"找不到类型为 {dps_type} 的数据，只支持 adps rdps pdps"
+        if dps_type not in ["adps", "rdps", "pdps", "ndps"]:
+            return f"找不到类型为 {dps_type} 的数据，只支持 adps rdps pdps ndps"
 
         # 排名从前一天开始排，因为今天的数据并不全
         date = datetime.now() - timedelta(days=1)
@@ -328,7 +345,7 @@ class FFLogs:
             return "角色名或者服务器名有误，无法获取数据。"
 
         for i in ranking:
-            reply += f'\n{i["spec"]} {i["percentile"]:.2f}% {i["total"]:.2f}'
+            reply += f"\n{i.spec} {i.percentile:.2f}% {i.total:.2f}"
 
         return reply
 
