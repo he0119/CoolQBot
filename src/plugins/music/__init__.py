@@ -31,7 +31,7 @@ EXPR_NOT_FOUND = (
     "没有找到，要不要换个关键字试试？",
 )
 
-music_cmd = on_command("music", aliases={"点歌"})
+music_cmd = on_command("music", aliases={"点歌"}, block=True)
 
 
 @music_cmd.handle()

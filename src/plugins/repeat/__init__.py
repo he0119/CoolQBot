@@ -22,7 +22,7 @@ __plugin_meta__ = PluginMetadata(
 
 _sub_plugins = set()
 
-repeat = CommandGroup("repeat")
+repeat = CommandGroup("repeat", block=True)
 global_config = get_driver().config
 plugin_config = Config.parse_obj(global_config)
 from .recorder import Recorder

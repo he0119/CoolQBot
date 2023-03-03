@@ -16,7 +16,7 @@ __plugin_meta__ = PluginMetadata(
 /公主连结日程表""",
 )
 
-calendar_cmd = on_command("公主连结日程表")
+calendar_cmd = on_command("公主连结日程表", block=True)
 
 
 @calendar_cmd.handle()

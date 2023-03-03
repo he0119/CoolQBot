@@ -40,7 +40,7 @@ async def hello_on_connect(bot: Bot) -> None:
     logger.info("发送首次启动的问候")
 
 
-hello_cmd = on_command("hello", aliases={"问候"}, permission=GROUP)
+hello_cmd = on_command("hello", aliases={"问候"}, permission=GROUP, block=True)
 
 
 @hello_cmd.handle()

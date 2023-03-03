@@ -68,7 +68,7 @@ def get_ban_type(bot_role: str, sender_role: str) -> BanType:
     return BanType.OK
 
 
-ban_cmd = on_command("ban", aliases={"禁言"})
+ban_cmd = on_command("ban", aliases={"禁言"}, block=True)
 
 
 @ban_cmd.handle()
