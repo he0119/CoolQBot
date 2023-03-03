@@ -39,7 +39,9 @@ __plugin_meta__ = PluginMetadata(
 
 hospital_service = Hospital()
 
-hospital = CommandGroup("hospital", permission=GROUP_OWNER | GROUP_ADMIN | SUPERUSER)
+hospital = CommandGroup(
+    "hospital", permission=GROUP_OWNER | GROUP_ADMIN | SUPERUSER, block=True
+)
 
 rounds_cmd = hospital.command("rounds", aliases={"查房", "赛博查房"})
 

@@ -52,7 +52,7 @@ async def morning():
     logger.info("发送早安信息")
 
 
-morning_cmd = on_command("morning", aliases={"早安"}, permission=GROUP)
+morning_cmd = on_command("morning", aliases={"早安"}, permission=GROUP, block=True)
 
 
 @morning_cmd.handle()

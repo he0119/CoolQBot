@@ -24,7 +24,7 @@ __plugin_meta__ = PluginMetadata(
 /weather 西安 黑龙江""",
 )
 
-weather_cmd = on_command("weather", aliases={"天气"})
+weather_cmd = on_command("weather", aliases={"天气"}, block=True)
 
 
 @weather_cmd.handle()

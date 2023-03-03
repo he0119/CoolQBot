@@ -18,7 +18,7 @@ roll 两次点数100和两次点数50
 /roll 2d100+2d50""",
 )
 
-roll_cmd = on_command("roll")
+roll_cmd = on_command("roll", block=True)
 
 
 def check_roll_syntax(input: str) -> bool:

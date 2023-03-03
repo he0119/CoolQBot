@@ -15,7 +15,7 @@ __plugin_meta__ = PluginMetadata(
     usage="与最终幻想XIV有关的功能",
 )
 
-ff14 = CommandGroup("ff14")
+ff14 = CommandGroup("ff14", block=True)
 
 _sub_plugins = set()
 

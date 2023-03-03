@@ -15,7 +15,7 @@ __plugin_meta__ = PluginMetadata(
 /rand 今天捐钱的概率""",
 )
 
-rand_cmd = on_command("rand")
+rand_cmd = on_command("rand", block=True)
 
 
 @rand_cmd.handle()

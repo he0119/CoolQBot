@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - 'master'
+      - "master"
   pull_request:
   release:
     types: [published]
@@ -27,9 +27,11 @@ jobs:
       - name: Set up Python
         uses: he0119/setup-python@main
         with:
-          python-version: '3.10'
+          python-version: "3.10"
       - name: Install prerequisites
-        run: poetry install
+        run: |
+          poetry config installer.modern-installation false
+          poetry install
       - name: Run tests
         run: poetry run pytest --cov=src --cov-report xml -n auto
       - name: Upload coverage to Codecov
