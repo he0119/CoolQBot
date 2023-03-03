@@ -23,6 +23,7 @@ nonebot-plugin-memes = "0.3.10"
 nonebot-plugin-petpet = "0.3.20"
 nonebot-bison = "0.7.0"
 nonebot-plugin-gscode = "0.1.6"
+nonebot-plugin-naturel-gpt = "1.4.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
@@ -46,6 +47,7 @@ plugins = [
     "nonebot_plugin_petpet",
     "nonebot_bison",
     "nonebot_plugin_gscode",
+    "nonebot_plugin_naturel_gpt",
 ]
 
 [tool.black]
