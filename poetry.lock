@@ -190,14 +190,14 @@ trio = ["trio (>=0.16,<0.22)"]
 
 [[package]]
 name = "apscheduler"
-version = "3.10.0"
+version = "3.10.1"
 description = "In-process task scheduler with Cron-like capabilities"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "APScheduler-3.10.0-py3-none-any.whl", hash = "sha256:575299f20073c60a2cc9d4fa5906024cdde33c5c0ce6087c4e3c14be3b50fdd4"},
-    {file = "APScheduler-3.10.0.tar.gz", hash = "sha256:a49fc23269218416f0e41890eea7a75ed6b284f10630dcfe866ab659621a3696"},
+    {file = "APScheduler-3.10.1-py3-none-any.whl", hash = "sha256:e813ad5ada7aff36fb08cdda746b520531eaac7757832abc204868ba78e0c8f6"},
+    {file = "APScheduler-3.10.1.tar.gz", hash = "sha256:0293937d8f6051a0f493359440c1a1b93e882c57daf0197afeff0e727777b96e"},
 ]
 
 [package.dependencies]
@@ -1912,14 +1912,14 @@ Pillow = ">=9.0.0,<10.0.0"
 
 [[package]]
 name = "nonebot-plugin-naturel-gpt"
-version = "1.4.3"
+version = "1.4.4"
 description = "一个基于NoneBot框架的Ai聊天插件，对接OpenAi文本生成接口"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_naturel_gpt-1.4.3-py3-none-any.whl", hash = "sha256:870ac4b247fa55a6012b936d9a2519581f40c33d8e7b16f8865a0891fdb77126"},
-    {file = "nonebot_plugin_naturel_gpt-1.4.3.tar.gz", hash = "sha256:f53a5ad9fd5ecd9ea6bcb940e2365f67ed1dc688aa702bb9e9fe8f5482e82d52"},
+    {file = "nonebot_plugin_naturel_gpt-1.4.4-py3-none-any.whl", hash = "sha256:e2cc118c53abba340b02d23d36be5aad5ab7ed8cd975b87b1d97e3730b7f404d"},
+    {file = "nonebot_plugin_naturel_gpt-1.4.4.tar.gz", hash = "sha256:ada59e357fcb499a3713fa5085630287267884ae7ea193b2c729db6f5361b89d"},
 ]
 
 [package.dependencies]
@@ -3851,4 +3851,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "41019c3c1207ca8018ca218a5b026da1e963c516f2fc462bd995c88b3cfdd732"
+content-hash = "b9ccd9c5cf61728a8eb17866b139079aea83574b652710e14284b993ffa6af69"
