@@ -8,21 +8,27 @@ import asyncio
 import json
 import math
 from datetime import datetime, timedelta
+from random import randint
 from typing import Literal, cast
 
 import httpx
 from nonebot.log import logger
 from nonebot_plugin_apscheduler import scheduler
+from nonebot_plugin_datastore import create_session, get_plugin_data
+from nonebot_plugin_datastore.db import post_db_init
 from pydantic import ValidationError, parse_obj_as
+from sqlalchemy import select
 
-from ... import DATA, plugin_config
-from .fflogs_data import (
+from .config import plugin_config
+from .data import (
     FFLOGS_DATA,
     FFlogsDataModel,
     get_boss_info_by_nickname,
     get_job_info_by_nickname,
 )
-from .fflogs_models import CharacterRanking, Class, FFLogsRanking, Ranking, Zones
+from .models import CharacterRanking, Class, FFLogsRanking, Ranking, User, Zones
+
+plugin_data = get_plugin_data()
 
 
 class DataException(Exception):
@@ -50,37 +56,31 @@ class FFLogs:
         # 定时缓存任务
         self._cache_job = None
 
-        # 根据配置启动
-        if plugin_config.fflogs_enable_cache:
-            self.enable_cache()
+    async def init(self) -> None:
+        """初始化"""
+        enable = await plugin_data.config.get("cache_enable", False)
+        if enable:
+            await self.enable_cache()
 
-        # QQ号 与 最终幻想14 角色用户名，服务器的对应关系
-        if DATA.exists("characters.pkl"):
-            self.characters = DATA.load_pkl("characters.pkl")
-        else:
-            self.characters = {}
-
-    def enable_cache(self) -> None:
+    async def enable_cache(self) -> None:
         """开启定时缓存任务"""
+        await plugin_data.config.set("cache_enable", True)
         self._cache_job = scheduler.add_job(
             self.cache_data,
             "cron",
-            hour=plugin_config.fflogs_cache_hour,
-            minute=plugin_config.fflogs_cache_minute,
-            second=plugin_config.fflogs_cache_second,
+            hour=plugin_config.fflogs_cache_time.hour,
+            minute=plugin_config.fflogs_cache_time.minute,
+            second=plugin_config.fflogs_cache_time.second,
             id="fflogs_cache",
         )
-        plugin_config.fflogs_enable_cache = True
-        logger.info(
-            f"开启定时缓存，执行时间为每天 {plugin_config.fflogs_cache_hour}:{plugin_config.fflogs_cache_minute}:{plugin_config.fflogs_cache_second}"
-        )
+        logger.info(f"开启定时缓存，执行时间为每天 {plugin_config.fflogs_cache_time}")
 
-    def disable_cache(self) -> None:
+    async def disable_cache(self) -> None:
         """关闭定时缓存任务"""
+        await plugin_data.config.set("cache_enable", False)
         if self._cache_job:
             self._cache_job.remove()
         self._cache_job = None
-        plugin_config.fflogs_enable_cache = False
         logger.info("定时缓存已关闭")
 
     @property
@@ -91,22 +91,55 @@ class FFLogs:
         else:
             return False
 
+    async def get_token(self) -> str:
+        """获取 token"""
+        token = await plugin_data.config.get("token", "")
+        if not token:
+            raise AuthException("没有设置 token")
+        return token
+
+    async def set_character(
+        self, platform: str, user_id: str, character_name: str, server_name: str
+    ) -> None:
+        """设置角色名和服务器名"""
+        async with create_session() as session:
+            await session.merge(
+                User(
+                    platform=platform,
+                    user_id=user_id,
+                    character_name=character_name,
+                    server_name=server_name,
+                )
+            )
+            await session.commit()
+
+    async def get_character(self, platform: str, user_id: str) -> User | None:
+        """获取角色名和服务器名"""
+        async with create_session() as session:
+            user = await session.scalar(
+                select(User)
+                .where(User.platform == platform)
+                .where(User.user_id == user_id)
+            )
+            return user
+
     async def cache_data(self) -> None:
         """缓存数据"""
         data = await FFLOGS_DATA.data
         data = cast(FFlogsDataModel, data)
-        for boss in plugin_config.fflogs_cache_boss:
+        cache_boss = await plugin_data.config.get("cache_boss", [])
+        for boss in cache_boss:
             for job in data.job:
                 await self.dps(boss, job.name)
                 logger.info(f"{boss} {job.name}的数据缓存完成。")
-                await asyncio.sleep(30)
+                await asyncio.sleep(randint(1, 30))
 
-    @staticmethod
-    async def _http(url):
+    async def _http(self, url: str, params: dict = {}):
         try:
+            params.setdefault("api_key", await self.get_token())
             # 使用 httpx 库发送最终的请求
             async with httpx.AsyncClient() as client:
-                resp = await client.get(url)
+                resp = await client.get(url, params=params)
                 if resp.status_code == 401:
                     raise AuthException("Token 有误，无法获取数据")
                 if resp.status_code == 400:
@@ -125,8 +158,8 @@ class FFLogs:
         """获取指定 boss，指定职业，指定一天中的排名数据"""
         # 查看是否有缓存
         cache_name = f'{boss}_{difficulty}_{job}_{date.strftime("%Y%m%d")}.pkl'
-        if DATA.exists(cache_name, cache=True):
-            data = DATA.load_pkl(cache_name, cache=True)
+        if plugin_data.exists(cache_name, cache=True):
+            data = plugin_data.load_pkl(cache_name, cache=True)
             # 为了兼容以前的数据，以前的数据是字典格式
             if len(data) > 0 and isinstance(data[0], dict):
                 return parse_obj_as(list[Ranking], data)
@@ -143,9 +176,18 @@ class FFLogs:
 
         # API 只支持获取 50 页以内的数据
         while hasMorePages and page < 51:
-            rankings_url = f"{self.base_url}/rankings/encounter/{boss}?metric=rdps&difficulty={difficulty}&spec={job}&page={page}&filter=date.{start_timestamp}.{end_timestamp}&api_key={plugin_config.fflogs_token}"
+            rankings_url = f"{self.base_url}/rankings/encounter/{boss}"
 
-            res = await self._http(rankings_url)
+            res = await self._http(
+                rankings_url,
+                params={
+                    "metric": "rdps",
+                    "difficulty": difficulty,
+                    "spec": job,
+                    "page": page,
+                    "filter": f"date.{start_timestamp}.{end_timestamp}",
+                },
+            )
             try:
                 ranking = FFLogsRanking.parse_obj(res)
             except ValidationError:
@@ -159,7 +201,7 @@ class FFLogs:
         # 因为今天的数据可能还会增加，不能先缓存
         if end_date < datetime.now():
             # 为了兼容以前的版本，这里将数据转换成 dict
-            DATA.dump_pkl(rankings, cache_name, cache=True)
+            plugin_data.dump_pkl(rankings, cache_name, cache=True)
 
         return rankings
 
@@ -214,9 +256,16 @@ class FFLogs:
 
         返回列表
         """
-        url = f"https://cn.fflogs.com/v1/rankings/character/{characterName}/{serverName}/CN?zone={zone}&encounter={encounter}&metric={metric}&api_key={plugin_config.fflogs_token}"
+        url = f"https://cn.fflogs.com/v1/rankings/character/{characterName}/{serverName}/CN"
 
-        res = await self._http(url)
+        res = await self._http(
+            url,
+            params={
+                "zone": zone,
+                "encounter": encounter,
+                "metric": metric,
+            },
+        )
 
         if not res and isinstance(res, list):
             raise DataException("网站里没有数据")
@@ -247,14 +296,14 @@ class FFLogs:
 
     async def zones(self) -> list[Zones]:
         """副本"""
-        url = f"{self.base_url}/zones?api_key={plugin_config.fflogs_token}"
+        url = f"{self.base_url}/zones"
         data = await self._http(url)
         zones = parse_obj_as(list[Zones], data)
         return zones
 
     async def classes(self) -> list[Class]:
         """职业"""
-        url = f"{self.base_url}/classes?api_key={plugin_config.fflogs_token}"
+        url = f"{self.base_url}/classes"
         data = await self._http(url)
         classes = parse_obj_as(list[Class], data)
         return classes
@@ -304,13 +353,6 @@ class FFLogs:
 
         return reply
 
-    def set_character(
-        self, user_id: str, character_name: str, server_name: str
-    ) -> None:
-        """设置 QQ号 与 最终幻想14 用户名和服务器名"""
-        self.characters[user_id] = [character_name, server_name]
-        DATA.dump_pkl(self.characters, "characters.pkl")
-
     async def character_dps(
         self,
         boss_nickname: str,
@@ -351,3 +393,4 @@ class FFLogs:
 
 
 fflogs = FFLogs()
+post_db_init(fflogs.init)
