@@ -3,8 +3,9 @@ import httpx
 from nonebot.adapters import Event, Message
 from nonebot.params import CommandArg
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_datastore import get_plugin_data
 
-from ... import DATA, ff14
+from ... import ff14
 from .data_source import get_item_price
 
 __plugin_meta__ = PluginMetadata(
@@ -19,6 +20,9 @@ __plugin_meta__ = PluginMetadata(
 查询当前设置的默认值
 /查价 默认值""",
 )
+
+plugin_data = get_plugin_data()
+
 price_cmd = ff14.command("price", aliases={"查价"})
 
 
@@ -30,14 +34,14 @@ async def price_handle(event: Event, args: Message = CommandArg()):
     user_id = event.get_user_id()
 
     if len(argv) == 0:
-        await price_cmd.finish()
+        await price_cmd.finish(f"最终幻想XIV 价格查询\n\n{__plugin_meta__.usage}")
 
     if len(argv) == 1 and argv[0] == "默认值":
-        world_or_dc = DATA.config.get(f"price-default-{user_id}", "猫小胖")
+        world_or_dc = await plugin_data.config.get(f"default-{user_id}", "猫小胖")
         await price_cmd.finish(f"当前设置的默认值为：{world_or_dc}")
 
     if len(argv) == 2 and argv[0] == "默认值":
-        DATA.config.set(f"price-default-{user_id}", argv[1])
+        await plugin_data.config.set(f"default-{user_id}", argv[1])
         await price_cmd.finish("查询区域默认值设置成功！")
 
     if len(argv) > 0:
@@ -45,7 +49,7 @@ async def price_handle(event: Event, args: Message = CommandArg()):
         if len(argv) >= 2:
             world_or_dc = argv[1]
         else:
-            world_or_dc = DATA.config.get(f"price-default-{user_id}", "猫小胖")
+            world_or_dc = await plugin_data.config.get(f"default-{user_id}", "猫小胖")
 
         try:
             reply = await get_item_price(name, world_or_dc)

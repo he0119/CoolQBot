@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from nonebot.adapters.onebot.v11 import Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -9,12 +10,7 @@ from tests.fake import fake_group_message_event_v11
 
 async def test_nuannuan(app: App, mocker: MockerFixture):
     """测试时尚品鉴"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.ff14")
-
-    from src.plugins.ff14.plugins.nuannuan import nuannuan_cmd
+    from src.plugins.ff14.plugins.ff14_nuannuan import nuannuan_cmd
 
     with open(Path(__file__).parent / "nuannuan.json", encoding="utf-8") as f:
         data = json.load(f)
