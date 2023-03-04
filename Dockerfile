@@ -25,7 +25,7 @@ WORKDIR /app
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 RUN apt-get update \
   && apt-get -y upgrade \
-  && apt-get install -y --no-install-recommends build-essential \
+  && apt-get install -y --no-install-recommends build-essential git \
   && pip install --no-cache-dir --upgrade "uvicorn[standard]" gunicorn \
   && pip install --no-cache-dir --upgrade -r requirements.txt \
   && apt-get purge -y --auto-remove \
