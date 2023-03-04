@@ -1,6 +1,4 @@
 """ 赛博查房 """
-from typing import cast
-
 from nonebot import CommandGroup
 from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message, MessageSegment
 from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER

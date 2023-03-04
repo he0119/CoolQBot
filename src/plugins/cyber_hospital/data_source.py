@@ -1,8 +1,8 @@
-from typing import cast
+from collections.abc import Sequence
 
 from nonebot_plugin_datastore import create_session
+from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
-from sqlmodel import func, select
 
 from .model import Patient, Record
 
@@ -16,8 +16,8 @@ class Hospital:
                 .where(Patient.group_id == group_id)
                 .where(Patient.discharged_at == None)
             )
-            results = await session.exec(statement)  # type: ignore
-            patient = results.first()  # type: ignore
+            results = await session.scalars(statement)
+            patient = results.first()
             if patient is not None:
                 raise ValueError("病人已入院")
 
@@ -33,8 +33,8 @@ class Hospital:
                 .where(Patient.group_id == group_id)
                 .where(Patient.discharged_at == None)
             )
-            results = await session.exec(statement)  # type: ignore
-            patient = results.first()  # type: ignore
+            results = await session.scalars(statement)
+            patient = results.first()
             if patient is None:
                 raise ValueError("病人未入院")
 
@@ -42,7 +42,7 @@ class Hospital:
             session.add(patient)
             await session.commit()
 
-    async def get_admitted_patients(self, group_id: str) -> list[Patient]:
+    async def get_admitted_patients(self, group_id: str) -> Sequence[Patient]:
         """获取所有入院病人"""
         async with create_session() as session:
             statement = (
@@ -50,8 +50,8 @@ class Hospital:
                 .where(Patient.group_id == group_id)
                 .where(Patient.discharged_at == None)
             ).options(selectinload(Patient.records))
-            results = await session.exec(statement)  # type: ignore
-            return results.all()  # type: ignore
+            results = await session.scalars(statement)
+            return results.all()
 
     async def get_admitted_patient(self, user_id: str, group_id: str) -> Patient | None:
         """获取入院病人"""
@@ -62,7 +62,7 @@ class Hospital:
                 .where(Patient.group_id == group_id)
                 .where(Patient.discharged_at == None)
             )
-            results = await session.exec(statement)  # type: ignore
+            results = await session.scalars(statement)
             return results.first()
 
     async def get_records(self, user_id: str, group_id: str) -> list[Record] | None:
@@ -73,11 +73,10 @@ class Hospital:
                 .where(Patient.group_id == group_id)
                 .where(Patient.discharged_at == None)
             ).options(selectinload(Patient.records))
-            results = await session.exec(statement)  # type: ignore
+            results = await session.scalars(statement)
             patient = results.first()
             if patient is None:
                 raise ValueError("病人未入院")
-            patient = cast(Patient, patient)
             return patient.records
 
     async def add_record(self, user_id: str, group_id: str, content: str) -> None:
@@ -88,28 +87,27 @@ class Hospital:
                 .where(Patient.group_id == group_id)
                 .where(Patient.discharged_at == None)
             )
-            results = await session.exec(statement)  # type: ignore
+            results = await session.scalars(statement)
             patient = results.first()
             if patient is None:
                 raise ValueError("病人未入院")
 
-            patient = cast(Patient, patient)
             record = Record(content=content, patient=patient)
             session.add(record)
             await session.commit()
 
-    async def patient_count(self, group_id: str) -> list[tuple[str, int]]:
+    async def patient_count(self, group_id: str) -> Sequence[tuple[str, int]]:
         """统计病人住院次数"""
         async with create_session() as session:
             statement = (
-                select(Patient.user_id, func.count("*"))  # type: ignore
+                select(Patient.user_id, func.count("*"))
                 .group_by(Patient.user_id)
                 .where(Patient.group_id == group_id)
             )
-            results = await session.exec(statement)  # type: ignore
+            results = await session.scalars(statement)
             return results.all()
 
-    async def get_patient(self, user_id: str, group_id: str) -> list[Patient]:
+    async def get_patient(self, user_id: str, group_id: str) -> Sequence[Patient]:
         """获取病人所有住院记录"""
         async with create_session() as session:
             statement = (
@@ -117,5 +115,5 @@ class Hospital:
                 .where(Patient.user_id == user_id)
                 .where(Patient.group_id == group_id)
             )
-            results = await session.exec(statement)  # type: ignore
+            results = await session.scalars(statement)
             return results.all()

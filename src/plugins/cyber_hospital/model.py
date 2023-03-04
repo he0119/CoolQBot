@@ -1,35 +1,31 @@
 from datetime import datetime
 
-from sqlmodel import Field, Relationship, SQLModel
+from nonebot_plugin_datastore import get_plugin_data
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+Model = get_plugin_data().Model
 
 
-class Patient(SQLModel, table=True):
+class Patient(Model):
     """病人"""
 
-    __tablename__: str = "cyber_hospital_patient"
-    __table_args__ = {"extend_existing": True}
-
-    id: int | None = Field(default=None, primary_key=True)
-    user_id: str
-    group_id: str
-    records: list["Record"] | None = Relationship(back_populates="patient")
-    admitted_at: datetime = Field(default_factory=datetime.now)
-    discharged_at: datetime | None = None
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[str]
+    group_id: Mapped[str]
+    records: Mapped[list["Record"]] = relationship(back_populates="patient")
+    admitted_at: Mapped[datetime] = mapped_column(default=datetime.now)
+    discharged_at: Mapped[datetime | None]
 
     def discharge(self) -> None:
         self.discharged_at = datetime.now()
 
 
-class Record(SQLModel, table=True):
+class Record(Model):
     """病历"""
 
-    __tablename__: str = "cyber_hospital_record"
-    __table_args__ = {"extend_existing": True}
-
-    id: int | None = Field(default=None, primary_key=True)
-    patient: Patient | None = Relationship(back_populates="records")
-    patient_id: int | None = Field(
-        default=None, foreign_key="cyber_hospital_patient.id"
-    )
-    time: datetime = Field(default_factory=datetime.now)
-    content: str
+    id: Mapped[int] = mapped_column(primary_key=True)
+    patient: Mapped[Patient] = relationship(back_populates="records")
+    patient_id: Mapped[int] = mapped_column(ForeignKey("cyber_hospital_patient.id"))
+    time: Mapped[datetime] = mapped_column(default=datetime.now)
+    content: Mapped[str]
