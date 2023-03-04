@@ -5,7 +5,6 @@ import nonebot
 import pytest
 from nonebug import NONEBOT_INIT_KWARGS
 from nonebug.app import App
-from sqlalchemy import delete
 
 if TYPE_CHECKING:
     from nonebot.plugin import Plugin
@@ -34,10 +33,4 @@ async def app(nonebug_init: None, tmp_path: Path):
 
     await init_db()
 
-    yield App()
-
-    # 清理数据库
-    from src.plugins.ff14.plugins.ff14_fflogs.models import User as FFLogsUser
-
-    async with create_session() as session, session.begin():
-        await session.execute(delete(FFLogsUser))
+    return App()

@@ -1,8 +1,19 @@
 import pytest
+from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 from nonebug import App
 from pytest_mock import MockerFixture
 
 from tests.fake import fake_group_message_event_v11
+
+
+@pytest.fixture
+async def app(app: App):
+    yield app
+
+    from src.plugins.ban import _bot_role
+
+    # 清空机器人角色缓存
+    _bot_role.clear()
 
 
 @pytest.mark.parametrize(
@@ -21,10 +32,6 @@ async def test_ban_group_bot_is_owner(
 
     机器人为群主，禁言对象为管理员或普通群员（一个群不可能有两个群主）
     """
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Bot, Message
-
-    require("src.plugins.ban")
     from src.plugins.ban import EXPR_OK, ban_cmd
 
     render_expression = mocker.patch("src.plugins.ban.render_expression")
@@ -69,10 +76,6 @@ async def test_ban_group_bot_is_admin(
 
     机器人为管理员，禁言对象为群主，管理员或普通群员
     """
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
-
-    require("src.plugins.ban")
     from src.plugins.ban import EXPR_NEED_HELP, EXPR_OK, EXPR_OWNER, ban_cmd
 
     render_expression = mocker.patch("src.plugins.ban.render_expression")
@@ -137,10 +140,6 @@ async def test_ban_group_bot_is_member(
 
     机器人为管理员，禁言对象为群主，管理员或普通群员
     """
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
-
-    require("src.plugins.ban")
     from src.plugins.ban import EXPR_NEED_HELP, EXPR_OWNER, ban_cmd
 
     render_expression = mocker.patch("src.plugins.ban.render_expression")
@@ -195,10 +194,6 @@ async def test_ban_group_get_arg(
 
     机器人为普通群员，禁言对象为管理员或普通群员
     """
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Bot, Message
-
-    require("src.plugins.ban")
     from src.plugins.ban import EXPR_OK, ban_cmd
 
     render_expression = mocker.patch("src.plugins.ban.render_expression")
@@ -235,10 +230,6 @@ async def test_ban_group_get_arg_invalid(
     mocker: MockerFixture,
 ):
     """测试群聊天，获取参数禁言 1 分钟，第一次参数错误"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Bot, Message
-
-    require("src.plugins.ban")
     from src.plugins.ban import EXPR_OK, ban_cmd
 
     render_expression = mocker.patch("src.plugins.ban.render_expression")

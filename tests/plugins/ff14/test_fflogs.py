@@ -1,11 +1,26 @@
 from typing import cast
 from unittest.mock import AsyncMock
 
+import pytest
 from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 from nonebug import App
 from pytest_mock import MockerFixture
+from sqlalchemy import delete
 
 from tests.fake import fake_channel_message_event_v12, fake_group_message_event_v11
+
+
+@pytest.fixture
+async def app(app: App):
+    yield app
+
+    # 清理数据库
+    from nonebot_plugin_datastore.db import create_session
+
+    from src.plugins.ff14.plugins.ff14_fflogs.models import User as FFLogsUser
+
+    async with create_session() as session, session.begin():
+        await session.execute(delete(FFLogsUser))
 
 
 async def test_dps_missing_token(app: App):
