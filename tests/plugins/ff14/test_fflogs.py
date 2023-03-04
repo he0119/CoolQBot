@@ -17,10 +17,10 @@ async def app(app: App):
     # 清理数据库
     from nonebot_plugin_datastore.db import create_session
 
-    from src.plugins.ff14.plugins.ff14_fflogs.models import User as FFLogsUser
+    from src.plugins.ff14.plugins.ff14_fflogs.models import User
 
     async with create_session() as session, session.begin():
-        await session.execute(delete(FFLogsUser))
+        await session.execute(delete(User))
 
 
 async def test_dps_missing_token(app: App):

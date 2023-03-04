@@ -1,20 +1,17 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-import pytest
+from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 from nonebug import App
 
 from tests.fake import fake_group_message_event_v11
 
 if TYPE_CHECKING:
-    from sqlmodel.ext.asyncio.session import AsyncSession
+    from sqlalchemy.ext.asyncio.session import AsyncSession
 
 
-@pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
 async def test_history(app: App, session: "AsyncSession"):
     """测试入院记录"""
-    from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
-
     from src.plugins.cyber_hospital import history_cmd
     from src.plugins.cyber_hospital.model import Patient, Record
 
@@ -93,11 +90,8 @@ async def test_history(app: App, session: "AsyncSession"):
         ctx.should_finished()
 
 
-@pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
 async def test_history_empty(app: App, session: "AsyncSession"):
     """测试入院记录为空"""
-    from nonebot.adapters.onebot.v11 import Bot, Message
-
     from src.plugins.cyber_hospital import history_cmd
 
     async with app.test_matcher(history_cmd) as ctx:

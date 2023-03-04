@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
 from nonebot_plugin_datastore import create_session
-from sqlalchemy import func, select
+from sqlalchemy import Row, func, select
 from sqlalchemy.orm import selectinload
 
 from .model import Patient, Record
@@ -96,16 +96,16 @@ class Hospital:
             session.add(record)
             await session.commit()
 
-    async def patient_count(self, group_id: str) -> Sequence[tuple[str, int]]:
+    async def patient_count(self, group_id: str) -> Sequence[Row[tuple[str, int]]]:
         """统计病人住院次数"""
         async with create_session() as session:
             statement = (
-                select(Patient.user_id, func.count("*"))
+                select(Patient.user_id, func.count(Patient.user_id))
                 .group_by(Patient.user_id)
                 .where(Patient.group_id == group_id)
             )
-            results = await session.scalars(statement)
-            return results.all()
+            results = (await session.execute(statement)).all()
+            return results
 
     async def get_patient(self, user_id: str, group_id: str) -> Sequence[Patient]:
         """获取病人所有住院记录"""
