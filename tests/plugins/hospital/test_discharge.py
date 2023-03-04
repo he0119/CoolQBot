@@ -14,8 +14,8 @@ async def test_discharge(app: App, session: "AsyncSession"):
     """测试病人出院"""
     from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
-    from src.plugins.hospital import discharge_cmd
-    from src.plugins.hospital.model import Patient
+    from src.plugins.cyber_hospital import discharge_cmd
+    from src.plugins.cyber_hospital.model import Patient
 
     async with app.test_matcher(discharge_cmd) as ctx:
         bot = ctx.create_bot()

@@ -15,8 +15,8 @@ async def test_record(app: App, session: "AsyncSession"):
     """测试病历"""
     from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
-    from src.plugins.hospital import record_cmd
-    from src.plugins.hospital.model import Patient, Record
+    from src.plugins.cyber_hospital import record_cmd
+    from src.plugins.cyber_hospital.model import Patient, Record
 
     patient = Patient(
         user_id="123456",
@@ -67,8 +67,8 @@ async def test_record_empty(app: App, session: "AsyncSession"):
     """测试病历为空"""
     from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
-    from src.plugins.hospital import record_cmd
-    from src.plugins.hospital.model import Patient
+    from src.plugins.cyber_hospital import record_cmd
+    from src.plugins.cyber_hospital.model import Patient
 
     patient = Patient(user_id="123456", group_id="10000")
     session.add(patient)

@@ -15,8 +15,8 @@ async def test_history(app: App, session: "AsyncSession"):
     """测试入院记录"""
     from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
-    from src.plugins.hospital import history_cmd
-    from src.plugins.hospital.model import Patient, Record
+    from src.plugins.cyber_hospital import history_cmd
+    from src.plugins.cyber_hospital.model import Patient, Record
 
     patient = Patient(
         user_id="123456",
@@ -98,7 +98,7 @@ async def test_history_empty(app: App, session: "AsyncSession"):
     """测试入院记录为空"""
     from nonebot.adapters.onebot.v11 import Bot, Message
 
-    from src.plugins.hospital import history_cmd
+    from src.plugins.cyber_hospital import history_cmd
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
