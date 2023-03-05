@@ -396,7 +396,7 @@ class FFLogs:
             return "角色名或者服务器名有误，无法获取数据。"
 
         for i in ranking:
-            reply += f"\n{i.spec} {i.percentile:.2f}% {i.total:.2f}"
+            reply += f"\n{i.spec}({i.rank}/{i.outOf}) {i.percentile:.2f}% {i.total:.2f}"
 
         return reply
 

@@ -128,4 +128,3 @@ class CharacterRanking(BaseModel):
     percentile: float
     ilvlKeyOrPatch: float
     total: float
-    estimated: bool
