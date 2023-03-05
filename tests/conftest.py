@@ -24,7 +24,11 @@ def load_plugin(nonebug_init: None) -> set["Plugin"]:
 @pytest.fixture
 async def app(nonebug_init: None, tmp_path: Path):
     from nonebot_plugin_datastore.config import plugin_config
-    from nonebot_plugin_datastore.db import create_session, init_db
+    from nonebot_plugin_datastore.db import init_db
+
+    driver = nonebot.get_driver()
+    # 清除连接钩子，现在 NoneBug 会自动触发 on_bot_connect
+    driver._bot_connection_hook.clear()
 
     # 插件数据目录
     plugin_config.datastore_cache_dir = tmp_path / "cache"

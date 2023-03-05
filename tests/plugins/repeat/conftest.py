@@ -11,6 +11,9 @@ async def app(app: App):
     from nonebot_plugin_datastore.db import create_session
 
     from src.plugins.repeat.models import Enabled, Record
+    from src.plugins.repeat.recorder import Singleton
+
+    Singleton._instances.clear()
 
     async with create_session() as session, session.begin():
         await session.execute(delete(Record))
