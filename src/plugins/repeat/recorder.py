@@ -265,6 +265,10 @@ class Recorder(metaclass=Singleton):
 @post_db_init
 async def data_migration():
     """迁移数据"""
+    files = list(plugin_data.data_dir.glob("*.pkl"))
+    if not files:
+        return
+
     if not plugin_config.repeat_migration_group_id:
         logger.warning("未配置默认群，无法迁移数据")
         return
@@ -277,7 +281,7 @@ async def data_migration():
     #    "msg_number_list": { group_id: { day: { user_id: int } } },
     # }
     async with create_session() as session:
-        for file in plugin_data.data_dir.glob("*.pkl"):
+        for file in files:
             if file.stem == "recorder":
                 record_date = datetime.now().date()
             else:
@@ -321,5 +325,6 @@ async def data_migration():
                     **values,
                 )
                 session.add(record)
-        await session.commit()
+            await session.commit()
+            file.rename(file.with_suffix(".pkl.bak"))
     logger.info("迁移数据成功")
