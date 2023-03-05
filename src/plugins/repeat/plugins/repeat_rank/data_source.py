@@ -18,9 +18,9 @@ async def get_rank(
     minimal_msg_number: int,
     display_total_number: bool,
     platform: str,
-    group_id: str | None,
-    guild_id: str | None,
-    channel_id: str | None,
+    group_id: str,
+    guild_id: str,
+    channel_id: str,
 ) -> str:
     """获取排行榜"""
     recorder = Recorder(platform, group_id, guild_id, channel_id)

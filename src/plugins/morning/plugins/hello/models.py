@@ -17,6 +17,6 @@ class Hello(Model):
     )
     id: Mapped[int] = mapped_column(primary_key=True)
     platform: Mapped[str]
-    group_id: Mapped[str | None]
-    guild_id: Mapped[str | None]
-    channel_id: Mapped[str | None]
+    group_id: Mapped[str] = mapped_column(default="")
+    guild_id: Mapped[str] = mapped_column(default="")
+    channel_id: Mapped[str] = mapped_column(default="")

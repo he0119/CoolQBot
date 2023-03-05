@@ -4,8 +4,9 @@ import pytest
 from nonebot.adapters.onebot.v11 import Bot, Message
 from nonebug import App
 from pytest_mock import MockerFixture
+from sqlalchemy.exc import IntegrityError
 
-from tests.fake import fake_group_message_event_v11, fake_private_message_event_v11
+from tests.fake import fake_group_message_event_v11
 
 
 @pytest.fixture
@@ -31,6 +32,26 @@ async def records(app: App, mocker: MockerFixture):
             )
         )
         await session.commit()
+
+
+async def test_unique_record(records: None):
+    from nonebot_plugin_datastore import create_session
+
+    from src.plugins.repeat.models import Record
+
+    async with create_session() as session:
+        session.add(
+            Record(
+                date=date(2020, 1, 1),
+                platform="qq",
+                group_id=10000,
+                user_id=10,
+                msg_number=100,
+                repeat_time=10,
+            )
+        )
+        with pytest.raises(IntegrityError):
+            await session.commit()
 
 
 async def test_rank(app: App, records: None):

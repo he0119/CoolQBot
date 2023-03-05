@@ -154,9 +154,9 @@ async def get_platform(bot: Bot) -> str | None:
 
 
 class GroupOrChannel(BaseModel):
-    group_id: str | None
-    channel_id: str | None
-    guild_id: str | None
+    group_id: str
+    channel_id: str
+    guild_id: str
 
     @property
     def detail_type(self) -> str:
@@ -169,18 +169,18 @@ async def get_group_or_channel(
     event: OneBotV11GroupMessageEvent
     | OneBotV12GroupMessageEvent
     | OneBotV12ChannelMessageEvent,
-) -> GroupOrChannel | None:
+) -> GroupOrChannel:
     """获取群号或频道号"""
     if isinstance(event, OneBotV11GroupMessageEvent):
         group_id = str(event.group_id)
-        guild_id = None
-        channel_id = None
+        guild_id = ""
+        channel_id = ""
     elif isinstance(event, OneBotV12GroupMessageEvent):
         group_id = event.group_id
-        guild_id = None
-        channel_id = None
+        guild_id = ""
+        channel_id = ""
     else:
-        group_id = None
+        group_id = ""
         guild_id = event.guild_id
         channel_id = event.channel_id
 

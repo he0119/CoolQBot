@@ -23,9 +23,9 @@ class Record(Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     date: Mapped[date]
     platform: Mapped[str]
-    group_id: Mapped[str | None]
-    guild_id: Mapped[str | None]
-    channel_id: Mapped[str | None]
+    group_id: Mapped[str] = mapped_column(default="")
+    guild_id: Mapped[str] = mapped_column(default="")
+    channel_id: Mapped[str] = mapped_column(default="")
 
     user_id: Mapped[str]
     repeat_time: Mapped[int] = mapped_column(default=0)
@@ -45,6 +45,6 @@ class Enabled(Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     platform: Mapped[str]
-    group_id: Mapped[str | None]
-    guild_id: Mapped[str | None]
-    channel_id: Mapped[str | None]
+    group_id: Mapped[str] = mapped_column(default="")
+    guild_id: Mapped[str] = mapped_column(default="")
+    channel_id: Mapped[str] = mapped_column(default="")
