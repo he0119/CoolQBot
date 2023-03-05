@@ -2,7 +2,6 @@
 from nonebot import get_bot
 from nonebot.adapters import Message
 from nonebot.adapters.onebot.v11 import Bot as V11Bot
-from nonebot.adapters.onebot.v11.permission import GROUP
 from nonebot.adapters.onebot.v12 import Bot as V12Bot
 from nonebot.adapters.onebot.v12 import Message as V12Message
 from nonebot.log import logger
@@ -83,7 +82,7 @@ async def morning():
     logger.info("发送早安信息")
 
 
-morning_cmd = on_command("morning", aliases={"早安"}, permission=GROUP, block=True)
+morning_cmd = on_command("morning", aliases={"早安"}, block=True)
 
 
 @morning_cmd.handle()
