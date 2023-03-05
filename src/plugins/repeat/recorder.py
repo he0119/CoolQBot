@@ -105,9 +105,9 @@ class Recorder(metaclass=Singleton):
     def __init__(
         self,
         platform: str,
-        group_id: str | None,
-        guild_id: str | None,
-        channel_id: str | None,
+        group_id: str,
+        guild_id: str,
+        channel_id: str,
     ):
         self._msg_send_time: list[datetime] = []
         self._last_message_on: datetime = datetime.now()
