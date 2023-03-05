@@ -86,10 +86,19 @@ def update_old_2(data: dict, group_id: int):
 class Singleton(type):
     _instances = {}
 
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super().__call__(*args, **kwargs)
-        return cls._instances[cls]
+    def __call__(
+        cls,
+        platform: str,
+        group_id: str | None,
+        guild_id: str | None,
+        channel_id: str | None,
+    ):
+        key = (platform, group_id, guild_id, channel_id)
+        if key not in cls._instances:
+            cls._instances[key] = super().__call__(
+                platform, group_id, guild_id, channel_id
+            )
+        return cls._instances[key]
 
 
 class Recorder(metaclass=Singleton):
