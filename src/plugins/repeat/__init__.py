@@ -26,6 +26,8 @@ repeat = CommandGroup("repeat", block=True)
 global_config = get_driver().config
 plugin_config = Config.parse_obj(global_config)
 
-from .recorder import update
+from .recorder import Recorder
 
-# _sub_plugins |= nonebot.load_plugins(str((Path(__file__).parent / "plugins").resolve()))
+recorder_obj = Recorder()
+
+_sub_plugins |= nonebot.load_plugins(str((Path(__file__).parent / "plugins").resolve()))

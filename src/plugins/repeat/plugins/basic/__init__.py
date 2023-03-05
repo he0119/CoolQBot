@@ -1,16 +1,21 @@
 """ 复读 """
 from nonebot import on_message
-from nonebot.adapters.onebot.v11 import Message
-from nonebot.adapters.onebot.v11.event import GroupMessageEvent
-from nonebot.adapters.onebot.v11.permission import GROUP
-from nonebot.log import logger
-from nonebot.params import CommandArg
+from nonebot.adapters import Event, Message
+from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata
-from nonebot_plugin_apscheduler import scheduler
+from nonebot_plugin_datastore import get_session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import strtobool
+from src.utils.helpers import (
+    GroupOrChannel,
+    get_group_or_channel,
+    get_platform,
+    strtobool,
+)
 
-from ... import plugin_config, recorder_obj, repeat
+from ... import repeat
+from ...models import Enabled
 from .repeat_rule import need_repeat
 
 __plugin_meta__ = PluginMetadata(
@@ -23,46 +28,20 @@ __plugin_meta__ = PluginMetadata(
 关闭复读功能
 /repeat off""",
     extra={
-        "adapters": ["OneBot V11"],
+        "adapters": ["OneBot V11", "OneBot V12"],
     },
 )
 
 
-# region 自动保存数据
-@scheduler.scheduled_job("interval", minutes=1, id="save_recorder")
-async def save_recorder():
-    """每隔一分钟保存一次数据"""
-    # 保存数据前先清理 msg_send_time 列表，仅保留最近 10 分钟的数据
-    for group_id in plugin_config.group_id:
-        recorder_obj.message_number(10, group_id)
-
-    recorder_obj.save_data()
-
-
-@scheduler.scheduled_job("cron", day=1, hour=0, minute=0, second=0, id="clear_recorder")
-async def clear_recorder():
-    """每个月最后一天 24 点（下月 0 点）保存记录于历史记录文件夹，并重置记录"""
-    recorder_obj.save_data_to_history()
-    recorder_obj.init_data()
-    logger.info("记录清除完成")
-
-
-# endregion
-# region 复读
-repeat_message = on_message(
-    rule=need_repeat,
-    permission=GROUP,
-    priority=5,
-    block=True,
-)
+repeat_message = on_message(rule=need_repeat, priority=50, block=True)
 
 
 @repeat_message.handle()
-async def repeat_message_handle(event: GroupMessageEvent):
-    await repeat_message.finish(event.message)
+async def repeat_message_handle(event: Event):
+    await repeat_message.finish(event.get_message())
 
 
-repeat_cmd = repeat.command("basic", aliases={"repeat", "复读"}, permission=GROUP)
+repeat_cmd = repeat.command("basic", aliases={"repeat", "复读"})
 repeat_cmd.__doc__ = """
 复读
 
@@ -71,26 +50,36 @@ repeat_cmd.__doc__ = """
 
 
 @repeat_cmd.handle()
-async def repeat_handle(event: GroupMessageEvent, arg: Message = CommandArg()):
+async def repeat_handle(
+    arg: Message = CommandArg(),
+    session: AsyncSession = Depends(get_session),
+    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    platform: str = Depends(get_platform),
+):
     args = arg.extract_plain_text()
 
-    group_id = event.group_id
+    group = (
+        await session.scalars(
+            select(Enabled)
+            .where(Enabled.platform == platform)
+            .where(Enabled.group_id == group_or_channel.group_id)
+            .where(Enabled.guild_id == group_or_channel.guild_id)
+            .where(Enabled.channel_id == group_or_channel.channel_id)
+        )
+    ).one_or_none()
 
-    if args and group_id:
+    if args:
         if strtobool(args):
-            plugin_config.group_id += [group_id]
-            recorder_obj.add_new_group()
+            if not group:
+                session.add(Enabled(platform=platform, **group_or_channel.dict()))
+                await session.commit()
             await repeat_cmd.finish("已在本群开启复读功能")
         else:
-            plugin_config.group_id = [
-                n for n in plugin_config.group_id if n != group_id
-            ]
+            await session.delete(group)
+            await session.commit()
             await repeat_cmd.finish("已在本群关闭复读功能")
     else:
-        if group_id in plugin_config.group_id:
+        if group:
             await repeat_cmd.finish("复读功能开启中")
         else:
             await repeat_cmd.finish("复读功能关闭中")
-
-
-# endregion
