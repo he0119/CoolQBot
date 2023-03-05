@@ -126,8 +126,9 @@ async def morning_handle(
                 await session.commit()
             await morning_cmd.finish("已在本群开启每日早安功能")
         else:
-            await session.delete(group)
-            await session.commit()
+            if group:
+                await session.delete(group)
+                await session.commit()
             await morning_cmd.finish("已在本群关闭每日早安功能")
     else:
         if group:

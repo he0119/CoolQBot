@@ -105,8 +105,9 @@ async def hello_handle(
                 await session.commit()
             await hello_cmd.finish("已在本群开启启动问候功能")
         else:
-            await session.delete(group)
-            await session.commit()
+            if group:
+                await session.delete(group)
+                await session.commit()
             await hello_cmd.finish("已在本群关闭启动问候功能")
     else:
         if group:
