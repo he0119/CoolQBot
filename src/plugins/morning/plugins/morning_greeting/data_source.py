@@ -2,11 +2,11 @@ from datetime import date, timedelta
 from typing import TypedDict
 
 from dateutil import parser
-from nonebot.adapters.onebot.v11 import Message
+from nonebot_plugin_datastore import get_plugin_data
 
 from src.utils.helpers import render_expression
 
-from ... import DATA
+plugin_data = get_plugin_data()
 
 
 class HolidayInfo(TypedDict):
@@ -32,7 +32,7 @@ def process_data(data: dict) -> dict:
     return holidays
 
 
-HOLIDAYS_DATA = DATA.network_file(
+HOLIDAYS_DATA = plugin_data.network_file(
     "https://raw.fastgit.org/he0119/CoolQBot/master/src/plugins/morning/holidays.json",
     "holidays.json",
     process_data,
@@ -212,7 +212,7 @@ EXPR_MORNING = (
 )
 
 
-async def get_moring_message() -> Message:
+async def get_moring_message() -> str:
     """获得早上问好"""
     message = await get_holiday_message()
     return render_expression(EXPR_MORNING, message=message)

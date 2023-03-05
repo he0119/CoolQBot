@@ -1,16 +1,26 @@
 """ 启动问候 """
+from typing import Any
+
 import nonebot
-from nonebot.adapters.onebot.v11 import Bot, Message
-from nonebot.adapters.onebot.v11.event import GroupMessageEvent
-from nonebot.adapters.onebot.v11.permission import GROUP
+from nonebot.adapters import Message
+from nonebot.adapters.onebot.v11 import Bot as V11Bot
+from nonebot.adapters.onebot.v12 import Bot as V12Bot
 from nonebot.log import logger
-from nonebot.params import CommandArg
+from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata, on_command
+from nonebot_plugin_datastore import get_session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import strtobool
+from src.utils.helpers import (
+    GroupOrChannel,
+    get_group_or_channel,
+    get_platform,
+    strtobool,
+)
 
-from ... import plugin_config
 from .data_source import get_first_connect_message
+from .models import Hello
 
 __plugin_meta__ = PluginMetadata(
     name="启动问候",
@@ -24,7 +34,7 @@ __plugin_meta__ = PluginMetadata(
 关闭启动问候功能
 /hello off""",
     extra={
-        "adapters": ["OneBot V11"],
+        "adapters": ["OneBot V11", "OneBot V12"],
     },
 )
 
@@ -32,34 +42,74 @@ driver = nonebot.get_driver()
 
 
 @driver.on_bot_connect
-async def hello_on_connect(bot: Bot) -> None:
+async def hello_on_connect(
+    bot: V11Bot | V12Bot,
+    session: AsyncSession = Depends(get_session),
+    platform: str = Depends(get_platform),
+) -> None:
     """启动时发送问候"""
+    groups = (
+        await session.scalars(select(Hello).where(Hello.platform == platform))
+    ).all()
+    if not groups:
+        return
+
     hello_str = get_first_connect_message()
-    for group_id in plugin_config.hello_group_id:
-        await bot.send_msg(message_type="group", group_id=group_id, message=hello_str)
+    for group in groups:
+        params: Any = {
+            "message_type": "group" if group.group_id else "channel",
+            "message": hello_str,
+        }
+        if isinstance(bot, V11Bot):
+            params["group_id"] = int(group.group_id) if group.group_id else None
+            await bot.send_msg(**params)
+        else:
+            params["group_id"] = group.group_id
+            params["guild_id"] = group.guild_id
+            params["channel_id"] = group.channel_id
+            await bot.send_message(**params)
     logger.info("发送首次启动的问候")
 
 
-hello_cmd = on_command("hello", aliases={"问候"}, permission=GROUP, block=True)
+hello_cmd = on_command("hello", aliases={"问候"}, block=True)
 
 
 @hello_cmd.handle()
-async def hello_handle(event: GroupMessageEvent, arg: Message = CommandArg()):
+async def hello_handle(
+    arg: Message = CommandArg(),
+    session: AsyncSession = Depends(get_session),
+    platform: str = Depends(get_platform),
+    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+):
     args = arg.extract_plain_text()
 
-    group_id = event.group_id
+    group = (
+        await session.scalars(
+            select(Hello)
+            .where(Hello.platform == platform)
+            .where(Hello.group_id == group_or_channel.group_id)
+            .where(Hello.guild_id == group_or_channel.guild_id)
+            .where(Hello.channel_id == group_or_channel.channel_id)
+        )
+    ).one_or_none()
 
-    if args and group_id:
+    if args:
         if strtobool(args):
-            plugin_config.hello_group_id += [group_id]
+            if not group:
+                session.add(
+                    Hello(
+                        platform=platform,
+                        **group_or_channel.dict(exclude={"message_type"}),
+                    )
+                )
+                await session.commit()
             await hello_cmd.finish("已在本群开启启动问候功能")
         else:
-            plugin_config.hello_group_id = [
-                n for n in plugin_config.hello_group_id if n != group_id
-            ]
+            await session.delete(group)
+            await session.commit()
             await hello_cmd.finish("已在本群关闭启动问候功能")
     else:
-        if group_id in plugin_config.hello_group_id:
+        if group:
             await hello_cmd.finish("启动问候功能开启中")
         else:
             await hello_cmd.finish("启动问候功能关闭中")
