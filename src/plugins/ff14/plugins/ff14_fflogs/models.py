@@ -7,11 +7,7 @@ Model = get_plugin_data().Model
 
 
 class User(Model):
-    __table_args__ = (
-        UniqueConstraint(
-            "platform", "user_id", "character_name", "server_name", name="unique-user"
-        ),
-    )
+    __table_args__ = (UniqueConstraint("platform", "user_id", name="unique-user"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
 

@@ -103,14 +103,23 @@ class FFLogs:
     ) -> None:
         """设置角色名和服务器名"""
         async with create_session() as session:
-            await session.merge(
-                User(
-                    platform=platform,
-                    user_id=user_id,
-                    character_name=character_name,
-                    server_name=server_name,
-                )
+            user = await session.scalar(
+                select(User)
+                .where(User.platform == platform)
+                .where(User.user_id == user_id)
             )
+            if user:
+                user.character_name = character_name
+                user.server_name = server_name
+            else:
+                session.add(
+                    User(
+                        platform=platform,
+                        user_id=user_id,
+                        character_name=character_name,
+                        server_name=server_name,
+                    )
+                )
             await session.commit()
 
     async def get_character(self, platform: str, user_id: str) -> User | None:

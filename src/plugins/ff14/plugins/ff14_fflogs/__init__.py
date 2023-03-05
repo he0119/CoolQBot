@@ -2,12 +2,14 @@
 
 查询副本输出数据。
 """
+from nonebot import logger
 from nonebot.adapters import Event, Message, MessageSegment
 from nonebot.adapters.onebot.v11 import Bot as V11Bot
 from nonebot.adapters.onebot.v12 import Bot as V12Bot
 from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot_plugin_datastore import get_plugin_data
+from nonebot_plugin_datastore.db import post_db_init
 
 from src.utils.helpers import MentionedUser, get_mentioned_user, strtobool
 
@@ -211,3 +213,16 @@ async def get_character_dps_by_user_id(boss_nickname: str, platform: str, user_i
     return await fflogs.character_dps(
         boss_nickname, user.character_name, user.server_name
     )
+
+
+@post_db_init
+async def data_migration():
+    """数据迁移"""
+    file_path = get_plugin_data("ff14").data_dir / "characters.pkl"
+    if file_path.exists():
+        logger.info("正在迁移数据")
+        characters = get_plugin_data("ff14").load_pkl("characters.pkl")
+        for user_id, character in characters.items():
+            await fflogs.set_character("qq", user_id, character[0], character[1])
+        file_path.rename(file_path.with_suffix(".pkl.bak"))
+        logger.info("数据迁移完成")
