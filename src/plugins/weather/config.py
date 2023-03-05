@@ -6,7 +6,7 @@ DATA = PluginData("weather")
 
 
 class Config(BaseSettings):
-    heweather_key: str = DATA.config.get("heweather_key", "")
+    heweather_key: str | None
 
     class Config:
         extra = "ignore"

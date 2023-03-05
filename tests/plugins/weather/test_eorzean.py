@@ -1,3 +1,4 @@
+from nonebot.adapters.onebot.v11 import Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -6,10 +7,6 @@ from tests.fake import fake_group_message_event_v11
 
 async def test_eorzean(app: App, mocker: MockerFixture):
     """测试艾欧泽亚天气"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.weather")
     from src.plugins.weather import weather_cmd
 
     mocked_time = mocker.patch("src.plugins.weather.eorzean_api.time")
@@ -32,10 +29,6 @@ async def test_eorzean(app: App, mocker: MockerFixture):
 
 async def test_eorzean_fuzzy(app: App, mocker: MockerFixture):
     """艾欧泽亚天气，模糊搜索"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.weather")
     from src.plugins.weather import weather_cmd
 
     mocked_time = mocker.patch("src.plugins.weather.eorzean_api.time")
