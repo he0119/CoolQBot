@@ -1,11 +1,15 @@
 """ 复读排行榜
 """
 import collections
+from collections.abc import Sequence
 from operator import itemgetter
 
-from nonebot.adapters.onebot.v11 import Bot
+from nonebot.adapters import Bot
 
-from ... import plugin_config, recorder_obj
+from src.utils.helpers import get_nickname
+
+from ...models import Record
+from ...recorder import Recorder
 
 
 async def get_rank(
@@ -13,23 +17,26 @@ async def get_rank(
     display_number: int,
     minimal_msg_number: int,
     display_total_number: bool,
-    group_id: int,
+    platform: str,
+    group_id: str,
+    guild_id: str,
+    channel_id: str,
 ) -> str:
     """获取排行榜"""
-    if group_id not in plugin_config.group_id:
+    recorder = Recorder(platform, group_id, guild_id, channel_id)
+
+    if not await recorder.is_enabled():
         return "该群未开启复读功能，无法获取排行榜。"
 
-    repeat_list = recorder_obj.repeat_list(group_id)
-    msg_number_list = recorder_obj.msg_number_list(group_id)
+    records = await recorder.get_records()
 
     ranking = Ranking(
         bot,
-        group_id,
+        records,
         display_number,
         minimal_msg_number,
         display_total_number,
-        repeat_list,
-        msg_number_list,
+        group_id,
     )
     str_data = await ranking.ranking()
 
@@ -45,24 +52,29 @@ class Ranking:
     def __init__(
         self,
         bot: Bot,
-        group_id: int,
+        records: Sequence[Record],
         display_number: int,
         minimal_msg_number: int,
         display_total_number: bool,
-        repeat_list,
-        msg_number_list,
+        group_id: str | None = None,
     ):
         self.bot = bot
-        self.group_id = group_id
+        self.records = records
         self.display_number = display_number
         self.minimal_msg_number = minimal_msg_number
         self.display_total_number = display_total_number
-        self.repeat_list = repeat_list
-        self.msg_number_list = msg_number_list
+        self.group_id = group_id
         self._nickname_cache = {}
 
     async def ranking(self):
         """合并两个排行榜"""
+        self.repeat_list = {
+            record.user_id: record.repeat_time for record in self.records
+        }
+        self.msg_number_list = {
+            record.user_id: record.msg_number for record in self.records
+        }
+
         repeat_rate_ranking = await self.repeat_rate_ranking()
         repeat_number_ranking = await self.repeat_number_ranking()
 
@@ -125,20 +137,6 @@ class Ranking:
         if user_id in self._nickname_cache:
             return self._nickname_cache[user_id]
         else:
-            name = await self._nikcname(user_id)
+            name = await get_nickname(self.bot, user_id, self.group_id)
             self._nickname_cache[user_id] = name
             return name
-
-    async def _nikcname(self, user_id):
-        """输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称"""
-        try:
-            msg = await self.bot.get_group_member_info(
-                group_id=self.group_id, user_id=user_id, no_cache=True
-            )
-            if msg["card"]:
-                return msg["card"]
-            return msg["nickname"]
-        except:
-            # 如果不在群里的话(因为有可能会退群)
-            msg = await self.bot.get_stranger_info(user_id=user_id)
-            return msg["nickname"]

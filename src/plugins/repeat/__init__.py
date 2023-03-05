@@ -9,24 +9,22 @@ import nonebot
 from nonebot import CommandGroup, get_driver
 from nonebot.plugin import PluginMetadata
 
-from .config import DATA, Config
+from .config import Config
 
 __plugin_meta__ = PluginMetadata(
     name="复读",
     description="与复读有关的功能",
     usage="与复读有关的功能",
     extra={
-        "adapters": ["OneBot V11"],
+        "adapters": ["OneBot V11", "OneBot V12"],
     },
 )
 
 _sub_plugins = set()
 
 repeat = CommandGroup("repeat", block=True)
+
 global_config = get_driver().config
 plugin_config = Config.parse_obj(global_config)
-from .recorder import Recorder
-
-recorder_obj = Recorder("recorder.pkl")
 
 _sub_plugins |= nonebot.load_plugins(str((Path(__file__).parent / "plugins").resolve()))

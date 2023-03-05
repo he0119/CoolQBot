@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-import pytest
+from nonebot.adapters.onebot.v11 import Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -46,14 +46,10 @@ def mocked_get(url: str):
 
 async def test_heweather(app: App, mocker: MockerFixture):
     """测试和风天气"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.weather")
     from src.plugins.weather import weather_cmd
     from src.plugins.weather.heweather_api import plugin_config
 
-    plugin_config.heweather_key = "1234567890"
+    mocker.patch.object(plugin_config, "heweather_key", "1234567890")
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
@@ -86,14 +82,10 @@ async def test_heweather(app: App, mocker: MockerFixture):
 
 async def test_heweather_with_adm(app: App, mocker: MockerFixture):
     """测试和风天气，带行政区划"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.weather")
     from src.plugins.weather import weather_cmd
     from src.plugins.weather.heweather_api import plugin_config
 
-    plugin_config.heweather_key = "1234567890"
+    mocker.patch.object(plugin_config, "heweather_key", "1234567890")
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
@@ -126,14 +118,10 @@ async def test_heweather_with_adm(app: App, mocker: MockerFixture):
 
 async def test_heweather_with_three_args(app: App, mocker: MockerFixture):
     """测试和风天气，输入三个参数"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.weather")
     from src.plugins.weather import weather_cmd
     from src.plugins.weather.heweather_api import plugin_config
 
-    plugin_config.heweather_key = "1234567890"
+    mocker.patch.object(plugin_config, "heweather_key", "1234567890")
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 

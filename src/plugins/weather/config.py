@@ -1,15 +1,9 @@
 from nonebot import get_driver
-from nonebot_plugin_datastore import PluginData
-from pydantic import BaseSettings
-
-DATA = PluginData("weather")
+from pydantic import BaseModel, Extra
 
 
-class Config(BaseSettings):
-    heweather_key: str = DATA.config.get("heweather_key", "")
-
-    class Config:
-        extra = "ignore"
+class Config(BaseModel, extra=Extra.ignore):
+    heweather_key: str | None
 
 
 global_config = get_driver().config

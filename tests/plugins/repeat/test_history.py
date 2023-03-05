@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import date, datetime
 
-import pytest
+from nonebot.adapters.onebot.v11 import Bot, Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -9,23 +9,30 @@ from tests.fake import fake_group_message_event_v11
 
 async def test_history(app: App, mocker: MockerFixture):
     """测试历史"""
-    from nonebot import require
+    from nonebot_plugin_datastore import create_session
 
-    require("src.plugins.repeat")
-    from nonebot.adapters.onebot.v11 import Bot, Message
-
-    from src.plugins.repeat import plugin_config, recorder_obj
-    from src.plugins.repeat.plugins.history import history_cmd
+    from src.plugins.repeat.models import Enabled, Record
+    from src.plugins.repeat.plugins.repeat_history import history_cmd
 
     mocked_datetime = mocker.patch(
-        "src.plugins.repeat.plugins.history.data_source.datetime"
+        "src.plugins.repeat.plugins.repeat_history.data_source.datetime"
     )
     mocked_datetime.now.return_value = datetime(2020, 1, 2)
     mocked_datetime.return_value = datetime(2020, 1, 1)
 
-    plugin_config.group_id = [10000]
-    recorder_obj._msg_number_list = {10000: {1: {10: 100}}}
-    recorder_obj._repeat_list = {10000: {1: {10: 10}}}
+    async with create_session() as session:
+        session.add(Enabled(platform="qq", group_id=10000))
+        session.add(
+            Record(
+                date=date(2020, 1, 1),
+                platform="qq",
+                group_id=10000,
+                user_id=10,
+                msg_number=100,
+                repeat_time=10,
+            )
+        )
+        await session.commit()
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -35,7 +42,7 @@ async def test_history(app: App, mocker: MockerFixture):
         ctx.receive_event(bot, event)
         ctx.should_call_api(
             "get_group_member_info",
-            data={"group_id": 10000, "user_id": 10, "no_cache": True},
+            data={"group_id": 10000, "user_id": 10},
             result={"card": "test"},
         )
         ctx.should_call_send(
@@ -51,23 +58,30 @@ async def test_history(app: App, mocker: MockerFixture):
 
 async def test_history_get_arg(app: App, mocker: MockerFixture):
     """请求参数"""
-    from nonebot import require
+    from nonebot_plugin_datastore import create_session
 
-    require("src.plugins.repeat")
-    from nonebot.adapters.onebot.v11 import Bot, Message
+    from src.plugins.repeat.models import Enabled, Record
+    from src.plugins.repeat.plugins.repeat_history import history_cmd
 
-    from src.plugins.repeat import plugin_config, recorder_obj
-    from src.plugins.repeat.plugins.history import history_cmd
+    async with create_session() as session:
+        session.add(Enabled(platform="qq", group_id=10000))
+        session.add(
+            Record(
+                date=date(2020, 1, 1),
+                platform="qq",
+                group_id=10000,
+                user_id=10,
+                msg_number=100,
+                repeat_time=10,
+            )
+        )
+        await session.commit()
 
     mocked_datetime = mocker.patch(
-        "src.plugins.repeat.plugins.history.data_source.datetime"
+        "src.plugins.repeat.plugins.repeat_history.data_source.datetime"
     )
     mocked_datetime.now.return_value = datetime(2020, 1, 2)
     mocked_datetime.return_value = datetime(2020, 1, 1)
-
-    plugin_config.group_id = [10000]
-    recorder_obj._msg_number_list = {10000: {1: {10: 100}}}
-    recorder_obj._repeat_list = {10000: {1: {10: 10}}}
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -89,7 +103,7 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
         ctx.receive_event(bot, day_event)
         ctx.should_call_api(
             "get_group_member_info",
-            data={"group_id": 10000, "user_id": 10, "no_cache": True},
+            data={"group_id": 10000, "user_id": 10},
             result={"card": "test"},
         )
         ctx.should_call_send(
@@ -104,15 +118,14 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
 
 async def test_history_get_invalid_args(app: App):
     """参数错误的情况"""
-    from nonebot import require
+    from nonebot_plugin_datastore import create_session
 
-    require("src.plugins.repeat")
-    from nonebot.adapters.onebot.v11 import Bot, Message
+    from src.plugins.repeat.models import Enabled
+    from src.plugins.repeat.plugins.repeat_history import history_cmd
 
-    from src.plugins.repeat import plugin_config
-    from src.plugins.repeat.plugins.history import history_cmd
-
-    plugin_config.group_id = [10000]
+    async with create_session() as session:
+        session.add(Enabled(platform="qq", group_id=10000))
+        await session.commit()
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -142,11 +155,7 @@ async def test_history_get_invalid_args(app: App):
 
 async def test_history_not_enabled(app: App):
     """没有启用复读的情况"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Bot, Message
-
-    require("src.plugins.repeat")
-    from src.plugins.repeat.plugins.history import history_cmd
+    from src.plugins.repeat.plugins.repeat_history import history_cmd
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)

@@ -1,17 +1,17 @@
 """ 历史记录 """
 import re
 
-from nonebot.adapters.onebot.v11 import (
-    Bot,
-    GroupMessageEvent,
-    Message,
-    PrivateMessageEvent,
-)
+from nonebot.adapters import Bot, Message
 from nonebot.params import Arg, CommandArg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
-from src.utils.helpers import parse_int
+from src.utils.helpers import (
+    GroupOrChannel,
+    get_group_or_channel,
+    get_platform,
+    parse_int,
+)
 
 from ... import repeat
 from .data_source import get_history
@@ -63,54 +63,18 @@ async def history_handle_first_receive(state: T_State, arg: Message = CommandArg
 )
 async def history_handle_group_message(
     bot: Bot,
-    event: GroupMessageEvent,
     year: int = Arg(),
     month: int = Arg(),
     day: int = Arg(),
+    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    platform: str = Depends(get_platform),
 ):
     res = await get_history(
         bot,
         year=year,
         month=month,
         day=day,
-        group_id=event.group_id,
-    )
-    await history_cmd.finish(res)
-
-
-@history_cmd.got(
-    "year",
-    prompt="你请输入你要查询的年份",
-    parameterless=[Depends(parse_int("year"))],
-)
-@history_cmd.got(
-    "month",
-    prompt="你请输入你要查询的月份",
-    parameterless=[Depends(parse_int("month"))],
-)
-@history_cmd.got(
-    "day",
-    prompt="你请输入你要查询的日期（如查询整月排名请输入 0）",
-    parameterless=[Depends(parse_int("day"))],
-)
-@history_cmd.got(
-    "group_id",
-    prompt="请问你想查询哪个群？",
-    parameterless=[Depends(parse_int("group_id"))],
-)
-async def history_handle_private_message(
-    bot: Bot,
-    event: PrivateMessageEvent,
-    year: int = Arg(),
-    month: int = Arg(),
-    day: int = Arg(),
-    group_id: int = Arg(),
-):
-    res = await get_history(
-        bot=bot,
-        year=year,
-        month=month,
-        day=day,
-        group_id=group_id,
+        platform=platform,
+        **group_or_channel.dict(),
     )
     await history_cmd.finish(res)

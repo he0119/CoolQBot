@@ -2,8 +2,11 @@
 
 副本与职业数据
 """
-from ... import DATA
-from .fflogs_models import BossInfo, FFlogsDataModel, JobInfo
+from nonebot_plugin_datastore import get_plugin_data
+
+from .models import BossInfo, FFlogsDataModel, JobInfo
+
+plugin_data = get_plugin_data()
 
 
 def parse_data(data: dict) -> FFlogsDataModel:
@@ -11,7 +14,7 @@ def parse_data(data: dict) -> FFlogsDataModel:
     return FFlogsDataModel.parse_obj(data)
 
 
-FFLOGS_DATA = DATA.network_file(
+FFLOGS_DATA = plugin_data.network_file(
     "https://raw.fastgit.org/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json",
     "fflogs_data.json",
     parse_data,  # type: ignore

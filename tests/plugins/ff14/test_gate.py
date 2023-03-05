@@ -1,3 +1,4 @@
+from nonebot.adapters.onebot.v11 import Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -6,19 +7,14 @@ from tests.fake import fake_group_message_event_v11
 
 async def test_gete(app: App, mocker: MockerFixture):
     """测试藏宝选门，两个门的情况"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.ff14")
-
-    from src.plugins.ff14.plugins.gate import gate_cmd
-    from src.plugins.ff14.plugins.gate.data_source import EXPR_GATE
+    from src.plugins.ff14.plugins.ff14_gate import gate_cmd
+    from src.plugins.ff14.plugins.ff14_gate.data_source import EXPR_GATE
 
     render_expression = mocker.patch(
-        "src.plugins.ff14.plugins.gate.data_source.render_expression"
+        "src.plugins.ff14.plugins.ff14_gate.data_source.render_expression"
     )
     render_expression.return_value = Message("test")
-    randint = mocker.patch("src.plugins.ff14.plugins.gate.data_source.randint")
+    randint = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.randint")
     randint.return_value = 1
 
     async with app.test_matcher(gate_cmd) as ctx:
@@ -35,19 +31,14 @@ async def test_gete(app: App, mocker: MockerFixture):
 
 async def test_gete_ask_arg(app: App, mocker: MockerFixture):
     """测试藏宝选门，两个门的情况"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.ff14")
-
-    from src.plugins.ff14.plugins.gate import gate_cmd
-    from src.plugins.ff14.plugins.gate.data_source import EXPR_GATE
+    from src.plugins.ff14.plugins.ff14_gate import gate_cmd
+    from src.plugins.ff14.plugins.ff14_gate.data_source import EXPR_GATE
 
     render_expression = mocker.patch(
-        "src.plugins.ff14.plugins.gate.data_source.render_expression"
+        "src.plugins.ff14.plugins.ff14_gate.data_source.render_expression"
     )
     render_expression.return_value = Message("test")
-    randint = mocker.patch("src.plugins.ff14.plugins.gate.data_source.randint")
+    randint = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.randint")
     randint.return_value = 1
 
     async with app.test_matcher(gate_cmd) as ctx:
@@ -67,19 +58,14 @@ async def test_gete_ask_arg(app: App, mocker: MockerFixture):
 
 async def test_gete_ask_arg_error(app: App, mocker: MockerFixture):
     """测试藏宝选门，两个门的情况，第一次输入错误"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.ff14")
-
-    from src.plugins.ff14.plugins.gate import gate_cmd
-    from src.plugins.ff14.plugins.gate.data_source import EXPR_GATE
+    from src.plugins.ff14.plugins.ff14_gate import gate_cmd
+    from src.plugins.ff14.plugins.ff14_gate.data_source import EXPR_GATE
 
     render_expression = mocker.patch(
-        "src.plugins.ff14.plugins.gate.data_source.render_expression"
+        "src.plugins.ff14.plugins.ff14_gate.data_source.render_expression"
     )
     render_expression.return_value = Message("test")
-    randint = mocker.patch("src.plugins.ff14.plugins.gate.data_source.randint")
+    randint = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.randint")
     randint.return_value = 1
 
     async with app.test_matcher(gate_cmd) as ctx:

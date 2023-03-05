@@ -23,6 +23,19 @@
       ],
       "console": "integratedTerminal",
       "justMyCode": false,
+    },
+    {
+      "name": "CoolQBot Test - Single",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "-s",
+        "-k",
+        "test_hello_disable"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false,
     }
   ]
 }

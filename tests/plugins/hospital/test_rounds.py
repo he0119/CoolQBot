@@ -1,21 +1,20 @@
 from typing import TYPE_CHECKING
 
 import pytest
+from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 from nonebug import App
 
 from tests.fake import fake_group_message_event_v11
 
 if TYPE_CHECKING:
-    from sqlmodel.ext.asyncio.session import AsyncSession
+    from sqlalchemy.ext.asyncio.session import AsyncSession
 
 
-@pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
 async def test_rounds(app: App, session: "AsyncSession"):
     """测试查房"""
-    from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 
-    from src.plugins.hospital import rounds_cmd
-    from src.plugins.hospital.model import Patient
+    from src.plugins.cyber_hospital import rounds_cmd
+    from src.plugins.cyber_hospital.model import Patient
 
     async with app.test_matcher(rounds_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -86,13 +85,10 @@ async def test_rounds(app: App, session: "AsyncSession"):
         ctx.should_finished()
 
 
-@pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
 async def test_rounds_with_record(app: App, session: "AsyncSession"):
     """测试查房并录入病情"""
-    from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
-
-    from src.plugins.hospital import rounds_cmd
-    from src.plugins.hospital.model import Patient
+    from src.plugins.cyber_hospital import rounds_cmd
+    from src.plugins.cyber_hospital.model import Patient
 
     patient = Patient(user_id="123456", group_id="10000")
     session.add(patient)

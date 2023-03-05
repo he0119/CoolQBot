@@ -2,21 +2,19 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 import pytest
+from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 from nonebug import App
 
 from tests.fake import fake_group_message_event_v11
 
 if TYPE_CHECKING:
-    from sqlmodel.ext.asyncio.session import AsyncSession
+    from sqlalchemy.ext.asyncio.session import AsyncSession
 
 
-@pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
 async def test_record(app: App, session: "AsyncSession"):
     """测试病历"""
-    from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
-
-    from src.plugins.hospital import record_cmd
-    from src.plugins.hospital.model import Patient, Record
+    from src.plugins.cyber_hospital import record_cmd
+    from src.plugins.cyber_hospital.model import Patient, Record
 
     patient = Patient(
         user_id="123456",
@@ -62,13 +60,10 @@ async def test_record(app: App, session: "AsyncSession"):
         ctx.should_finished()
 
 
-@pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
 async def test_record_empty(app: App, session: "AsyncSession"):
     """测试病历为空"""
-    from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
-
-    from src.plugins.hospital import record_cmd
-    from src.plugins.hospital.model import Patient
+    from src.plugins.cyber_hospital import record_cmd
+    from src.plugins.cyber_hospital.model import Patient
 
     patient = Patient(user_id="123456", group_id="10000")
     session.add(patient)

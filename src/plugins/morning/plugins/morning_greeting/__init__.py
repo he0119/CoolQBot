@@ -1,16 +1,28 @@
 """ 每日早安 """
 from nonebot import get_bot
-from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
+from nonebot.adapters import Message
+from nonebot.adapters.onebot.v11 import Bot as V11Bot
 from nonebot.adapters.onebot.v11.permission import GROUP
+from nonebot.adapters.onebot.v12 import Bot as V12Bot
+from nonebot.adapters.onebot.v12 import Message as V12Message
 from nonebot.log import logger
-from nonebot.params import CommandArg
+from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata, on_command
 from nonebot_plugin_apscheduler import scheduler
+from nonebot_plugin_datastore import create_session, get_session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import strtobool
+from src.utils.helpers import (
+    GroupOrChannel,
+    get_group_or_channel,
+    get_platform,
+    strtobool,
+)
 
 from ... import plugin_config
 from .data_source import HOLIDAYS_DATA, get_moring_message
+from .models import MorningGreeting
 
 __plugin_meta__ = PluginMetadata(
     name="每日早安",
@@ -28,27 +40,46 @@ __plugin_meta__ = PluginMetadata(
 获取今天的问好
 /morning today""",
     extra={
-        "adapters": ["OneBot V11"],
+        "adapters": ["OneBot V11", "OneBot V12"],
     },
 )
 
 
 @scheduler.scheduled_job(
     "cron",
-    hour=plugin_config.morning_hour,
-    minute=plugin_config.morning_minute,
-    second=plugin_config.morning_second,
+    hour=plugin_config.morning_time.hour,
+    minute=plugin_config.morning_time.minute,
+    second=plugin_config.morning_time.second,
     id="morning",
 )
 async def morning():
     """早安"""
+    async with create_session() as session:
+        groups = (await session.scalars(select(MorningGreeting))).all()
+
+    if not groups:
+        return
+
     hello_str = await get_moring_message()
-    for group_id in plugin_config.morning_group_id:
-        await get_bot().send_msg(
-            message_type="group",
-            group_id=group_id,
-            message=hello_str,
-        )
+    for group in groups:
+        try:
+            bot = get_bot(group.bot_id)
+        except ValueError:
+            logger.warning(f"Bot {group.bot_id} 不存在，跳过")
+            continue
+        group = GroupOrChannel.parse_obj(group)
+        if isinstance(bot, V11Bot):
+            await get_bot().send_msg(
+                message_type="group",
+                group_id=group.group_id,
+                message=hello_str,
+            )
+        elif isinstance(bot, V12Bot):
+            await bot.send_message(
+                detail_type=group.detail_type,
+                message=V12Message(hello_str),
+                **group.dict(),
+            )
     logger.info("发送早安信息")
 
 
@@ -56,10 +87,14 @@ morning_cmd = on_command("morning", aliases={"早安"}, permission=GROUP, block=
 
 
 @morning_cmd.handle()
-async def morning_handle(event: GroupMessageEvent, arg: Message = CommandArg()):
+async def morning_handle(
+    bot: V11Bot | V12Bot,
+    arg: Message = CommandArg(),
+    session: AsyncSession = Depends(get_session),
+    platform: str = Depends(get_platform),
+    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+):
     args = arg.extract_plain_text()
-
-    group_id = event.group_id
 
     if args == "today":
         await morning_cmd.finish(await get_moring_message())
@@ -68,17 +103,35 @@ async def morning_handle(event: GroupMessageEvent, arg: Message = CommandArg()):
         await HOLIDAYS_DATA.update()
         await morning_cmd.finish("节假日数据更新成功")
 
-    if args and group_id:
+    group = (
+        await session.scalars(
+            select(MorningGreeting)
+            .where(MorningGreeting.bot_id == bot.self_id)
+            .where(MorningGreeting.platform == platform)
+            .where(MorningGreeting.group_id == group_or_channel.group_id)
+            .where(MorningGreeting.guild_id == group_or_channel.guild_id)
+            .where(MorningGreeting.channel_id == group_or_channel.channel_id)
+        )
+    ).one_or_none()
+    if args:
         if strtobool(args):
-            plugin_config.morning_group_id += [group_id]
+            if not group:
+                session.add(
+                    MorningGreeting(
+                        bot_id=bot.self_id,
+                        platform=platform,
+                        **group_or_channel.dict(),
+                    )
+                )
+                await session.commit()
             await morning_cmd.finish("已在本群开启每日早安功能")
         else:
-            plugin_config.morning_group_id = [
-                n for n in plugin_config.morning_group_id if n != group_id
-            ]
+            if group:
+                await session.delete(group)
+                await session.commit()
             await morning_cmd.finish("已在本群关闭每日早安功能")
     else:
-        if group_id in plugin_config.morning_group_id:
+        if group:
             await morning_cmd.finish("每日早安功能开启中")
         else:
             await morning_cmd.finish("每日早安功能关闭中")

@@ -5,8 +5,13 @@ from typing import cast
 
 from nonebot.adapters import Bot, Message, MessageSegment
 from nonebot.adapters.onebot.v11 import Bot as OneBotV11Bot
+from nonebot.adapters.onebot.v11 import GroupMessageEvent as OneBotV11GroupMessageEvent
 from nonebot.adapters.onebot.v11 import Message as OneBotV11Message
 from nonebot.adapters.onebot.v12 import Bot as OneBotV12Bot
+from nonebot.adapters.onebot.v12 import (
+    ChannelMessageEvent as OneBotV12ChannelMessageEvent,
+)
+from nonebot.adapters.onebot.v12 import GroupMessageEvent as OneBotV12GroupMessageEvent
 from nonebot.adapters.onebot.v12 import Message as OneBotV12Message
 from nonebot.matcher import Matcher
 from nonebot.params import Arg, CommandArg
@@ -138,3 +143,49 @@ async def get_mentioned_user(args: Message = CommandArg()) -> MentionedUser | No
         mention = mention[0]
         mention = cast(MessageSegment, mention)
         return MentionedUser(id=mention.data["user_id"], segment=mention)
+
+
+async def get_platform(bot: Bot) -> str | None:
+    """获取平台"""
+    if isinstance(bot, OneBotV11Bot):
+        return "qq"
+    elif isinstance(bot, OneBotV12Bot):
+        return bot.platform
+
+
+class GroupOrChannel(BaseModel):
+    group_id: str
+    channel_id: str
+    guild_id: str
+
+    @property
+    def detail_type(self) -> str:
+        if self.group_id:
+            return "group"
+        return "channel"
+
+
+async def get_group_or_channel(
+    event: OneBotV11GroupMessageEvent
+    | OneBotV12GroupMessageEvent
+    | OneBotV12ChannelMessageEvent,
+) -> GroupOrChannel:
+    """获取群号或频道号"""
+    if isinstance(event, OneBotV11GroupMessageEvent):
+        group_id = str(event.group_id)
+        guild_id = ""
+        channel_id = ""
+    elif isinstance(event, OneBotV12GroupMessageEvent):
+        group_id = event.group_id
+        guild_id = ""
+        channel_id = ""
+    else:
+        group_id = ""
+        guild_id = event.guild_id
+        channel_id = event.channel_id
+
+    return GroupOrChannel(
+        group_id=group_id,
+        channel_id=channel_id,
+        guild_id=guild_id,
+    )

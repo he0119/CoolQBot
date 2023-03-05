@@ -1,134 +1,114 @@
 from datetime import datetime
 
 import pytest
+from nonebot.adapters.onebot.v11 import Bot, Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
 from tests.fake import fake_group_message_event_v11
 
 
-async def test_repeat(app: App, mocker: MockerFixture):
-    """测试复读"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
+@pytest.fixture
+async def records(app: App):
+    from nonebot_plugin_datastore import create_session
 
-    require("src.plugins.repeat")
-    from src.plugins.repeat import plugin_config, recorder_obj
-    from src.plugins.repeat.plugins.basic import repeat_message
+    from src.plugins.repeat.models import Enabled
+
+    async with create_session() as session:
+        session.add(Enabled(platform="qq", group_id="10000"))
+        await session.commit()
+
+
+async def test_repeat(app: App, mocker: MockerFixture, records: None):
+    """测试复读"""
+    from src.plugins.repeat.plugins.repeat_basic import repeat_message
 
     mocked_rule_datetime = mocker.patch(
-        "src.plugins.repeat.plugins.basic.repeat_rule.datetime"
+        "src.plugins.repeat.plugins.repeat_basic.repeat_rule.datetime"
     )
     mocked_rule_datetime.now.return_value = datetime(2021, 1, 1, 0, 0, 0)
     mocked_recorder_datetime = mocker.patch("src.plugins.repeat.recorder.datetime")
     mocked_recorder_datetime.now.side_effect = [
-        datetime(2020, 1, 1, 0, 0, 0),  # add_new_group
-        datetime(2021, 1, 1, 1, 0, 0),  # add_msg_number_list
+        datetime(2020, 1, 1, 0, 0, 0),  # init
+        datetime(2021, 1, 1, 1, 0, 0),  # add_repeat_list
         datetime(2021, 1, 1, 2, 0, 0),  # reset_last_message_on
-        datetime(2021, 1, 1, 3, 0, 0),  # add_repeat_list
     ]
     mocked_random = mocker.patch(
-        "src.plugins.repeat.plugins.basic.repeat_rule.secrets.SystemRandom"
+        "src.plugins.repeat.plugins.repeat_basic.repeat_rule.secrets.SystemRandom"
     )
     mocked_random().randint.return_value = 1
 
-    plugin_config.group_id = [10000]
-    recorder_obj.add_new_group()
-
-    mocked_recorder_datetime.now.assert_called_once()
-
     async with app.test_matcher(repeat_message) as ctx:
-        bot = ctx.create_bot()
+        bot = ctx.create_bot(base=Bot)
         event = fake_group_message_event_v11(message=Message("123"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, event.message, "result")
+        ctx.should_call_send(event, event.message, None)
         ctx.should_finished()
 
-    assert mocked_recorder_datetime.now.call_count == 4
-    assert recorder_obj.last_message_on(10000) == datetime(2021, 1, 1, 2, 0, 0)
-    assert recorder_obj.repeat_list(10000) == {10: 1}
+    assert mocked_recorder_datetime.now.call_count == 3
 
 
-async def test_repeat_enabled(app: App):
+async def test_repeat_enabled(app: App, records: None):
     """测试复读已开启的情况"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.repeat")
-    from src.plugins.repeat import plugin_config
-    from src.plugins.repeat.plugins.basic import repeat_cmd
-
-    plugin_config.group_id = [10000]
+    from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        bot = ctx.create_bot()
+        bot = ctx.create_bot(base=Bot)
         event = fake_group_message_event_v11(message=Message("/repeat"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "复读功能开启中", "result")
+        ctx.should_call_send(event, "复读功能开启中", None)
         ctx.should_finished()
 
 
 async def test_repeat_not_enabled(app: App):
     """测试复读关闭的情况"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.repeat")
-    from src.plugins.repeat import plugin_config
-    from src.plugins.repeat.plugins.basic import repeat_cmd
+    from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        bot = ctx.create_bot()
+        bot = ctx.create_bot(base=Bot)
         event = fake_group_message_event_v11(message=Message("/repeat"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "复读功能关闭中", "result")
+        ctx.should_call_send(event, "复读功能关闭中", None)
         ctx.should_finished()
 
 
 async def test_repeat_enable(app: App):
     """测试复读，在群里启用的情况"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.repeat")
-    from src.plugins.repeat import plugin_config
-    from src.plugins.repeat.plugins.basic import repeat_cmd
-
-    assert plugin_config.group_id == []
+    from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        bot = ctx.create_bot()
+        bot = ctx.create_bot(base=Bot)
         event = fake_group_message_event_v11(message=Message("/repeat 1"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "已在本群开启复读功能", "result")
+        ctx.should_call_send(event, "已在本群开启复读功能", None)
         ctx.should_finished()
 
-    assert plugin_config.group_id == [10000]
 
-
-async def test_repeat_disable(app: App):
+async def test_repeat_disable(app: App, records: None):
     """测试复读，在群里关闭的情况"""
-    from nonebot import require
-    from nonebot.adapters.onebot.v11 import Message
-
-    require("src.plugins.repeat")
-    from src.plugins.repeat import plugin_config
-    from src.plugins.repeat.plugins.basic import repeat_cmd
-
-    plugin_config.group_id = [10000]
-
-    assert plugin_config.group_id == [10000]
+    from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        bot = ctx.create_bot()
+        bot = ctx.create_bot(base=Bot)
         event = fake_group_message_event_v11(message=Message("/repeat 0"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "已在本群关闭复读功能", "result")
+        ctx.should_call_send(event, "已在本群关闭复读功能", None)
         ctx.should_finished()
 
-    assert plugin_config.group_id == []
+
+async def test_repeat_disable_already_disabled(app: App):
+    """测试复读，群里已关闭的情况"""
+    from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
+
+    async with app.test_matcher(repeat_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(message=Message("/repeat 0"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "已在本群关闭复读功能", None)
+        ctx.should_finished()

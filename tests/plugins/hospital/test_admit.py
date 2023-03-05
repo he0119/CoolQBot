@@ -1,20 +1,18 @@
 from typing import TYPE_CHECKING
 
-import pytest
 from nonebug import App
 
 if TYPE_CHECKING:
-    from sqlmodel.ext.asyncio.session import AsyncSession
+    from sqlalchemy.ext.asyncio.session import AsyncSession
+
+from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
 from tests.fake import fake_group_message_event_v11
 
 
-@pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
-async def test_admin(app: App, session: "AsyncSession"):
+async def test_admin(app: App):
     """测试病人入院"""
-    from nonebot.adapters.onebot.v11 import Message, MessageSegment
-
-    from src.plugins.hospital import admit_cmd
+    from src.plugins.cyber_hospital import admit_cmd
 
     async with app.test_matcher(admit_cmd) as ctx:
         bot = ctx.create_bot()
@@ -47,13 +45,11 @@ async def test_admin(app: App, session: "AsyncSession"):
         ctx.should_finished()
 
 
-@pytest.mark.parametrize("app", [("src.plugins.hospital",)], indirect=True)
 async def test_admin_different_group(app: App, session: "AsyncSession"):
     """测试病人在不同群内入院"""
-    from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
-    from src.plugins.hospital import admit_cmd
-    from src.plugins.hospital.model import Patient
+    from src.plugins.cyber_hospital import admit_cmd
+    from src.plugins.cyber_hospital.model import Patient
 
     patient = Patient(user_id="123456", group_id="10001")
     session.add(patient)

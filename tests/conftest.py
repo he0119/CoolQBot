@@ -1,43 +1,40 @@
 from pathlib import Path
+from typing import TYPE_CHECKING
 
+import nonebot
 import pytest
+from nonebug import NONEBOT_INIT_KWARGS
 from nonebug.app import App
 
+if TYPE_CHECKING:
+    from nonebot.plugin import Plugin
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    config.stash[NONEBOT_INIT_KWARGS] = {
+        "datastore_database_url": "sqlite+aiosqlite:///:memory:"
+    }
+
+
+@pytest.fixture(scope="session", autouse=True)
+def load_plugin(nonebug_init: None) -> set["Plugin"]:
+    return nonebot.load_plugins(str(Path(__file__).parent.parent / "src" / "plugins"))
+
 
 @pytest.fixture
-def app(
-    nonebug_init: None,
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    request,
-) -> App:
-    param = getattr(request, "param", ())
+async def app(nonebug_init: None, tmp_path: Path):
+    from nonebot_plugin_datastore.config import plugin_config
+    from nonebot_plugin_datastore.db import init_db
 
-    import nonebot
+    driver = nonebot.get_driver()
+    # 清除连接钩子，现在 NoneBug 会自动触发 on_bot_connect
+    driver._bot_connection_hook.clear()
 
-    config = nonebot.get_driver().config
     # 插件数据目录
-    config.datastore_cache_dir = tmp_path / "cache"
-    config.datastore_config_dir = tmp_path / "config"
-    config.datastore_data_dir = tmp_path / "data"
-
-    # 加载插件
-    if param:
-        if param == "all":
-            nonebot.load_from_toml("pyproject.toml")
-        else:
-            for plugin in param:
-                nonebot.load_plugin(plugin)
-
-    return App(monkeypatch)
-
-
-@pytest.fixture
-async def session(app: App):
-    from nonebot_plugin_datastore.db import get_engine, init_db
-    from sqlmodel.ext.asyncio.session import AsyncSession
+    plugin_config.datastore_cache_dir = tmp_path / "cache"
+    plugin_config.datastore_config_dir = tmp_path / "config"
+    plugin_config.datastore_data_dir = tmp_path / "data"
 
     await init_db()
 
-    async with AsyncSession(get_engine()) as session:
-        yield session
+    return App()
