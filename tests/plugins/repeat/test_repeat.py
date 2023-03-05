@@ -21,10 +21,10 @@ async def records(app: App):
 
 async def test_repeat(app: App, mocker: MockerFixture, records: None):
     """测试复读"""
-    from src.plugins.repeat.plugins.basic import repeat_message
+    from src.plugins.repeat.plugins.repeat_basic import repeat_message
 
     mocked_rule_datetime = mocker.patch(
-        "src.plugins.repeat.plugins.basic.repeat_rule.datetime"
+        "src.plugins.repeat.plugins.repeat_basic.repeat_rule.datetime"
     )
     mocked_rule_datetime.now.return_value = datetime(2021, 1, 1, 0, 0, 0)
     mocked_recorder_datetime = mocker.patch("src.plugins.repeat.recorder.datetime")
@@ -34,7 +34,7 @@ async def test_repeat(app: App, mocker: MockerFixture, records: None):
         datetime(2021, 1, 1, 2, 0, 0),  # reset_last_message_on
     ]
     mocked_random = mocker.patch(
-        "src.plugins.repeat.plugins.basic.repeat_rule.secrets.SystemRandom"
+        "src.plugins.repeat.plugins.repeat_basic.repeat_rule.secrets.SystemRandom"
     )
     mocked_random().randint.return_value = 1
 
@@ -51,7 +51,7 @@ async def test_repeat(app: App, mocker: MockerFixture, records: None):
 
 async def test_repeat_enabled(app: App, records: None):
     """测试复读已开启的情况"""
-    from src.plugins.repeat.plugins.basic import repeat_cmd
+    from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -64,7 +64,7 @@ async def test_repeat_enabled(app: App, records: None):
 
 async def test_repeat_not_enabled(app: App):
     """测试复读关闭的情况"""
-    from src.plugins.repeat.plugins.basic import repeat_cmd
+    from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -77,7 +77,7 @@ async def test_repeat_not_enabled(app: App):
 
 async def test_repeat_enable(app: App):
     """测试复读，在群里启用的情况"""
-    from src.plugins.repeat.plugins.basic import repeat_cmd
+    from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -90,7 +90,7 @@ async def test_repeat_enable(app: App):
 
 async def test_repeat_disable(app: App, records: None):
     """测试复读，在群里关闭的情况"""
-    from src.plugins.repeat.plugins.basic import repeat_cmd
+    from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -103,7 +103,7 @@ async def test_repeat_disable(app: App, records: None):
 
 async def test_repeat_disable_already_disabled(app: App):
     """测试复读，群里已关闭的情况"""
-    from src.plugins.repeat.plugins.basic import repeat_cmd
+    from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)

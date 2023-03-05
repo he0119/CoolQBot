@@ -35,7 +35,7 @@ async def records(app: App, mocker: MockerFixture):
 
 async def test_rank(app: App, records: None):
     """测试排行榜"""
-    from src.plugins.repeat.plugins.rank import rank_cmd
+    from src.plugins.repeat.plugins.repeat_rank import rank_cmd
 
     async with app.test_matcher(rank_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -55,7 +55,7 @@ async def test_rank(app: App, records: None):
 
 async def test_rank_limit(app: App, records: None):
     """不限制最低次数"""
-    from src.plugins.repeat.plugins.rank import rank_cmd
+    from src.plugins.repeat.plugins.repeat_rank import rank_cmd
 
     async with app.test_matcher(rank_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -77,7 +77,7 @@ async def test_rank_limit(app: App, records: None):
 
 async def test_rank_not_enabled(app: App):
     """没有启用复读的情况"""
-    from src.plugins.repeat.plugins.rank import rank_cmd
+    from src.plugins.repeat.plugins.repeat_rank import rank_cmd
 
     async with app.test_matcher(rank_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)

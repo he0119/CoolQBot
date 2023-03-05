@@ -6,7 +6,7 @@ from datetime import datetime
 from nonebot.adapters import Bot
 
 from ...recorder import Recorder
-from ..rank.data_source import Ranking
+from ..repeat_rank.data_source import Ranking
 
 
 async def get_history(

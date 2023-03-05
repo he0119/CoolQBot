@@ -12,10 +12,10 @@ async def test_history(app: App, mocker: MockerFixture):
     from nonebot_plugin_datastore import create_session
 
     from src.plugins.repeat.models import Enabled, Record
-    from src.plugins.repeat.plugins.history import history_cmd
+    from src.plugins.repeat.plugins.repeat_history import history_cmd
 
     mocked_datetime = mocker.patch(
-        "src.plugins.repeat.plugins.history.data_source.datetime"
+        "src.plugins.repeat.plugins.repeat_history.data_source.datetime"
     )
     mocked_datetime.now.return_value = datetime(2020, 1, 2)
     mocked_datetime.return_value = datetime(2020, 1, 1)
@@ -61,7 +61,7 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
     from nonebot_plugin_datastore import create_session
 
     from src.plugins.repeat.models import Enabled, Record
-    from src.plugins.repeat.plugins.history import history_cmd
+    from src.plugins.repeat.plugins.repeat_history import history_cmd
 
     async with create_session() as session:
         session.add(Enabled(platform="qq", group_id=10000))
@@ -78,7 +78,7 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
         await session.commit()
 
     mocked_datetime = mocker.patch(
-        "src.plugins.repeat.plugins.history.data_source.datetime"
+        "src.plugins.repeat.plugins.repeat_history.data_source.datetime"
     )
     mocked_datetime.now.return_value = datetime(2020, 1, 2)
     mocked_datetime.return_value = datetime(2020, 1, 1)
@@ -121,7 +121,7 @@ async def test_history_get_invalid_args(app: App):
     from nonebot_plugin_datastore import create_session
 
     from src.plugins.repeat.models import Enabled
-    from src.plugins.repeat.plugins.history import history_cmd
+    from src.plugins.repeat.plugins.repeat_history import history_cmd
 
     async with create_session() as session:
         session.add(Enabled(platform="qq", group_id=10000))
@@ -155,7 +155,7 @@ async def test_history_get_invalid_args(app: App):
 
 async def test_history_not_enabled(app: App):
     """没有启用复读的情况"""
-    from src.plugins.repeat.plugins.history import history_cmd
+    from src.plugins.repeat.plugins.repeat_history import history_cmd
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
