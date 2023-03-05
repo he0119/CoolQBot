@@ -5,10 +5,13 @@ from pydantic import BaseModel, Extra
 
 
 class Config(BaseModel, extra=Extra.ignore):
-    # 复读概率
     repeat_rate: int = 10
-    # 复读间隔
+    """ 复读概率 """
     repeat_interval: int = 1
+    """ 复读间隔 """
+
+    repeat_migration_group_id: int | None = None
+    """ 旧数据迁移的群号 """
 
 
 global_config = get_driver().config
