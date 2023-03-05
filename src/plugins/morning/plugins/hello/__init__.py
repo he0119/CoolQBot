@@ -1,10 +1,10 @@
 """ 启动问候 """
-from typing import Any
-
 import nonebot
 from nonebot.adapters import Message
 from nonebot.adapters.onebot.v11 import Bot as V11Bot
 from nonebot.adapters.onebot.v12 import Bot as V12Bot
+from nonebot.adapters.onebot.v12 import Message as V12Message
+from nonebot.exception import ActionFailed
 from nonebot.log import logger
 from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata, on_command
@@ -56,18 +56,21 @@ async def hello_on_connect(
 
     hello_str = get_first_connect_message()
     for group in groups:
-        params: Any = {
-            "message_type": "group" if group.group_id else "channel",
-            "message": hello_str,
-        }
-        if isinstance(bot, V11Bot):
-            params["group_id"] = int(group.group_id) if group.group_id else None
-            await bot.send_msg(**params)
-        else:
-            params["group_id"] = group.group_id
-            params["guild_id"] = group.guild_id
-            params["channel_id"] = group.channel_id
-            await bot.send_message(**params)
+        try:
+            if isinstance(bot, V11Bot):
+                await bot.send_group_msg(
+                    message=hello_str, group_id=int(group.group_id)
+                )
+            else:
+                await bot.send_message(
+                    detail_type="group" if group.group_id else "channel",
+                    message=V12Message(hello_str),
+                    group_id=group.group_id,
+                    guild_id=group.guild_id,
+                    channel_id=group.channel_id,
+                )
+        except ActionFailed as e:
+            logger.error(f"发送启动问候失败: {e}")
     logger.info("发送首次启动的问候")
 
 
