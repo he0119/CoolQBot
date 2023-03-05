@@ -75,8 +75,9 @@ async def repeat_handle(
                 await session.commit()
             await repeat_cmd.finish("已在本群开启复读功能")
         else:
-            await session.delete(group)
-            await session.commit()
+            if group:
+                await session.delete(group)
+                await session.commit()
             await repeat_cmd.finish("已在本群关闭复读功能")
     else:
         if group:

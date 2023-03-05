@@ -16,18 +16,15 @@ __plugin_meta__ = PluginMetadata(
     description="与复读有关的功能",
     usage="与复读有关的功能",
     extra={
-        "adapters": ["OneBot V11"],
+        "adapters": ["OneBot V11", "OneBot V12"],
     },
 )
 
 _sub_plugins = set()
 
 repeat = CommandGroup("repeat", block=True)
+
 global_config = get_driver().config
 plugin_config = Config.parse_obj(global_config)
-
-from .recorder import Recorder
-
-recorder_obj = Recorder()
 
 _sub_plugins |= nonebot.load_plugins(str((Path(__file__).parent / "plugins").resolve()))

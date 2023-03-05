@@ -3,15 +3,25 @@
 from calendar import monthrange
 from datetime import datetime
 
-from nonebot.adapters.onebot.v11 import Bot
+from nonebot.adapters import Bot
 
-from ... import DATA, Recorder, plugin_config, recorder_obj
+from ...recorder import Recorder
 from ..rank.data_source import Ranking
 
 
-async def get_history(bot: Bot, year: int, month: int, day: int, group_id: int) -> str:
+async def get_history(
+    bot: Bot,
+    year: int,
+    month: int,
+    day: int,
+    platform: str,
+    group_id: str | None,
+    guild_id: str | None,
+    channel_id: str | None,
+) -> str:
     """获取历史数据"""
-    if group_id not in plugin_config.group_id:
+    recorder = Recorder(platform, group_id, guild_id, channel_id)
+    if not await recorder.is_enabled():
         return "该群未开启复读功能，无法获取历史排行榜。"
 
     str_data = ""
@@ -24,24 +34,15 @@ async def get_history(bot: Bot, year: int, month: int, day: int, group_id: int) 
     # 尝试读取历史数据
     # 如果是本月就直接从 recorder 中获取数据
     # 不是则从历史记录中获取
-    if year == now.year and month == now.month:
-        history_data = recorder_obj
-    else:
-        history_filename = Recorder.get_history_pkl_name(date)
-        if not DATA.exists(history_filename):
-            if day:
-                str_data = f"{date.year} 年 {date.month} 月 {day} 日的数据不存在，请换个试试吧 ~>_<~"
-            else:
-                str_data = f"{date.year} 年 {date.month} 月的数据不存在，请换个试试吧 0.0"
-            return str_data
-        history_data = Recorder(history_filename)
 
     if day:
-        repeat_list = history_data.repeat_list_by_day(day, group_id)
-        msg_number_list = history_data.msg_number_list_by_day(day, group_id)
+        records = await recorder.get_records_by_day(year, month, day)
+        if not records:
+            return f"{date.year} 年 {date.month} 月 {day} 日的数据不存在，请换个试试吧 ~>_<~"
     else:
-        repeat_list = history_data.repeat_list(group_id)
-        msg_number_list = history_data.msg_number_list(group_id)
+        records = await recorder.get_records(year, month)
+        if not records:
+            return f"{date.year} 年 {date.month} 月的数据不存在，请换个试试吧 0.0"
 
     # 如无其他情况，并输出排行榜
     display_number = 10000
@@ -50,12 +51,11 @@ async def get_history(bot: Bot, year: int, month: int, day: int, group_id: int) 
 
     ranking = Ranking(
         bot,
-        group_id,
+        records,
         display_number,
         minimal_msg_number,
         display_total_number,
-        repeat_list,
-        msg_number_list,
+        group_id,
     )
     ranking_str = await ranking.ranking()
 

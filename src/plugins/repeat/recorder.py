@@ -3,7 +3,7 @@
 记录排行版，历史，状态所需的数据
 如果遇到老版本数据，则自动升级
 """
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from nonebot.log import logger
 from nonebot_plugin_datastore import create_session, get_plugin_data
@@ -11,7 +11,7 @@ from nonebot_plugin_datastore.db import post_db_init
 from sqlalchemy import select
 
 from . import plugin_config
-from .models import Record
+from .models import Enabled, Record
 
 plugin_data = get_plugin_data()
 
@@ -83,75 +83,105 @@ def update_old_2(data: dict, group_id: int):
     return new_data
 
 
-class Recorder:
-    def __init__(self):
-        # 启动时间
-        self.start_time = datetime.now()
+class Singleton(type):
+    _instances = {}
 
-        self._msg_send_time: dict[tuple, list[datetime]] = {}
-        self._last_message_on: dict[tuple, datetime] = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
 
-    def message_number(
+
+class Recorder(metaclass=Singleton):
+    def __init__(
         self,
-        x: int,
         platform: str,
         group_id: str | None,
         guild_id: str | None,
         channel_id: str | None,
     ):
-        """返回指定群 x 分钟内的消息条数，并清除之前的消息记录"""
-        key = (platform, group_id, guild_id, channel_id)
+        self._msg_send_time: list[datetime] = []
+        self._last_message_on: datetime = datetime.now()
 
-        times = self._msg_send_time.get(key, [])
+        self.platform = platform
+        self.group_id = group_id
+        self.guild_id = guild_id
+        self.channel_id = channel_id
+
+    def message_number(self, x: int):
+        """返回指定群 x 分钟内的消息条数，并清除之前的消息记录"""
+
         now = datetime.now()
-        for i in range(len(times)):
-            if times[i] > now - timedelta(minutes=x):
-                self._msg_send_time[key] = times[i:]
-                return len(self._msg_send_time[key])
+        for i in range(len(self._msg_send_time)):
+            if self._msg_send_time[i] > now - timedelta(minutes=x):
+                self._msg_send_time = self._msg_send_time[i:]
+                return len(self._msg_send_time)
 
         # 如果没有满足条件的消息，则清除记录
-        self._msg_send_time[key] = []
+        self._msg_send_time.clear()
         return 0
 
-        #     def repeat_list(self, group_id: int):
-        #         """获取指定群整个月的复读记录"""
-        #         return self._merge_list(self._repeat_list[group_id])
+    async def get_records(self, year: int | None = None, month: int | None = None):
+        """获取指定月的复读记录
 
-        #     def msg_number_list(self, group_id: int):
-        #         """获取指定群整个月的消息数量记录"""
-        #         return self._merge_list(self._msg_number_list[group_id])
+        没有参数则为当月数据
+        只填写年月为这个月的数据
+        """
+        if year is None and month is None:
+            end = datetime.now().date()
+            start = end.replace(day=1)
+        else:
+            if year is None:
+                raise ValueError("year 不能为 None")
+            if month is None:
+                raise ValueError("month 不能为 None")
+            if month != 12:
+                end = date(year, month + 1, 1) - timedelta(days=1)
+            else:
+                end = date(year + 1, 1, 1) - timedelta(days=1)
+            start = date(year, month, 1)
 
-        #     def repeat_list_by_day(self, day, group_id: int):
-        #         """获取指定群某一天的复读记录"""
-        #         if day in self._repeat_list[group_id]:
-        #             return self._repeat_list[group_id][day]
-        #         return {}
+        async with create_session() as session:
+            records = await session.execute(
+                select(Record)
+                .where(Record.platform == self.platform)
+                .where(Record.group_id == self.group_id)
+                .where(Record.guild_id == self.guild_id)
+                .where(Record.channel_id == self.channel_id)
+                .where(Record.date >= start)
+                .where(Record.date <= end)
+            )
+            return records.scalars().all()
 
-        #     def msg_number_list_by_day(self, day, group_id: int):
-        #         """获取指定群某一天的消息数量记录"""
-        #         if day in self._msg_number_list[group_id]:
-        #             return self._msg_number_list[group_id][day]
-        #         return {}
+    async def get_records_by_day(self, year: int, month: int, day: int):
+        """获取指定群某一天的复读记录
 
-    async def add_repeat_list(
-        self,
-        platform: str,
-        user_id: str,
-        group_id: str | None,
-        guild_id: str | None,
-        channel_id: str | None,
-    ):
+        只填写日为这个月第几日的数据
+        """
+        time = date(year, month, day)
+        async with create_session() as session:
+            records = await session.execute(
+                select(Record)
+                .where(Record.platform == self.platform)
+                .where(Record.group_id == self.group_id)
+                .where(Record.guild_id == self.guild_id)
+                .where(Record.channel_id == self.channel_id)
+                .where(Record.date == time)
+            )
+            return records.scalars().all()
+
+    async def add_repeat_list(self, user_id: str):
         """该 QQ 号在指定群的复读记录，加一"""
         now_date = datetime.now().date()
         async with create_session() as session:
             record = await session.scalar(
                 select(Record)
                 .where(Record.date == now_date)
-                .where(Record.platform == platform)
                 .where(Record.user_id == user_id)
-                .where(Record.group_id == group_id)
-                .where(Record.guild_id == guild_id)
-                .where(Record.channel_id == channel_id)
+                .where(Record.platform == self.platform)
+                .where(Record.group_id == self.group_id)
+                .where(Record.guild_id == self.guild_id)
+                .where(Record.channel_id == self.channel_id)
             )
             if record:
                 record.msg_number += 1
@@ -160,36 +190,29 @@ class Recorder:
             else:
                 record = Record(
                     date=now_date,
-                    platform=platform,
                     user_id=user_id,
-                    group_id=group_id,
-                    guild_id=guild_id,
-                    channel_id=channel_id,
+                    platform=self.platform,
+                    group_id=self.group_id,
+                    guild_id=self.guild_id,
+                    channel_id=self.channel_id,
                     msg_number=1,
                     repeat_time=1,
                 )
                 session.add(record)
                 await session.commit()
 
-    async def add_msg_number_list(
-        self,
-        platform: str,
-        user_id: str,
-        group_id: str | None,
-        guild_id: str | None,
-        channel_id: str | None,
-    ):
+    async def add_msg_number_list(self, user_id: str):
         """该 QQ 号在指定群的消息数量记录，加一"""
         now_date = datetime.now().date()
         async with create_session() as session:
             record = await session.scalar(
                 select(Record)
                 .where(Record.date == now_date)
-                .where(Record.platform == platform)
                 .where(Record.user_id == user_id)
-                .where(Record.group_id == group_id)
-                .where(Record.guild_id == guild_id)
-                .where(Record.channel_id == channel_id)
+                .where(Record.platform == self.platform)
+                .where(Record.group_id == self.group_id)
+                .where(Record.guild_id == self.guild_id)
+                .where(Record.channel_id == self.channel_id)
             )
             if record:
                 record.msg_number += 1
@@ -197,148 +220,37 @@ class Recorder:
             else:
                 record = Record(
                     date=now_date,
-                    platform=platform,
                     user_id=user_id,
-                    group_id=group_id,
-                    guild_id=guild_id,
-                    channel_id=channel_id,
+                    platform=self.platform,
+                    group_id=self.group_id,
+                    guild_id=self.guild_id,
+                    channel_id=self.channel_id,
                     msg_number=1,
                 )
                 session.add(record)
                 await session.commit()
 
-    def add_msg_send_time(
-        self,
-        time,
-        platform: str,
-        group_id: str | None,
-        guild_id: str | None,
-        channel_id: str | None,
-    ):
+    def add_msg_send_time(self, time):
         """将这个时间加入到指定群的消息发送时间列表中"""
-        key = (platform, group_id, guild_id, channel_id)
-        if key not in self._msg_send_time:
-            self._msg_send_time[key] = []
-        self._msg_send_time[key].append(time)
+        self._msg_send_time.append(time)
 
-    def last_message_on(
-        self,
-        platform: str,
-        group_id: str | None,
-        guild_id: str | None,
-        channel_id: str | None,
-    ):
-        return self._last_message_on.get(
-            (platform, group_id, guild_id, channel_id), None
-        )
+    def last_message_on(self):
+        return self._last_message_on
 
-    def reset_last_message_on(
-        self,
-        platform: str,
-        group_id: str | None,
-        guild_id: str | None,
-        channel_id: str | None,
-    ):
-        self._last_message_on[
-            (platform, group_id, guild_id, channel_id)
-        ] = datetime.now()
+    def reset_last_message_on(self):
+        self._last_message_on = datetime.now()
 
-
-#     def _add_to_list(self, recrod_list, qq, group_id: int):
-#         """添加数据进列表"""
-#         day = datetime.now().day
-#         if day not in recrod_list[group_id]:
-#             recrod_list[group_id][day] = {}
-#         try:
-#             recrod_list[group_id][day][qq] += 1
-#         except KeyError:
-#             recrod_list[group_id][day][qq] = 1
-
-#     def _merge_list(self, recrod_list):
-#         """合并词典中按天数存储的数据"""
-#         new_list = {}
-#         for day_list in recrod_list:
-#             for qq in recrod_list[day_list]:
-#                 if qq in new_list:
-#                     new_list[qq] += recrod_list[day_list][qq]
-#                 else:
-#                     new_list[qq] = recrod_list[day_list][qq]
-#         return new_list
-
-#     def _load_data(self):
-#         """加载数据"""
-#         if not DATA.exists(self._name):
-#             logger.warning(f"{self._name} 复读记录文件不存在！")
-#             return
-
-#         data = DATA.load_pkl(self._name)
-
-#         # 如果是老版本格式的数据则先升级在加载
-#         # 默认使用配置中第一个群来升级老数据
-#         if "version" not in data or data["version"] != VERSION:
-#             logger.info("发现旧版本数据，正在升级数据")
-#             data = update(data, plugin_config.group_id[0])
-#             DATA.dump_pkl(data, self._name)
-#             logger.info("升级数据成功")
-
-#         # 加载数据
-#         self._last_message_on = data["last_message_on"]
-#         self._msg_send_time = data["msg_send_time"]
-#         self._repeat_list = data["repeat_list"]
-#         self._msg_number_list = data["msg_number_list"]
-
-#         self.add_new_group()
-
-#     def add_new_group(self):
-#         """如果群列表新加了群，则补充所需的数据"""
-#         for group_id in plugin_config.group_id:
-#             if group_id not in self._last_message_on:
-#                 self._last_message_on[group_id] = datetime.now()
-
-#             if group_id not in self._msg_send_time:
-#                 self._msg_send_time[group_id] = []
-
-#             if group_id not in self._repeat_list:
-#                 self._repeat_list[group_id] = {}
-
-#             if group_id not in self._msg_number_list:
-#                 self._msg_number_list[group_id] = {}
-
-#     def save_data(self):
-#         """保存数据"""
-#         DATA.dump_pkl(self.get_data(), self._name)
-
-#     def save_data_to_history(self):
-#         """保存数据到历史文件夹"""
-#         date = datetime.now() - timedelta(hours=1)
-#         DATA.dump_pkl(self.get_data(), self.get_history_pkl_name(date))
-
-#     def get_data(self):
-#         """获取当前数据
-
-#         并附带上数据的版本
-#         """
-#         return {
-#             "version": VERSION,
-#             "last_message_on": self._last_message_on,
-#             "msg_send_time": self._msg_send_time,
-#             "repeat_list": self._repeat_list,
-#             "msg_number_list": self._msg_number_list,
-#         }
-
-#     def init_data(self):
-#         """初始化数据"""
-#         self._last_message_on = {
-#             group_id: datetime.now() for group_id in plugin_config.group_id
-#         }
-#         self._msg_send_time = {group_id: [] for group_id in plugin_config.group_id}
-#         self._repeat_list = {group_id: {} for group_id in plugin_config.group_id}
-#         self._msg_number_list = {group_id: {} for group_id in plugin_config.group_id}
-
-#     @staticmethod
-#     def get_history_pkl_name(dt: datetime):
-#         time_str = dt.strftime("%Y-%m")
-#         return f"{time_str}.pkl"
+    async def is_enabled(self):
+        async with create_session() as session:
+            return (
+                await session.scalars(
+                    select(Enabled)
+                    .where(Enabled.platform == self.platform)
+                    .where(Enabled.group_id == self.group_id)
+                    .where(Enabled.guild_id == self.guild_id)
+                    .where(Enabled.channel_id == self.channel_id)
+                )
+            ).one_or_none()
 
 
 @post_db_init
