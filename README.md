@@ -42,7 +42,7 @@ nb run
 ```shell
 # 然后配置 go-cqhttp，请参考上面的文档
 # 以下是单独运行 go-cqhttp 的命令
-sudo docker run -it --rm -v $PWD/cqdata:/data ghcr.io/mrs4s/go-cqhttp:latest
+sudo docker run -it --rm -v $PWD/cqhttp:/data ghcr.io/mrs4s/go-cqhttp:latest
 ```
 
 完成 `go-cqhttp` 配置之后在 `docker-compose.yml` 文件所在目录下运行 `sudo docker compose up -d`，便可启动机器人。

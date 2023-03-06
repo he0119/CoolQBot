@@ -12,25 +12,45 @@ services:
     environment:
       - APP_MODULE=bot:app # 配置 asgi 入口
       - MAX_WORKERS=1 # 如果你有多个QQ，且存在 self_id 指定，多个 worker 会导致无法找到其他 websocket 连接
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8080}/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   cqhttp:
     image: ghcr.io/mrs4s/go-cqhttp
     container_name: cqhttp
     restart: always
     volumes:
-      - ./cqdata:/data
+      - ./cqhttp:/data
+    depends_on:
+      - coolqbot
   walle-k:
     image: ghcr.io/he0119/walle-k
     container_name: walle-k
     restart: always
     volumes:
       - ./walle-k:/data
+    depends_on:
+      - coolqbot
   teydacore:
     image: ghcr.io/he0119/teydacore
     container_name: teydacore
     restart: always
     env_file:
-      - ".env.prod"
+      - ".env"
+    depends_on:
+      - coolqbot
+  all4one:
+    image: ghcr.io/he0119/nonebot-all4one
+    container_name: all4one
+    restart: always
+    env_file:
+      - ".env"
+    depends_on:
+      - coolqbot
 
   netease:
     image: binaryify/netease_cloud_music_api
