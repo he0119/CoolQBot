@@ -22,7 +22,7 @@ ENV SENTRY_RELEASE=version
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 RUN apt-get update \
   && apt-get -y upgrade \
-  && apt-get install -y --no-install-recommends git \
+  && apt-get install -y --no-install-recommends git curl \
   && pip install --no-cache-dir --upgrade -r requirements.txt \
   && apt-get purge -y --auto-remove \
   && rm -rf /var/lib/apt/lists/*

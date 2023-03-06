@@ -26,7 +26,8 @@ services:
     volumes:
       - ./cqhttp:/data
     depends_on:
-      - coolqbot
+      coolqbot:
+        condition: service_healthy
   walle-k:
     image: ghcr.io/he0119/walle-k
     container_name: walle-k
@@ -34,7 +35,8 @@ services:
     volumes:
       - ./walle-k:/data
     depends_on:
-      - coolqbot
+      coolqbot:
+        condition: service_healthy
   teydacore:
     image: ghcr.io/he0119/teydacore
     container_name: teydacore
@@ -42,7 +44,8 @@ services:
     env_file:
       - ".env"
     depends_on:
-      - coolqbot
+      coolqbot:
+        condition: service_healthy
   all4one:
     image: ghcr.io/he0119/nonebot-all4one
     container_name: all4one
@@ -50,7 +53,8 @@ services:
     env_file:
       - ".env"
     depends_on:
-      - coolqbot
+      coolqbot:
+        condition: service_healthy
 
   netease:
     image: binaryify/netease_cloud_music_api
