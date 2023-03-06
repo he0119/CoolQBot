@@ -12,7 +12,7 @@ ENV PATH="${PATH}:/root/.local/bin"
 
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
-FROM tiangolo/uvicorn-gunicorn:python3.10:slim
+FROM tiangolo/uvicorn-gunicorn:python3.10-slim
 
 # 设置时区
 ENV TZ=Asia/Shanghai
