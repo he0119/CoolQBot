@@ -18,7 +18,7 @@ nonebot-plugin-apscheduler = "^0.2.0"
 nonebot-plugin-sentry = "^0.2.2"
 nonebot-plugin-datastore = "^0.6.0a2"
 nonebot-plugin-wordcloud = "^0.4.5"
-nonebot-plugin-treehelp = ">=0.0.2"
+nonebot-plugin-treehelp = ">=0.0.5"
 nonebot-plugin-memes = "0.3.10"
 nonebot-plugin-petpet = "0.3.20"
 nonebot-bison = { git = "https://github.com/felinae98/nonebot-bison.git", branch = "main" }
