@@ -18,8 +18,6 @@ FROM tiangolo/uvicorn-gunicorn:python3.10-slim
 ENV TZ=Asia/Shanghai
 ENV SENTRY_RELEASE=version
 
-WORKDIR /app
-
 # 安装依赖
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 RUN apt-get update \
@@ -32,5 +30,3 @@ RUN rm requirements.txt
 
 COPY bot.py pyproject.toml .env prestart.sh /app/
 COPY src /app/src/
-
-CMD ["gunicorn", "bot:app", "-k", "uvicorn.workers.UvicornWorker"]
