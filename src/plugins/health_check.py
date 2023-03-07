@@ -18,5 +18,4 @@ class HealthCheckFilter(logging.Filter):
         return record.getMessage().find("/health") == -1
 
 
-uvicorn_logger = logging.getLogger("uvicorn.access")
-uvicorn_logger.addFilter(HealthCheckFilter())
+logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
