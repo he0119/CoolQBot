@@ -1,11 +1,11 @@
 from nonebot_plugin_datastore import get_plugin_data
 from sqlalchemy import UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, MappedAsDataclass, mapped_column
 
 Model = get_plugin_data().Model
 
 
-class MorningGreeting(Model):
+class MorningGreeting(MappedAsDataclass, Model):
     __table_args__ = (
         UniqueConstraint(
             "platform",
@@ -17,7 +17,7 @@ class MorningGreeting(Model):
         ),
     )
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(init=False, primary_key=True)
     platform: Mapped[str]
     bot_id: Mapped[str]
     group_id: Mapped[str] = mapped_column(default="")

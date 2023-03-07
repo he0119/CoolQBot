@@ -154,12 +154,15 @@ async def get_platform(bot: Bot) -> str | None:
 
 
 class GroupOrChannel(BaseModel):
+    """群或频道"""
+
     group_id: str
     channel_id: str
     guild_id: str
 
     @property
     def detail_type(self) -> str:
+        """根据是否有 group_id 判断是群还是频道"""
         if self.group_id:
             return "group"
         return "channel"

@@ -1,4 +1,6 @@
 """ 每日早安 """
+from dataclasses import asdict
+
 from nonebot import get_bot
 from nonebot.adapters import Message
 from nonebot.adapters.onebot.v11 import Bot as V11Bot
@@ -66,18 +68,18 @@ async def morning():
         except ValueError:
             logger.warning(f"Bot {group.bot_id} 不存在，跳过")
             continue
-        group = GroupOrChannel.parse_obj(group)
+        group_or_channel = GroupOrChannel.parse_obj(asdict(group))
         if isinstance(bot, V11Bot):
             await get_bot().send_msg(
                 message_type="group",
-                group_id=group.group_id,
+                group_id=group_or_channel.group_id,
                 message=hello_str,
             )
         elif isinstance(bot, V12Bot):
             await bot.send_message(
-                detail_type=group.detail_type,
+                detail_type=group_or_channel.detail_type,
                 message=V12Message(hello_str),
-                **group.dict(),
+                **group_or_channel.dict(),
             )
     logger.info("发送早安信息")
 
