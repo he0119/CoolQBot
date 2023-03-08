@@ -15,9 +15,10 @@ def parse_data(data: dict) -> FFlogsDataModel:
 
 
 FFLOGS_DATA = plugin_data.network_file(
-    "https://raw.fastgit.org/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json",
+    "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json",
     "fflogs_data.json",
-    parse_data,  # type: ignore
+    parse_data,
+    cache=True,
 )
 
 

@@ -33,9 +33,10 @@ def process_data(data: dict) -> dict:
 
 
 HOLIDAYS_DATA = plugin_data.network_file(
-    "https://raw.fastgit.org/he0119/CoolQBot/master/src/plugins/morning/holidays.json",
+    "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/morning/holidays.json",
     "holidays.json",
     process_data,
+    cache=True,
 )
 
 
