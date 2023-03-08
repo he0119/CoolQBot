@@ -26,7 +26,7 @@ def mocked_get(url: str, **kwargs):
     test_dir = Path(__file__).parent
     if (
         url
-        == "https://raw.fastgit.org/he0119/CoolQBot/master/src/plugins/morning/holidays.json"
+        == "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/morning/holidays.json"
     ):
         with open(test_dir / "holidays.json", encoding="utf-8") as f:
             data = json.load(f)
@@ -164,7 +164,7 @@ async def test_morning_today(app: App, mocker: MockerFixture):
 
     mocked_date.today.assert_called()
     get.assert_called_once_with(
-        "https://raw.fastgit.org/he0119/CoolQBot/master/src/plugins/morning/holidays.json"
+        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/morning/holidays.json"
     )
     render_expression.assert_called_once_with(
         EXPR_MORNING,
