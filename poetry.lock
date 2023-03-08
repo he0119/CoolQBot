@@ -1906,14 +1906,14 @@ nonebot2 = ">=2.0.0-rc.1,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-chatrecorder"
-version = "0.2.2"
+version = "0.2.3"
 description = "适用于 Nonebot2 的聊天记录插件"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_chatrecorder-0.2.2-py3-none-any.whl", hash = "sha256:89d9e7f0bb8624f23a862b1c3b7b8e8cdd35234942ce29cf3985683e8bc6468b"},
-    {file = "nonebot_plugin_chatrecorder-0.2.2.tar.gz", hash = "sha256:eafebf9fd85f42d3fab31be58c00ffd641d917a3e36f0043ba54234573b54626"},
+    {file = "nonebot_plugin_chatrecorder-0.2.3-py3-none-any.whl", hash = "sha256:b69d93d117ce7ece2ecff6714b07561befd1251db0cbb738d4fb80119b6e5b31"},
+    {file = "nonebot_plugin_chatrecorder-0.2.3.tar.gz", hash = "sha256:86b4b8a51e9e531578b06cf70a8e138e89fb223e7d3d16bde3265b850e82f88d"},
 ]
 
 [package.dependencies]
@@ -2115,14 +2115,14 @@ nonebot2 = ">=2.0.0-beta.5,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.4.5"
+version = "0.4.6"
 description = "适用于 NoneBot2 的词云插件"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_wordcloud-0.4.5-py3-none-any.whl", hash = "sha256:7f0c8b36e1019be44bf90a1d8dc7537239e112d756dbe2e153b2c0b96818dff9"},
-    {file = "nonebot_plugin_wordcloud-0.4.5.tar.gz", hash = "sha256:d3a3af66b21c39a2ebd3964a4fad969f1594fe92edd6a0012d2aa73bdb85bd7f"},
+    {file = "nonebot_plugin_wordcloud-0.4.6-py3-none-any.whl", hash = "sha256:94eb203dd3f6be4f13b54c5b98eb1dda6cefe6594ac44b822b9f8825d331169f"},
+    {file = "nonebot_plugin_wordcloud-0.4.6.tar.gz", hash = "sha256:e105c8980858314eb32618cc65b4da484f372fd348eda24b47726c749f5d8a6c"},
 ]
 
 [package.dependencies]
@@ -2130,7 +2130,7 @@ emoji = ">=1.6.3,<3.0.0"
 jieba = ">=0.42.1,<0.43.0"
 nonebot-adapter-onebot = ">=2.2.0,<3.0.0"
 nonebot-plugin-apscheduler = ">=0.2.0,<0.3.0"
-nonebot-plugin-chatrecorder = ">=0.2.2,<0.3.0"
+nonebot-plugin-chatrecorder = ">=0.2.3,<0.3.0"
 nonebot-plugin-datastore = ">=0.6.0a2,<0.7.0"
 nonebot2 = {version = ">=2.0.0-rc.1,<3.0.0", extras = ["fastapi"]}
 tzdata = "*"
@@ -4047,4 +4047,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "ffb245f8f171ea8085ea907f023fad99d86b6be43ccb34871f5f00ddaea81048"
+content-hash = "255d7bebff94948675cebadb2031a8a706c53082d46cd90ef6271664955b6107"
