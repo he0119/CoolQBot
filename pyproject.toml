@@ -19,8 +19,7 @@ nonebot-plugin-sentry = "^0.2.2"
 nonebot-plugin-datastore = "^0.6.0a2"
 nonebot-plugin-wordcloud = "^0.4.6"
 nonebot-plugin-treehelp = ">=0.0.5"
-nonebot-plugin-memes = "0.3.10"
-nonebot-plugin-petpet = "0.3.20"
+nonebot-plugin-memes = "0.4.0a1"
 nonebot-bison = { git = "https://github.com/felinae98/nonebot-bison.git", branch = "main" }
 nonebot-plugin-gscode = "0.1.6"
 nonebot-plugin-naturel-gpt = "1.5.2"
@@ -45,7 +44,6 @@ plugins = [
     "nonebot_plugin_datastore",
     "nonebot_plugin_wordcloud",
     "nonebot_plugin_memes",
-    "nonebot_plugin_petpet",
     "nonebot_bison",
     "nonebot_plugin_gscode",
     "nonebot_plugin_naturel_gpt",
