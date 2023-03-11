@@ -1641,14 +1641,14 @@ python-dateutil = ">=2.7"
 
 [[package]]
 name = "meme-generator"
-version = "0.0.3"
+version = "0.0.4"
 description = "Python package for making fun pictures"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "meme_generator-0.0.3-py3-none-any.whl", hash = "sha256:118b4fc81258043a20bf9b8e1d234a83e92f3b5c4090c45eb3483ecd65a8807d"},
-    {file = "meme_generator-0.0.3.tar.gz", hash = "sha256:9c43261bc7cb1795b3251a40010dcab4de256dca87c8ef75fdcfdfe4426b847d"},
+    {file = "meme_generator-0.0.4-py3-none-any.whl", hash = "sha256:8a2af6e032b38a8a1ee4c60516f5a71a1e5851cc10a96a9ee75da8fd09c682b9"},
+    {file = "meme_generator-0.0.4.tar.gz", hash = "sha256:4675f221809857dbe247a20487c14d3e5c0b0fabc43a12c6d5b17858547c2b8a"},
 ]
 
 [package.dependencies]
@@ -1957,14 +1957,14 @@ nonebot2 = {version = ">=2.0.0-rc.1,<3.0.0", extras = ["fastapi"]}
 
 [[package]]
 name = "nonebot-plugin-datastore"
-version = "0.6.0a2"
+version = "0.6.0a3"
 description = "适用于 Nonebot2 的数据存储插件"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_datastore-0.6.0a2-py3-none-any.whl", hash = "sha256:1e0095065c6213a875ed1d939dd21f2dde0d20e399f83ecdc0532d89fc93e2ae"},
-    {file = "nonebot_plugin_datastore-0.6.0a2.tar.gz", hash = "sha256:a27d5dfdab4899d3b30e407575ee15b6b70385ee38d8d7c2ab4bf87e7dc29326"},
+    {file = "nonebot_plugin_datastore-0.6.0a3-py3-none-any.whl", hash = "sha256:8a3ea97599aa12eaef477419ce604c46db8cc93c1812f554b7cb3377c94de911"},
+    {file = "nonebot_plugin_datastore-0.6.0a3.tar.gz", hash = "sha256:d3030cfc00d0ffee6014d56d3a0bbc11a83feb246d5be9a4cc0995274789d8e5"},
 ]
 
 [package.dependencies]
@@ -2037,23 +2037,23 @@ typing-extensions = ">=4.0.0"
 
 [[package]]
 name = "nonebot-plugin-memes"
-version = "0.4.0a1"
+version = "0.4.0"
 description = "Nonebot2 plugin for making memes"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_memes-0.4.0a1-py3-none-any.whl", hash = "sha256:4477c839a5c013cdf678763ef09a4ed07846a40149d0fca74de4e481d7479f94"},
-    {file = "nonebot_plugin_memes-0.4.0a1.tar.gz", hash = "sha256:7386b050fdbe67d86cf1b059af8b9402b2825bd838882401db404037b99f3598"},
+    {file = "nonebot_plugin_memes-0.4.0-py3-none-any.whl", hash = "sha256:ab4676529b25271aeedf99a37a9831724483d5618ed99538331e48538947f7ad"},
+    {file = "nonebot_plugin_memes-0.4.0.tar.gz", hash = "sha256:627c76cb3ca8c4dabe9669784d64d9bcc68953e4a22a11b2096790bbc046a67c"},
 ]
 
 [package.dependencies]
 httpx = ">=0.20.0,<1.0.0"
-meme-generator = ">=0.0.1,<0.1.0"
-nonebot-adapter-onebot = ">=2.1.1,<3.0.0"
+meme-generator = ">=0.0.4,<0.1.0"
+nonebot-adapter-onebot = ">=2.2.0,<3.0.0"
 nonebot-plugin-localstore = ">=0.4.0,<0.5.0"
 nonebot2 = {version = ">=2.0.0-rc.1,<3.0.0", extras = ["fastapi"]}
-pil-utils = ">=0.1.0,<0.2.0"
+pil-utils = ">=0.1.3,<0.2.0"
 pypinyin = ">=0.44.0,<1.0.0"
 
 [[package]]
@@ -4089,4 +4089,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "36f9eacaff83f0db522e3b67c972df1d1956c053ce4bc963e25ea818923f4bb9"
+content-hash = "bdeb5b78a10663cbfd914122d7e944280b824a15f37e9d8c706768891937205d"
