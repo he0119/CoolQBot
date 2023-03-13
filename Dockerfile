@@ -28,5 +28,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 RUN rm requirements.txt
 
+RUN meme download
+
 COPY bot.py pyproject.toml .env prestart.sh /app/
 COPY src /app/src/
