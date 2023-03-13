@@ -33,7 +33,7 @@ pre-commit = "*"
 nonebug = { git = "https://github.com/nonebot/nonebug.git" }
 pytest-cov = "^4.0.0"
 pytest-mock = "^3.6.1"
-pytest-xdist = "^3.0.2"
+pytest-xdist = "^3.2.1"
 pytest-asyncio = "^0.20.2"
 
 [tool.nonebot]
