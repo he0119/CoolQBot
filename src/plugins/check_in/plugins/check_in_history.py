@@ -99,12 +99,12 @@ async def _(
         case "c":
             weight_records = (
                 await session.scalars(
-                    select(WeightRecord).where(FitnessRecord.user == user)
+                    select(WeightRecord).where(WeightRecord.user == user)
                 )
             ).all()
             body_fat_records = (
                 await session.scalars(
-                    select(BodyFatRecord).where(FitnessRecord.user == user)
+                    select(BodyFatRecord).where(BodyFatRecord.user == user)
                 )
             ).all()
             if not weight_records and not body_fat_records:
