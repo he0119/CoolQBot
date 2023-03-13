@@ -67,6 +67,9 @@ async def _(
     except ValueError:
         await target_body_fat_cmd.reject("目标体脂只能输入数字哦，请重新输入", at_sender=True)
 
+    if body_fat < 0 or body_fat > 100:
+        await target_body_fat_cmd.reject("目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True)
+
     user = await ensure_user(session, group_or_channel)
     user.target_body_fat = body_fat
     await session.commit()
@@ -102,6 +105,9 @@ async def _(
         body_fat = float(content)
     except ValueError:
         await body_fat_record_cmd.reject("体脂只能输入数字哦，请重新输入", at_sender=True)
+
+    if body_fat < 0 or body_fat > 100:
+        await target_body_fat_cmd.reject("目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True)
 
     user = await ensure_user(session, group_or_channel)
 
