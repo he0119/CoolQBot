@@ -22,7 +22,7 @@ nonebot-plugin-treehelp = ">=0.0.5"
 nonebot-plugin-memes = "0.4.0"
 nonebot-bison = { git = "https://github.com/felinae98/nonebot-bison.git", branch = "main" }
 nonebot-plugin-gscode = "0.1.6"
-nonebot-plugin-naturel-gpt = "1.5.2"
+nonebot-plugin-naturel-gpt = "1.5.3"
 nb-cli = "^1.0.5"
 matplotlib = "^3.7.1"
 
