@@ -25,7 +25,7 @@ async def need_repeat(
     user_id = event.get_user_id()
 
     # 只复读指定群内消息
-    recorder = Recorder(platform, **group_or_channel.dict())
+    recorder = Recorder(platform, **group_or_channel.group_or_channel_id)
     if not await recorder.is_enabled():
         return False
 

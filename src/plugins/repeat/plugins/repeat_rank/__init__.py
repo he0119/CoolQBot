@@ -89,6 +89,6 @@ async def rank_handle_group_message(
         minimal_msg_number=minimal_msg_number,
         display_total_number=display_total_number,
         platform=platform,
-        **group_or_channel.dict(),
+        **group_or_channel.group_or_channel_id,
     )
     await rank_cmd.finish(res)

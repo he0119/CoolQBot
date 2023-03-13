@@ -24,6 +24,7 @@ nonebot-bison = { git = "https://github.com/felinae98/nonebot-bison.git", branch
 nonebot-plugin-gscode = "0.1.6"
 nonebot-plugin-naturel-gpt = "1.5.2"
 nb-cli = "^1.0.5"
+matplotlib = "^3.7.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"

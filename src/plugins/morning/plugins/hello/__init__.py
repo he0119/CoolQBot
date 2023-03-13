@@ -100,10 +100,7 @@ async def hello_handle(
         if strtobool(args):
             if not group:
                 session.add(
-                    Hello(
-                        platform=platform,
-                        **group_or_channel.dict(exclude={"message_type"}),
-                    )
+                    Hello(platform=platform, **group_or_channel.group_or_channel_id),
                 )
                 await session.commit()
             await hello_cmd.finish("已在本群开启启动问候功能")
