@@ -75,6 +75,6 @@ async def history_handle_group_message(
         month=month,
         day=day,
         platform=platform,
-        **group_or_channel.dict(),
+        **group_or_channel.group_or_channel_id,
     )
     await history_cmd.finish(res)

@@ -79,7 +79,7 @@ async def morning():
             await bot.send_message(
                 detail_type=group_or_channel.detail_type,
                 message=V12Message(hello_str),
-                **group_or_channel.dict(),
+                **group_or_channel.group_or_channel_id,
             )
     logger.info("发送早安信息")
 
@@ -121,7 +121,7 @@ async def morning_handle(
                     MorningGreeting(
                         bot_id=bot.self_id,
                         platform=platform,
-                        **group_or_channel.dict(),
+                        **group_or_channel.group_or_channel_id,
                     )
                 )
                 await session.commit()

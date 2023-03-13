@@ -81,6 +81,19 @@ def parse_bool(key: str):
     return _key_parser
 
 
+def parse_str(key: str):
+    """解析字符串，并将结果存入 state 中"""
+
+    async def _key_parser(state: T_State, input: str | Message = Arg(key)):
+        if isinstance(input, str):
+            return
+
+        plaintext = input.extract_plain_text().strip()
+        state[key] = plaintext
+
+    return _key_parser
+
+
 def timedelta_to_chinese(timedelta: timedelta) -> str:
     """将 timedelta 转换为中文时间"""
     days = timedelta.days
@@ -156,6 +169,9 @@ async def get_platform(bot: Bot) -> str | None:
 class GroupOrChannel(BaseModel):
     """群或频道"""
 
+    platform: str
+    user_id: str
+
     group_id: str
     channel_id: str
     guild_id: str
@@ -167,13 +183,38 @@ class GroupOrChannel(BaseModel):
             return "group"
         return "channel"
 
+    @property
+    def group_or_channel_id(self) -> dict[str, str]:
+        """获取群号或频道号"""
+        return {
+            "group_id": self.group_id,
+            "channel_id": self.channel_id,
+            "guild_id": self.guild_id,
+        }
+
+    @property
+    def platform_user_id(self) -> dict[str, str]:
+        """获取平台用户 ID"""
+        return {
+            "user_id": self.user_id,
+            "platform": self.platform,
+        }
+
 
 async def get_group_or_channel(
+    bot: OneBotV11Bot | OneBotV12Bot,
     event: OneBotV11GroupMessageEvent
     | OneBotV12GroupMessageEvent
     | OneBotV12ChannelMessageEvent,
 ) -> GroupOrChannel:
     """获取群号或频道号"""
+    user_id = str(event.user_id)
+
+    if isinstance(bot, OneBotV11Bot):
+        platform = "qq"
+    else:
+        platform = bot.platform
+
     if isinstance(event, OneBotV11GroupMessageEvent):
         group_id = str(event.group_id)
         guild_id = ""
@@ -188,7 +229,16 @@ async def get_group_or_channel(
         channel_id = event.channel_id
 
     return GroupOrChannel(
+        platform=platform,
+        user_id=user_id,
         group_id=group_id,
         channel_id=channel_id,
         guild_id=guild_id,
     )
+
+
+async def get_plaintext_content(args: Message = CommandArg()) -> str | None:
+    """获取纯文本命令参数"""
+    if content := args["text"]:
+        if message_str := content.extract_plain_text().strip():
+            return message_str
