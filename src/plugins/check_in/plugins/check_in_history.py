@@ -13,12 +13,7 @@ from nonebot_plugin_datastore import get_session
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import (
-    GroupOrChannel,
-    get_group_or_channel,
-    get_plaintext_content,
-    parse_str,
-)
+from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -55,7 +50,7 @@ async def handle_first_message(
 async def _(
     bot: BotV11 | BotV12,
     content: str = Arg(),
-    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    user_info: UserInfo = Depends(get_user_info),
     session: AsyncSession = Depends(get_session),
 ):
     content = content.lower()
@@ -65,7 +60,7 @@ async def _(
     if content not in ["a", "b", "c"]:
         await history_cmd.reject("选项不正确，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, group_or_channel)
+    user = await ensure_user(session, user_info)
 
     match content:
         case "a":
@@ -126,33 +121,29 @@ async def _(
             await history_cmd.finish(msg, at_sender=True)
 
 
-# 字体使用黑体
-plt.rcParams["font.sans-serif"] = ["SimHei"]
-
-
 def gerenate_graph(
     weight_records: Sequence[WeightRecord], body_fat_records: Sequence[BodyFatRecord]
 ) -> bytes:
     weight = {
-        record.time.strftime("%Y-%m-%d %H:%M:%S"): record.weight
+        record.time.astimezone().strftime("%Y-%m-%d %H:%M:%S"): record.weight
         for record in weight_records
     }
     body_fat = {
-        record.time.strftime("%Y-%m-%d %H:%M:%S"): record.body_fat
+        record.time.astimezone().strftime("%Y-%m-%d %H:%M:%S"): record.body_fat
         for record in body_fat_records
     }
 
     fig, (ax0, ax1) = plt.subplots(2, 1, constrained_layout=True)
 
     ax0.plot(weight.keys(), weight.values())
-    ax0.set_title("体重历史")
-    ax0.set_xlabel("时间")
-    ax0.set_ylabel("体重 (kg)")
+    ax0.set_title("Weight History")
+    ax0.set_xlabel("time")
+    ax0.set_ylabel("weight (kg)")
 
     ax1.plot(body_fat.keys(), body_fat.values())
-    ax1.set_title("体脂历史")
-    ax1.set_xlabel("时间")
-    ax1.set_ylabel("体脂 (%)")
+    ax1.set_title("Body Fat History")
+    ax1.set_xlabel("time")
+    ax1.set_ylabel("body fat (%)")
 
     file = BytesIO()
     fig.savefig(file)

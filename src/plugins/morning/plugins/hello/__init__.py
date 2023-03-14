@@ -81,7 +81,6 @@ hello_cmd = on_command("hello", aliases={"问候"}, block=True)
 async def hello_handle(
     arg: Message = CommandArg(),
     session: AsyncSession = Depends(get_session),
-    platform: str = Depends(get_platform),
     group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
 ):
     args = arg.extract_plain_text()
@@ -89,7 +88,7 @@ async def hello_handle(
     group = (
         await session.scalars(
             select(Hello)
-            .where(Hello.platform == platform)
+            .where(Hello.platform == group_or_channel.platform)
             .where(Hello.group_id == group_or_channel.group_id)
             .where(Hello.guild_id == group_or_channel.guild_id)
             .where(Hello.channel_id == group_or_channel.channel_id)
@@ -99,9 +98,7 @@ async def hello_handle(
     if args:
         if strtobool(args):
             if not group:
-                session.add(
-                    Hello(platform=platform, **group_or_channel.group_or_channel_id),
-                )
+                session.add(Hello(**group_or_channel.dict()))
                 await session.commit()
             await hello_cmd.finish("已在本群开启启动问候功能")
         else:

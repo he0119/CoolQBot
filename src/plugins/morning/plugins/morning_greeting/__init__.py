@@ -79,7 +79,7 @@ async def morning():
             await bot.send_message(
                 detail_type=group_or_channel.detail_type,
                 message=V12Message(hello_str),
-                **group_or_channel.group_or_channel_id,
+                **group_or_channel.send_message_args,
             )
     logger.info("发送早安信息")
 
@@ -92,7 +92,6 @@ async def morning_handle(
     bot: V11Bot | V12Bot,
     arg: Message = CommandArg(),
     session: AsyncSession = Depends(get_session),
-    platform: str = Depends(get_platform),
     group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
 ):
     args = arg.extract_plain_text()
@@ -108,7 +107,7 @@ async def morning_handle(
         await session.scalars(
             select(MorningGreeting)
             .where(MorningGreeting.bot_id == bot.self_id)
-            .where(MorningGreeting.platform == platform)
+            .where(MorningGreeting.platform == group_or_channel.platform)
             .where(MorningGreeting.group_id == group_or_channel.group_id)
             .where(MorningGreeting.guild_id == group_or_channel.guild_id)
             .where(MorningGreeting.channel_id == group_or_channel.channel_id)
@@ -118,11 +117,7 @@ async def morning_handle(
         if strtobool(args):
             if not group:
                 session.add(
-                    MorningGreeting(
-                        bot_id=bot.self_id,
-                        platform=platform,
-                        **group_or_channel.group_or_channel_id,
-                    )
+                    MorningGreeting(bot_id=bot.self_id, **group_or_channel.dict())
                 )
                 await session.commit()
             await morning_cmd.finish("已在本群开启每日早安功能")

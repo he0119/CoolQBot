@@ -1,21 +1,21 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import GroupOrChannel
+from src.utils.helpers import UserInfo
 
 from .models import User
 
 
-async def ensure_user(session: AsyncSession, group_or_channel: GroupOrChannel) -> User:
+async def ensure_user(session: AsyncSession, user_info: UserInfo) -> User:
     """确保用户存在"""
     user = await session.scalar(
         select(User)
-        .where(User.user_id == group_or_channel.user_id)
-        .where(User.platform == group_or_channel.platform)
+        .where(User.user_id == user_info.user_id)
+        .where(User.platform == user_info.platform)
     )
 
     if not user:
-        user = User(**group_or_channel.platform_user_id)
+        user = User(**user_info.dict())
         session.add(user)
         await session.commit()
 

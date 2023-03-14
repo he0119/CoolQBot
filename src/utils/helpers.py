@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from datetime import timedelta
 from typing import cast
 
-from nonebot.adapters import Bot, Message, MessageSegment
+from nonebot.adapters import Bot, Event, Message, MessageSegment
 from nonebot.adapters.onebot.v11 import Bot as OneBotV11Bot
 from nonebot.adapters.onebot.v11 import GroupMessageEvent as OneBotV11GroupMessageEvent
 from nonebot.adapters.onebot.v11 import Message as OneBotV11Message
@@ -166,12 +166,29 @@ async def get_platform(bot: Bot) -> str | None:
         return bot.platform
 
 
-class GroupOrChannel(BaseModel):
-    """群或频道"""
+class UserInfo(BaseModel):
+    """确定一个用户所需的信息"""
 
     platform: str
     user_id: str
 
+
+async def get_user_info(bot: OneBotV11Bot | OneBotV12Bot, event: Event) -> UserInfo:
+    """获取用户信息"""
+    if isinstance(bot, OneBotV11Bot):
+        platform = "qq"
+    else:
+        platform = bot.platform
+
+    user_id = str(event.get_user_id())
+
+    return UserInfo(platform=platform, user_id=user_id)
+
+
+class GroupOrChannel(BaseModel):
+    """确定一个群或频道所需信息"""
+
+    platform: str
     group_id: str
     channel_id: str
     guild_id: str
@@ -184,20 +201,12 @@ class GroupOrChannel(BaseModel):
         return "channel"
 
     @property
-    def group_or_channel_id(self) -> dict[str, str]:
-        """获取群号或频道号"""
+    def send_message_args(self) -> dict[str, str]:
+        """发送消息所需数据"""
         return {
             "group_id": self.group_id,
             "channel_id": self.channel_id,
             "guild_id": self.guild_id,
-        }
-
-    @property
-    def platform_user_id(self) -> dict[str, str]:
-        """获取平台用户 ID"""
-        return {
-            "user_id": self.user_id,
-            "platform": self.platform,
         }
 
 
@@ -208,8 +217,6 @@ async def get_group_or_channel(
     | OneBotV12ChannelMessageEvent,
 ) -> GroupOrChannel:
     """获取群号或频道号"""
-    user_id = str(event.user_id)
-
     if isinstance(bot, OneBotV11Bot):
         platform = "qq"
     else:
@@ -230,7 +237,6 @@ async def get_group_or_channel(
 
     return GroupOrChannel(
         platform=platform,
-        user_id=user_id,
         group_id=group_id,
         channel_id=channel_id,
         guild_id=guild_id,

@@ -54,14 +54,13 @@ async def repeat_handle(
     arg: Message = CommandArg(),
     session: AsyncSession = Depends(get_session),
     group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
-    platform: str = Depends(get_platform),
 ):
     args = arg.extract_plain_text()
 
     group = (
         await session.scalars(
             select(Enabled)
-            .where(Enabled.platform == platform)
+            .where(Enabled.platform == group_or_channel.platform)
             .where(Enabled.group_id == group_or_channel.group_id)
             .where(Enabled.guild_id == group_or_channel.guild_id)
             .where(Enabled.channel_id == group_or_channel.channel_id)
@@ -71,9 +70,7 @@ async def repeat_handle(
     if args:
         if strtobool(args):
             if not group:
-                session.add(
-                    Enabled(platform=platform, **group_or_channel.group_or_channel_id)
-                )
+                session.add(Enabled(**group_or_channel.dict()))
                 await session.commit()
             await repeat_cmd.finish("已在本群开启复读功能")
         else:

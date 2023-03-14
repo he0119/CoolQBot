@@ -170,3 +170,51 @@ async def test_morning_today(app: App, mocker: MockerFixture):
         EXPR_MORNING,
         message="今天就是元旦，好好玩吧！",
     )
+
+
+async def test_morning_push(app: App, mocker: MockerFixture):
+    """测试每日早安，发送早安"""
+    from nonebot_plugin_datastore import create_session
+
+    from src.plugins.morning.plugins.morning_greeting import MorningGreeting, morning
+    from src.plugins.morning.plugins.morning_greeting.data_source import EXPR_MORNING
+
+    mocked_date = mocker.patch(
+        "src.plugins.morning.plugins.morning_greeting.data_source.date"
+    )
+    mocked_date.today.return_value = date(2022, 1, 1)
+    get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
+    render_expression = mocker.patch(
+        "src.plugins.morning.plugins.morning_greeting.data_source.render_expression"
+    )
+    render_expression.return_value = Message("test")
+
+    async with create_session() as session:
+        session.add(
+            MorningGreeting(
+                platform="qq",
+                bot_id="test",
+                group_id="10000",
+            )
+        )
+        await session.commit()
+
+    async with app.test_api() as ctx:
+        bot = ctx.create_bot(base=Bot)
+
+        ctx.should_call_api(
+            "send_msg",
+            {"message_type": "group", "group_id": "10000", "message": Message("test")},
+            True,
+        )
+
+        await morning()
+
+    mocked_date.today.assert_called()
+    get.assert_called_once_with(
+        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/morning/holidays.json"
+    )
+    render_expression.assert_called_once_with(
+        EXPR_MORNING,
+        message="今天就是元旦，好好玩吧！",
+    )

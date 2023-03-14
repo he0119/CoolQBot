@@ -4,12 +4,7 @@ from nonebot.typing import T_State
 from nonebot_plugin_datastore import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import (
-    GroupOrChannel,
-    get_group_or_channel,
-    get_plaintext_content,
-    parse_str,
-)
+from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -39,14 +34,14 @@ async def handle_first_message(
 )
 async def _(
     content: str = Arg(),
-    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    user_info: UserInfo = Depends(get_user_info),
     session: AsyncSession = Depends(get_session),
 ):
     content = content.strip()
     if not content:
         await fitness_cmd.reject("健身内容不能为空，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, group_or_channel)
+    user = await ensure_user(session, user_info)
 
     session.add(FitnessRecord(user=user, message=content))
     await session.commit()

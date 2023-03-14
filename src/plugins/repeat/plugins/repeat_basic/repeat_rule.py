@@ -15,7 +15,6 @@ from ...recorder import Recorder
 async def need_repeat(
     event: Event,
     group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
-    platform: str = Depends(get_platform),
 ) -> bool:
     """是否复读这个消息"""
     # 不复读对机器人说的，因为这个应该由闲聊插件处理
@@ -25,7 +24,7 @@ async def need_repeat(
     user_id = event.get_user_id()
 
     # 只复读指定群内消息
-    recorder = Recorder(platform, **group_or_channel.group_or_channel_id)
+    recorder = Recorder(**group_or_channel.dict())
     if not await recorder.is_enabled():
         return False
 

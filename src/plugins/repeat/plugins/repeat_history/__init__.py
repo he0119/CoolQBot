@@ -67,14 +67,12 @@ async def history_handle_group_message(
     month: int = Arg(),
     day: int = Arg(),
     group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
-    platform: str = Depends(get_platform),
 ):
     res = await get_history(
         bot,
         year=year,
         month=month,
         day=day,
-        platform=platform,
-        **group_or_channel.group_or_channel_id,
+        **group_or_channel.dict(),
     )
     await history_cmd.finish(res)

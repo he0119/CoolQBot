@@ -4,12 +4,7 @@ from nonebot.typing import T_State
 from nonebot_plugin_datastore import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import (
-    GroupOrChannel,
-    get_group_or_channel,
-    get_plaintext_content,
-    parse_str,
-)
+from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -35,13 +30,13 @@ target_weight_cmd = check_in.command("weight", aliases={"目标体重"})
 async def _(
     state: T_State,
     content: str | None = Depends(get_plaintext_content),
-    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    user_infoget_user_info: UserInfo = Depends(get_user_info),
     session: AsyncSession = Depends(get_session),
 ):
     if content:
         state["content"] = content
     else:
-        user = await ensure_user(session, group_or_channel)
+        user = await ensure_user(session, user_infoget_user_info)
         if user.target_weight:
             await target_weight_cmd.finish(
                 f"你的目标体重是 {user.target_weight}kg，继续努力哦～", at_sender=True
@@ -53,7 +48,7 @@ async def _(
 )
 async def _(
     content: str = Arg(),
-    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    user_infoget_user_info: UserInfo = Depends(get_user_info),
     session: AsyncSession = Depends(get_session),
 ):
     content = content.strip()
@@ -68,7 +63,7 @@ async def _(
     if weight <= 0:
         await target_weight_cmd.reject("目标体重必须大于 0kg，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, group_or_channel)
+    user = await ensure_user(session, user_infoget_user_info)
     user.target_weight = weight
     await session.commit()
 
@@ -91,7 +86,7 @@ async def _(
 )
 async def _(
     content: str = Arg(),
-    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    user_infoget_user_info: UserInfo = Depends(get_user_info),
     session: AsyncSession = Depends(get_session),
 ):
     content = content.strip()
@@ -106,7 +101,7 @@ async def _(
     if weight <= 0:
         await target_weight_cmd.reject("目标体重必须大于 0kg，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, group_or_channel)
+    user = await ensure_user(session, user_infoget_user_info)
 
     session.add(WeightRecord(user=user, weight=weight))
     await session.commit()

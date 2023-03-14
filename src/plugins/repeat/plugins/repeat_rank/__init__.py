@@ -81,14 +81,12 @@ async def rank_handle_group_message(
     minimal_msg_number: int = Arg(),
     display_total_number: bool = Arg(),
     group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
-    platform: str = Depends(get_platform),
 ):
     res = await get_rank(
         bot,
         display_number=display_number,
         minimal_msg_number=minimal_msg_number,
         display_total_number=display_total_number,
-        platform=platform,
-        **group_or_channel.group_or_channel_id,
+        **group_or_channel.dict(),
     )
     await rank_cmd.finish(res)
