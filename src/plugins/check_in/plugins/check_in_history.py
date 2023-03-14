@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from datetime import timezone
 from io import BytesIO
 
 import matplotlib.pyplot as plt
@@ -17,7 +18,7 @@ from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, pa
 
 from .. import check_in
 from ..helpers import ensure_user
-from ..models import BodyFatRecord, DietaryRecord, FitnessRecord, User, WeightRecord
+from ..models import BodyFatRecord, DietaryRecord, FitnessRecord, WeightRecord
 
 __plugin_meta__ = PluginMetadata(
     name="打卡历史",
@@ -125,11 +126,15 @@ def gerenate_graph(
     weight_records: Sequence[WeightRecord], body_fat_records: Sequence[BodyFatRecord]
 ) -> bytes:
     weight = {
-        record.time.astimezone().strftime("%Y-%m-%d %H:%M:%S"): record.weight
+        record.time.replace(tzinfo=timezone.utc)
+        .astimezone()
+        .strftime("%Y-%m-%d %H:%M:%S"): record.weight
         for record in weight_records
     }
     body_fat = {
-        record.time.astimezone().strftime("%Y-%m-%d %H:%M:%S"): record.body_fat
+        record.time.replace(tzinfo=timezone.utc)
+        .astimezone()
+        .strftime("%Y-%m-%d %H:%M:%S"): record.body_fat
         for record in body_fat_records
     }
 
