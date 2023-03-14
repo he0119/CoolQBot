@@ -18,7 +18,8 @@ __plugin_meta__ = PluginMetadata(
 设置目标体重
 /目标体重 60
 记录体重
-/记录体重""",
+/体重打卡
+/体重打卡 60""",
     extra={
         "adapters": ["OneBot V11", "OneBot V12"],
     },
@@ -70,7 +71,7 @@ async def _(
     await target_weight_cmd.finish("已成功设置，你真棒哦！祝你早日达成目标～", at_sender=True)
 
 
-weight_record_cmd = check_in.command("weight_record", aliases={"记录体重"})
+weight_record_cmd = check_in.command("weight_record", aliases={"记录体重", "体重打卡"})
 
 
 @weight_record_cmd.handle()

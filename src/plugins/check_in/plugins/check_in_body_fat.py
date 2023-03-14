@@ -18,7 +18,8 @@ __plugin_meta__ = PluginMetadata(
 设置目标体脂
 /目标体脂 20
 记录体脂
-/记录体脂""",
+/体脂打卡
+/体制打卡 20""",
     extra={
         "adapters": ["OneBot V11", "OneBot V12"],
     },
@@ -72,7 +73,7 @@ async def _(
     await target_body_fat_cmd.finish("已成功设置，你真棒哦！祝你早日达成目标～", at_sender=True)
 
 
-body_fat_record_cmd = check_in.command("body_record", aliases={"记录体脂"})
+body_fat_record_cmd = check_in.command("body_record", aliases={"记录体脂", "体脂打卡"})
 
 
 @body_fat_record_cmd.handle()
