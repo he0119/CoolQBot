@@ -13,6 +13,7 @@ from nonebot.adapters.onebot.v12 import (
 )
 from nonebot.adapters.onebot.v12 import GroupMessageEvent as OneBotV12GroupMessageEvent
 from nonebot.adapters.onebot.v12 import Message as OneBotV12Message
+from nonebot.exception import ActionFailed
 from nonebot.matcher import Matcher
 from nonebot.params import Arg, CommandArg
 from nonebot.typing import T_State
@@ -118,8 +119,18 @@ def timedelta_to_chinese(timedelta: timedelta) -> str:
     return time_str
 
 
-async def get_nickname(bot: Bot, user_id: str, group_id: str | None = None):
-    """输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称"""
+async def get_nickname(
+    bot: Bot,
+    user_id: str,
+    group_id: str | None = None,
+    guild_id: str | None = None,
+    channel_id: str | None = None,
+) -> str | None:
+    """输入用户 ID，获取用户昵称
+
+    如果提供 group_id，优先获取群名片
+    如果提供 guild_id/channel_id，优先获取频道名片
+    """
     if isinstance(bot, OneBotV11Bot):
         if group_id:
             try:
@@ -129,16 +140,50 @@ async def get_nickname(bot: Bot, user_id: str, group_id: str | None = None):
                 if msg["card"]:
                     return msg["card"]
                 return msg["nickname"]
-            except:
+            except ActionFailed:
                 pass
         # 如果不在群里的话(因为有可能会退群)
         msg = await bot.get_stranger_info(user_id=int(user_id))
         return msg["nickname"]
     elif isinstance(bot, OneBotV12Bot):
-        user = await bot.get_user_info(user_id=user_id)
-        if user["user_displayname"]:
-            return user["user_displayname"]
-        return user["user_name"]
+        if group_id:
+            try:
+                msg = await bot.get_group_member_info(
+                    group_id=group_id, user_id=user_id
+                )
+                if msg["user_displayname"]:
+                    return msg["user_displayname"]
+                return msg["user_name"]
+            except ActionFailed:
+                pass
+        elif channel_id:
+            try:
+                msg = await bot.get_channel_member_info(
+                    guild_id=guild_id, channel_id=channel_id, user_id=user_id
+                )
+                if msg["user_displayname"]:
+                    return msg["user_displayname"]
+                return msg["user_name"]
+            except ActionFailed:
+                pass
+        elif guild_id:
+            try:
+                msg = await bot.get_guild_member_info(
+                    guild_id=guild_id, user_id=user_id
+                )
+                if msg["user_displayname"]:
+                    return msg["user_displayname"]
+                return msg["user_name"]
+            except ActionFailed:
+                pass
+
+        try:
+            user = await bot.get_user_info(user_id=user_id)
+            if user["user_displayname"]:
+                return user["user_displayname"]
+            return user["user_name"]
+        except ActionFailed:
+            pass
 
 
 class MentionedUser(BaseModel):
@@ -190,8 +235,18 @@ class GroupOrChannel(BaseModel):
 
     platform: str
     group_id: str
-    channel_id: str
     guild_id: str
+    channel_id: str
+
+    def __hash__(self):
+        return hash(
+            (
+                self.platform,
+                self.group_id,
+                self.guild_id,
+                self.channel_id,
+            )
+        )
 
     @property
     def detail_type(self) -> str:

@@ -6,12 +6,7 @@ from nonebot.params import Arg, CommandArg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
-from src.utils.helpers import (
-    GroupOrChannel,
-    get_group_or_channel,
-    get_platform,
-    parse_int,
-)
+from src.utils.helpers import GroupOrChannel, get_group_or_channel, parse_int
 
 from ... import repeat
 from .data_source import get_history
@@ -73,6 +68,6 @@ async def history_handle_group_message(
         year=year,
         month=month,
         day=day,
-        **group_or_channel.dict(),
+        group_or_channel=group_or_channel,
     )
     await history_cmd.finish(res)

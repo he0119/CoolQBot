@@ -11,7 +11,6 @@ from nonebot.typing import T_State
 from src.utils.helpers import (
     GroupOrChannel,
     get_group_or_channel,
-    get_platform,
     parse_bool,
     parse_int,
 )
@@ -87,6 +86,6 @@ async def rank_handle_group_message(
         display_number=display_number,
         minimal_msg_number=minimal_msg_number,
         display_total_number=display_total_number,
-        **group_or_channel.dict(),
+        group_or_channel=group_or_channel,
     )
     await rank_cmd.finish(res)

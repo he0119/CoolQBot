@@ -6,7 +6,7 @@ from operator import itemgetter
 
 from nonebot.adapters import Bot
 
-from src.utils.helpers import get_nickname
+from src.utils.helpers import GroupOrChannel, get_nickname
 
 from ...models import Record
 from ...recorder import Recorder
@@ -17,13 +17,10 @@ async def get_rank(
     display_number: int,
     minimal_msg_number: int,
     display_total_number: bool,
-    platform: str,
-    group_id: str,
-    guild_id: str,
-    channel_id: str,
+    group_or_channel: GroupOrChannel,
 ) -> str:
     """获取排行榜"""
-    recorder = Recorder(platform, group_id, guild_id, channel_id)
+    recorder = Recorder(group_or_channel)
 
     if not await recorder.is_enabled():
         return "该群未开启复读功能，无法获取排行榜。"
@@ -36,7 +33,7 @@ async def get_rank(
         display_number,
         minimal_msg_number,
         display_total_number,
-        group_id,
+        group_or_channel,
     )
     str_data = await ranking.ranking()
 
@@ -56,14 +53,14 @@ class Ranking:
         display_number: int,
         minimal_msg_number: int,
         display_total_number: bool,
-        group_id: str | None = None,
+        group_or_channel: GroupOrChannel,
     ):
         self.bot = bot
         self.records = records
         self.display_number = display_number
         self.minimal_msg_number = minimal_msg_number
         self.display_total_number = display_total_number
-        self.group_id = group_id
+        self.group_or_channel = group_or_channel
         self._nickname_cache = {}
 
     async def ranking(self):
@@ -137,6 +134,8 @@ class Ranking:
         if user_id in self._nickname_cache:
             return self._nickname_cache[user_id]
         else:
-            name = await get_nickname(self.bot, user_id, self.group_id)
+            name = await get_nickname(
+                self.bot, user_id, **self.group_or_channel.dict(exclude={"platform"})
+            )
             self._nickname_cache[user_id] = name
             return name
