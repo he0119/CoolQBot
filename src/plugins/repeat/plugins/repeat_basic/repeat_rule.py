@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 
 from nonebot.adapters import Event
 from nonebot.log import logger
-from nonebot.params import Depends, EventToMe
+from nonebot.params import Depends
 
-from src.utils.helpers import GroupOrChannel, get_group_or_channel, get_platform
+from src.utils.helpers import GroupOrChannel, get_group_or_channel
 
 from ... import plugin_config
 from ...recorder import Recorder
@@ -24,7 +24,7 @@ async def need_repeat(
     user_id = event.get_user_id()
 
     # 只复读指定群内消息
-    recorder = Recorder(**group_or_channel.dict())
+    recorder = Recorder(group_or_channel)
     if not await recorder.is_enabled():
         return False
 

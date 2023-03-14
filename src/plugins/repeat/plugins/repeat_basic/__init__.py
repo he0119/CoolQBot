@@ -7,12 +7,7 @@ from nonebot_plugin_datastore import get_session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import (
-    GroupOrChannel,
-    get_group_or_channel,
-    get_platform,
-    strtobool,
-)
+from src.utils.helpers import GroupOrChannel, get_group_or_channel, strtobool
 
 from ... import repeat
 from ...models import Enabled
