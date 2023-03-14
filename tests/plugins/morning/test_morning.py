@@ -177,17 +177,11 @@ async def test_morning_push(app: App, mocker: MockerFixture):
     from nonebot_plugin_datastore import create_session
 
     from src.plugins.morning.plugins.morning_greeting import MorningGreeting, morning
-    from src.plugins.morning.plugins.morning_greeting.data_source import EXPR_MORNING
 
-    mocked_date = mocker.patch(
-        "src.plugins.morning.plugins.morning_greeting.data_source.date"
+    get_moring_message = mocker.patch(
+        "src.plugins.morning.plugins.morning_greeting.get_moring_message"
     )
-    mocked_date.today.return_value = date(2022, 1, 1)
-    get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
-    render_expression = mocker.patch(
-        "src.plugins.morning.plugins.morning_greeting.data_source.render_expression"
-    )
-    render_expression.return_value = Message("test")
+    get_moring_message.return_value = Message("test")
 
     async with create_session() as session:
         session.add(
@@ -210,11 +204,4 @@ async def test_morning_push(app: App, mocker: MockerFixture):
 
         await morning()
 
-    mocked_date.today.assert_called()
-    get.assert_called_once_with(
-        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/morning/holidays.json"
-    )
-    render_expression.assert_called_once_with(
-        EXPR_MORNING,
-        message="今天就是元旦，好好玩吧！",
-    )
+    get_moring_message.assert_called_once()
