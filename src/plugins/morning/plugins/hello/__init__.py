@@ -12,12 +12,7 @@ from nonebot_plugin_datastore import create_session, get_session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import (
-    GroupOrChannel,
-    get_group_or_channel,
-    get_platform,
-    strtobool,
-)
+from src.utils.helpers import GroupInfo, get_group_info, get_platform, strtobool
 
 from .data_source import get_first_connect_message
 from .models import Hello
@@ -81,24 +76,24 @@ hello_cmd = on_command("hello", aliases={"问候"}, block=True)
 async def hello_handle(
     arg: Message = CommandArg(),
     session: AsyncSession = Depends(get_session),
-    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    group_info: GroupInfo = Depends(get_group_info),
 ):
     args = arg.extract_plain_text()
 
     group = (
         await session.scalars(
             select(Hello)
-            .where(Hello.platform == group_or_channel.platform)
-            .where(Hello.group_id == group_or_channel.group_id)
-            .where(Hello.guild_id == group_or_channel.guild_id)
-            .where(Hello.channel_id == group_or_channel.channel_id)
+            .where(Hello.platform == group_info.platform)
+            .where(Hello.group_id == group_info.group_id)
+            .where(Hello.guild_id == group_info.guild_id)
+            .where(Hello.channel_id == group_info.channel_id)
         )
     ).one_or_none()
 
     if args:
         if strtobool(args):
             if not group:
-                session.add(Hello(**group_or_channel.dict()))
+                session.add(Hello(**group_info.dict()))
                 await session.commit()
             await hello_cmd.finish("已在本群开启启动问候功能")
         else:

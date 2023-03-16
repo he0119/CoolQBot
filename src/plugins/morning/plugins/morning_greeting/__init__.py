@@ -14,12 +14,7 @@ from nonebot_plugin_datastore import create_session, get_session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import (
-    GroupOrChannel,
-    get_group_or_channel,
-    get_platform,
-    strtobool,
-)
+from src.utils.helpers import GroupInfo, get_group_info, strtobool
 
 from ... import plugin_config
 from .data_source import HOLIDAYS_DATA, get_moring_message
@@ -68,18 +63,18 @@ async def morning():
         except ValueError:
             logger.warning(f"Bot {group.bot_id} 不存在，跳过")
             continue
-        group_or_channel = GroupOrChannel.parse_obj(asdict(group))
+        group_info = GroupInfo.parse_obj(asdict(group))
         if isinstance(bot, V11Bot):
             await get_bot().send_msg(
                 message_type="group",
-                group_id=group_or_channel.group_id,
+                group_id=group_info.group_id,
                 message=hello_str,
             )
         elif isinstance(bot, V12Bot):
             await bot.send_message(
-                detail_type=group_or_channel.detail_type,
+                detail_type=group_info.detail_type,
                 message=V12Message(hello_str),
-                **group_or_channel.send_message_args,
+                **group_info.send_message_args,
             )
     logger.info("发送早安信息")
 
@@ -92,7 +87,7 @@ async def morning_handle(
     bot: V11Bot | V12Bot,
     arg: Message = CommandArg(),
     session: AsyncSession = Depends(get_session),
-    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    group_info: GroupInfo = Depends(get_group_info),
 ):
     args = arg.extract_plain_text()
 
@@ -107,18 +102,16 @@ async def morning_handle(
         await session.scalars(
             select(MorningGreeting)
             .where(MorningGreeting.bot_id == bot.self_id)
-            .where(MorningGreeting.platform == group_or_channel.platform)
-            .where(MorningGreeting.group_id == group_or_channel.group_id)
-            .where(MorningGreeting.guild_id == group_or_channel.guild_id)
-            .where(MorningGreeting.channel_id == group_or_channel.channel_id)
+            .where(MorningGreeting.platform == group_info.platform)
+            .where(MorningGreeting.group_id == group_info.group_id)
+            .where(MorningGreeting.guild_id == group_info.guild_id)
+            .where(MorningGreeting.channel_id == group_info.channel_id)
         )
     ).one_or_none()
     if args:
         if strtobool(args):
             if not group:
-                session.add(
-                    MorningGreeting(bot_id=bot.self_id, **group_or_channel.dict())
-                )
+                session.add(MorningGreeting(bot_id=bot.self_id, **group_info.dict()))
                 await session.commit()
             await morning_cmd.finish("已在本群开启每日早安功能")
         else:

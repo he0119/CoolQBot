@@ -8,12 +8,7 @@ from nonebot.params import Arg, CommandArg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
-from src.utils.helpers import (
-    GroupOrChannel,
-    get_group_or_channel,
-    parse_bool,
-    parse_int,
-)
+from src.utils.helpers import GroupInfo, get_group_info, parse_bool, parse_int
 
 from ... import repeat
 from .data_source import get_rank
@@ -79,13 +74,13 @@ async def rank_handle_group_message(
     display_number: int = Arg(),
     minimal_msg_number: int = Arg(),
     display_total_number: bool = Arg(),
-    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    group_info: GroupInfo = Depends(get_group_info),
 ):
     res = await get_rank(
         bot,
         display_number=display_number,
         minimal_msg_number=minimal_msg_number,
         display_total_number=display_total_number,
-        group_or_channel=group_or_channel,
+        group_info=group_info,
     )
     await rank_cmd.finish(res)

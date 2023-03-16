@@ -6,7 +6,7 @@ from nonebot.adapters import Event
 from nonebot.log import logger
 from nonebot.params import Depends
 
-from src.utils.helpers import GroupOrChannel, get_group_or_channel
+from src.utils.helpers import GroupInfo, get_group_info
 
 from ... import plugin_config
 from ...recorder import Recorder
@@ -14,7 +14,7 @@ from ...recorder import Recorder
 
 async def need_repeat(
     event: Event,
-    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    group_info: GroupInfo = Depends(get_group_info),
 ) -> bool:
     """是否复读这个消息"""
     # 不复读对机器人说的，因为这个应该由闲聊插件处理
@@ -24,7 +24,7 @@ async def need_repeat(
     user_id = event.get_user_id()
 
     # 只复读指定群内消息
-    recorder = Recorder(group_or_channel)
+    recorder = Recorder(group_info)
     if not await recorder.is_enabled():
         return False
 

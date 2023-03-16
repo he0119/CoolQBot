@@ -211,7 +211,7 @@ async def get_platform(bot: Bot) -> str | None:
         return bot.platform
 
 
-class UserInfo(BaseModel):
+class UserInfo(BaseModel, frozen=True):
     """确定一个用户所需的信息"""
 
     platform: str
@@ -230,23 +230,13 @@ async def get_user_info(bot: OneBotV11Bot | OneBotV12Bot, event: Event) -> UserI
     return UserInfo(platform=platform, user_id=user_id)
 
 
-class GroupOrChannel(BaseModel):
+class GroupInfo(BaseModel, frozen=True):
     """确定一个群或频道所需信息"""
 
     platform: str
     group_id: str
     guild_id: str
     channel_id: str
-
-    def __hash__(self):
-        return hash(
-            (
-                self.platform,
-                self.group_id,
-                self.guild_id,
-                self.channel_id,
-            )
-        )
 
     @property
     def detail_type(self) -> str:
@@ -265,13 +255,13 @@ class GroupOrChannel(BaseModel):
         }
 
 
-async def get_group_or_channel(
+async def get_group_info(
     bot: OneBotV11Bot | OneBotV12Bot,
     event: OneBotV11GroupMessageEvent
     | OneBotV12GroupMessageEvent
     | OneBotV12ChannelMessageEvent,
-) -> GroupOrChannel:
-    """获取群号或频道号"""
+) -> GroupInfo:
+    """获取群号或频道号信息"""
     if isinstance(bot, OneBotV11Bot):
         platform = "qq"
     else:
@@ -290,7 +280,7 @@ async def get_group_or_channel(
         guild_id = event.guild_id
         channel_id = event.channel_id
 
-    return GroupOrChannel(
+    return GroupInfo(
         platform=platform,
         group_id=group_id,
         channel_id=channel_id,

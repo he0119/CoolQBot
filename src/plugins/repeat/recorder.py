@@ -10,7 +10,7 @@ from nonebot_plugin_datastore import create_session, get_plugin_data
 from nonebot_plugin_datastore.db import post_db_init
 from sqlalchemy import select
 
-from src.utils.helpers import GroupOrChannel
+from src.utils.helpers import GroupInfo
 
 from . import plugin_config
 from .models import Enabled, Record
@@ -88,18 +88,18 @@ def update_old_2(data: dict, group_id: int):
 class Singleton(type):
     _instances = {}
 
-    def __call__(cls, group_or_channel: GroupOrChannel):
-        if group_or_channel not in cls._instances:
-            cls._instances[group_or_channel] = super().__call__(group_or_channel)
-        return cls._instances[group_or_channel]
+    def __call__(cls, group_info: GroupInfo):
+        if group_info not in cls._instances:
+            cls._instances[group_info] = super().__call__(group_info)
+        return cls._instances[group_info]
 
 
 class Recorder(metaclass=Singleton):
-    def __init__(self, group_or_channel: GroupOrChannel):
+    def __init__(self, group_info: GroupInfo):
         self._msg_send_time: list[datetime] = []
         self._last_message_on: datetime = datetime.now()
 
-        self.group_or_channel = group_or_channel
+        self.group_info = group_info
 
     def message_number(self, x: int):
         """返回指定群 x 分钟内的消息条数，并清除之前的消息记录"""
@@ -137,10 +137,10 @@ class Recorder(metaclass=Singleton):
         async with create_session() as session:
             records = await session.execute(
                 select(Record)
-                .where(Record.platform == self.group_or_channel.platform)
-                .where(Record.group_id == self.group_or_channel.group_id)
-                .where(Record.guild_id == self.group_or_channel.guild_id)
-                .where(Record.channel_id == self.group_or_channel.channel_id)
+                .where(Record.platform == self.group_info.platform)
+                .where(Record.group_id == self.group_info.group_id)
+                .where(Record.guild_id == self.group_info.guild_id)
+                .where(Record.channel_id == self.group_info.channel_id)
                 .where(Record.date >= start)
                 .where(Record.date <= end)
             )
@@ -155,10 +155,10 @@ class Recorder(metaclass=Singleton):
         async with create_session() as session:
             records = await session.execute(
                 select(Record)
-                .where(Record.platform == self.group_or_channel.platform)
-                .where(Record.group_id == self.group_or_channel.group_id)
-                .where(Record.guild_id == self.group_or_channel.guild_id)
-                .where(Record.channel_id == self.group_or_channel.channel_id)
+                .where(Record.platform == self.group_info.platform)
+                .where(Record.group_id == self.group_info.group_id)
+                .where(Record.guild_id == self.group_info.guild_id)
+                .where(Record.channel_id == self.group_info.channel_id)
                 .where(Record.date == time)
             )
             return records.scalars().all()
@@ -171,10 +171,10 @@ class Recorder(metaclass=Singleton):
                 select(Record)
                 .where(Record.date == now_date)
                 .where(Record.user_id == user_id)
-                .where(Record.platform == self.group_or_channel.platform)
-                .where(Record.group_id == self.group_or_channel.group_id)
-                .where(Record.guild_id == self.group_or_channel.guild_id)
-                .where(Record.channel_id == self.group_or_channel.channel_id)
+                .where(Record.platform == self.group_info.platform)
+                .where(Record.group_id == self.group_info.group_id)
+                .where(Record.guild_id == self.group_info.guild_id)
+                .where(Record.channel_id == self.group_info.channel_id)
             )
             if record:
                 record.msg_number += 1
@@ -186,7 +186,7 @@ class Recorder(metaclass=Singleton):
                     user_id=user_id,
                     msg_number=1,
                     repeat_time=1,
-                    **self.group_or_channel.dict(),
+                    **self.group_info.dict(),
                 )
                 session.add(record)
                 await session.commit()
@@ -199,10 +199,10 @@ class Recorder(metaclass=Singleton):
                 select(Record)
                 .where(Record.date == now_date)
                 .where(Record.user_id == user_id)
-                .where(Record.platform == self.group_or_channel.platform)
-                .where(Record.group_id == self.group_or_channel.group_id)
-                .where(Record.guild_id == self.group_or_channel.guild_id)
-                .where(Record.channel_id == self.group_or_channel.channel_id)
+                .where(Record.platform == self.group_info.platform)
+                .where(Record.group_id == self.group_info.group_id)
+                .where(Record.guild_id == self.group_info.guild_id)
+                .where(Record.channel_id == self.group_info.channel_id)
             )
             if record:
                 record.msg_number += 1
@@ -212,7 +212,7 @@ class Recorder(metaclass=Singleton):
                     date=now_date,
                     user_id=user_id,
                     msg_number=1,
-                    **self.group_or_channel.dict(),
+                    **self.group_info.dict(),
                 )
                 session.add(record)
                 await session.commit()
@@ -232,10 +232,10 @@ class Recorder(metaclass=Singleton):
             return (
                 await session.scalars(
                     select(Enabled)
-                    .where(Enabled.platform == self.group_or_channel.platform)
-                    .where(Enabled.group_id == self.group_or_channel.group_id)
-                    .where(Enabled.guild_id == self.group_or_channel.guild_id)
-                    .where(Enabled.channel_id == self.group_or_channel.channel_id)
+                    .where(Enabled.platform == self.group_info.platform)
+                    .where(Enabled.group_id == self.group_info.group_id)
+                    .where(Enabled.guild_id == self.group_info.guild_id)
+                    .where(Enabled.channel_id == self.group_info.channel_id)
                 )
             ).one_or_none()
 

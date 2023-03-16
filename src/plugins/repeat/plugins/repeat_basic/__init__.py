@@ -7,7 +7,7 @@ from nonebot_plugin_datastore import get_session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import GroupOrChannel, get_group_or_channel, strtobool
+from src.utils.helpers import GroupInfo, get_group_info, strtobool
 
 from ... import repeat
 from ...models import Enabled
@@ -48,24 +48,24 @@ repeat_cmd.__doc__ = """
 async def repeat_handle(
     arg: Message = CommandArg(),
     session: AsyncSession = Depends(get_session),
-    group_or_channel: GroupOrChannel = Depends(get_group_or_channel),
+    group_info: GroupInfo = Depends(get_group_info),
 ):
     args = arg.extract_plain_text()
 
     group = (
         await session.scalars(
             select(Enabled)
-            .where(Enabled.platform == group_or_channel.platform)
-            .where(Enabled.group_id == group_or_channel.group_id)
-            .where(Enabled.guild_id == group_or_channel.guild_id)
-            .where(Enabled.channel_id == group_or_channel.channel_id)
+            .where(Enabled.platform == group_info.platform)
+            .where(Enabled.group_id == group_info.group_id)
+            .where(Enabled.guild_id == group_info.guild_id)
+            .where(Enabled.channel_id == group_info.channel_id)
         )
     ).one_or_none()
 
     if args:
         if strtobool(args):
             if not group:
-                session.add(Enabled(**group_or_channel.dict()))
+                session.add(Enabled(**group_info.dict()))
                 await session.commit()
             await repeat_cmd.finish("已在本群开启复读功能")
         else:

@@ -6,7 +6,7 @@ from operator import itemgetter
 
 from nonebot.adapters import Bot
 
-from src.utils.helpers import GroupOrChannel, get_nickname
+from src.utils.helpers import GroupInfo, get_nickname
 
 from ...models import Record
 from ...recorder import Recorder
@@ -17,10 +17,10 @@ async def get_rank(
     display_number: int,
     minimal_msg_number: int,
     display_total_number: bool,
-    group_or_channel: GroupOrChannel,
+    group_info: GroupInfo,
 ) -> str:
     """获取排行榜"""
-    recorder = Recorder(group_or_channel)
+    recorder = Recorder(group_info)
 
     if not await recorder.is_enabled():
         return "该群未开启复读功能，无法获取排行榜。"
@@ -33,7 +33,7 @@ async def get_rank(
         display_number,
         minimal_msg_number,
         display_total_number,
-        group_or_channel,
+        group_info,
     )
     str_data = await ranking.ranking()
 
@@ -53,14 +53,14 @@ class Ranking:
         display_number: int,
         minimal_msg_number: int,
         display_total_number: bool,
-        group_or_channel: GroupOrChannel,
+        group_info: GroupInfo,
     ):
         self.bot = bot
         self.records = records
         self.display_number = display_number
         self.minimal_msg_number = minimal_msg_number
         self.display_total_number = display_total_number
-        self.group_or_channel = group_or_channel
+        self.group_info = group_info
         self._nickname_cache = {}
 
     async def ranking(self):
@@ -135,7 +135,7 @@ class Ranking:
             return self._nickname_cache[user_id]
         else:
             name = await get_nickname(
-                self.bot, user_id, **self.group_or_channel.dict(exclude={"platform"})
+                self.bot, user_id, **self.group_info.dict(exclude={"platform"})
             )
             self._nickname_cache[user_id] = name
             return name
