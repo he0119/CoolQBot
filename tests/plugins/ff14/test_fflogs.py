@@ -178,7 +178,7 @@ async def test_dps_at_user_channel(app: App, mocker: MockerFixture):
     await fflogs.set_character("qq", "10000", "name", "server")
 
     async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot, platform="qq")
+        bot = ctx.create_bot(base=Bot, platform="qq", impl="test")
         event = fake_channel_message_event_v12(
             message=Message("/dps" + MessageSegment.mention("10000"))
         )
@@ -202,7 +202,7 @@ async def test_dps_at_user_channel(app: App, mocker: MockerFixture):
     mock.side_effect = test
 
     async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot, platform="qq")
+        bot = ctx.create_bot(base=Bot, platform="qq", impl="test")
         event = fake_channel_message_event_v12(
             message=Message("/dps e1s" + MessageSegment.mention("10000"))
         )
