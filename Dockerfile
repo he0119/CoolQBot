@@ -28,7 +28,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 RUN rm requirements.txt
 
-RUN meme download
+RUN meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator
 
 COPY bot.py pyproject.toml .env prestart.sh /app/
 COPY src /app/src/
