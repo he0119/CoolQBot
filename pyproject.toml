@@ -26,7 +26,7 @@ nonebot-plugin-treehelp = ">=0.0.5"
 nonebot-plugin-memes = "0.4.1"
 nonebot-bison = { git = "https://github.com/felinae98/nonebot-bison.git", branch = "main" }
 nonebot-plugin-gscode = "0.1.6"
-nonebot-plugin-naturel-gpt = "1.5.3"
+nonebot-plugin-naturel-gpt = "2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
