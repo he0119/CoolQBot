@@ -2,8 +2,9 @@ import nonebot
 from nonebot.adapters.onebot.v11 import Adapter as OneBotV11Adapter
 from nonebot.adapters.onebot.v12 import Adapter as OneBotV12Adapter
 from nonebot.log import logger
+from sqlalchemy import StaticPool
 
-nonebot.init()
+nonebot.init(datastore_engine_options={"poolclass": StaticPool})
 app = nonebot.get_asgi()
 
 driver = nonebot.get_driver()
