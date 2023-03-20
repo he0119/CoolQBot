@@ -23,7 +23,7 @@ nonebot-plugin-sentry = "^0.2.2"
 nonebot-plugin-datastore = "^0.6.0a3"
 nonebot-plugin-wordcloud = "^0.4.7"
 nonebot-plugin-treehelp = ">=0.0.5"
-nonebot-plugin-memes = "0.4.1"
+nonebot-plugin-memes = "0.4.2"
 nonebot-bison = { git = "https://github.com/felinae98/nonebot-bison.git", branch = "main" }
 nonebot-plugin-gscode = "0.1.6"
 nonebot-plugin-naturel-gpt = "1.5.3"
