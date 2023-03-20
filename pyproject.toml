@@ -21,7 +21,7 @@ nonebot-adapter-onebot = { git = "https://github.com/nonebot/adapter-onebot.git"
 nonebot-plugin-apscheduler = "^0.2.0"
 nonebot-plugin-sentry = "^0.2.2"
 nonebot-plugin-datastore = "^0.6.0a3"
-nonebot-plugin-wordcloud = "^0.4.7"
+nonebot-plugin-wordcloud = "^0.4.8"
 nonebot-plugin-treehelp = ">=0.0.5"
 nonebot-plugin-memes = "0.4.1"
 nonebot-bison = { git = "https://github.com/felinae98/nonebot-bison.git", branch = "main" }
