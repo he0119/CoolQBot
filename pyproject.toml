@@ -16,17 +16,18 @@ matplotlib = "^3.7.1"
 
 nonebot2 = { extras = ["httpx", "fastapi"], version = "^2.0.0-rc.3" }
 nb-cli = "^1.0.5"
-nonebot-adapter-onebot = { git = "https://github.com/nonebot/adapter-onebot.git", branch = "master" }
+nonebot-adapter-onebot = "2.2.2"
+
+nonebot-plugin-datastore = "^0.6.0"
+nonebot-plugin-wordcloud = "^0.4.7"
+nonebot-plugin-treehelp = ">=0.0.5"
 
 nonebot-plugin-apscheduler = "^0.2.0"
 nonebot-plugin-sentry = "^0.2.2"
-nonebot-plugin-datastore = "^0.6.0a3"
-nonebot-plugin-wordcloud = "^0.4.7"
-nonebot-plugin-treehelp = ">=0.0.5"
-nonebot-plugin-memes = "0.4.1"
-nonebot-bison = { git = "https://github.com/felinae98/nonebot-bison.git", branch = "main" }
+nonebot-plugin-memes = "0.4.2"
+nonebot-bison = "0.7.1"
 nonebot-plugin-gscode = "0.1.6"
-nonebot-plugin-naturel-gpt = "1.5.3"
+nonebot-plugin-naturel-gpt = "2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
@@ -36,7 +37,7 @@ nonebug = { git = "https://github.com/nonebot/nonebug.git" }
 pytest-cov = "^4.0.0"
 pytest-mock = "^3.6.1"
 pytest-xdist = "^3.0.2"
-pytest-asyncio = "^0.20.2"
+pytest-asyncio = "^0.21.0"
 
 [tool.nonebot]
 plugin_dirs = ["src/plugins"]

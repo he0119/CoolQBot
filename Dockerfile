@@ -22,11 +22,11 @@ ENV SENTRY_RELEASE=version
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 RUN apt-get update \
   && apt-get -y upgrade \
-  && apt-get install -y --no-install-recommends git curl \
+  && apt-get install -y --no-install-recommends curl \
   && pip install --no-cache-dir --upgrade -r requirements.txt \
   && apt-get purge -y --auto-remove \
-  && rm -rf /var/lib/apt/lists/*
-RUN rm requirements.txt
+  && rm -rf /var/lib/apt/lists/* \
+  && rm /app/requirements.txt
 
 RUN meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator
 

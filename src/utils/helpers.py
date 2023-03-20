@@ -156,7 +156,7 @@ async def get_nickname(
                 return msg["user_name"]
             except ActionFailed:
                 pass
-        elif channel_id:
+        elif channel_id and guild_id:
             try:
                 msg = await bot.get_channel_member_info(
                     guild_id=guild_id, channel_id=channel_id, user_id=user_id

@@ -47,4 +47,6 @@ async def send(
     return await bot.send_message(**params)
 
 
-Adapter.custom_send(send, platform="qqguild", impl="nonebot-plugin-all4one")
+# FIXME: 暂时反着写，因为适配器写反了，等发布新版之后改回来
+# https://github.com/nonebot/adapter-onebot/commit/0e8dddc662c271b235d7d0ae4bc6f2312c675f75
+Adapter.custom_send(send, impl="qqguild", platform="nonebot-plugin-all4one")
