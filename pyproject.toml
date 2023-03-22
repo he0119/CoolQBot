@@ -17,6 +17,7 @@ matplotlib = "^3.7.1"
 nonebot2 = { extras = ["httpx", "fastapi"], version = "^2.0.0-rc.3" }
 nb-cli = "^1.0.5"
 nonebot-adapter-onebot = "2.2.2"
+onebot-qqguild-extension = "^0.1.0"
 
 nonebot-plugin-datastore = "^0.6.0"
 nonebot-plugin-wordcloud = "^0.4.7"
@@ -42,6 +43,7 @@ pytest-asyncio = "^0.21.0"
 [tool.nonebot]
 plugin_dirs = ["src/plugins"]
 plugins = [
+    "onebot_qqguild_extension",
     "nonebot_plugin_apscheduler",
     "nonebot_plugin_sentry",
     "nonebot_plugin_treehelp",

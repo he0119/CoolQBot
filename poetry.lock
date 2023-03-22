@@ -309,14 +309,14 @@ files = [
 
 [[package]]
 name = "beautifulsoup4"
-version = "4.11.2"
+version = "4.12.0"
 description = "Screen-scraping library"
 category = "main"
 optional = false
 python-versions = ">=3.6.0"
 files = [
-    {file = "beautifulsoup4-4.11.2-py3-none-any.whl", hash = "sha256:0e79446b10b3ecb499c1556f7e228a53e64a2bfcebd455f370d8927cb5b59e39"},
-    {file = "beautifulsoup4-4.11.2.tar.gz", hash = "sha256:bc4bdda6717de5a2987436fb8d72f45dc90dd856bdfd512a1314ce90349a0106"},
+    {file = "beautifulsoup4-4.12.0-py3-none-any.whl", hash = "sha256:2130a5ad7f513200fae61a17abb5e338ca980fa28c439c0571014bc0217e9591"},
+    {file = "beautifulsoup4-4.12.0.tar.gz", hash = "sha256:c5fceeaec29d09c84970e47c65f2f0efe57872f7cff494c9691a26ec0ff13234"},
 ]
 
 [package.dependencies]
@@ -1242,14 +1242,14 @@ socks = ["socksio (>=1.0.0,<2.0.0)"]
 
 [[package]]
 name = "huggingface-hub"
-version = "0.13.2"
+version = "0.13.3"
 description = "Client library to download and publish models, datasets and other repos on the huggingface.co hub"
 category = "main"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "huggingface_hub-0.13.2-py3-none-any.whl", hash = "sha256:745c4cbd97a27fc5c1c6c89cb477662004c88bc3dd89bafc1a27ef24af77f944"},
-    {file = "huggingface_hub-0.13.2.tar.gz", hash = "sha256:246e8eb39b6e6e9d9d5846e4b56c265cdf1872f48ba5a13a1321295d371626f5"},
+    {file = "huggingface_hub-0.13.3-py3-none-any.whl", hash = "sha256:f73a298a55028575334f9670d86b8171a4dd890b320315f3ad28a20b9eb3b5bc"},
+    {file = "huggingface_hub-0.13.3.tar.gz", hash = "sha256:1f95f65c5e7aa76728701402f55b697ee8a8b50234adda91fbdbb81038fbcd21"},
 ]
 
 [package.dependencies]
@@ -2232,6 +2232,22 @@ files = [
     {file = "numpy-1.24.2-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:150947adbdfeceec4e5926d956a06865c1c690f2fd902efede4ca6fe2e657c3f"},
     {file = "numpy-1.24.2.tar.gz", hash = "sha256:003a9f530e880cb2cd177cba1af7220b9aa42def9c4afc2a2fc3ee6be7eb2b22"},
 ]
+
+[[package]]
+name = "onebot-qqguild-extension"
+version = "0.1.0"
+description = ""
+category = "main"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "onebot_qqguild_extension-0.1.0-py3-none-any.whl", hash = "sha256:fc953b16988f5376629788077d2d4ceddbb4415e7a72e85c0fc8fd58360b8647"},
+    {file = "onebot_qqguild_extension-0.1.0.tar.gz", hash = "sha256:23c3d71f6b15935fad704a7b5d7bac6fa3070f9d2fc3612a226e259c5bbf606e"},
+]
+
+[package.dependencies]
+nonebot-adapter-onebot = ">=2.2.2,<3.0.0"
+nonebot2 = ">=2.0.0-rc.1,<3.0.0"
 
 [[package]]
 name = "openai"
@@ -3435,14 +3451,14 @@ full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyam
 
 [[package]]
 name = "tencentcloud-sdk-python"
-version = "3.0.855"
+version = "3.0.857"
 description = "Tencent Cloud SDK for Python"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "tencentcloud-sdk-python-3.0.855.tar.gz", hash = "sha256:f7eb3ced37b42c804dc776f6691e38f18d18467a3fc209dc00ca1520859efe20"},
-    {file = "tencentcloud_sdk_python-3.0.855-py2.py3-none-any.whl", hash = "sha256:14a9c07503b3f12ce8cce010eeea433126d7b1b47d09e06d0d32bda90d4522fc"},
+    {file = "tencentcloud-sdk-python-3.0.857.tar.gz", hash = "sha256:947a69fdc727134c1e04e41627c9dbd487eb7647e4b5de460d2da1976b967032"},
+    {file = "tencentcloud_sdk_python-3.0.857-py2.py3-none-any.whl", hash = "sha256:d80187c6e66c62ef15bcb913639032f1be5a36c7b47e50f1d286aaa7a0d4fa54"},
 ]
 
 [package.dependencies]
@@ -3586,14 +3602,14 @@ telegram = ["requests"]
 
 [[package]]
 name = "transformers"
-version = "4.27.1"
+version = "4.27.2"
 description = "State-of-the-art Machine Learning for JAX, PyTorch and TensorFlow"
 category = "main"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "transformers-4.27.1-py3-none-any.whl", hash = "sha256:b8cf844cbeaefd24b07f7ab1550af11b5d9cf0a7d09e5f4fedede9b15a3da2c0"},
-    {file = "transformers-4.27.1.tar.gz", hash = "sha256:05120d91e407c0d3db364f5d0710cdacccd15f67114b075f161a71535c133695"},
+    {file = "transformers-4.27.2-py3-none-any.whl", hash = "sha256:499a5ac4c1160f27b71bbd3c080e36ee3fd8cc2922aeaa52a8b163adf5ff4f19"},
+    {file = "transformers-4.27.2.tar.gz", hash = "sha256:940a6c0e04d89d14d012ee7214f8fd4e2aa2924a70a41106e0beb6ff25227752"},
 ]
 
 [package.dependencies]
@@ -4095,4 +4111,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "1c4f72225d6367ec7826edd114ae7808dcebbae0f2432b7fff935dad3c6a584a"
+content-hash = "aa76c23ea6c1beea385814eae873bee50d03905a55434a4a044b8c69b318791f"
