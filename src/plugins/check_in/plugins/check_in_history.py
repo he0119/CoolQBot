@@ -45,7 +45,7 @@ async def handle_first_message(
 
 @history_cmd.got(
     "content",
-    prompt="请问你要查询什么历史呢？请输入 A：健身打卡记录 B：饮食打卡记录 C：体重和体脂历史",
+    prompt="请问你要查询什么历史呢？请输入 A：健身打卡记录 B：饮食打卡记录 C：体重历史 D：体脂历史",
     parameterless=[Depends(parse_str("content"))],
 )
 async def _(
@@ -58,7 +58,7 @@ async def _(
     if not content:
         await history_cmd.reject("选项不能为空，请重新输入", at_sender=True)
 
-    if content not in ["a", "b", "c"]:
+    if content not in ["a", "b", "c", "d"]:
         await history_cmd.reject("选项不正确，请重新输入", at_sender=True)
 
     user = await ensure_user(session, user_info)
@@ -98,57 +98,69 @@ async def _(
                     select(WeightRecord).where(WeightRecord.user == user)
                 )
             ).all()
+            if not weight_records:
+                await history_cmd.finish("你还没有体重记录哦", at_sender=True)
+
+            msg = f"你的目标体重是 {user.target_weight or 'NaN'}kg\n"
+
+            image = gerenate_graph(weight_records)
+            if isinstance(bot, BotV11):
+                msg += MessageSegmentV11.image(image)
+            else:
+                file_id = (
+                    await bot.upload_file(type="data", data=image, name="weight.png")
+                )["file_id"]
+                msg += MessageSegmentV12.image(file_id)
+
+            await history_cmd.finish(msg, at_sender=True)
+        case "d":
             body_fat_records = (
                 await session.scalars(
                     select(BodyFatRecord).where(BodyFatRecord.user == user)
                 )
             ).all()
-            if not weight_records and not body_fat_records:
-                await history_cmd.finish("你还没有体重或体脂记录哦", at_sender=True)
+            if not body_fat_records:
+                await history_cmd.finish("你还没有体脂记录哦", at_sender=True)
 
-            msg = f"你的目标体重是 {user.target_weight or 'NaN'}kg，目标体脂是 {user.target_body_fat or 'NaN'}%\n"
+            msg = f"你的目标体脂是 {user.target_body_fat or 'NaN'}%\n"
 
-            image = gerenate_graph(weight_records, body_fat_records)
+            image = gerenate_graph(body_fat_records)
             if isinstance(bot, BotV11):
                 msg += MessageSegmentV11.image(image)
             else:
                 file_id = (
-                    await bot.upload_file(
-                        type="data", data=image, name="weight_body_fat.png"
-                    )
+                    await bot.upload_file(type="data", data=image, name="body_fat.png")
                 )["file_id"]
                 msg += MessageSegmentV12.image(file_id)
 
             await history_cmd.finish(msg, at_sender=True)
 
 
-def gerenate_graph(
-    weight_records: Sequence[WeightRecord], body_fat_records: Sequence[BodyFatRecord]
-) -> bytes:
-    weight = {
-        record.time.replace(tzinfo=timezone.utc)
-        .astimezone()
-        .strftime("%Y-%m-%d %H:%M:%S"): record.weight
-        for record in weight_records
+def gerenate_graph(records: Sequence[WeightRecord] | Sequence[BodyFatRecord]) -> bytes:
+    if isinstance(records[0], WeightRecord):
+        title = "Weight History"
+        xlabel = "time"
+        ylabel = "weight (kg)"
+    else:
+        title = "Body Fat History"
+        xlabel = "time"
+        ylabel = "body fat (%)"
+
+    data = {
+        record.time.replace(tzinfo=timezone.utc).astimezone(): record.weight
+        if isinstance(record, WeightRecord)
+        else record.body_fat
+        for record in records
     }
-    body_fat = {
-        record.time.replace(tzinfo=timezone.utc)
-        .astimezone()
-        .strftime("%Y-%m-%d %H:%M:%S"): record.body_fat
-        for record in body_fat_records
-    }
+    fig, ax = plt.subplots(constrained_layout=True)
 
-    fig, (ax0, ax1) = plt.subplots(2, 1, constrained_layout=True)
+    ax.plot(data.keys(), data.values())
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.xaxis_date()
 
-    ax0.plot(weight.keys(), weight.values())
-    ax0.set_title("Weight History")
-    ax0.set_xlabel("time")
-    ax0.set_ylabel("weight (kg)")
-
-    ax1.plot(body_fat.keys(), body_fat.values())
-    ax1.set_title("Body Fat History")
-    ax1.set_xlabel("time")
-    ax1.set_ylabel("body fat (%)")
+    fig.autofmt_xdate()
 
     file = BytesIO()
     fig.savefig(file)
