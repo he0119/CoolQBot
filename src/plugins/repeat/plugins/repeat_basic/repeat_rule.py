@@ -40,8 +40,8 @@ async def need_repeat(
     if user_id == 1000000:
         return False
 
-    # 不要复读签到，分享，小程序，转发
-    if event.get_message()[0].type in ["sign", "share", "json", "forward"]:
+    # 不要复读签到，分享，小程序，转发，红包
+    if event.get_message()[0].type in ["sign", "share", "json", "forward", "redbag"]:
         return False
 
     # 不要复读带网址的消息
