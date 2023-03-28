@@ -1,4 +1,4 @@
-""" 打卡签到插件
+""" 打卡插件
 """
 from pathlib import Path
 
@@ -7,8 +7,8 @@ from nonebot import CommandGroup, get_driver
 from nonebot.plugin import PluginMetadata
 
 __plugin_meta__ = PluginMetadata(
-    name="打卡签到",
-    description="每日打卡签到，记录健身数据",
+    name="打卡",
+    description="每日打卡，记录健身数据",
     usage="",
     extra={
         "adapters": ["OneBot V11", "OneBot V12"],

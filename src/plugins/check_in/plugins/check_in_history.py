@@ -23,12 +23,14 @@ from ..models import BodyFatRecord, DietaryRecord, FitnessRecord, WeightRecord
 __plugin_meta__ = PluginMetadata(
     name="打卡历史",
     description="查看打卡历史记录",
-    usage="""查看健身打卡历史
+    usage="""查看健身历史
 /打卡历史 A
-查看饮食打卡历史
+查看饮食历史
 /打卡历史 B
-查看体重和体脂历史
-/打卡历史 C""",
+查看体重历史
+/打卡历史 C
+查看体脂历史
+/打卡历史 D""",
     extra={
         "adapters": ["OneBot V11", "OneBot V12"],
     },
@@ -45,7 +47,7 @@ async def handle_first_message(
 
 @history_cmd.got(
     "content",
-    prompt="请问你要查询什么历史呢？请输入 A：健身打卡记录 B：饮食打卡记录 C：体重历史 D：体脂历史",
+    prompt="请问你要查询什么历史呢？请输入 A：健身 B：饮食 C：体重 D：体脂",
     parameterless=[Depends(parse_str("content"))],
 )
 async def _(
