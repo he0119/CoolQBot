@@ -65,9 +65,9 @@ async def morning():
             continue
         group_info = GroupInfo.parse_obj(asdict(group))
         if isinstance(bot, V11Bot):
-            await get_bot().send_msg(
+            await bot.send_msg(
                 message_type="group",
-                group_id=group_info.group_id,
+                group_id=int(group_info.group_id),
                 message=hello_str,
             )
         elif isinstance(bot, V12Bot):
