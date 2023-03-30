@@ -198,7 +198,7 @@ async def test_morning_push(app: App, mocker: MockerFixture):
 
         ctx.should_call_api(
             "send_msg",
-            {"message_type": "group", "group_id": "10000", "message": Message("test")},
+            {"message_type": "group", "group_id": 10000, "message": Message("test")},
             True,
         )
 
