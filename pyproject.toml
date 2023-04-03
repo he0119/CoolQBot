@@ -34,7 +34,7 @@ nonebot-plugin-naturel-gpt = "2.0.4"
 black = "*"
 isort = "*"
 pre-commit = "*"
-nonebug = { git = "https://github.com/nonebot/nonebug.git" }
+nonebug = "0.3.2"
 pytest-cov = "^4.0.0"
 pytest-mock = "^3.6.1"
 pytest-xdist = "^3.0.2"
