@@ -25,7 +25,7 @@ nonebot-plugin-treehelp = ">=0.0.5"
 
 nonebot-plugin-apscheduler = "^0.2.0"
 nonebot-plugin-sentry = "^0.2.2"
-nonebot-plugin-memes = "0.4.4"
+nonebot-plugin-memes = "0.4.5"
 nonebot-bison = "0.7.1"
 nonebot-plugin-gscode = "0.1.6"
 nonebot-plugin-naturel-gpt = "2.0.4"
