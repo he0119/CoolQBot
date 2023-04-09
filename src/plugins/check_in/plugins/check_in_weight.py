@@ -1,10 +1,9 @@
 from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
-from nonebot_plugin_datastore import get_session
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
+from src.utils.typing import AsyncSession
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -30,9 +29,9 @@ target_weight_cmd = check_in.command("weight", aliases={"目标体重"})
 @target_weight_cmd.handle()
 async def _(
     state: T_State,
+    session: AsyncSession,
     content: str | None = Depends(get_plaintext_content),
     user_infoget_user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
 ):
     if content:
         state["content"] = content
@@ -48,9 +47,9 @@ async def _(
     "content", prompt="请输入你的目标体重哦～", parameterless=[Depends(parse_str("content"))]
 )
 async def _(
+    session: AsyncSession,
     content: str = Arg(),
     user_infoget_user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
 ):
     content = content.strip()
     if not content:
@@ -86,9 +85,9 @@ async def _(
     "content", prompt="今天你的体重是多少呢？", parameterless=[Depends(parse_str("content"))]
 )
 async def _(
+    session: AsyncSession,
     content: str = Arg(),
     user_infoget_user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
 ):
     content = content.strip()
     if not content:

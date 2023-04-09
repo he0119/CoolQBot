@@ -1,10 +1,9 @@
 from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
-from nonebot_plugin_datastore import get_session
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
+from src.utils.typing import AsyncSession
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -33,9 +32,9 @@ async def handle_first_message(
     "content", prompt="请问你做了什么运动？", parameterless=[Depends(parse_str("content"))]
 )
 async def _(
+    session: AsyncSession,
     content: str = Arg(),
     user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
 ):
     content = content.strip()
     if not content:

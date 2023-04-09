@@ -1,7 +1,7 @@
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.utils.helpers import UserInfo
+from src.utils.typing import AsyncSession
 
 from .models import User
 

@@ -10,11 +10,10 @@ from nonebot.adapters.onebot.v12 import MessageSegment as MessageSegmentV12
 from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
-from nonebot_plugin_datastore import get_session
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
+from src.utils.typing import AsyncSession
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -52,9 +51,9 @@ async def handle_first_message(
 )
 async def _(
     bot: BotV11 | BotV12,
+    session: AsyncSession,
     content: str = Arg(),
     user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
 ):
     content = content.lower()
     if not content:
