@@ -5,8 +5,8 @@ from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata
 from sqlalchemy import select
 
+from src.utils.annotated import AsyncSession
 from src.utils.helpers import GroupInfo, get_group_info, strtobool
-from src.utils.typing import AsyncSession
 
 from ... import repeat
 from ...models import Enabled

@@ -10,8 +10,8 @@ from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata, on_command
 from sqlalchemy import select
 
+from src.utils.annotated import AsyncSession
 from src.utils.helpers import GroupInfo, get_group_info, get_platform, strtobool
-from src.utils.typing import AsyncSession
 
 from .data_source import get_first_connect_message
 from .models import Hello

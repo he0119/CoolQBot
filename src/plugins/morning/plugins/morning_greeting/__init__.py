@@ -13,8 +13,8 @@ from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_datastore import create_session
 from sqlalchemy import select
 
+from src.utils.annotated import AsyncSession
 from src.utils.helpers import GroupInfo, get_group_info, strtobool
-from src.utils.typing import AsyncSession
 
 from ... import plugin_config
 from .data_source import HOLIDAYS_DATA, get_moring_message

@@ -2,8 +2,8 @@ from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
+from src.utils.annotated import AsyncSession
 from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
-from src.utils.typing import AsyncSession
 
 from .. import check_in
 from ..helpers import ensure_user

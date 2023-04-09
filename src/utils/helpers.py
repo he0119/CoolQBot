@@ -19,7 +19,7 @@ from nonebot.params import Arg, CommandArg
 from nonebot.typing import T_State
 from pydantic import BaseModel
 
-from .typing import Expression_T  # type: ignore
+from .typing import Expression_T
 
 
 def render_expression(expr: Expression_T, *args, **kwargs) -> str:
