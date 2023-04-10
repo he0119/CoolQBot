@@ -13,8 +13,8 @@ from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_datastore import create_session
 from sqlalchemy import select
 
-from src.utils.annotated import AsyncSession
-from src.utils.helpers import GroupInfo, get_group_info, strtobool
+from src.utils.annotated import AsyncSession, GroupInfo
+from src.utils.helpers import strtobool
 
 from ... import plugin_config
 from .data_source import HOLIDAYS_DATA, get_moring_message
@@ -86,8 +86,8 @@ morning_cmd = on_command("morning", aliases={"早安"}, block=True)
 async def morning_handle(
     bot: V11Bot | V12Bot,
     session: AsyncSession,
+    group_info: GroupInfo,
     arg: Message = CommandArg(),
-    group_info: GroupInfo = Depends(get_group_info),
 ):
     args = arg.extract_plain_text()
 

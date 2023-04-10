@@ -5,8 +5,8 @@ from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata
 from sqlalchemy import select
 
-from src.utils.annotated import AsyncSession
-from src.utils.helpers import GroupInfo, get_group_info, strtobool
+from src.utils.annotated import AsyncSession, GroupInfo
+from src.utils.helpers import strtobool
 
 from ... import repeat
 from ...models import Enabled
@@ -46,8 +46,8 @@ repeat_cmd.__doc__ = """
 @repeat_cmd.handle()
 async def repeat_handle(
     session: AsyncSession,
+    group_info: GroupInfo,
     arg: Message = CommandArg(),
-    group_info: GroupInfo = Depends(get_group_info),
 ):
     args = arg.extract_plain_text()
 

@@ -12,8 +12,8 @@ from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 from sqlalchemy import func, select
 
-from src.utils.annotated import AsyncSession
-from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
+from src.utils.annotated import AsyncSession, UserInfo
+from src.utils.helpers import get_plaintext_content, parse_str
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -52,8 +52,8 @@ async def handle_first_message(
 async def _(
     bot: BotV11 | BotV12,
     session: AsyncSession,
+    user_info: UserInfo,
     content: str = Arg(),
-    user_info: UserInfo = Depends(get_user_info),
 ):
     content = content.lower()
     if not content:

@@ -2,8 +2,8 @@ from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
-from src.utils.annotated import AsyncSession
-from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
+from src.utils.annotated import AsyncSession, UserInfo
+from src.utils.helpers import get_plaintext_content, parse_str
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -31,8 +31,8 @@ target_body_fat_cmd = check_in.command("body_fat", aliases={"目标体脂"})
 async def handle_first_message(
     state: T_State,
     session: AsyncSession,
+    user_info: UserInfo,
     content: str | None = Depends(get_plaintext_content),
-    user_info: UserInfo = Depends(get_user_info),
 ):
     """目标体脂"""
     if content:
@@ -50,8 +50,8 @@ async def handle_first_message(
 )
 async def _(
     session: AsyncSession,
+    user_info: UserInfo,
     content: str = Arg(),
-    user_info: UserInfo = Depends(get_user_info),
 ):
     """目标体脂"""
     if not content:
@@ -89,8 +89,8 @@ async def _(
 )
 async def _(
     session: AsyncSession,
+    user_info: UserInfo,
     content: str = Arg(),
-    user_info: UserInfo = Depends(get_user_info),
 ):
     """记录体脂"""
     if not content:

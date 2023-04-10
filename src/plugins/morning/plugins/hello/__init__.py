@@ -10,8 +10,8 @@ from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata, on_command
 from sqlalchemy import select
 
-from src.utils.annotated import AsyncSession
-from src.utils.helpers import GroupInfo, get_group_info, get_platform, strtobool
+from src.utils.annotated import AsyncSession, GroupInfo
+from src.utils.helpers import get_platform, strtobool
 
 from .data_source import get_first_connect_message
 from .models import Hello
@@ -74,8 +74,8 @@ hello_cmd = on_command("hello", aliases={"问候"}, block=True)
 @hello_cmd.handle()
 async def hello_handle(
     session: AsyncSession,
+    group_info: GroupInfo,
     arg: Message = CommandArg(),
-    group_info: GroupInfo = Depends(get_group_info),
 ):
     args = arg.extract_plain_text()
 

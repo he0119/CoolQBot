@@ -6,7 +6,8 @@ from operator import itemgetter
 
 from nonebot.adapters import Bot
 
-from src.utils.helpers import GroupInfo, get_nickname
+from src.utils.annotated import GroupInfo
+from src.utils.helpers import get_nickname
 
 from ...models import Record
 from ...recorder import Recorder

@@ -187,6 +187,8 @@ async def get_nickname(
 
 
 class MentionedUser(BaseModel):
+    """提及的用户信息"""
+
     id: str
     segment: MessageSegment
 
