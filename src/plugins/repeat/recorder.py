@@ -10,7 +10,7 @@ from nonebot_plugin_datastore import create_session, get_plugin_data
 from nonebot_plugin_datastore.db import post_db_init
 from sqlalchemy import select
 
-from src.utils.helpers import GroupInfo
+from src.utils.annotated import GroupInfo
 
 from . import plugin_config
 from .models import Enabled, Record

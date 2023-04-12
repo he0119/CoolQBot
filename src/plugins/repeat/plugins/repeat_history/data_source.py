@@ -5,7 +5,7 @@ from datetime import datetime
 
 from nonebot.adapters import Bot
 
-from src.utils.helpers import GroupInfo
+from src.utils.annotated import GroupInfo
 
 from ...recorder import Recorder
 from ..repeat_rank.data_source import Ranking

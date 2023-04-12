@@ -1,10 +1,14 @@
 from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
-from nonebot_plugin_datastore import get_session
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
+from src.utils.annotated import (
+    AsyncSession,
+    OptionalPlainTextArgs,
+    PlainTextArgs,
+    UserInfo,
+)
+from src.utils.helpers import parse_str
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -31,9 +35,9 @@ target_body_fat_cmd = check_in.command("body_fat", aliases={"目标体脂"})
 @target_body_fat_cmd.handle()
 async def handle_first_message(
     state: T_State,
-    content: str | None = Depends(get_plaintext_content),
-    user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession,
+    user_info: UserInfo,
+    content: OptionalPlainTextArgs,
 ):
     """目标体脂"""
     if content:
@@ -50,9 +54,9 @@ async def handle_first_message(
     "content", prompt="请输入你的目标体脂哦～", parameterless=[Depends(parse_str("content"))]
 )
 async def _(
+    session: AsyncSession,
+    user_info: UserInfo,
     content: str = Arg(),
-    user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
 ):
     """目标体脂"""
     if not content:
@@ -77,10 +81,7 @@ body_fat_record_cmd = check_in.command("body_record", aliases={"记录体脂", "
 
 
 @body_fat_record_cmd.handle()
-async def _(
-    state: T_State,
-    content: str = Depends(get_plaintext_content),
-):
+async def _(state: T_State, content: PlainTextArgs):
     """记录体脂"""
     state["content"] = content
 
@@ -89,9 +90,9 @@ async def _(
     "content", prompt="今天你的体脂是多少呢？", parameterless=[Depends(parse_str("content"))]
 )
 async def _(
+    session: AsyncSession,
+    user_info: UserInfo,
     content: str = Arg(),
-    user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
 ):
     """记录体脂"""
     if not content:

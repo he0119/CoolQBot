@@ -6,16 +6,13 @@ from nonebot.adapters import Event
 from nonebot.log import logger
 from nonebot.params import Depends
 
-from src.utils.helpers import GroupInfo, get_group_info
+from src.utils.annotated import GroupInfo
 
 from ... import plugin_config
 from ...recorder import Recorder
 
 
-async def need_repeat(
-    event: Event,
-    group_info: GroupInfo = Depends(get_group_info),
-) -> bool:
+async def need_repeat(event: Event, group_info: GroupInfo) -> bool:
     """是否复读这个消息"""
     # 不复读对机器人说的，因为这个应该由闲聊插件处理
     if event.is_tome():

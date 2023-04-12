@@ -1,10 +1,14 @@
 from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
-from nonebot_plugin_datastore import get_session
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
+from src.utils.annotated import (
+    AsyncSession,
+    OptionalPlainTextArgs,
+    PlainTextArgs,
+    UserInfo,
+)
+from src.utils.helpers import parse_str
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -30,14 +34,14 @@ target_weight_cmd = check_in.command("weight", aliases={"目标体重"})
 @target_weight_cmd.handle()
 async def _(
     state: T_State,
-    content: str | None = Depends(get_plaintext_content),
-    user_infoget_user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession,
+    user_info: UserInfo,
+    content: OptionalPlainTextArgs,
 ):
     if content:
         state["content"] = content
     else:
-        user = await ensure_user(session, user_infoget_user_info)
+        user = await ensure_user(session, user_info)
         if user.target_weight:
             await target_weight_cmd.finish(
                 f"你的目标体重是 {user.target_weight}kg，继续努力哦～", at_sender=True
@@ -48,9 +52,9 @@ async def _(
     "content", prompt="请输入你的目标体重哦～", parameterless=[Depends(parse_str("content"))]
 )
 async def _(
+    session: AsyncSession,
+    user_info: UserInfo,
     content: str = Arg(),
-    user_infoget_user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
 ):
     content = content.strip()
     if not content:
@@ -64,7 +68,7 @@ async def _(
     if weight <= 0:
         await target_weight_cmd.reject("目标体重必须大于 0kg，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, user_infoget_user_info)
+    user = await ensure_user(session, user_info)
     user.target_weight = weight
     await session.commit()
 
@@ -75,10 +79,7 @@ weight_record_cmd = check_in.command("weight_record", aliases={"记录体重", "
 
 
 @weight_record_cmd.handle()
-async def _(
-    state: T_State,
-    content: str = Depends(get_plaintext_content),
-):
+async def _(state: T_State, content: PlainTextArgs):
     state["content"] = content
 
 
@@ -86,9 +87,9 @@ async def _(
     "content", prompt="今天你的体重是多少呢？", parameterless=[Depends(parse_str("content"))]
 )
 async def _(
+    session: AsyncSession,
+    user_info: UserInfo,
     content: str = Arg(),
-    user_infoget_user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
 ):
     content = content.strip()
     if not content:
@@ -102,7 +103,7 @@ async def _(
     if weight <= 0:
         await target_weight_cmd.reject("目标体重必须大于 0kg，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, user_infoget_user_info)
+    user = await ensure_user(session, user_info)
 
     session.add(WeightRecord(user=user, weight=weight))
     await session.commit()

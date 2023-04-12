@@ -10,11 +10,10 @@ from nonebot.adapters.onebot.v12 import MessageSegment as MessageSegmentV12
 from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
-from nonebot_plugin_datastore import get_session
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.helpers import UserInfo, get_plaintext_content, get_user_info, parse_str
+from src.utils.annotated import AsyncSession, PlainTextArgs, UserInfo
+from src.utils.helpers import parse_str
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -39,9 +38,7 @@ history_cmd = check_in.command("history", aliases={"打卡历史"})
 
 
 @history_cmd.handle()
-async def handle_first_message(
-    state: T_State, content: str = Depends(get_plaintext_content)
-):
+async def handle_first_message(state: T_State, content: PlainTextArgs):
     state["content"] = content
 
 
@@ -52,9 +49,9 @@ async def handle_first_message(
 )
 async def _(
     bot: BotV11 | BotV12,
+    session: AsyncSession,
+    user_info: UserInfo,
     content: str = Arg(),
-    user_info: UserInfo = Depends(get_user_info),
-    session: AsyncSession = Depends(get_session),
 ):
     content = content.lower()
     if not content:
