@@ -6,12 +6,12 @@ from nonebot import logger
 from nonebot.adapters import Event, Message, MessageSegment
 from nonebot.adapters.onebot.v11 import Bot as V11Bot
 from nonebot.adapters.onebot.v12 import Bot as V12Bot
-from nonebot.params import CommandArg, Depends
+from nonebot.params import CommandArg
 from nonebot.plugin import PluginMetadata
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_datastore.db import post_db_init
 
-from src.utils.annotated import MentionedUser
+from src.utils.annotated import OptionalMentionedUser
 from src.utils.helpers import strtobool
 
 from ... import ff14, global_config
@@ -52,7 +52,7 @@ fflogs_cmd = ff14.command("dps", aliases={"dps"})
 async def fflogs_handle(
     bot: V11Bot | V12Bot,
     event: Event,
-    mentioned_user: MentionedUser,
+    mentioned_user: OptionalMentionedUser,
     args: Message = CommandArg(),
 ):
     user_id = event.get_user_id()

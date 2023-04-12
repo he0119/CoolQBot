@@ -8,7 +8,7 @@ from nonebot.permission import SUPERUSER, USER
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
-from src.utils.annotated import MentionedUser
+from src.utils.annotated import OptionalMentionedUser
 from src.utils.helpers import get_nickname
 
 from .data_source import Hospital
@@ -63,7 +63,7 @@ async def _(
     bot: Bot,
     event: GroupMessageEvent,
     state: T_State,
-    mentioned_user: MentionedUser,
+    mentioned_user: OptionalMentionedUser,
     content: Message | None = Depends(get_content),
 ):
     group_id = str(event.group_id)
@@ -113,7 +113,7 @@ admit_cmd = hospital.command("admit", aliases={"入院", "赛博入院"})
 @admit_cmd.handle()
 async def _(
     event: GroupMessageEvent,
-    mentioned_user: MentionedUser,
+    mentioned_user: OptionalMentionedUser,
 ):
     if not mentioned_user:
         await admit_cmd.finish("请 @ 需要入院的病人")
@@ -131,7 +131,7 @@ discharge_cmd = hospital.command("discharge", aliases={"出院", "赛博出院"}
 @discharge_cmd.handle()
 async def _(
     event: GroupMessageEvent,
-    mentioned_user: MentionedUser,
+    mentioned_user: OptionalMentionedUser,
 ):
     if not mentioned_user:
         await discharge_cmd.finish("请 @ 需要出院的病人")
@@ -149,7 +149,7 @@ record_cmd = hospital.command("record", aliases={"病历", "赛博病历"})
 @record_cmd.handle()
 async def _(
     event: GroupMessageEvent,
-    mentioned_user: MentionedUser,
+    mentioned_user: OptionalMentionedUser,
 ):
     if not mentioned_user:
         await discharge_cmd.finish("请 @ 需要查看记录的病人")
@@ -179,7 +179,7 @@ history_cmd = hospital.command("history", aliases={"入院记录", "赛博入院
 async def _(
     bot: Bot,
     event: GroupMessageEvent,
-    mentioned_user: MentionedUser,
+    mentioned_user: OptionalMentionedUser,
 ):
     if not mentioned_user:
         patients = await hospital_service.patient_count(str(event.group_id))

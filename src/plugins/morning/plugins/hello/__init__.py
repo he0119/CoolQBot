@@ -10,8 +10,8 @@ from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata, on_command
 from sqlalchemy import select
 
-from src.utils.annotated import AsyncSession, GroupInfo
-from src.utils.helpers import get_platform, strtobool
+from src.utils.annotated import AsyncSession, GroupInfo, Platform
+from src.utils.helpers import strtobool
 
 from .data_source import get_first_connect_message
 from .models import Hello
@@ -37,9 +37,7 @@ driver = nonebot.get_driver()
 
 @driver.on_bot_connect
 async def hello_on_connect(
-    bot: V11Bot | V12Bot,
-    session: AsyncSession,
-    platform: str = Depends(get_platform),
+    bot: V11Bot | V12Bot, session: AsyncSession, platform: Platform
 ) -> None:
     """启动时发送问候"""
     groups = (

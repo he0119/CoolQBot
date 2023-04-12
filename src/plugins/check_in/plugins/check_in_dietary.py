@@ -2,8 +2,8 @@ from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
-from src.utils.annotated import AsyncSession, UserInfo
-from src.utils.helpers import get_plaintext_content, parse_str
+from src.utils.annotated import AsyncSession, PlainTextArgs, UserInfo
+from src.utils.helpers import parse_str
 
 from .. import check_in
 from ..helpers import ensure_user
@@ -22,10 +22,7 @@ dietary_cmd = check_in.command("dietary", aliases={"饮食打卡"})
 
 
 @dietary_cmd.handle()
-async def handle_first_message(
-    state: T_State,
-    content: str = Depends(get_plaintext_content),
-):
+async def handle_first_message(state: T_State, content: PlainTextArgs):
     state["content"] = content
 
 
