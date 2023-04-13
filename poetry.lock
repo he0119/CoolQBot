@@ -423,14 +423,14 @@ beautifulsoup4 = "*"
 
 [[package]]
 name = "cashews"
-version = "5.3.2"
+version = "6.0.2"
 description = "cache tools with async power"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "cashews-5.3.2-py3-none-any.whl", hash = "sha256:0bf6086089f145e908346cd604d37ed9d01b94296f6b8ebfd6edf4f416e1b469"},
-    {file = "cashews-5.3.2.tar.gz", hash = "sha256:6b591aa57837ea47560883a439c3f327986a2ea858b02ef7dd8a1c2bd38e78dc"},
+    {file = "cashews-6.0.2-py3-none-any.whl", hash = "sha256:4c5ff02dc57b94b08651787e51691debfca734e79c54a18b35d4ad6ba253bdff"},
+    {file = "cashews-6.0.2.tar.gz", hash = "sha256:f2e4e6fe5aa29a10121c5e5686608d7273bf0b1f7fdeeb101b0110070d194c54"},
 ]
 
 [package.extras]
@@ -1834,24 +1834,24 @@ files = [
 
 [[package]]
 name = "nb-cli"
-version = "1.0.5"
+version = "1.1.1"
 description = "CLI for nonebot2"
 category = "main"
 optional = false
 python-versions = ">=3.8, <4.0"
 files = [
-    {file = "nb-cli-1.0.5.tar.gz", hash = "sha256:9c52c5d091a4f11e139c30605a06674cc1dcbdc5e8f93bd0d32f85146184bd15"},
-    {file = "nb_cli-1.0.5-py3-none-any.whl", hash = "sha256:95bdf66db70eff41e69d84f550cd9d0b9bab4f39cb4544eeb4d6f809d06d1515"},
+    {file = "nb-cli-1.1.1.tar.gz", hash = "sha256:5bf9e891326434b69882c5c39c754f4669ef299e0efb2d33726b91246fd8bd92"},
+    {file = "nb_cli-1.1.1-py3-none-any.whl", hash = "sha256:5f6c712ed41549fb9c0417feb6c0c1a743032a72a821f1cf1865e1b2d5521242"},
 ]
 
 [package.dependencies]
 anyio = ">=3.6,<4.0"
-cashews = ">=5.0,<6.0"
+cashews = ">=6.0,<7.0"
 click = ">=8.1,<9.0"
 cookiecutter = ">=2.1,<3.0"
 httpx = ">=0.18,<1.0"
 jinja2 = ">=3.0,<4.0"
-noneprompt = ">=0.1.7,<1.0.0"
+noneprompt = ">=0.1.9,<1.0.0"
 pydantic = ">=1.9,<2.0"
 pyfiglet = ">=0.8.post1,<1.0.0"
 tomlkit = ">=0.10,<1.0"
@@ -4058,4 +4058,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "3ccb68d223620adfad30756fa7d5cdf58a82ac8c4dc6ba222a9794162d9146ad"
+content-hash = "3e9351f2d79019d9a3573bf625d500bcbcffa8169089277ac6edd6166baf90fc"
