@@ -3,8 +3,10 @@
 from urllib.parse import urlencode
 
 import httpx
+from nonebot import logger
 
 from .config import plugin_config
+from .heweather_models import DailyResp, LookupResp, NowResp
 
 
 async def get(url: str) -> dict:
@@ -28,15 +30,11 @@ async def lookup_location(
     params = urlencode(params)
 
     url = f"https://geoapi.qweather.com/v2/city/lookup?{params}"
-    resp = await get(url)
+    resp = LookupResp.parse_obj(await get(url))
 
-    if resp["code"] == "200":
-        locations = [
-            resp["location"][0]["country"],
-            resp["location"][0]["adm1"],
-            resp["location"][0]["adm2"],
-            resp["location"][0]["name"],
-        ]
+    if resp.code == "200":
+        city = resp.location[0]
+        locations = [city.country, city.adm1, city.adm2, city.name]
 
         # 去重，依据优先级
         # 从 国家 第一级行政区 第二集行政区 地名 来
@@ -45,7 +43,7 @@ async def lookup_location(
             if location not in filtered:
                 filtered.append(location)
 
-        return resp["location"][0]["id"], " ".join(filtered)
+        return city.id, " ".join(filtered)
 
 
 async def now(location_id: str) -> str:
@@ -54,13 +52,10 @@ async def now(location_id: str) -> str:
     当前温度：12℃ 湿度：52%(体感温度：7℃)
     """
     url = f"https://devapi.qweather.com/v7/weather/now?location={location_id}"
-    resp = await get(url)
+    resp = NowResp.parse_obj(await get(url))
 
-    temp = resp["now"]["temp"]
-    humidity = resp["now"]["humidity"]
-    feelsLike = resp["now"]["feelsLike"]
-
-    return f"当前温度：{temp}℃ 湿度：{humidity}%(体感温度：{feelsLike}℃)"
+    now = resp.now
+    return f"当前温度：{now.temp}℃ 湿度：{now.humidity}%(体感温度：{now.feelsLike}℃)"
 
 
 async def daily(location_id: str) -> str:
@@ -71,17 +66,19 @@ async def daily(location_id: str) -> str:
     2020-11-23 阴转小雨 温度：10~6℃ 盈凸月
     """
     url = f"https://devapi.qweather.com/v7/weather/3d?location={location_id}"
-    resp = await get(url)
+    resp = DailyResp.parse_obj(await get(url))
+
+    daily = resp.daily
 
     daily_text = []
-    for day in resp["daily"]:
-        temp_text = [day["fxDate"]]
-        if day["textDay"] == day["textNight"]:
-            temp_text.append(day["textDay"])
+    for day in daily:
+        temp_text = [day.fxDate]
+        if day.textDay == day.textNight:
+            temp_text.append(day.textDay)
         else:
-            temp_text.append(f'{day["textDay"]}转{day["textNight"]}')
-        temp_text.append(f'温度：{day["tempMax"]}~{day["tempMin"]}℃')
-        temp_text.append(day["moonPhase"])
+            temp_text.append(f"{day.textDay}转{day.textNight}")
+        temp_text.append(f"温度：{day.tempMax}~{day.tempMin}℃")
+        temp_text.append(day.moonPhase)
         daily_text.append(" ".join(temp_text))
     return "\n".join(daily_text)
 
@@ -89,12 +86,12 @@ async def daily(location_id: str) -> str:
 async def heweather(location: str, adm: str | None = None) -> str | None:
     """和风天气 API"""
     if not plugin_config.heweather_key:
-        return None
+        return
 
     try:
         city = await lookup_location(location, adm)
         if not city:
-            return None
+            return
 
         return "\n".join(
             [
@@ -104,4 +101,5 @@ async def heweather(location: str, adm: str | None = None) -> str | None:
             ]
         )
     except:
-        return None
+        logger.exception("和风天气 API 请求失败")
+        return
