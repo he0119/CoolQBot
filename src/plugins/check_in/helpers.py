@@ -17,5 +17,6 @@ async def ensure_user(session: AsyncSession, user_info: UserInfo) -> User:
         user = User(**user_info.dict())
         session.add(user)
         await session.commit()
+        await session.refresh(user)
 
     return user

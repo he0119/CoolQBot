@@ -102,7 +102,7 @@ async def _(
 
             msg = f"你的目标体重是 {user.target_weight or 'NaN'}kg\n"
 
-            image = gerenate_graph(weight_records)
+            image = generate_graph(weight_records)
             if isinstance(bot, BotV11):
                 msg += MessageSegmentV11.image(image)
             else:
@@ -123,7 +123,7 @@ async def _(
 
             msg = f"你的目标体脂是 {user.target_body_fat or 'NaN'}%\n"
 
-            image = gerenate_graph(body_fat_records)
+            image = generate_graph(body_fat_records)
             if isinstance(bot, BotV11):
                 msg += MessageSegmentV11.image(image)
             else:
@@ -135,7 +135,7 @@ async def _(
             await history_cmd.finish(msg, at_sender=True)
 
 
-def gerenate_graph(records: Sequence[WeightRecord] | Sequence[BodyFatRecord]) -> bytes:
+def generate_graph(records: Sequence[WeightRecord] | Sequence[BodyFatRecord]) -> bytes:
     if isinstance(records[0], WeightRecord):
         title = "Weight History"
         xlabel = "time"
