@@ -1,18 +1,21 @@
+<!-- markdownlint-disable-next-line MD033 MD041 -->
+<div align="center">
+
 # CoolQBot
 
 ![CI](https://github.com/he0119/CoolQBot/workflows/CI/badge.svg)
+[![codecov](https://codecov.io/gh/he0119/CoolQBot/branch/master/graph/badge.svg?token=QEC2IWAREH)](https://codecov.io/gh/he0119/CoolQBot)
+[![Powered by NoneBot](https://img.shields.io/badge/Powered%20%20by-NoneBot-red)](https://github.com/nonebot/nonebot2)
 
-该机器人利用了
-[go-cqhttp](https://github.com/Mrs4s/go-cqhttp)
-以及
-[NoneBot2](https://github.com/nonebot/nonebot2)
-来实现消息接收和发送的功能。
+</div>
 
 这只是一个随便写写的机器人，主要工作就是按照一定的规则进行复读 ~~（模仿人类）~~，其他功能都是增加可玩性的。
 
 关于名称：最早机器人是基于 `酷Q`，然而现在已经是时代的眼泪。想想还是把这个名字保留下来，留作纪念。
 
 ## 运行
+
+<!-- markdownlint-disable-next-line MD013 -->
 
 请先参考 [文档](https://v2.nonebot.dev/guide/getting-started.html#%E9%85%8D%E7%BD%AE-qq-%E5%8D%8F%E8%AE%AE%E7%AB%AF) 配置好 `go-cqhttp`。
 
