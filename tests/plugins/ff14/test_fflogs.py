@@ -46,6 +46,14 @@ async def fflogs_character_rankings(app: App) -> dict[str, Any]:
 
 
 @pytest.fixture
+async def fflogs_job_rankings(app: App) -> dict[str, Any]:
+    path = Path(__file__).parent / "fflogs_job_rankings.json"
+    with path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+    return data
+
+
+@pytest.fixture
 async def fflogs_job_rankings_empty(app: App) -> dict[str, Any]:
     path = Path(__file__).parent / "fflogs_job_rankings_empty.json"
     with path.open("r", encoding="utf-8") as f:
@@ -436,4 +444,96 @@ async def test_dps_job_rankings_empty(
             mocker.call.now(),
             mocker.call(year=2023, month=4, day=15),  # type: ignore
         ]
+    )
+
+
+@respx.mock(assert_all_called=True)
+async def test_dps_job_rankings(
+    app: App,
+    mocker: MockerFixture,
+    respx_mock: MockRouter,
+    fflogs_data: dict[str, Any],
+    fflogs_job_rankings: dict[str, Any],
+    fflogs_job_rankings_empty: dict[str, Any],
+):
+    """测试查询职业排行榜"""
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_data
+    from src.plugins.ff14.plugins.ff14_fflogs.config import plugin_config
+
+    plugin_config.fflogs_range = 2
+    await plugin_data.config.set("token", "test")
+
+    mocked_datatime = mocker.patch(
+        "src.plugins.ff14.plugins.ff14_fflogs.api.datetime",
+        return_value=datetime(2023, 4, 15, 0, 0, 0),
+    )
+    mocked_datatime.now.return_value = datetime(2023, 4, 16, 12, 0, 0)
+
+    fflogs_data_mock = respx_mock.get(
+        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json"
+    ).mock(return_value=httpx.Response(200, json=fflogs_data))
+    fflogs_job_rankings_15_mock = respx_mock.get(
+        "https://cn.fflogs.com/v1/rankings/encounter/87?metric=rdps&difficulty=0&spec=13&page=1&filter=date.1681488000000.1681574400000&api_key=test"
+    ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings))
+    fflogs_job_rankings_14_mock = respx_mock.get(
+        "https://cn.fflogs.com/v1/rankings/encounter/87?metric=rdps&difficulty=0&spec=13&page=1&filter=date.1681401600000.1681488000000&api_key=test"
+    ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings_empty))
+
+    # 使用职业名查询
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(message=Message("/dps p8s 白魔法师"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "零式万魔殿 炼净之狱4 白魔法师 的数据(rdps)\n数据总数：86 条\n100% : 6603.57\n99% : 6603.57\n95% : 6306.06\n75% : 5523.09\n50% : 5214.54\n25% : 4892.16\n10% : 4414.67",
+            True,
+        )
+        ctx.should_finished(fflogs_cmd)
+
+    # 使用职业昵称查询
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(message=Message("/dps p8s 白魔"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "零式万魔殿 炼净之狱4 白魔法师 的数据(rdps)\n数据总数：86 条\n100% : 6603.57\n99% : 6603.57\n95% : 6306.06\n75% : 5523.09\n50% : 5214.54\n25% : 4892.16\n10% : 4414.67",
+            True,
+        )
+        ctx.should_finished(fflogs_cmd)
+
+    # 查询 adps
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(message=Message("/dps p8s 白魔 adps"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "零式万魔殿 炼净之狱4 白魔法师 的数据(adps)\n数据总数：86 条\n100% : 7035.92\n99% : 7035.92\n95% : 6610.49\n75% : 5803.14\n50% : 5452.80\n25% : 5058.98\n10% : 4562.49",
+            True,
+        )
+        ctx.should_finished(fflogs_cmd)
+
+    assert fflogs_data_mock.call_count == 1
+    # 第二次请求会直接使用缓存，所以不会再次请求
+    assert fflogs_job_rankings_15_mock.call_count == 1
+    assert fflogs_job_rankings_14_mock.call_count == 1
+    mocked_datatime.assert_has_calls(
+        [
+            # 第一次查询
+            mocker.call.now(),
+            mocker.call(year=2023, month=4, day=15),
+            mocker.call.now(),  # 确认15号数据是否需要缓存
+            mocker.call.now(),  # 确认14号数据是否需要缓存
+            # 第二次查询
+            mocker.call.now(),
+            mocker.call(year=2023, month=4, day=15),
+            # 第三次查询
+            mocker.call.now(),
+            mocker.call(year=2023, month=4, day=15),
+        ]  # type: ignore
     )
