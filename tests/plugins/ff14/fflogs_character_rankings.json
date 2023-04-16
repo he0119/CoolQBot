@@ -1,0 +1,23 @@
+[
+  {
+    "encounterID": 65,
+    "encounterName": "至尊伊甸",
+    "class": "Global",
+    "spec": "白魔法师",
+    "rank": 17624,
+    "outOf": 24314,
+    "duration": 594013,
+    "startTime": 1577280241971,
+    "reportID": "dRXc3AptDY6nwZMg",
+    "fightID": 13,
+    "difficulty": 101,
+    "size": 8,
+    "characterID": 13325079,
+    "characterName": "name",
+    "server": "server",
+    "percentile": 27.51452340533816,
+    "ilvlKeyOrPatch": 5,
+    "total": 4790.8345300776,
+    "estimated": true
+  }
+]

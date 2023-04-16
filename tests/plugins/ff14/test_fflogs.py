@@ -1,10 +1,14 @@
-from typing import cast
+import json
+from pathlib import Path
+from typing import Any, cast
 from unittest.mock import AsyncMock
 
+import httpx
 import pytest
 from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 from nonebug import App
 from pytest_mock import MockerFixture
+from respx import MockRouter
 from sqlalchemy import delete
 
 from tests.fake import fake_channel_message_event_v12, fake_group_message_event_v11
@@ -21,6 +25,22 @@ async def app(app: App):
 
     async with create_session() as session, session.begin():
         await session.execute(delete(User))
+
+
+@pytest.fixture
+async def fflogs_data(app: App) -> dict[str, Any]:
+    path = Path(__file__).parent / "fflogs_data.json"
+    with path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+    return data
+
+
+@pytest.fixture
+async def fflogs_character_rankings(app: App) -> dict[str, Any]:
+    path = Path(__file__).parent / "fflogs_character_rankings.json"
+    with path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+    return data
 
 
 async def test_dps_missing_token(app: App):
@@ -126,7 +146,12 @@ async def test_dps_cache(app: App):
         ctx.should_finished()
 
 
-async def test_dps_at_user(app: App, mocker: MockerFixture):
+async def test_dps_at_user(
+    app: App,
+    respx_mock: MockRouter,
+    fflogs_data: dict[str, Any],
+    fflogs_character_rankings: dict[str, Any],
+):
     """测试 FFLOGS，测试 @ 用户的情况"""
     from src.plugins.ff14.plugins.ff14_fflogs import fflogs, fflogs_cmd, plugin_data
 
@@ -145,15 +170,12 @@ async def test_dps_at_user(app: App, mocker: MockerFixture):
         )
         ctx.should_finished()
 
-    mock = mocker.patch(
-        "src.plugins.ff14.plugins.ff14_fflogs.get_character_dps_by_user_id"
-    )
-    mock = cast(AsyncMock, mock)
-
-    async def test(a, b, c):
-        return "test"
-
-    mock.side_effect = test
+    fflogs_data_mock = respx_mock.get(
+        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json"
+    ).mock(return_value=httpx.Response(200, json=fflogs_data))
+    user_dps_mock = respx_mock.get(
+        "https://cn.fflogs.com/v1/rankings/character/name/server/CN?zone=29&encounter=65&metric=rdps&api_key=test"
+    ).mock(return_value=httpx.Response(200, json=fflogs_character_rankings))
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -162,10 +184,15 @@ async def test_dps_at_user(app: App, mocker: MockerFixture):
         )
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "test", "")
-        ctx.should_finished()
+        ctx.should_call_send(
+            event,
+            "伊甸零式希望乐园 觉醒之章1 name-server 的排名(rdps)\n白魔法师(17624/24314) 27.51% 4790.83",
+            True,
+        )
+        ctx.should_finished(fflogs_cmd)
 
-    mock.assert_awaited_once_with("e1s", "qq", "10000")
+    assert fflogs_data_mock.called
+    assert user_dps_mock.called
 
 
 async def test_dps_at_user_channel(app: App, mocker: MockerFixture):

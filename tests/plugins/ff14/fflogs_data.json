@@ -1,0 +1,782 @@
+{
+  "version": "6.2",
+  "boss": [
+    {
+      "name": "究极神兵幻巧战",
+      "nicknames": [
+        "幻神兵"
+      ],
+      "zone": 46,
+      "encounter": 3004,
+      "difficulty": 100
+    },
+    {
+      "name": "萨菲洛特幻巧战",
+      "nicknames": [
+        "幻魔神"
+      ],
+      "zone": 46,
+      "encounter": 3005,
+      "difficulty": 100
+    },
+    {
+      "name": "终极之战",
+      "nicknames": [
+        "极小鸟"
+      ],
+      "zone": 42,
+      "encounter": 1063,
+      "difficulty": 100
+    },
+    {
+      "name": "巴尔巴莉希娅歼殛战",
+      "nicknames": [
+        "极巴"
+      ],
+      "zone": 50,
+      "encounter": 1066,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 炼净之狱1",
+      "nicknames": [
+        "p5"
+      ],
+      "zone": 49,
+      "encounter": 83,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 炼净之狱2",
+      "nicknames": [
+        "p6"
+      ],
+      "zone": 49,
+      "encounter": 84,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 炼净之狱3",
+      "nicknames": [
+        "p7"
+      ],
+      "zone": 49,
+      "encounter": 85,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 炼净之狱4（门神）",
+      "nicknames": [
+        "p8门神"
+      ],
+      "zone": 49,
+      "encounter": 86,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 炼净之狱4",
+      "nicknames": [
+        "p8"
+      ],
+      "zone": 49,
+      "encounter": 87,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 炼净之狱1",
+      "nicknames": [
+        "p5s"
+      ],
+      "zone": 49,
+      "encounter": 83,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 炼净之狱2",
+      "nicknames": [
+        "p6s"
+      ],
+      "zone": 49,
+      "encounter": 84,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 炼净之狱3",
+      "nicknames": [
+        "p7s"
+      ],
+      "zone": 49,
+      "encounter": 85,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 炼净之狱4（门神）",
+      "nicknames": [
+        "p8s门神"
+      ],
+      "zone": 49,
+      "encounter": 86,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 炼净之狱4",
+      "nicknames": [
+        "p8s"
+      ],
+      "zone": 49,
+      "encounter": 87,
+      "difficulty": 0
+    },
+    {
+      "name": "佐迪亚克暝暗歼灭战",
+      "nicknames": [
+        "极佐迪亚克",
+        "极黑",
+        "佐爹",
+        "极爹"
+      ],
+      "zone": 42,
+      "encounter": 1058,
+      "difficulty": 100
+    },
+    {
+      "name": "海德林晖光歼灭战",
+      "nicknames": [
+        "极海德林",
+        "极白",
+        "海妈",
+        "极妈"
+      ],
+      "zone": 42,
+      "encounter": 1059,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 边境之狱1",
+      "nicknames": [
+        "p1"
+      ],
+      "zone": 44,
+      "encounter": 78,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 边境之狱2",
+      "nicknames": [
+        "p2"
+      ],
+      "zone": 44,
+      "encounter": 79,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 边境之狱3",
+      "nicknames": [
+        "p3"
+      ],
+      "zone": 44,
+      "encounter": 80,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 边境之狱4（门神）",
+      "nicknames": [
+        "p4门神"
+      ],
+      "zone": 44,
+      "encounter": 81,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 边境之狱4",
+      "nicknames": [
+        "p4"
+      ],
+      "zone": 44,
+      "encounter": 82,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 边境之狱1",
+      "nicknames": [
+        "p1s"
+      ],
+      "zone": 44,
+      "encounter": 78,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 边境之狱2",
+      "nicknames": [
+        "p2s"
+      ],
+      "zone": 44,
+      "encounter": 79,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 边境之狱3",
+      "nicknames": [
+        "p3s"
+      ],
+      "zone": 44,
+      "encounter": 80,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 边境之狱4（门神）",
+      "nicknames": [
+        "p4s门神"
+      ],
+      "zone": 44,
+      "encounter": 81,
+      "difficulty": 0
+    },
+    {
+      "name": "零式万魔殿 边境之狱4",
+      "nicknames": [
+        "p4s"
+      ],
+      "zone": 44,
+      "encounter": 82,
+      "difficulty": 0
+    },
+    {
+      "name": "提坦妮雅歼殛战",
+      "nicknames": [
+        "缇坦妮雅",
+        "妖精",
+        "极妖精",
+        "妖灵王",
+        "妖精王",
+        "老婆",
+        "10王"
+      ],
+      "zone": 28,
+      "encounter": 1045,
+      "difficulty": 100
+    },
+    {
+      "name": "无瑕灵君歼殛战",
+      "nicknames": [
+        "无瑕灵君",
+        "肥宅",
+        "极肥宅",
+        "全能王"
+      ],
+      "zone": 28,
+      "encounter": 1046,
+      "difficulty": 100
+    },
+    {
+      "name": "哈迪斯歼殛战",
+      "nicknames": [
+        "哈迪斯",
+        "老公"
+      ],
+      "zone": 34,
+      "encounter": 1049,
+      "difficulty": 100
+    },
+    {
+      "name": "红宝石神兵狂想作战1",
+      "nicknames": [
+        "红宝石1",
+        "红宝石神兵1",
+        "红宝石门神",
+        "红宝石神兵门神"
+      ],
+      "zone": 34,
+      "encounter": 1051,
+      "difficulty": 100
+    },
+    {
+      "name": "红宝石神兵狂想作战2",
+      "nicknames": [
+        "红宝石2",
+        "红宝石神兵2",
+        "红宝石本体",
+        "红宝石神兵本体"
+      ],
+      "zone": 34,
+      "encounter": 1052,
+      "difficulty": 100
+    },
+    {
+      "name": "博兹雅堡垒追忆战",
+      "nicknames": [
+        "老屁股",
+        "极老屁股"
+      ],
+      "zone": 34,
+      "encounter": 1053,
+      "difficulty": 100
+    },
+    {
+      "name": "光之战士幻耀歼灭战",
+      "nicknames": [
+        "光战",
+        "极光战"
+      ],
+      "zone": 34,
+      "encounter": 1054,
+      "difficulty": 100
+    },
+    {
+      "name": "绿宝石神兵狂想作战1",
+      "nicknames": [
+        "绿宝石1",
+        "绿宝石神兵1",
+        "绿宝石门神",
+        "绿宝石神兵门神"
+      ],
+      "zone": 37,
+      "encounter": 1056,
+      "difficulty": 100
+    },
+    {
+      "name": "绿宝石神兵狂想作战2",
+      "nicknames": [
+        "绿宝石2",
+        "绿宝石神兵2",
+        "绿宝石本体",
+        "绿宝石神兵本体"
+      ],
+      "zone": 37,
+      "encounter": 1055,
+      "difficulty": 100
+    },
+    {
+      "name": "钻石神兵狂想作战",
+      "nicknames": [
+        "钻石",
+        "钻石神兵"
+      ],
+      "zone": 37,
+      "encounter": 1057,
+      "difficulty": 100
+    },
+    {
+      "name": "希瓦幻巧战",
+      "nicknames": [
+        "幻冰神"
+      ],
+      "zone": 36,
+      "encounter": 3001,
+      "difficulty": 100
+    },
+    {
+      "name": "泰坦幻巧战",
+      "nicknames": [
+        "幻泰坦"
+      ],
+      "zone": 36,
+      "encounter": 3002,
+      "difficulty": 100
+    },
+    {
+      "name": "利维亚桑幻巧战",
+      "nicknames": [
+        "幻水神"
+      ],
+      "zone": 36,
+      "encounter": 3003,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章1",
+      "nicknames": [
+        "e1"
+      ],
+      "zone": 29,
+      "encounter": 65,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章2",
+      "nicknames": [
+        "e2"
+      ],
+      "zone": 29,
+      "encounter": 66,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章3",
+      "nicknames": [
+        "e3"
+      ],
+      "zone": 29,
+      "encounter": 67,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章4",
+      "nicknames": [
+        "e4"
+      ],
+      "zone": 29,
+      "encounter": 68,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章1",
+      "nicknames": [
+        "e1s"
+      ],
+      "zone": 29,
+      "encounter": 65,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章2",
+      "nicknames": [
+        "e2s"
+      ],
+      "zone": 29,
+      "encounter": 66,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章3",
+      "nicknames": [
+        "e3s"
+      ],
+      "zone": 29,
+      "encounter": 67,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章4",
+      "nicknames": [
+        "e4s"
+      ],
+      "zone": 29,
+      "encounter": 68,
+      "difficulty": 0
+    },
+    {
+      "name": "亚历山大绝境战",
+      "nicknames": [
+        "绝亚"
+      ],
+      "zone": 32,
+      "encounter": 1050,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章1",
+      "nicknames": [
+        "e5"
+      ],
+      "zone": 33,
+      "encounter": 69,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章2",
+      "nicknames": [
+        "e6"
+      ],
+      "zone": 33,
+      "encounter": 70,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章3",
+      "nicknames": [
+        "e7"
+      ],
+      "zone": 33,
+      "encounter": 71,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章4",
+      "nicknames": [
+        "e8"
+      ],
+      "zone": 33,
+      "encounter": 72,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章1",
+      "nicknames": [
+        "e5s"
+      ],
+      "zone": 33,
+      "encounter": 69,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章2",
+      "nicknames": [
+        "e6s"
+      ],
+      "zone": 33,
+      "encounter": 70,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章3",
+      "nicknames": [
+        "e7s"
+      ],
+      "zone": 33,
+      "encounter": 71,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章4",
+      "nicknames": [
+        "e8s"
+      ],
+      "zone": 33,
+      "encounter": 72,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸希望乐园 再生之章1",
+      "nicknames": [
+        "e9"
+      ],
+      "zone": 38,
+      "encounter": 73,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 再生之章2",
+      "nicknames": [
+        "e10"
+      ],
+      "zone": 38,
+      "encounter": 74,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 再生之章3",
+      "nicknames": [
+        "e11"
+      ],
+      "zone": 38,
+      "encounter": 75,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 再生之章4（门神）",
+      "nicknames": [
+        "e12门神"
+      ],
+      "zone": 38,
+      "encounter": 76,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 再生之章4",
+      "nicknames": [
+        "e12"
+      ],
+      "zone": 38,
+      "encounter": 77,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 再生之章1",
+      "nicknames": [
+        "e9s"
+      ],
+      "zone": 38,
+      "encounter": 73,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 再生之章2",
+      "nicknames": [
+        "e10s"
+      ],
+      "zone": 38,
+      "encounter": 74,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 再生之章3",
+      "nicknames": [
+        "e11s"
+      ],
+      "zone": 38,
+      "encounter": 75,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 再生之章4（门神）",
+      "nicknames": [
+        "e12s门神"
+      ],
+      "zone": 38,
+      "encounter": 76,
+      "difficulty": 0
+    },
+    {
+      "name": "伊甸零式希望乐园 再生之章4",
+      "nicknames": [
+        "e12s"
+      ],
+      "zone": 38,
+      "encounter": 77,
+      "difficulty": 0
+    }
+  ],
+  "job": [
+    {
+      "name": "占星术士",
+      "nicknames": [
+        "占星"
+      ],
+      "spec": 1
+    },
+    {
+      "name": "吟游诗人",
+      "nicknames": [
+        "诗人"
+      ],
+      "spec": 2
+    },
+    {
+      "name": "黑魔法师",
+      "nicknames": [
+        "黑魔",
+        "伏地魔",
+        "永动机"
+      ],
+      "spec": 3
+    },
+    {
+      "name": "暗黑骑士",
+      "nicknames": [
+        "黑骑",
+        "暗骑",
+        "DK"
+      ],
+      "spec": 4
+    },
+    {
+      "name": "龙骑士",
+      "nicknames": [
+        "龙骑",
+        "躺尸龙",
+        "擦炮工"
+      ],
+      "spec": 5
+    },
+    {
+      "name": "机工士",
+      "nicknames": [
+        "机工"
+      ],
+      "spec": 6
+    },
+    {
+      "name": "武僧",
+      "nicknames": [
+        "扫地僧",
+        "猴子",
+        "和尚"
+      ],
+      "spec": 7
+    },
+    {
+      "name": "忍者",
+      "nicknames": [
+        "兔忍",
+        "火影"
+      ],
+      "spec": 8
+    },
+    {
+      "name": "骑士",
+      "nicknames": [
+        "圣骑",
+        "奶骑"
+      ],
+      "spec": 9
+    },
+    {
+      "name": "学者",
+      "nicknames": [
+        "小仙女",
+        "死炎法师"
+      ],
+      "spec": 10
+    },
+    {
+      "name": "召唤师",
+      "nicknames": [
+        "召唤"
+      ],
+      "spec": 11
+    },
+    {
+      "name": "战士",
+      "nicknames": [
+        "战爹"
+      ],
+      "spec": 12
+    },
+    {
+      "name": "白魔法师",
+      "nicknames": [
+        "白魔",
+        "白膜",
+        "投石机",
+        "抛光机"
+      ],
+      "spec": 13
+    },
+    {
+      "name": "赤魔法师",
+      "nicknames": [
+        "赤魔",
+        "吃馍",
+        "红色治疗"
+      ],
+      "spec": 14
+    },
+    {
+      "name": "武士",
+      "nicknames": [
+        "侍"
+      ],
+      "spec": 15
+    },
+    {
+      "name": "舞者",
+      "nicknames": [
+        "舞娘"
+      ],
+      "spec": 16
+    },
+    {
+      "name": "绝枪战士",
+      "nicknames": [
+        "绝枪",
+        "枪刃",
+        "枪决战士"
+      ],
+      "spec": 17
+    },
+    {
+      "name": "钐镰客",
+      "nicknames": [
+        "镰刀",
+        "镰刀哥"
+      ],
+      "spec": 18
+    },
+    {
+      "name": "贤者",
+      "nicknames": [],
+      "spec": 19
+    }
+  ]
+}
