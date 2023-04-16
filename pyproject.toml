@@ -21,7 +21,7 @@ onebot-qqguild-extension = "^0.1.0"
 
 nonebot-plugin-datastore = "^0.6.0"
 nonebot-plugin-wordcloud = "^0.4.7"
-nonebot-plugin-treehelp = ">=0.0.5"
+nonebot-plugin-treehelp = "^0.1.0"
 
 nonebot-plugin-apscheduler = "^0.2.0"
 nonebot-plugin-sentry = "^0.2.2"
