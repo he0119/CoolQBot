@@ -23,10 +23,14 @@ async def app(app: App):
     # 清理数据库
     from nonebot_plugin_datastore.db import create_session
 
+    from src.plugins.ff14.plugins.ff14_fflogs.data import FFLOGS_DATA
     from src.plugins.ff14.plugins.ff14_fflogs.models import User
 
     async with create_session() as session, session.begin():
         await session.execute(delete(User))
+
+    # 清除缓存的数据
+    FFLOGS_DATA._data = None
 
 
 @pytest.fixture
