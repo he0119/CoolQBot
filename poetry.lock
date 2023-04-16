@@ -2054,14 +2054,14 @@ pypinyin = ">=0.44.0,<1.0.0"
 
 [[package]]
 name = "nonebot-plugin-naturel-gpt"
-version = "2.0.5"
+version = "2.1.1"
 description = "一个基于NoneBot框架的Ai聊天插件，对接OpenAi文本生成接口"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_naturel_gpt-2.0.5-py3-none-any.whl", hash = "sha256:7494a1109b0219b804a6530f4700398874ee7fbd7538b9af2b723b4301219ef8"},
-    {file = "nonebot_plugin_naturel_gpt-2.0.5.tar.gz", hash = "sha256:01d4600da1852c96f403ad8d0ab499aa8a34ad930a575f2c44b3f25a49f6760c"},
+    {file = "nonebot_plugin_naturel_gpt-2.1.1-py3-none-any.whl", hash = "sha256:cd3a5afc7d7408423ae4c099bac2ffddfa918049d735c890751aa14bd8586880"},
+    {file = "nonebot_plugin_naturel_gpt-2.1.1.tar.gz", hash = "sha256:fbc443255f887c8a57c29d27ed2718a218e7c94c0f81e3cff1e96ce71990b7f8"},
 ]
 
 [package.dependencies]
@@ -2074,14 +2074,14 @@ transformers = ">=4.26.0,<5.0.0"
 
 [[package]]
 name = "nonebot-plugin-sentry"
-version = "0.2.2"
+version = "0.3.0"
 description = "Push your bot errors to Sentry.io"
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "nonebot-plugin-sentry-0.2.2.tar.gz", hash = "sha256:e042e773e1d533d9bb5deb81cc0e9a0d78800e43c5093475d65d8c91308f98f7"},
-    {file = "nonebot_plugin_sentry-0.2.2-py3-none-any.whl", hash = "sha256:cc7aab8a258aa1931bd4fdab36672e6e99f645d438c6c24999688a8422ba0dd3"},
+    {file = "nonebot_plugin_sentry-0.3.0-py3-none-any.whl", hash = "sha256:d93b30805634aff7f83e7014f252a02ee2665b32237fa6f05d0572658077d251"},
+    {file = "nonebot_plugin_sentry-0.3.0.tar.gz", hash = "sha256:b13716f1c02ef17decf551c15471f2f390b243d81a593967bc77636d5b6d83fb"},
 ]
 
 [package.dependencies]
@@ -4065,4 +4065,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e65c137e5396f787912bb02248ebd7697c29e84316c91c5c93d6e6f68ed5f081"
+content-hash = "4b23f1f2184e8937b4f3107bd2ef4b06fba1448917edb91eecc733f855cd4f3a"
