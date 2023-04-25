@@ -18,7 +18,7 @@ nb-cli = "^1.1.1"
 nonebot-adapter-onebot = "2.2.2"
 onebot-qqguild-extension = "^0.1.0"
 
-nonebot-plugin-datastore = "^0.6.0"
+nonebot-plugin-datastore = "^0.6.3"
 nonebot-plugin-wordcloud = "^0.4.7"
 nonebot-plugin-treehelp = "^0.1.0"
 
