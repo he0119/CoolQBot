@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 
-import pytest
 from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
 from nonebug import App
 

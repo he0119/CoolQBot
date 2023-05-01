@@ -1,4 +1,3 @@
-import pytest
 from nonebug import App
 
 from tests.fake import fake_group_message_event_v11

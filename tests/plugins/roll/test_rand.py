@@ -1,4 +1,3 @@
-import pytest
 from nonebug import App
 from pytest_mock import MockerFixture
 

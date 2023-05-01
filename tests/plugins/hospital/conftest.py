@@ -1,7 +1,6 @@
 import pytest
 from nonebug import App
 from sqlalchemy import delete
-from sqlalchemy.ext.asyncio.session import AsyncSession
 
 
 @pytest.fixture

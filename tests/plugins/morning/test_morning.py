@@ -2,7 +2,6 @@ import json
 from datetime import date
 from pathlib import Path
 
-import pytest
 from nonebot.adapters.onebot.v11 import Bot, Message
 from nonebug import App
 from pytest_mock import MockerFixture

@@ -2,10 +2,10 @@ from typing import TYPE_CHECKING
 
 from nonebug import App
 
+from tests.fake import fake_group_message_event_v11
+
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio.session import AsyncSession
-
-from tests.fake import fake_group_message_event_v11
 
 
 async def test_discharge(app: App, session: "AsyncSession"):

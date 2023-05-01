@@ -1,13 +1,12 @@
 from typing import TYPE_CHECKING
 
+from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from nonebug import App
+
+from tests.fake import fake_group_message_event_v11
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio.session import AsyncSession
-
-from nonebot.adapters.onebot.v11 import Message, MessageSegment
-
-from tests.fake import fake_group_message_event_v11
 
 
 async def test_admin(app: App):
