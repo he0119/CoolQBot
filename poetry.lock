@@ -2048,14 +2048,14 @@ typing-extensions = ">=4.0.0"
 
 [[package]]
 name = "nonebot-plugin-memes"
-version = "0.4.5"
+version = "0.4.6"
 description = "Nonebot2 plugin for making memes"
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_memes-0.4.5-py3-none-any.whl", hash = "sha256:08fdac383a1419da9edb4d45146de67f0ae68fd9544fc168d86636a7c653f19e"},
-    {file = "nonebot_plugin_memes-0.4.5.tar.gz", hash = "sha256:e82a764ee203d58bf7f4fcc111e04de70a3be2124772269933481591bca78e6f"},
+    {file = "nonebot_plugin_memes-0.4.6-py3-none-any.whl", hash = "sha256:ec77f476093f5f9ab08398cf389f1a3cca2f9c2ceaf0e11d9d010f3b4028a26a"},
+    {file = "nonebot_plugin_memes-0.4.6.tar.gz", hash = "sha256:0941d500a38ed30d0faef035ae2ab3c034e15da92503e261aacdb459c4abe5cd"},
 ]
 
 [package.dependencies]
@@ -4109,4 +4109,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "be7813ed33d783cf30a560d9b7c59630de395580c3f96f2648d139c9acdb8ba6"
+content-hash = "9c6960ecbedf3d77389dd963ec88149d4820f27a78bcabbdf242bc9bd97f8743"
