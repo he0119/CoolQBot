@@ -26,7 +26,7 @@ nonebot-plugin-apscheduler = "^0.2.0"
 nonebot-plugin-sentry = "^0.3.0"
 nonebot-plugin-memes = "0.4.6"
 nonebot-bison = "0.7.1"
-nonebot-plugin-gscode = "0.1.6"
+nonebot-plugin-gscode = "0.1.7"
 nonebot-plugin-naturel-gpt = "2.1.3"
 nonebot-plugin-status = "^0.6.1"
 
