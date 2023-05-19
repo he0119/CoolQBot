@@ -11,7 +11,9 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio.session import AsyncSession
 
 
-async def test_fitness_history(app: App, session: "AsyncSession"):
+async def test_fitness_history(
+    app: App, session: "AsyncSession", mocker: MockerFixture
+):
     """测试健身历史记录"""
     from src.plugins.check_in.models import FitnessRecord, User
     from src.plugins.check_in.plugins.check_in_history import history_cmd
@@ -21,10 +23,15 @@ async def test_fitness_history(app: App, session: "AsyncSession"):
     session.add(user)
     session.add(user2)
     await session.commit()
-    fitness_record = FitnessRecord(user=user, time=datetime(2023, 1, 1), message="健身记录")
-    session.add(fitness_record)
+    session.add(FitnessRecord(user=user, time=datetime(2023, 1, 1), message="健身记录"))
+    session.add(FitnessRecord(user=user, time=datetime(2023, 2, 1), message="健身记录"))
     session.add(FitnessRecord(user=user2, message="健身记录"))
     await session.commit()
+
+    mocked_datetime = mocker.patch(
+        "src.plugins.check_in.plugins.check_in_history.datetime"
+    )
+    mocked_datetime.now.return_value = datetime(2023, 2, 10, 1, 1, 1)
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -37,7 +44,7 @@ async def test_fitness_history(app: App, session: "AsyncSession"):
 
         ctx.receive_event(bot, event2)
         ctx.should_call_send(
-            event2, "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-01-01 健身记录", True, at_sender=True
+            event2, "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-02-01 健身记录", True, at_sender=True
         )
         ctx.should_finished(history_cmd)
 
@@ -47,7 +54,7 @@ async def test_fitness_history(app: App, session: "AsyncSession"):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
-            event, "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-01-01 健身记录", True, at_sender=True
+            event, "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-02-01 健身记录", True, at_sender=True
         )
         ctx.should_finished(history_cmd)
 
@@ -57,7 +64,7 @@ async def test_fitness_history(app: App, session: "AsyncSession"):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
-            event, "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-01-01 健身记录", True, at_sender=True
+            event, "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-02-01 健身记录", True, at_sender=True
         )
         ctx.should_finished(history_cmd)
 
