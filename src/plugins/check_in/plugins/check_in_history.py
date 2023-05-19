@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from datetime import timezone
+from datetime import datetime, timezone
 from io import BytesIO
 
 import matplotlib.pyplot as plt
@@ -64,15 +64,24 @@ async def _(
 
     match content:
         case "a":
-            weight_records = (
+            # 仅获取当月记录
+            now = (
+                datetime.now()
+                .replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+                .astimezone(tz=timezone.utc)
+                .replace(tzinfo=None)
+            )
+            fitness_records = (
                 await session.scalars(
-                    select(FitnessRecord).where(FitnessRecord.user == user)
+                    select(FitnessRecord)
+                    .where(FitnessRecord.user == user)
+                    .where(FitnessRecord.time >= now)
                 )
             ).all()
-            if not weight_records:
+            if not fitness_records:
                 await history_cmd.finish("你还没有健身打卡记录哦", at_sender=True)
-            msgs = [f"你已成功打卡 {len(weight_records)} 次，以下是你当月的健身情况哦～："]
-            for record in weight_records:
+            msgs = [f"你已成功打卡 {len(fitness_records)} 次，以下是你当月的健身情况哦～："]
+            for record in fitness_records:
                 msgs.append(f"{record.time.date()} {record.message}")
             await history_cmd.finish("\n".join(msgs), at_sender=True)
         case "b":
