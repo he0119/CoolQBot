@@ -37,7 +37,7 @@ pre-commit = "*"
 nonebug = "^0.3.3"
 pytest-cov = "^4.0.0"
 pytest-mock = "^3.6.1"
-pytest-xdist = "^3.0.2"
+pytest-xdist = "^3.3.1"
 pytest-asyncio = "^0.21.0"
 respx = "^0.20.1"
 
