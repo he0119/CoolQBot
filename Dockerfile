@@ -1,4 +1,4 @@
-FROM python:3.10 as requirements-stage
+FROM python:3.11 as requirements-stage
 
 WORKDIR /tmp
 
@@ -12,7 +12,7 @@ ENV PATH="${PATH}:/root/.local/bin"
 
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
-FROM tiangolo/uvicorn-gunicorn:python3.10-slim
+FROM tiangolo/uvicorn-gunicorn:python3.11-slim
 
 # 设置时区
 ENV TZ=Asia/Shanghai
@@ -31,7 +31,7 @@ RUN apt-get update \
   && apt-get purge -y --auto-remove \
   && rm -rf /var/lib/apt/lists/* \
   && rm /app/requirements.txt
-RUN playwright install chromium && playwright install-deps
+RUN playwright install --with-deps chromium
 RUN meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator
 
 COPY bot.py pyproject.toml .env prestart.sh /app/
