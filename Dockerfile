@@ -31,7 +31,7 @@ RUN apt-get update \
   && apt-get purge -y --auto-remove \
   && rm -rf /var/lib/apt/lists/* \
   && rm /app/requirements.txt
-RUN playwright install chromium && playwright install-deps
+RUN playwright install --with-deps chromium
 RUN meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator
 
 COPY bot.py pyproject.toml .env prestart.sh /app/
