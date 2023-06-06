@@ -14,9 +14,7 @@ __plugin_meta__ = PluginMetadata(
     description="记录饮食是否健康",
     usage="""记录饮食是否健康
 /饮食打卡""",
-    extra={
-        "adapters": ["OneBot V11", "OneBot V12"],
-    },
+    supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
 dietary_cmd = check_in.command("dietary", aliases={"饮食打卡"})
 

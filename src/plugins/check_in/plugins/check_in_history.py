@@ -30,9 +30,7 @@ __plugin_meta__ = PluginMetadata(
 /打卡历史 C
 查看体脂历史
 /打卡历史 D""",
-    extra={
-        "adapters": ["OneBot V11", "OneBot V12"],
-    },
+    supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
 history_cmd = check_in.command("history", aliases={"打卡历史"})
 

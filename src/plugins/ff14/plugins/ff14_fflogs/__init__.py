@@ -38,9 +38,7 @@ __plugin_meta__ = PluginMetadata(
 /dps me 角色名 服务器名
 查询他人绑定的角色
 /dps @他人""",
-    extra={
-        "adapters": ["OneBot V11", "OneBot V12"],
-    },
+    supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
 
 plugin_data = get_plugin_data()

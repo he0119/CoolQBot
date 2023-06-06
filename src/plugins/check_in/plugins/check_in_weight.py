@@ -24,9 +24,7 @@ __plugin_meta__ = PluginMetadata(
 记录体重
 /体重打卡
 /体重打卡 60""",
-    extra={
-        "adapters": ["OneBot V11", "OneBot V12"],
-    },
+    supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
 target_weight_cmd = check_in.command("weight", aliases={"目标体重"})
 

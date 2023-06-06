@@ -23,9 +23,7 @@ __plugin_meta__ = PluginMetadata(
 解除禁言
 /ban 0
 如果私聊，则需要再提供群号""",
-    extra={
-        "adapters": ["OneBot V11"],
-    },
+    supported_adapters={"~onebot.v11"},
 )
 
 

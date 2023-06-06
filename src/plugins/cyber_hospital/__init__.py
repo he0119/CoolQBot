@@ -31,9 +31,7 @@ __plugin_meta__ = PluginMetadata(
 查看所有人入院次数，或指定人出入院时间
 /入院记录
 /入院记录 @病人""",
-    extra={
-        "adapters": ["OneBot V11"],
-    },
+    supported_adapters={"~onebot.v11"},
 )
 
 hospital_service = Hospital()
