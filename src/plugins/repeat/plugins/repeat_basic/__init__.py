@@ -21,9 +21,7 @@ __plugin_meta__ = PluginMetadata(
 /repeat on
 关闭复读功能
 /repeat off""",
-    extra={
-        "adapters": ["OneBot V11", "OneBot V12"],
-    },
+    supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
 
 

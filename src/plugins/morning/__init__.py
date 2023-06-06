@@ -9,12 +9,7 @@ from nonebot.plugin import PluginMetadata
 from .config import Config
 
 __plugin_meta__ = PluginMetadata(
-    name="问好",
-    description="早上好下午好晚上好",
-    usage="",
-    extra={
-        "adapters": ["OneBot V11"],
-    },
+    name="问好", description="早上好下午好晚上好", usage="", supported_adapters={"~onebot.v11"}
 )
 
 _sub_plugins = set()

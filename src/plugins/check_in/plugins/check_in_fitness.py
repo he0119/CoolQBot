@@ -14,9 +14,7 @@ __plugin_meta__ = PluginMetadata(
     description="记录健身情况",
     usage="""记录健身情况
 /健身打卡""",
-    extra={
-        "adapters": ["OneBot V11", "OneBot V12"],
-    },
+    supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
 fitness_cmd = check_in.command("fitness", aliases={"健身打卡"})
 

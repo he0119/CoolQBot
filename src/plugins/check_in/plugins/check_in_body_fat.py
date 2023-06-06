@@ -24,9 +24,7 @@ __plugin_meta__ = PluginMetadata(
 记录体脂
 /体脂打卡
 /体制打卡 20""",
-    extra={
-        "adapters": ["OneBot V11", "OneBot V12"],
-    },
+    supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
 
 target_body_fat_cmd = check_in.command("body_fat", aliases={"目标体脂"})

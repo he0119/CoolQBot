@@ -15,9 +15,7 @@ __plugin_meta__ = PluginMetadata(
     name="复读",
     description="与复读有关的功能",
     usage="与复读有关的功能",
-    extra={
-        "adapters": ["OneBot V11", "OneBot V12"],
-    },
+    supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
 
 _sub_plugins = set()

@@ -10,9 +10,7 @@ __plugin_meta__ = PluginMetadata(
     name="打卡",
     description="每日打卡，记录健身数据",
     usage="",
-    extra={
-        "adapters": ["OneBot V11", "OneBot V12"],
-    },
+    supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
 
 check_in = CommandGroup("check_in", block=True)
