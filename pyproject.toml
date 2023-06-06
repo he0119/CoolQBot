@@ -8,7 +8,7 @@ repository = "https://github.com/he0119/CoolQBot"
 version = "0.15.3"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 tencentcloud-sdk-python = "^3.0.593"
 eorzeaenv = "^2.2.8"
 matplotlib = "^3.7.1"
