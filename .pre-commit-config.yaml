@@ -6,7 +6,7 @@ ci:
   autoupdate_commit_msg: "chore: auto update by pre-commit hooks"
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.4.0
+    rev: v3.6.0
     hooks:
       - id: pyupgrade
         args: [--py310-plus]
