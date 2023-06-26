@@ -27,7 +27,6 @@ nonebot-plugin-sentry = "^0.4.0"
 nonebot-plugin-memes = "0.4.6"
 nonebot-bison = "0.7.3"
 nonebot-plugin-gscode = "0.1.8"
-nonebot-plugin-naturel-gpt = "2.1.7"
 nonebot-plugin-status = "^0.7.1"
 
 [tool.poetry.group.dev.dependencies]
@@ -53,7 +52,6 @@ plugins = [
     "nonebot_plugin_memes",
     "nonebot_bison",
     "nonebot_plugin_gscode",
-    "nonebot_plugin_naturel_gpt",
     "nonebot_plugin_status",
 ]
 
