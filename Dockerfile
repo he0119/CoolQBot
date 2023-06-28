@@ -32,7 +32,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* \
   && rm /app/requirements.txt
 RUN playwright install --with-deps chromium
-RUN meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator
+RUN meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator/
 
 COPY bot.py pyproject.toml .env prestart.sh /app/
 COPY src /app/src/
