@@ -11,7 +11,7 @@ version = "0.15.3"
 python = "^3.11"
 tencentcloud-sdk-python = "^3.0.593"
 eorzeaenv = "^2.2.8"
-matplotlib = "^3.7.1"
+matplotlib = "^3.7.2"
 
 nonebot2 = { extras = ["httpx", "fastapi"], version = "^2.0.0" }
 nb-cli = "^1.1.1"
