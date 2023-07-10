@@ -1719,13 +1719,13 @@ yaml = ["pyyaml (>=6.0,<7.0)"]
 
 [[package]]
 name = "nonebot-plugin-gscode"
-version = "0.1.8"
+version = "0.2.1"
 description = "Genshin live codes plugin for NoneBot2"
 optional = false
 python-versions = ">=3.8.1,<4.0"
 files = [
-    {file = "nonebot_plugin_gscode-0.1.8-py3-none-any.whl", hash = "sha256:b684e318147dc355e16828c0a2eb2ec947a914ce8bc6758e679c0149e600b4af"},
-    {file = "nonebot_plugin_gscode-0.1.8.tar.gz", hash = "sha256:c5c2ebe3c3949cd7d07f919eed6c8ac24def2a6eb4b3bef30ddc19efc1ef06da"},
+    {file = "nonebot_plugin_gscode-0.2.1-py3-none-any.whl", hash = "sha256:c303760eeaa79defe79eff3d9bcb5bf4ecef174bb3aab5e614d1bb79867ac060"},
+    {file = "nonebot_plugin_gscode-0.2.1.tar.gz", hash = "sha256:0fb538fcd970221787db1071517091de1ca65c3c16fdc6abf76ced8f5bb30faa"},
 ]
 
 [package.dependencies]
@@ -3597,4 +3597,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "7230a70fbc86a22d7c61fce4bb8771ff5c135ed86ed41dd21613601b174ae962"
+content-hash = "619051e4276ac20e8d33a7012b92602fa6113259a22856862ee0dec328f4d772"

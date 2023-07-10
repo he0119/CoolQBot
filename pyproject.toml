@@ -26,7 +26,7 @@ nonebot-plugin-apscheduler = "^0.2.0"
 nonebot-plugin-sentry = "^0.4.0"
 nonebot-plugin-memes = "0.4.6"
 nonebot-bison = "0.7.3"
-nonebot-plugin-gscode = "0.1.8"
+nonebot-plugin-gscode = "0.2.1"
 nonebot-plugin-status = "^0.7.1"
 
 [tool.poetry.group.dev.dependencies]
