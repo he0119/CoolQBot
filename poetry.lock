@@ -3109,20 +3109,6 @@ release = ["twine"]
 test = ["pylint", "pytest", "pytest-black", "pytest-cov", "pytest-pylint"]
 
 [[package]]
-name = "tencentcloud-sdk-python"
-version = "3.0.937"
-description = "Tencent Cloud SDK for Python"
-optional = false
-python-versions = "*"
-files = [
-    {file = "tencentcloud-sdk-python-3.0.937.tar.gz", hash = "sha256:6bb114707350beea326f721be68041e488e6ffc2a4c8a35fdc66fc181c6c1c1e"},
-    {file = "tencentcloud_sdk_python-3.0.937-py2.py3-none-any.whl", hash = "sha256:7e41121b49a026893a07532bf1bb3a5885197435210068d25eb243502fd19aad"},
-]
-
-[package.dependencies]
-requests = ">=2.16.0"
-
-[[package]]
 name = "text-unidecode"
 version = "1.3"
 description = "The most basic Text::Unidecode port"
@@ -3608,4 +3594,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "c6986e4823657e075a94eed2e33a86807165d66bf39eeeec54e30ae775d2f95e"
+content-hash = "d0e438336083545e49c2262fc5d6cb5b661aae45fdaf94191caf7523c8ebf350"
