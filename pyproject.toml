@@ -37,7 +37,7 @@ pytest-cov = "^4.0.0"
 pytest-mock = "^3.6.1"
 pytest-xdist = "^3.0.2"
 pytest-asyncio = "^0.21.0"
-respx = "^0.20.1"
+respx = "^0.20.2"
 
 [tool.nonebot]
 plugin_dirs = ["src/plugins"]
