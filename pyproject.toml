@@ -23,10 +23,10 @@ nonebot-plugin-treehelp = "^0.3.0"
 
 nonebot-plugin-apscheduler = "^0.3.0"
 nonebot-plugin-sentry = "^0.4.0"
-nonebot-plugin-memes = "0.4.6"
+nonebot-plugin-memes = "0.4.7"
 nonebot-bison = "0.8.0"
 nonebot-plugin-gscode = "0.2.1"
-nonebot-plugin-status = "^0.7.1"
+nonebot-plugin-status = "0.7.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
