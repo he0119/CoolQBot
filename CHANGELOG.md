@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.16.0] - 2023-07-28
+
 ### Added
 
 - 添加数据库插件
@@ -15,18 +17,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 适配插件元信息
 - 使用 nonebot-plugin-treehelp 生成插件帮助
 - 添加赛博医院，支持入院，出院和查房
+- 添加打卡功能，支持健身，饮食，体重，体质打卡
 
 ### Changed
 
-- 利用新版 NoneBot2(beta1) 特性简化帮助
-- 适配 NoneBot2(beta1)
+- 适配 NoneBot2 2.0.0
+- 利用新版 NoneBot2 特性简化帮助
 - 将 FFlogs 缓存数据存放至缓存目录
-- 直接使用 nonebot-bison 0.5.2 版本
+- 直接使用 nonebot-bison 0.8.0 版本
 - 利用 eorzeaenv 计算艾欧泽亚天气
 
 ### Removed
 
 - 删除 `公主连结Re:Dive` 插件中定时推送功能
+- 移除机器人插件
 
 ## [0.15.3] - 2021-12-19
 
@@ -440,7 +444,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.15.3...HEAD
+[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/he0119/CoolQBot/compare/v0.15.3...v0.16.0
 [0.15.3]: https://github.com/he0119/CoolQBot/compare/v0.15.2...v0.15.3
 [0.15.2]: https://github.com/he0119/CoolQBot/compare/v0.15.1...v0.15.2
 [0.15.1]: https://github.com/he0119/CoolQBot/compare/v0.15.0...v0.15.1
