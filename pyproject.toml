@@ -31,7 +31,6 @@ nonebot-plugin-status = "0.7.1"
 [tool.poetry.group.dev.dependencies]
 black = "*"
 isort = "*"
-pre-commit = "*"
 nonebug = "^0.3.3"
 pytest-cov = "^4.0.0"
 pytest-mock = "^3.6.1"

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 修复和风天气无法找到城市时报错的问题
+
 ## [0.16.0] - 2023-07-28
 
 ### Added
