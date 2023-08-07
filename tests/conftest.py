@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 import nonebot
 import pytest
+from loguru import logger
 from nonebug import NONEBOT_INIT_KWARGS
 from nonebug.app import App
 
@@ -38,3 +39,10 @@ async def app(nonebug_init: None, tmp_path: Path):
     await init_db()
 
     return App()
+
+
+@pytest.fixture
+def caplog(caplog):
+    handler_id = logger.add(caplog.handler, format="{message}")
+    yield caplog
+    logger.remove(handler_id)

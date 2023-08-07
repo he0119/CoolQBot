@@ -9,7 +9,7 @@ repos:
     rev: v3.10.1
     hooks:
       - id: pyupgrade
-        args: [--py310-plus]
+        args: [--py311-plus]
 
   - repo: https://github.com/hadialqattan/pycln
     rev: v2.2.0

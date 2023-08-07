@@ -30,9 +30,12 @@ async def lookup_location(
     params = urlencode(params)
 
     url = f"https://geoapi.qweather.com/v2/city/lookup?{params}"
-    resp = LookupResp.parse_obj(await get(url))
+    rjson = await get(url)
+    resp = LookupResp.parse_obj(rjson)
 
     if resp.code == "200":
+        assert resp.location, "API 返回的 location 为空"
+
         city = resp.location[0]
         locations = [city.country, city.adm1, city.adm2, city.name]
 
@@ -52,7 +55,8 @@ async def now(location_id: str) -> str:
     当前温度：12℃ 湿度：52%(体感温度：7℃)
     """
     url = f"https://devapi.qweather.com/v7/weather/now?location={location_id}"
-    resp = NowResp.parse_obj(await get(url))
+    rjson = await get(url)
+    resp = NowResp.parse_obj(rjson)
 
     now = resp.now
     return f"当前温度：{now.temp}℃ 湿度：{now.humidity}%(体感温度：{now.feelsLike}℃)"

@@ -26,8 +26,8 @@ class LookupResp(BaseModel):
     """https://geoapi.qweather.com/v2/city/lookup"""
 
     code: str
-    location: list[LocationItem]
-    refer: Refer
+    location: list[LocationItem] | None
+    refer: Refer | None
 
 
 class Now(BaseModel):

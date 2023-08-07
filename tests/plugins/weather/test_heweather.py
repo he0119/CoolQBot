@@ -17,29 +17,21 @@ def mocked_get(url: str):
             return self._json
 
     test_dir = Path(__file__).parent
-    if (
-        url
-        == "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&key=1234567890"
-        or url
-        == "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&adm=%E5%9B%9B%E5%B7%9D&key=1234567890"
-    ):
-        with open(test_dir / "lookup.json", encoding="utf-8") as f:
-            data = json.load(f)
-        return MockResponse(data)
-    if (
-        url
-        == "https://devapi.qweather.com/v7/weather/now?location=101270101&key=1234567890"
-    ):
-        with open(test_dir / "now.json", encoding="utf-8") as f:
-            data = json.load(f)
-        return MockResponse(data)
-    if (
-        url
-        == "https://devapi.qweather.com/v7/weather/3d?location=101270101&key=1234567890"
-    ):
-        with open(test_dir / "3d.json", encoding="utf-8") as f:
-            data = json.load(f)
-        return MockResponse(data)
+    match url:
+        case "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&key=1234567890" | "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&adm=%E5%9B%9B%E5%B7%9D&key=1234567890":
+            with open(test_dir / "lookup.json", encoding="utf-8") as f:
+                data = json.load(f)
+            return MockResponse(data)
+        case "https://devapi.qweather.com/v7/weather/now?location=101270101&key=1234567890":
+            with open(test_dir / "now.json", encoding="utf-8") as f:
+                data = json.load(f)
+            return MockResponse(data)
+        case "https://devapi.qweather.com/v7/weather/3d?location=101270101&key=1234567890":
+            with open(test_dir / "3d.json", encoding="utf-8") as f:
+                data = json.load(f)
+            return MockResponse(data)
+        case "https://geoapi.qweather.com/v2/city/lookup?location=fail&key=1234567890":
+            return MockResponse({"code": "404"})
 
     return MockResponse({})
 
@@ -150,3 +142,36 @@ async def test_heweather_with_three_args(app: App, mocker: MockerFixture):
             ),
         ]
     )
+
+
+async def test_heweather_lookup_failed(app: App, mocker: MockerFixture, caplog):
+    """测试和风天气，城市查找失败"""
+    from src.plugins.weather import weather_cmd
+    from src.plugins.weather.heweather_api import plugin_config
+
+    mocker.patch.object(plugin_config, "heweather_key", "1234567890")
+
+    get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
+
+    async with app.test_matcher(weather_cmd) as ctx:
+        bot = ctx.create_bot()
+        event = fake_group_message_event_v11(message=Message("/天气 fail"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "我才不是因为不知道才不告诉你fail的天气呢",
+            True,
+        )
+        ctx.should_finished()
+
+    get.assert_has_calls(
+        [
+            mocker.call(
+                "https://geoapi.qweather.com/v2/city/lookup?location=fail&key=1234567890"
+            ),  # type: ignore
+        ]
+    )
+
+    # 如果没有查询到城市，不应该有和风天气 API 请求失败的日志
+    assert "和风天气 API 请求失败" not in caplog.text
