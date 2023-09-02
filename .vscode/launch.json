@@ -18,24 +18,18 @@
       "type": "python",
       "request": "launch",
       "module": "pytest",
-      "args": [
-        "-s"
-      ],
+      "args": ["-s"],
       "console": "integratedTerminal",
-      "justMyCode": false,
+      "justMyCode": false
     },
     {
       "name": "CoolQBot Test - Single",
       "type": "python",
       "request": "launch",
       "module": "pytest",
-      "args": [
-        "-s",
-        "-k",
-        "${selectedText}"
-      ],
+      "args": ["-s", "-k", "${selectedText}"],
       "console": "integratedTerminal",
-      "justMyCode": false,
+      "justMyCode": false
     }
   ]
 }

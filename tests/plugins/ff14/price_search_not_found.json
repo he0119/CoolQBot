@@ -1,1 +1,13 @@
-{"Pagination":{"Page":0,"PageNext":null,"PagePrev":null,"PageTotal":0,"Results":0,"ResultsPerPage":100,"ResultsTotal":0},"Results":[],"SpeedMs":1}
+{
+  "Pagination": {
+    "Page": 0,
+    "PageNext": null,
+    "PagePrev": null,
+    "PageTotal": 0,
+    "Results": 0,
+    "ResultsPerPage": 100,
+    "ResultsTotal": 0
+  },
+  "Results": [],
+  "SpeedMs": 1
+}

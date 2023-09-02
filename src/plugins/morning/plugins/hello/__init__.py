@@ -6,7 +6,7 @@ from nonebot.adapters.onebot.v12 import Bot as V12Bot
 from nonebot.adapters.onebot.v12 import Message as V12Message
 from nonebot.exception import ActionFailed
 from nonebot.log import logger
-from nonebot.params import CommandArg, Depends
+from nonebot.params import CommandArg
 from nonebot.plugin import PluginMetadata, on_command
 from sqlalchemy import select
 

@@ -1,7 +1,7 @@
 """ 复读 """
 from nonebot import on_message
 from nonebot.adapters import Event, Message
-from nonebot.params import CommandArg, Depends
+from nonebot.params import CommandArg
 from nonebot.plugin import PluginMetadata
 from sqlalchemy import select
 

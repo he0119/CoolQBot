@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 
 from nonebot.adapters import Event
 from nonebot.log import logger
-from nonebot.params import Depends
 
 from src.utils.annotated import GroupInfo
 

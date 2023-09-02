@@ -104,6 +104,6 @@ async def heweather(location: str, adm: str | None = None) -> str | None:
                 await daily(city[0]),
             ]
         )
-    except:
+    except Exception:
         logger.exception("和风天气 API 请求失败")
         return

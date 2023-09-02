@@ -27,7 +27,7 @@ def eorzean_weather(location: str) -> str | None:
         for num, weather in enumerate(weathers[1:]):
             str_data += f"\n还剩{next_weather_time(int(now), num)}切换到天气：{weather}"
         return str_data
-    except Exception as e:
+    except Exception:
         return None
 
 

@@ -294,9 +294,9 @@ async def data_migration():
                             users[(date_str, group_id, user_id)] = {
                                 "msg_number": msg_number
                             }
-            for (date, group_id, user_id), values in users.items():
+            for (date_str, group_id, user_id), values in users.items():
                 record = Record(
-                    date=datetime.strptime(date, "%Y-%m-%d").date(),
+                    date=datetime.strptime(date_str, "%Y-%m-%d").date(),
                     platform="qq",
                     group_id=group_id,
                     user_id=user_id,
