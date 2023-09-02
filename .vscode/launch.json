@@ -32,7 +32,7 @@
       "args": [
         "-s",
         "-k",
-        "test_hello_disable"
+        "${selectedText}"
       ],
       "console": "integratedTerminal",
       "justMyCode": false,
