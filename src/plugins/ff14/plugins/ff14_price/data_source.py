@@ -62,7 +62,7 @@ async def get_item_price(name: str, world_or_dc: str) -> str:
     try:
         item = await search_item_id_by_name(name)
     except httpx.HTTPError:
-        return f"抱歉，网络出错，无法获取物品 ID，请稍后再试。"
+        return "抱歉，网络出错，无法获取物品 ID，请稍后再试。"
 
     if not item:
         return f"抱歉，没有找到 {name}，请检查物品名称是否正确。"

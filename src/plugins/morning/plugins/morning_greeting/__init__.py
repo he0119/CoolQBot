@@ -7,7 +7,7 @@ from nonebot.adapters.onebot.v11 import Bot as V11Bot
 from nonebot.adapters.onebot.v12 import Bot as V12Bot
 from nonebot.adapters.onebot.v12 import Message as V12Message
 from nonebot.log import logger
-from nonebot.params import CommandArg, Depends
+from nonebot.params import CommandArg
 from nonebot.plugin import PluginMetadata, on_command
 from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_datastore import create_session

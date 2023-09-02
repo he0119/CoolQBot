@@ -1,50 +1,50 @@
-name-template: 'v$RESOLVED_VERSION'
-tag-template: 'v$RESOLVED_VERSION'
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
 autolabeler:
-  - label: 'bug'
+  - label: "bug"
     branch:
       - '/fix\/.+/'
-  - label: 'change'
+  - label: "change"
     branch:
       - '/change\/.+/'
-  - label: 'enhancement'
+  - label: "enhancement"
     branch:
       - '/feature\/.+/'
       - '/feat\/.+/'
 categories:
-  - title: 'Added'
+  - title: "Added"
     labels:
-      - 'enhancement'
-      - 'feature'
-  - title: 'Changed'
+      - "enhancement"
+      - "feature"
+  - title: "Changed"
     labels:
-      - 'improve'
-      - 'change'
-  - title: 'Deprecated'
+      - "improve"
+      - "change"
+  - title: "Deprecated"
     labels:
-      - 'deprecation'
-  - title: 'Removed'
+      - "deprecation"
+  - title: "Removed"
     labels:
-      - 'removed'
-  - title: 'Fixed'
+      - "removed"
+  - title: "Fixed"
     labels:
-      - 'bug'
-      - 'fix'
-  - title: 'Security'
+      - "bug"
+      - "fix"
+  - title: "Security"
     labels:
-      - 'security'
-change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+      - "security"
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
 change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
 version-resolver:
   major:
     labels:
-      - 'major'
+      - "major"
   minor:
     labels:
-      - 'minor'
+      - "minor"
   patch:
     labels:
-      - 'patch'
+      - "patch"
   default: patch
 template: |
   $CHANGES

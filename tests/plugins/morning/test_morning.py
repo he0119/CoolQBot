@@ -193,7 +193,7 @@ async def test_morning_push(app: App, mocker: MockerFixture):
         await session.commit()
 
     async with app.test_api() as ctx:
-        bot = ctx.create_bot(base=Bot)
+        ctx.create_bot(base=Bot)
 
         ctx.should_call_api(
             "send_msg",
