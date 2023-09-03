@@ -14,7 +14,7 @@ matplotlib = "^3.7.1"
 
 nonebot2 = { extras = ["httpx", "fastapi"], version = "^2.0.0" }
 nb-cli = "^1.1.1"
-nonebot-adapter-onebot = "2.2.3"
+nonebot-adapter-onebot = "2.2.4"
 onebot-qqguild-extension = "^0.1.1"
 
 nonebot-plugin-datastore = "^1.0.0"
