@@ -27,6 +27,7 @@ nonebot-plugin-memes = "0.4.7"
 nonebot-bison = "0.8.0"
 nonebot-plugin-gscode = "0.2.1"
 nonebot-plugin-status = "0.7.1"
+nonebot-plugin-bawiki = "^0.8.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
@@ -51,6 +52,7 @@ plugins = [
     "nonebot_bison",
     "nonebot_plugin_gscode",
     "nonebot_plugin_status",
+    "nonebot_plugin_bawiki",
 ]
 
 [tool.black]
