@@ -13,8 +13,8 @@ eorzeaenv = "^2.2.8"
 matplotlib = "^3.7.1"
 
 nonebot2 = { extras = ["httpx", "fastapi"], version = "^2.0.0" }
-nb-cli = "^1.1.1"
-nonebot-adapter-onebot = "2.2.3"
+nb-cli = "^1.2.3"
+nonebot-adapter-onebot = "2.2.4"
 onebot-qqguild-extension = "^0.1.1"
 
 nonebot-plugin-datastore = "^1.0.0"
@@ -27,7 +27,7 @@ nonebot-plugin-memes = "0.4.7"
 nonebot-bison = "0.8.0"
 nonebot-plugin-gscode = "0.2.1"
 nonebot-plugin-status = "0.7.1"
-nonebot-plugin-bawiki = "^0.8.5"
+nonebot-plugin-bawiki = "^0.8.6"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
