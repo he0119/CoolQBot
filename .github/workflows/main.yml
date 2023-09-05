@@ -98,6 +98,7 @@ jobs:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
+          version: 1.46.1
       - name: Deploy to server
         uses: appleboy/ssh-action@55dabf81b49d4120609345970c91507e2d734799
         with:
