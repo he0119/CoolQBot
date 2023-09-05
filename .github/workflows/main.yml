@@ -93,12 +93,11 @@ jobs:
     if: ${{ github.event_name != 'pull_request' }}
     steps:
       - name: Tailscale
-        uses: tailscale/github-action@v2
+        uses: tailscale/github-action@65cdd9a05d7ebe4ef4e8c70141f5d84e1cd4cab4
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
-          version: 1.46.1
       - name: Deploy to server
         uses: appleboy/ssh-action@55dabf81b49d4120609345970c91507e2d734799
         with:
