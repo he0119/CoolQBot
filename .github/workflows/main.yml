@@ -99,15 +99,7 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
       - name: Deploy to server
-        uses: appleboy/ssh-action@55dabf81b49d4120609345970c91507e2d734799
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script_stop: true
-          script: sudo ${{ secrets.COOLQBOT_ROOT }}/deploy.sh
-          debug: true
+        run: tailscale ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "${{ secrets.COOLQBOT_ROOT }}/deploy.sh"
 
   deploy_prod:
     name: Deploy Prod
