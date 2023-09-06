@@ -1691,13 +1691,13 @@ typing-extensions = ">=4.0.0,<5.0.0"
 
 [[package]]
 name = "nonebot-bison"
-version = "0.8.0"
+version = "0.8.2"
 description = "Subscribe message from social medias"
 optional = false
 python-versions = ">=3.10,<4.0.0"
 files = [
-    {file = "nonebot_bison-0.8.0-py3-none-any.whl", hash = "sha256:e392e85c684b588faf70aab70453598ac3b48714cda0d4b745241b1dbb46ead8"},
-    {file = "nonebot_bison-0.8.0.tar.gz", hash = "sha256:586a4fa5f097459e6bb8f81f675746b7d424659cdcd6c9b61723e84725ecfa93"},
+    {file = "nonebot_bison-0.8.2-py3-none-any.whl", hash = "sha256:fb180aa1ec982cc4a26024379301b1e9589eda8d1f4eb3f96e3f5ef7bb7d2036"},
+    {file = "nonebot_bison-0.8.2.tar.gz", hash = "sha256:96cc97decaabf5103e52e8a51bf5aa6403d8b413f49413dc588d64e4a716cace"},
 ]
 
 [package.dependencies]
@@ -1707,9 +1707,9 @@ feedparser = ">=6.0.2,<7.0.0"
 httpx = ">=0.16.1"
 nonebot-adapter-onebot = ">=2.0.0,<3.0.0"
 nonebot-plugin-apscheduler = ">=0.2,<0.4"
-nonebot-plugin-datastore = ">=0.6.2,<1.1.0"
+nonebot-plugin-datastore = ">=0.6.2,<2.0.0"
 nonebot-plugin-htmlrender = ">=0.2.0"
-nonebot-plugin-send-anything-anywhere = ">=0.2.7,<0.3.0"
+nonebot-plugin-send-anything-anywhere = ">=0.3.0,<0.4.0"
 nonebot2 = {version = ">=2.0.0,<3.0.0", extras = ["fastapi"]}
 pillow = ">=8.1,<11.0"
 pyjwt = ">=2.1.0,<3.0.0"
@@ -1868,13 +1868,13 @@ pypinyin = ">=0.44.0,<1.0.0"
 
 [[package]]
 name = "nonebot-plugin-send-anything-anywhere"
-version = "0.2.8"
+version = "0.3.0"
 description = "An adaptor for nonebot2 adaptors"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_send_anything_anywhere-0.2.8-py3-none-any.whl", hash = "sha256:54e80477ab2da95454dbf6760450aac813b4e9a3d13c03fcbb14380c1e8330ee"},
-    {file = "nonebot_plugin_send_anything_anywhere-0.2.8.tar.gz", hash = "sha256:b7083c6c565c354e0dea5529adecc7d201e875f490d6a751c0f74be18cb61880"},
+    {file = "nonebot_plugin_send_anything_anywhere-0.3.0-py3-none-any.whl", hash = "sha256:30ed3346e9acd0b80f7be5306b70f581d6a20f90388e46ccc984303d4c4449be"},
+    {file = "nonebot_plugin_send_anything_anywhere-0.3.0.tar.gz", hash = "sha256:1ec98b48c842cdc656fbc9d90ee44a60eb77761d94843cf03cc1327f1b04773c"},
 ]
 
 [package.dependencies]
@@ -3677,4 +3677,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "94698fd5234c3de0cd731bcd86f2cdac89760a9801562a1fcbec94fe39954b91"
+content-hash = "0cc2cc06eeb9f2d9ec96a7a0673f7c37c22c58ccddeb48959eb012293c43f96f"
