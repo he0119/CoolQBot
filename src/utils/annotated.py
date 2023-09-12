@@ -2,6 +2,10 @@ from typing import Annotated
 
 from nonebot.params import Depends
 from nonebot_plugin_datastore import get_session
+from nonebot_plugin_session import Session as _Session
+from nonebot_plugin_session import extract_session
+from nonebot_plugin_userinfo import EventUserInfo
+from nonebot_plugin_userinfo import UserInfo as _MyUserInfo
 from sqlalchemy.ext.asyncio import AsyncSession as _AsyncSession
 
 from .depends import (
@@ -24,3 +28,5 @@ PlainTextArgs = Annotated[str, Depends(get_plaintext_args)]
 OptionalPlainTextArgs = Annotated[str | None, Depends(get_plaintext_args)]
 Platform = Annotated[str, Depends(get_platform)]
 OptionalPlatform = Annotated[str | None, Depends(get_platform)]
+MyUserInfo = Annotated[_MyUserInfo, EventUserInfo()]
+Session = Annotated[_Session, Depends(extract_session)]

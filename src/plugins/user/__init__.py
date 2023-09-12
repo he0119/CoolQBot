@@ -2,7 +2,6 @@ import random
 from typing import cast
 
 from expiringdict import ExpiringDict
-from nonebot.params import Depends
 from nonebot_plugin_alconna import (
     Alconna,
     AlconnaQuery,
@@ -12,16 +11,18 @@ from nonebot_plugin_alconna import (
     on_alconna,
 )
 from nonebot_plugin_datastore import create_session
-from nonebot_plugin_session import Session, SessionLevel, extract_session
+from nonebot_plugin_session import SessionLevel
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+
+from src.utils.annotated import MyUserInfo, Session
 
 from .models import Bind, User
 
 
-async def create_user(pid: str, platform: str):
+async def create_user(pid: str, platform: str, nickname: str):
     async with create_session() as session:
-        user = User(name=pid)
+        user = User(name=nickname)
         session.add(user)
         bind = Bind(
             pid=pid,
@@ -71,15 +72,14 @@ user_cmd = on_alconna(Alconna("user"), use_cmd_start=True)
 
 
 @user_cmd.handle()
-async def _(session: Session = Depends(extract_session)):
-    if session.platform == "unknown":
+async def _(session: Session, user_info: MyUserInfo):
+    if session.platform == "unknown" or not session.id1:
         await bind_cmd.finish("不支持的平台")
-
-    assert session.id1 and session.platform
+        return
 
     user = await get_user(session.id1, session.platform)
     if not user:
-        user = await create_user(session.id1, session.platform)
+        user = await create_user(session.id1, session.platform, user_info.user_name)
 
     await user_cmd.finish(f"{user.id} {user.name}")
 
@@ -97,9 +97,10 @@ bind_cmd = on_alconna(
 
 @bind_cmd.handle()
 async def _(
+    session: Session,
+    user_info: MyUserInfo,
     token: str | None = None,
     remove: Query[bool] = AlconnaQuery("r.value", default=False),
-    session: Session = Depends(extract_session),
 ):
     if (
         session.platform == "unknown"
@@ -111,7 +112,7 @@ async def _(
 
     user = await get_user(session.id1, session.platform)
     if not user:
-        user = await create_user(session.id1, session.platform)
+        user = await create_user(session.id1, session.platform, user_info.user_name)
 
     if remove.result:
         async with create_session() as db_session:
