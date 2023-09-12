@@ -13,60 +13,11 @@ from nonebot_plugin_alconna import (
 from nonebot_plugin_datastore import create_session
 from nonebot_plugin_session import SessionLevel
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 from src.utils.annotated import MyUserInfo, Session
 
-from .models import Bind, User
-
-
-async def create_user(pid: str, platform: str, nickname: str):
-    async with create_session() as session:
-        user = User(name=nickname)
-        session.add(user)
-        bind = Bind(
-            pid=pid,
-            platform=platform,
-            auser=user,
-            buser=user,
-        )
-        session.add(bind)
-        await session.commit()
-        await session.refresh(user)
-        return user
-
-
-async def get_user(pid: str, platform: str):
-    async with create_session() as session:
-        bind = (
-            await session.scalars(
-                select(Bind)
-                .where(Bind.pid == pid)
-                .where(Bind.platform == platform)
-                .options(selectinload(Bind.auser))
-            )
-        ).one_or_none()
-
-        if not bind:
-            return
-
-        return bind.auser
-
-
-async def set_user(pid: str, platform: str, aid: int):
-    async with create_session() as session:
-        bind = (
-            await session.scalars(
-                select(Bind).where(Bind.pid == pid).where(Bind.platform == platform)
-            )
-        ).one_or_none()
-
-        if not bind:
-            raise ValueError("找不到用户信息")
-
-        bind.aid = aid
-        await session.commit()
-
+from .models import Bind
+from .utils import create_user, get_user, set_user
 
 user_cmd = on_alconna(Alconna("user"), use_cmd_start=True)
 
@@ -81,7 +32,7 @@ async def _(session: Session, user_info: MyUserInfo):
     if not user:
         user = await create_user(session.id1, session.platform, user_info.user_name)
 
-    await user_cmd.finish(f"{user.id} {user.name}")
+    await user_cmd.finish(f"用户名： {user.name}\n创建日期： {user.created_at}")
 
 
 tokens = cast(
