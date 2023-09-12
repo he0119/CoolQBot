@@ -2,7 +2,7 @@
 
 Revision ID: 5cb13347bece
 Revises:
-Create Date: 2023-09-09 16:44:31.700425
+Create Date: 2023-09-12 17:07:22.228191
 
 """
 import sqlalchemy as sa
@@ -21,6 +21,7 @@ def upgrade() -> None:
         "user_user",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.String(length=255), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
