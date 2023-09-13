@@ -3,10 +3,8 @@ from datetime import datetime
 
 from nonebot.matcher import Matcher
 from nonebot.params import Depends
-from nonebot_plugin_session import SessionLevel
+from nonebot_plugin_session import Session, SessionLevel, extract_session
 from nonebot_plugin_userinfo import EventUserInfo, UserInfo
-
-from src.utils.annotated import MyUserInfo, Session
 
 from . import utils
 from .models import User
@@ -14,13 +12,12 @@ from .models import User
 
 async def get_or_create_user(
     matcher: Matcher,
-    session: Session,
+    session: Session = Depends(extract_session),
     user_info: UserInfo | None = EventUserInfo(),
 ):
     """获取一个用户，如果不存在则创建"""
     if (
         session.platform == "unknown"
-        or user_info is None
         or session.level == SessionLevel.LEVEL0
         or not session.id1
     ):
@@ -31,7 +28,9 @@ async def get_or_create_user(
         user = await utils.get_user(session.id1, session.platform)
     except ValueError:
         user = await utils.create_user(
-            session.id1, session.platform, user_info.user_name
+            session.id1,
+            session.platform,
+            user_info and user_info.user_name or session.id1,
         )
 
     return user
@@ -39,8 +38,8 @@ async def get_or_create_user(
 
 @dataclass
 class UserSession:
-    session: Session
-    info: MyUserInfo
+    session: Session = Depends(extract_session)
+    info: UserInfo | None = EventUserInfo()
     user: User = Depends(get_or_create_user)
 
     @property
@@ -56,7 +55,7 @@ class UserSession:
     @property
     def created_at(self) -> datetime:
         """用户创建日期"""
-        return self.user.created_at
+        return self.user.created_at.astimezone()
 
     @property
     def pid(self) -> str:
