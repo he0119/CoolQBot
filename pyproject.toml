@@ -45,8 +45,6 @@ pytest-mock = "^3.6.1"
 pytest-xdist = "^3.0.2"
 pytest-asyncio = "^0.21.0"
 respx = "^0.20.1"
-nonebot-adapter-red = { git = "https://github.com/nonebot/adapter-red.git" }
-nonebot-plugin-send-anything-anywhere = { git = "https://github.com/MountainDash/nonebot-plugin-send-anything-anywhere.git" }
 
 [tool.nonebot]
 adapters = [
@@ -66,6 +64,7 @@ plugins = [
     "nonebot_plugin_treehelp",
     "nonebot_plugin_datastore",
     "nonebot_plugin_session",
+    "nonebot_plugin_userinfo",
     "nonebot_plugin_wordcloud",
     "nonebot_plugin_memes",
     "nonebot_bison",
