@@ -4,6 +4,7 @@ from datetime import datetime
 from nonebot.matcher import Matcher
 from nonebot.params import Depends
 from nonebot_plugin_session import SessionLevel
+from nonebot_plugin_userinfo import EventUserInfo, UserInfo
 
 from src.utils.annotated import MyUserInfo, Session
 
@@ -11,10 +12,15 @@ from . import utils
 from .models import User
 
 
-async def get_or_create_user(matcher: Matcher, session: Session, user_info: MyUserInfo):
+async def get_or_create_user(
+    matcher: Matcher,
+    session: Session,
+    user_info: UserInfo | None = EventUserInfo(),
+):
     """获取一个用户，如果不存在则创建"""
     if (
         session.platform == "unknown"
+        or user_info is None
         or session.level == SessionLevel.LEVEL0
         or not session.id1
     ):
