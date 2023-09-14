@@ -1,13 +1,10 @@
-from dataclasses import dataclass
-from datetime import datetime
-
 from nonebot.matcher import Matcher
 from nonebot.params import Depends
 from nonebot_plugin_session import Session, SessionLevel, extract_session
 from nonebot_plugin_userinfo import EventUserInfo, UserInfo
 
 from . import utils
-from .models import User
+from .models import UserSession
 
 
 async def get_or_create_user(
@@ -22,7 +19,7 @@ async def get_or_create_user(
         or not session.id1
     ):
         await matcher.finish("用户相关功能暂不支持当前平台")
-        return
+        raise ValueError("用户相关功能暂不支持当前平台")
 
     try:
         user = await utils.get_user(session.id1, session.platform)
@@ -36,39 +33,11 @@ async def get_or_create_user(
     return user
 
 
-@dataclass
-class UserSession:
-    session: Session = Depends(extract_session)
-    info: UserInfo | None = EventUserInfo()
-    user: User = Depends(get_or_create_user)
-
-    @property
-    def uid(self) -> int:
-        """用户 ID"""
-        return self.user.id
-
-    @property
-    def name(self) -> str:
-        """用户名"""
-        return self.user.name
-
-    @property
-    def created_at(self) -> datetime:
-        """用户创建日期"""
-        return self.user.created_at.astimezone()
-
-    @property
-    def pid(self) -> str:
-        """用户所在平台 ID"""
-        assert self.session.id1
-        return self.session.id1
-
-    @property
-    def platform(self) -> str:
-        """用户所在平台"""
-        return self.session.platform
-
-    @property
-    def level(self) -> SessionLevel:
-        """用户会话级别"""
-        return self.session.level
+async def get_user_session(
+    matcher: Matcher,
+    session: Session = Depends(extract_session),
+    user_info: UserInfo | None = EventUserInfo(),
+):
+    """获取用户会话"""
+    user = await get_or_create_user(matcher, session, user_info)
+    return UserSession(session, user_info, user)

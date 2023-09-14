@@ -1,6 +1,9 @@
+from dataclasses import dataclass
 from datetime import datetime
 
 from nonebot_plugin_datastore import get_plugin_data
+from nonebot_plugin_session import Session, SessionLevel
+from nonebot_plugin_userinfo import UserInfo
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -40,3 +43,41 @@ User.binds = relationship(
     Bind, uselist=True, back_populates="auser", foreign_keys=[Bind.aid]
 )
 User.bind = relationship(Bind, back_populates="buser", foreign_keys=[Bind.bid])
+
+
+@dataclass
+class UserSession:
+    session: Session
+    info: UserInfo | None
+    user: User
+
+    @property
+    def uid(self) -> int:
+        """用户 ID"""
+        return self.user.id
+
+    @property
+    def name(self) -> str:
+        """用户名"""
+        return self.user.name
+
+    @property
+    def created_at(self) -> datetime:
+        """用户创建日期"""
+        return self.user.created_at.astimezone()
+
+    @property
+    def pid(self) -> str:
+        """用户所在平台 ID"""
+        assert self.session.id1
+        return self.session.id1
+
+    @property
+    def platform(self) -> str:
+        """用户所在平台"""
+        return self.session.platform
+
+    @property
+    def level(self) -> SessionLevel:
+        """用户会话级别"""
+        return self.session.level

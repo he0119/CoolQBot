@@ -19,7 +19,12 @@ def pytest_configure(config: pytest.Config) -> None:
 
 @pytest.fixture(scope="session", autouse=True)
 def load_plugin(nonebug_init: None) -> set["Plugin"]:
-    return nonebot.load_plugins(str(Path(__file__).parent.parent / "src" / "plugins"))
+    from nonebot.adapters.onebot.v11 import Adapter
+
+    driver = nonebot.get_driver()
+    driver.register_adapter(Adapter)
+
+    return nonebot.load_from_toml("pyproject.toml")
 
 
 @pytest.fixture
