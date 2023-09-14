@@ -1,14 +1,10 @@
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import nonebot
 import pytest
 from loguru import logger
 from nonebug import NONEBOT_INIT_KWARGS
 from nonebug.app import App
-
-if TYPE_CHECKING:
-    from nonebot.plugin import Plugin
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -18,13 +14,20 @@ def pytest_configure(config: pytest.Config) -> None:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def load_plugin(nonebug_init: None) -> set["Plugin"]:
+def load_plugin(nonebug_init: None):
     from nonebot.adapters.onebot.v11 import Adapter
 
     driver = nonebot.get_driver()
     driver.register_adapter(Adapter)
 
-    return nonebot.load_from_toml("pyproject.toml")
+    nonebot.load_plugin("nonebot_plugin_datastore")
+    nonebot.load_plugin("nonebot_plugin_apscheduler")
+    nonebot.load_plugin("nonebot_plugin_saa")
+    nonebot.load_plugin("nonebot_plugin_alconna")
+    nonebot.load_plugin("nonebot_plugin_session")
+    nonebot.load_plugin("nonebot_plugin_userinfo")
+
+    nonebot.load_plugins(str(Path(__file__).parent.parent / "src" / "plugins"))
 
 
 @pytest.fixture
