@@ -94,4 +94,4 @@ async def _(
             await set_bind(pid, platform, session.uid)
             await bind_cmd.finish("绑定成功")
     else:
-        await bind_cmd.finish("令牌无效/已过期")
+        await bind_cmd.finish("令牌不存在或已过期")
