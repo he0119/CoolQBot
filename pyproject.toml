@@ -11,17 +11,26 @@ version = "0.16.0"
 python = "^3.11"
 eorzeaenv = "^2.2.8"
 matplotlib = "^3.7.1"
+expiringdict = "^1.2.2"
 
-nonebot2 = { extras = ["httpx", "fastapi"], version = "^2.0.0" }
+nonebot2 = { extras = ["httpx", "fastapi", "websockets"], version = "^2.0.0" }
 nb-cli = "^1.2.3"
 nonebot-adapter-onebot = "2.2.4"
 onebot-qqguild-extension = "^0.1.1"
+nonebot-adapter-qqguild = "^0.2.5"
+nonebot-adapter-kaiheila = "^0.2.12"
+nonebot-adapter-red = "^0.1.0"
 
 nonebot-plugin-datastore = "^1.1.1"
 nonebot-plugin-wordcloud = "^0.5.2"
 nonebot-plugin-treehelp = "^0.3.0"
 
 nonebot-plugin-apscheduler = "^0.3.0"
+nonebot-plugin-send-anything-anywhere = "^0.3.0"
+nonebot-plugin-alconna = "^0.22.3"
+nonebot-plugin-session = "^0.1.0"
+nonebot-plugin-userinfo = "^0.1.0"
+
 nonebot-plugin-sentry = "^0.4.0"
 nonebot-plugin-memes = "0.4.7"
 nonebot-bison = "0.8.2"
@@ -36,15 +45,27 @@ pytest-mock = "^3.6.1"
 pytest-xdist = "^3.0.2"
 pytest-asyncio = "^0.21.0"
 respx = "^0.20.1"
+freezegun = "^1.2.2"
 
 [tool.nonebot]
+adapters = [
+    { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" },
+    { name = "OneBot V12", module_name = "nonebot.adapters.onebot.v12" },
+    { name = "开黑啦", module_name = "nonebot.adapters.kaiheila" },
+    { name = "QQ 频道", module_name = "nonebot.adapters.qqguild" },
+    { name = "RedProtocol", module_name = "nonebot.adapters.red" },
+]
 plugin_dirs = ["src/plugins"]
 plugins = [
     "onebot_qqguild_extension",
     "nonebot_plugin_apscheduler",
+    "nonebot_plugin_saa",
+    "nonebot_plugin_alconna",
     "nonebot_plugin_sentry",
     "nonebot_plugin_treehelp",
     "nonebot_plugin_datastore",
+    "nonebot_plugin_session",
+    "nonebot_plugin_userinfo",
     "nonebot_plugin_wordcloud",
     "nonebot_plugin_memes",
     "nonebot_bison",

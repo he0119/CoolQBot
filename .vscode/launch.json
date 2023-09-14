@@ -23,12 +23,9 @@
       "justMyCode": false
     },
     {
-      "name": "CoolQBot Test - Single",
+      "name": "Debug Unit Test",
       "type": "python",
-      "request": "launch",
-      "module": "pytest",
-      "args": ["-s", "-k", "${selectedText}"],
-      "console": "integratedTerminal",
+      "request": "test",
       "justMyCode": false
     }
   ]
