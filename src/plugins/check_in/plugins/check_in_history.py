@@ -3,21 +3,23 @@ from datetime import datetime, timezone
 from io import BytesIO
 
 import matplotlib.pyplot as plt
-from nonebot.adapters.onebot.v11 import Bot as BotV11
-from nonebot.adapters.onebot.v11 import MessageSegment as MessageSegmentV11
-from nonebot.adapters.onebot.v12 import Bot as BotV12
-from nonebot.adapters.onebot.v12 import MessageSegment as MessageSegmentV12
-from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
-from nonebot.typing import T_State
+from nonebot_plugin_alconna import (
+    Alconna,
+    AlconnaMatcher,
+    Args,
+    Image,
+    Match,
+    Text,
+    on_alconna,
+)
 from sqlalchemy import func, select
 
-from src.utils.annotated import AsyncSession, PlainTextArgs, UserInfo
-from src.utils.helpers import parse_str
+from src.plugins.user import UserSession
+from src.utils.annotated import AsyncSession
 
-from .. import check_in
-from ..helpers import ensure_user
 from ..models import BodyFatRecord, DietaryRecord, FitnessRecord, WeightRecord
+from ..utils import get_or_create_user_info
 
 __plugin_meta__ = PluginMetadata(
     name="打卡历史",
@@ -32,24 +34,24 @@ __plugin_meta__ = PluginMetadata(
 /打卡历史 D""",
     supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
-history_cmd = check_in.command("history", aliases={"打卡历史"})
+
+history_cmd = on_alconna(Alconna("打卡历史", Args["content?", str]), use_cmd_start=True)
 
 
 @history_cmd.handle()
-async def handle_first_message(state: T_State, content: PlainTextArgs):
-    state["content"] = content
+async def handle_first_message(matcher: AlconnaMatcher, content: Match[str]):
+    if content.available:
+        matcher.set_path_arg("content", content.result)
 
 
-@history_cmd.got(
+@history_cmd.got_path(
     "content",
     prompt="请问你要查询什么历史呢？请输入 A：健身 B：饮食 C：体重 D：体脂",
-    parameterless=[Depends(parse_str("content"))],
 )
 async def _(
-    bot: BotV11 | BotV12,
     session: AsyncSession,
-    user_info: UserInfo,
-    content: str = Arg(),
+    user: UserSession,
+    content: str,
 ):
     content = content.lower()
     if not content:
@@ -57,8 +59,6 @@ async def _(
 
     if content not in ["a", "b", "c", "d"]:
         await history_cmd.reject("选项不正确，请重新输入", at_sender=True)
-
-    user = await ensure_user(session, user_info)
 
     match content:
         case "a":
@@ -72,7 +72,7 @@ async def _(
             fitness_records = (
                 await session.scalars(
                     select(FitnessRecord)
-                    .where(FitnessRecord.user == user)
+                    .where(FitnessRecord.user_id == user.uid)
                     .where(FitnessRecord.time >= now)
                 )
             ).all()
@@ -86,7 +86,7 @@ async def _(
             count = (
                 await session.execute(
                     select(DietaryRecord.healthy, func.count("*"))
-                    .where(DietaryRecord.user == user)
+                    .where(DietaryRecord.user_id == user.uid)
                     .group_by(DietaryRecord.healthy)
                 )
             ).all()
@@ -101,45 +101,31 @@ async def _(
         case "c":
             weight_records = (
                 await session.scalars(
-                    select(WeightRecord).where(WeightRecord.user == user)
+                    select(WeightRecord).where(WeightRecord.user_id == user.uid)
                 )
             ).all()
             if not weight_records:
                 await history_cmd.finish("你还没有体重记录哦", at_sender=True)
 
-            msg = f"你的目标体重是 {user.target_weight or 'NaN'}kg\n"
+            user_info = await get_or_create_user_info(user, session)
+            msg = f"你的目标体重是 {user_info.target_weight or 'NaN'}kg\n"
 
             image = generate_graph(weight_records)
-            if isinstance(bot, BotV11):
-                msg += MessageSegmentV11.image(image)
-            else:
-                file_id = (
-                    await bot.upload_file(type="data", data=image, name="weight.png")
-                )["file_id"]
-                msg += MessageSegmentV12.image(file_id)
-
-            await history_cmd.finish(msg, at_sender=True)
+            await history_cmd.finish(Text(msg) + Image(raw=image), at_sender=True)
         case "d":
             body_fat_records = (
                 await session.scalars(
-                    select(BodyFatRecord).where(BodyFatRecord.user == user)
+                    select(BodyFatRecord).where(BodyFatRecord.user_id == user.uid)
                 )
             ).all()
             if not body_fat_records:
                 await history_cmd.finish("你还没有体脂记录哦", at_sender=True)
 
-            msg = f"你的目标体脂是 {user.target_body_fat or 'NaN'}%\n"
+            user_info = await get_or_create_user_info(user, session)
+            msg = f"你的目标体脂是 {user_info.target_body_fat or 'NaN'}%\n"
 
             image = generate_graph(body_fat_records)
-            if isinstance(bot, BotV11):
-                msg += MessageSegmentV11.image(image)
-            else:
-                file_id = (
-                    await bot.upload_file(type="data", data=image, name="body_fat.png")
-                )["file_id"]
-                msg += MessageSegmentV12.image(file_id)
-
-            await history_cmd.finish(msg, at_sender=True)
+            await history_cmd.finish(Text(msg) + Image(raw=image), at_sender=True)
 
 
 def generate_graph(records: Sequence[WeightRecord] | Sequence[BodyFatRecord]) -> bytes:

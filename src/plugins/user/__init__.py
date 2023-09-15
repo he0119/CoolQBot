@@ -12,7 +12,7 @@ from nonebot_plugin_alconna import (
 )
 from nonebot_plugin_session import SessionLevel
 
-from .annotated import UserSession
+from .annotated import UserSession as UserSession
 from .utils import get_user, remove_bind, set_bind
 
 user_cmd = on_alconna(Alconna("user"), use_cmd_start=True)

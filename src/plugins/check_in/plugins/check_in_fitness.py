@@ -2,11 +2,11 @@ from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
-from src.utils.annotated import AsyncSession, PlainTextArgs, UserInfo
+from src.plugins.user import UserSession
+from src.utils.annotated import AsyncSession, PlainTextArgs
 from src.utils.helpers import parse_str
 
 from .. import check_in
-from ..helpers import ensure_user
 from ..models import FitnessRecord
 
 __plugin_meta__ = PluginMetadata(
@@ -29,16 +29,14 @@ async def handle_first_message(state: T_State, content: PlainTextArgs):
 )
 async def _(
     session: AsyncSession,
-    user_info: UserInfo,
+    user: UserSession,
     content: str = Arg(),
 ):
     content = content.strip()
     if not content:
         await fitness_cmd.reject("健身内容不能为空，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, user_info)
-
-    session.add(FitnessRecord(user=user, message=content))
+    session.add(FitnessRecord(user_id=user.uid, message=content))
     await session.commit()
 
     await fitness_cmd.finish("已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True)

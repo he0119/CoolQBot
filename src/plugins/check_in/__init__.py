@@ -5,6 +5,17 @@ from pathlib import Path
 import nonebot
 from nonebot import CommandGroup, get_driver
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_datastore.db import pre_db_init
+
+
+@pre_db_init
+async def upgrade_user():
+    from nonebot_plugin_datastore.script.command import upgrade
+    from nonebot_plugin_datastore.script.utils import Config
+
+    config = Config("user")
+    await upgrade(config, "head")
+
 
 __plugin_meta__ = PluginMetadata(
     name="打卡",
