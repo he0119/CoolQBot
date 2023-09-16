@@ -5,6 +5,7 @@ import pytest
 from loguru import logger
 from nonebug import NONEBOT_INIT_KWARGS
 from nonebug.app import App
+from sqlalchemy import delete
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -54,3 +55,42 @@ def caplog(caplog):
     handler_id = logger.add(caplog.handler, format="{message}")
     yield caplog
     logger.remove(handler_id)
+
+
+@pytest.fixture
+async def default_user(app: App):
+    from nonebot_plugin_datastore import create_session
+
+    from src.plugins.user.models import Bind, User
+
+    async with create_session() as session:
+        user = User(id=1, name="nickname")
+        session.add(user)
+        bind = Bind(pid=10, platform="qq", auser=user, buser=user)
+        session.add(bind)
+        await session.commit()
+
+    # 设置 UserInfo 缓存
+    from nonebot_plugin_userinfo import UserInfo
+    from nonebot_plugin_userinfo.getter import _user_info_cache
+    from nonebot_plugin_userinfo.image_source import QQAvatar
+
+    user_info = UserInfo(
+        user_id="10",
+        user_name="nickname",
+        user_displayname="card",
+        user_remark=None,
+        user_avatar=QQAvatar(qq=10),
+        user_gender="unknown",
+    )
+    # 默认为 fake 适配器
+    _user_info_cache["qq_fake_test_10000_10_10"] = user_info
+    # 需要 onebot 11 适配器才能使用 alconna，因为其不支持 fake 适配器
+    _user_info_cache["qq_OneBot V11_test_10000_10_10"] = user_info
+
+    yield
+
+    # 清除数据库
+    async with create_session() as session, session.begin():
+        await session.execute(delete(User))
+        await session.execute(delete(Bind))

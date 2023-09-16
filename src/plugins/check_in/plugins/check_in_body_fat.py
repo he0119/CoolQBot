@@ -40,7 +40,7 @@ async def handle_first_message(
     else:
         target_body_fat = (
             await session.scalars(
-                select(UserInfo.target_weight).where(UserInfo.user_id == user.uid)
+                select(UserInfo.target_body_fat).where(UserInfo.user_id == user.uid)
             )
         ).one_or_none()
         if target_body_fat:
