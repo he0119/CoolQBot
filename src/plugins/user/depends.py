@@ -21,14 +21,11 @@ async def get_or_create_user(
         await matcher.finish("用户相关功能暂不支持当前平台")
         raise ValueError("用户相关功能暂不支持当前平台")
 
-    try:
-        user = await utils.get_user(session.id1, session.platform)
-    except ValueError:
-        user = await utils.create_user(
-            session.id1,
-            session.platform,
-            user_info and user_info.user_name or session.id1,
-        )
+    user = await utils.get_or_create_user(
+        session.id1,
+        session.platform,
+        user_info and user_info.user_name or session.id1,
+    )
 
     return user
 

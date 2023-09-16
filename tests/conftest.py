@@ -65,9 +65,13 @@ async def default_user(app: App):
 
     async with create_session() as session:
         user = User(id=1, name="nickname")
+        user2 = User(id=2, name="nickname10000")
         session.add(user)
+        session.add(user2)
         bind = Bind(pid=10, platform="qq", auser=user, buser=user)
+        bind2 = Bind(pid=10000, platform="qq", auser=user2, buser=user2)
         session.add(bind)
+        session.add(bind2)
         await session.commit()
 
     # 设置 UserInfo 缓存
@@ -83,10 +87,20 @@ async def default_user(app: App):
         user_avatar=QQAvatar(qq=10),
         user_gender="unknown",
     )
+    user_info2 = UserInfo(
+        user_id="10000",
+        user_name="nickname10000",
+        user_displayname="card10000",
+        user_remark=None,
+        user_avatar=QQAvatar(qq=10000),
+        user_gender="unknown",
+    )
     # 默认为 fake 适配器
     _user_info_cache["qq_fake_test_10000_10_10"] = user_info
+    _user_info_cache["qq_fake_test_10000_10000_10000"] = user_info2
     # 需要 onebot 11 适配器才能使用 alconna，因为其不支持 fake 适配器
     _user_info_cache["qq_OneBot V11_test_10000_10_10"] = user_info
+    _user_info_cache["qq_OneBot V11_test_10000_10000_10000"] = user_info2
 
     yield
 
