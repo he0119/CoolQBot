@@ -1,3 +1,4 @@
+import contextlib
 import random
 from collections.abc import Sequence
 from datetime import timedelta
@@ -8,6 +9,7 @@ from nonebot.adapters.onebot.v12 import Bot as OneBotV12Bot
 from nonebot.exception import ActionFailed
 from nonebot.matcher import Matcher
 from nonebot.params import Arg
+from nonebot.permission import SUPERUSER
 from nonebot.typing import T_State
 
 from .typing import Expression_T
@@ -175,3 +177,13 @@ async def get_nickname(
             return user["user_name"]
         except ActionFailed:
             pass
+
+
+def admin_permission():
+    permission = SUPERUSER
+    with contextlib.suppress(ImportError):
+        from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
+
+        permission = permission | GROUP_ADMIN | GROUP_OWNER
+
+    return permission

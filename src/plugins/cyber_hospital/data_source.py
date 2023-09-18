@@ -8,7 +8,7 @@ from .model import Patient, Record
 
 
 class Hospital:
-    async def admit_patient(self, user_id: str, group_id: str) -> None:
+    async def admit_patient(self, user_id: int, group_id: str) -> None:
         async with create_session() as session:
             statement = (
                 select(Patient)
@@ -25,7 +25,7 @@ class Hospital:
             session.add(patient)
             await session.commit()
 
-    async def discharge_patient(self, user_id: str, group_id: str) -> None:
+    async def discharge_patient(self, user_id: int, group_id: str) -> None:
         async with create_session() as session:
             statement = (
                 select(Patient)
@@ -53,19 +53,18 @@ class Hospital:
             results = await session.scalars(statement)
             return results.all()
 
-    async def get_admitted_patient(self, user_id: str, group_id: str) -> Patient | None:
+    async def get_admitted_patient(self, uid: int) -> Patient | None:
         """获取入院病人"""
         async with create_session() as session:
             statement = (
                 select(Patient)
-                .where(Patient.user_id == user_id)
-                .where(Patient.group_id == group_id)
+                .where(Patient.user_id == uid)
                 .where(Patient.discharged_at == None)
             )
             results = await session.scalars(statement)
             return results.first()
 
-    async def get_records(self, user_id: str, group_id: str) -> list[Record] | None:
+    async def get_records(self, user_id: int, group_id: str) -> list[Record] | None:
         async with create_session() as session:
             statement = (
                 select(Patient)
@@ -79,12 +78,11 @@ class Hospital:
                 raise ValueError("病人未入院")
             return patient.records
 
-    async def add_record(self, user_id: str, group_id: str, content: str) -> None:
+    async def add_record(self, uid: int, content: str) -> None:
         async with create_session() as session:
             statement = (
                 select(Patient)
-                .where(Patient.user_id == user_id)
-                .where(Patient.group_id == group_id)
+                .where(Patient.user_id == uid)
                 .where(Patient.discharged_at == None)
             )
             results = await session.scalars(statement)
@@ -96,7 +94,7 @@ class Hospital:
             session.add(record)
             await session.commit()
 
-    async def patient_count(self, group_id: str) -> Sequence[Row[tuple[str, int]]]:
+    async def patient_count(self, group_id: str) -> Sequence[Row[tuple[int, int]]]:
         """统计病人住院次数"""
         async with create_session() as session:
             statement = (
@@ -107,7 +105,7 @@ class Hospital:
             results = (await session.execute(statement)).all()
             return results
 
-    async def get_patient(self, user_id: str, group_id: str) -> Sequence[Patient]:
+    async def get_patient(self, user_id: int, group_id: str) -> Sequence[Patient]:
         """获取病人所有住院记录"""
         async with create_session() as session:
             statement = (

@@ -40,6 +40,17 @@ async def get_user(pid: str, platform: str):
         return bind.auser
 
 
+async def get_user_by_id(uid: int):
+    """通过 uid 获取账号"""
+    async with create_session() as session:
+        user = (await session.scalars(select(User).where(User.id == uid))).one_or_none()
+
+        if not user:
+            raise ValueError("找不到用户信息")
+
+        return user
+
+
 async def set_bind(pid: str, platform: str, aid: int):
     """设置账号绑定"""
     async with create_session() as session:

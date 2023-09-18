@@ -1,4 +1,3 @@
-from nonebot.matcher import Matcher
 from nonebot.params import Depends
 from nonebot_plugin_session import Session, SessionLevel, extract_session
 from nonebot_plugin_userinfo import EventUserInfo, UserInfo
@@ -8,7 +7,6 @@ from .models import UserSession
 
 
 async def get_or_create_user(
-    matcher: Matcher,
     session: Session = Depends(extract_session),
     user_info: UserInfo | None = EventUserInfo(),
 ):
@@ -18,7 +16,6 @@ async def get_or_create_user(
         or session.level == SessionLevel.LEVEL0
         or not session.id1
     ):
-        await matcher.finish("用户相关功能暂不支持当前平台")
         raise ValueError("用户相关功能暂不支持当前平台")
 
     user = await utils.get_or_create_user(
@@ -31,10 +28,9 @@ async def get_or_create_user(
 
 
 async def get_user_session(
-    matcher: Matcher,
     session: Session = Depends(extract_session),
     user_info: UserInfo | None = EventUserInfo(),
 ):
     """获取用户会话"""
-    user = await get_or_create_user(matcher, session, user_info)
+    user = await get_or_create_user(session, user_info)
     return UserSession(session, user_info, user)

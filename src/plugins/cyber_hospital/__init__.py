@@ -1,17 +1,36 @@
 """ 赛博查房 """
-from nonebot import CommandGroup
-from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, Message, MessageSegment
-from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
 from nonebot.matcher import Matcher
-from nonebot.params import Arg, ArgPlainText, CommandArg, Depends
-from nonebot.permission import SUPERUSER, USER
+from nonebot.params import ArgPlainText
+from nonebot.permission import Permission
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
+from nonebot_plugin_alconna import (
+    Alconna,
+    AlconnaMatcher,
+    Args,
+    At,
+    Option,
+    Text,
+    UniMessage,
+    on_alconna,
+)
+from nonebot_plugin_datastore.db import pre_db_init
 
-from src.utils.annotated import OptionalMentionedUser
-from src.utils.helpers import get_nickname
+from src.plugins.user import UserSession
+from src.plugins.user.utils import get_or_create_user, get_user_by_id
+from src.utils.helpers import admin_permission
 
 from .data_source import Hospital
+
+
+@pre_db_init
+async def upgrade_user():
+    from nonebot_plugin_datastore.script.command import upgrade
+    from nonebot_plugin_datastore.script.utils import Config
+
+    config = Config("user")
+    await upgrade(config, "head")
+
 
 __plugin_meta__ = PluginMetadata(
     name="赛博医院",
@@ -36,56 +55,72 @@ __plugin_meta__ = PluginMetadata(
 
 hospital_service = Hospital()
 
-hospital = CommandGroup(
-    "hospital", permission=GROUP_OWNER | GROUP_ADMIN | SUPERUSER, block=True
+hospital = on_alconna(
+    Alconna(
+        "赛博医院",
+        Option(
+            "查房",
+            Args["at?", At]["content?", str],
+        ),
+        Option("入院", Args["at?", At]),
+        Option("出院", Args["at?", At]),
+        Option("病历", Args["at?", At]),
+        Option("入院记录", Args["at?", At]),
+    ),
+    permission=admin_permission(),
+    use_cmd_start=True,
 )
 
-rounds_cmd = hospital.command("rounds", aliases={"查房", "赛博查房"})
+rounds_cmd = hospital.dispatch("查房")
 
 
-async def get_content(args: Message = CommandArg()) -> Message | None:
-    if content := args["text"]:
-        if content.extract_plain_text().strip():
-            return content
+def ensure_user(uid: int):
+    async def checker(user: UserSession):
+        if user.uid == uid:
+            return True
+        return False
+
+    return Permission(checker)
 
 
 @rounds_cmd.permission_updater
-async def _(matcher: Matcher, user_id: str = Arg(), group_id: str = Arg()):
-    if user_id and group_id:
-        return USER(f"group_{group_id}_{user_id}")
+async def _(matcher: Matcher, at_uid: int | None = None):
+    if at_uid:
+        return ensure_user(at_uid)
     return matcher.permission
 
 
 @rounds_cmd.handle()
 async def _(
-    bot: Bot,
-    event: GroupMessageEvent,
     state: T_State,
-    mentioned_user: OptionalMentionedUser,
-    content: Message | None = Depends(get_content),
+    matcher: AlconnaMatcher,
+    user: UserSession,
+    at: At | None = None,
+    content: str | None = None,
 ):
-    group_id = str(event.group_id)
-
-    if mentioned_user:
+    if at:
         if content:
-            state["content"] = content
-        state["at"] = mentioned_user.segment
-        state["user_id"] = mentioned_user.id
-        state["group_id"] = group_id
-        patient = await hospital_service.get_admitted_patient(
-            state["user_id"], state["group_id"]
+            state["content"] = UniMessage(content)
+        at_user = await get_or_create_user(
+            at.target, user.platform, at.display or at.target
         )
+        patient = await hospital_service.get_admitted_patient(at_user.id)
         if not patient:
-            await rounds_cmd.finish(state["at"] + " 未入院")
+            await rounds_cmd.finish(at + Text(" 未入院"))
+
+        matcher.set_path_arg("at_uid", at_user.id)
+        matcher.set_path_arg("at_pid", at.target)
     else:
-        patients = await hospital_service.get_admitted_patients(group_id)
+        patients = await hospital_service.get_admitted_patients(user.group_id)
         if not patients:
             await rounds_cmd.finish("当前没有住院病人")
 
         patient_infos = []
         for patient in patients:
-            nikcname = await get_nickname(bot, patient.user_id, patient.group_id)
-            patient_info = f"{nikcname} 入院时间：{patient.admitted_at:%Y-%m-%d %H:%M}"
+            # TODO: get nickname
+            # nikcname = await get_nickname(bot, patient.user_id, patient.group_id)
+            nickname = (await get_user_by_id(patient.user_id)).name
+            patient_info = f"{nickname} 入院时间：{patient.admitted_at:%Y-%m-%d %H:%M}"
             latest_record = patient.records[-1] if patient.records else None
             if latest_record:
                 patient_info += f" 上次查房时间：{latest_record.time:%Y-%m-%d %H:%M}"
@@ -96,72 +131,76 @@ async def _(
         await rounds_cmd.finish("\n".join(patient_infos))
 
 
-@rounds_cmd.got("content", prompt=Message.template("{at}请问你现在有什么不适吗？"))
-async def _(user_id: str = Arg(), group_id: str = Arg(), content: str = ArgPlainText()):
+@rounds_cmd.got("content", prompt="请问你现在有什么不适吗？")
+async def _(at_uid: int, at_pid: str, content: str = ArgPlainText()):
+    at = At("user", at_pid)
     if not content.strip():
-        await rounds_cmd.reject(MessageSegment.at(user_id) + "症状不能为空，请重新输入")
+        await rounds_cmd.reject(at + Text("症状不能为空，请重新输入"))
 
-    await hospital_service.add_record(user_id, group_id, content)
-    await rounds_cmd.finish(MessageSegment.at(user_id) + "记录成功")
+    await hospital_service.add_record(at_uid, content)
+    await rounds_cmd.finish(at + Text("记录成功"))
 
 
-admit_cmd = hospital.command("admit", aliases={"入院", "赛博入院"})
+admit_cmd = hospital.dispatch("入院")
 
 
 @admit_cmd.handle()
-async def _(
-    event: GroupMessageEvent,
-    mentioned_user: OptionalMentionedUser,
-):
-    if not mentioned_user:
+async def _(user: UserSession, at: At | None = None):
+    if not at:
         await admit_cmd.finish("请 @ 需要入院的病人")
+        raise ValueError("请 @ 需要入院的病人")
 
     try:
-        await hospital_service.admit_patient(mentioned_user.id, str(event.group_id))
-        await admit_cmd.finish(mentioned_user.segment + "入院成功")
+        at_user = await get_or_create_user(
+            at.target, user.platform, at.display or at.target
+        )
+        await hospital_service.admit_patient(at_user.id, user.group_id)
+        await admit_cmd.finish(at + Text("入院成功"))
     except ValueError:
-        await admit_cmd.finish(mentioned_user.segment + "已入院")
+        await admit_cmd.finish(at + Text("已入院"))
 
 
-discharge_cmd = hospital.command("discharge", aliases={"出院", "赛博出院"})
+discharge_cmd = hospital.dispatch("出院")
 
 
 @discharge_cmd.handle()
-async def _(
-    event: GroupMessageEvent,
-    mentioned_user: OptionalMentionedUser,
-):
-    if not mentioned_user:
+async def _(user: UserSession, at: At | None = None):
+    if not at:
         await discharge_cmd.finish("请 @ 需要出院的病人")
+        raise ValueError("请 @ 需要出院的病人")
 
     try:
-        await hospital_service.discharge_patient(mentioned_user.id, str(event.group_id))
-        await discharge_cmd.finish(mentioned_user.segment + "出院成功")
+        at_user = await get_or_create_user(
+            at.target, user.platform, at.display or at.target
+        )
+        await hospital_service.discharge_patient(at_user.id, user.group_id)
+        await discharge_cmd.finish(at + Text("出院成功"))
     except ValueError:
-        await discharge_cmd.finish(mentioned_user.segment + "未入院")
+        await discharge_cmd.finish(at + Text("未入院"))
 
 
-record_cmd = hospital.command("record", aliases={"病历", "赛博病历"})
+record_cmd = hospital.dispatch("病历")
 
 
 @record_cmd.handle()
-async def _(
-    event: GroupMessageEvent,
-    mentioned_user: OptionalMentionedUser,
-):
-    if not mentioned_user:
+async def _(user: UserSession, at: At | None = None):
+    if not at:
         await discharge_cmd.finish("请 @ 需要查看记录的病人")
+        raise ValueError("请 @ 需要查看记录的病人")
 
     try:
-        records = await hospital_service.get_records(
-            mentioned_user.id, str(event.group_id)
+        at_user = await get_or_create_user(
+            at.target, user.platform, at.display or at.target
         )
+        records = await hospital_service.get_records(at_user.id, user.group_id)
     except ValueError:
-        await record_cmd.finish(mentioned_user.segment + "未入院")
+        await record_cmd.finish(at + Text("未入院"))
+        raise ValueError("未入院")
     if not records:
-        await record_cmd.finish(mentioned_user.segment + "暂时没有记录")
+        await record_cmd.finish(at + Text("暂时没有记录"))
+        raise ValueError("暂时没有记录")
 
-    msg = mentioned_user.segment + "\n"
+    msg = at + Text("\n")
     await record_cmd.finish(
         msg
         + "\n".join(
@@ -170,35 +209,30 @@ async def _(
     )
 
 
-history_cmd = hospital.command("history", aliases={"入院记录", "赛博入院记录"})
+history_cmd = hospital.dispatch("入院记录")
 
 
 @history_cmd.handle()
-async def _(
-    bot: Bot,
-    event: GroupMessageEvent,
-    mentioned_user: OptionalMentionedUser,
-):
-    if not mentioned_user:
-        patients = await hospital_service.patient_count(str(event.group_id))
+async def _(user: UserSession, at: At | None = None):
+    if not at:
+        patients = await hospital_service.patient_count(user.group_id)
         if not patients:
             await history_cmd.finish("没有住院病人")
+            return
 
         patient_infos = []
         for user_id, count in patients:
-            nikcname = await get_nickname(
-                bot,
-                user_id,
-                str(event.group_id),
-            )
-            patient_infos.append(f"{nikcname} 入院次数：{count}")
+            nickname = (await get_user_by_id(user_id)).name
+            patient_infos.append(f"{nickname} 入院次数：{count}")
         await history_cmd.finish("\n".join(patient_infos))
+        return
 
-    patients = await hospital_service.get_patient(
-        mentioned_user.id, str(event.group_id)
+    at_user = await get_or_create_user(
+        at.target, user.platform, at.display or at.target
     )
+    patients = await hospital_service.get_patient(at_user.id, user.group_id)
     if not patients:
-        await history_cmd.finish(mentioned_user.segment + "从未入院")
+        await history_cmd.finish(UniMessage(at) + "从未入院")
 
     patient_info = []
     for patient in patients:
@@ -209,4 +243,4 @@ async def _(
             info += " 出院时间：未出院"
         patient_info.append(info)
 
-    await history_cmd.finish(mentioned_user.segment + "\n".join(patient_info))
+    await history_cmd.finish(UniMessage(at) + "\n".join(patient_info))
