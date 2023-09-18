@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from nonebot_plugin_datastore import get_plugin_data
-from nonebot_plugin_session import Session, SessionLevel
+from nonebot_plugin_session import Session, SessionIdType, SessionLevel
 from nonebot_plugin_userinfo import UserInfo
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -81,3 +81,16 @@ class UserSession:
     def level(self) -> SessionLevel:
         """用户会话级别"""
         return self.session.level
+
+    @property
+    def group_id(self) -> str:
+        """用户所在群组 ID
+
+        ID 由平台名称和平台的群组 ID 组成，例如 `qq_123456789`。
+        """
+        return self.session.get_id(
+            id_type=SessionIdType.GROUP,
+            include_platform=True,
+            include_bot_type=False,
+            include_bot_id=False,
+        )
