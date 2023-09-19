@@ -9,7 +9,6 @@ from nonebot_plugin_alconna import (
     AlconnaMatcher,
     Args,
     At,
-    Option,
     Text,
     UniMessage,
     on_alconna,
@@ -55,23 +54,11 @@ __plugin_meta__ = PluginMetadata(
 
 hospital_service = Hospital()
 
-hospital = on_alconna(
-    Alconna(
-        "赛博医院",
-        Option(
-            "查房",
-            Args["at?", At]["content?", str],
-        ),
-        Option("入院", Args["at?", At]),
-        Option("出院", Args["at?", At]),
-        Option("病历", Args["at?", At]),
-        Option("入院记录", Args["at?", At]),
-    ),
+rounds_cmd = on_alconna(
+    Alconna("查房", Args["at?", At]["content?", str]),
     permission=admin_permission(),
     use_cmd_start=True,
 )
-
-rounds_cmd = hospital.dispatch("查房")
 
 
 def ensure_user(uid: int):
@@ -131,7 +118,7 @@ async def _(
         await rounds_cmd.finish("\n".join(patient_infos))
 
 
-@rounds_cmd.got("content", prompt="请问你现在有什么不适吗？")
+@rounds_cmd.got("content", prompt=UniMessage.template("{at}请问你现在有什么不适吗？"))
 async def _(at_uid: int, at_pid: str, content: str = ArgPlainText()):
     at = At("user", at_pid)
     if not content.strip():
@@ -141,7 +128,11 @@ async def _(at_uid: int, at_pid: str, content: str = ArgPlainText()):
     await rounds_cmd.finish(at + Text("记录成功"))
 
 
-admit_cmd = hospital.dispatch("入院")
+admit_cmd = on_alconna(
+    Alconna("入院", Args["at?", At]),
+    permission=admin_permission(),
+    use_cmd_start=True,
+)
 
 
 @admit_cmd.handle()
@@ -160,7 +151,11 @@ async def _(user: UserSession, at: At | None = None):
         await admit_cmd.finish(at + Text("已入院"))
 
 
-discharge_cmd = hospital.dispatch("出院")
+discharge_cmd = on_alconna(
+    Alconna("出院", Args["at?", At]),
+    permission=admin_permission(),
+    use_cmd_start=True,
+)
 
 
 @discharge_cmd.handle()
@@ -179,7 +174,11 @@ async def _(user: UserSession, at: At | None = None):
         await discharge_cmd.finish(at + Text("未入院"))
 
 
-record_cmd = hospital.dispatch("病历")
+record_cmd = on_alconna(
+    Alconna("病历", Args["at?", At]),
+    permission=admin_permission(),
+    use_cmd_start=True,
+)
 
 
 @record_cmd.handle()
@@ -209,7 +208,11 @@ async def _(user: UserSession, at: At | None = None):
     )
 
 
-history_cmd = hospital.dispatch("入院记录")
+history_cmd = on_alconna(
+    Alconna("入院记录", Args["at?", At]),
+    permission=admin_permission(),
+    use_cmd_start=True,
+)
 
 
 @history_cmd.handle()
