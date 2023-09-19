@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from io import BytesIO
 
 import matplotlib.pyplot as plt
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import (
     Alconna,
     AlconnaMatcher,
@@ -32,7 +32,7 @@ __plugin_meta__ = PluginMetadata(
 /打卡历史 C
 查看体脂历史
 /打卡历史 D""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "user"),
 )
 
 history_cmd = on_alconna(Alconna("打卡历史", Args["content?", str]), use_cmd_start=True)

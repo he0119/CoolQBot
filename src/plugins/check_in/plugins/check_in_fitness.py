@@ -1,5 +1,5 @@
 from nonebot.params import Arg, Depends
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 
 from src.plugins.user import UserSession
@@ -14,7 +14,7 @@ __plugin_meta__ = PluginMetadata(
     description="记录健身情况",
     usage="""记录健身情况
 /健身打卡""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("user"),
 )
 fitness_cmd = check_in.command("fitness", aliases={"健身打卡"})
 

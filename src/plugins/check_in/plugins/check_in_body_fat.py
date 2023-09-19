@@ -1,5 +1,5 @@
 from nonebot.params import Arg, Depends
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 from sqlalchemy import select
 
@@ -21,7 +21,7 @@ __plugin_meta__ = PluginMetadata(
 记录体脂
 /体脂打卡
 /体制打卡 20""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("user"),
 )
 
 target_body_fat_cmd = check_in.command("body_fat", aliases={"目标体脂"})

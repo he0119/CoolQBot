@@ -1,5 +1,5 @@
 from nonebot.params import Arg, Depends
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 
 from src.plugins.user import UserSession
@@ -20,7 +20,7 @@ __plugin_meta__ = PluginMetadata(
 记录体重
 /体重打卡
 /体重打卡 60""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("user"),
 )
 target_weight_cmd = check_in.command("weight", aliases={"目标体重"})
 

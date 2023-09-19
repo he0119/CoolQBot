@@ -4,7 +4,7 @@ from pathlib import Path
 
 import nonebot
 from nonebot import CommandGroup, get_driver
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_datastore.db import pre_db_init
 
 
@@ -21,7 +21,7 @@ __plugin_meta__ = PluginMetadata(
     name="打卡",
     description="每日打卡，记录健身数据",
     usage="",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("user"),
 )
 
 check_in = CommandGroup("check_in", block=True)

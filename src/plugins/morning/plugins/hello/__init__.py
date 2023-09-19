@@ -4,7 +4,7 @@ from nonebot.adapters import Bot, Message
 from nonebot.exception import ActionFailed
 from nonebot.log import logger
 from nonebot.params import CommandArg, Depends
-from nonebot.plugin import PluginMetadata, on_command
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters, on_command
 from nonebot_plugin_saa import PlatformTarget, Text, get_target
 from nonebot_plugin_saa.utils.auto_select_bot import (
     extract_adapter_type,
@@ -30,7 +30,7 @@ __plugin_meta__ = PluginMetadata(
 /hello on
 关闭启动问候功能
 /hello off""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_saa"),
 )
 
 driver = nonebot.get_driver()

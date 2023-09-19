@@ -2,7 +2,7 @@
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText
 from nonebot.permission import Permission
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 from nonebot_plugin_alconna import (
     Alconna,
@@ -49,7 +49,7 @@ __plugin_meta__ = PluginMetadata(
 查看所有人入院次数，或指定人出入院时间
 /入院记录
 /入院记录 @病人""",
-    supported_adapters={"~onebot.v11"},
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "user"),
 )
 
 hospital_service = Hospital()
