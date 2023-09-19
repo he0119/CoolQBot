@@ -4,6 +4,7 @@ from pathlib import Path
 
 from nonebot.adapters.onebot.v11 import Bot, Message
 from nonebug import App
+from nonebug_saa import should_send_saa
 from pytest_mock import MockerFixture
 from sqlalchemy import select
 
@@ -37,6 +38,7 @@ def mocked_get(url: str, **kwargs):
 async def test_morning_enabled(app: App):
     """测试每日早安已开启的情况"""
     from nonebot_plugin_datastore import create_session
+    from nonebot_plugin_saa import TargetQQGroup
 
     from src.plugins.morning.plugins.morning_greeting import (
         MorningGreeting,
@@ -44,13 +46,7 @@ async def test_morning_enabled(app: App):
     )
 
     async with create_session() as session:
-        session.add(
-            MorningGreeting(
-                platform="qq",
-                bot_id="test",
-                group_id="10000",
-            )
-        )
+        session.add(MorningGreeting(target=TargetQQGroup(group_id=10000).dict()))
         await session.commit()
 
     async with app.test_matcher(morning_cmd) as ctx:
@@ -78,6 +74,7 @@ async def test_morning_not_enabled(app: App):
 async def test_morning_enable(app: App):
     """测试每日早安已，在群里启用的情况"""
     from nonebot_plugin_datastore import create_session
+    from nonebot_plugin_saa import TargetQQGroup
 
     from src.plugins.morning.plugins.morning_greeting import (
         MorningGreeting,
@@ -99,12 +96,13 @@ async def test_morning_enable(app: App):
     async with create_session() as session:
         groups = (await session.scalars(select(MorningGreeting))).all()
         assert len(groups) == 1
-        assert groups[0].group_id == "10000"
+        assert groups[0].saa_target == TargetQQGroup(group_id=10000)
 
 
 async def test_morning_disable(app: App):
     """测试每日早安，在群里关闭的情况"""
     from nonebot_plugin_datastore import create_session
+    from nonebot_plugin_saa import TargetQQGroup
 
     from src.plugins.morning.plugins.morning_greeting import (
         MorningGreeting,
@@ -112,13 +110,7 @@ async def test_morning_disable(app: App):
     )
 
     async with create_session() as session:
-        session.add(
-            MorningGreeting(
-                platform="qq",
-                bot_id="test",
-                group_id="10000",
-            )
-        )
+        session.add(MorningGreeting(target=TargetQQGroup(group_id=10000).dict()))
         await session.commit()
 
     async with app.test_matcher(morning_cmd) as ctx:
@@ -174,6 +166,7 @@ async def test_morning_today(app: App, mocker: MockerFixture):
 async def test_morning_push(app: App, mocker: MockerFixture):
     """测试每日早安，发送早安"""
     from nonebot_plugin_datastore import create_session
+    from nonebot_plugin_saa import MessageFactory, TargetQQGroup, Text
 
     from src.plugins.morning.plugins.morning_greeting import MorningGreeting, morning
 
@@ -182,25 +175,21 @@ async def test_morning_push(app: App, mocker: MockerFixture):
     )
     get_moring_message.return_value = Message("test")
 
+    text = Text("test")
+    mock_text = mocker.patch("src.plugins.morning.plugins.morning_greeting.Text")
+    mock_text.return_value = text
+
+    target = TargetQQGroup(group_id=10000)
     async with create_session() as session:
-        session.add(
-            MorningGreeting(
-                platform="qq",
-                bot_id="test",
-                group_id="10000",
-            )
-        )
+        session.add(MorningGreeting(target=target.dict()))
         await session.commit()
 
     async with app.test_api() as ctx:
-        ctx.create_bot(base=Bot)
+        bot = ctx.create_bot(base=Bot)
 
-        ctx.should_call_api(
-            "send_msg",
-            {"message_type": "group", "group_id": 10000, "message": Message("test")},
-            True,
-        )
+        should_send_saa(ctx, MessageFactory(text), bot, target=target)
 
         await morning()
 
     get_moring_message.assert_called_once()
+    mock_text.assert_called_once()

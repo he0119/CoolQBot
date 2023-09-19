@@ -21,12 +21,12 @@ def load_plugin(nonebug_init: None):
     driver = nonebot.get_driver()
     driver.register_adapter(Adapter)
 
-    nonebot.load_plugin("nonebot_plugin_datastore")
-    nonebot.load_plugin("nonebot_plugin_apscheduler")
-    nonebot.load_plugin("nonebot_plugin_saa")
-    nonebot.load_plugin("nonebot_plugin_alconna")
-    nonebot.load_plugin("nonebot_plugin_session")
-    nonebot.load_plugin("nonebot_plugin_userinfo")
+    nonebot.require("nonebot_plugin_datastore")
+    nonebot.require("nonebot_plugin_apscheduler")
+    nonebot.require("nonebot_plugin_saa")
+    nonebot.require("nonebot_plugin_alconna")
+    nonebot.require("nonebot_plugin_session")
+    nonebot.require("nonebot_plugin_userinfo")
 
     nonebot.load_plugins(str(Path(__file__).parent.parent / "src" / "plugins"))
 
