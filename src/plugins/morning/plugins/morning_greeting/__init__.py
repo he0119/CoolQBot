@@ -7,7 +7,7 @@ from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata, on_command
 from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_datastore import create_session
-from nonebot_plugin_saa import PlatformTarget, Text, enable_auto_select_bot, get_target
+from nonebot_plugin_saa import PlatformTarget, Text, get_target
 from sqlalchemy import select
 
 from src.utils.annotated import AsyncSession
@@ -34,8 +34,6 @@ __plugin_meta__ = PluginMetadata(
 /morning today""",
     supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
-
-enable_auto_select_bot()
 
 
 @scheduler.scheduled_job(
