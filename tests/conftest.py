@@ -14,7 +14,7 @@ def pytest_configure(config: pytest.Config) -> None:
     }
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def load_plugin(nonebug_init: None):
     from nonebot.adapters.onebot.v11 import Adapter
 
@@ -32,7 +32,7 @@ def load_plugin(nonebug_init: None):
 
 
 @pytest.fixture
-async def app(nonebug_init: None, tmp_path: Path):
+async def app(nonebug_init: None, tmp_path: Path, load_plugin):
     from nonebot_plugin_datastore.config import plugin_config
     from nonebot_plugin_datastore.db import init_db
 
