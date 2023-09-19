@@ -5,10 +5,10 @@ from sqlalchemy.orm import selectinload
 from .models import Bind, User
 
 
-async def create_user(pid: str, platform: str, nickname: str):
+async def create_user(pid: str, platform: str, name: str):
     """创建账号"""
     async with create_session() as session:
-        user = User(name=nickname)
+        user = User(name=name)
         session.add(user)
         bind = Bind(
             pid=pid,
@@ -38,6 +38,17 @@ async def get_user(pid: str, platform: str):
             raise ValueError("找不到用户信息")
 
         return bind.auser
+
+
+async def get_user_by_id(uid: int):
+    """通过 uid 获取账号"""
+    async with create_session() as session:
+        user = (await session.scalars(select(User).where(User.id == uid))).one_or_none()
+
+        if not user:
+            raise ValueError("找不到用户信息")
+
+        return user
 
 
 async def set_bind(pid: str, platform: str, aid: int):
@@ -71,3 +82,13 @@ async def remove_bind(pid: str, platform: str):
             bind.aid = bind.bid
             await db_session.commit()
             return True
+
+
+async def get_or_create_user(pid: str, platform: str, name: str):
+    """获取一个用户，如果不存在则创建"""
+    try:
+        user = await get_user(pid, platform)
+    except ValueError:
+        user = await create_user(pid, platform, name)
+
+    return user

@@ -2,15 +2,12 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from nonebot_plugin_datastore import get_plugin_data
-from nonebot_plugin_session import Session, SessionLevel
+from nonebot_plugin_session import Session, SessionIdType, SessionLevel
 from nonebot_plugin_userinfo import UserInfo
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-plugin_data = get_plugin_data()
-plugin_data.use_global_registry()
-
-Model = plugin_data.Model
+Model = get_plugin_data().Model
 
 
 class User(Model):
@@ -18,9 +15,13 @@ class User(Model):
     name: Mapped[str] = mapped_column(String(255))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    binds: Mapped[list["Bind"]] = relationship(back_populates="auser")
+    binds: Mapped[list["Bind"]] = relationship(
+        back_populates="auser", foreign_keys="[Bind.aid]"
+    )
     """当前绑定的平台"""
-    bind: Mapped["Bind"] = relationship(back_populates="buser")
+    bind: Mapped["Bind"] = relationship(
+        back_populates="buser", foreign_keys="[Bind.bid]"
+    )
     """初始时绑定的平台"""
 
 
@@ -37,12 +38,6 @@ class Bind(Model):
     """当前绑定的账号"""
     buser: Mapped[User] = relationship(back_populates="bind", foreign_keys=[bid])
     """初始时绑定的账号"""
-
-
-User.binds = relationship(
-    Bind, uselist=True, back_populates="auser", foreign_keys=[Bind.aid]
-)
-User.bind = relationship(Bind, back_populates="buser", foreign_keys=[Bind.bid])
 
 
 @dataclass
@@ -81,3 +76,16 @@ class UserSession:
     def level(self) -> SessionLevel:
         """用户会话级别"""
         return self.session.level
+
+    @property
+    def group_id(self) -> str:
+        """用户所在群组 ID
+
+        ID 由平台名称和平台的群组 ID 组成，例如 `qq_123456789`。
+        """
+        return self.session.get_id(
+            id_type=SessionIdType.GROUP,
+            include_platform=True,
+            include_bot_type=False,
+            include_bot_id=False,
+        )

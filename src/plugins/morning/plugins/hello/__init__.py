@@ -1,16 +1,19 @@
 """ 启动问候 """
 import nonebot
-from nonebot.adapters import Message
-from nonebot.adapters.onebot.v11 import Bot as V11Bot
-from nonebot.adapters.onebot.v12 import Bot as V12Bot
-from nonebot.adapters.onebot.v12 import Message as V12Message
+from nonebot.adapters import Bot, Message
 from nonebot.exception import ActionFailed
 from nonebot.log import logger
-from nonebot.params import CommandArg
-from nonebot.plugin import PluginMetadata, on_command
-from sqlalchemy import select
+from nonebot.params import CommandArg, Depends
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters, on_command
+from nonebot_plugin_saa import PlatformTarget, Text, get_target
+from nonebot_plugin_saa.utils.auto_select_bot import (
+    extract_adapter_type,
+    list_targets_map,
+)
+from sqlalchemy import or_, select
+from sqlalchemy.sql import ColumnElement
 
-from src.utils.annotated import AsyncSession, GroupInfo, Platform
+from src.utils.annotated import AsyncSession
 from src.utils.helpers import strtobool
 
 from .data_source import get_first_connect_message
@@ -27,38 +30,34 @@ __plugin_meta__ = PluginMetadata(
 /hello on
 关闭启动问候功能
 /hello off""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_saa"),
 )
 
 driver = nonebot.get_driver()
 
 
 @driver.on_bot_connect
-async def hello_on_connect(
-    bot: V11Bot | V12Bot, session: AsyncSession, platform: Platform
-) -> None:
+async def hello_on_connect(bot: Bot, session: AsyncSession) -> None:
     """启动时发送问候"""
-    groups = (
-        await session.scalars(select(Hello).where(Hello.platform == platform))
-    ).all()
+    whereclause: list[ColumnElement[bool]] = []
+    adapter_name = extract_adapter_type(bot)
+    if list_targets := list_targets_map.get(adapter_name):
+        targets = await list_targets(bot)
+        for target in targets:
+            whereclause.append(or_(Hello.target == target.dict()))
+    else:
+        logger.info(f"不支持的适配器 {adapter_name}")
+        return
+
+    groups = (await session.scalars(select(Hello).where(*whereclause))).all()
     if not groups:
         return
 
     hello_str = get_first_connect_message()
+    msg = Text(hello_str)
     for group in groups:
         try:
-            if isinstance(bot, V11Bot):
-                await bot.send_group_msg(
-                    message=hello_str, group_id=int(group.group_id)
-                )
-            else:
-                await bot.send_message(
-                    detail_type="group" if group.group_id else "channel",
-                    message=V12Message(hello_str),
-                    group_id=group.group_id,
-                    guild_id=group.guild_id,
-                    channel_id=group.channel_id,
-                )
+            await msg.send_to(group.saa_target, bot=bot)
         except ActionFailed as e:
             logger.error(f"发送启动问候失败: {e}")
     logger.info("发送首次启动的问候")
@@ -70,25 +69,19 @@ hello_cmd = on_command("hello", aliases={"问候"}, block=True)
 @hello_cmd.handle()
 async def hello_handle(
     session: AsyncSession,
-    group_info: GroupInfo,
     arg: Message = CommandArg(),
+    target: PlatformTarget = Depends(get_target),
 ):
     args = arg.extract_plain_text()
 
     group = (
-        await session.scalars(
-            select(Hello)
-            .where(Hello.platform == group_info.platform)
-            .where(Hello.group_id == group_info.group_id)
-            .where(Hello.guild_id == group_info.guild_id)
-            .where(Hello.channel_id == group_info.channel_id)
-        )
+        await session.scalars(select(Hello).where(Hello.target == target.dict()))
     ).one_or_none()
 
     if args:
         if strtobool(args):
             if not group:
-                session.add(Hello(**group_info.dict()))
+                session.add(Hello(target=target.dict()))
                 await session.commit()
             await hello_cmd.finish("已在本群开启启动问候功能")
         else:

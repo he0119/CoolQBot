@@ -27,6 +27,14 @@
       "type": "python",
       "request": "test",
       "justMyCode": false
+    },
+    {
+      "name": "Upgrade",
+      "type": "python",
+      "request": "launch",
+      "module": "nb_cli",
+      "args": ["datastore", "upgrade", "-n", "check_in"],
+      "justMyCode": false
     }
   ]
 }

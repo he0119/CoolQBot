@@ -4,7 +4,7 @@ from sqlalchemy import delete
 
 
 @pytest.fixture
-async def app(app: App):
+async def app(app: App, default_user):
     yield app
 
     # 清理数据库

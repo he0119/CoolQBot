@@ -99,37 +99,28 @@ class FFLogs:
         return token
 
     async def set_character(
-        self, platform: str, user_id: str, character_name: str, server_name: str
+        self, uid: int, character_name: str, server_name: str
     ) -> None:
         """设置角色名和服务器名"""
         async with create_session() as session:
-            user = await session.scalar(
-                select(User)
-                .where(User.platform == platform)
-                .where(User.user_id == user_id)
-            )
+            user = await session.scalar(select(User).where(User.user_id == uid))
             if user:
                 user.character_name = character_name
                 user.server_name = server_name
             else:
                 session.add(
                     User(
-                        platform=platform,
-                        user_id=user_id,
+                        user_id=uid,
                         character_name=character_name,
                         server_name=server_name,
                     )
                 )
             await session.commit()
 
-    async def get_character(self, platform: str, user_id: str) -> User | None:
+    async def get_character(self, uid: int) -> User | None:
         """获取角色名和服务器名"""
         async with create_session() as session:
-            user = await session.scalar(
-                select(User)
-                .where(User.platform == platform)
-                .where(User.user_id == user_id)
-            )
+            user = await session.scalar(select(User).where(User.user_id == uid))
             return user
 
     async def cache_data(self) -> None:

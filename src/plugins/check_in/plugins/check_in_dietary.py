@@ -1,12 +1,12 @@
 from nonebot.params import Arg, Depends
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 
-from src.utils.annotated import AsyncSession, PlainTextArgs, UserInfo
+from src.plugins.user import UserSession
+from src.utils.annotated import AsyncSession, PlainTextArgs
 from src.utils.helpers import parse_str
 
 from .. import check_in
-from ..helpers import ensure_user
 from ..models import DietaryRecord
 
 __plugin_meta__ = PluginMetadata(
@@ -14,7 +14,7 @@ __plugin_meta__ = PluginMetadata(
     description="记录饮食是否健康",
     usage="""记录饮食是否健康
 /饮食打卡""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("user"),
 )
 dietary_cmd = check_in.command("dietary", aliases={"饮食打卡"})
 
@@ -31,7 +31,7 @@ async def handle_first_message(state: T_State, content: PlainTextArgs):
 )
 async def _(
     session: AsyncSession,
-    user_info: UserInfo,
+    user: UserSession,
     content: str = Arg(),
 ):
     content = content.lower()
@@ -41,10 +41,8 @@ async def _(
     if content not in ("a", "b"):
         await dietary_cmd.reject("饮食情况只能输入 A 或 B 哦，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, user_info)
-
     healthy = content == "a"
-    session.add(DietaryRecord(user=user, healthy=healthy))
+    session.add(DietaryRecord(user_id=user.uid, healthy=healthy))
     await session.commit()
 
     if healthy:

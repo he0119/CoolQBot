@@ -4,7 +4,7 @@ from sqlalchemy import delete
 
 
 @pytest.fixture
-async def app(app: App):
+async def app(app: App, default_user):
     yield app
 
     # 清理数据库
@@ -14,12 +14,12 @@ async def app(app: App):
         BodyFatRecord,
         DietaryRecord,
         FitnessRecord,
-        User,
+        UserInfo,
         WeightRecord,
     )
 
     async with create_session() as session, session.begin():
-        await session.execute(delete(User))
+        await session.execute(delete(UserInfo))
         await session.execute(delete(WeightRecord))
         await session.execute(delete(BodyFatRecord))
         await session.execute(delete(DietaryRecord))

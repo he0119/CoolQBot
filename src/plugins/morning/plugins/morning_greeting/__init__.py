@@ -1,19 +1,16 @@
 """ 每日早安 """
-from dataclasses import asdict
 
-from nonebot import get_bot
 from nonebot.adapters import Message
-from nonebot.adapters.onebot.v11 import Bot as V11Bot
-from nonebot.adapters.onebot.v12 import Bot as V12Bot
-from nonebot.adapters.onebot.v12 import Message as V12Message
+from nonebot.exception import ActionFailed
 from nonebot.log import logger
-from nonebot.params import CommandArg
-from nonebot.plugin import PluginMetadata, on_command
+from nonebot.params import CommandArg, Depends
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters, on_command
 from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_datastore import create_session
+from nonebot_plugin_saa import PlatformTarget, Text, get_target
 from sqlalchemy import select
 
-from src.utils.annotated import AsyncSession, GroupInfo
+from src.utils.annotated import AsyncSession
 from src.utils.helpers import strtobool
 
 from ... import plugin_config
@@ -35,7 +32,7 @@ __plugin_meta__ = PluginMetadata(
 /morning update
 获取今天的问好
 /morning today""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_saa"),
 )
 
 
@@ -55,25 +52,13 @@ async def morning():
         return
 
     hello_str = await get_moring_message()
+    msg = Text(hello_str)
     for group in groups:
         try:
-            bot = get_bot(group.bot_id)
-        except ValueError:
-            logger.warning(f"Bot {group.bot_id} 不存在，跳过")
-            continue
-        group_info = GroupInfo.parse_obj(asdict(group))
-        if isinstance(bot, V11Bot):
-            await bot.send_msg(
-                message_type="group",
-                group_id=int(group_info.group_id),
-                message=hello_str,
-            )
-        elif isinstance(bot, V12Bot):
-            await bot.send_message(
-                detail_type=group_info.detail_type,
-                message=V12Message(hello_str),
-                **group_info.send_message_args,
-            )
+            await msg.send_to(group.saa_target)
+        except ActionFailed as e:
+            logger.error(f"发送早安信息失败: {e}")
+
     logger.info("发送早安信息")
 
 
@@ -82,10 +67,9 @@ morning_cmd = on_command("morning", aliases={"早安"}, block=True)
 
 @morning_cmd.handle()
 async def morning_handle(
-    bot: V11Bot | V12Bot,
     session: AsyncSession,
-    group_info: GroupInfo,
     arg: Message = CommandArg(),
+    target: PlatformTarget = Depends(get_target),
 ):
     args = arg.extract_plain_text()
 
@@ -98,18 +82,13 @@ async def morning_handle(
 
     group = (
         await session.scalars(
-            select(MorningGreeting)
-            .where(MorningGreeting.bot_id == bot.self_id)
-            .where(MorningGreeting.platform == group_info.platform)
-            .where(MorningGreeting.group_id == group_info.group_id)
-            .where(MorningGreeting.guild_id == group_info.guild_id)
-            .where(MorningGreeting.channel_id == group_info.channel_id)
+            select(MorningGreeting).where(MorningGreeting.target == target.dict())
         )
     ).one_or_none()
     if args:
         if strtobool(args):
             if not group:
-                session.add(MorningGreeting(bot_id=bot.self_id, **group_info.dict()))
+                session.add(MorningGreeting(target=target.dict()))
                 await session.commit()
             await morning_cmd.finish("已在本群开启每日早安功能")
         else:

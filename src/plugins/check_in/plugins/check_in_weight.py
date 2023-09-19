@@ -1,18 +1,14 @@
 from nonebot.params import Arg, Depends
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 
-from src.utils.annotated import (
-    AsyncSession,
-    OptionalPlainTextArgs,
-    PlainTextArgs,
-    UserInfo,
-)
+from src.plugins.user import UserSession
+from src.utils.annotated import AsyncSession, OptionalPlainTextArgs, PlainTextArgs
 from src.utils.helpers import parse_str
 
 from .. import check_in
-from ..helpers import ensure_user
 from ..models import WeightRecord
+from ..utils import get_or_create_user_info
 
 __plugin_meta__ = PluginMetadata(
     name="体重打卡",
@@ -24,7 +20,7 @@ __plugin_meta__ = PluginMetadata(
 记录体重
 /体重打卡
 /体重打卡 60""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("user"),
 )
 target_weight_cmd = check_in.command("weight", aliases={"目标体重"})
 
@@ -33,16 +29,16 @@ target_weight_cmd = check_in.command("weight", aliases={"目标体重"})
 async def _(
     state: T_State,
     session: AsyncSession,
-    user_info: UserInfo,
+    user: UserSession,
     content: OptionalPlainTextArgs,
 ):
     if content:
         state["content"] = content
     else:
-        user = await ensure_user(session, user_info)
-        if user.target_weight:
+        user_info = await get_or_create_user_info(user, session)
+        if user_info.target_weight:
             await target_weight_cmd.finish(
-                f"你的目标体重是 {user.target_weight}kg，继续努力哦～", at_sender=True
+                f"你的目标体重是 {user_info.target_weight}kg，继续努力哦～", at_sender=True
             )
 
 
@@ -51,7 +47,7 @@ async def _(
 )
 async def _(
     session: AsyncSession,
-    user_info: UserInfo,
+    user: UserSession,
     content: str = Arg(),
 ):
     content = content.strip()
@@ -62,12 +58,13 @@ async def _(
         weight = float(content)
     except ValueError:
         await target_weight_cmd.reject("目标体重只能输入数字哦，请重新输入", at_sender=True)
+        raise
 
     if weight <= 0:
         await target_weight_cmd.reject("目标体重必须大于 0kg，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, user_info)
-    user.target_weight = weight
+    user_info = await get_or_create_user_info(user, session)
+    user_info.target_weight = weight
     await session.commit()
 
     await target_weight_cmd.finish("已成功设置，你真棒哦！祝你早日达成目标～", at_sender=True)
@@ -86,7 +83,7 @@ async def _(state: T_State, content: PlainTextArgs):
 )
 async def _(
     session: AsyncSession,
-    user_info: UserInfo,
+    user: UserSession,
     content: str = Arg(),
 ):
     content = content.strip()
@@ -97,13 +94,12 @@ async def _(
         weight = float(content)
     except ValueError:
         await target_weight_cmd.reject("体重只能输入数字哦，请重新输入", at_sender=True)
+        raise
 
     if weight <= 0:
         await target_weight_cmd.reject("目标体重必须大于 0kg，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, user_info)
-
-    session.add(WeightRecord(user=user, weight=weight))
+    session.add(WeightRecord(user_id=user.uid, weight=weight))
     await session.commit()
 
     await weight_record_cmd.finish("已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True)

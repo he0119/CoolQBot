@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message, MessageSegment
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -15,17 +16,12 @@ async def test_fitness_history(
     app: App, session: "AsyncSession", mocker: MockerFixture
 ):
     """测试健身历史记录"""
-    from src.plugins.check_in.models import FitnessRecord, User
+    from src.plugins.check_in.models import FitnessRecord
     from src.plugins.check_in.plugins.check_in_history import history_cmd
 
-    user = User(platform="qq", user_id=10)
-    user2 = User(platform="qq", user_id=100)
-    session.add(user)
-    session.add(user2)
-    await session.commit()
-    session.add(FitnessRecord(user=user, time=datetime(2023, 1, 1), message="健身记录"))
-    session.add(FitnessRecord(user=user, time=datetime(2023, 2, 1), message="健身记录"))
-    session.add(FitnessRecord(user=user2, message="健身记录"))
+    session.add(FitnessRecord(user_id=1, time=datetime(2023, 1, 1), message="健身记录"))
+    session.add(FitnessRecord(user_id=1, time=datetime(2023, 2, 1), message="健身记录"))
+    session.add(FitnessRecord(user_id=2, message="健身记录"))
     await session.commit()
 
     mocked_datetime = mocker.patch(
@@ -71,18 +67,13 @@ async def test_fitness_history(
 
 async def test_dietary_history(app: App, session: "AsyncSession"):
     """测试饮食历史记录"""
-    from src.plugins.check_in.models import DietaryRecord, User
+    from src.plugins.check_in.models import DietaryRecord
     from src.plugins.check_in.plugins.check_in_history import history_cmd
 
-    user = User(platform="qq", user_id=10)
-    user2 = User(platform="qq", user_id=100)
-    session.add(user)
-    session.add(user2)
-    await session.commit()
-    session.add(DietaryRecord(user=user, time=datetime(2023, 1, 1), healthy=True))
-    session.add(DietaryRecord(user=user, time=datetime(2023, 1, 2), healthy=True))
-    session.add(DietaryRecord(user=user, time=datetime(2023, 1, 3), healthy=False))
-    session.add(DietaryRecord(user=user2, healthy=True))
+    session.add(DietaryRecord(user_id=1, time=datetime(2023, 1, 1), healthy=True))
+    session.add(DietaryRecord(user_id=1, time=datetime(2023, 1, 2), healthy=True))
+    session.add(DietaryRecord(user_id=1, time=datetime(2023, 1, 3), healthy=False))
+    session.add(DietaryRecord(user_id=2, healthy=True))
     await session.commit()
 
     async with app.test_matcher(history_cmd) as ctx:
@@ -100,7 +91,7 @@ async def test_weight_record_history(
     app: App, session: "AsyncSession", mocker: MockerFixture
 ):
     """测试体重历史记录"""
-    from src.plugins.check_in.models import User, WeightRecord
+    from src.plugins.check_in.models import WeightRecord
     from src.plugins.check_in.plugins.check_in_history import history_cmd
 
     image_url = "http://example.com"
@@ -109,19 +100,15 @@ async def test_weight_record_history(
         return_value=image_url,
     )
 
-    user = User(platform="qq", user_id=10)
-    user2 = User(platform="qq", user_id=100)
-    session.add(user)
-    session.add(user2)
-    await session.commit()
-    session.add(WeightRecord(user=user, time=datetime(2023, 1, 1), weight=50))
-    session.add(WeightRecord(user=user, time=datetime(2023, 1, 2), weight=51))
-    session.add(WeightRecord(user=user, time=datetime(2023, 1, 3), weight=52))
-    session.add(WeightRecord(user=user2, weight=40))
+    session.add(WeightRecord(user_id=1, time=datetime(2023, 1, 1), weight=50))
+    session.add(WeightRecord(user_id=1, time=datetime(2023, 1, 2), weight=51))
+    session.add(WeightRecord(user_id=1, time=datetime(2023, 1, 3), weight=52))
+    session.add(WeightRecord(user_id=2, weight=40))
     await session.commit()
 
     async with app.test_matcher(history_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/打卡历史 C"))
 
         ctx.receive_event(bot, event)
@@ -140,7 +127,7 @@ async def test_body_fat_record_history(
     app: App, session: "AsyncSession", mocker: MockerFixture
 ):
     """测试体脂历史记录"""
-    from src.plugins.check_in.models import BodyFatRecord, User
+    from src.plugins.check_in.models import BodyFatRecord
     from src.plugins.check_in.plugins.check_in_history import history_cmd
 
     image_url = "http://example.com"
@@ -149,19 +136,15 @@ async def test_body_fat_record_history(
         return_value=image_url,
     )
 
-    user = User(platform="qq", user_id=10)
-    user2 = User(platform="qq", user_id=100)
-    session.add(user)
-    session.add(user2)
-    await session.commit()
-    session.add(BodyFatRecord(user=user, time=datetime(2023, 1, 1), body_fat=50))
-    session.add(BodyFatRecord(user=user, time=datetime(2023, 1, 2), body_fat=51))
-    session.add(BodyFatRecord(user=user, time=datetime(2023, 1, 3), body_fat=52))
-    session.add(BodyFatRecord(user=user2, body_fat=40))
+    session.add(BodyFatRecord(user_id=1, time=datetime(2023, 1, 1), body_fat=50))
+    session.add(BodyFatRecord(user_id=1, time=datetime(2023, 1, 2), body_fat=51))
+    session.add(BodyFatRecord(user_id=1, time=datetime(2023, 1, 3), body_fat=52))
+    session.add(BodyFatRecord(user_id=2, body_fat=40))
     await session.commit()
 
     async with app.test_matcher(history_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/打卡历史 D"))
 
         ctx.receive_event(bot, event)

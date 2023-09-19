@@ -2,19 +2,19 @@
 
 查询副本输出数据。
 """
-from nonebot import logger
-from nonebot.adapters import Event, Message, MessageSegment
-from nonebot.adapters.onebot.v11 import Bot as V11Bot
-from nonebot.adapters.onebot.v12 import Bot as V12Bot
-from nonebot.params import CommandArg
-from nonebot.plugin import PluginMetadata
-from nonebot_plugin_datastore import get_plugin_data
-from nonebot_plugin_datastore.db import post_db_init
+from typing import Literal, cast
 
-from src.utils.annotated import OptionalMentionedUser
+from nonebot import logger
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from nonebot_plugin_alconna import Alconna, Args, At, MultiVar, Text, on_alconna
+from nonebot_plugin_datastore import get_plugin_data
+from nonebot_plugin_datastore.db import post_db_init, pre_db_init
+
+from src.plugins.user import UserSession, get_user
+from src.plugins.user.utils import get_or_create_user
 from src.utils.helpers import strtobool
 
-from ... import ff14, global_config
+from ... import global_config
 from .api import fflogs
 from .data import FFLOGS_DATA
 
@@ -38,34 +38,23 @@ __plugin_meta__ = PluginMetadata(
 /dps me 角色名 服务器名
 查询他人绑定的角色
 /dps @他人""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "user"),
 )
 
 plugin_data = get_plugin_data()
 
-fflogs_cmd = ff14.command("dps", aliases={"dps"})
+fflogs_cmd = on_alconna(
+    Alconna("dps", Args["argv", MultiVar(At | str)]),
+    use_cmd_start=True,
+)
 
 
 @fflogs_cmd.handle()
-async def fflogs_handle(
-    bot: V11Bot | V12Bot,
-    event: Event,
-    mentioned_user: OptionalMentionedUser,
-    args: Message = CommandArg(),
-):
-    user_id = event.get_user_id()
-
-    argv: list[str | MessageSegment] = list(args.extract_plain_text().split())
-    if mentioned_user:
-        argv.append(mentioned_user.segment)
-
-    if not argv:
-        await fflogs_cmd.finish(f"{__plugin_meta__.name}\n\n{__plugin_meta__.usage}")
-
+async def fflogs_handle(user: UserSession, argv: tuple[str | At, ...]):
     # 设置 Token
     if argv[0] == "token" and len(argv) == 2:
         # 检查是否是超级用户
-        if user_id not in global_config.superusers:
+        if user.pid not in global_config.superusers:
             await fflogs_cmd.finish("抱歉，你没有权限修改 Token。")
 
         await plugin_data.config.set("token", str(argv[1]))
@@ -80,7 +69,7 @@ async def fflogs_handle(
 
     if argv[0] == "token" and len(argv) == 1:
         # 检查是否是超级用户
-        if user_id not in global_config.superusers:
+        if user.pid not in global_config.superusers:
             await fflogs_cmd.finish("抱歉，你没有权限查看 Token。")
         await fflogs_cmd.finish(f"当前的 Token 为 {token}")
 
@@ -98,7 +87,7 @@ async def fflogs_handle(
                     await fflogs_cmd.finish("当前没有缓存副本。")
                 await fflogs_cmd.finish("当前缓存的副本有：\n" + "\n".join(cache_boss))
             # 检查是否是超级用户
-            if user_id not in global_config.superusers:
+            if user.pid not in global_config.superusers:
                 await fflogs_cmd.finish("抱歉，你没有权限设置缓存。")
             if strtobool(str(argv[1])):
                 if not fflogs.is_cache_enabled:
@@ -126,37 +115,41 @@ async def fflogs_handle(
             else:
                 await fflogs_cmd.finish("定时缓存关闭中")
 
-    # 获取平台信息
-    if isinstance(bot, V11Bot):
-        platform = "qq"
-    else:
-        platform = bot.platform
-
     if argv[0] == "me" and len(argv) == 1:
-        user = await fflogs.get_character(platform, user_id)
-        if not user:
+        character = await fflogs.get_character(user.uid)
+        if not character:
             await fflogs_cmd.finish(
-                "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。",
-                at_sender=True,
+                At(type="user", target=user.pid)
+                + Text("抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。")
             )
+            raise Exception("用户没有绑定角色")
+
         await fflogs_cmd.finish(
-            f"你当前绑定的角色：\n角色：{user.character_name}\n服务器：{user.server_name}",
-            at_sender=True,
+            At(type="user", target=user.pid)
+            + Text(
+                f"你当前绑定的角色：\n角色：{character.character_name}\n服务器：{character.server_name}"
+            )
         )
 
-    if isinstance(argv[0], MessageSegment) and mentioned_user and len(argv) == 1:
-        user_id = mentioned_user.id
-        user = await fflogs.get_character(platform, user_id)
-        if not user:
-            await fflogs_cmd.finish("抱歉，该用户没有绑定最终幻想14的角色。", at_sender=True)
+    if isinstance(argv[0], At) and len(argv) == 1:
+        at_user = await get_user(argv[0].target, user.platform)
+        character = await fflogs.get_character(at_user.id)
+        if not character:
+            await fflogs_cmd.finish(
+                At(type="user", target=user.pid) + Text("抱歉，该用户没有绑定最终幻想14的角色。")
+            )
+            raise Exception("用户没有绑定角色")
+
         await fflogs_cmd.finish(
-            mentioned_user.segment
-            + f"当前绑定的角色：\n角色：{user.character_name}\n服务器：{user.server_name}"
+            argv[0]
+            + Text(
+                f"当前绑定的角色：\n角色：{character.character_name}\n服务器：{character.server_name}"
+            )
         )
 
     if argv[0] == "me" and len(argv) == 3:
-        await fflogs.set_character(platform, user_id, str(argv[1]), str(argv[2]))
-        await fflogs_cmd.finish("角色绑定成功！", at_sender=True)
+        await fflogs.set_character(user.uid, str(argv[1]), str(argv[2]))
+        await fflogs_cmd.finish(At(type="user", target=user.pid) + Text("角色绑定成功！"))
 
     if argv[0] == "classes" and len(argv) == 1:
         data = await fflogs.classes()
@@ -172,21 +165,16 @@ async def fflogs_handle(
         # <BOSS名> me
         # <BOSS名> <@他人>
         # <BOSS名> <职业名>
-        if (
-            not isinstance(argv[0], MessageSegment)
-            and isinstance(argv[1], MessageSegment)
-            and mentioned_user
-        ):
+        if isinstance(argv[0], str) and isinstance(argv[1], At):
             # @他人的格式
-            data = await get_character_dps_by_user_id(
-                argv[0], platform, mentioned_user.id
-            )
+            at_user = await get_user(argv[1].target, user.platform)
+            data = await get_character_dps_by_user_id(argv[0], at_user.id)
         elif (
-            not isinstance(argv[0], MessageSegment)
+            isinstance(argv[0], str)
             and isinstance(argv[1], str)
             and argv[1].lower() == "me"
         ):
-            data = await get_character_dps_by_user_id(argv[0], platform, user_id)
+            data = await get_character_dps_by_user_id(argv[0], user.uid)
         else:
             data = await fflogs.dps(*argv)  # type:ignore
         await fflogs_cmd.finish(data)
@@ -194,19 +182,21 @@ async def fflogs_handle(
     if len(argv) == 3:
         # <BOSS名> <职业名> <DPS种类>
         # <BOSS名> <角色名> <服务器名>
-        argv[2] = str(argv[2]).lower()
-        if argv[2] in ["adps", "rdps", "pdps", "ndps"]:
-            data = await fflogs.dps(*argv)  # type:ignore
+        args = cast(tuple[str, str, str], argv)
+        dps_type = args[2].lower()
+        if dps_type in ["adps", "rdps", "pdps", "ndps"]:
+            dps_type = cast(Literal["adps", "rdps", "pdps", "ndps"], dps_type)
+            data = await fflogs.dps(args[0], args[1], dps_type)
         else:
-            data = await fflogs.character_dps(*argv)  # type:ignore
+            data = await fflogs.character_dps(args[0], args[1], args[2])
         await fflogs_cmd.finish(data)
 
     await fflogs_cmd.finish(f"{__plugin_meta__.name}\n\n{__plugin_meta__.usage}")
 
 
-async def get_character_dps_by_user_id(boss_nickname: str, platform: str, user_id: str):
+async def get_character_dps_by_user_id(boss_nickname: str, uid: int):
     """通过 BOSS 名称和 QQ 号来获取角色的 DPS 数据"""
-    user = await fflogs.get_character(platform, user_id)
+    user = await fflogs.get_character(uid)
     if not user:
         return "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me <角色名> <服务器名>\n绑定自己的角色。"
     return await fflogs.character_dps(
@@ -222,6 +212,16 @@ async def data_migration():
         logger.info("正在迁移数据")
         characters = get_plugin_data("ff14").load_pkl("characters.pkl")
         for user_id, character in characters.items():
-            await fflogs.set_character("qq", user_id, character[0], character[1])
+            user = await get_or_create_user(user_id, "qq", user_id)
+            await fflogs.set_character(user.id, character[0], character[1])
         file_path.rename(file_path.with_suffix(".pkl.bak"))
         logger.info("数据迁移完成")
+
+
+@pre_db_init
+async def upgrade_user():
+    from nonebot_plugin_datastore.script.command import upgrade
+    from nonebot_plugin_datastore.script.utils import Config
+
+    config = Config("user")
+    await upgrade(config, "head")

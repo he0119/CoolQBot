@@ -2,6 +2,7 @@ import random
 from typing import cast
 
 from expiringdict import ExpiringDict
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import (
     Alconna,
     AlconnaQuery,
@@ -12,8 +13,22 @@ from nonebot_plugin_alconna import (
 )
 from nonebot_plugin_session import SessionLevel
 
-from .annotated import UserSession
+from .annotated import UserSession as UserSession
 from .utils import get_user, remove_bind, set_bind
+
+__plugin_meta__ = PluginMetadata(
+    name="用户",
+    description="管理和绑定不同平台的用户",
+    usage="""查看用户信息
+/user
+绑定用户
+/bind
+解除绑定
+/bind -r""",
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_alconna", "nonebot_plugin_session", "nonebot_plugin_userinfo"
+    ),
+)
 
 user_cmd = on_alconna(Alconna("user"), use_cmd_start=True)
 

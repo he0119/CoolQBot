@@ -1,19 +1,19 @@
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, cast
-from unittest.mock import AsyncMock
+from typing import Any
 
 import httpx
 import pytest
 import respx
-from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message, MessageSegment
 from nonebug import App
 from pytest_mock import MockerFixture
 from respx import MockRouter
 from sqlalchemy import delete
 
-from tests.fake import fake_channel_message_event_v12, fake_group_message_event_v11
+from tests.fake import fake_group_message_event_v11
 
 
 @pytest.fixture
@@ -82,37 +82,6 @@ async def test_dps_missing_token(app: App):
         ctx.should_finished(fflogs_cmd)
 
 
-async def test_dps_help(app: App):
-    """测试 FFLOGS，直接发送 /dps 命令的情况"""
-    from src.plugins.ff14.plugins.ff14_fflogs import (
-        __plugin_meta__,
-        fflogs_cmd,
-        plugin_data,
-    )
-
-    await plugin_data.config.set("token", "test")
-
-    async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/dps"))
-
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(
-            event, f"{__plugin_meta__.name}\n\n{__plugin_meta__.usage}", True
-        )
-        ctx.should_finished(fflogs_cmd)
-
-    async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/dps test"))
-
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(
-            event, f"{__plugin_meta__.name}\n\n{__plugin_meta__.usage}", True
-        )
-        ctx.should_finished(fflogs_cmd)
-
-
 async def test_dps_cache(app: App):
     """测试 FFLOGS，设置缓存的情况"""
     from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_data
@@ -176,21 +145,23 @@ async def test_dps_bind(app: App):
 
     # 查询自己的绑定角色
     async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps me"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。",
+            MessageSegment.at(10)
+            + "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。",
             True,
-            at_sender=True,
         )
         ctx.should_finished(fflogs_cmd)
 
     # 查询别人的绑定角色
     async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
             message=Message("/dps" + MessageSegment.at(10))
         )
@@ -198,44 +169,45 @@ async def test_dps_bind(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "抱歉，该用户没有绑定最终幻想14的角色。",
+            MessageSegment.at(10) + "抱歉，该用户没有绑定最终幻想14的角色。",
             True,
-            at_sender=True,
         )
         ctx.should_finished(fflogs_cmd)
 
     # 绑定角色
     async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps me name server"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "角色绑定成功！", True, at_sender=True)
+        ctx.should_call_send(event, MessageSegment.at(10) + "角色绑定成功！", True)
         ctx.should_finished(fflogs_cmd)
 
     # 再次查询
     async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps me"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "你当前绑定的角色：\n角色：name\n服务器：server",
+            MessageSegment.at(10) + "你当前绑定的角色：\n角色：name\n服务器：server",
             True,
-            at_sender=True,
         )
         ctx.should_finished(fflogs_cmd)
 
     async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
             message=Message("/dps" + MessageSegment.at(10))
         )
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
-            event, MessageSegment.at(10) + "当前绑定的角色：\n角色：name\n服务器：server", ""
+            event, MessageSegment.at(10) + "当前绑定的角色：\n角色：name\n服务器：server", True
         )
         ctx.should_finished(fflogs_cmd)
 
@@ -251,7 +223,7 @@ async def test_dps_character_rankings(
     from src.plugins.ff14.plugins.ff14_fflogs import fflogs, fflogs_cmd, plugin_data
 
     await plugin_data.config.set("token", "test")
-    await fflogs.set_character("qq", "10", "name", "server")
+    await fflogs.set_character(1, "name", "server")
 
     fflogs_data_mock = respx_mock.get(
         "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json"
@@ -305,52 +277,6 @@ async def test_dps_character_rankings(
     assert user_dps_mock.call_count == 3
 
 
-async def test_dps_character_rankings_channel(app: App, mocker: MockerFixture):
-    """测试角色排行榜，onebot v12 频道"""
-    from nonebot.adapters.onebot.v12 import Bot, Message, MessageSegment
-
-    from src.plugins.ff14.plugins.ff14_fflogs import fflogs, fflogs_cmd, plugin_data
-
-    await plugin_data.config.set("token", "test")
-    await fflogs.set_character("qq", "10000", "name", "server")
-
-    async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot, platform="qq", impl="test")
-        event = fake_channel_message_event_v12(
-            message=Message("/dps" + MessageSegment.mention("10000"))
-        )
-
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(
-            event,
-            MessageSegment.mention("10000") + "当前绑定的角色：\n角色：name\n服务器：server",
-            "",
-        )
-        ctx.should_finished(fflogs_cmd)
-
-    mock = mocker.patch(
-        "src.plugins.ff14.plugins.ff14_fflogs.get_character_dps_by_user_id"
-    )
-    mock = cast(AsyncMock, mock)
-
-    async def test(a, b, c):
-        return "test"
-
-    mock.side_effect = test
-
-    async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot, platform="qq", impl="test")
-        event = fake_channel_message_event_v12(
-            message=Message("/dps e1s" + MessageSegment.mention("10000"))
-        )
-
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "test", "")
-        ctx.should_finished(fflogs_cmd)
-
-    mock.assert_awaited_once_with("e1s", "qq", "10000")
-
-
 async def test_dps_character_rankings_not_bind(app: App):
     """测试 @ 用户，但没有绑定角色"""
     from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_data
@@ -358,7 +284,8 @@ async def test_dps_character_rankings_not_bind(app: App):
     await plugin_data.config.set("token", "test")
 
     async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
             message=Message("/dps" + MessageSegment.at(10000))
         )
@@ -366,9 +293,8 @@ async def test_dps_character_rankings_not_bind(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "抱歉，该用户没有绑定最终幻想14的角色。",
+            MessageSegment.at(10) + "抱歉，该用户没有绑定最终幻想14的角色。",
             True,
-            at_sender=True,
         )
         ctx.should_finished(fflogs_cmd)
 
@@ -383,7 +309,7 @@ async def test_dps_update_data(
     from src.plugins.ff14.plugins.ff14_fflogs import fflogs, fflogs_cmd, plugin_data
 
     await plugin_data.config.set("token", "test")
-    await fflogs.set_character("qq", "10000", "name", "server")
+    await fflogs.set_character(2, "name", "server")
 
     fflogs_data_mock = respx_mock.get(
         "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json"

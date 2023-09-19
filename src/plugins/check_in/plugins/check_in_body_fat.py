@@ -1,18 +1,15 @@
 from nonebot.params import Arg, Depends
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
+from sqlalchemy import select
 
-from src.utils.annotated import (
-    AsyncSession,
-    OptionalPlainTextArgs,
-    PlainTextArgs,
-    UserInfo,
-)
+from src.plugins.user import UserSession
+from src.utils.annotated import AsyncSession, OptionalPlainTextArgs, PlainTextArgs
 from src.utils.helpers import parse_str
 
 from .. import check_in
-from ..helpers import ensure_user
-from ..models import BodyFatRecord
+from ..models import BodyFatRecord, UserInfo
+from ..utils import get_or_create_user_info
 
 __plugin_meta__ = PluginMetadata(
     name="体脂打卡",
@@ -24,7 +21,7 @@ __plugin_meta__ = PluginMetadata(
 记录体脂
 /体脂打卡
 /体制打卡 20""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("user"),
 )
 
 target_body_fat_cmd = check_in.command("body_fat", aliases={"目标体脂"})
@@ -34,17 +31,21 @@ target_body_fat_cmd = check_in.command("body_fat", aliases={"目标体脂"})
 async def handle_first_message(
     state: T_State,
     session: AsyncSession,
-    user_info: UserInfo,
+    user: UserSession,
     content: OptionalPlainTextArgs,
 ):
     """目标体脂"""
     if content:
         state["content"] = content
     else:
-        user = await ensure_user(session, user_info)
-        if user.target_body_fat:
+        target_body_fat = (
+            await session.scalars(
+                select(UserInfo.target_body_fat).where(UserInfo.user_id == user.uid)
+            )
+        ).one_or_none()
+        if target_body_fat:
             await target_body_fat_cmd.finish(
-                f"你的目标体脂是 {user.target_body_fat}%，继续努力哦～", at_sender=True
+                f"你的目标体脂是 {target_body_fat}%，继续努力哦～", at_sender=True
             )
 
 
@@ -53,7 +54,7 @@ async def handle_first_message(
 )
 async def _(
     session: AsyncSession,
-    user_info: UserInfo,
+    user: UserSession,
     content: str = Arg(),
 ):
     """目标体脂"""
@@ -64,12 +65,13 @@ async def _(
         body_fat = float(content)
     except ValueError:
         await target_body_fat_cmd.reject("目标体脂只能输入数字哦，请重新输入", at_sender=True)
+        raise
 
     if body_fat < 0 or body_fat > 100:
         await target_body_fat_cmd.reject("目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, user_info)
-    user.target_body_fat = body_fat
+    user_info = await get_or_create_user_info(user, session)
+    user_info.target_body_fat = body_fat
     await session.commit()
 
     await target_body_fat_cmd.finish("已成功设置，你真棒哦！祝你早日达成目标～", at_sender=True)
@@ -89,7 +91,7 @@ async def _(state: T_State, content: PlainTextArgs):
 )
 async def _(
     session: AsyncSession,
-    user_info: UserInfo,
+    user: UserSession,
     content: str = Arg(),
 ):
     """记录体脂"""
@@ -100,13 +102,12 @@ async def _(
         body_fat = float(content)
     except ValueError:
         await body_fat_record_cmd.reject("体脂只能输入数字哦，请重新输入", at_sender=True)
+        raise
 
     if body_fat < 0 or body_fat > 100:
         await target_body_fat_cmd.reject("目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True)
 
-    user = await ensure_user(session, user_info)
-
-    session.add(BodyFatRecord(user=user, body_fat=body_fat))
+    session.add(BodyFatRecord(user_id=user.uid, body_fat=body_fat))
     await session.commit()
 
     await body_fat_record_cmd.finish("已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True)
