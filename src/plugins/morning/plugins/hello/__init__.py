@@ -46,6 +46,9 @@ async def hello_on_connect(bot: Bot, session: AsyncSession) -> None:
     adapter_name = extract_adapter_type(bot)
     if list_targets := list_targets_map.get(adapter_name):
         targets = await list_targets(bot)
+        if not targets:
+            logger.info(f"没有找到适配器 {adapter_name} 支持的发送目标")
+            return
         for target in targets:
             whereclause.append(or_(Hello.target == target.dict()))
     else:
