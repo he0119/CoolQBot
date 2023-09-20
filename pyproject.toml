@@ -58,6 +58,14 @@ adapters = [
 ]
 plugin_dirs = ["src/plugins"]
 plugins = [
+    "onebot_qqguild_extension",
+    "nonebot_plugin_apscheduler",
+    "nonebot_plugin_saa",
+    "nonebot_plugin_alconna",
+    "nonebot_plugin_datastore",
+    "nonebot_plugin_session",
+    "nonebot_plugin_userinfo",
+    "src.user",
     "nonebot_plugin_sentry",
     "nonebot_plugin_treehelp",
     "nonebot_plugin_wordcloud",

@@ -18,19 +18,6 @@ driver.register_adapter(QQGuildAdapter)
 driver.register_adapter(RedAdapter)
 
 # 加载插件
-nonebot.load_all_plugins(
-    [
-        "onebot_qqguild_extension",
-        "nonebot_plugin_apscheduler",
-        "nonebot_plugin_saa",
-        "nonebot_plugin_alconna",
-        "nonebot_plugin_datastore",
-        "nonebot_plugin_session",
-        "nonebot_plugin_userinfo",
-        "src.user",
-    ],
-    [],
-)
 nonebot.load_from_toml("pyproject.toml")
 
 if __name__ == "__main__":
