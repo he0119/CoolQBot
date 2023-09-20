@@ -2,7 +2,7 @@ from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 
-from src.plugins.user import UserSession
+from src.user import UserSession
 from src.utils.annotated import AsyncSession, PlainTextArgs
 from src.utils.helpers import parse_str
 

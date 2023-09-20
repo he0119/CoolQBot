@@ -8,9 +8,9 @@ from tests.fake import fake_private_message_event_v11
 
 async def test_bind_private(app: App, patch_current_time, mocker: MockerFixture):
     """私聊绑定用户"""
-    from src.plugins.user import bind_cmd, user_cmd
+    from src.user import bind_cmd, user_cmd
 
-    mocked_random = mocker.patch("src.plugins.user.random.randint")
+    mocked_random = mocker.patch("src.user.random.randint")
     mocked_random.return_value = 123456
 
     with patch_current_time("2023-09-14 10:46:10.416389", tick=False):
@@ -111,9 +111,9 @@ async def test_bind_private_invalid_token(
     app: App, patch_current_time, mocker: MockerFixture
 ):
     """私聊绑定用户，无效的令牌"""
-    from src.plugins.user import bind_cmd, user_cmd
+    from src.user import bind_cmd, user_cmd
 
-    mocked_random = mocker.patch("src.plugins.user.random.randint")
+    mocked_random = mocker.patch("src.user.random.randint")
     mocked_random.return_value = 123456
 
     with patch_current_time("2023-09-14 10:46:10.416389", tick=False):

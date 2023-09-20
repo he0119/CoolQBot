@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from src.plugins.user import UserSession
+from src.user import UserSession
 from src.utils.annotated import AsyncSession
 
 from .models import UserInfo

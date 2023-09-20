@@ -15,7 +15,7 @@ from nonebot_plugin_alconna import (
 )
 from sqlalchemy import func, select
 
-from src.plugins.user import UserSession
+from src.user import UserSession
 from src.utils.annotated import AsyncSession
 
 from ..models import BodyFatRecord, DietaryRecord, FitnessRecord, WeightRecord

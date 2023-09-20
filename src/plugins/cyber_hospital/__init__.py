@@ -1,8 +1,4 @@
 """ 赛博查房 """
-from nonebot import require
-
-require("nonebot_plugin_alconna")
-require("src.plugins.user")
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText
 from nonebot.permission import Permission
@@ -19,8 +15,8 @@ from nonebot_plugin_alconna import (
 )
 from nonebot_plugin_datastore.db import pre_db_init
 
-from src.plugins.user import UserSession
-from src.plugins.user.utils import get_or_create_user, get_user_by_id
+from src.user import UserSession
+from src.user.utils import get_or_create_user, get_user_by_id
 from src.utils.helpers import admin_permission
 
 from .data_source import Hospital

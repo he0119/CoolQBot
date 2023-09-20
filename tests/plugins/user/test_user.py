@@ -7,7 +7,7 @@ from tests.fake import fake_group_message_event_v11, fake_private_message_event_
 
 async def test_user(app: App, patch_current_time):
     """获取用户信息"""
-    from src.plugins.user import user_cmd
+    from src.user import user_cmd
 
     with patch_current_time("2023-09-14 10:46:10.416389", tick=False):
         async with app.test_matcher(user_cmd) as ctx:

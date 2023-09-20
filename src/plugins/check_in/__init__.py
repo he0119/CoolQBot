@@ -2,7 +2,7 @@
 """
 from nonebot import require
 
-require("src.plugins.user")
+require("src.user")
 from pathlib import Path
 
 import nonebot

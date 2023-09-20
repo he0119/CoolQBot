@@ -27,12 +27,13 @@ def load_plugin(nonebug_init: None):
     nonebot.require("nonebot_plugin_alconna")
     nonebot.require("nonebot_plugin_session")
     nonebot.require("nonebot_plugin_userinfo")
+    nonebot.require("src.user")
 
     nonebot.load_plugins(str(Path(__file__).parent.parent / "src" / "plugins"))
 
 
 @pytest.fixture
-async def app(nonebug_init: None, tmp_path: Path, load_plugin):
+async def app(tmp_path: Path, load_plugin):
     from nonebot_plugin_datastore.config import plugin_config
     from nonebot_plugin_datastore.db import init_db
 
@@ -61,7 +62,7 @@ def caplog(caplog):
 async def default_user(app: App):
     from nonebot_plugin_datastore import create_session
 
-    from src.plugins.user.models import Bind, User
+    from src.user.models import Bind, User
 
     async with create_session() as session:
         user = User(id=1, name="nickname")

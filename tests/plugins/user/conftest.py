@@ -19,7 +19,7 @@ async def app(app: App):
     # 清理数据库
     from nonebot_plugin_datastore.db import create_session
 
-    from src.plugins.user.models import Bind, User
+    from src.user.models import Bind, User
 
     async with create_session() as session, session.begin():
         await session.execute(delete(Bind))
@@ -37,7 +37,7 @@ async def session(app: App):
 # https://stackoverflow.com/questions/29116718/how-to-mocking-created-time-in-sqlalchemy
 @contextmanager
 def patch_time(time_to_freeze, tick=True):
-    from src.plugins.user.models import User
+    from src.user.models import User
 
     with freeze_time(time_to_freeze, tick=tick) as frozen_time:
 

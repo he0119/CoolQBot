@@ -8,9 +8,9 @@ from tests.fake import fake_group_message_event_v11
 
 async def test_bind_group(app: App, patch_current_time, mocker: MockerFixture):
     """群聊绑定用户"""
-    from src.plugins.user import bind_cmd, user_cmd
+    from src.user import bind_cmd, user_cmd
 
-    mocked_random = mocker.patch("src.plugins.user.random.randint")
+    mocked_random = mocker.patch("src.user.random.randint")
     mocked_random.return_value = 123456
 
     with patch_current_time("2023-09-14 10:46:10.416389", tick=False):
@@ -128,9 +128,9 @@ async def test_bind_group_different_user(
     app: App, patch_current_time, mocker: MockerFixture
 ):
     """群聊绑定用户，不是最开始发送绑定命令的用户"""
-    from src.plugins.user import bind_cmd, user_cmd
+    from src.user import bind_cmd, user_cmd
 
-    mocked_random = mocker.patch("src.plugins.user.random.randint")
+    mocked_random = mocker.patch("src.user.random.randint")
     mocked_random.return_value = 123456
 
     with patch_current_time("2023-09-14 10:46:10.416389", tick=False):

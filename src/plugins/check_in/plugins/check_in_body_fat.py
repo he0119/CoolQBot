@@ -3,7 +3,7 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 from sqlalchemy import select
 
-from src.plugins.user import UserSession
+from src.user import UserSession
 from src.utils.annotated import AsyncSession, OptionalPlainTextArgs, PlainTextArgs
 from src.utils.helpers import parse_str
 

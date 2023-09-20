@@ -2,10 +2,6 @@
 
 查询副本输出数据。
 """
-from nonebot import require
-
-require("nonebot_plugin_alconna")
-require("src.plugins.user")
 from typing import Literal, cast
 
 from nonebot import logger
@@ -14,8 +10,8 @@ from nonebot_plugin_alconna import Alconna, Args, At, MultiVar, Text, on_alconna
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_datastore.db import post_db_init, pre_db_init
 
-from src.plugins.user import UserSession, get_user
-from src.plugins.user.utils import get_or_create_user
+from src.user import UserSession, get_user
+from src.user.utils import get_or_create_user
 from src.utils.helpers import strtobool
 
 from ... import global_config
