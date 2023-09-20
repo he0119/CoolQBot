@@ -2,6 +2,10 @@
 
 查询副本输出数据。
 """
+from nonebot import require
+
+require("nonebot_plugin_alconna")
+require("src.plugins.user")
 from typing import Literal, cast
 
 from nonebot import logger

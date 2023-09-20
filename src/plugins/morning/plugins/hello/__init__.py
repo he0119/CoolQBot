@@ -1,4 +1,7 @@
 """ 启动问候 """
+from nonebot import require
+
+require("nonebot_plugin_saa")
 import nonebot
 from nonebot.adapters import Bot, Message
 from nonebot.exception import ActionFailed

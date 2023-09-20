@@ -1,5 +1,8 @@
 """ 打卡插件
 """
+from nonebot import require
+
+require("src.plugins.user")
 from pathlib import Path
 
 import nonebot

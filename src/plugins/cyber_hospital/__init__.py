@@ -1,4 +1,8 @@
 """ 赛博查房 """
+from nonebot import require
+
+require("nonebot_plugin_alconna")
+require("src.plugins.user")
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText
 from nonebot.permission import Permission

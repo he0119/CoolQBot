@@ -1,3 +1,8 @@
+from nonebot import require
+
+require("nonebot_plugin_alconna")
+require("nonebot_plugin_session")
+require("nonebot_plugin_userinfo")
 import random
 from typing import cast
 

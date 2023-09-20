@@ -1,5 +1,7 @@
 """ 每日早安 """
+from nonebot import require
 
+require("nonebot_plugin_saa")
 from nonebot.adapters import Message
 from nonebot.exception import ActionFailed
 from nonebot.log import logger
