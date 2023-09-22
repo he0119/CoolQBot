@@ -2118,23 +2118,19 @@ name = "nonebot-plugin-user"
 version = "0.0.1"
 description = "适用于 Nonebot2 的用户插件"
 optional = false
-python-versions = "^3.8"
-files = []
-develop = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "nonebot_plugin_user-0.0.1-py3-none-any.whl", hash = "sha256:c0938e668fd3b61ddb23a17406bac346d5a43e569aaeef4ec1b4d7dd756bb789"},
+    {file = "nonebot_plugin_user-0.0.1.tar.gz", hash = "sha256:875f479409737b854466c233ce3fc8c034faa6ab9aff7b426deb5c921afb58c6"},
+]
 
 [package.dependencies]
-expiringdict = "^1.2.2"
-nonebot-plugin-alconna = "^0.24.0"
-nonebot-plugin-datastore = "^1.1.2"
-nonebot-plugin-session = "^0.1.0"
-nonebot-plugin-userinfo = "^0.1.0"
-nonebot2 = "^2.1.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/he0119/nonebot-plugin-user.git"
-reference = "HEAD"
-resolved_reference = "dce8d6c437cdaf457115ee0fac207ecd5b91f1d3"
+expiringdict = ">=1.2.2,<2.0.0"
+nonebot-plugin-alconna = ">=0.24.0,<0.25.0"
+nonebot-plugin-datastore = ">=1.1.2,<2.0.0"
+nonebot-plugin-session = ">=0.1.0,<0.2.0"
+nonebot-plugin-userinfo = ">=0.1.0,<0.2.0"
+nonebot2 = ">=2.1.0,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-userinfo"
@@ -4007,4 +4003,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "1b907f27a1fddccaaf105ed117b69dcf89849dbb6320f41e34d76243f2c53606"
+content-hash = "7ef97210f0f544c92e5d0e998a0f356e9c5f0d892913965406c01d04502b5945"

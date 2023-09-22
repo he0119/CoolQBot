@@ -24,7 +24,7 @@ nonebot-adapter-red = "^0.4.1"
 nonebot-plugin-datastore = "^1.1.2"
 nonebot-plugin-wordcloud = "^0.5.2"
 nonebot-plugin-treehelp = "^0.3.0"
-nonebot-plugin-user = { git = "https://github.com/he0119/nonebot-plugin-user.git" }
+nonebot-plugin-user = "^0.0.1"
 
 nonebot-plugin-apscheduler = "^0.3.0"
 nonebot-plugin-send-anything-anywhere = "^0.3.0"
