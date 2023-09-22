@@ -48,8 +48,8 @@ def upgrade() -> None:
     Base.prepare(op.get_bind())
 
     FF14User = Base.classes.ff14_fflogs_user
-    User = Base.classes.user_user
-    Bind = Base.classes.user_bind
+    User = Base.classes.nonebot_plugin_user_user
+    Bind = Base.classes.nonebot_plugin_user_bind
     with Session(op.get_bind()) as session:
         users = session.scalars(sa.select(FF14User)).all()
         for user in users:

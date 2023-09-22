@@ -1,6 +1,6 @@
+from nonebot_plugin_user import UserSession
 from sqlalchemy import select
 
-from src.user import UserSession
 from src.utils.annotated import AsyncSession
 
 from .models import UserInfo

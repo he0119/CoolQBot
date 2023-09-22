@@ -14,9 +14,9 @@ from nonebot_plugin_alconna import (
     on_alconna,
 )
 from nonebot_plugin_datastore.db import pre_db_init
+from nonebot_plugin_user import UserSession
+from nonebot_plugin_user.utils import get_or_create_user, get_user_by_id
 
-from src.user import UserSession
-from src.user.utils import get_or_create_user, get_user_by_id
 from src.utils.helpers import admin_permission
 
 from .data_source import Hospital
@@ -27,7 +27,7 @@ async def upgrade_user():
     from nonebot_plugin_datastore.script.command import upgrade
     from nonebot_plugin_datastore.script.utils import Config
 
-    config = Config("user")
+    config = Config("nonebot_plugin_user")
     await upgrade(config, "head")
 
 
@@ -49,7 +49,9 @@ __plugin_meta__ = PluginMetadata(
 查看所有人入院次数，或指定人出入院时间
 /入院记录
 /入院记录 @病人""",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "user"),
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_alconna", "nonebot_plugin_user"
+    ),
 )
 
 hospital_service = Hospital()

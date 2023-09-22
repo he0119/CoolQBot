@@ -1,9 +1,9 @@
 from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
+from nonebot_plugin_user import UserSession
 from sqlalchemy import select
 
-from src.user import UserSession
 from src.utils.annotated import AsyncSession, OptionalPlainTextArgs, PlainTextArgs
 from src.utils.helpers import parse_str
 
@@ -21,7 +21,7 @@ __plugin_meta__ = PluginMetadata(
 记录体脂
 /体脂打卡
 /体制打卡 20""",
-    supported_adapters=inherit_supported_adapters("user"),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_user"),
 )
 
 target_body_fat_cmd = check_in.command("body_fat", aliases={"目标体脂"})
