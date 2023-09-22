@@ -1738,13 +1738,13 @@ files = [
 
 [[package]]
 name = "nb-cli"
-version = "1.2.4"
+version = "1.2.5"
 description = "CLI for nonebot2"
 optional = false
 python-versions = ">=3.8, <4.0"
 files = [
-    {file = "nb-cli-1.2.4.tar.gz", hash = "sha256:5af5dd5967716ccf939a2927f8067f4b320692c399e059f8952c7b22240690c9"},
-    {file = "nb_cli-1.2.4-py3-none-any.whl", hash = "sha256:714b0a0c731b2f5e9ddedd41d5f983c9f61def6956d137a2e1e040107ae61d3a"},
+    {file = "nb-cli-1.2.5.tar.gz", hash = "sha256:8c32e72a64e943239e73aaddb8e682226d0797823f5e6998ce048469be351310"},
+    {file = "nb_cli-1.2.5-py3-none-any.whl", hash = "sha256:8261a8f4714acacb7072f30bb3444bc533e883731dd82f5e929de88fc1a3c838"},
 ]
 
 [package.dependencies]
@@ -1759,7 +1759,7 @@ pydantic = ">=1.9,<2.0"
 pyfiglet = ">=0.8.post1,<1.0.0"
 tomlkit = ">=0.10,<1.0"
 typing-extensions = ">=4.4,<5.0"
-virtualenv = ">=20.17.1,<20.18.0"
+virtualenv = ">=20.21,<21.0"
 watchfiles = ">=0.16,<1.0"
 wcwidth = ">=0.2,<1.0"
 
@@ -1825,13 +1825,13 @@ pydantic = ">=1.9.0,<2.0.0"
 
 [[package]]
 name = "nonebot-adapter-red"
-version = "0.4.1"
+version = "0.4.2"
 description = "Red Protocol Adapter for Nonebot2"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "nonebot_adapter_red-0.4.1-py3-none-any.whl", hash = "sha256:dd80d19490a2f74d3feb677852733111215f17b194302b58396159154b1d7fbb"},
-    {file = "nonebot_adapter_red-0.4.1.tar.gz", hash = "sha256:f5e15a10de1b8bbcdba5f17926bec87b233112bd34279da6f74a64b0e436461e"},
+    {file = "nonebot_adapter_red-0.4.2-py3-none-any.whl", hash = "sha256:f9ab53cb3d7fb53726b738e13b8242bc9a5243a4e5e48385473951f66b7eca8b"},
+    {file = "nonebot_adapter_red-0.4.2.tar.gz", hash = "sha256:81f98dced6adc0cd835327cc9b0aa07ff4ced32df8ed6da873342b1e6ffc1744"},
 ]
 
 [package.dependencies]
@@ -2425,18 +2425,18 @@ tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "pa
 
 [[package]]
 name = "platformdirs"
-version = "2.6.2"
+version = "3.10.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "platformdirs-2.6.2-py3-none-any.whl", hash = "sha256:83c8f6d04389165de7c9b6f0c682439697887bca0aa2f1c87ef1826be3584490"},
-    {file = "platformdirs-2.6.2.tar.gz", hash = "sha256:e1fea1fe471b9ff8332e229df3cb7de4f53eeea4998d3b6bfff542115e998bd2"},
+    {file = "platformdirs-3.10.0-py3-none-any.whl", hash = "sha256:d7c24979f292f916dc9cbf8648319032f551ea8c49a4c9bf2fb556a02070ec1d"},
+    {file = "platformdirs-3.10.0.tar.gz", hash = "sha256:b45696dab2d7cc691a3226759c0d3b00c47c8b6e293d96f6436f733303f77f6d"},
 ]
 
 [package.extras]
-docs = ["furo (>=2022.12.7)", "proselint (>=0.13)", "sphinx (>=5.3)", "sphinx-autodoc-typehints (>=1.19.5)"]
-test = ["appdirs (==1.4.4)", "covdefaults (>=2.2.2)", "pytest (>=7.2)", "pytest-cov (>=4)", "pytest-mock (>=3.10)"]
+docs = ["furo (>=2023.7.26)", "proselint (>=0.13)", "sphinx (>=7.1.1)", "sphinx-autodoc-typehints (>=1.24)"]
+test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.4)", "pytest-cov (>=4.1)", "pytest-mock (>=3.11.1)"]
 
 [[package]]
 name = "playwright"
@@ -3676,23 +3676,23 @@ test = ["Cython (>=0.29.32,<0.30.0)", "aiohttp", "flake8 (>=3.9.2,<3.10.0)", "my
 
 [[package]]
 name = "virtualenv"
-version = "20.17.1"
+version = "20.24.5"
 description = "Virtual Python Environment builder"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = [
-    {file = "virtualenv-20.17.1-py3-none-any.whl", hash = "sha256:ce3b1684d6e1a20a3e5ed36795a97dfc6af29bc3970ca8dab93e11ac6094b3c4"},
-    {file = "virtualenv-20.17.1.tar.gz", hash = "sha256:f8b927684efc6f1cc206c9db297a570ab9ad0e51c16fa9e45487d36d1905c058"},
+    {file = "virtualenv-20.24.5-py3-none-any.whl", hash = "sha256:b80039f280f4919c77b30f1c23294ae357c4c8701042086e3fc005963e4e537b"},
+    {file = "virtualenv-20.24.5.tar.gz", hash = "sha256:e8361967f6da6fbdf1426483bfe9fca8287c242ac0bc30429905721cefbff752"},
 ]
 
 [package.dependencies]
-distlib = ">=0.3.6,<1"
-filelock = ">=3.4.1,<4"
-platformdirs = ">=2.4,<3"
+distlib = ">=0.3.7,<1"
+filelock = ">=3.12.2,<4"
+platformdirs = ">=3.9.1,<4"
 
 [package.extras]
-docs = ["proselint (>=0.13)", "sphinx (>=5.3)", "sphinx-argparse (>=0.3.2)", "sphinx-rtd-theme (>=1)", "towncrier (>=22.8)"]
-testing = ["coverage (>=6.2)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7)", "packaging (>=21.3)", "pytest (>=7.0.1)", "pytest-env (>=0.6.2)", "pytest-freezegun (>=0.4.2)", "pytest-mock (>=3.6.1)", "pytest-randomly (>=3.10.3)", "pytest-timeout (>=2.1)"]
+docs = ["furo (>=2023.7.26)", "proselint (>=0.13)", "sphinx (>=7.1.2)", "sphinx-argparse (>=0.4)", "sphinxcontrib-towncrier (>=0.2.1a0)", "towncrier (>=23.6)"]
+test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7)", "packaging (>=23.1)", "pytest (>=7.4)", "pytest-env (>=0.8.2)", "pytest-freezer (>=0.4.8)", "pytest-mock (>=3.11.1)", "pytest-randomly (>=3.12)", "pytest-timeout (>=2.1)", "setuptools (>=68)", "time-machine (>=2.10)"]
 
 [[package]]
 name = "watchfiles"
@@ -4005,4 +4005,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "0b598bc0b1b011c411f3563d2fcd4b7c3d37df86aa120f95ab375312815e5fcb"
+content-hash = "7fba505a100e9d0a8e80a4b2fb6f572841fcfdbb2c4af2a4e42173c8e0b42a23"
