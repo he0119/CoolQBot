@@ -48,8 +48,8 @@ def upgrade() -> None:
     Base.prepare(op.get_bind())
 
     Patient = Base.classes.cyber_hospital_patient
-    User = Base.classes.user_user
-    Bind = Base.classes.user_bind
+    User = Base.classes.nonebot_plugin_user_user
+    Bind = Base.classes.nonebot_plugin_user_bind
     with Session(op.get_bind()) as session:
         patients = session.scalars(sa.select(Patient)).all()
         for patient in patients:

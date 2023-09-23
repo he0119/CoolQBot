@@ -13,9 +13,9 @@ from nonebot_plugin_alconna import (
     Text,
     on_alconna,
 )
+from nonebot_plugin_user import UserSession
 from sqlalchemy import func, select
 
-from src.user import UserSession
 from src.utils.annotated import AsyncSession
 
 from ..models import BodyFatRecord, DietaryRecord, FitnessRecord, WeightRecord
@@ -32,7 +32,9 @@ __plugin_meta__ = PluginMetadata(
 /打卡历史 C
 查看体脂历史
 /打卡历史 D""",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "user"),
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_alconna", "nonebot_plugin_user"
+    ),
 )
 
 history_cmd = on_alconna(Alconna("打卡历史", Args["content?", str]), use_cmd_start=True)

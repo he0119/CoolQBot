@@ -49,8 +49,8 @@ def upgrade() -> None:
 
     OldUser = Base.classes.check_in_user
     UserInfo = Base.classes.check_in_userinfo
-    User = Base.classes.user_user
-    Bind = Base.classes.user_bind
+    User = Base.classes.nonebot_plugin_user_user
+    Bind = Base.classes.nonebot_plugin_user_bind
     user_id_map = {}
     with Session(op.get_bind()) as session:
         users = session.scalars(sa.select(OldUser)).all()

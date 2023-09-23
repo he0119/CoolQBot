@@ -9,9 +9,9 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, At, MultiVar, Text, on_alconna
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_datastore.db import post_db_init, pre_db_init
+from nonebot_plugin_user import UserSession, get_user
+from nonebot_plugin_user.utils import get_or_create_user
 
-from src.user import UserSession, get_user
-from src.user.utils import get_or_create_user
 from src.utils.helpers import strtobool
 
 from ... import global_config
@@ -38,7 +38,9 @@ __plugin_meta__ = PluginMetadata(
 /dps me 角色名 服务器名
 查询他人绑定的角色
 /dps @他人""",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "user"),
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_alconna", "nonebot_plugin_user"
+    ),
 )
 
 plugin_data = get_plugin_data()
@@ -223,5 +225,5 @@ async def upgrade_user():
     from nonebot_plugin_datastore.script.command import upgrade
     from nonebot_plugin_datastore.script.utils import Config
 
-    config = Config("user")
+    config = Config("nonebot_plugin_user")
     await upgrade(config, "head")

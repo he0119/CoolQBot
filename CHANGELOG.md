@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加多适配器支持
+- 添加用户插件
+
 ### Fixed
 
 - 修复和风天气无法找到城市时报错的问题

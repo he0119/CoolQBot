@@ -2,7 +2,7 @@
 """
 from nonebot import require
 
-require("src.user")
+require("nonebot_plugin_user")
 from pathlib import Path
 
 import nonebot
@@ -16,7 +16,7 @@ async def upgrade_user():
     from nonebot_plugin_datastore.script.command import upgrade
     from nonebot_plugin_datastore.script.utils import Config
 
-    config = Config("user")
+    config = Config("nonebot_plugin_user")
     await upgrade(config, "head")
 
 
@@ -24,7 +24,7 @@ __plugin_meta__ = PluginMetadata(
     name="打卡",
     description="每日打卡，记录健身数据",
     usage="",
-    supported_adapters=inherit_supported_adapters("user"),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_user"),
 )
 
 check_in = CommandGroup("check_in", block=True)
