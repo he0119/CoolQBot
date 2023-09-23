@@ -1,5 +1,9 @@
+template: $CHANGES
 name-template: "v$RESOLVED_VERSION"
 tag-template: "v$RESOLVED_VERSION"
+exclude-labels:
+  - "dependencies"
+  - "skip-changelog"
 autolabeler:
   - label: "bug"
     branch:
@@ -11,28 +15,24 @@ autolabeler:
     branch:
       - '/feature\/.+/'
       - '/feat\/.+/'
+      - '/improve\/.+/'
+  - label: "ci"
+    files:
+      - .github/**/*
+  - label: "breaking-change"
+    title:
+      - "/.+!:.+/"
 categories:
-  - title: "Added"
+  - title: 💥 破坏性变更
     labels:
-      - "enhancement"
-      - "feature"
-  - title: "Changed"
+      - breaking-change
+  - title: 🚀 新功能
     labels:
-      - "improve"
-      - "change"
-  - title: "Deprecated"
+      - enhancement
+  - title: 🐛 Bug 修复
     labels:
-      - "deprecation"
-  - title: "Removed"
-    labels:
-      - "removed"
-  - title: "Fixed"
-    labels:
-      - "bug"
-      - "fix"
-  - title: "Security"
-    labels:
-      - "security"
+      - bug
+  - title: 💫 杂项
 change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
 change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
 version-resolver:
@@ -46,5 +46,3 @@ version-resolver:
     labels:
       - "patch"
   default: patch
-template: |
-  $CHANGES
