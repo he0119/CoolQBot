@@ -1,4 +1,4 @@
-"""remove bot_id platform et al
+"""remove platform et al
 
 Revision ID: 9dbb35122585
 Revises: 92c2c4affdce

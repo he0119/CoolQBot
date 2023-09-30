@@ -9,12 +9,7 @@ from nonebot.log import logger
 from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters, on_command
 from nonebot_plugin_saa import PlatformTarget, Text, get_target
-from nonebot_plugin_saa.utils.auto_select_bot import (
-    extract_adapter_type,
-    list_targets_map,
-)
-from sqlalchemy import or_, select
-from sqlalchemy.sql import ColumnElement
+from sqlalchemy import select
 
 from src.utils.annotated import AsyncSession
 from src.utils.helpers import strtobool
@@ -25,7 +20,7 @@ from .models import Hello
 __plugin_meta__ = PluginMetadata(
     name="启动问候",
     description="启动时发送问候",
-    usage="""开启时会在每天机器人第一次启动时发送问候
+    usage="""开启时会在机器人第一次启动时发送问候
 
 查看当前群是否开启启动问候
 /hello
@@ -42,20 +37,9 @@ driver = nonebot.get_driver()
 @driver.on_bot_connect
 async def hello_on_connect(bot: Bot, session: AsyncSession) -> None:
     """启动时发送问候"""
-    whereclause: list[ColumnElement[bool]] = []
-    adapter_name = extract_adapter_type(bot)
-    if list_targets := list_targets_map.get(adapter_name):
-        targets = await list_targets(bot)
-        if not targets:
-            logger.info(f"没有找到适配器 {adapter_name} 支持的发送目标")
-            return
-        for target in targets:
-            whereclause.append(or_(Hello.target == target.dict()))
-    else:
-        logger.info(f"不支持的适配器 {adapter_name}")
-        return
-
-    groups = (await session.scalars(select(Hello).where(*whereclause))).all()
+    groups = (
+        await session.scalars(select(Hello).where(Hello.bot_id == bot.self_id))
+    ).all()
     if not groups:
         return
 
@@ -74,6 +58,7 @@ hello_cmd = on_command("hello", aliases={"问候"}, block=True)
 
 @hello_cmd.handle()
 async def hello_handle(
+    bot: Bot,
     session: AsyncSession,
     arg: Message = CommandArg(),
     target: PlatformTarget = Depends(get_target),
@@ -81,13 +66,17 @@ async def hello_handle(
     args = arg.extract_plain_text()
 
     group = (
-        await session.scalars(select(Hello).where(Hello.target == target.dict()))
+        await session.scalars(
+            select(Hello)
+            .where(Hello.target == target.dict())
+            .where(Hello.bot_id == bot.self_id)
+        )
     ).one_or_none()
 
     if args:
         if strtobool(args):
             if not group:
-                session.add(Hello(target=target.dict()))
+                session.add(Hello(target=target.dict(), bot_id=bot.self_id))
                 await session.commit()
             await hello_cmd.finish("已在本群开启启动问候功能")
         else:
