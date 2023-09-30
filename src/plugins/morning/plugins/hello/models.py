@@ -10,6 +10,7 @@ Model = get_plugin_data().Model
 class Hello(Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     target: Mapped[dict] = mapped_column(JSON().with_variant(JSONB, "postgresql"))
+    bot_id: Mapped[str]
 
     @property
     def saa_target(self) -> PlatformTarget:
