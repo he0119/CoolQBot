@@ -99,7 +99,7 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
       - name: Deploy to server
-        run: tailscale ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "${{ secrets.COOLQBOT_ROOT }}/deploy.sh"
+        run: tailscale ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} ${{ secrets.DEPLOY_SCRIPT }}
 
   deploy_prod:
     name: Deploy Prod
@@ -108,15 +108,14 @@ jobs:
     needs: docker
     if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
     steps:
-      - name: Deploy to server
-        uses: appleboy/ssh-action@55dabf81b49d4120609345970c91507e2d734799
+      - name: Tailscale
+        uses: tailscale/github-action@4e4c49acaa9818630ce0bd7a564372c17e33fb4d
         with:
-          host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script_stop: true
-          script: sudo ${{ secrets.COOLQBOT_ROOT }}/deploy.sh
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+      - name: Deploy to server
+        run: tailscale ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} ${{ secrets.DEPLOY_SCRIPT }}
 
   sentry_release:
     name: Sentry Release
