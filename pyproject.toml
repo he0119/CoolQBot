@@ -13,13 +13,13 @@ eorzeaenv = "^2.2.8"
 matplotlib = "^3.7.1"
 expiringdict = "^1.2.2"
 
-nonebot2 = { extras = ["httpx", "fastapi", "websockets"], version = "^2.1.0" }
+nonebot2 = { extras = ["httpx", "fastapi", "websockets"], version = "^2.1.1" }
 nb-cli = "^1.2.3"
-nonebot-adapter-onebot = "2.2.4"
+nonebot-adapter-onebot = "2.3.1"
 onebot-qqguild-extension = "^0.1.1"
-nonebot-adapter-qqguild = "^0.2.5"
+nonebot-adapter-qqguild = "^0.4.0"
 nonebot-adapter-kaiheila = "^0.2.12"
-nonebot-adapter-red = "^0.4.1"
+nonebot-adapter-red = "^0.5.2"
 
 nonebot-plugin-datastore = "^1.1.2"
 nonebot-plugin-wordcloud = "^0.5.2"
@@ -27,17 +27,17 @@ nonebot-plugin-treehelp = "^0.3.0"
 nonebot-plugin-user = "^0.0.1"
 
 nonebot-plugin-apscheduler = "^0.3.0"
-nonebot-plugin-send-anything-anywhere = "^0.3.1"
+nonebot-plugin-send-anything-anywhere = "^0.3.2"
 nonebot-plugin-alconna = "^0.24.0"
 nonebot-plugin-session = "^0.1.0"
-nonebot-plugin-userinfo = "^0.1.0"
+nonebot-plugin-userinfo = "^0.1.2"
 
 nonebot-plugin-sentry = "^0.4.0"
 nonebot-plugin-memes = "0.4.7"
 nonebot-bison = "0.8.2"
 nonebot-plugin-gscode = "0.2.1"
 nonebot-plugin-status = "0.7.1"
-nonebot-plugin-bawiki = "0.9.3"
+nonebot-plugin-bawiki = "0.9.5"
 
 [tool.poetry.group.dev.dependencies]
 nonebug = "^0.3.3"
