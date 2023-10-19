@@ -2095,13 +2095,13 @@ saa = ["nonebot-plugin-send-anything-anywhere (>=0.3.0,<0.4.0)"]
 
 [[package]]
 name = "nonebot-plugin-status"
-version = "0.7.1"
+version = "0.7.2"
 description = "Check your server status (CPU, Memory, Disk Usage) via nonebot"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_status-0.7.1-py3-none-any.whl", hash = "sha256:fe2b1b2fd10f593bbf817e36879a67caa5d504cfeff428cc0e22ef5293046a81"},
-    {file = "nonebot_plugin_status-0.7.1.tar.gz", hash = "sha256:e288fe94ed4072ab8f9f7d0f2e6947c8da709a34e84dc5158b8af1c84297179a"},
+    {file = "nonebot_plugin_status-0.7.2-py3-none-any.whl", hash = "sha256:bf0d57916cc04e0bfc1ca3d8af9540a230f45a296016a4417c832320c664aba2"},
+    {file = "nonebot_plugin_status-0.7.2.tar.gz", hash = "sha256:7fac4d521defe00f111457a0ecb199048703385158719146013505f4544c0c22"},
 ]
 
 [package.dependencies]
@@ -4025,4 +4025,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "861b22fce23524d5acc0b719649b9ca91d2f04b4023e123adb43ec28c140ebac"
+content-hash = "4ef9aaadc9d0c35892cb81f74047ddef5dc8e350e3001ae9041a4a7004201288"
