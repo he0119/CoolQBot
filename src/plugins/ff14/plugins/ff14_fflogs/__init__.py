@@ -122,13 +122,12 @@ async def fflogs_handle(user: UserSession, argv: tuple[str | At, ...]):
         character = await fflogs.get_character(user.user_id)
         if not character:
             await fflogs_cmd.finish(
-                At(type="user", target=user.platform_id)
+                At(flag="user", target=user.platform_id)
                 + Text("抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。")
             )
-            raise Exception("用户没有绑定角色")
 
         await fflogs_cmd.finish(
-            At(type="user", target=user.platform_id)
+            At(flag="user", target=user.platform_id)
             + Text(
                 f"你当前绑定的角色：\n角色：{character.character_name}\n服务器：{character.server_name}"
             )
@@ -139,9 +138,8 @@ async def fflogs_handle(user: UserSession, argv: tuple[str | At, ...]):
         character = await fflogs.get_character(at_user.id)
         if not character:
             await fflogs_cmd.finish(
-                At(type="user", target=user.platform_id) + Text("抱歉，该用户没有绑定最终幻想14的角色。")
+                At(flag="user", target=user.platform_id) + Text("抱歉，该用户没有绑定最终幻想14的角色。")
             )
-            raise Exception("用户没有绑定角色")
 
         await fflogs_cmd.finish(
             argv[0]
@@ -153,7 +151,7 @@ async def fflogs_handle(user: UserSession, argv: tuple[str | At, ...]):
     if argv[0] == "me" and len(argv) == 3:
         await fflogs.set_character(user.user_id, str(argv[1]), str(argv[2]))
         await fflogs_cmd.finish(
-            At(type="user", target=user.platform_id) + Text("角色绑定成功！")
+            At(flag="user", target=user.platform_id) + Text("角色绑定成功！")
         )
 
     if argv[0] == "classes" and len(argv) == 1:

@@ -58,7 +58,6 @@ async def _(
         weight = float(content)
     except ValueError:
         await target_weight_cmd.reject("目标体重只能输入数字哦，请重新输入", at_sender=True)
-        raise
 
     if weight <= 0:
         await target_weight_cmd.reject("目标体重必须大于 0kg，请重新输入", at_sender=True)
@@ -94,7 +93,6 @@ async def _(
         weight = float(content)
     except ValueError:
         await target_weight_cmd.reject("体重只能输入数字哦，请重新输入", at_sender=True)
-        raise
 
     if weight <= 0:
         await target_weight_cmd.reject("目标体重必须大于 0kg，请重新输入", at_sender=True)

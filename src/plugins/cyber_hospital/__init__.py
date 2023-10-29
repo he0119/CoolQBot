@@ -133,7 +133,6 @@ admit_cmd = on_alconna(
 async def _(user: UserSession, at: At | None = None):
     if not at:
         await admit_cmd.finish("请 @ 需要入院的病人")
-        raise ValueError("请 @ 需要入院的病人")
 
     try:
         at_user = await get_or_create_user(
@@ -156,7 +155,6 @@ discharge_cmd = on_alconna(
 async def _(user: UserSession, at: At | None = None):
     if not at:
         await discharge_cmd.finish("请 @ 需要出院的病人")
-        raise ValueError("请 @ 需要出院的病人")
 
     try:
         at_user = await get_or_create_user(
@@ -179,7 +177,6 @@ record_cmd = on_alconna(
 async def _(user: UserSession, at: At | None = None):
     if not at:
         await discharge_cmd.finish("请 @ 需要查看记录的病人")
-        raise ValueError("请 @ 需要查看记录的病人")
 
     try:
         at_user = await get_or_create_user(
@@ -188,10 +185,8 @@ async def _(user: UserSession, at: At | None = None):
         records = await hospital_service.get_records(at_user.id, user.group_session_id)
     except ValueError:
         await record_cmd.finish(at + Text("未入院"))
-        raise ValueError("未入院")
     if not records:
         await record_cmd.finish(at + Text("暂时没有记录"))
-        raise ValueError("暂时没有记录")
 
     msg = at + Text("\n")
     await record_cmd.finish(
@@ -215,14 +210,12 @@ async def _(user: UserSession, at: At | None = None):
         patients = await hospital_service.patient_count(user.group_session_id)
         if not patients:
             await history_cmd.finish("没有住院病人")
-            return
 
         patient_infos = []
         for user_id, count in patients:
             nickname = (await get_user_by_id(user_id)).name
             patient_infos.append(f"{nickname} 入院次数：{count}")
         await history_cmd.finish("\n".join(patient_infos))
-        return
 
     at_user = await get_or_create_user(
         at.target, user.platform, at.display or at.target
