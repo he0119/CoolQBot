@@ -36,7 +36,7 @@ async def _(
     if not content:
         await fitness_cmd.reject("健身内容不能为空，请重新输入", at_sender=True)
 
-    session.add(FitnessRecord(user_id=user.uid, message=content))
+    session.add(FitnessRecord(user_id=user.user_id, message=content))
     await session.commit()
 
     await fitness_cmd.finish("已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True)

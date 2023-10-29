@@ -9,6 +9,7 @@ import nonebot
 from nonebot import CommandGroup, get_driver
 from nonebot.plugin import PluginMetadata
 
+from . import migrations
 from .config import Config
 
 __plugin_meta__ = PluginMetadata(
@@ -16,6 +17,7 @@ __plugin_meta__ = PluginMetadata(
     description="与复读有关的功能",
     usage="与复读有关的功能",
     supported_adapters={"~onebot.v11", "~onebot.v12"},
+    extra={"orm_version_location": migrations},
 )
 
 _sub_plugins = set()

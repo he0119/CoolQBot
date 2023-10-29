@@ -99,7 +99,7 @@ async def _(
     if weight <= 0:
         await target_weight_cmd.reject("目标体重必须大于 0kg，请重新输入", at_sender=True)
 
-    session.add(WeightRecord(user_id=user.uid, weight=weight))
+    session.add(WeightRecord(user_id=user.user_id, weight=weight))
     await session.commit()
 
     await weight_record_cmd.finish("已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True)

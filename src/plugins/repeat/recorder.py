@@ -5,9 +5,9 @@
 """
 from datetime import date, datetime, timedelta
 
+from nonebot import get_driver
 from nonebot.log import logger
-from nonebot_plugin_datastore import create_session, get_plugin_data
-from nonebot_plugin_datastore.db import post_db_init
+from nonebot_plugin_orm import get_session
 from sqlalchemy import select
 
 from src.utils.annotated import GroupInfo
@@ -15,9 +15,9 @@ from src.utils.annotated import GroupInfo
 from . import plugin_config
 from .models import Enabled, Record
 
-plugin_data = get_plugin_data()
-
 VERSION = "1"
+
+plugin_data = None
 
 
 def update(data: dict) -> dict:
@@ -134,7 +134,7 @@ class Recorder(metaclass=Singleton):
                 end = date(year + 1, 1, 1) - timedelta(days=1)
             start = date(year, month, 1)
 
-        async with create_session() as session:
+        async with get_session() as session:
             records = await session.execute(
                 select(Record)
                 .where(Record.platform == self.group_info.platform)
@@ -152,7 +152,7 @@ class Recorder(metaclass=Singleton):
         只填写日为这个月第几日的数据
         """
         time = date(year, month, day)
-        async with create_session() as session:
+        async with get_session() as session:
             records = await session.execute(
                 select(Record)
                 .where(Record.platform == self.group_info.platform)
@@ -166,7 +166,7 @@ class Recorder(metaclass=Singleton):
     async def add_repeat_list(self, user_id: str):
         """该 QQ 号在指定群的复读记录，加一"""
         now_date = datetime.now().date()
-        async with create_session() as session:
+        async with get_session() as session:
             record = await session.scalar(
                 select(Record)
                 .where(Record.date == now_date)
@@ -194,7 +194,7 @@ class Recorder(metaclass=Singleton):
     async def add_msg_number_list(self, user_id: str):
         """该 QQ 号在指定群的消息数量记录，加一"""
         now_date = datetime.now().date()
-        async with create_session() as session:
+        async with get_session() as session:
             record = await session.scalar(
                 select(Record)
                 .where(Record.date == now_date)
@@ -228,7 +228,7 @@ class Recorder(metaclass=Singleton):
         self._last_message_on = datetime.now()
 
     async def is_enabled(self):
-        async with create_session() as session:
+        async with get_session() as session:
             return (
                 await session.scalars(
                     select(Enabled)
@@ -240,7 +240,7 @@ class Recorder(metaclass=Singleton):
             ).one_or_none()
 
 
-@post_db_init
+@get_driver().on_startup
 async def data_migration():
     """迁移数据"""
     files = list(plugin_data.data_dir.glob("*.pkl"))
@@ -258,7 +258,7 @@ async def data_migration():
     #    "repeat_list": { group_id: { day: { user_id: int } } },
     #    "msg_number_list": { group_id: { day: { user_id: int } } },
     # }
-    async with create_session() as session:
+    async with get_session() as session:
         for file in files:
             if file.stem == "recorder":
                 record_date = datetime.now().date()

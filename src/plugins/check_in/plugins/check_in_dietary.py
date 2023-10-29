@@ -42,7 +42,7 @@ async def _(
         await dietary_cmd.reject("饮食情况只能输入 A 或 B 哦，请重新输入", at_sender=True)
 
     healthy = content == "a"
-    session.add(DietaryRecord(user_id=user.uid, healthy=healthy))
+    session.add(DietaryRecord(user_id=user.user_id, healthy=healthy))
     await session.commit()
 
     if healthy:

@@ -1,12 +1,8 @@
 from datetime import datetime
 
-from nonebot_plugin_datastore import get_plugin_data
+from nonebot_plugin_orm import Model
 from sqlalchemy import Text
 from sqlalchemy.orm import Mapped, mapped_column
-
-plugin_data = get_plugin_data()
-
-Model = plugin_data.Model
 
 
 class UserInfo(Model):

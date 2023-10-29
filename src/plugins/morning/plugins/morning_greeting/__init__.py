@@ -5,7 +5,7 @@ from nonebot.log import logger
 from nonebot.params import CommandArg, Depends
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters, on_command
 from nonebot_plugin_apscheduler import scheduler
-from nonebot_plugin_datastore import create_session
+from nonebot_plugin_orm import get_session
 from nonebot_plugin_saa import PlatformTarget, Text, get_target
 from sqlalchemy import select
 
@@ -13,6 +13,7 @@ from src.utils.annotated import AsyncSession
 from src.utils.helpers import strtobool
 
 from ... import plugin_config
+from . import migrations
 from .data_source import HOLIDAYS_DATA, get_moring_message
 from .models import MorningGreeting
 
@@ -32,6 +33,7 @@ __plugin_meta__ = PluginMetadata(
 获取今天的问好
 /morning today""",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_saa"),
+    extra={"orm_version_location": migrations},
 )
 
 
@@ -44,7 +46,7 @@ __plugin_meta__ = PluginMetadata(
 )
 async def morning():
     """早安"""
-    async with create_session() as session:
+    async with get_session() as session:
         groups = (await session.scalars(select(MorningGreeting))).all()
 
     if not groups:

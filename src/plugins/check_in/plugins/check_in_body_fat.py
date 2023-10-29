@@ -40,7 +40,7 @@ async def handle_first_message(
     else:
         target_body_fat = (
             await session.scalars(
-                select(UserInfo.target_body_fat).where(UserInfo.user_id == user.uid)
+                select(UserInfo.target_body_fat).where(UserInfo.user_id == user.user_id)
             )
         ).one_or_none()
         if target_body_fat:
@@ -107,7 +107,7 @@ async def _(
     if body_fat < 0 or body_fat > 100:
         await target_body_fat_cmd.reject("目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True)
 
-    session.add(BodyFatRecord(user_id=user.uid, body_fat=body_fat))
+    session.add(BodyFatRecord(user_id=user.user_id, body_fat=body_fat))
     await session.commit()
 
     await body_fat_record_cmd.finish("已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True)

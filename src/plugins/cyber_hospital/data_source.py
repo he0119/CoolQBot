@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from nonebot_plugin_datastore import create_session
+from nonebot_plugin_orm import get_session
 from sqlalchemy import Row, func, select
 from sqlalchemy.orm import selectinload
 
@@ -9,7 +9,7 @@ from .model import Patient, Record
 
 class Hospital:
     async def admit_patient(self, user_id: int, group_id: str) -> None:
-        async with create_session() as session:
+        async with get_session() as session:
             statement = (
                 select(Patient)
                 .where(Patient.user_id == user_id)
@@ -26,7 +26,7 @@ class Hospital:
             await session.commit()
 
     async def discharge_patient(self, user_id: int, group_id: str) -> None:
-        async with create_session() as session:
+        async with get_session() as session:
             statement = (
                 select(Patient)
                 .where(Patient.user_id == user_id)
@@ -44,7 +44,7 @@ class Hospital:
 
     async def get_admitted_patients(self, group_id: str) -> Sequence[Patient]:
         """获取所有入院病人"""
-        async with create_session() as session:
+        async with get_session() as session:
             statement = (
                 select(Patient)
                 .where(Patient.group_id == group_id)
@@ -55,7 +55,7 @@ class Hospital:
 
     async def get_admitted_patient(self, uid: int) -> Patient | None:
         """获取入院病人"""
-        async with create_session() as session:
+        async with get_session() as session:
             statement = (
                 select(Patient)
                 .where(Patient.user_id == uid)
@@ -65,7 +65,7 @@ class Hospital:
             return results.first()
 
     async def get_records(self, user_id: int, group_id: str) -> list[Record] | None:
-        async with create_session() as session:
+        async with get_session() as session:
             statement = (
                 select(Patient)
                 .where(Patient.user_id == user_id)
@@ -79,7 +79,7 @@ class Hospital:
             return patient.records
 
     async def add_record(self, uid: int, content: str) -> None:
-        async with create_session() as session:
+        async with get_session() as session:
             statement = (
                 select(Patient)
                 .where(Patient.user_id == uid)
@@ -96,7 +96,7 @@ class Hospital:
 
     async def patient_count(self, group_id: str) -> Sequence[Row[tuple[int, int]]]:
         """统计病人住院次数"""
-        async with create_session() as session:
+        async with get_session() as session:
             statement = (
                 select(Patient.user_id, func.count(Patient.user_id))
                 .group_by(Patient.user_id)
@@ -107,7 +107,7 @@ class Hospital:
 
     async def get_patient(self, user_id: int, group_id: str) -> Sequence[Patient]:
         """获取病人所有住院记录"""
-        async with create_session() as session:
+        async with get_session() as session:
             statement = (
                 select(Patient)
                 .where(Patient.user_id == user_id)

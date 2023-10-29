@@ -37,7 +37,7 @@ def mocked_get(url: str, **kwargs):
 
 async def test_morning_enabled(app: App):
     """测试每日早安已开启的情况"""
-    from nonebot_plugin_datastore import create_session
+    from nonebot_plugin_orm import get_session
     from nonebot_plugin_saa import TargetQQGroup
 
     from src.plugins.morning.plugins.morning_greeting import (
@@ -45,7 +45,7 @@ async def test_morning_enabled(app: App):
         morning_cmd,
     )
 
-    async with create_session() as session:
+    async with get_session() as session:
         session.add(MorningGreeting(target=TargetQQGroup(group_id=10000).dict()))
         await session.commit()
 
@@ -73,7 +73,7 @@ async def test_morning_not_enabled(app: App):
 
 async def test_morning_enable(app: App):
     """测试每日早安已，在群里启用的情况"""
-    from nonebot_plugin_datastore import create_session
+    from nonebot_plugin_orm import get_session
     from nonebot_plugin_saa import TargetQQGroup
 
     from src.plugins.morning.plugins.morning_greeting import (
@@ -81,7 +81,7 @@ async def test_morning_enable(app: App):
         morning_cmd,
     )
 
-    async with create_session() as session:
+    async with get_session() as session:
         groups = (await session.scalars(select(MorningGreeting))).all()
         assert len(groups) == 0
 
@@ -93,7 +93,7 @@ async def test_morning_enable(app: App):
         ctx.should_call_send(event, "已在本群开启每日早安功能", None)
         ctx.should_finished()
 
-    async with create_session() as session:
+    async with get_session() as session:
         groups = (await session.scalars(select(MorningGreeting))).all()
         assert len(groups) == 1
         assert groups[0].saa_target == TargetQQGroup(group_id=10000)
@@ -101,7 +101,7 @@ async def test_morning_enable(app: App):
 
 async def test_morning_disable(app: App):
     """测试每日早安，在群里关闭的情况"""
-    from nonebot_plugin_datastore import create_session
+    from nonebot_plugin_orm import get_session
     from nonebot_plugin_saa import TargetQQGroup
 
     from src.plugins.morning.plugins.morning_greeting import (
@@ -109,7 +109,7 @@ async def test_morning_disable(app: App):
         morning_cmd,
     )
 
-    async with create_session() as session:
+    async with get_session() as session:
         session.add(MorningGreeting(target=TargetQQGroup(group_id=10000).dict()))
         await session.commit()
 
@@ -121,7 +121,7 @@ async def test_morning_disable(app: App):
         ctx.should_call_send(event, "已在本群关闭每日早安功能", None)
         ctx.should_finished()
 
-    async with create_session() as session:
+    async with get_session() as session:
         groups = (await session.scalars(select(MorningGreeting))).all()
         assert len(groups) == 0
 
@@ -165,7 +165,7 @@ async def test_morning_today(app: App, mocker: MockerFixture):
 
 async def test_morning_push(app: App, mocker: MockerFixture):
     """测试每日早安，发送早安"""
-    from nonebot_plugin_datastore import create_session
+    from nonebot_plugin_orm import get_session
     from nonebot_plugin_saa import MessageFactory, TargetQQGroup, Text
 
     from src.plugins.morning.plugins.morning_greeting import MorningGreeting, morning
@@ -180,7 +180,7 @@ async def test_morning_push(app: App, mocker: MockerFixture):
     mock_text.return_value = text
 
     target = TargetQQGroup(group_id=10000)
-    async with create_session() as session:
+    async with get_session() as session:
         session.add(MorningGreeting(target=target.dict()))
         await session.commit()
 

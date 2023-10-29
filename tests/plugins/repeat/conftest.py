@@ -8,13 +8,13 @@ async def app(app: App):
     yield app
 
     # 清理数据库
-    from nonebot_plugin_datastore.db import create_session
+    from nonebot_plugin_datastore.db import get_session
 
     from src.plugins.repeat.models import Enabled, Record
     from src.plugins.repeat.recorder import Singleton
 
     Singleton._instances.clear()
 
-    async with create_session() as session, session.begin():
+    async with get_session() as session, session.begin():
         await session.execute(delete(Record))
         await session.execute(delete(Enabled))

@@ -11,7 +11,7 @@ from tests.fake import fake_group_message_event_v11
 
 @pytest.fixture
 async def records(app: App, mocker: MockerFixture):
-    from nonebot_plugin_datastore import create_session
+    from nonebot_plugin_orm import get_session
 
     from src.plugins.repeat.models import Enabled, Record
 
@@ -19,7 +19,7 @@ async def records(app: App, mocker: MockerFixture):
     mocked_datetime.now.return_value = datetime(2020, 1, 2)
     mocked_datetime.return_value = datetime(2020, 1, 1)
 
-    async with create_session() as session:
+    async with get_session() as session:
         session.add(Enabled(platform="qq", group_id=10000))
         session.add(
             Record(
@@ -35,11 +35,11 @@ async def records(app: App, mocker: MockerFixture):
 
 
 async def test_unique_record(records: None):
-    from nonebot_plugin_datastore import create_session
+    from nonebot_plugin_orm import get_session
 
     from src.plugins.repeat.models import Record
 
-    async with create_session() as session:
+    async with get_session() as session:
         session.add(
             Record(
                 date=date(2020, 1, 1),
