@@ -113,7 +113,10 @@ async def _(
             msg = f"你的目标体重是 {user_info.target_weight or 'NaN'}kg\n"
 
             image = generate_graph(weight_records)
-            await history_cmd.finish(Text(msg) + Image(raw=image), at_sender=True)
+            await history_cmd.finish(
+                Text(msg) + Image(raw={"data": image, "mimetype": "image/png"}),
+                at_sender=True,
+            )
         case "d":
             body_fat_records = (
                 await session.scalars(
@@ -127,7 +130,10 @@ async def _(
             msg = f"你的目标体脂是 {user_info.target_body_fat or 'NaN'}%\n"
 
             image = generate_graph(body_fat_records)
-            await history_cmd.finish(Text(msg) + Image(raw=image), at_sender=True)
+            await history_cmd.finish(
+                Text(msg) + Image(raw={"data": image, "mimetype": "image/png"}),
+                at_sender=True,
+            )
 
 
 def generate_graph(records: Sequence[WeightRecord] | Sequence[BodyFatRecord]) -> bytes:
@@ -157,5 +163,5 @@ def generate_graph(records: Sequence[WeightRecord] | Sequence[BodyFatRecord]) ->
     fig.autofmt_xdate()
 
     file = BytesIO()
-    fig.savefig(file)
+    fig.savefig(file, format="png")
     return file.getvalue()

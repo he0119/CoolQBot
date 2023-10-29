@@ -58,7 +58,7 @@ async def test_record(app: App, session: "AsyncSession"):
         )
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, MessageSegment.at("10") + "\n" + message, True)
+        ctx.should_call_send(event, MessageSegment.at("10") + f"\n{message}", True)
         ctx.should_finished(record_cmd)
 
 
