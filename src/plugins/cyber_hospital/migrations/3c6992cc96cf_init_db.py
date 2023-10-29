@@ -25,7 +25,7 @@ def upgrade(name: str = "") -> None:
     op.create_table(
         "cyber_hospital_patient",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("user_id", sa.Integer(), nullable=False),
+        sa.Column("user_id", sa.String(), nullable=False),
         sa.Column("group_id", sa.String(), nullable=False),
         sa.Column("admitted_at", sa.DateTime(), nullable=False),
         sa.Column("discharged_at", sa.DateTime(), nullable=True),

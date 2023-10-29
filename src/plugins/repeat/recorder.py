@@ -16,9 +16,9 @@ from src.utils.annotated import GroupInfo
 from . import plugin_config
 from .models import Enabled, MessageRecord
 
-VERSION = "1"
-
 plugin_data = get_plugin_data()
+
+VERSION = "1"
 
 
 def update(data: dict) -> dict:

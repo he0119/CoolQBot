@@ -26,6 +26,7 @@ def load_plugin(nonebug_init: None):
 
     nonebot.require("nonebot_plugin_localstore")
     nonebot.require("nonebot_plugin_datastore")
+    nonebot.require("nonebot_plugin_orm")
     nonebot.require("nonebot_plugin_apscheduler")
     nonebot.require("nonebot_plugin_saa")
     nonebot.require("nonebot_plugin_alconna")

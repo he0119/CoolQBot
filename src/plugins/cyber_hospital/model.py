@@ -9,7 +9,7 @@ class Patient(Model):
     """病人"""
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int]
+    user_id: Mapped[str]
     group_id: Mapped[str]
     records: Mapped[list["Record"]] = relationship(back_populates="patient")
     admitted_at: Mapped[datetime] = mapped_column(default=datetime.now)
