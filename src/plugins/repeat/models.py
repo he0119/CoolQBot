@@ -5,7 +5,7 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 
-class Record(Model):
+class MessageRecord(Model):
     __table_args__ = (
         UniqueConstraint(
             "date",

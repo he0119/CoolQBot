@@ -13,7 +13,7 @@ from sqlalchemy import select
 from src.utils.annotated import GroupInfo
 
 from . import plugin_config
-from .models import Enabled, Record
+from .models import Enabled, MessageRecord
 
 VERSION = "1"
 
@@ -136,13 +136,13 @@ class Recorder(metaclass=Singleton):
 
         async with get_session() as session:
             records = await session.execute(
-                select(Record)
-                .where(Record.platform == self.group_info.platform)
-                .where(Record.group_id == self.group_info.group_id)
-                .where(Record.guild_id == self.group_info.guild_id)
-                .where(Record.channel_id == self.group_info.channel_id)
-                .where(Record.date >= start)
-                .where(Record.date <= end)
+                select(MessageRecord)
+                .where(MessageRecord.platform == self.group_info.platform)
+                .where(MessageRecord.group_id == self.group_info.group_id)
+                .where(MessageRecord.guild_id == self.group_info.guild_id)
+                .where(MessageRecord.channel_id == self.group_info.channel_id)
+                .where(MessageRecord.date >= start)
+                .where(MessageRecord.date <= end)
             )
             return records.scalars().all()
 
@@ -154,12 +154,12 @@ class Recorder(metaclass=Singleton):
         time = date(year, month, day)
         async with get_session() as session:
             records = await session.execute(
-                select(Record)
-                .where(Record.platform == self.group_info.platform)
-                .where(Record.group_id == self.group_info.group_id)
-                .where(Record.guild_id == self.group_info.guild_id)
-                .where(Record.channel_id == self.group_info.channel_id)
-                .where(Record.date == time)
+                select(MessageRecord)
+                .where(MessageRecord.platform == self.group_info.platform)
+                .where(MessageRecord.group_id == self.group_info.group_id)
+                .where(MessageRecord.guild_id == self.group_info.guild_id)
+                .where(MessageRecord.channel_id == self.group_info.channel_id)
+                .where(MessageRecord.date == time)
             )
             return records.scalars().all()
 
@@ -168,20 +168,20 @@ class Recorder(metaclass=Singleton):
         now_date = datetime.now().date()
         async with get_session() as session:
             record = await session.scalar(
-                select(Record)
-                .where(Record.date == now_date)
-                .where(Record.user_id == user_id)
-                .where(Record.platform == self.group_info.platform)
-                .where(Record.group_id == self.group_info.group_id)
-                .where(Record.guild_id == self.group_info.guild_id)
-                .where(Record.channel_id == self.group_info.channel_id)
+                select(MessageRecord)
+                .where(MessageRecord.date == now_date)
+                .where(MessageRecord.user_id == user_id)
+                .where(MessageRecord.platform == self.group_info.platform)
+                .where(MessageRecord.group_id == self.group_info.group_id)
+                .where(MessageRecord.guild_id == self.group_info.guild_id)
+                .where(MessageRecord.channel_id == self.group_info.channel_id)
             )
             if record:
                 record.msg_number += 1
                 record.repeat_time += 1
                 await session.commit()
             else:
-                record = Record(
+                record = MessageRecord(
                     date=now_date,
                     user_id=user_id,
                     msg_number=1,
@@ -196,19 +196,19 @@ class Recorder(metaclass=Singleton):
         now_date = datetime.now().date()
         async with get_session() as session:
             record = await session.scalar(
-                select(Record)
-                .where(Record.date == now_date)
-                .where(Record.user_id == user_id)
-                .where(Record.platform == self.group_info.platform)
-                .where(Record.group_id == self.group_info.group_id)
-                .where(Record.guild_id == self.group_info.guild_id)
-                .where(Record.channel_id == self.group_info.channel_id)
+                select(MessageRecord)
+                .where(MessageRecord.date == now_date)
+                .where(MessageRecord.user_id == user_id)
+                .where(MessageRecord.platform == self.group_info.platform)
+                .where(MessageRecord.group_id == self.group_info.group_id)
+                .where(MessageRecord.guild_id == self.group_info.guild_id)
+                .where(MessageRecord.channel_id == self.group_info.channel_id)
             )
             if record:
                 record.msg_number += 1
                 await session.commit()
             else:
-                record = Record(
+                record = MessageRecord(
                     date=now_date,
                     user_id=user_id,
                     msg_number=1,
@@ -295,7 +295,7 @@ async def data_migration():
                                 "msg_number": msg_number
                             }
             for (date_str, group_id, user_id), values in users.items():
-                record = Record(
+                record = MessageRecord(
                     date=datetime.strptime(date_str, "%Y-%m-%d").date(),
                     platform="qq",
                     group_id=group_id,

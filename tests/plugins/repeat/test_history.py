@@ -11,7 +11,7 @@ async def test_history(app: App, mocker: MockerFixture):
     """测试历史"""
     from nonebot_plugin_orm import get_session
 
-    from src.plugins.repeat.models import Enabled, Record
+    from src.plugins.repeat.models import Enabled, MessageRecord
     from src.plugins.repeat.plugins.repeat_history import history_cmd
 
     mocked_datetime = mocker.patch(
@@ -23,7 +23,7 @@ async def test_history(app: App, mocker: MockerFixture):
     async with get_session() as session:
         session.add(Enabled(platform="qq", group_id=10000))
         session.add(
-            Record(
+            MessageRecord(
                 date=date(2020, 1, 1),
                 platform="qq",
                 group_id=10000,
@@ -60,13 +60,13 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
     """请求参数"""
     from nonebot_plugin_orm import get_session
 
-    from src.plugins.repeat.models import Enabled, Record
+    from src.plugins.repeat.models import Enabled, MessageRecord
     from src.plugins.repeat.plugins.repeat_history import history_cmd
 
     async with get_session() as session:
         session.add(Enabled(platform="qq", group_id=10000))
         session.add(
-            Record(
+            MessageRecord(
                 date=date(2020, 1, 1),
                 platform="qq",
                 group_id=10000,

@@ -10,11 +10,11 @@ async def app(app: App):
     # 清理数据库
     from nonebot_plugin_datastore.db import get_session
 
-    from src.plugins.repeat.models import Enabled, Record
+    from src.plugins.repeat.models import Enabled, MessageRecord
     from src.plugins.repeat.recorder import Singleton
 
     Singleton._instances.clear()
 
     async with get_session() as session, session.begin():
-        await session.execute(delete(Record))
+        await session.execute(delete(MessageRecord))
         await session.execute(delete(Enabled))

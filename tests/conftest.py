@@ -70,9 +70,9 @@ async def default_user(app: App):
         user2 = User(id=2, name="nickname10000")
         session.add(user)
         session.add(user2)
-        bind = Bind(platform_id=10, platform="qq", bind_id=user, original_user=user)
+        bind = Bind(platform_id=10, platform="qq", bind_user=user, original_user=user)
         bind2 = Bind(
-            platform_id=10000, platform="qq", bind_id=user2, original_user=user2
+            platform_id=10000, platform="qq", bind_user=user2, original_user=user2
         )
         session.add(bind)
         session.add(bind2)
