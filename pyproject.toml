@@ -21,11 +21,11 @@ nonebot-adapter-qqguild = "^0.2.5"
 nonebot-adapter-kaiheila = "^0.2.12"
 nonebot-adapter-red = "^0.4.1"
 
-nonebot-plugin-wordcloud = "^0.6.0b2"
+nonebot-plugin-wordcloud = "^0.6.0"
 nonebot-plugin-treehelp = "^0.3.0"
-nonebot-plugin-user = "^0.0.2"
+nonebot-plugin-user = "^0.0.3"
 
-nonebot-plugin-orm = { extras = ["default"], version = "^0.1.1" }
+nonebot-plugin-orm = { extras = ["default"], version = "^0.3.0" }
 nonebot-plugin-apscheduler = "^0.3.0"
 nonebot-plugin-send-anything-anywhere = "^0.3.1"
 nonebot-plugin-alconna = "^0.24.0"
@@ -66,6 +66,7 @@ plugins = [
     "nonebot_plugin_saa",
     "nonebot_plugin_alconna",
     "nonebot_plugin_datastore",
+    "nonebot_plugin_orm",
     "nonebot_plugin_session",
     "nonebot_plugin_userinfo",
     "nonebot_plugin_user",
