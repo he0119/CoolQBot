@@ -2321,23 +2321,19 @@ typing-extensions = ">=4.0.0,<5.0.0"
 
 [[package]]
 name = "nonebug-saa"
-version = "0.2.1"
+version = "0.2.2"
 description = "A nonebug helper for nonebot-plugin-send-anything-anything"
 optional = false
-python-versions = "^3.8"
-files = []
-develop = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "nonebug_saa-0.2.2-py3-none-any.whl", hash = "sha256:bec2512856243e7a4191a502b34ce9580882cbd84e0e42cfe2323d3e09e5d5e1"},
+    {file = "nonebug_saa-0.2.2.tar.gz", hash = "sha256:bbfb993cc04ce3b9589d7d7214b8d2e7f2d79bd3d7cfd26954ea3f0c1f0d864d"},
+]
 
 [package.dependencies]
 nonebot-plugin-send-anything-anywhere = ">=0.2.4"
-nonebug = "^0.3.1"
-pytest-mock = "^3.10.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/MountainDash/nonebug-saa.git"
-reference = "HEAD"
-resolved_reference = "0b2e90aeb33a4594ea6321c85660f18f1a24a902"
+nonebug = ">=0.3.1,<0.4.0"
+pytest-mock = ">=3.10.0,<4.0.0"
 
 [[package]]
 name = "noneprompt"
@@ -4190,4 +4186,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "fdd258b12cdfc1bfe40f3bcf9821c5c386768d8ac80d8bf7043ce2251330b292"
+content-hash = "de3690c6a7d06b91f9755d34eb05636a00d1c40b525cb15c7dffaef792a43677"
