@@ -9,7 +9,7 @@ from nonebot.adapters import Bot
 from src.utils.annotated import GroupInfo
 from src.utils.helpers import get_nickname
 
-from ...models import Record
+from ...models import MessageRecord
 from ...recorder import Recorder
 
 
@@ -50,7 +50,7 @@ class Ranking:
     def __init__(
         self,
         bot: Bot,
-        records: Sequence[Record],
+        records: Sequence[MessageRecord],
         display_number: int,
         minimal_msg_number: int,
         display_total_number: bool,

@@ -1,6 +1,6 @@
 """ 赛博查房 """
 from nonebot.matcher import Matcher
-from nonebot.params import ArgPlainText
+from nonebot.params import ArgPlainText, Depends
 from nonebot.permission import Permission
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
@@ -13,23 +13,14 @@ from nonebot_plugin_alconna import (
     UniMessage,
     on_alconna,
 )
-from nonebot_plugin_datastore.db import pre_db_init
-from nonebot_plugin_user import UserSession
+from nonebot_plugin_user import User, UserSession
+from nonebot_plugin_user.depends import get_or_create_user as get_or_create_user_depends
 from nonebot_plugin_user.utils import get_or_create_user, get_user_by_id
 
 from src.utils.helpers import admin_permission
 
+from . import migrations
 from .data_source import Hospital
-
-
-@pre_db_init
-async def upgrade_user():
-    from nonebot_plugin_datastore.script.command import upgrade
-    from nonebot_plugin_datastore.script.utils import Config
-
-    config = Config("nonebot_plugin_user")
-    await upgrade(config, "head")
-
 
 __plugin_meta__ = PluginMetadata(
     name="赛博医院",
@@ -52,6 +43,7 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters=inherit_supported_adapters(
         "nonebot_plugin_alconna", "nonebot_plugin_user"
     ),
+    extra={"orm_version_location": migrations},
 )
 
 hospital_service = Hospital()
@@ -64,8 +56,8 @@ rounds_cmd = on_alconna(
 
 
 def ensure_user(uid: int):
-    async def checker(user: UserSession):
-        if user.uid == uid:
+    async def checker(user: User = Depends(get_or_create_user_depends)):
+        if user.id == uid:
             return True
         return False
 
@@ -100,7 +92,7 @@ async def _(
         matcher.set_path_arg("at_uid", at_user.id)
         matcher.set_path_arg("at_pid", at.target)
     else:
-        patients = await hospital_service.get_admitted_patients(user.group_id)
+        patients = await hospital_service.get_admitted_patients(user.group_session_id)
         if not patients:
             await rounds_cmd.finish("当前没有住院病人")
 
@@ -147,7 +139,7 @@ async def _(user: UserSession, at: At | None = None):
         at_user = await get_or_create_user(
             at.target, user.platform, at.display or at.target
         )
-        await hospital_service.admit_patient(at_user.id, user.group_id)
+        await hospital_service.admit_patient(at_user.id, user.group_session_id)
         await admit_cmd.finish(at + Text("入院成功"))
     except ValueError:
         await admit_cmd.finish(at + Text("已入院"))
@@ -170,7 +162,7 @@ async def _(user: UserSession, at: At | None = None):
         at_user = await get_or_create_user(
             at.target, user.platform, at.display or at.target
         )
-        await hospital_service.discharge_patient(at_user.id, user.group_id)
+        await hospital_service.discharge_patient(at_user.id, user.group_session_id)
         await discharge_cmd.finish(at + Text("出院成功"))
     except ValueError:
         await discharge_cmd.finish(at + Text("未入院"))
@@ -193,7 +185,7 @@ async def _(user: UserSession, at: At | None = None):
         at_user = await get_or_create_user(
             at.target, user.platform, at.display or at.target
         )
-        records = await hospital_service.get_records(at_user.id, user.group_id)
+        records = await hospital_service.get_records(at_user.id, user.group_session_id)
     except ValueError:
         await record_cmd.finish(at + Text("未入院"))
         raise ValueError("未入院")
@@ -220,7 +212,7 @@ history_cmd = on_alconna(
 @history_cmd.handle()
 async def _(user: UserSession, at: At | None = None):
     if not at:
-        patients = await hospital_service.patient_count(user.group_id)
+        patients = await hospital_service.patient_count(user.group_session_id)
         if not patients:
             await history_cmd.finish("没有住院病人")
             return
@@ -235,7 +227,7 @@ async def _(user: UserSession, at: At | None = None):
     at_user = await get_or_create_user(
         at.target, user.platform, at.display or at.target
     )
-    patients = await hospital_service.get_patient(at_user.id, user.group_id)
+    patients = await hospital_service.get_patient(at_user.id, user.group_session_id)
     if not patients:
         await history_cmd.finish(UniMessage(at) + "从未入院")
 

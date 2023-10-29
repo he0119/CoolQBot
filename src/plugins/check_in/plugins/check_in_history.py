@@ -74,7 +74,7 @@ async def _(
             fitness_records = (
                 await session.scalars(
                     select(FitnessRecord)
-                    .where(FitnessRecord.user_id == user.uid)
+                    .where(FitnessRecord.user_id == user.user_id)
                     .where(FitnessRecord.time >= now)
                 )
             ).all()
@@ -88,7 +88,7 @@ async def _(
             count = (
                 await session.execute(
                     select(DietaryRecord.healthy, func.count("*"))
-                    .where(DietaryRecord.user_id == user.uid)
+                    .where(DietaryRecord.user_id == user.user_id)
                     .group_by(DietaryRecord.healthy)
                 )
             ).all()
@@ -103,7 +103,7 @@ async def _(
         case "c":
             weight_records = (
                 await session.scalars(
-                    select(WeightRecord).where(WeightRecord.user_id == user.uid)
+                    select(WeightRecord).where(WeightRecord.user_id == user.user_id)
                 )
             ).all()
             if not weight_records:
@@ -117,7 +117,7 @@ async def _(
         case "d":
             body_fat_records = (
                 await session.scalars(
-                    select(BodyFatRecord).where(BodyFatRecord.user_id == user.uid)
+                    select(BodyFatRecord).where(BodyFatRecord.user_id == user.user_id)
                 )
             ).all()
             if not body_fat_records:

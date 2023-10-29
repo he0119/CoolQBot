@@ -8,7 +8,7 @@ async def app(app: App, default_user):
     yield app
 
     # 清理数据库
-    from nonebot_plugin_datastore.db import create_session
+    from nonebot_plugin_orm import get_session
 
     from src.plugins.check_in.models import (
         BodyFatRecord,
@@ -18,7 +18,7 @@ async def app(app: App, default_user):
         WeightRecord,
     )
 
-    async with create_session() as session, session.begin():
+    async with get_session() as session, session.begin():
         await session.execute(delete(UserInfo))
         await session.execute(delete(WeightRecord))
         await session.execute(delete(BodyFatRecord))
@@ -28,7 +28,7 @@ async def app(app: App, default_user):
 
 @pytest.fixture
 async def session(app: App):
-    from nonebot_plugin_datastore.db import create_session
+    from nonebot_plugin_orm import get_session
 
-    async with create_session() as session:
+    async with get_session() as session:
         yield session

@@ -14,6 +14,7 @@ from sqlalchemy import select
 from src.utils.annotated import AsyncSession
 from src.utils.helpers import strtobool
 
+from . import migrations
 from .data_source import get_first_connect_message
 from .models import Hello
 
@@ -29,6 +30,7 @@ __plugin_meta__ = PluginMetadata(
 关闭启动问候功能
 /hello off""",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_saa"),
+    extra={"orm_version_location": migrations},
 )
 
 driver = nonebot.get_driver()

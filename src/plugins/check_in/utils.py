@@ -12,11 +12,11 @@ async def get_or_create_user_info(
     """获取用户信息，如果不存在则创建"""
 
     user_info = (
-        await session.scalars(select(UserInfo).where(UserInfo.user_id == user.uid))
+        await session.scalars(select(UserInfo).where(UserInfo.user_id == user.user_id))
     ).one_or_none()
 
     if not user_info:
-        user_info = UserInfo(user_id=user.uid)
+        user_info = UserInfo(user_id=user.user_id)
         session.add(user_info)
 
     if commit:

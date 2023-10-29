@@ -12,10 +12,11 @@ from random import randint
 from typing import Literal, cast
 
 import httpx
+from nonebot import get_driver
 from nonebot.log import logger
 from nonebot_plugin_apscheduler import scheduler
-from nonebot_plugin_datastore import create_session, get_plugin_data
-from nonebot_plugin_datastore.db import post_db_init
+from nonebot_plugin_datastore import get_plugin_data
+from nonebot_plugin_orm import get_session
 from pydantic import ValidationError, parse_obj_as
 from sqlalchemy import select
 
@@ -102,7 +103,7 @@ class FFLogs:
         self, uid: int, character_name: str, server_name: str
     ) -> None:
         """设置角色名和服务器名"""
-        async with create_session() as session:
+        async with get_session() as session:
             user = await session.scalar(select(User).where(User.user_id == uid))
             if user:
                 user.character_name = character_name
@@ -119,7 +120,7 @@ class FFLogs:
 
     async def get_character(self, uid: int) -> User | None:
         """获取角色名和服务器名"""
-        async with create_session() as session:
+        async with get_session() as session:
             user = await session.scalar(select(User).where(User.user_id == uid))
             return user
 
@@ -393,4 +394,4 @@ class FFLogs:
 
 
 fflogs = FFLogs()
-post_db_init(fflogs.init)
+get_driver().on_startup(fflogs.init)

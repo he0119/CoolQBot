@@ -10,11 +10,11 @@ from tests.fake import fake_group_message_event_v11
 
 @pytest.fixture
 async def records(app: App):
-    from nonebot_plugin_datastore import create_session
+    from nonebot_plugin_orm import get_session
 
     from src.plugins.repeat.models import Enabled
 
-    async with create_session() as session:
+    async with get_session() as session:
         session.add(Enabled(platform="qq", group_id="10000"))
         await session.commit()
 

@@ -7,7 +7,7 @@ from nonebot.adapters.red import Adapter as RedAdapter
 from nonebot.log import logger
 from sqlalchemy import StaticPool
 
-nonebot.init(datastore_engine_options={"poolclass": StaticPool})
+nonebot.init(sqlalchemy_engine_options={"poolclass": StaticPool})
 app = nonebot.get_asgi()
 
 driver = nonebot.get_driver()
