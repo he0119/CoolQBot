@@ -25,6 +25,7 @@ def load_plugin(nonebug_init: None):
     driver.register_adapter(Adapter)
 
     nonebot.require("nonebot_plugin_localstore")
+    nonebot.require("nonebot_plugin_datastore")
     nonebot.require("nonebot_plugin_apscheduler")
     nonebot.require("nonebot_plugin_saa")
     nonebot.require("nonebot_plugin_alconna")
@@ -37,6 +38,7 @@ def load_plugin(nonebug_init: None):
 
 @pytest.fixture
 async def app(tmp_path: Path, load_plugin, mocker: MockerFixture):
+    from nonebot_plugin_datastore.config import plugin_config
     from nonebot_plugin_orm import init_orm
 
     driver = nonebot.get_driver()
@@ -47,6 +49,9 @@ async def app(tmp_path: Path, load_plugin, mocker: MockerFixture):
     mocker.patch("nonebot_plugin_localstore.BASE_DATA_DIR", tmp_path / "data")
     mocker.patch("nonebot_plugin_localstore.BASE_CACHE_DIR", tmp_path / "cache")
     mocker.patch("nonebot_plugin_localstore.BASE_CONFIG_DIR", tmp_path / "config")
+    plugin_config.datastore_cache_dir = tmp_path / "cache"
+    plugin_config.datastore_config_dir = tmp_path / "config"
+    plugin_config.datastore_data_dir = tmp_path / "data"
 
     await init_orm()
 

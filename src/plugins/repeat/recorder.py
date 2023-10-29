@@ -7,6 +7,7 @@ from datetime import date, datetime, timedelta
 
 from nonebot import get_driver
 from nonebot.log import logger
+from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_orm import get_session
 from sqlalchemy import select
 
@@ -17,7 +18,7 @@ from .models import Enabled, MessageRecord
 
 VERSION = "1"
 
-plugin_data = None
+plugin_data = get_plugin_data()
 
 
 def update(data: dict) -> dict:

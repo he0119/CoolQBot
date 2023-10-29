@@ -8,7 +8,7 @@ async def app(app: App):
     yield app
 
     # 清理数据库
-    from nonebot_plugin_datastore.db import get_session
+    from nonebot_plugin_orm import get_session
 
     from src.plugins.repeat.models import Enabled, MessageRecord
     from src.plugins.repeat.recorder import Singleton

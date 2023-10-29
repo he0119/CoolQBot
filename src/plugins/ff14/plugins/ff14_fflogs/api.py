@@ -15,6 +15,7 @@ import httpx
 from nonebot import get_driver
 from nonebot.log import logger
 from nonebot_plugin_apscheduler import scheduler
+from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_orm import get_session
 from pydantic import ValidationError, parse_obj_as
 from sqlalchemy import select
@@ -28,7 +29,7 @@ from .data import (
 )
 from .models import CharacterRanking, Class, FFLogsRanking, Ranking, User, Zones
 
-plugin_data = None
+plugin_data = get_plugin_data()
 
 
 class DataException(Exception):
