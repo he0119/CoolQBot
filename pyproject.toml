@@ -10,7 +10,7 @@ version = "0.16.0"
 [tool.poetry.dependencies]
 python = "^3.11"
 eorzeaenv = "^2.2.8"
-matplotlib = "^3.7.1"
+matplotlib = "^3.8.1"
 expiringdict = "^1.2.2"
 
 nonebot2 = { extras = ["httpx", "fastapi", "websockets"], version = "^2.1.0" }
