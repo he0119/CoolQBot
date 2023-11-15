@@ -39,6 +39,7 @@ nonebot-bison = "0.8.2"
 nonebot-plugin-gscode = "0.2.1"
 nonebot-plugin-status = "0.7.2"
 nonebot-plugin-bawiki = "0.9.7.post1"
+nonebot-adapter-qq = "^1.1.1"
 
 [tool.poetry.group.dev.dependencies]
 nonebug = "^0.3.3"
@@ -51,13 +52,6 @@ freezegun = "^1.2.2"
 nonebug-saa = "^0.2.2"
 
 [tool.nonebot]
-adapters = [
-    { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" },
-    { name = "OneBot V12", module_name = "nonebot.adapters.onebot.v12" },
-    { name = "开黑啦", module_name = "nonebot.adapters.kaiheila" },
-    { name = "QQ 频道", module_name = "nonebot.adapters.qqguild" },
-    { name = "RedProtocol", module_name = "nonebot.adapters.red" },
-]
 plugin_dirs = ["src/plugins"]
 plugins = [
     "onebot_qqguild_extension",
