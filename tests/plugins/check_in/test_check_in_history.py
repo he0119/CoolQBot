@@ -35,12 +35,19 @@ async def test_fitness_history(
         event2 = fake_group_message_event_v11(message=Message("A"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "请问你要查询什么历史呢？请输入 A：健身 B：饮食 C：体重 D：体脂", True)
+        ctx.should_call_send(
+            event,
+            "请问你要查询什么历史呢？请输入 A：健身 B：饮食 C：体重 D：体脂",
+            True,
+        )
         ctx.should_rejected(history_cmd)
 
         ctx.receive_event(bot, event2)
         ctx.should_call_send(
-            event2, "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-02-01 健身记录", True, at_sender=True
+            event2,
+            "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-02-01 健身记录",
+            True,
+            at_sender=True,
         )
         ctx.should_finished(history_cmd)
 
@@ -50,7 +57,10 @@ async def test_fitness_history(
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
-            event, "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-02-01 健身记录", True, at_sender=True
+            event,
+            "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-02-01 健身记录",
+            True,
+            at_sender=True,
         )
         ctx.should_finished(history_cmd)
 
@@ -60,7 +70,10 @@ async def test_fitness_history(
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
-            event, "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-02-01 健身记录", True, at_sender=True
+            event,
+            "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-02-01 健身记录",
+            True,
+            at_sender=True,
         )
         ctx.should_finished(history_cmd)
 
@@ -82,7 +95,10 @@ async def test_dietary_history(app: App, session: "AsyncSession"):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
-            event, "你已成功打卡 3 次，其中健康饮食 2 次，不健康饮食 1 次", True, at_sender=True
+            event,
+            "你已成功打卡 3 次，其中健康饮食 2 次，不健康饮食 1 次",
+            True,
+            at_sender=True,
         )
         ctx.should_finished(history_cmd)
 
@@ -94,7 +110,7 @@ async def test_weight_record_history(
     from src.plugins.check_in.models import WeightRecord
     from src.plugins.check_in.plugins.check_in_history import history_cmd
 
-    image_url = "http://example.com"
+    image_url = b"http://example.com"
     mocked_gerenate_graph = mocker.patch(
         "src.plugins.check_in.plugins.check_in_history.generate_graph",
         return_value=image_url,
@@ -130,7 +146,7 @@ async def test_body_fat_record_history(
     from src.plugins.check_in.models import BodyFatRecord
     from src.plugins.check_in.plugins.check_in_history import history_cmd
 
-    image_url = "http://example.com"
+    image_url = b"http://example.com"
     mocked_gerenate_graph = mocker.patch(
         "src.plugins.check_in.plugins.check_in_history.generate_graph",
         return_value=image_url,

@@ -25,10 +25,10 @@ nonebot-plugin-wordcloud = "^0.6.0"
 nonebot-plugin-treehelp = "^0.3.0"
 nonebot-plugin-user = "^0.0.3"
 
-nonebot-plugin-orm = { extras = ["default"], version = "^0.3.0" }
+nonebot-plugin-orm = { extras = ["default"], version = "^0.5.0" }
 nonebot-plugin-apscheduler = "^0.3.0"
 nonebot-plugin-send-anything-anywhere = "^0.3.1"
-nonebot-plugin-alconna = "^0.31.0"
+nonebot-plugin-alconna = "^0.33.3"
 nonebot-plugin-session = "^0.2.0"
 nonebot-plugin-userinfo = "^0.1.0"
 nonebot-plugin-datastore = "^1.1.2"

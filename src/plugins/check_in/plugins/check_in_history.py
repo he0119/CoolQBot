@@ -114,7 +114,7 @@ async def _(
 
             image = generate_graph(weight_records)
             await history_cmd.finish(
-                Text(msg) + Image(raw={"data": image, "mimetype": "image/png"}),
+                Text(msg) + Image(raw=image, mimetype="image/png"),
                 at_sender=True,
             )
         case "d":
@@ -131,7 +131,7 @@ async def _(
 
             image = generate_graph(body_fat_records)
             await history_cmd.finish(
-                Text(msg) + Image(raw={"data": image, "mimetype": "image/png"}),
+                Text(msg) + Image(raw=image, mimetype="image/png"),
                 at_sender=True,
             )
 
