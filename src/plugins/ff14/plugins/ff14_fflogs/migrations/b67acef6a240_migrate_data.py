@@ -11,7 +11,7 @@ from collections.abc import Sequence
 
 from alembic import op
 from nonebot import logger
-from sqlalchemy import Connection
+from sqlalchemy import Connection, inspect, select
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
@@ -23,20 +23,40 @@ depends_on: str | Sequence[str] | None = None
 
 
 def _migrate_old_data(ds_conn: Connection):
+    insp = inspect(ds_conn)
+    if (
+        "ff14_fflogs_user" not in insp.get_table_names()
+        or "ff14_fflogs_alembic_version" not in insp.get_table_names()
+    ):
+        logger.info("ff14_fflogs: 未发现来自 datastore 的数据")
+        return
+
     DsBase = automap_base()
     DsBase.prepare(autoload_with=ds_conn)
+    ds_session = Session(ds_conn)
+
+    AlembicVersion = DsBase.classes.ff14_fflogs_alembic_version
+    version_num = ds_session.scalars(select(AlembicVersion.version_num)).one_or_none()
+    if not version_num:
+        return
+    if version_num != "9452fd434415":
+        logger.warning(
+            "ff14_fflogs: 发现旧版本的数据，请先安装 0.16.1 版本，"
+            "并运行 nb datastore upgrade 完成数据迁移之后再安装新版本"
+        )
+        raise RuntimeError("morning_greeting: 请先安装 0.16.1 版本完成迁移之后再升级")
+
     DsUser = DsBase.classes.ff14_fflogs_user
 
     Base = automap_base()
     Base.prepare(autoload_with=op.get_bind())
-    User = Base.classes.ff14_fflogs_user
-
-    ds_sessioin = Session(ds_conn)
     session = Session(op.get_bind())
+
+    User = Base.classes.ff14_fflogs_user
 
     # 写入数据
     logger.info("ff14_fflogs: 发现来自 datastore 的数据，正在迁移...")
-    for ds_user in ds_sessioin.query(DsUser).all():
+    for ds_user in ds_session.query(DsUser).all():
         user = User(
             id=ds_user.id,
             user_id=ds_user.user_id,

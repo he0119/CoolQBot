@@ -11,7 +11,7 @@ from collections.abc import Sequence
 
 from alembic import op
 from nonebot import logger
-from sqlalchemy import Connection
+from sqlalchemy import Connection, inspect, select
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
@@ -23,20 +23,39 @@ depends_on: str | Sequence[str] | None = None
 
 
 def _migrate_old_data(ds_conn: Connection):
+    insp = inspect(ds_conn)
+    if (
+        "hello_hello" not in insp.get_table_names()
+        or "hello_alembic_version" not in insp.get_table_names()
+    ):
+        logger.info("hello: 未发现来自 datastore 的数据")
+        return
+
     DsBase = automap_base()
     DsBase.prepare(autoload_with=ds_conn)
+    ds_session = Session(ds_conn)
+
+    AlembicVersion = DsBase.classes.hello_alembic_version
+    version_num = ds_session.scalars(select(AlembicVersion.version_num)).one_or_none()
+    if not version_num:
+        return
+    if version_num != "e92b0f680c78":
+        logger.warning(
+            "hello: 发现旧版本的数据，请先安装 0.16.1 版本，并运行 nb datastore upgrade 完成数据迁移之后再安装新版本"
+        )
+        raise RuntimeError("hello: 请先安装 0.16.1 版本完成迁移之后再升级")
+
     DsHello = DsBase.classes.hello_hello
 
     Base = automap_base()
     Base.prepare(autoload_with=op.get_bind())
-    Hello = Base.classes.hello_hello
-
-    ds_sessioin = Session(ds_conn)
     session = Session(op.get_bind())
+
+    Hello = Base.classes.hello_hello
 
     # 写入数据
     logger.info("hello: 发现来自 datastore 的数据，正在迁移...")
-    for ds_hello in ds_sessioin.query(DsHello).all():
+    for ds_hello in ds_session.query(DsHello).all():
         hello = Hello(
             id=ds_hello.id,
             target=ds_hello.target,

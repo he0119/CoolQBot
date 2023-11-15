@@ -11,7 +11,7 @@ from collections.abc import Sequence
 
 from alembic import op
 from nonebot import logger
-from sqlalchemy import Connection
+from sqlalchemy import Connection, inspect, select
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
@@ -23,22 +23,41 @@ depends_on: str | Sequence[str] | None = None
 
 
 def _migrate_old_data(ds_conn: Connection):
+    insp = inspect(ds_conn)
+    if (
+        "repeat_record" not in insp.get_table_names()
+        or "repeat_alembic_version" not in insp.get_table_names()
+    ):
+        logger.info("repeat: 未发现来自 datastore 的数据")
+        return
+
     DsBase = automap_base()
     DsBase.prepare(autoload_with=ds_conn)
+    ds_session = Session(ds_conn)
+
+    AlembicVersion = DsBase.classes.repeat_alembic_version
+    version_num = ds_session.scalars(select(AlembicVersion.version_num)).one_or_none()
+    if not version_num:
+        return
+    if version_num != "c3848b5b41fb":
+        logger.warning(
+            "repeat: 发现旧版本的数据，请先安装 0.16.1 版本，并运行 nb datastore upgrade 完成数据迁移之后再安装新版本"
+        )
+        raise RuntimeError("repeat: 请先安装 0.16.1 版本完成迁移之后再升级")
+
     DsMessageRecord = DsBase.classes.repeat_record
     DsEnabled = DsBase.classes.repeat_enabled
 
     Base = automap_base()
     Base.prepare(autoload_with=op.get_bind())
+    session = Session(op.get_bind())
+
     MessageRecord = Base.classes.repeat_messagerecord
     Enabled = Base.classes.repeat_enabled
 
-    ds_sessioin = Session(ds_conn)
-    session = Session(op.get_bind())
-
     # 写入数据
     logger.info("repeat: 发现来自 datastore 的数据，正在迁移...")
-    for ds_message_record in ds_sessioin.query(DsMessageRecord).all():
+    for ds_message_record in ds_session.query(DsMessageRecord).all():
         message_record = MessageRecord(
             id=ds_message_record.id,
             date=ds_message_record.date,
@@ -51,7 +70,7 @@ def _migrate_old_data(ds_conn: Connection):
             msg_number=ds_message_record.msg_number,
         )
         session.add(message_record)
-    for ds_enabled in ds_sessioin.query(DsEnabled).all():
+    for ds_enabled in ds_session.query(DsEnabled).all():
         enabled = Enabled(
             id=ds_enabled.id,
             platform=ds_enabled.platform,
