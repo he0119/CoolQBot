@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.16.1] - 2023-11-15
+
 ### Added
 
 - 添加多适配器支持
@@ -453,7 +455,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.16.0...HEAD
+[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.16.1...HEAD
+[0.16.1]: https://github.com/he0119/CoolQBot/compare/v0.16.0...v0.16.1
 [0.16.0]: https://github.com/he0119/CoolQBot/compare/v0.15.3...v0.16.0
 [0.15.3]: https://github.com/he0119/CoolQBot/compare/v0.15.2...v0.15.3
 [0.15.2]: https://github.com/he0119/CoolQBot/compare/v0.15.1...v0.15.2
