@@ -10,8 +10,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/bot.py",
       "console": "integratedTerminal",
-      "justMyCode": false,
-      "envFile": "${workspaceFolder}/.env.prod"
+      "justMyCode": false
     },
     {
       "name": "CoolQBot Test",
@@ -26,14 +25,6 @@
       "name": "Debug Unit Test",
       "type": "python",
       "request": "test",
-      "justMyCode": false
-    },
-    {
-      "name": "Upgrade",
-      "type": "python",
-      "request": "launch",
-      "module": "nb_cli",
-      "args": ["datastore", "upgrade", "-n", "check_in"],
       "justMyCode": false
     }
   ]
