@@ -31,7 +31,6 @@ def load_plugin(nonebug_init: None):
     nonebot.require("nonebot_plugin_saa")
     nonebot.require("nonebot_plugin_alconna")
     nonebot.require("nonebot_plugin_session")
-    nonebot.require("nonebot_plugin_userinfo")
     nonebot.require("nonebot_plugin_user")
 
     nonebot.load_plugins(str(Path(__file__).parent.parent / "src" / "plugins"))
@@ -53,6 +52,7 @@ async def app(tmp_path: Path, load_plugin, mocker: MockerFixture):
     plugin_config.datastore_cache_dir = tmp_path / "cache"
     plugin_config.datastore_config_dir = tmp_path / "config"
     plugin_config.datastore_data_dir = tmp_path / "data"
+    mocker.patch("nonebot_plugin_orm._data_dir", tmp_path / "orm")
 
     await init_orm()
 
@@ -70,47 +70,10 @@ def caplog(caplog):
 async def default_user(app: App):
     from nonebot_plugin_orm import get_session
     from nonebot_plugin_user.models import Bind, User
+    from nonebot_plugin_user.utils import create_user
 
-    async with get_session() as session:
-        user = User(id=1, name="nickname")
-        user2 = User(id=2, name="nickname10000")
-        session.add(user)
-        session.add(user2)
-        bind = Bind(platform_id=10, platform="qq", bind_user=user, original_user=user)
-        bind2 = Bind(
-            platform_id=10000, platform="qq", bind_user=user2, original_user=user2
-        )
-        session.add(bind)
-        session.add(bind2)
-        await session.commit()
-
-    # 设置 UserInfo 缓存
-    from nonebot_plugin_userinfo import UserInfo
-    from nonebot_plugin_userinfo.getter import _user_info_cache
-    from nonebot_plugin_userinfo.image_source import QQAvatar
-
-    user_info = UserInfo(
-        user_id="10",
-        user_name="nickname",
-        user_displayname="card",
-        user_remark=None,
-        user_avatar=QQAvatar(qq=10),
-        user_gender="unknown",
-    )
-    user_info2 = UserInfo(
-        user_id="10000",
-        user_name="nickname10000",
-        user_displayname="card10000",
-        user_remark=None,
-        user_avatar=QQAvatar(qq=10000),
-        user_gender="unknown",
-    )
-    # 默认为 fake 适配器
-    _user_info_cache["qq_fake_test_10000_10_10"] = user_info
-    _user_info_cache["qq_fake_test_10000_10000_10000"] = user_info2
-    # 需要 onebot 11 适配器才能使用 alconna，因为其不支持 fake 适配器
-    _user_info_cache["qq_OneBot V11_test_10000_10_10"] = user_info
-    _user_info_cache["qq_OneBot V11_test_10000_10000_10000"] = user_info2
+    await create_user("10", "qq", "nickname")
+    await create_user("10000", "qq", "nickname10000")
 
     yield
 

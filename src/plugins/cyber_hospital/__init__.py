@@ -1,6 +1,6 @@
 """ 赛博查房 """
 from nonebot.matcher import Matcher
-from nonebot.params import ArgPlainText, Depends
+from nonebot.params import ArgPlainText
 from nonebot.permission import Permission
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
@@ -14,7 +14,6 @@ from nonebot_plugin_alconna import (
     on_alconna,
 )
 from nonebot_plugin_user import User, UserSession
-from nonebot_plugin_user.depends import get_or_create_user as get_or_create_user_depends
 from nonebot_plugin_user.utils import get_or_create_user, get_user_by_id
 
 from src.utils.helpers import admin_permission
@@ -56,7 +55,7 @@ rounds_cmd = on_alconna(
 
 
 def ensure_user(uid: int):
-    async def checker(user: User = Depends(get_or_create_user_depends)):
+    async def checker(user: User):
         if user.id == uid:
             return True
         return False

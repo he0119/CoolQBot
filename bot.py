@@ -5,6 +5,7 @@ from nonebot.adapters.onebot.v12 import Adapter as OneBotV12Adapter
 from nonebot.adapters.qq import Adapter as QQAdapter
 from nonebot.adapters.qqguild import Adapter as QQGuildAdapter
 from nonebot.adapters.red import Adapter as RedAdapter
+from nonebot.adapters.satori import Adapter as SatoriAdapter
 from nonebot.log import logger
 from sqlalchemy import StaticPool
 
@@ -18,6 +19,7 @@ driver.register_adapter(KaiheilaAdapter)
 driver.register_adapter(QQAdapter)
 driver.register_adapter(QQGuildAdapter)
 driver.register_adapter(RedAdapter)
+driver.register_adapter(SatoriAdapter)
 
 # 加载插件
 nonebot.load_from_toml("pyproject.toml")
