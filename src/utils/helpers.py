@@ -9,8 +9,9 @@ from nonebot.adapters.onebot.v12 import Bot as OneBotV12Bot
 from nonebot.exception import ActionFailed
 from nonebot.matcher import Matcher
 from nonebot.params import Arg
-from nonebot.permission import SUPERUSER
 from nonebot.typing import T_State
+
+from src.utils.permission import SUPERUSER
 
 from .typing import Expression_T
 
