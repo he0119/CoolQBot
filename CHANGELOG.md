@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 添加 QQ 适配器
 - 添加 Satori 适配器
+- 通过用户名判断是否是超级用户
 
 ### Changed
 

@@ -12,8 +12,8 @@ from nonebot_plugin_user import UserSession, get_user
 from nonebot_plugin_user.utils import get_or_create_user
 
 from src.utils.helpers import strtobool
+from src.utils.permission import is_superuser
 
-from ... import global_config
 from . import migrations
 from .api import fflogs
 from .data import FFLOGS_DATA
@@ -53,11 +53,11 @@ fflogs_cmd = on_alconna(
 
 
 @fflogs_cmd.handle()
-async def fflogs_handle(user: UserSession, argv: tuple[str | At, ...]):
+async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
     # 设置 Token
     if argv[0] == "token" and len(argv) == 2:
         # 检查是否是超级用户
-        if user.platform_id not in global_config.superusers:
+        if is_superuser(session.user):
             await fflogs_cmd.finish("抱歉，你没有权限修改 Token。")
 
         await plugin_data.config.set("token", str(argv[1]))
@@ -72,7 +72,7 @@ async def fflogs_handle(user: UserSession, argv: tuple[str | At, ...]):
 
     if argv[0] == "token" and len(argv) == 1:
         # 检查是否是超级用户
-        if user.platform_id not in global_config.superusers:
+        if is_superuser(session.user):
             await fflogs_cmd.finish("抱歉，你没有权限查看 Token。")
         await fflogs_cmd.finish(f"当前的 Token 为 {token}")
 
@@ -90,7 +90,7 @@ async def fflogs_handle(user: UserSession, argv: tuple[str | At, ...]):
                     await fflogs_cmd.finish("当前没有缓存副本。")
                 await fflogs_cmd.finish("当前缓存的副本有：\n" + "\n".join(cache_boss))
             # 检查是否是超级用户
-            if user.platform_id not in global_config.superusers:
+            if is_superuser(session.user):
                 await fflogs_cmd.finish("抱歉，你没有权限设置缓存。")
             if strtobool(str(argv[1])):
                 if not fflogs.is_cache_enabled:
@@ -119,26 +119,27 @@ async def fflogs_handle(user: UserSession, argv: tuple[str | At, ...]):
                 await fflogs_cmd.finish("定时缓存关闭中")
 
     if argv[0] == "me" and len(argv) == 1:
-        character = await fflogs.get_character(user.user_id)
+        character = await fflogs.get_character(session.user_id)
         if not character:
             await fflogs_cmd.finish(
-                At(flag="user", target=user.platform_id)
+                At(flag="user", target=session.platform_id)
                 + Text("抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。")
             )
 
         await fflogs_cmd.finish(
-            At(flag="user", target=user.platform_id)
+            At(flag="user", target=session.platform_id)
             + Text(
                 f"你当前绑定的角色：\n角色：{character.character_name}\n服务器：{character.server_name}"
             )
         )
 
     if isinstance(argv[0], At) and len(argv) == 1:
-        at_user = await get_user(argv[0].target, user.platform)
+        at_user = await get_user(argv[0].target, session.platform)
         character = await fflogs.get_character(at_user.id)
         if not character:
             await fflogs_cmd.finish(
-                At(flag="user", target=user.platform_id) + Text("抱歉，该用户没有绑定最终幻想14的角色。")
+                At(flag="user", target=session.platform_id)
+                + Text("抱歉，该用户没有绑定最终幻想14的角色。")
             )
 
         await fflogs_cmd.finish(
@@ -149,9 +150,9 @@ async def fflogs_handle(user: UserSession, argv: tuple[str | At, ...]):
         )
 
     if argv[0] == "me" and len(argv) == 3:
-        await fflogs.set_character(user.user_id, str(argv[1]), str(argv[2]))
+        await fflogs.set_character(session.user_id, str(argv[1]), str(argv[2]))
         await fflogs_cmd.finish(
-            At(flag="user", target=user.platform_id) + Text("角色绑定成功！")
+            At(flag="user", target=session.platform_id) + Text("角色绑定成功！")
         )
 
     if argv[0] == "classes" and len(argv) == 1:
@@ -170,14 +171,14 @@ async def fflogs_handle(user: UserSession, argv: tuple[str | At, ...]):
         # <BOSS名> <职业名>
         if isinstance(argv[0], str) and isinstance(argv[1], At):
             # @他人的格式
-            at_user = await get_user(argv[1].target, user.platform)
+            at_user = await get_user(argv[1].target, session.platform)
             data = await get_character_dps_by_user_id(argv[0], at_user.id)
         elif (
             isinstance(argv[0], str)
             and isinstance(argv[1], str)
             and argv[1].lower() == "me"
         ):
-            data = await get_character_dps_by_user_id(argv[0], user.user_id)
+            data = await get_character_dps_by_user_id(argv[0], session.user_id)
         else:
             data = await fflogs.dps(*argv)  # type:ignore
         await fflogs_cmd.finish(data)
