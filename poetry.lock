@@ -1976,22 +1976,6 @@ toml = ["rtoml (>=0.9.0)"]
 yaml = ["pyyaml (>=6.0)"]
 
 [[package]]
-name = "nonebot-plugin-gscode"
-version = "0.2.1"
-description = "Genshin live codes plugin for NoneBot2"
-optional = false
-python-versions = ">=3.8.1,<4.0"
-files = [
-    {file = "nonebot_plugin_gscode-0.2.1-py3-none-any.whl", hash = "sha256:c303760eeaa79defe79eff3d9bcb5bf4ecef174bb3aab5e614d1bb79867ac060"},
-    {file = "nonebot_plugin_gscode-0.2.1.tar.gz", hash = "sha256:0fb538fcd970221787db1071517091de1ca65c3c16fdc6abf76ced8f5bb30faa"},
-]
-
-[package.dependencies]
-httpx = ">=0.20.0,<1.0.0"
-nonebot-adapter-onebot = ">=2.0.0b1"
-nonebot2 = ">=2.0.0b3"
-
-[[package]]
 name = "nonebot-plugin-htmlrender"
 version = "0.2.2"
 description = "通过浏览器渲染图片"
@@ -4107,4 +4091,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d44adb3ccfef62fbc590c5ed61793c24f108809188df5089c11b4550b54d51f4"
+content-hash = "9992fda6b6cde688509b5b31dcb8c183f10bedeeb0b517cfe93e9d6a8afc7da8"

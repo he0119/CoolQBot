@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 使用 orm 插件
 
+### Removed
+
+- 移除 gscode 与 pcr 插件
+
 ## [0.16.1] - 2023-11-15
 
 ### Added
