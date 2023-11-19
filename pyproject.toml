@@ -37,7 +37,6 @@ nonebot-plugin-datastore = "^1.1.2"
 nonebot-plugin-sentry = "1.0.0"
 nonebot-plugin-memes = "0.4.7"
 nonebot-bison = "0.8.2"
-nonebot-plugin-gscode = "0.2.1"
 nonebot-plugin-status = "0.7.2"
 nonebot-plugin-bawiki = "0.9.7.post1"
 
@@ -67,7 +66,6 @@ plugins = [
     "nonebot_plugin_wordcloud",
     "nonebot_plugin_memes",
     "nonebot_bison",
-    "nonebot_plugin_gscode",
     "nonebot_plugin_status",
     "nonebot_plugin_bawiki",
 ]
