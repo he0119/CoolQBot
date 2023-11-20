@@ -19,43 +19,6 @@ services:
       retries: 5
       start_period: 30s
 
-  cqhttp:
-    image: ghcr.io/mrs4s/go-cqhttp
-    container_name: cqhttp
-    restart: always
-    volumes:
-      - ./cqhttp:/data
-    depends_on:
-      coolqbot:
-        condition: service_healthy
-  walle-k:
-    image: ghcr.io/he0119/walle-k
-    container_name: walle-k
-    restart: always
-    volumes:
-      - ./walle-k:/data
-    depends_on:
-      coolqbot:
-        condition: service_healthy
-  teydacore:
-    image: ghcr.io/he0119/teydacore
-    container_name: teydacore
-    restart: always
-    env_file:
-      - ".env"
-    depends_on:
-      coolqbot:
-        condition: service_healthy
-  all4one:
-    image: ghcr.io/he0119/nonebot-all4one
-    container_name: all4one
-    restart: always
-    env_file:
-      - ".env"
-    depends_on:
-      coolqbot:
-        condition: service_healthy
-
   netease:
     image: binaryify/netease_cloud_music_api
     container_name: netease
