@@ -1768,13 +1768,13 @@ typing-extensions = ">=4.0.0,<5.0.0"
 
 [[package]]
 name = "nonebot-adapter-qq"
-version = "1.1.1"
+version = "1.1.2"
 description = "QQ adapter for nonebot2"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_adapter_qq-1.1.1-py3-none-any.whl", hash = "sha256:45014d435ee56cd2a0885bcbdec12b00fd2a2267205d5452de4e9cbcfb584edb"},
-    {file = "nonebot_adapter_qq-1.1.1.tar.gz", hash = "sha256:d452d5a7046c4021e18bbdc6a27fb0880e3911844d0bfba3e2bd08042ae5c671"},
+    {file = "nonebot_adapter_qq-1.1.2-py3-none-any.whl", hash = "sha256:39e6ab0fffce12476e89713faf598f15d703c12970ebf908d285b756eb481258"},
+    {file = "nonebot_adapter_qq-1.1.2.tar.gz", hash = "sha256:7780158228000d44d462009653ef71f2486474b416e92f51487f26d7b952bd61"},
 ]
 
 [package.dependencies]
@@ -1860,13 +1860,13 @@ tinydb = ">=4.3.0,<5.0.0"
 
 [[package]]
 name = "nonebot-plugin-alconna"
-version = "0.33.5"
+version = "0.33.6"
 description = "Alconna Adapter for Nonebot"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "nonebot_plugin_alconna-0.33.5-py3-none-any.whl", hash = "sha256:57414d52fbe586479c6a372a58213346ceeccf7aeec261a18df5351f9a489069"},
-    {file = "nonebot_plugin_alconna-0.33.5.tar.gz", hash = "sha256:ecb5213402cff4cd93a04e7a8c618d434972ca144eb2a6010df6e85b47f520fa"},
+    {file = "nonebot_plugin_alconna-0.33.6-py3-none-any.whl", hash = "sha256:89989dd6dc1bccd8a1603159b57e9e96da438eb0bbbdbbcd2bfcf747594e12c3"},
+    {file = "nonebot_plugin_alconna-0.33.6.tar.gz", hash = "sha256:54e761ef621c8285cd9ea2f81324f9f52f6fb6292d3ddb87387dbdcaeaa8dc1b"},
 ]
 
 [package.dependencies]
@@ -2096,17 +2096,17 @@ sentry-sdk = {version = ">=1.23.0,<2.0.0", extras = ["loguru"]}
 
 [[package]]
 name = "nonebot-plugin-session"
-version = "0.2.0"
+version = "0.2.1"
 description = "Nonebot2 会话信息提取与会话id定义"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_session-0.2.0-py3-none-any.whl", hash = "sha256:00859872b7c7d2967e1eaabf161c8a47dc83bc85791629b659922b2f425d4854"},
-    {file = "nonebot_plugin_session-0.2.0.tar.gz", hash = "sha256:5f92706dfeb6e21dcce04998bc3b8dafc59f5af50d2908aceeed0faf9d88a67c"},
+    {file = "nonebot_plugin_session-0.2.1-py3-none-any.whl", hash = "sha256:f23dca9f9d6ffcb8d556bf982843904bec6302e90fb6a19f2b333f349581d1f5"},
+    {file = "nonebot_plugin_session-0.2.1.tar.gz", hash = "sha256:f3cbf4f7b180fda35fc035da6f474f3a1d06581f7498d40f52badad5ebdee36e"},
 ]
 
 [package.dependencies]
-nonebot2 = {version = ">=2.0.0,<3.0.0", extras = ["fastapi"]}
+nonebot2 = ">=2.0.0,<3.0.0"
 strenum = ">=0.4.8,<0.5.0"
 
 [[package]]
@@ -4091,4 +4091,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "a7120aff87374cd79ac6a7641dde4c77ae450a305a73e5821f26966672781bf1"
+content-hash = "2f10fc1c41db8fd24370d58e49f0d8294d52afe4e99714605f12c0025345de4d"
