@@ -13,8 +13,7 @@ from nonebot_plugin_alconna import (
     UniMessage,
     on_alconna,
 )
-from nonebot_plugin_user import User, UserSession
-from nonebot_plugin_user.utils import get_or_create_user, get_user_by_id
+from nonebot_plugin_user import User, UserSession, get_user, get_user_by_id
 
 from src.utils.helpers import admin_permission
 
@@ -81,9 +80,7 @@ async def _(
     if at:
         if content:
             state["content"] = UniMessage(content)
-        at_user = await get_or_create_user(
-            at.target, user.platform, at.display or at.target
-        )
+        at_user = await get_user(user.platform, at.target)
         patient = await hospital_service.get_admitted_patient(at_user.id)
         if not patient:
             await rounds_cmd.finish(at + Text(" 未入院"))
@@ -134,9 +131,7 @@ async def _(user: UserSession, at: At | None = None):
         await admit_cmd.finish("请 @ 需要入院的病人")
 
     try:
-        at_user = await get_or_create_user(
-            at.target, user.platform, at.display or at.target
-        )
+        at_user = await get_user(user.platform, at.target)
         await hospital_service.admit_patient(at_user.id, user.group_session_id)
         await admit_cmd.finish(at + Text("入院成功"))
     except ValueError:
@@ -156,9 +151,7 @@ async def _(user: UserSession, at: At | None = None):
         await discharge_cmd.finish("请 @ 需要出院的病人")
 
     try:
-        at_user = await get_or_create_user(
-            at.target, user.platform, at.display or at.target
-        )
+        at_user = await get_user(user.platform, at.target)
         await hospital_service.discharge_patient(at_user.id, user.group_session_id)
         await discharge_cmd.finish(at + Text("出院成功"))
     except ValueError:
@@ -178,9 +171,7 @@ async def _(user: UserSession, at: At | None = None):
         await discharge_cmd.finish("请 @ 需要查看记录的病人")
 
     try:
-        at_user = await get_or_create_user(
-            at.target, user.platform, at.display or at.target
-        )
+        at_user = await get_user(user.platform, at.target)
         records = await hospital_service.get_records(at_user.id, user.group_session_id)
     except ValueError:
         await record_cmd.finish(at + Text("未入院"))
@@ -216,9 +207,7 @@ async def _(user: UserSession, at: At | None = None):
             patient_infos.append(f"{nickname} 入院次数：{count}")
         await history_cmd.finish("\n".join(patient_infos))
 
-    at_user = await get_or_create_user(
-        at.target, user.platform, at.display or at.target
-    )
+    at_user = await get_user(user.platform, at.target)
     patients = await hospital_service.get_patient(at_user.id, user.group_session_id)
     if not patients:
         await history_cmd.finish(UniMessage(at) + "从未入院")
