@@ -25,7 +25,7 @@ nonebot-adapter-satori = "^0.8.0"
 
 nonebot-plugin-wordcloud = "^0.6.0"
 nonebot-plugin-treehelp = "^0.3.0"
-nonebot-plugin-user = "^0.0.5"
+nonebot-plugin-user = "^0.1.1"
 
 nonebot-plugin-orm = { extras = ["default"], version = "^0.6.0" }
 nonebot-plugin-apscheduler = "^0.3.0"

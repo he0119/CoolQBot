@@ -9,7 +9,6 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, At, MultiVar, Text, on_alconna
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_user import UserSession, get_user
-from nonebot_plugin_user.utils import get_or_create_user
 
 from src.utils.helpers import strtobool
 from src.utils.permission import is_superuser
@@ -134,7 +133,7 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
         )
 
     if isinstance(argv[0], At) and len(argv) == 1:
-        at_user = await get_user(argv[0].target, session.platform)
+        at_user = await get_user(session.platform, argv[0].target)
         character = await fflogs.get_character(at_user.id)
         if not character:
             await fflogs_cmd.finish(
@@ -171,7 +170,7 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
         # <BOSS名> <职业名>
         if isinstance(argv[0], str) and isinstance(argv[1], At):
             # @他人的格式
-            at_user = await get_user(argv[1].target, session.platform)
+            at_user = await get_user(session.platform, argv[1].target)
             data = await get_character_dps_by_user_id(argv[0], at_user.id)
         elif (
             isinstance(argv[0], str)
@@ -216,7 +215,7 @@ async def data_migration():
         logger.info("正在迁移数据")
         characters = get_plugin_data("ff14").load_pkl("characters.pkl")
         for user_id, character in characters.items():
-            user = await get_or_create_user(user_id, "qq", user_id)
+            user = await get_user("qq", user_id)
             await fflogs.set_character(user.id, character[0], character[1])
         file_path.rename(file_path.with_suffix(".pkl.bak"))
         logger.info("数据迁移完成")

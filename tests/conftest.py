@@ -70,10 +70,12 @@ def caplog(caplog):
 async def default_user(app: App):
     from nonebot_plugin_orm import get_session
     from nonebot_plugin_user.models import Bind, User
-    from nonebot_plugin_user.utils import create_user
+    from nonebot_plugin_user.utils import get_user, set_user_name
 
-    await create_user("10", "qq", "nickname")
-    await create_user("10000", "qq", "nickname10000")
+    await get_user("qq", "10")
+    await set_user_name("qq", "10", "nickname")
+    await get_user("qq", "10000")
+    await set_user_name("qq", "10000", "nickname10000")
 
     yield
 
