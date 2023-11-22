@@ -36,6 +36,8 @@ jobs:
         run: poetry run pytest --cov=src --cov-report xml -n auto
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Set build version
         id: setVersion
         run: |
