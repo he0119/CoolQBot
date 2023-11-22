@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 状态插件默认不发送 Disk 数据
+
 ## [0.17.1] - 2023-11-21
 
 ### Fixed
