@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Fixed
 
 - 修复超级管理员权限判断问题
+- 通过环境变量设置 token
 
 ## [0.17.2] - 2023-11-22
 
