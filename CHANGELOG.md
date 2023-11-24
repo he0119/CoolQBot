@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 修复超级管理员权限判断问题
 - 通过环境变量设置 token
+- 处理参数有多余的空格的情况
 
 ## [0.17.2] - 2023-11-22
 
