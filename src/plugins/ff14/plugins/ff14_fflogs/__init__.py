@@ -32,7 +32,7 @@ __plugin_meta__ = PluginMetadata(
 /dps 副本名 me
 或查询他人绑定的角色排名
 /dps 副本名 @他人
-查询当前QQ号绑定的角色
+查询自己绑定的角色
 /dps me
 绑定自己的角色
 /dps me 角色名 服务器名
@@ -47,13 +47,16 @@ __plugin_meta__ = PluginMetadata(
 plugin_data = get_plugin_data()
 
 fflogs_cmd = on_alconna(
-    Alconna("dps", Args["argv", MultiVar(At | str)]),
+    Alconna("dps", Args["argv", MultiVar(At | str, flag="*")]),
     use_cmd_start=True,
 )
 
 
 @fflogs_cmd.handle()
 async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
+    if not argv:
+        await fflogs_cmd.finish(f"{__plugin_meta__.name}\n\n{__plugin_meta__.usage}")
+
     # 检查 Token 是否设置
     if not plugin_config.fflogs_token:
         await fflogs_cmd.finish("对不起，Token 未设置，无法查询数据。\n请先在 .env 中配置好 Token 后再尝试查询数据。")
