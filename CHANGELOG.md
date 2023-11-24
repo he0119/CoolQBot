@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 支持 qq 适配器下频道的 admin 权限
+
 ### Fixed
 
 - 修复超级管理员权限判断问题

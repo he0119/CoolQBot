@@ -187,4 +187,13 @@ def admin_permission():
 
         permission = permission | GROUP_ADMIN | GROUP_OWNER
 
+    with contextlib.suppress(ImportError):
+        from nonebot.adapters.qq.permission import (
+            GUILD_ADMIN,
+            GUILD_CHANNEL_ADMIN,
+            GUILD_OWNER,
+        )
+
+        permission = permission | GUILD_ADMIN | GUILD_CHANNEL_ADMIN | GUILD_OWNER
+
     return permission
