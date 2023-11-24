@@ -22,6 +22,8 @@ gate_cmd = ff14.command("gate", aliases={"gate"})
 
 async def get_door_number(door_number: str = ArgPlainText()) -> int:
     """获取门的数量"""
+    door_number = door_number.strip()
+
     if not door_number:
         await gate_cmd.reject("你什么都不输入我怎么知道呢，请告诉我有几个门！")
 
