@@ -76,17 +76,17 @@ async def test_dps_missing_token(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "对不起，Token 未设置，无法查询数据。\n请先使用命令\n/dps token <token>\n配置好 Token 后再尝试查询数据。",
+            "对不起，Token 未设置，无法查询数据。\n请先在 .env 中配置好 Token 后再尝试查询数据。",
             True,
         )
         ctx.should_finished(fflogs_cmd)
 
 
-async def test_dps_cache(app: App):
+async def test_dps_cache(app: App, mocker: MockerFixture):
     """测试 FFLOGS，设置缓存的情况"""
-    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_data
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_config
 
-    await plugin_data.config.set("token", "test")
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -137,11 +137,11 @@ async def test_dps_cache(app: App):
         ctx.should_finished(fflogs_cmd)
 
 
-async def test_dps_permission(app: App):
+async def test_dps_permission(app: App, mocker: MockerFixture):
     """测试 FFLOGS，没有权限情况"""
-    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_data
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_config
 
-    await plugin_data.config.set("token", "test")
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -153,32 +153,12 @@ async def test_dps_permission(app: App):
         ctx.should_call_send(event, "抱歉，你没有权限设置缓存。", True)
         ctx.should_finished(fflogs_cmd)
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(
-            message=Message("/dps token"), user_id=10000
-        )
 
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "抱歉，你没有权限查看 Token。", True)
-        ctx.should_finished(fflogs_cmd)
-
-    async with app.test_matcher(fflogs_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(
-            message=Message("/dps token test"), user_id=10000
-        )
-
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "抱歉，你没有权限修改 Token。", True)
-        ctx.should_finished(fflogs_cmd)
-
-
-async def test_dps_bind(app: App):
+async def test_dps_bind(app: App, mocker: MockerFixture):
     """测试绑定角色"""
-    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_data
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_config
 
-    await plugin_data.config.set("token", "test")
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
 
     # 查询自己的绑定角色
     async with app.test_matcher(fflogs_cmd) as ctx:
@@ -254,14 +234,15 @@ async def test_dps_bind(app: App):
 @respx.mock(assert_all_called=True)
 async def test_dps_character_rankings(
     app: App,
+    mocker: MockerFixture,
     respx_mock: MockRouter,
     fflogs_data: dict[str, Any],
     fflogs_character_rankings: dict[str, Any],
 ):
     """测试角色排行榜"""
-    from src.plugins.ff14.plugins.ff14_fflogs import fflogs, fflogs_cmd, plugin_data
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs, fflogs_cmd, plugin_config
 
-    await plugin_data.config.set("token", "test")
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
     await fflogs.set_character(1, "name", "server")
 
     fflogs_data_mock = respx_mock.get(
@@ -316,11 +297,11 @@ async def test_dps_character_rankings(
     assert user_dps_mock.call_count == 3
 
 
-async def test_dps_character_rankings_not_bind(app: App):
+async def test_dps_character_rankings_not_bind(app: App, mocker: MockerFixture):
     """测试 @ 用户，但没有绑定角色"""
-    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_data
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_config
 
-    await plugin_data.config.set("token", "test")
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
 
     async with app.test_matcher(fflogs_cmd) as ctx:
         adapter = get_adapter(Adapter)
@@ -343,11 +324,12 @@ async def test_dps_update_data(
     app: App,
     respx_mock: MockRouter,
     fflogs_data: dict[str, Any],
+    mocker: MockerFixture,
 ):
     """测试 FFLOGS，测试 @ 用户的情况"""
-    from src.plugins.ff14.plugins.ff14_fflogs import fflogs, fflogs_cmd, plugin_data
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs, fflogs_cmd, plugin_config
 
-    await plugin_data.config.set("token", "test")
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
     await fflogs.set_character(2, "name", "server")
 
     fflogs_data_mock = respx_mock.get(
@@ -374,11 +356,10 @@ async def test_dps_job_rankings_empty(
     fflogs_job_rankings_empty: dict[str, Any],
 ):
     """测试查询职业排行榜，数据为空的情况"""
-    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_data
-    from src.plugins.ff14.plugins.ff14_fflogs.config import plugin_config
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_config
 
-    plugin_config.fflogs_range = 2
-    await plugin_data.config.set("token", "test")
+    mocker.patch.object(plugin_config, "fflogs_range", 2)
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
 
     mocked_datatime = mocker.patch(
         "src.plugins.ff14.plugins.ff14_fflogs.api.datetime",
@@ -426,11 +407,10 @@ async def test_dps_job_rankings(
     fflogs_job_rankings_empty: dict[str, Any],
 ):
     """测试查询职业排行榜"""
-    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_data
-    from src.plugins.ff14.plugins.ff14_fflogs.config import plugin_config
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_config
 
-    plugin_config.fflogs_range = 2
-    await plugin_data.config.set("token", "test")
+    mocker.patch.object(plugin_config, "fflogs_range", 2)
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
 
     mocked_datatime = mocker.patch(
         "src.plugins.ff14.plugins.ff14_fflogs.api.datetime",

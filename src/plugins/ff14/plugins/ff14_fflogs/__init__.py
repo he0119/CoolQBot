@@ -15,6 +15,7 @@ from src.utils.permission import is_superuser
 
 from . import migrations
 from .api import fflogs
+from .config import plugin_config
 from .data import FFLOGS_DATA
 
 __plugin_meta__ = PluginMetadata(
@@ -53,27 +54,9 @@ fflogs_cmd = on_alconna(
 
 @fflogs_cmd.handle()
 async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
-    # 设置 Token
-    if argv[0] == "token" and len(argv) == 2:
-        # 检查是否是超级用户
-        if not is_superuser(session.user):
-            await fflogs_cmd.finish("抱歉，你没有权限修改 Token。")
-
-        await plugin_data.config.set("token", str(argv[1]))
-        await fflogs_cmd.finish("Token 设置完成。")
-
     # 检查 Token 是否设置
-    token = await plugin_data.config.get("token")
-    if not token:
-        await fflogs_cmd.finish(
-            "对不起，Token 未设置，无法查询数据。\n请先使用命令\n/dps token <token>\n配置好 Token 后再尝试查询数据。"
-        )
-
-    if argv[0] == "token" and len(argv) == 1:
-        # 检查是否是超级用户
-        if not is_superuser(session.user):
-            await fflogs_cmd.finish("抱歉，你没有权限查看 Token。")
-        await fflogs_cmd.finish(f"当前的 Token 为 {token}")
+    if not plugin_config.fflogs_token:
+        await fflogs_cmd.finish("对不起，Token 未设置，无法查询数据。\n请先在 .env 中配置好 Token 后再尝试查询数据。")
 
     if argv[0] == "update" and len(argv) == 1:
         await FFLOGS_DATA.update()

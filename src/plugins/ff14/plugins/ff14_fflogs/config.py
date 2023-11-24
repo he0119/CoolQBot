@@ -13,6 +13,8 @@ class Config(BaseModel, extra=Extra.ignore):
     fflogs_range: int = 14
     # 缓存的时间
     fflogs_cache_time: time = time(hour=4, minute=30)
+    fflogs_token: str | None = None
+    """FFLogs API Token"""
 
 
 plugin_config = Config.parse_obj(global_config)

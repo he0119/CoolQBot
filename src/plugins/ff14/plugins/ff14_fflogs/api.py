@@ -92,13 +92,6 @@ class FFLogs:
         else:
             return False
 
-    async def get_token(self) -> str:
-        """获取 token"""
-        token = await plugin_data.config.get("token", "")
-        if not token:
-            raise AuthException("没有设置 token")
-        return token
-
     async def set_character(
         self, uid: int, character_name: str, server_name: str
     ) -> None:
@@ -137,7 +130,7 @@ class FFLogs:
 
     async def _http(self, url: str, params: dict = {}):
         try:
-            params.setdefault("api_key", await self.get_token())
+            params.setdefault("api_key", plugin_config.fflogs_token)
             # 使用 httpx 库发送最终的请求
             async with httpx.AsyncClient() as client:
                 resp = await client.get(url, params=params)
