@@ -6,7 +6,7 @@ from nonebot_plugin_user import User
 config = get_driver().config
 
 
-async def is_superuser(user: User) -> bool:
+def is_superuser(user: User) -> bool:
     """检查当前用户是否属于超级管理员"""
     return user.name in config.superusers
 

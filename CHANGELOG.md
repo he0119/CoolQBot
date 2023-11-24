@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 修复超级管理员权限判断问题
+
 ## [0.17.2] - 2023-11-22
 
 ### Fixed
