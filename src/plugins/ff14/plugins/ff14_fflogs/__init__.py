@@ -56,7 +56,7 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
     # 设置 Token
     if argv[0] == "token" and len(argv) == 2:
         # 检查是否是超级用户
-        if is_superuser(session.user):
+        if not is_superuser(session.user):
             await fflogs_cmd.finish("抱歉，你没有权限修改 Token。")
 
         await plugin_data.config.set("token", str(argv[1]))
@@ -71,7 +71,7 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
 
     if argv[0] == "token" and len(argv) == 1:
         # 检查是否是超级用户
-        if is_superuser(session.user):
+        if not is_superuser(session.user):
             await fflogs_cmd.finish("抱歉，你没有权限查看 Token。")
         await fflogs_cmd.finish(f"当前的 Token 为 {token}")
 
@@ -89,7 +89,7 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
                     await fflogs_cmd.finish("当前没有缓存副本。")
                 await fflogs_cmd.finish("当前缓存的副本有：\n" + "\n".join(cache_boss))
             # 检查是否是超级用户
-            if is_superuser(session.user):
+            if not is_superuser(session.user):
                 await fflogs_cmd.finish("抱歉，你没有权限设置缓存。")
             if strtobool(str(argv[1])):
                 if not fflogs.is_cache_enabled:
@@ -100,6 +100,9 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
                     await fflogs.disable_cache()
                 await fflogs_cmd.finish("已停止定时缓存。")
         if len(argv) == 3:
+            # 检查是否是超级用户
+            if not is_superuser(session.user):
+                await fflogs_cmd.finish("抱歉，你没有权限设置缓存。")
             if argv[1] == "add":
                 cache_boss.append(str(argv[2]))
                 await plugin_data.config.set("cache_boss", cache_boss)

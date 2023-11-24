@@ -14,6 +14,7 @@ def pytest_configure(config: pytest.Config) -> None:
         "sqlalchemy_database_url": "sqlite+aiosqlite:///:memory:",
         "sqlalchemy_engine_options": {"poolclass": StaticPool},
         "alembic_startup_check": False,
+        "superusers": ["nickname"],
     }
 
 

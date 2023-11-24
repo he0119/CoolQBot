@@ -137,6 +137,43 @@ async def test_dps_cache(app: App):
         ctx.should_finished(fflogs_cmd)
 
 
+async def test_dps_permission(app: App):
+    """测试 FFLOGS，没有权限情况"""
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_data
+
+    await plugin_data.config.set("token", "test")
+
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(
+            message=Message("/dps cache del p2s"), user_id=10000
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "抱歉，你没有权限设置缓存。", True)
+        ctx.should_finished(fflogs_cmd)
+
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(
+            message=Message("/dps token"), user_id=10000
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "抱歉，你没有权限查看 Token。", True)
+        ctx.should_finished(fflogs_cmd)
+
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(
+            message=Message("/dps token test"), user_id=10000
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "抱歉，你没有权限修改 Token。", True)
+        ctx.should_finished(fflogs_cmd)
+
+
 async def test_dps_bind(app: App):
     """测试绑定角色"""
     from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_data
@@ -207,7 +244,9 @@ async def test_dps_bind(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
-            event, MessageSegment.at(10) + "当前绑定的角色：\n角色：name\n服务器：server", True
+            event,
+            MessageSegment.at(10) + "当前绑定的角色：\n角色：name\n服务器：server",
+            True,
         )
         ctx.should_finished(fflogs_cmd)
 
