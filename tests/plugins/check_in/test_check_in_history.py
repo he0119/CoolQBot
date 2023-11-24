@@ -210,3 +210,30 @@ async def test_history_empty(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你还没有体脂记录哦", True, at_sender=True)
         ctx.should_finished(history_cmd)
+
+
+async def test_history_two_step_strip(app: App):
+    """回复内容有多余的空格"""
+    from src.plugins.check_in.plugins.check_in_history import history_cmd
+
+    async with app.test_matcher(history_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(message=Message("/打卡历史"))
+        event2 = fake_group_message_event_v11(message=Message(" A "))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "请问你要查询什么历史呢？请输入 A：健身 B：饮食 C：体重 D：体脂",
+            True,
+        )
+        ctx.should_rejected(history_cmd)
+
+        ctx.receive_event(bot, event2)
+        ctx.should_call_send(
+            event2,
+            "你还没有健身打卡记录哦",
+            True,
+            at_sender=True,
+        )
+        ctx.should_finished(history_cmd)

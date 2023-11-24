@@ -55,7 +55,7 @@ async def _(
     user: UserSession,
     content: str,
 ):
-    content = content.lower()
+    content = content.strip().lower()
     if not content:
         await history_cmd.reject("选项不能为空，请重新输入", at_sender=True)
 

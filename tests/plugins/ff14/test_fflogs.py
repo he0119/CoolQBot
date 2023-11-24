@@ -65,6 +65,45 @@ async def fflogs_job_rankings_empty(app: App) -> dict[str, Any]:
     return data
 
 
+async def test_dps_help(app: App, mocker: MockerFixture):
+    """测试 FFLOGS，返回帮助的情况"""
+    from src.plugins.ff14.plugins.ff14_fflogs import (
+        __plugin_meta__,
+        fflogs_cmd,
+        plugin_config,
+    )
+
+    help_msg = f"{__plugin_meta__.name}\n\n{__plugin_meta__.usage}"
+
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
+
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(message=Message("/dps"), user_id=10000)
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, help_msg, True)
+        ctx.should_finished(fflogs_cmd)
+
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(message=Message("/dps "), user_id=10000)
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, help_msg, True)
+        ctx.should_finished(fflogs_cmd)
+
+    async with app.test_matcher(fflogs_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(
+            message=Message("/dps test"), user_id=10000
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, help_msg, True)
+        ctx.should_finished(fflogs_cmd)
+
+
 async def test_dps_missing_token(app: App):
     """测试 FFLOGS，缺少 Token 的情况"""
     from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd
