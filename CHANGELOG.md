@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加 DoDo 和 Villa 适配器
+
 ## [0.17.3] - 2023-11-24
 
 ### Added
 
-- 支持 qq 适配器下频道的 admin 权限
+- 支持 QQ 适配器下频道的 admin 权限
 
 ### Fixed
 
