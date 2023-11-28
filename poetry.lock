@@ -175,6 +175,17 @@ multidict = ">=4.0,<7.0"
 requests = ">=2.21,<3.0"
 
 [[package]]
+name = "async-lru"
+version = "2.0.4"
+description = "Simple LRU cache for asyncio"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "async-lru-2.0.4.tar.gz", hash = "sha256:b8a59a5df60805ff63220b2a0c5b5393da5521b113cd5465a44eb037d81a5627"},
+    {file = "async_lru-2.0.4-py3-none-any.whl", hash = "sha256:ff02944ce3c288c5be660c42dbcca0742b32c3b279d6dceda655190240b99224"},
+]
+
+[[package]]
 name = "bbcode"
 version = "1.1.0"
 description = "A pure python bbcode parser and formatter."
@@ -1832,13 +1843,13 @@ typing-extensions = ">=4.0.0,<5.0.0"
 
 [[package]]
 name = "nonebot-adapter-qq"
-version = "1.3.0"
+version = "1.3.1"
 description = "QQ adapter for nonebot2"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_adapter_qq-1.3.0-py3-none-any.whl", hash = "sha256:f2e5117fc2451f4054699a797b6df7eae19e8b105b277f5b87bc1a0c4e189cab"},
-    {file = "nonebot_adapter_qq-1.3.0.tar.gz", hash = "sha256:625009e440cda7a994df71ac946f748dc620a6f79f6435e1c66bc0d0dca13029"},
+    {file = "nonebot_adapter_qq-1.3.1-py3-none-any.whl", hash = "sha256:ad420692122295b07eb30dbf6584675a685e72b831b2cef92ab6f9e85b2ff619"},
+    {file = "nonebot_adapter_qq-1.3.1.tar.gz", hash = "sha256:2e38f608bbd6cea9ffb3fa959ca9d2bd2407af131b4a72dbf24caaf0a45e76cd"},
 ]
 
 [package.dependencies]
@@ -1973,19 +1984,21 @@ nonebot2 = ">=2.0.0,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-bawiki"
-version = "0.9.7.post1"
+version = "0.10.0.post1"
 description = "A nonebot2 plugin for Blue Archive."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "nonebot_plugin_bawiki-0.9.7.post1-py3-none-any.whl", hash = "sha256:b7a754dfd6cd8c75a59c488fe99ad1d28c35cdc093d4f74d4e108d0263e828c0"},
-    {file = "nonebot_plugin_bawiki-0.9.7.post1.tar.gz", hash = "sha256:44106f4a988b3f399d157a13449db854ea8041cee7b5c8145abfab923a788110"},
+    {file = "nonebot_plugin_bawiki-0.10.0.post1-py3-none-any.whl", hash = "sha256:bd128d9ef53a8172e3c0a047214e957cd6af88f6df80eaba5b0cf9ea7913637f"},
+    {file = "nonebot_plugin_bawiki-0.10.0.post1.tar.gz", hash = "sha256:d9e195d7298d2d775ade24e30aa3af38f98a6dd4b9809f3106e8ff3ee00691b2"},
 ]
 
 [package.dependencies]
+async-lru = ">=2.0.4"
 beautifulsoup4 = ">=4.11.1"
 httpx = ">=0.24.1"
 lxml = ">=4.9.1"
+matplotlib = ">=3.7.4"
 nonebot-adapter-onebot = ">=2.3.1"
 nonebot-plugin-apscheduler = ">=0.3.0"
 nonebot-plugin-htmlrender = ">=0.2.2"
@@ -4253,4 +4266,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "cadf427b6d232de8dc802070a5f88ad39288cc0a1ca26eb41b4040216bfd1e1a"
+content-hash = "26c8fd38a2116821e170de054578da7ed50e73f189ea641e9c0e5f69f341b6d6"
