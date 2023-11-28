@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 添加 DoDo 和 Villa 适配器
 
+### Fixed
+
+- 修复无法捕获 NoneBot 错误日志的问题
+
 ## [0.17.3] - 2023-11-24
 
 ### Added
