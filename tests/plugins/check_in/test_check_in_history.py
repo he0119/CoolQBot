@@ -31,42 +31,7 @@ async def test_fitness_history(
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/打卡历史"))
-        event2 = fake_group_message_event_v11(message=Message("A"))
-
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(
-            event,
-            "请问你要查询什么历史呢？请输入 A：健身 B：饮食 C：体重 D：体脂",
-            True,
-        )
-        ctx.should_rejected(history_cmd)
-
-        ctx.receive_event(bot, event2)
-        ctx.should_call_send(
-            event2,
-            "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-02-01 健身记录",
-            True,
-            at_sender=True,
-        )
-        ctx.should_finished(history_cmd)
-
-    async with app.test_matcher(history_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/打卡历史 A"))
-
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(
-            event,
-            "你已成功打卡 1 次，以下是你当月的健身情况哦～：\n2023-02-01 健身记录",
-            True,
-            at_sender=True,
-        )
-        ctx.should_finished(history_cmd)
-
-    async with app.test_matcher(history_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/打卡历史 a"))
+        event = fake_group_message_event_v11(message=Message("/打卡历史 健身"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -91,7 +56,7 @@ async def test_dietary_history(app: App, session: "AsyncSession"):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/打卡历史 B"))
+        event = fake_group_message_event_v11(message=Message("/打卡历史 饮食"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -125,7 +90,7 @@ async def test_weight_record_history(
     async with app.test_matcher(history_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/打卡历史 C"))
+        event = fake_group_message_event_v11(message=Message("/打卡历史 体重"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -161,7 +126,7 @@ async def test_body_fat_record_history(
     async with app.test_matcher(history_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/打卡历史 D"))
+        event = fake_group_message_event_v11(message=Message("/打卡历史 体脂"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -181,7 +146,7 @@ async def test_history_empty(app: App):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/打卡历史 A"))
+        event = fake_group_message_event_v11(message=Message("/打卡历史 健身"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你还没有健身打卡记录哦", True, at_sender=True)
@@ -189,7 +154,7 @@ async def test_history_empty(app: App):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/打卡历史 B"))
+        event = fake_group_message_event_v11(message=Message("/打卡历史 饮食"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你还没有饮食打卡记录哦", True, at_sender=True)
@@ -197,7 +162,7 @@ async def test_history_empty(app: App):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/打卡历史 C"))
+        event = fake_group_message_event_v11(message=Message("/打卡历史 体重"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你还没有体重记录哦", True, at_sender=True)
@@ -205,35 +170,8 @@ async def test_history_empty(app: App):
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/打卡历史 D"))
+        event = fake_group_message_event_v11(message=Message("/打卡历史 体脂"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你还没有体脂记录哦", True, at_sender=True)
-        ctx.should_finished(history_cmd)
-
-
-async def test_history_two_step_strip(app: App):
-    """回复内容有多余的空格"""
-    from src.plugins.check_in.plugins.check_in_history import history_cmd
-
-    async with app.test_matcher(history_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/打卡历史"))
-        event2 = fake_group_message_event_v11(message=Message(" A "))
-
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(
-            event,
-            "请问你要查询什么历史呢？请输入 A：健身 B：饮食 C：体重 D：体脂",
-            True,
-        )
-        ctx.should_rejected(history_cmd)
-
-        ctx.receive_event(bot, event2)
-        ctx.should_call_send(
-            event2,
-            "你还没有健身打卡记录哦",
-            True,
-            at_sender=True,
-        )
         ctx.should_finished(history_cmd)
