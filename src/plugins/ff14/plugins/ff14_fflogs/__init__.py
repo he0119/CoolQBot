@@ -59,7 +59,9 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
 
     # 检查 Token 是否设置
     if not plugin_config.fflogs_token:
-        await fflogs_cmd.finish("对不起，Token 未设置，无法查询数据。\n请先在 .env 中配置好 Token 后再尝试查询数据。")
+        await fflogs_cmd.finish(
+            "对不起，Token 未设置，无法查询数据。\n请先在 .env 中配置好 Token 后再尝试查询数据。"
+        )
 
     if argv[0] == "update" and len(argv) == 1:
         await FFLOGS_DATA.update()
@@ -111,7 +113,9 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
         if not character:
             await fflogs_cmd.finish(
                 At(flag="user", target=session.platform_id)
-                + Text("抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。")
+                + Text(
+                    "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。"
+                )
             )
 
         await fflogs_cmd.finish(

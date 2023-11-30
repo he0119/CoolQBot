@@ -63,7 +63,9 @@ async def handle_first_message(
             ).all()
             if not fitness_records:
                 await history_cmd.finish("你还没有健身打卡记录哦", at_sender=True)
-            msgs = [f"你已成功打卡 {len(fitness_records)} 次，以下是你当月的健身情况哦～："]
+            msgs = [
+                f"你已成功打卡 {len(fitness_records)} 次，以下是你当月的健身情况哦～："
+            ]
             for record in fitness_records:
                 msgs.append(f"{record.time.date()} {record.message}")
             await history_cmd.finish("\n".join(msgs), at_sender=True)

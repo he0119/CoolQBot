@@ -25,7 +25,9 @@ async def handle_first_message(state: T_State, content: PlainTextArgs):
 
 
 @fitness_cmd.got(
-    "content", prompt="请问你做了什么运动？", parameterless=[Depends(parse_str("content"))]
+    "content",
+    prompt="请问你做了什么运动？",
+    parameterless=[Depends(parse_str("content"))],
 )
 async def _(
     session: AsyncSession,
@@ -39,4 +41,6 @@ async def _(
     session.add(FitnessRecord(user_id=user.user_id, message=content))
     await session.commit()
 
-    await fitness_cmd.finish("已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True)
+    await fitness_cmd.finish(
+        "已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True
+    )

@@ -48,7 +48,9 @@ async def test_history(app: App, session: "AsyncSession"):
         )
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "nickname 入院次数：2\nnickname10000 入院次数：1", True)
+        ctx.should_call_send(
+            event, "nickname 入院次数：2\nnickname10000 入院次数：1", True
+        )
         ctx.should_finished(history_cmd)
 
     async with app.test_matcher(history_cmd) as ctx:

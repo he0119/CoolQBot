@@ -165,9 +165,7 @@ async def get_holiday_message() -> str:
         elif holiday_rest == 1:
             return f'今天是{workday["name"]}前调休，明天就是{workday["name"]}了，加油！'
         else:
-            return (
-                f'今天是{workday["name"]}前调休，马上就是{workday["name"]}了，还有{holiday_rest}天，加油！'
-            )
+            return f'今天是{workday["name"]}前调休，马上就是{workday["name"]}了，还有{holiday_rest}天，加油！'
 
     # 处理今天是周末，且不是节假日或者调休的情况
     if today.weekday() == 5:

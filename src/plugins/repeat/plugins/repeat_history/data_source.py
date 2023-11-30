@@ -86,7 +86,10 @@ def is_valid_date(year: int, month: int, day: int, now: datetime) -> tuple[bool,
     if day:
         valid_day = monthrange(year, month)[1]
         if day > valid_day:
-            return False, f"哼，别以为我不知道 {year} 年 {month} 月只有 {valid_day} 天！"
+            return (
+                False,
+                f"哼，别以为我不知道 {year} 年 {month} 月只有 {valid_day} 天！",
+            )
         if year == now.year and month == now.month and day > now.day:
             return False, "抱歉，小誓约不能穿越时空呢！"
 

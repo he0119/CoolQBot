@@ -74,7 +74,9 @@ async def get_item_price(name: str, world_or_dc: str) -> str:
         rjson = r.json()
 
         if "itemID" not in rjson:
-            return f"抱歉，没有找到 {world_or_dc} 的数据，请检查大区或服务器名称是否正确。"
+            return (
+                f"抱歉，没有找到 {world_or_dc} 的数据，请检查大区或服务器名称是否正确。"
+            )
 
         data = UniversalisCurrentlyShown.parse_obj(rjson)
 

@@ -18,7 +18,10 @@ def mocked_get(url: str):
 
     test_dir = Path(__file__).parent
     match url:
-        case "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&key=1234567890" | "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&adm=%E5%9B%9B%E5%B7%9D&key=1234567890":
+        case (
+            "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&key=1234567890"
+            | "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&adm=%E5%9B%9B%E5%B7%9D&key=1234567890"
+        ):
             with open(test_dir / "lookup.json", encoding="utf-8") as f:
                 data = json.load(f)
             return MockResponse(data)
