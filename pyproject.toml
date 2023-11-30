@@ -36,11 +36,11 @@ nonebot-plugin-alconna = "^0.33.3"
 nonebot-plugin-session = "^0.2.3"
 nonebot-plugin-datastore = "^1.1.2"
 
-nonebot-plugin-sentry = "1.0.0"
+nonebot-plugin-sentry = "1.0.1"
 nonebot-plugin-memes = "0.5.0"
 nonebot-bison = "0.8.2"
 nonebot-plugin-status = "0.7.2"
-nonebot-plugin-bawiki = "0.10.0.post2"
+nonebot-plugin-bawiki = "0.10.1.post1"
 
 [tool.poetry.group.dev.dependencies]
 nonebug = "^0.3.3"
