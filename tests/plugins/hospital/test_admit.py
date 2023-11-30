@@ -29,7 +29,8 @@ async def test_admin(app: App):
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
-            message=Message("/入院") + MessageSegment.at(123456), sender={"role": "admin"}
+            message=Message("/入院") + MessageSegment.at(123456),
+            sender={"role": "admin"},
         )
 
         ctx.receive_event(bot, event)
@@ -40,7 +41,8 @@ async def test_admin(app: App):
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
-            message=Message("/入院") + MessageSegment.at(123456), sender={"role": "admin"}
+            message=Message("/入院") + MessageSegment.at(123456),
+            sender={"role": "admin"},
         )
 
         ctx.receive_event(bot, event)
@@ -62,7 +64,8 @@ async def test_admin_different_group(app: App, session: "AsyncSession"):
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
-            message=Message("/入院") + MessageSegment.at(123456), sender={"role": "admin"}
+            message=Message("/入院") + MessageSegment.at(123456),
+            sender={"role": "admin"},
         )
 
         ctx.receive_event(bot, event)

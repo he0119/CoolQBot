@@ -77,7 +77,9 @@ async def test_gete_ask_arg_error(app: App, mocker: MockerFixture):
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "总共有多少个门呢？", "result")
         ctx.receive_event(bot, next_event)
-        ctx.should_call_send(next_event, "暂时只支持两个门或者三个门的情况，请重新输入吧。", "result")
+        ctx.should_call_send(
+            next_event, "暂时只支持两个门或者三个门的情况，请重新输入吧。", "result"
+        )
         ctx.should_rejected()
         ctx.receive_event(bot, final_event)
         ctx.should_call_send(final_event, Message("test"), "result", at_sender=True)

@@ -39,7 +39,9 @@ async def test_rounds(app: App, session: "AsyncSession"):
         )
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, MessageSegment.at(10) + "请问你现在有什么不适吗？", True)
+        ctx.should_call_send(
+            event, MessageSegment.at(10) + "请问你现在有什么不适吗？", True
+        )
         ctx.should_rejected()
 
         event = fake_group_message_event_v11(message=Message("头疼"), user_id=10)
@@ -56,7 +58,9 @@ async def test_rounds(app: App, session: "AsyncSession"):
         )
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, MessageSegment.at(10) + "请问你现在有什么不适吗？", True)
+        ctx.should_call_send(
+            event, MessageSegment.at(10) + "请问你现在有什么不适吗？", True
+        )
         ctx.should_rejected()
 
         event = fake_group_message_event_v11(message=Message("头疼"), user_id=10)
@@ -73,14 +77,18 @@ async def test_rounds(app: App, session: "AsyncSession"):
         )
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, MessageSegment.at(10) + "请问你现在有什么不适吗？", True)
+        ctx.should_call_send(
+            event, MessageSegment.at(10) + "请问你现在有什么不适吗？", True
+        )
         ctx.should_rejected()
 
         event = fake_group_message_event_v11(
             message=" " + MessageSegment.at(10), user_id=10
         )
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, MessageSegment.at(10) + "症状不能为空，请重新输入", True)
+        ctx.should_call_send(
+            event, MessageSegment.at(10) + "症状不能为空，请重新输入", True
+        )
         ctx.should_rejected()
 
         event = fake_group_message_event_v11(message=Message("头疼"), user_id=10)
@@ -102,7 +110,9 @@ async def test_rounds_with_record(app: App, session: "AsyncSession"):
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
-            message=Message("/查房") + MessageSegment.at(10) + MessageSegment.text("咳嗽"),
+            message=Message("/查房")
+            + MessageSegment.at(10)
+            + MessageSegment.text("咳嗽"),
             sender={"role": "admin"},
         )
 

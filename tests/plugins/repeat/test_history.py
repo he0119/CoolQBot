@@ -98,7 +98,9 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
         ctx.should_call_send(year_event, "你请输入你要查询的月份", True)
 
         ctx.receive_event(bot, month_event)
-        ctx.should_call_send(month_event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True)
+        ctx.should_call_send(
+            month_event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True
+        )
 
         ctx.receive_event(bot, day_event)
         ctx.should_call_api(
@@ -143,14 +145,20 @@ async def test_history_get_invalid_args(app: App):
         ctx.should_call_send(year_event, "你请输入你要查询的月份", True)
 
         ctx.receive_event(bot, invalid_month_event)
-        ctx.should_call_send(invalid_month_event, "请只输入数字，不然我没法理解呢！", True)
+        ctx.should_call_send(
+            invalid_month_event, "请只输入数字，不然我没法理解呢！", True
+        )
         ctx.should_rejected()
 
         ctx.receive_event(bot, month_event)
-        ctx.should_call_send(month_event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True)
+        ctx.should_call_send(
+            month_event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True
+        )
 
         ctx.receive_event(bot, day_event)
-        ctx.should_call_send(day_event, "2020 年 1 月的数据不存在，请换个试试吧 0.0", True)
+        ctx.should_call_send(
+            day_event, "2020 年 1 月的数据不存在，请换个试试吧 0.0", True
+        )
 
 
 async def test_history_not_enabled(app: App):

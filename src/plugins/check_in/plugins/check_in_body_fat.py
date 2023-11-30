@@ -50,7 +50,9 @@ async def handle_first_message(
 
 
 @target_body_fat_cmd.got(
-    "content", prompt="请输入你的目标体脂哦～", parameterless=[Depends(parse_str("content"))]
+    "content",
+    prompt="请输入你的目标体脂哦～",
+    parameterless=[Depends(parse_str("content"))],
 )
 async def _(
     session: AsyncSession,
@@ -64,16 +66,22 @@ async def _(
     try:
         body_fat = float(content)
     except ValueError:
-        await target_body_fat_cmd.reject("目标体脂只能输入数字哦，请重新输入", at_sender=True)
+        await target_body_fat_cmd.reject(
+            "目标体脂只能输入数字哦，请重新输入", at_sender=True
+        )
 
     if body_fat < 0 or body_fat > 100:
-        await target_body_fat_cmd.reject("目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True)
+        await target_body_fat_cmd.reject(
+            "目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True
+        )
 
     user_info = await get_or_create_user_info(user, session)
     user_info.target_body_fat = body_fat
     await session.commit()
 
-    await target_body_fat_cmd.finish("已成功设置，你真棒哦！祝你早日达成目标～", at_sender=True)
+    await target_body_fat_cmd.finish(
+        "已成功设置，你真棒哦！祝你早日达成目标～", at_sender=True
+    )
 
 
 body_fat_record_cmd = check_in.command("body_record", aliases={"记录体脂", "体脂打卡"})
@@ -86,7 +94,9 @@ async def _(state: T_State, content: PlainTextArgs):
 
 
 @body_fat_record_cmd.got(
-    "content", prompt="今天你的体脂是多少呢？", parameterless=[Depends(parse_str("content"))]
+    "content",
+    prompt="今天你的体脂是多少呢？",
+    parameterless=[Depends(parse_str("content"))],
 )
 async def _(
     session: AsyncSession,
@@ -100,12 +110,18 @@ async def _(
     try:
         body_fat = float(content)
     except ValueError:
-        await body_fat_record_cmd.reject("体脂只能输入数字哦，请重新输入", at_sender=True)
+        await body_fat_record_cmd.reject(
+            "体脂只能输入数字哦，请重新输入", at_sender=True
+        )
 
     if body_fat < 0 or body_fat > 100:
-        await target_body_fat_cmd.reject("目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True)
+        await target_body_fat_cmd.reject(
+            "目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True
+        )
 
     session.add(BodyFatRecord(user_id=user.user_id, body_fat=body_fat))
     await session.commit()
 
-    await body_fat_record_cmd.finish("已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True)
+    await body_fat_record_cmd.finish(
+        "已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True
+    )
