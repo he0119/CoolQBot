@@ -43,7 +43,7 @@ async def handle_first_message(
 
     value = content.result.strip()
     if value not in ["健身", "饮食", "体重", "体脂"]:
-        await history_cmd.finish("选项不正确，请重新输入", at_sender=True)
+        await history_cmd.finish("不存在这项历史，请重新输入", at_sender=True)
 
     match value:
         case "健身":

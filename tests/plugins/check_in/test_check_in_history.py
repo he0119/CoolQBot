@@ -140,9 +140,28 @@ async def test_body_fat_record_history(
     mocked_gerenate_graph.assert_called_once()
 
 
-async def test_history_empty(app: App):
-    """测试历史记录为空的情况"""
-    from src.plugins.check_in.plugins.check_in_history import history_cmd
+async def test_history_other(app: App):
+    """测试其他情况"""
+    from src.plugins.check_in.plugins.check_in_history import (
+        __plugin_meta__,
+        history_cmd,
+    )
+
+    async with app.test_matcher(history_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(message=Message("/打卡历史"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, __plugin_meta__.usage, True, at_sender=True)
+        ctx.should_finished(history_cmd)
+
+    async with app.test_matcher(history_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(message=Message("/打卡历史 aa"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "不存在这项历史，请重新输入", True, at_sender=True)
+        ctx.should_finished(history_cmd)
 
     async with app.test_matcher(history_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
