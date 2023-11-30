@@ -72,14 +72,6 @@ plugins = [
     "nonebot_plugin_bawiki",
 ]
 
-[tool.black]
-line-length = 88
-
-[tool.isort]
-profile = "black"
-line_length = 88
-skip_gitignore = true
-
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 
