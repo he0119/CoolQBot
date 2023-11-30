@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Fixed
 
 - 修复无法捕获 NoneBot 错误日志的问题
+- 修复打卡历史选项不直观的问题
 
 ## [0.17.3] - 2023-11-24
 
