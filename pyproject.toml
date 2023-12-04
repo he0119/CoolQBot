@@ -47,9 +47,9 @@ nonebug = "^0.3.3"
 pytest-cov = "^4.0.0"
 pytest-mock = "^3.6.1"
 pytest-xdist = "^3.0.2"
-pytest-asyncio = "^0.21.0"
+pytest-asyncio = "^0.23.1"
 respx = "^0.20.1"
-freezegun = "^1.2.2"
+freezegun = "^1.3.0"
 nonebug-saa = "^0.2.2"
 
 [tool.nonebot]
