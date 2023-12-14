@@ -1722,13 +1722,13 @@ files = [
 
 [[package]]
 name = "nb-cli"
-version = "1.2.7"
+version = "1.2.8"
 description = "CLI for nonebot2"
 optional = false
 python-versions = ">=3.8, <4.0"
 files = [
-    {file = "nb-cli-1.2.7.tar.gz", hash = "sha256:a868f03c2da9ccdfbdebd067f70c0f8e687ab904aebbea7f3a9a01853705e483"},
-    {file = "nb_cli-1.2.7-py3-none-any.whl", hash = "sha256:574914fa224a25952a6ad60e7165b6208ebd8519d4f91b738f48210febf8b66c"},
+    {file = "nb-cli-1.2.8.tar.gz", hash = "sha256:8e17c73ca494ce16b3a18a18d4d611b5ffb27e37ee3de2c7a510c7e32b7df002"},
+    {file = "nb_cli-1.2.8-py3-none-any.whl", hash = "sha256:080a07c4bb94f93a662844d7f1fe8b9672cb61daf6a9c3ae74bbc42ed17a35a7"},
 ]
 
 [package.dependencies]
@@ -1778,17 +1778,18 @@ nonebot2 = ">=2.0.0,<3.0.0"
 
 [[package]]
 name = "nonebot-adapter-kaiheila"
-version = "0.2.12"
+version = "0.3.0"
 description = "kaiheila adapter for nonebot2"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_adapter_kaiheila-0.2.12-py3-none-any.whl", hash = "sha256:3ddc7e47b7213807d652428b95663e03991d1d89e79f434fbcf8b73a95a7a5ee"},
-    {file = "nonebot_adapter_kaiheila-0.2.12.tar.gz", hash = "sha256:102e00642e693f859b3263f53dc41675e4c8ec6c123e253fdddecf3b3f2ec61f"},
+    {file = "nonebot_adapter_kaiheila-0.3.0-py3-none-any.whl", hash = "sha256:8868f57f9ac591dff46d5cf711c419aa76ece22a5dd2380abc33d337132b5157"},
+    {file = "nonebot_adapter_kaiheila-0.3.0.tar.gz", hash = "sha256:b32b4e9d911b98ae0270540ed7fa414e94f74b228363b6b012ae2f2d54ed4e21"},
 ]
 
 [package.dependencies]
 nonebot2 = ">=2.0.0,<3.0.0"
+typing-extensions = ">=4.8.0,<5.0.0"
 
 [[package]]
 name = "nonebot-adapter-onebot"
@@ -1916,13 +1917,13 @@ tinydb = ">=4.3.0,<5.0.0"
 
 [[package]]
 name = "nonebot-plugin-alconna"
-version = "0.33.9"
+version = "0.34.1"
 description = "Alconna Adapter for Nonebot"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "nonebot_plugin_alconna-0.33.9-py3-none-any.whl", hash = "sha256:b9fc19dee747349ec0a5937816130ba1d60df21481b5b80755af38cffa0389aa"},
-    {file = "nonebot_plugin_alconna-0.33.9.tar.gz", hash = "sha256:c6da752dce6c1c3e1bc1ce25b55528c521a927aa2b4b6c1a63f85cefd11a8ab4"},
+    {file = "nonebot_plugin_alconna-0.34.1-py3-none-any.whl", hash = "sha256:c8e71ffad194e30f14ae7a53e29483b2a59328df2fc8d4ba9e1c407f2f76bf0d"},
+    {file = "nonebot_plugin_alconna-0.34.1.tar.gz", hash = "sha256:12a8809bd3ee96ecaa25b20ad3950f7078eb1d109ad2f6656c581ddcdb3244d6"},
 ]
 
 [package.dependencies]
@@ -1949,13 +1950,13 @@ nonebot2 = ">=2.0.0,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-bawiki"
-version = "0.10.3"
+version = "0.10.4"
 description = "A nonebot2 plugin for Blue Archive."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "nonebot_plugin_bawiki-0.10.3-py3-none-any.whl", hash = "sha256:1a2959a5035ae4ed9b1caa9d41d4cbc591bfa9f3bdd34775f10d9ab41d1d5a54"},
-    {file = "nonebot_plugin_bawiki-0.10.3.tar.gz", hash = "sha256:48048c97495ad6ebc90a1aa324cad20a6afbce987ffeb47ffb7db15389326904"},
+    {file = "nonebot_plugin_bawiki-0.10.4-py3-none-any.whl", hash = "sha256:02660995e4cd182048ec65a7f23d720da0a572657190c6fa3066b30403c32b9a"},
+    {file = "nonebot_plugin_bawiki-0.10.4.tar.gz", hash = "sha256:5ef0362a7958cefb11ab40701e9c095eb70fa9a51e0154e937782afa589894d8"},
 ]
 
 [package.dependencies]
@@ -4242,4 +4243,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "80d1ee527010d610b468084c9352b1f82e906d045d185de329e317a6f489a4fd"
+content-hash = "49ae606e5b18b55908b6ce6a18801173389e7acc3bdb49e51c4315da680a7d14"
