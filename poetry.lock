@@ -1722,13 +1722,13 @@ files = [
 
 [[package]]
 name = "nb-cli"
-version = "1.2.7"
+version = "1.2.8"
 description = "CLI for nonebot2"
 optional = false
 python-versions = ">=3.8, <4.0"
 files = [
-    {file = "nb-cli-1.2.7.tar.gz", hash = "sha256:a868f03c2da9ccdfbdebd067f70c0f8e687ab904aebbea7f3a9a01853705e483"},
-    {file = "nb_cli-1.2.7-py3-none-any.whl", hash = "sha256:574914fa224a25952a6ad60e7165b6208ebd8519d4f91b738f48210febf8b66c"},
+    {file = "nb-cli-1.2.8.tar.gz", hash = "sha256:8e17c73ca494ce16b3a18a18d4d611b5ffb27e37ee3de2c7a510c7e32b7df002"},
+    {file = "nb_cli-1.2.8-py3-none-any.whl", hash = "sha256:080a07c4bb94f93a662844d7f1fe8b9672cb61daf6a9c3ae74bbc42ed17a35a7"},
 ]
 
 [package.dependencies]
@@ -1778,17 +1778,18 @@ nonebot2 = ">=2.0.0,<3.0.0"
 
 [[package]]
 name = "nonebot-adapter-kaiheila"
-version = "0.2.12"
+version = "0.3.0"
 description = "kaiheila adapter for nonebot2"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_adapter_kaiheila-0.2.12-py3-none-any.whl", hash = "sha256:3ddc7e47b7213807d652428b95663e03991d1d89e79f434fbcf8b73a95a7a5ee"},
-    {file = "nonebot_adapter_kaiheila-0.2.12.tar.gz", hash = "sha256:102e00642e693f859b3263f53dc41675e4c8ec6c123e253fdddecf3b3f2ec61f"},
+    {file = "nonebot_adapter_kaiheila-0.3.0-py3-none-any.whl", hash = "sha256:8868f57f9ac591dff46d5cf711c419aa76ece22a5dd2380abc33d337132b5157"},
+    {file = "nonebot_adapter_kaiheila-0.3.0.tar.gz", hash = "sha256:b32b4e9d911b98ae0270540ed7fa414e94f74b228363b6b012ae2f2d54ed4e21"},
 ]
 
 [package.dependencies]
 nonebot2 = ">=2.0.0,<3.0.0"
+typing-extensions = ">=4.8.0,<5.0.0"
 
 [[package]]
 name = "nonebot-adapter-onebot"
@@ -1808,13 +1809,13 @@ typing-extensions = ">=4.0.0,<5.0.0"
 
 [[package]]
 name = "nonebot-adapter-qq"
-version = "1.3.4"
+version = "1.3.5"
 description = "QQ adapter for nonebot2"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_adapter_qq-1.3.4-py3-none-any.whl", hash = "sha256:c3b26ba025401f9fd5c3e27fc37979257746458c94765029f3e9d35e78dbf65b"},
-    {file = "nonebot_adapter_qq-1.3.4.tar.gz", hash = "sha256:de67efe1c5e3d61ee012e7f8cdf7a31645cb6572c35df3a1791998485a660d0a"},
+    {file = "nonebot_adapter_qq-1.3.5-py3-none-any.whl", hash = "sha256:ebd34601d58939bd7453dc05e1e890179ed83072c6c65c5624e9c36df2139212"},
+    {file = "nonebot_adapter_qq-1.3.5.tar.gz", hash = "sha256:c8b1f8a3b4ecaf822e970bf7a59bcc5e64ff628de9e85d59c98a953d2e57f197"},
 ]
 
 [package.dependencies]
@@ -1873,13 +1874,13 @@ nonebot2 = ">=2.1.0"
 
 [[package]]
 name = "nonebot-adapter-villa"
-version = "1.4.0"
+version = "1.4.2"
 description = "NoneBot2 米游社大别野 Bot 适配器。MiHoYo Villa Bot adapter for nonebot2."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_adapter_villa-1.4.0-py3-none-any.whl", hash = "sha256:fb965879f17644a057a14c1e61964f706b0d2bbfe1cd587ba2159cb3c62f7a6c"},
-    {file = "nonebot_adapter_villa-1.4.0.tar.gz", hash = "sha256:4185fcc2d441e74c12e36760fc07893a4d02d1aa33c311eb2f40c3d78060f0f2"},
+    {file = "nonebot_adapter_villa-1.4.2-py3-none-any.whl", hash = "sha256:13583a494c007cf46f17166c0459423ff6e80dc05d7cbab12c4466776411353d"},
+    {file = "nonebot_adapter_villa-1.4.2.tar.gz", hash = "sha256:1234b946ec275f257eaf0a05769c6992243586930dd37eee4cd23fcd9282590a"},
 ]
 
 [package.dependencies]
@@ -1916,13 +1917,13 @@ tinydb = ">=4.3.0,<5.0.0"
 
 [[package]]
 name = "nonebot-plugin-alconna"
-version = "0.33.9"
+version = "0.35.1"
 description = "Alconna Adapter for Nonebot"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "nonebot_plugin_alconna-0.33.9-py3-none-any.whl", hash = "sha256:b9fc19dee747349ec0a5937816130ba1d60df21481b5b80755af38cffa0389aa"},
-    {file = "nonebot_plugin_alconna-0.33.9.tar.gz", hash = "sha256:c6da752dce6c1c3e1bc1ce25b55528c521a927aa2b4b6c1a63f85cefd11a8ab4"},
+    {file = "nonebot_plugin_alconna-0.35.1-py3-none-any.whl", hash = "sha256:70dd86b477642dc1d154aef1ceb142e5350475852f87f4b3413dfc0c7d929d87"},
+    {file = "nonebot_plugin_alconna-0.35.1.tar.gz", hash = "sha256:0940af2ddfd8cedde59123b2e3dc77aacb4efab1751d9744091d6baa69920e94"},
 ]
 
 [package.dependencies]
@@ -1949,13 +1950,13 @@ nonebot2 = ">=2.0.0,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-bawiki"
-version = "0.10.3"
+version = "0.10.5.post1"
 description = "A nonebot2 plugin for Blue Archive."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "nonebot_plugin_bawiki-0.10.3-py3-none-any.whl", hash = "sha256:1a2959a5035ae4ed9b1caa9d41d4cbc591bfa9f3bdd34775f10d9ab41d1d5a54"},
-    {file = "nonebot_plugin_bawiki-0.10.3.tar.gz", hash = "sha256:48048c97495ad6ebc90a1aa324cad20a6afbce987ffeb47ffb7db15389326904"},
+    {file = "nonebot_plugin_bawiki-0.10.5.post1-py3-none-any.whl", hash = "sha256:f8b7ea6631e9c5845c9f3e1fb7e5f0562d493bbe1cbee4959e3fa146dffb0df5"},
+    {file = "nonebot_plugin_bawiki-0.10.5.post1.tar.gz", hash = "sha256:fcbf4ff59c59578850fd3aca9bfb6ce11bc79ab2fdeb1e61ba8a11f33483451a"},
 ]
 
 [package.dependencies]
@@ -2072,13 +2073,13 @@ typing-extensions = ">=4.0.0"
 
 [[package]]
 name = "nonebot-plugin-memes"
-version = "0.5.0"
+version = "0.5.1"
 description = "Nonebot2 plugin for making memes"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_memes-0.5.0-py3-none-any.whl", hash = "sha256:6ec1292b3c9bcb22ca2380ae929a79d3cf1130ec9150fdd770381cc8613917c7"},
-    {file = "nonebot_plugin_memes-0.5.0.tar.gz", hash = "sha256:876d18d33dc49c0855f5fb636c9b79e41534002ff3df5b81ac8d3f56de0ade54"},
+    {file = "nonebot_plugin_memes-0.5.1-py3-none-any.whl", hash = "sha256:369095abfabf4081f52dbfda51085631793b575c4c5f980f60b0e0a063bbbed4"},
+    {file = "nonebot_plugin_memes-0.5.1.tar.gz", hash = "sha256:9b49ddc3bc69dbca3b5845f506351fcf60fd4d501abd0e6daa0113e70e8d2a35"},
 ]
 
 [package.dependencies]
@@ -2283,13 +2284,13 @@ wordcloud = ">=1.8.1,<2.0.0"
 
 [[package]]
 name = "nonebot2"
-version = "2.1.2"
+version = "2.1.3"
 description = "An asynchronous python bot framework."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot2-2.1.2-py3-none-any.whl", hash = "sha256:a4df78e4c8b81773ea70b4b68d4ac3a5027d69517661d756772f11edf3cd3b1f"},
-    {file = "nonebot2-2.1.2.tar.gz", hash = "sha256:afb3c141c67645cd038125287d0583aec2220eca998a8392e42ba87722f6659f"},
+    {file = "nonebot2-2.1.3-py3-none-any.whl", hash = "sha256:c36c1a60ce4355d9777fee431c08619f22ffd60f7060993fbbbd1fe67b6368f7"},
+    {file = "nonebot2-2.1.3.tar.gz", hash = "sha256:e750e615f1ad2503721ce055fbe55ec3b061277135d995be112fecd27f7232e5"},
 ]
 
 [package.dependencies]
@@ -2304,8 +2305,8 @@ websockets = {version = ">=10.0", optional = true, markers = "extra == \"websock
 yarl = ">=1.7.2,<2.0.0"
 
 [package.extras]
-aiohttp = ["aiohttp[speedups] (>=3.7.4,<4.0.0)"]
-all = ["Quart (>=0.18.0,<1.0.0)", "aiohttp[speedups] (>=3.7.4,<4.0.0)", "fastapi (>=0.93.0,<1.0.0)", "httpx[http2] (>=0.20.0,<1.0.0)", "uvicorn[standard] (>=0.20.0,<1.0.0)", "websockets (>=10.0)"]
+aiohttp = ["aiohttp[speedups] (>=3.9.0b0,<4.0.0)"]
+all = ["Quart (>=0.18.0,<1.0.0)", "aiohttp[speedups] (>=3.9.0b0,<4.0.0)", "fastapi (>=0.93.0,<1.0.0)", "httpx[http2] (>=0.20.0,<1.0.0)", "uvicorn[standard] (>=0.20.0,<1.0.0)", "websockets (>=10.0)"]
 fastapi = ["fastapi (>=0.93.0,<1.0.0)", "uvicorn[standard] (>=0.20.0,<1.0.0)"]
 httpx = ["httpx[http2] (>=0.20.0,<1.0.0)"]
 quart = ["Quart (>=0.18.0,<1.0.0)", "uvicorn[standard] (>=0.20.0,<1.0.0)"]
@@ -4242,4 +4243,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "80d1ee527010d610b468084c9352b1f82e906d045d185de329e317a6f489a4fd"
+content-hash = "6328b45732f6bd78e78276117c0353a34990ea0d259b9fb736c09fdd36395124"
