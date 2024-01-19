@@ -8,7 +8,7 @@ repository = "https://github.com/he0119/CoolQBot"
 version = "0.17.4"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 eorzeaenv = "^2.2.8"
 matplotlib = "^3.7.1"
 expiringdict = "^1.2.2"
@@ -16,7 +16,6 @@ expiringdict = "^1.2.2"
 nonebot2 = { extras = ["httpx", "fastapi", "websockets"], version = "^2.1.0" }
 nb-cli = "^1.2.7"
 nonebot-adapter-onebot = "^2.2.4"
-onebot-qqguild-extension = "^0.1.1"
 nonebot-adapter-qq = "^1.3.4"
 nonebot-adapter-qqguild = "^0.4.0"
 nonebot-adapter-kaiheila = "^0.2.12"
