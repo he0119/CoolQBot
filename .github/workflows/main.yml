@@ -27,7 +27,7 @@ jobs:
       - name: Set up Python
         uses: he0119/setup-python@main
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - name: Install prerequisites
         run: |
           poetry config installer.modern-installation false
