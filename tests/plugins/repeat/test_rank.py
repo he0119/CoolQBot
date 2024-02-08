@@ -9,8 +9,8 @@ from sqlalchemy.exc import IntegrityError
 from tests.fake import fake_group_message_event_v11
 
 
-@pytest.fixture
-async def records(app: App, mocker: MockerFixture):
+@pytest.fixture()
+async def _records(app: App, mocker: MockerFixture):
     from nonebot_plugin_orm import get_session
 
     from src.plugins.repeat.models import Enabled, MessageRecord
@@ -34,7 +34,8 @@ async def records(app: App, mocker: MockerFixture):
         await session.commit()
 
 
-async def test_unique_record(records: None):
+@pytest.mark.usefixtures("_records")
+async def test_unique_record():
     from nonebot_plugin_orm import get_session
 
     from src.plugins.repeat.models import MessageRecord
@@ -54,7 +55,8 @@ async def test_unique_record(records: None):
             await session.commit()
 
 
-async def test_rank(app: App, records: None):
+@pytest.mark.usefixtures("_records")
+async def test_rank(app: App):
     """测试排行榜"""
     from src.plugins.repeat.plugins.repeat_rank import rank_cmd
 
@@ -74,7 +76,8 @@ async def test_rank(app: App, records: None):
         ctx.should_finished()
 
 
-async def test_rank_limit(app: App, records: None):
+@pytest.mark.usefixtures("_records")
+async def test_rank_limit(app: App):
     """不限制最低次数"""
     from src.plugins.repeat.plugins.repeat_rank import rank_cmd
 

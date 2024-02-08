@@ -1,7 +1,8 @@
 """ 时尚品鉴 """
 from nonebot.plugin import PluginMetadata
 
-from ... import ff14
+from src.plugins.ff14 import ff14
+
 from .data_source import get_latest_nuannuan
 
 __plugin_meta__ = PluginMetadata(

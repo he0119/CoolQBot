@@ -4,7 +4,7 @@ from datetime import time
 
 from pydantic import BaseModel, Extra
 
-from ... import global_config
+from src.plugins.ff14 import global_config
 
 
 class Config(BaseModel, extra=Extra.ignore):

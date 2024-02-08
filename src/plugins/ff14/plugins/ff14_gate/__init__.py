@@ -6,7 +6,8 @@ from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText, CommandArg, Depends
 from nonebot.plugin import PluginMetadata
 
-from ... import ff14
+from src.plugins.ff14 import ff14
+
 from .data_source import get_direction
 
 __plugin_meta__ = PluginMetadata(

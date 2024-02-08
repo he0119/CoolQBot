@@ -19,7 +19,7 @@ def pytest_configure(config: pytest.Config) -> None:
 
 
 @pytest.fixture(scope="session")
-def load_plugin(nonebug_init: None):
+def _load_plugin(nonebug_init: None):
     from nonebot.adapters.onebot.v11 import Adapter
 
     driver = nonebot.get_driver()
@@ -37,8 +37,8 @@ def load_plugin(nonebug_init: None):
     nonebot.load_plugins(str(Path(__file__).parent.parent / "src" / "plugins"))
 
 
-@pytest.fixture
-async def app(tmp_path: Path, load_plugin, mocker: MockerFixture):
+@pytest.fixture()
+async def app(tmp_path: Path, _load_plugin, mocker: MockerFixture):
     from nonebot_plugin_datastore.config import plugin_config
     from nonebot_plugin_orm import init_orm
 
@@ -60,15 +60,15 @@ async def app(tmp_path: Path, load_plugin, mocker: MockerFixture):
     return App()
 
 
-@pytest.fixture
+@pytest.fixture()
 def caplog(caplog):
     handler_id = logger.add(caplog.handler, format="{message}")
     yield caplog
     logger.remove(handler_id)
 
 
-@pytest.fixture
-async def default_user(app: App):
+@pytest.fixture()
+async def _default_user(app: App):
     from nonebot_plugin_orm import get_session
     from nonebot_plugin_user.models import Bind, User
     from nonebot_plugin_user.utils import get_user, set_user_name

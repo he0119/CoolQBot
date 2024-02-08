@@ -3,12 +3,11 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 from nonebot_plugin_user import UserSession
 
+from src.plugins.check_in import check_in
+from src.plugins.check_in.models import WeightRecord
+from src.plugins.check_in.utils import get_or_create_user_info
 from src.utils.annotated import AsyncSession, OptionalPlainTextArgs, PlainTextArgs
 from src.utils.helpers import parse_str
-
-from .. import check_in
-from ..models import WeightRecord
-from ..utils import get_or_create_user_info
 
 __plugin_meta__ = PluginMetadata(
     name="体重打卡",

@@ -3,11 +3,10 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 from nonebot_plugin_user import UserSession
 
+from src.plugins.check_in import check_in
+from src.plugins.check_in.models import DietaryRecord
 from src.utils.annotated import AsyncSession, PlainTextArgs
 from src.utils.helpers import parse_str
-
-from .. import check_in
-from ..models import DietaryRecord
 
 __plugin_meta__ = PluginMetadata(
     name="饮食打卡",

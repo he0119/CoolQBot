@@ -9,10 +9,10 @@ from nonebot_plugin_orm import get_session
 from nonebot_plugin_saa import PlatformTarget, Text, get_target
 from sqlalchemy import select
 
+from src.plugins.morning import plugin_config
 from src.utils.annotated import AsyncSession
 from src.utils.helpers import strtobool
 
-from ... import plugin_config
 from . import migrations
 from .data_source import HOLIDAYS_DATA, get_moring_message
 from .models import MorningGreeting

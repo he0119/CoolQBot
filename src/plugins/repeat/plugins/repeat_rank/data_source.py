@@ -6,11 +6,10 @@ from operator import itemgetter
 
 from nonebot.adapters import Bot
 
+from src.plugins.repeat.models import MessageRecord
+from src.plugins.repeat.recorder import Recorder
 from src.utils.annotated import GroupInfo
 from src.utils.helpers import get_nickname
-
-from ...models import MessageRecord
-from ...recorder import Recorder
 
 
 async def get_rank(

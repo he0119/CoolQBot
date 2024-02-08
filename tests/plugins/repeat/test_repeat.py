@@ -8,8 +8,8 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event_v11
 
 
-@pytest.fixture
-async def records(app: App):
+@pytest.fixture()
+async def _records(app: App):
     from nonebot_plugin_orm import get_session
 
     from src.plugins.repeat.models import Enabled
@@ -19,7 +19,8 @@ async def records(app: App):
         await session.commit()
 
 
-async def test_repeat(app: App, mocker: MockerFixture, records: None):
+@pytest.mark.usefixtures("_records")
+async def test_repeat(app: App, mocker: MockerFixture):
     """测试复读"""
     from src.plugins.repeat.plugins.repeat_basic import repeat_message
 
@@ -49,7 +50,8 @@ async def test_repeat(app: App, mocker: MockerFixture, records: None):
     assert mocked_recorder_datetime.now.call_count == 3
 
 
-async def test_repeat_enabled(app: App, records: None):
+@pytest.mark.usefixtures("_records")
+async def test_repeat_enabled(app: App):
     """测试复读已开启的情况"""
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
@@ -88,7 +90,8 @@ async def test_repeat_enable(app: App):
         ctx.should_finished()
 
 
-async def test_repeat_disable(app: App, records: None):
+@pytest.mark.usefixtures("_records")
+async def test_repeat_disable(app: App):
     """测试复读，在群里关闭的情况"""
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 

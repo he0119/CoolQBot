@@ -75,10 +75,12 @@ plugins = [
 asyncio_mode = "auto"
 
 [tool.pyright]
+pythonVersion = "3.12"
+pythonPlatform = "All"
 typeCheckingMode = "basic"
 
-[tool.ruff]
-select = ["E", "W", "F", "UP", "C", "T", "PYI", "Q"]
+[tool.ruff.lint]
+select = ["F", "E", "W", "C", "I", "UP", "T", "PYI", "PT", "Q", "TID"]
 ignore = ["E402", "E501", "E711", "C901", "UP037"]
 
 [tool.coverage.report]

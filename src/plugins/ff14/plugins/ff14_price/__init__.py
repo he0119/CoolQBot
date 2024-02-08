@@ -5,7 +5,8 @@ from nonebot.params import CommandArg
 from nonebot.plugin import PluginMetadata
 from nonebot_plugin_datastore import get_plugin_data
 
-from ... import ff14
+from src.plugins.ff14 import ff14
+
 from .data_source import get_item_price
 
 __plugin_meta__ = PluginMetadata(

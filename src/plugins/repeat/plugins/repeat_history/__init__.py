@@ -6,10 +6,10 @@ from nonebot.params import Arg, CommandArg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 
+from src.plugins.repeat import repeat
 from src.utils.annotated import GroupInfo
 from src.utils.helpers import parse_int
 
-from ... import repeat
 from .data_source import get_history
 
 __plugin_meta__ = PluginMetadata(
