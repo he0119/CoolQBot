@@ -5,10 +5,9 @@ from datetime import datetime, timedelta
 from nonebot.adapters import Event
 from nonebot.log import logger
 
+from src.plugins.repeat import plugin_config
+from src.plugins.repeat.recorder import Recorder
 from src.utils.annotated import GroupInfo
-
-from ... import plugin_config
-from ...recorder import Recorder
 
 
 async def need_repeat(event: Event, group_info: GroupInfo) -> bool:

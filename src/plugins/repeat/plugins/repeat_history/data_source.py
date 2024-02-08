@@ -5,10 +5,9 @@ from datetime import datetime
 
 from nonebot.adapters import Bot
 
+from src.plugins.repeat.plugins.repeat_rank.data_source import Ranking
+from src.plugins.repeat.recorder import Recorder
 from src.utils.annotated import GroupInfo
-
-from ...recorder import Recorder
-from ..repeat_rank.data_source import Ranking
 
 
 async def get_history(

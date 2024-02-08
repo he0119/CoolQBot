@@ -16,7 +16,7 @@ from sqlalchemy import delete
 from tests.fake import fake_group_message_event_v11
 
 
-@pytest.fixture
+@pytest.fixture()
 async def app(app: App):
     yield app
 
@@ -33,7 +33,7 @@ async def app(app: App):
     FFLOGS_DATA._data = None
 
 
-@pytest.fixture
+@pytest.fixture()
 async def fflogs_data(app: App) -> dict[str, Any]:
     path = Path(__file__).parent / "fflogs_data.json"
     with path.open("r", encoding="utf-8") as f:
@@ -41,7 +41,7 @@ async def fflogs_data(app: App) -> dict[str, Any]:
     return data
 
 
-@pytest.fixture
+@pytest.fixture()
 async def fflogs_character_rankings(app: App) -> dict[str, Any]:
     path = Path(__file__).parent / "fflogs_character_rankings.json"
     with path.open("r", encoding="utf-8") as f:
@@ -49,7 +49,7 @@ async def fflogs_character_rankings(app: App) -> dict[str, Any]:
     return data
 
 
-@pytest.fixture
+@pytest.fixture()
 async def fflogs_job_rankings(app: App) -> dict[str, Any]:
     path = Path(__file__).parent / "fflogs_job_rankings.json"
     with path.open("r", encoding="utf-8") as f:
@@ -57,7 +57,7 @@ async def fflogs_job_rankings(app: App) -> dict[str, Any]:
     return data
 
 
-@pytest.fixture
+@pytest.fixture()
 async def fflogs_job_rankings_empty(app: App) -> dict[str, Any]:
     path = Path(__file__).parent / "fflogs_job_rankings_empty.json"
     with path.open("r", encoding="utf-8") as f:

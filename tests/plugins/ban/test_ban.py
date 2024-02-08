@@ -6,7 +6,7 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event_v11
 
 
-@pytest.fixture
+@pytest.fixture()
 async def app(app: App):
     yield app
 

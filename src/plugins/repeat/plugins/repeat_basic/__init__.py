@@ -5,11 +5,11 @@ from nonebot.params import CommandArg
 from nonebot.plugin import PluginMetadata
 from sqlalchemy import select
 
+from src.plugins.repeat import repeat
+from src.plugins.repeat.models import Enabled
 from src.utils.annotated import AsyncSession, GroupInfo
 from src.utils.helpers import strtobool
 
-from ... import repeat
-from ...models import Enabled
 from .repeat_rule import need_repeat
 
 __plugin_meta__ = PluginMetadata(

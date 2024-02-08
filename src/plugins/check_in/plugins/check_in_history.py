@@ -8,10 +8,14 @@ from nonebot_plugin_alconna import Alconna, Args, Image, Match, Text, on_alconna
 from nonebot_plugin_user import UserSession
 from sqlalchemy import func, select
 
+from src.plugins.check_in.models import (
+    BodyFatRecord,
+    DietaryRecord,
+    FitnessRecord,
+    WeightRecord,
+)
+from src.plugins.check_in.utils import get_or_create_user_info
 from src.utils.annotated import AsyncSession
-
-from ..models import BodyFatRecord, DietaryRecord, FitnessRecord, WeightRecord
-from ..utils import get_or_create_user_info
 
 __plugin_meta__ = PluginMetadata(
     name="打卡历史",
