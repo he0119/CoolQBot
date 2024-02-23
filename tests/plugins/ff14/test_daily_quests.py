@@ -42,9 +42,21 @@ async def test_set_daily_quests(app: App):
         ctx.should_finished(daily_quests_cmd)
 
 
-async def test_set_daily_quests_pair(app: App):
-    """设置每日委托配对"""
+async def test_daily_quests_pair(app: App):
+    """查询每日委托配对"""
     from src.plugins.ff14.plugins.ff14_daily_quests import daily_quests_cmd
+
+    async with app.test_matcher(daily_quests_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(message=Message("/每日委托 配对"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "你还没有设置每日委托。",
+            True,
+        )
+        ctx.should_finished(daily_quests_cmd)
 
     async with app.test_matcher(daily_quests_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
@@ -74,7 +86,7 @@ async def test_set_daily_quests_pair(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "与你相同的每日委托的群友有：\n乐园都市笑笑镇：qq-2\n伊弗利特歼灭战：qq-2\n神龙歼灭战：无",
+            "与你每日委托相同的群友：\n乐园都市笑笑镇：qq-2\n伊弗利特歼灭战：qq-2\n神龙歼灭战：无",
             True,
         )
         ctx.should_finished(daily_quests_cmd)

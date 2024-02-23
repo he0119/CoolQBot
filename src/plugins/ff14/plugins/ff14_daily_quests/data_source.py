@@ -58,6 +58,8 @@ async def get_daily_quests_pair(user_id: int) -> str:
     """获取与自己每日委托相同的群友"""
     data = get_quests_data()
     my_quests = data.get(str(user_id), [])
+    if not my_quests:
+        return "你还没有设置每日委托。"
 
     pair = {quest: [] for quest in my_quests}
     for user, quests in data.items():
@@ -67,7 +69,7 @@ async def get_daily_quests_pair(user_id: int) -> str:
             if quest in my_quests:
                 pair[quest].append(user)
 
-    msg = "与你相同的每日委托的群友有：\n"
+    msg = "与你每日委托相同的群友：\n"
     for quest, users in pair.items():
         if users:
             msg += f"{quest}：{await get_usernames(users)}\n"
