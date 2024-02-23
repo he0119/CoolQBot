@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加每日委托配对查询功能
+
 ## [0.17.4] - 2023-11-30
 
 ### Added
