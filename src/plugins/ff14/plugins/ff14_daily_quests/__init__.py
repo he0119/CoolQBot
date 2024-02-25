@@ -16,7 +16,7 @@ __plugin_meta__ = PluginMetadata(
 /每日委托
 查询与自己每日委托相同的人
 /每日委托 配对
-记录每日委托
+记录每日委托，并查看与自己每日委托相同的人
 /每日委托 乐园都市笑笑镇, 伊弗利特歼灭战, 神龙歼灭战
 """,
 )
@@ -42,4 +42,5 @@ async def daily_quests_handle(session: UserSession, args: Message = CommandArg()
         quests = content.replace("，", ",").split(",")
         quests = [quest.strip() for quest in quests]
         set_daily_quests(session.user_id, quests)
-        await daily_quests_cmd.finish("每日委托设置成功。")
+        reply = await get_daily_quests_pair(session.user_id)
+        await daily_quests_cmd.finish(reply)
