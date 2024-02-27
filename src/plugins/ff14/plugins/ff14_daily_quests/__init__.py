@@ -32,7 +32,7 @@ async def daily_quests_handle(session: UserSession, args: Message = CommandArg()
     content = args.extract_plain_text().strip()
 
     if not content:
-        reply = get_daily_quests(session.user_id)
+        reply = await get_daily_quests(session.user_id)
         await daily_quests_cmd.finish(reply)
 
     if content == "配对":

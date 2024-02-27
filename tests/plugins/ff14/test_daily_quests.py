@@ -1,7 +1,25 @@
+import json
+from pathlib import Path
+
+import pytest
 from nonebot.adapters.onebot.v11 import Bot, Message
 from nonebug import App
+from respx import MockRouter
 
 from tests.fake import fake_group_message_event_v11
+
+
+@pytest.fixture()
+async def app(app: App, respx_mock: MockRouter):
+    path = Path(__file__).parent / "mogu.json"
+    with path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    respx_mock.get(
+        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/plugins/ff14_daily_quests/mogu.json"
+    ).respond(json=data)
+
+    return app
 
 
 async def test_get_daily_quests(app: App):
@@ -24,7 +42,7 @@ async def test_set_daily_quests(app: App):
     async with app.test_matcher(daily_quests_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
         event = fake_group_message_event_v11(
-            message=Message("/每日委托 乐园都市笑笑镇，伊弗利特歼灭战, 神龙歼灭战")
+            message=Message("/每日委托 乐园都市笑笑镇，伊弗利特歼灭战, 影之国")
         )
 
         ctx.receive_event(bot, event)
@@ -33,7 +51,7 @@ async def test_set_daily_quests(app: App):
             "与你每日委托相同的群友：\n"
             "乐园都市笑笑镇：无\n"
             "伊弗利特歼灭战：无\n"
-            "神龙歼灭战：无",
+            "影之国（7）：无",
             True,
         )
         ctx.should_finished(daily_quests_cmd)
@@ -44,7 +62,7 @@ async def test_set_daily_quests(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
-            event, "你的每日委托为：乐园都市笑笑镇, 伊弗利特歼灭战, 神龙歼灭战", True
+            event, "你的每日委托为：乐园都市笑笑镇, 伊弗利特歼灭战, 影之国（7）", True
         )
         ctx.should_finished(daily_quests_cmd)
 

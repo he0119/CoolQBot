@@ -5,6 +5,8 @@ from datetime import datetime
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_user import get_user_by_id
 
+from .mogu import add_mogu_info
+
 plugin_data = get_plugin_data()
 
 type QUEST_DATA = dict[str, list[str]]
@@ -28,10 +30,11 @@ def save_quests_data(data: QUEST_DATA):
     plugin_data.dump_json(data, filename)
 
 
-def get_daily_quests(user_id: int) -> str:
+async def get_daily_quests(user_id: int) -> str:
     """获取每日委托"""
     data = get_quests_data()
     quests = data.get(str(user_id), [])
+    quests = [await add_mogu_info(quest) for quest in quests]
     return (
         f"你的每日委托为：{', '.join(quests)}" if quests else "你还没有设置每日委托。"
     )
@@ -71,6 +74,7 @@ async def get_daily_quests_pair(user_id: int) -> str:
 
     msg = "与你每日委托相同的群友：\n"
     for quest, users in pair.items():
+        quest = await add_mogu_info(quest)
         if users:
             msg += f"{quest}：{await get_usernames(users)}\n"
         else:
