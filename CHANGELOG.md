@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.17.5] - 2024-02-27
+
 ### Added
 
 - 添加每日委托配对查询功能
@@ -510,7 +512,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.17.4...HEAD
+[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.17.5...HEAD
+[0.17.5]: https://github.com/he0119/CoolQBot/compare/v0.17.4...v0.17.5
 [0.17.4]: https://github.com/he0119/CoolQBot/compare/v0.17.3...v0.17.4
 [0.17.3]: https://github.com/he0119/CoolQBot/compare/v0.17.2...v0.17.3
 [0.17.2]: https://github.com/he0119/CoolQBot/compare/v0.17.1...v0.17.2
