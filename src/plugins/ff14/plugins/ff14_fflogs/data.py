@@ -11,7 +11,7 @@ plugin_data = get_plugin_data()
 
 def parse_data(data: dict) -> FFlogsDataModel:
     """解析数据"""
-    return FFlogsDataModel.parse_obj(data)
+    return FFlogsDataModel.model_validate(data)
 
 
 FFLOGS_DATA = plugin_data.network_file(

@@ -6,7 +6,7 @@
   "configurations": [
     {
       "name": "CoolQBot",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/bot.py",
       "console": "integratedTerminal",
@@ -14,7 +14,7 @@
     },
     {
       "name": "CoolQBot Test",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": ["-s"],
@@ -23,7 +23,7 @@
     },
     {
       "name": "Debug Unit Test",
-      "type": "python",
+      "type": "debugpy",
       "request": "test",
       "justMyCode": false
     }

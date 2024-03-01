@@ -62,7 +62,7 @@ async def repeat_handle(
     if args:
         if strtobool(args):
             if not group:
-                session.add(Enabled(**group_info.dict()))
+                session.add(Enabled(**group_info.model_dump()))
                 await session.commit()
             await repeat_cmd.finish("已在本群开启复读功能")
         else:
