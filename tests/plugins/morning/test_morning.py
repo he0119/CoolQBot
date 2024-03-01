@@ -46,7 +46,7 @@ async def test_morning_enabled(app: App):
     )
 
     async with get_session() as session:
-        session.add(MorningGreeting(target=TargetQQGroup(group_id=10000).dict()))
+        session.add(MorningGreeting(target=TargetQQGroup(group_id=10000).model_dump()))
         await session.commit()
 
     async with app.test_matcher(morning_cmd) as ctx:
@@ -110,7 +110,7 @@ async def test_morning_disable(app: App):
     )
 
     async with get_session() as session:
-        session.add(MorningGreeting(target=TargetQQGroup(group_id=10000).dict()))
+        session.add(MorningGreeting(target=TargetQQGroup(group_id=10000).model_dump()))
         await session.commit()
 
     async with app.test_matcher(morning_cmd) as ctx:
@@ -181,7 +181,7 @@ async def test_morning_push(app: App, mocker: MockerFixture):
 
     target = TargetQQGroup(group_id=10000)
     async with get_session() as session:
-        session.add(MorningGreeting(target=target.dict()))
+        session.add(MorningGreeting(target=target.model_dump()))
         await session.commit()
 
     async with app.test_api() as ctx:

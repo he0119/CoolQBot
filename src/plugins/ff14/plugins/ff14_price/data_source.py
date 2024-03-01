@@ -45,7 +45,7 @@ async def search_item_id_by_name(name: str) -> XIVAPIResultsItem | None:
     async with httpx.AsyncClient() as client:
         r = await client.get(f"https://cafemaker.wakingsands.com/search?string={name}")
         rjson = r.json()
-        search = XIVAPISearch.parse_obj(rjson)
+        search = XIVAPISearch.model_validate(rjson)
 
         first_item = None
         for item in search.Results:
@@ -78,7 +78,7 @@ async def get_item_price(name: str, world_or_dc: str) -> str:
                 f"抱歉，没有找到 {world_or_dc} 的数据，请检查大区或服务器名称是否正确。"
             )
 
-        data = UniversalisCurrentlyShown.parse_obj(rjson)
+        data = UniversalisCurrentlyShown.model_validate(rjson)
 
         items_info = []
         for listitem in data.listings:

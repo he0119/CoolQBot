@@ -31,7 +31,7 @@ async def lookup_location(
 
     url = f"https://geoapi.qweather.com/v2/city/lookup?{params}"
     rjson = await get(url)
-    resp = LookupResp.parse_obj(rjson)
+    resp = LookupResp.model_validate(rjson)
 
     if resp.code == "200":
         assert resp.location, "API 返回的 location 为空"
@@ -56,7 +56,7 @@ async def now(location_id: str) -> str:
     """
     url = f"https://devapi.qweather.com/v7/weather/now?location={location_id}"
     rjson = await get(url)
-    resp = NowResp.parse_obj(rjson)
+    resp = NowResp.model_validate(rjson)
 
     now = resp.now
     return f"当前温度：{now.temp}℃ 湿度：{now.humidity}%(体感温度：{now.feelsLike}℃)"
@@ -70,7 +70,7 @@ async def daily(location_id: str) -> str:
     2020-11-23 阴转小雨 温度：10~6℃ 盈凸月
     """
     url = f"https://devapi.qweather.com/v7/weather/3d?location={location_id}"
-    resp = DailyResp.parse_obj(await get(url))
+    resp = DailyResp.model_validate(await get(url))
 
     daily = resp.daily
 

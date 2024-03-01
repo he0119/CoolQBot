@@ -187,7 +187,7 @@ class Recorder(metaclass=Singleton):
                     user_id=user_id,
                     msg_number=1,
                     repeat_time=1,
-                    **self.group_info.dict(),
+                    **self.group_info.model_dump(),
                 )
                 session.add(record)
                 await session.commit()
@@ -213,7 +213,7 @@ class Recorder(metaclass=Singleton):
                     date=now_date,
                     user_id=user_id,
                     msg_number=1,
-                    **self.group_info.dict(),
+                    **self.group_info.model_dump(),
                 )
                 session.add(record)
                 await session.commit()

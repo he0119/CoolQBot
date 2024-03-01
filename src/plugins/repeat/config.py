@@ -1,10 +1,10 @@
 """ 配置文件
 """
-from nonebot import get_driver
-from pydantic import BaseModel, Extra
+from nonebot import get_driver, get_plugin_config
+from pydantic import BaseModel
 
 
-class Config(BaseModel, extra=Extra.ignore):
+class Config(BaseModel):
     repeat_rate: int = 10
     """ 复读概率 """
     repeat_interval: int = 1
@@ -15,4 +15,4 @@ class Config(BaseModel, extra=Extra.ignore):
 
 
 global_config = get_driver().config
-plugin_config = Config.parse_obj(global_config)
+plugin_config = get_plugin_config(Config)

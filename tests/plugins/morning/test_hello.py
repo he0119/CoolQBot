@@ -13,7 +13,9 @@ async def test_hello_enabled(app: App):
     from src.plugins.morning.plugins.hello import Hello, hello_cmd
 
     async with get_session() as session:
-        session.add(Hello(target=TargetQQGroup(group_id=10000).dict(), bot_id="test"))
+        session.add(
+            Hello(target=TargetQQGroup(group_id=10000).model_dump(), bot_id="test")
+        )
         await session.commit()
 
     async with app.test_matcher(hello_cmd) as ctx:
@@ -72,7 +74,9 @@ async def test_hello_disable(app: App):
     from src.plugins.morning.plugins.hello import Hello, hello_cmd
 
     async with get_session() as session:
-        session.add(Hello(target=TargetQQGroup(group_id=10000).dict(), bot_id="test"))
+        session.add(
+            Hello(target=TargetQQGroup(group_id=10000).model_dump(), bot_id="test")
+        )
         await session.commit()
 
     async with app.test_matcher(hello_cmd) as ctx:

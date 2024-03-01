@@ -135,7 +135,7 @@ class Ranking:
             return self._nickname_cache[user_id]
         else:
             name = await get_nickname(
-                self.bot, user_id, **self.group_info.dict(exclude={"platform"})
+                self.bot, user_id, **self.group_info.model_dump(exclude={"platform"})
             )
             self._nickname_cache[user_id] = name
             return name

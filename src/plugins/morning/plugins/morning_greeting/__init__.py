@@ -83,13 +83,13 @@ async def morning_handle(
 
     group = (
         await session.scalars(
-            select(MorningGreeting).where(MorningGreeting.target == target.dict())
+            select(MorningGreeting).where(MorningGreeting.target == target.model_dump())
         )
     ).one_or_none()
     if args:
         if strtobool(args):
             if not group:
-                session.add(MorningGreeting(target=target.dict()))
+                session.add(MorningGreeting(target=target.model_dump()))
                 await session.commit()
             await morning_cmd.finish("已在本群开启每日早安功能")
         else:

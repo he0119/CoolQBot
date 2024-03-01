@@ -6,7 +6,7 @@
 from pathlib import Path
 
 import nonebot
-from nonebot import CommandGroup, get_driver
+from nonebot import CommandGroup, get_driver, get_plugin_config
 from nonebot.plugin import PluginMetadata
 
 from . import migrations
@@ -25,6 +25,6 @@ _sub_plugins = set()
 repeat = CommandGroup("repeat", block=True)
 
 global_config = get_driver().config
-plugin_config = Config.parse_obj(global_config)
+plugin_config = get_plugin_config(Config)
 
 _sub_plugins |= nonebot.load_plugins(str((Path(__file__).parent / "plugins").resolve()))

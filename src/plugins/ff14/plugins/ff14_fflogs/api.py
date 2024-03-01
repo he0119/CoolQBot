@@ -17,7 +17,7 @@ from nonebot.log import logger
 from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_orm import get_session
-from pydantic import ValidationError, parse_obj_as
+from pydantic import TypeAdapter, ValidationError
 from sqlalchemy import select
 
 from .config import plugin_config
@@ -156,7 +156,7 @@ class FFLogs:
             data = plugin_data.load_pkl(cache_name, cache=True)
             # 为了兼容以前的数据，以前的数据是字典格式
             if len(data) > 0 and isinstance(data[0], dict):
-                return parse_obj_as(list[Ranking], data)
+                return TypeAdapter(list[Ranking]).validate_python(data)
             return data
 
         page = 1
@@ -183,7 +183,7 @@ class FFLogs:
                 },
             )
             try:
-                ranking = FFLogsRanking.parse_obj(res)
+                ranking = FFLogsRanking.model_validate(res)
             except ValidationError:
                 raise DataException("服务器没有正确返回数据")
 
@@ -271,7 +271,7 @@ class FFLogs:
             raise DataException("角色数据被隐藏")
 
         try:
-            rankings = parse_obj_as(list[CharacterRanking], res)
+            rankings = TypeAdapter(list[CharacterRanking]).validate_python(res)
         except ValidationError:
             raise DataException("服务器没有正确返回数据")
 
@@ -292,14 +292,14 @@ class FFLogs:
         """副本"""
         url = f"{self.base_url}/zones"
         data = await self._http(url)
-        zones = parse_obj_as(list[Zones], data)
+        zones = TypeAdapter(list[Zones]).validate_python(data)
         return zones
 
     async def classes(self) -> list[Class]:
         """职业"""
         url = f"{self.base_url}/classes"
         data = await self._http(url)
-        classes = parse_obj_as(list[Class], data)
+        classes = TypeAdapter(list[Class]).validate_python(data)
         return classes
 
     async def dps(

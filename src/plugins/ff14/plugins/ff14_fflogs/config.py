@@ -2,12 +2,11 @@
 """
 from datetime import time
 
-from pydantic import BaseModel, Extra
+from nonebot import get_plugin_config
+from pydantic import BaseModel
 
-from src.plugins.ff14 import global_config
 
-
-class Config(BaseModel, extra=Extra.ignore):
+class Config(BaseModel):
     # FFLogs 相关配置
     # 默认从两周的数据中计算排名百分比
     fflogs_range: int = 14
@@ -17,4 +16,4 @@ class Config(BaseModel, extra=Extra.ignore):
     """FFLogs API Token"""
 
 
-plugin_config = Config.parse_obj(global_config)
+plugin_config = get_plugin_config(Config)

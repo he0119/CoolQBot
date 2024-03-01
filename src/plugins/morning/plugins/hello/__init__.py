@@ -70,7 +70,7 @@ async def hello_handle(
     group = (
         await session.scalars(
             select(Hello)
-            .where(Hello.target == target.dict())
+            .where(Hello.target == target.model_dump())
             .where(Hello.bot_id == bot.self_id)
         )
     ).one_or_none()
@@ -78,7 +78,7 @@ async def hello_handle(
     if args:
         if strtobool(args):
             if not group:
-                session.add(Hello(target=target.dict(), bot_id=bot.self_id))
+                session.add(Hello(target=target.model_dump(), bot_id=bot.self_id))
                 await session.commit()
             await hello_cmd.finish("已在本群开启启动问候功能")
         else:
