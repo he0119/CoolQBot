@@ -62,7 +62,12 @@ async def test_set_daily_quests(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
-            event, "你的每日委托为：乐园都市笑笑镇, 伊弗利特歼灭战, 影之国（7）", True
+            event,
+            "与你每日委托相同的群友：\n"
+            "乐园都市笑笑镇：无\n"
+            "伊弗利特歼灭战：无\n"
+            "影之国（7）：无",
+            True,
         )
         ctx.should_finished(daily_quests_cmd)
 
@@ -73,7 +78,7 @@ async def test_daily_quests_pair(app: App):
 
     async with app.test_matcher(daily_quests_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/每日委托 配对"))
+        event = fake_group_message_event_v11(message=Message("/每日委托"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -120,7 +125,7 @@ async def test_daily_quests_pair(app: App):
 
     async with app.test_matcher(daily_quests_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/每日委托 配对"))
+        event = fake_group_message_event_v11(message=Message("/每日委托"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(

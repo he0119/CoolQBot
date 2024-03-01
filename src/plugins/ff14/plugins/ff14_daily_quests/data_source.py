@@ -30,14 +30,14 @@ def save_quests_data(data: QUEST_DATA):
     plugin_data.dump_json(data, filename)
 
 
-async def get_daily_quests(user_id: int) -> str:
-    """获取每日委托"""
-    data = get_quests_data()
-    quests = data.get(str(user_id), [])
-    quests = [await add_mogu_info(quest) for quest in quests]
-    return (
-        f"你的每日委托为：{', '.join(quests)}" if quests else "你还没有设置每日委托。"
-    )
+# async def get_daily_quests(user_id: int) -> str:
+#     """获取每日委托"""
+#     data = get_quests_data()
+#     quests = data.get(str(user_id), [])
+#     quests = [await add_mogu_info(quest) for quest in quests]
+#     return (
+#         f"你的每日委托为：{', '.join(quests)}" if quests else "你还没有设置每日委托。"
+#     )
 
 
 def set_daily_quests(user_id: int, quests: list[str]):

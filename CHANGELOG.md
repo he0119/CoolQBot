@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 升级至 Pydantic V2
 
+### Changed
+
+- 优化每日委托的体验
+
 ## [0.17.5] - 2024-02-27
 
 ### Added
