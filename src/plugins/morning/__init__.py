@@ -1,5 +1,5 @@
-""" 每日早安插件
-"""
+"""每日早安插件"""
+
 from pathlib import Path
 
 import nonebot

@@ -1,5 +1,5 @@
-""" 配置文件
-"""
+"""配置文件"""
+
 from datetime import time
 
 from nonebot import get_plugin_config

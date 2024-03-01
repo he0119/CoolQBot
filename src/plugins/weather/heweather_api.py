@@ -1,5 +1,5 @@
-""" 和风天气
-"""
+"""和风天气"""
+
 from urllib.parse import urlencode
 
 import httpx

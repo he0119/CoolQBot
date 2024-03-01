@@ -1,5 +1,5 @@
-""" 天气插件
-"""
+"""天气插件"""
+
 from nonebot import on_command
 from nonebot.adapters import Message
 from nonebot.matcher import Matcher

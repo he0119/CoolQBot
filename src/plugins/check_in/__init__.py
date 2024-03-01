@@ -1,5 +1,5 @@
-""" 打卡插件
-"""
+"""打卡插件"""
+
 from nonebot import require
 
 require("nonebot_plugin_user")

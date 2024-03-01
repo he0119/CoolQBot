@@ -1,8 +1,9 @@
-""" roll 点插件
+"""roll 点插件
 
 NGA 风格 ROLL 点
 掷骰子
 """
+
 from pathlib import Path
 
 import nonebot

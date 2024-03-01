@@ -1,4 +1,5 @@
-""" 每日委托配对 """
+"""每日委托配对"""
+
 from nonebot.adapters import Message
 from nonebot.params import CommandArg
 from nonebot.plugin import PluginMetadata

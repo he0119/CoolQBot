@@ -1,4 +1,5 @@
-""" 复读 """
+"""复读"""
+
 import secrets
 from datetime import datetime, timedelta
 

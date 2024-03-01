@@ -1,4 +1,5 @@
-""" 启动问候 """
+"""启动问候"""
+
 from nonebot import require
 
 require("nonebot_plugin_saa")

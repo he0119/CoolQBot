@@ -1,5 +1,5 @@
-""" 复读排行榜
-"""
+"""复读排行榜"""
+
 import collections
 from collections.abc import Sequence
 from operator import itemgetter

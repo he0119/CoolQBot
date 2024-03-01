@@ -1,4 +1,5 @@
-""" 每日早安 """
+"""每日早安"""
+
 from nonebot.adapters import Message
 from nonebot.exception import ActionFailed
 from nonebot.log import logger

@@ -1,4 +1,4 @@
-""" 网易云音乐
+"""网易云音乐
 
 https://github.com/Binaryify/NeteaseCloudMusicApi
 """

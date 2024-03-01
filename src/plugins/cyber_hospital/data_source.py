@@ -1,3 +1,4 @@
+# ruff: noqa: E711
 from collections.abc import Sequence
 
 from nonebot_plugin_orm import get_session

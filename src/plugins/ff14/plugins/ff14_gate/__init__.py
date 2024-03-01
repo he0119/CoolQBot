@@ -1,4 +1,5 @@
-""" 藏宝选门 """
+"""藏宝选门"""
+
 from typing import Literal
 
 from nonebot.adapters import Message

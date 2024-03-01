@@ -1,5 +1,5 @@
-""" 音乐插件
-"""
+"""音乐插件"""
+
 from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Message
 from nonebot.matcher import Matcher

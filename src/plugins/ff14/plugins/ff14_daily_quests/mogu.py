@@ -1,4 +1,4 @@
-""" 莫古莫古大收集
+"""莫古莫古大收集
 
 https://actff1.web.sdo.com/project/20231113mogu/index.html
 
