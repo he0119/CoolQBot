@@ -31,7 +31,6 @@ def _load_plugin(nonebug_init: None):
     nonebot.require("nonebot_plugin_apscheduler")
     nonebot.require("nonebot_plugin_saa")
     nonebot.require("nonebot_plugin_alconna")
-    nonebot.require("nonebot_plugin_session")
     nonebot.require("nonebot_plugin_user")
 
     nonebot.load_plugins(str(Path(__file__).parent.parent / "src" / "plugins"))
