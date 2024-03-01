@@ -1,4 +1,5 @@
-""" 藏宝选门 """
+"""藏宝选门"""
+
 from random import randint
 from typing import Literal
 

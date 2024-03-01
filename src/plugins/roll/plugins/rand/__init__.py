@@ -1,4 +1,5 @@
-""" 掷骰子 """
+"""掷骰子"""
+
 from nonebot import on_command
 from nonebot.adapters import Message
 from nonebot.params import CommandArg

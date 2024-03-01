@@ -1,4 +1,5 @@
-""" 排行榜 """
+"""排行榜"""
+
 import re
 
 from nonebot.adapters import Message

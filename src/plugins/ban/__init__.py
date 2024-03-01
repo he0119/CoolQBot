@@ -1,5 +1,5 @@
-""" 自主禁言
-"""
+"""自主禁言"""
+
 from enum import Enum
 
 from nonebot import on_command, on_notice

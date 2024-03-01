@@ -1,4 +1,5 @@
-""" ROLL 点 """
+"""ROLL 点"""
+
 import re
 
 from nonebot import on_command

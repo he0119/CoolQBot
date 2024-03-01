@@ -1,8 +1,9 @@
-""" 数据记录
+"""数据记录
 
 记录排行版，历史，状态所需的数据
 如果遇到老版本数据，则自动升级
 """
+
 from datetime import date, datetime, timedelta
 
 from nonebot import get_driver
@@ -288,9 +289,9 @@ async def data_migration():
                     date_str = record_date.strftime("%Y-%m-%d")
                     for user_id, msg_number in days[day].items():
                         if (date_str, group_id, user_id) in users:
-                            users[(date_str, group_id, user_id)][
-                                "msg_number"
-                            ] = msg_number
+                            users[(date_str, group_id, user_id)]["msg_number"] = (
+                                msg_number
+                            )
                         else:
                             users[(date_str, group_id, user_id)] = {
                                 "msg_number": msg_number

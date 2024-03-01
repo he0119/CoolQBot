@@ -1,4 +1,5 @@
-""" 时尚品鉴 """
+"""时尚品鉴"""
+
 from nonebot.plugin import PluginMetadata
 
 from src.plugins.ff14 import ff14

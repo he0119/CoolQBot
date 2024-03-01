@@ -1,4 +1,5 @@
-""" 赛博查房 """
+"""赛博查房"""
+
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText
 from nonebot.permission import Permission

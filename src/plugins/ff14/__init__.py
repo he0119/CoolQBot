@@ -1,5 +1,4 @@
-""" 最终幻想XIV
-"""
+"""最终幻想XIV"""
 
 from pathlib import Path
 

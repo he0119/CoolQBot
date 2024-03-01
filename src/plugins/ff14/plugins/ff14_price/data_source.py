@@ -1,4 +1,4 @@
-""" 查询价格
+"""查询价格
 
 https://universalis.app/docs/index.html?urls.primaryName=Universalis%20v2
 

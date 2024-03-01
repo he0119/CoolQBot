@@ -1,5 +1,5 @@
-""" 历史记录
-"""
+"""历史记录"""
+
 from calendar import monthrange
 from datetime import datetime
 

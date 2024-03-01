@@ -1,9 +1,10 @@
-""" FFLogs API
+"""FFLogs API
 
 v1 版的 API，现在已经废弃，没有维护
 以后可能会失效
 文档网址 https://cn.fflogs.com/v1/docs
 """
+
 import asyncio
 import json
 import math

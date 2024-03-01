@@ -1,4 +1,5 @@
-""" 查价 """
+"""查价"""
+
 import httpx
 from nonebot.adapters import Event, Message
 from nonebot.params import CommandArg

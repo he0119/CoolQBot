@@ -1,4 +1,5 @@
-""" 掷骰子 """
+"""掷骰子"""
+
 import re
 from random import randint
 

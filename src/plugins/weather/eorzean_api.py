@@ -1,5 +1,5 @@
-""" 艾欧泽亚天气预报
-"""
+"""艾欧泽亚天气预报"""
+
 import time
 
 from EorzeaEnv import EorzeaLang, EorzeaPlaceName, EorzeaTime, EorzeaWeather

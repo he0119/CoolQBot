@@ -76,8 +76,23 @@ pythonPlatform = "All"
 typeCheckingMode = "basic"
 
 [tool.ruff.lint]
-select = ["F", "E", "W", "C", "I", "UP", "T", "PYI", "PT", "Q", "TID"]
-ignore = ["E402", "E501", "E711", "C901", "UP037"]
+select = [
+    "W",   # pycodestyle warnings
+    "E",   # pycodestyle errors
+    "F",   # Pyflakes
+    "UP",  # pyupgrade
+    "C4",  # flake8-comprehensions
+    "T10", # flake8-debugger
+    "T20", # flake8-print
+    "PYI", # flake8-pyi
+    "PT",  # flake8-pytest-style
+    "Q",   # flake8-quotes
+]
+ignore = [
+    "E402",  # module-import-not-at-top-of-file, Module level import not at top of cell
+    "E501",  # line-too-long, Line too long ({width} > {limit})
+    "UP037", # quoted-annotation, Remove quotes from type annotation
+]
 
 [tool.coverage.report]
 omit = ["*/migrations/*"]

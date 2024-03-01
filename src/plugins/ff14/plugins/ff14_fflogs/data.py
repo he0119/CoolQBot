@@ -1,7 +1,8 @@
-""" 一些数据
+"""一些数据
 
 副本与职业数据
 """
+
 from nonebot_plugin_datastore import get_plugin_data
 
 from .models import BossInfo, FFlogsDataModel, JobInfo

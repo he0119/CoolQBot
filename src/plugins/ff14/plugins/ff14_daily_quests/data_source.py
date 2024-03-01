@@ -1,5 +1,5 @@
-""" 记录每日委托
-"""
+"""记录每日委托"""
+
 from datetime import datetime
 
 from nonebot_plugin_datastore import get_plugin_data

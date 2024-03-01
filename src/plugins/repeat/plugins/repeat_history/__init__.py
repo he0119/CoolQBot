@@ -1,4 +1,5 @@
-""" 历史记录 """
+"""历史记录"""
+
 import re
 
 from nonebot.adapters import Bot, Message
