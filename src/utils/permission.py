@@ -25,3 +25,11 @@ class SuperUser:
 
 SUPERUSER: Permission = Permission(SuperUser())
 """匹配任意超级用户事件"""
+
+
+def patch_permission():
+    """替换 nonebot.permission.SUPERUSER 为自定义 SUPERUSER"""
+    import nonebot.permission
+
+    nonebot.permission.SuperUser = SuperUser
+    nonebot.permission.SUPERUSER = SUPERUSER

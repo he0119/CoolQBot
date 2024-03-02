@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Changed
 
 - 优化每日委托的体验
+- 替换内置的超级用户权限
 
 ## [0.17.5] - 2024-02-27
 
