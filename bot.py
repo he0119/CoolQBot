@@ -21,6 +21,12 @@ driver.register_adapter(QQAdapter)
 driver.register_adapter(RedAdapter)
 driver.register_adapter(SatoriAdapter)
 
+# 替换内置权限
+nonebot.load_plugin("nonebot_plugin_user")
+from src.utils.permission import patch_permission
+
+patch_permission()
+
 # 加载插件
 nonebot.load_from_toml("pyproject.toml")
 
