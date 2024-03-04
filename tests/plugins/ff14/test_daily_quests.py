@@ -93,6 +93,19 @@ async def test_daily_quests_pair(app: App):
 
     async with app.test_matcher(daily_quests_cmd) as ctx:
         bot = ctx.create_bot(base=Bot)
+        event = fake_group_message_event_v11(message=Message("/每日委托 总览"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "今日还没有人设置每日委托。",
+            True,
+            at_sender=True,
+        )
+        ctx.should_finished(daily_quests_cmd)
+
+    async with app.test_matcher(daily_quests_cmd) as ctx:
+        bot = ctx.create_bot(base=Bot)
         event = fake_group_message_event_v11(
             message=Message("/每日委托 乐园都市笑笑镇，伊弗利特歼灭战, 神龙歼灭战")
         )
