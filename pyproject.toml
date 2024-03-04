@@ -29,7 +29,7 @@ nonebot-plugin-user = "^0.2.0"
 nonebot-plugin-orm = { extras = ["default"], version = "^0.7.1" }
 nonebot-plugin-apscheduler = "^0.4.0"
 nonebot-plugin-send-anything-anywhere = "^0.6.0"
-nonebot-plugin-alconna = "^0.38.0"
+nonebot-plugin-alconna = "^0.38.2"
 nonebot-plugin-datastore = "^1.2.0"
 
 nonebot-plugin-sentry = "1.1.0"
