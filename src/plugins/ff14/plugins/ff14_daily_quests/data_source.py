@@ -81,3 +81,24 @@ async def get_daily_quests_pair(user_id: int) -> str:
             msg += f"{quest}：无\n"
 
     return msg.strip()
+
+
+async def get_daily_quests_overview() -> str:
+    """获取今日所有委托"""
+    data = get_quests_data()
+    if not data:
+        return "今日还没有人设置每日委托。"
+
+    quests = {}
+    for user, user_quests in data.items():
+        for quest in user_quests:
+            if quest not in quests:
+                quests[quest] = []
+            quests[quest].append(user)
+
+    msg = "今日所有委托：\n"
+    for quest, users in quests.items():
+        quest = await add_mogu_info(quest)
+        msg += f"{quest}：{await get_usernames(users)}\n"
+
+    return msg.strip()
