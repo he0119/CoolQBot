@@ -35,7 +35,7 @@ nonebot-plugin-datastore = "^1.2.0"
 nonebot-plugin-sentry = "1.1.0"
 nonebot-plugin-memes = "0.6.1"
 nonebot-bison = "0.9.0"
-nonebot-plugin-status = "0.7.2"
+nonebot-plugin-status = "0.8.0"
 nonebot-plugin-bawiki = "0.11.0"
 
 [tool.poetry.group.dev.dependencies]
@@ -60,7 +60,7 @@ plugins = [
     "nonebot_plugin_wordcloud",
     "nonebot_plugin_memes",
     "nonebot_bison",
-    # "nonebot_plugin_status",
+    "nonebot_plugin_status",
     "nonebot_plugin_bawiki",
 ]
 
