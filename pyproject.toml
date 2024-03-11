@@ -36,7 +36,7 @@ nonebot-plugin-sentry = "1.1.0"
 nonebot-plugin-memes = "0.6.1"
 nonebot-bison = "0.9.1"
 nonebot-plugin-status = "0.8.1"
-nonebot-plugin-bawiki = "0.11.1"
+nonebot-plugin-bawiki = "0.11.2"
 
 [tool.poetry.group.dev.dependencies]
 nonebug = "^0.3.3"
