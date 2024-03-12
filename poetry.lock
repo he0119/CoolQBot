@@ -1596,7 +1596,6 @@ files = [
     {file = "msgpack-1.0.8-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:5fbb160554e319f7b22ecf530a80a3ff496d38e8e07ae763b9e82fadfe96f273"},
     {file = "msgpack-1.0.8-cp39-cp39-win32.whl", hash = "sha256:f9af38a89b6a5c04b7d18c492c8ccf2aee7048aff1ce8437c4683bb5a1df893d"},
     {file = "msgpack-1.0.8-cp39-cp39-win_amd64.whl", hash = "sha256:ed59dd52075f8fc91da6053b12e8c89e37aa043f8986efd89e61fae69dc1b011"},
-    {file = "msgpack-1.0.8-py3-none-any.whl", hash = "sha256:24f727df1e20b9876fa6e95f840a2a2651e34c0ad147676356f4bf5fbb0206ca"},
     {file = "msgpack-1.0.8.tar.gz", hash = "sha256:95c02b0e27e706e48d0e5426d1710ca78e0f0628d6e89d5b5a5b91a5f12274f3"},
 ]
 
@@ -1757,13 +1756,13 @@ nonebot2 = ">=2.2.0,<3.0.0"
 
 [[package]]
 name = "nonebot-adapter-kaiheila"
-version = "0.3.1"
+version = "0.3.2"
 description = "kaiheila adapter for nonebot2"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_adapter_kaiheila-0.3.1-py3-none-any.whl", hash = "sha256:7acaa39d6c7479ae925b8d171fbae23fedf8bb3a81ded98c5b1e1214faad6aae"},
-    {file = "nonebot_adapter_kaiheila-0.3.1.tar.gz", hash = "sha256:1c14c22133ce84edc72de298e922f980d4e3b09febe4dcfeededc9603936daec"},
+    {file = "nonebot_adapter_kaiheila-0.3.2-py3-none-any.whl", hash = "sha256:06b109aefce62da80dc4e0653c4d2797efb516fdd32c70e75746b295c212928c"},
+    {file = "nonebot_adapter_kaiheila-0.3.2.tar.gz", hash = "sha256:7d42a61df1bef60762b6186a6ab5cf474ca4c4e75ed2ef5f9df662d72d8017ed"},
 ]
 
 [package.dependencies]
@@ -1900,13 +1899,13 @@ pydantic = ">=1.10.0,<2.5.0 || >2.5.0,<2.5.1 || >2.5.1,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-bawiki"
-version = "0.11.1"
+version = "0.11.2"
 description = "A nonebot2 plugin for Blue Archive."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "nonebot_plugin_bawiki-0.11.1-py3-none-any.whl", hash = "sha256:38e39edfe1270ae2875ef588c875b3f860822cb5678cc9b9525a5b98700e0f95"},
-    {file = "nonebot_plugin_bawiki-0.11.1.tar.gz", hash = "sha256:b305cc75501963b78fa32a9f44ab6b87b2d2f7a6aaca2a3fb8fd4cf98377176e"},
+    {file = "nonebot_plugin_bawiki-0.11.2-py3-none-any.whl", hash = "sha256:c4373124e2dcd8cd1904862ad5aaa93ed82bb20718b4e70fee7f5c731fe29861"},
+    {file = "nonebot_plugin_bawiki-0.11.2.tar.gz", hash = "sha256:06be4b0b03255e27ebc036c31c4adddbb0e8b1137ddb2fd6ea63d1d3a45939d7"},
 ]
 
 [package.dependencies]
@@ -4270,4 +4269,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "86c8d20a78dbad593d933c1f468f70ac1d132b93521de943070dbce04076d954"
+content-hash = "ba088d4c0fab2881968ffc21b0ddf9e0c37d01e6cc74a90e4be3f786966c9df6"
