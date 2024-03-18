@@ -9,7 +9,7 @@ version = "0.17.5"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-pydantic = "^2.6.3"
+pydantic = "^2.6.4"
 eorzeaenv = "^2.2.8"
 matplotlib = "^3.7.1"
 
@@ -17,7 +17,7 @@ nonebot2 = { extras = ["httpx", "fastapi", "websockets"], version = "^2.2.0" }
 nb-cli = "^1.4.0"
 nonebot-adapter-onebot = "^2.4.2"
 nonebot-adapter-qq = "^1.4.2"
-nonebot-adapter-kaiheila = "^0.3.1"
+nonebot-adapter-kaiheila = "^0.3.3"
 nonebot-adapter-red = "^0.9.0"
 nonebot-adapter-satori = "^0.10.1"
 nonebot-adapter-dodo = "^0.2.0"
@@ -29,14 +29,14 @@ nonebot-plugin-user = "^0.2.0"
 nonebot-plugin-orm = { extras = ["default"], version = "^0.7.1" }
 nonebot-plugin-apscheduler = "^0.4.0"
 nonebot-plugin-send-anything-anywhere = "^0.6.0"
-nonebot-plugin-alconna = "^0.38.0"
+nonebot-plugin-alconna = "^0.41.0"
 nonebot-plugin-datastore = "^1.2.0"
 
 nonebot-plugin-sentry = "1.1.0"
-nonebot-plugin-memes = "0.6.1"
+nonebot-plugin-memes = "0.6.2"
 nonebot-bison = "0.9.1"
 nonebot-plugin-status = "0.8.1"
-nonebot-plugin-bawiki = "0.11.1"
+nonebot-plugin-bawiki = "0.11.2"
 
 [tool.poetry.group.dev.dependencies]
 nonebug = "^0.3.3"

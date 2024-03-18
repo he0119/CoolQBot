@@ -109,13 +109,13 @@ zookeeper = ["kazoo"]
 
 [[package]]
 name = "arclet-alconna"
-version = "1.8.3"
+version = "1.8.6"
 description = "A High-performance, Generality, Humane Command Line Arguments Parser Library."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "arclet_alconna-1.8.3-py3-none-any.whl", hash = "sha256:a9e3ee69ae06b2ac20bb6571cfb2560f8d72c4103a1a866a464101b78fe3d578"},
-    {file = "arclet_alconna-1.8.3.tar.gz", hash = "sha256:5f698062206c7ff4e6c906f02017eacd07de8c03ad155b8ccbb1c37c1b638673"},
+    {file = "arclet_alconna-1.8.6-py3-none-any.whl", hash = "sha256:bac7f075328365b9727ae75eab83bb3884cbca40a725a6b2367d5af6c30ce6b5"},
+    {file = "arclet_alconna-1.8.6.tar.gz", hash = "sha256:ae0006335c41d1ad847f7a847f99523720c2a3605259833066133f08bc8feaf0"},
 ]
 
 [package.dependencies]
@@ -1596,7 +1596,6 @@ files = [
     {file = "msgpack-1.0.8-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:5fbb160554e319f7b22ecf530a80a3ff496d38e8e07ae763b9e82fadfe96f273"},
     {file = "msgpack-1.0.8-cp39-cp39-win32.whl", hash = "sha256:f9af38a89b6a5c04b7d18c492c8ccf2aee7048aff1ce8437c4683bb5a1df893d"},
     {file = "msgpack-1.0.8-cp39-cp39-win_amd64.whl", hash = "sha256:ed59dd52075f8fc91da6053b12e8c89e37aa043f8986efd89e61fae69dc1b011"},
-    {file = "msgpack-1.0.8-py3-none-any.whl", hash = "sha256:24f727df1e20b9876fa6e95f840a2a2651e34c0ad147676356f4bf5fbb0206ca"},
     {file = "msgpack-1.0.8.tar.gz", hash = "sha256:95c02b0e27e706e48d0e5426d1710ca78e0f0628d6e89d5b5a5b91a5f12274f3"},
 ]
 
@@ -1757,13 +1756,13 @@ nonebot2 = ">=2.2.0,<3.0.0"
 
 [[package]]
 name = "nonebot-adapter-kaiheila"
-version = "0.3.1"
+version = "0.3.3"
 description = "kaiheila adapter for nonebot2"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_adapter_kaiheila-0.3.1-py3-none-any.whl", hash = "sha256:7acaa39d6c7479ae925b8d171fbae23fedf8bb3a81ded98c5b1e1214faad6aae"},
-    {file = "nonebot_adapter_kaiheila-0.3.1.tar.gz", hash = "sha256:1c14c22133ce84edc72de298e922f980d4e3b09febe4dcfeededc9603936daec"},
+    {file = "nonebot_adapter_kaiheila-0.3.3-py3-none-any.whl", hash = "sha256:3ff5427b8fad0d97609f142bd00e5627ce6c8c668871a0e9b5d30dcc4c0558c5"},
+    {file = "nonebot_adapter_kaiheila-0.3.3.tar.gz", hash = "sha256:abf98c85e2f0007f51f2ef7a59608d5a8bf755e2e0eca06d640601fc9dff3018"},
 ]
 
 [package.dependencies]
@@ -1867,20 +1866,20 @@ tinydb = ">=4.3.0,<5.0.0"
 
 [[package]]
 name = "nonebot-plugin-alconna"
-version = "0.38.2"
+version = "0.41.0"
 description = "Alconna Adapter for Nonebot"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "nonebot_plugin_alconna-0.38.2-py3-none-any.whl", hash = "sha256:c1220bf69ce2c785f18bd5040450a53da88e5dbff9ef01ec0616a82233cabc36"},
-    {file = "nonebot_plugin_alconna-0.38.2.tar.gz", hash = "sha256:df45cdec0c7446ecc97aa7721c05241278d14fd7460cfe3a48249cf1d58a779f"},
+    {file = "nonebot_plugin_alconna-0.41.0-py3-none-any.whl", hash = "sha256:9aed8468ad7ec82d1849bf5d4010e08765239e6add1c7f2e744dc0b35ce8ce57"},
+    {file = "nonebot_plugin_alconna-0.41.0.tar.gz", hash = "sha256:29d4c7f39b629d14652274e0b26cf5b1e1d558d87df0334d738d969172c0d7d7"},
 ]
 
 [package.dependencies]
-arclet-alconna = ">=1.8.3"
+arclet-alconna = ">=1.8.5"
 arclet-alconna-tools = ">=0.7.0"
-nepattern = ">=0.6.0"
-nonebot2 = ">=2.2.0"
+nepattern = ">=0.6.5"
+nonebot2 = ">=2.2.1"
 
 [[package]]
 name = "nonebot-plugin-apscheduler"
@@ -1900,13 +1899,13 @@ pydantic = ">=1.10.0,<2.5.0 || >2.5.0,<2.5.1 || >2.5.1,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-bawiki"
-version = "0.11.1"
+version = "0.11.2"
 description = "A nonebot2 plugin for Blue Archive."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "nonebot_plugin_bawiki-0.11.1-py3-none-any.whl", hash = "sha256:38e39edfe1270ae2875ef588c875b3f860822cb5678cc9b9525a5b98700e0f95"},
-    {file = "nonebot_plugin_bawiki-0.11.1.tar.gz", hash = "sha256:b305cc75501963b78fa32a9f44ab6b87b2d2f7a6aaca2a3fb8fd4cf98377176e"},
+    {file = "nonebot_plugin_bawiki-0.11.2-py3-none-any.whl", hash = "sha256:c4373124e2dcd8cd1904862ad5aaa93ed82bb20718b4e70fee7f5c731fe29861"},
+    {file = "nonebot_plugin_bawiki-0.11.2.tar.gz", hash = "sha256:06be4b0b03255e27ebc036c31c4adddbb0e8b1137ddb2fd6ea63d1d3a45939d7"},
 ]
 
 [package.dependencies]
@@ -2023,19 +2022,19 @@ typing-extensions = ">=4.0.0"
 
 [[package]]
 name = "nonebot-plugin-memes"
-version = "0.6.1"
+version = "0.6.2"
 description = "Nonebot2 plugin for making memes"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "nonebot_plugin_memes-0.6.1-py3-none-any.whl", hash = "sha256:47a52d098c812aee5d80b34a14184741c88190583499faeeea51c516dcd8a6a4"},
-    {file = "nonebot_plugin_memes-0.6.1.tar.gz", hash = "sha256:00de11d5fa742794149de5f2e0eb7631a2633b90db555f31aba0215f77aaaa66"},
+    {file = "nonebot_plugin_memes-0.6.2-py3-none-any.whl", hash = "sha256:806d6bede5ed2d914fa91fa90cff6ecf86ff934451ce2fc45fc45946b616a571"},
+    {file = "nonebot_plugin_memes-0.6.2.tar.gz", hash = "sha256:f3008f1b656d5b3175711b9782832c71e4f26352c4d1d72752bcafd577393c4b"},
 ]
 
 [package.dependencies]
 httpx = ">=0.20.0,<1.0.0"
 meme-generator = ">=0.0.15,<0.1.0"
-nonebot-plugin-alconna = ">=0.38.0,<1.0.0"
+nonebot-plugin-alconna = ">=0.40.1,<1.0.0"
 nonebot-plugin-localstore = ">=0.6.0,<0.7.0"
 nonebot-plugin-session = ">=0.3.0,<0.4.0"
 nonebot-plugin-userinfo = ">=0.2.1,<0.3.0"
@@ -2586,13 +2585,13 @@ test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
 
 [[package]]
 name = "pydantic"
-version = "2.6.3"
+version = "2.6.4"
 description = "Data validation using Python type hints"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pydantic-2.6.3-py3-none-any.whl", hash = "sha256:72c6034df47f46ccdf81869fddb81aade68056003900a8724a4f160700016a2a"},
-    {file = "pydantic-2.6.3.tar.gz", hash = "sha256:e07805c4c7f5c6826e33a1d4c9d47950d7eaf34868e2690f8594d2e30241f11f"},
+    {file = "pydantic-2.6.4-py3-none-any.whl", hash = "sha256:cc46fce86607580867bdc3361ad462bab9c222ef042d3da86f2fb333e1d916c5"},
+    {file = "pydantic-2.6.4.tar.gz", hash = "sha256:b1704e0847db01817624a6b86766967f552dd9dbf3afba4004409f908dcc84e6"},
 ]
 
 [package.dependencies]
@@ -4270,4 +4269,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "86c8d20a78dbad593d933c1f468f70ac1d132b93521de943070dbce04076d954"
+content-hash = "53060a1a4ed1fd55356e478ed553d2c6d45a752587fd8ba1b660b44f56fdbb82"
