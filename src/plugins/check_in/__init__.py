@@ -1,13 +1,12 @@
 """打卡插件"""
 
-from nonebot import require
-
-require("nonebot_plugin_user")
 from pathlib import Path
 
 import nonebot
-from nonebot import CommandGroup, get_driver
+from nonebot import CommandGroup, get_driver, require
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+
+require("nonebot_plugin_user")
 
 from . import migrations
 

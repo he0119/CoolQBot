@@ -3,10 +3,12 @@
 from pathlib import Path
 
 import nonebot
-from nonebot import get_driver, get_plugin_config
+from nonebot import get_driver, get_plugin_config, require
 from nonebot.plugin import PluginMetadata
 
 from .config import Config
+
+require("nonebot_plugin_user")
 
 __plugin_meta__ = PluginMetadata(
     name="问好",

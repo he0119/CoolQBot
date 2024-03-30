@@ -3,8 +3,10 @@
 from pathlib import Path
 
 import nonebot
-from nonebot import CommandGroup, get_driver
+from nonebot import CommandGroup, get_driver, require
 from nonebot.plugin import PluginMetadata
+
+require("nonebot_plugin_user")
 
 __plugin_meta__ = PluginMetadata(
     name="最终幻想XIV",

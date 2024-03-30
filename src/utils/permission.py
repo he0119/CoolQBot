@@ -1,6 +1,8 @@
-from nonebot import get_driver
+from nonebot import get_driver, require
 from nonebot.adapters import Bot
 from nonebot.permission import Permission
+
+require("nonebot_plugin_user")
 from nonebot_plugin_user import User
 
 config = get_driver().config

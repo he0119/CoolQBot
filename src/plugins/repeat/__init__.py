@@ -7,8 +7,10 @@
 from pathlib import Path
 
 import nonebot
-from nonebot import CommandGroup, get_driver, get_plugin_config
+from nonebot import CommandGroup, get_driver, get_plugin_config, require
 from nonebot.plugin import PluginMetadata
+
+require("nonebot_plugin_user")
 
 from . import migrations
 from .config import Config
