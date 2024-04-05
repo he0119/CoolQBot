@@ -6,6 +6,8 @@ import nonebot
 from nonebot import CommandGroup, get_driver, require
 from nonebot.plugin import PluginMetadata
 
+require("nonebot_plugin_apscheduler")
+require("nonebot_plugin_datastore")
 require("nonebot_plugin_user")
 
 __plugin_meta__ = PluginMetadata(

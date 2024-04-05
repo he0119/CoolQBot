@@ -8,6 +8,9 @@ from nonebot.plugin import PluginMetadata
 
 from .config import Config
 
+require("nonebot_plugin_apscheduler")
+require("nonebot_plugin_datastore")
+require("nonebot_plugin_saa")
 require("nonebot_plugin_user")
 
 __plugin_meta__ = PluginMetadata(

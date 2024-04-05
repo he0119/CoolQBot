@@ -53,9 +53,6 @@ beautifulsoup4 = "^4.12.3"
 [tool.nonebot]
 plugin_dirs = ["src/plugins"]
 plugins = [
-    "nonebot_plugin_apscheduler",
-    "nonebot_plugin_saa",
-    "nonebot_plugin_datastore",
     "nonebot_plugin_sentry",
     "nonebot_plugin_treehelp",
     "nonebot_plugin_wordcloud",
