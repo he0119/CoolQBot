@@ -22,6 +22,8 @@ nonebot-adapter-kaiheila = "^0.3.1"
 nonebot-adapter-red = "^0.9.0"
 nonebot-adapter-satori = "^0.11.4"
 nonebot-adapter-dodo = "^0.2.0"
+nonebot-adapter-discord = "^0.1.8"
+nonebot-adapter-telegram = "^0.1.0b17"
 
 nonebot-plugin-wordcloud = "^0.7.0"
 nonebot-plugin-treehelp = "^0.4.1"
