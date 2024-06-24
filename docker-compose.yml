@@ -9,9 +9,6 @@ services:
       - "8080:8080"
     env_file:
       - ".env"
-    environment:
-      - APP_MODULE=bot:app # 配置 asgi 入口
-      - MAX_WORKERS=1 # 如果你有多个QQ，且存在 self_id 指定，多个 worker 会导致无法找到其他 websocket 连接
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8080}/health"]
       interval: 10s
