@@ -1,4 +1,4 @@
-FROM python:3.12 as requirements-stage
+FROM python:3.12.3 as requirements-stage
 
 WORKDIR /tmp
 
@@ -12,7 +12,7 @@ ENV PATH="${PATH}:/root/.local/bin"
 
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
-FROM python:3.12-slim
+FROM python:3.12.3-slim
 
 # 设置时区
 ENV TZ=Asia/Shanghai
