@@ -27,12 +27,12 @@ nonebot-adapter-telegram = "^0.1.0b17"
 
 nonebot-plugin-wordcloud = "^0.7.2"
 nonebot-plugin-treehelp = "^0.4.1"
-nonebot-plugin-user = "^0.2.0"
+nonebot-plugin-user = "^0.3.0"
 
-nonebot-plugin-orm = { extras = ["default"], version = "^0.7.3" }
-nonebot-plugin-apscheduler = "^0.4.0"
+nonebot-plugin-orm = { extras = ["default"], version = "^0.7.4" }
+nonebot-plugin-apscheduler = "^0.5.0"
 nonebot-plugin-send-anything-anywhere = "^0.6.1"
-nonebot-plugin-alconna = "^0.47.1"
+nonebot-plugin-alconna = "^0.48.0"
 nonebot-plugin-datastore = "^1.3.0"
 
 nonebot-plugin-sentry = "2.0.0"

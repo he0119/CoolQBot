@@ -109,13 +109,13 @@ zookeeper = ["kazoo"]
 
 [[package]]
 name = "arclet-alconna"
-version = "1.8.15"
+version = "1.8.16"
 description = "A High-performance, Generality, Humane Command Line Arguments Parser Library."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "arclet_alconna-1.8.15-py3-none-any.whl", hash = "sha256:9cc010e42f00a5201439318df3b2000234dce27fdc90d26813c3a295125e54e8"},
-    {file = "arclet_alconna-1.8.15.tar.gz", hash = "sha256:713a57bdfed3c3959600384e46358154ce33eec012615554beb5634d436507bc"},
+    {file = "arclet_alconna-1.8.16-py3-none-any.whl", hash = "sha256:b04241904d3f3a9d3eae30c5d1af7e264528b5a87b729fee5f408b2d93cef035"},
+    {file = "arclet_alconna-1.8.16.tar.gz", hash = "sha256:57bdc42c8626846ad536c19a24804790005554db4ad3300b7d4607c684cd25f3"},
 ]
 
 [package.dependencies]
@@ -2049,32 +2049,33 @@ yarl = ">=1.9.4"
 
 [[package]]
 name = "nonebot-plugin-alconna"
-version = "0.47.1"
+version = "0.48.0"
 description = "Alconna Adapter for Nonebot"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "nonebot_plugin_alconna-0.47.1-py3-none-any.whl", hash = "sha256:767bd427e9bf80c0b9f5a0cc3d5da392849bf08e7ccda5e9d3c8428d2ff541ee"},
-    {file = "nonebot_plugin_alconna-0.47.1.tar.gz", hash = "sha256:800139edec2250f36b3c5ec632eb6e3cacde417baeaf9a4c5365f1a283cc5410"},
+    {file = "nonebot_plugin_alconna-0.48.0-py3-none-any.whl", hash = "sha256:02dcdca744934368246d48373393bcd475d7e4c7182a56a777b0bc45586d557a"},
+    {file = "nonebot_plugin_alconna-0.48.0.tar.gz", hash = "sha256:f5a8a3b9da42f3a6ef2b387d9b5194023178c135d03381b1aa60eead9363d6cc"},
 ]
 
 [package.dependencies]
-arclet-alconna = ">=1.8.15"
+arclet-alconna = ">=1.8.16"
 arclet-alconna-tools = ">=0.7.6"
 importlib-metadata = ">=4.13.0"
 nepattern = ">=0.7.4"
 nonebot-plugin-waiter = ">=0.6.0"
 nonebot2 = ">=2.3.0"
+tarina = ">=0.5.4"
 
 [[package]]
 name = "nonebot-plugin-apscheduler"
-version = "0.4.0"
+version = "0.5.0"
 description = "APScheduler Support for NoneBot2"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "nonebot_plugin_apscheduler-0.4.0-py3-none-any.whl", hash = "sha256:f01bb418a5ecf9f04dcadbbc2ff5ba565a48177eb0a758c8c46b13048ac5680c"},
-    {file = "nonebot_plugin_apscheduler-0.4.0.tar.gz", hash = "sha256:ba91e68809a38e6dbe28906366d47f37f754ded360944b938cd5ac62029a0eb6"},
+    {file = "nonebot_plugin_apscheduler-0.5.0-py3-none-any.whl", hash = "sha256:8b99b5ee60c4bc195d4df2fd27dab3d6963691e3332f6cee31a06eb4277c307f"},
+    {file = "nonebot_plugin_apscheduler-0.5.0.tar.gz", hash = "sha256:6c0230e99765f275dc83d6639ff33bd6f71203fa10cd1b8a204b0f95530cda86"},
 ]
 
 [package.dependencies]
@@ -2230,13 +2231,13 @@ pyyaml = ">=6.0,<7.0"
 
 [[package]]
 name = "nonebot-plugin-orm"
-version = "0.7.3"
+version = "0.7.4"
 description = "SQLAlchemy ORM support for nonebot"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "nonebot_plugin_orm-0.7.3-py3-none-any.whl", hash = "sha256:9b0d114a4e7b2e452cb333e7147ae4216dff2f9685df616e5fa1f3f892d8795b"},
-    {file = "nonebot_plugin_orm-0.7.3.tar.gz", hash = "sha256:cbb573598d0ecef2d0e75b5bdebd05297c68a2b368029a8763660f2a45381a2c"},
+    {file = "nonebot_plugin_orm-0.7.4-py3-none-any.whl", hash = "sha256:e2d3f3ba6b7bf22236b9481015cbc13b184f22450fe7abe2f7a65ed128bf2d9e"},
+    {file = "nonebot_plugin_orm-0.7.4.tar.gz", hash = "sha256:67ff5f358249bd9413d958ad002dea1749eb2530e1038f633c1dd044dd5816f3"},
 ]
 
 [package.dependencies]
@@ -2361,13 +2362,13 @@ nonebot2 = ">=2.2.0,<3.0.0"
 
 [[package]]
 name = "nonebot-plugin-user"
-version = "0.2.0"
+version = "0.3.0"
 description = "适用于 Nonebot2 的用户插件"
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "nonebot_plugin_user-0.2.0-py3-none-any.whl", hash = "sha256:9b052551b13fd8f8fab39023a8088637b0447b0ef42d87f54a0e7e2c3c371740"},
-    {file = "nonebot_plugin_user-0.2.0.tar.gz", hash = "sha256:f2f559e3381deb20a067fb2004a92f3625b1777da076ecfb956e334bdbe0f7d5"},
+    {file = "nonebot_plugin_user-0.3.0-py3-none-any.whl", hash = "sha256:3b65884368e446b7b64b46216d060a020100855ecabcbbeb6d10223e55804773"},
+    {file = "nonebot_plugin_user-0.3.0.tar.gz", hash = "sha256:82d7b039d69cd791ebaff1be0308618a850a798219901cee2f5bcd1a96e14911"},
 ]
 
 [package.dependencies]
@@ -4649,4 +4650,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "ffb0c368772ce5e3d578dc33855fa20ba80f1752acff5305b2897f85b3824bfc"
+content-hash = "1aa564fe31c651a68cb3e3252b0da5394159cdf29249d0442d44113a97cd7b95"
