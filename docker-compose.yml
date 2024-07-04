@@ -5,6 +5,7 @@ services:
     restart: always
     volumes:
       - "./data:/app/data"
+      - "./fonts:/usr/share/fonts/meme-fonts"
     ports:
       - "8080:8080"
     env_file:
@@ -14,7 +15,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 180s
 
   netease:
     image: binaryify/netease_cloud_music_api
