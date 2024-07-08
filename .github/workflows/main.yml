@@ -28,6 +28,8 @@ jobs:
         uses: eifinger/setup-rye@v3
         with:
           enable-cache: true
+      - name: Install prerequisites
+        run: rye sync
       - name: Run tests
         run: rye run test
       - name: Upload coverage to Codecov
