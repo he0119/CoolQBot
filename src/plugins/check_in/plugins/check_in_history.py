@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from io import BytesIO
 
 import matplotlib.pyplot as plt
@@ -55,7 +55,7 @@ async def handle_first_message(
             now = (
                 datetime.now()
                 .replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-                .astimezone(tz=timezone.utc)
+                .astimezone(tz=UTC)
                 .replace(tzinfo=None)
             )
             fitness_records = (
@@ -136,7 +136,7 @@ def generate_graph(records: Sequence[WeightRecord] | Sequence[BodyFatRecord]) ->
         ylabel = "body fat (%)"
 
     data = {
-        record.time.replace(tzinfo=timezone.utc).astimezone(): record.weight
+        record.time.replace(tzinfo=UTC).astimezone(): record.weight
         if isinstance(record, WeightRecord)
         else record.body_fat
         for record in records
