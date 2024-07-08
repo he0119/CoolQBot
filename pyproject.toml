@@ -33,7 +33,7 @@ dependencies = [
 ]
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">= 3.12, < 4.0"
+requires-python = ">= 3.12, < 3.13"
 
 [project.urls]
 Homepage = "https://github.com/he0119/CoolQBot"
