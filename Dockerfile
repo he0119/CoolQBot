@@ -22,11 +22,6 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# Bot
-ENV APP_MODULE bot:app
-# # 如果你有多个QQ，且存在 self_id 指定，多个 worker 会导致无法找到其他 websocket 连接
-ENV MAX_WORKERS 1
-
 # 安装依赖
 RUN apt-get update \
   && apt-get -y upgrade \
@@ -35,12 +30,19 @@ RUN apt-get update \
   && fc-cache -fv \
   && apt-get purge -y --auto-remove \
   && rm -rf /var/lib/apt/lists/*
-RUN playwright install --with-deps chromium
-RUN meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator/
 
 # Python 依赖
 COPY requirements.lock ./
 RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
+
+# 提前缓存插件所需数据
+RUN playwright install --with-deps chromium
+RUN meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator/
+
+# Bot
+ENV APP_MODULE bot:app
+# # 如果你有多个QQ，且存在 self_id 指定，多个 worker 会导致无法找到其他 websocket 连接
+ENV MAX_WORKERS 1
 
 COPY bot.py pyproject.toml .env prestart.sh /app/
 COPY src /app/src/
