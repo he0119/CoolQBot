@@ -21,7 +21,7 @@
 # 首先克隆代码到本地
 git clone https://github.com/he0119/CoolQBot.git
 # 安装机器人所需依赖
-poetry install
+rye sync
 # 配置机器人通用配置
 vim .env
 ```
