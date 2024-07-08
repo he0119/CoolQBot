@@ -45,6 +45,12 @@ Changelog = "https://github.com/he0119/CoolQBot/blob/master/CHANGELOG.md"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
 [tool.rye]
 managed = true
 dev-dependencies = [
@@ -59,11 +65,8 @@ dev-dependencies = [
     "beautifulsoup4>=4.12.3",
 ]
 
-[tool.hatch.metadata]
-allow-direct-references = true
-
-[tool.hatch.build.targets.wheel]
-packages = ["src"]
+[tool.rye.scripts]
+test = "pytest --cov=src --cov-report xml -n auto"
 
 [tool.nonebot]
 plugin_dirs = ["src/plugins"]

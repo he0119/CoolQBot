@@ -24,16 +24,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Set timezone
         run: sudo timedatectl set-timezone 'Asia/Shanghai'
-      - name: Set up Python
-        uses: he0119/setup-python@main
+      - name: Setup rye
+        uses: eifinger/setup-rye@v3
         with:
-          python-version: "3.12"
-      - name: Install prerequisites
-        run: |
-          poetry config installer.modern-installation false
-          poetry install
+          enable-cache: true
       - name: Run tests
-        run: poetry run pytest --cov=src --cov-report xml -n auto
+        run: rye run test
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -41,7 +37,7 @@ jobs:
       - name: Set build version
         id: setVersion
         run: |
-          VERSION=$(poetry version -s)
+          VERSION=$(rye version)
           COMMIT_ID=$(git rev-parse --short HEAD)
           if [[ "${{github.event_name}}" == "release" && "${{github.event.action}}" == "published" ]]; then
             echo "environment=prod" >> $GITHUB_OUTPUT
