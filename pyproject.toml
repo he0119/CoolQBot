@@ -53,6 +53,7 @@ packages = ["src"]
 
 [tool.rye]
 managed = true
+virtual = true
 dev-dependencies = [
     "nonebug>=0.3.7",
     "nonebug-saa>=0.4.1",
