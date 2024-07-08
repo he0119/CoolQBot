@@ -25,7 +25,7 @@ jobs:
       - name: Set timezone
         run: sudo timedatectl set-timezone 'Asia/Shanghai'
       - name: Setup rye
-        uses: eifinger/setup-rye@v3
+        uses: eifinger/setup-rye@v4
         with:
           enable-cache: true
       - name: Install prerequisites
