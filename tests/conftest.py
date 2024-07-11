@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 import nonebot
@@ -7,6 +8,9 @@ from nonebug import NONEBOT_INIT_KWARGS
 from nonebug.app import App
 from pytest_mock import MockerFixture
 from sqlalchemy import StaticPool, delete
+
+home_dir = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(home_dir))
 
 
 def pytest_configure(config: pytest.Config) -> None:
