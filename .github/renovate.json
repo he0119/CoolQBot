@@ -8,5 +8,5 @@
   ],
   "labels": ["dependencies"],
   "rangeStrategy": "bump",
-  "ignoreDeps": ["python"]
+  "ignoreDeps": ["python", "eorzeaenv"]
 }
