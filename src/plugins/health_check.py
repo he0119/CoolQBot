@@ -13,9 +13,9 @@ async def health_check():
 
 
 @app.get("/secret/bot_health")
-async def bot_check():
+async def bot_check(bot_id: str | None = None):
     try:
-        bot = nonebot.get_bot()
+        nonebot.get_bot(bot_id)
         return JSONResponse({"status": "ok"}, status_code=200)
     except Exception as e:
         return JSONResponse(
