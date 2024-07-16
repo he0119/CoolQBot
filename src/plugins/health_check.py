@@ -26,7 +26,7 @@ async def bot_check(bot_id: str | None = None):
 
 # https://github.com/encode/starlette/issues/864
 class HealthCheckFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord) -> bool:
+    def filter(self, record: logging.LogRecord) -> bool:  # pragma: no cover
         # complete query string (so parameter and other value included)
         query_string: str = record.args[2]  # type: ignore
 
