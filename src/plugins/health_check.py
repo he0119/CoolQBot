@@ -27,7 +27,15 @@ async def bot_check(bot_id: str | None = None):
 # https://github.com/encode/starlette/issues/864
 class HealthCheckFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
-        return record.getMessage().find("/health") == -1
+        # complete query string (so parameter and other value included)
+        query_string: str = record.args[2]  # type: ignore
+
+        if query_string.startswith("/health"):
+            return False
+        if query_string.startswith("/secret/bot_health"):
+            return False
+
+        return True
 
 
 logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
