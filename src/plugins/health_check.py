@@ -3,6 +3,7 @@ import logging
 import nonebot
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from typing import Optional
 
 app: FastAPI = nonebot.get_app()
 
@@ -12,11 +13,10 @@ async def health_check():
     return JSONResponse({"status": "ok"}, status_code=200)
 
 
-# curl https://bot.hehome.xyz/bot_health?bot_id=2835792370
-@app.get("/bot_health")
-async def bot_check(bot_id: Optional[str] = None):
+@app.get("/secret/bot_health")
+async def bot_check():
     try:
-        bot = nonebot.get_bot(bot_id)
+        bot = nonebot.get_bot()
         return JSONResponse({"status": "ok"}, status_code=200)
     except Exception as e:
         return JSONResponse(
