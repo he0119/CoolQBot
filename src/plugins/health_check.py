@@ -3,7 +3,6 @@ import logging
 import nonebot
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from typing import Optional
 
 app: FastAPI = nonebot.get_app()
 
