@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 升级至 Pydantic V2
 - 添加 Discord 和 Telegram 适配器
+- 新增机器人健康检查 API
 
 ### Changed
 
