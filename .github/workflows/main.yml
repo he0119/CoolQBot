@@ -105,6 +105,7 @@ jobs:
         with:
           context: .
           push: false
+          load: true
           tags: he0119/coolqbot:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -112,7 +113,7 @@ jobs:
       - name: Test Image
         if: github.event_name == 'pull_request'
         run: |
-          docker run --name test-docker-container he0119/coolqbot:test > /dev/null
+          docker run --name test-docker-container -d he0119/coolqbot:test > /dev/null
 
           sleep 30
           CONTAINER_STATE=$(docker ps -f name=test-docker-container -a --format '{{.State}}')
