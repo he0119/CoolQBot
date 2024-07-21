@@ -1,4 +1,4 @@
-FROM python:3.12.3-slim
+FROM python:3.12.4-slim
 
 # 设置时区
 ENV TZ=Asia/Shanghai
