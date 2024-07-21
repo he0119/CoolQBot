@@ -115,7 +115,8 @@ jobs:
         run: |
           docker run --name test-docker-container -d he0119/coolqbot:test > /dev/null
 
-          sleep 30
+          sleep 10
+
           CONTAINER_STATE=$(docker ps -f name=test-docker-container -a --format '{{.State}}')
           if [[ $CONTAINER_STATE = "running" ]]; then
               echo "container still running, check passed"
