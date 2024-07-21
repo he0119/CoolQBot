@@ -108,6 +108,8 @@ fonttools==4.53.1
 greenlet==3.0.3
     # via playwright
     # via sqlalchemy
+gunicorn==22.0.0
+    # via uvicorn-worker
 h11==0.14.0
     # via httpcore
     # via uvicorn
@@ -290,6 +292,7 @@ opencv-python-headless==4.10.0.84
 orjson==3.10.6
     # via fastapi
 packaging==24.1
+    # via gunicorn
     # via matplotlib
     # via nonebot-adapter-red
 pil-utils==0.1.10
@@ -456,10 +459,12 @@ ujson==5.10.0
 urllib3==2.2.2
     # via requests
     # via sentry-sdk
-uvicorn==0.30.1
+uvicorn==0.30.3
     # via fastapi
     # via meme-generator
     # via nonebot2
+    # via uvicorn-worker
+uvicorn-worker==0.2.0
 uvloop==0.19.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'
     # via uvicorn
 virtualenv==20.26.3
