@@ -22,20 +22,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set timezone
         run: sudo timedatectl set-timezone 'Asia/Shanghai'
+
       - name: Setup rye
         uses: eifinger/setup-rye@v4
         with:
           enable-cache: true
+
       - name: Install prerequisites
         run: rye sync
+
       - name: Run tests
         run: rye run test
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Set build version
         id: setVersion
         run: |
@@ -56,41 +62,79 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set version
         run: sed -ri "s#SENTRY_RELEASE=version#SENTRY_RELEASE=$VERSION#g" Dockerfile
         env:
           VERSION: ${{ needs.test.outputs.version }}
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: he0119/coolqbot
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker meta
+        if: github.event_name != 'pull_request'
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: he0119/coolqbot
+
       - name: Build and push
+        if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Build for test
+        if: github.event_name == 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: he0119/coolqbot:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test Image
+        if: github.event_name == 'pull_request'
+        run: |
+          docker run --name test-docker-container -d he0119/coolqbot:test > /dev/null
+
+          sleep 10
+
+          CONTAINER_STATE=$(docker ps -f name=test-docker-container -a --format '{{.State}}')
+          if [[ $CONTAINER_STATE = "running" ]]; then
+              echo "container still running, check passed"
+              docker rm -f test-docker-container > /dev/null
+              exit
+          else
+              echo "container exited"
+              docker logs test-docker-container
+              docker rm test-docker-container > /dev/null
+              exit 1
+          fi
 
   deploy_dev:
     name: Deploy Dev
     runs-on: ubuntu-latest
     environment: dev
     needs: docker
-    if: ${{ github.event_name != 'pull_request' }}
+    if: github.event_name != 'pull_request'
     steps:
       - name: Tailscale
         uses: tailscale/github-action@v2
@@ -98,6 +142,7 @@ jobs:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
+
       - name: Deploy to server
         run: tailscale ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} ${{ secrets.DEPLOY_SCRIPT }}
 
@@ -114,6 +159,7 @@ jobs:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
+
       - name: Deploy to server
         run: tailscale ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} ${{ secrets.DEPLOY_SCRIPT }}
 
@@ -125,6 +171,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Create Sentry release
         uses: getsentry/action-release@v1
         env:

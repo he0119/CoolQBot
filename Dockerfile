@@ -1,4 +1,6 @@
-FROM python:3.12.3-slim
+FROM python:3.12.4-slim
+
+WORKDIR /app
 
 # 设置时区
 ENV TZ=Asia/Shanghai
@@ -11,16 +13,6 @@ COPY ./docker/start.sh /start.sh
 RUN chmod +x /start.sh
 
 COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
-
-# 安装 uvicorn, gunicorn
-# https://www.uvicorn.org/#quickstart
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends gcc \
-  && pip install --no-cache-dir --upgrade "uvicorn[standard]" gunicorn \
-  && apt-get purge -y --auto-remove \
-  && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
 
 # 安装依赖
 RUN apt-get update \
@@ -40,9 +32,9 @@ RUN playwright install --with-deps chromium
 RUN meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator/
 
 # Bot
-ENV APP_MODULE bot:app
+ENV APP_MODULE=bot:app
 # # 如果你有多个QQ，且存在 self_id 指定，多个 worker 会导致无法找到其他 websocket 连接
-ENV MAX_WORKERS 1
+ENV MAX_WORKERS=1
 
 COPY bot.py pyproject.toml .env prestart.sh /app/
 COPY src /app/src/
