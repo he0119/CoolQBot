@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.18.0] - 2024-07-22
+
 ### Added
 
 - 升级至 Pydantic V2
@@ -524,7 +526,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.17.5...HEAD
+[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/he0119/CoolQBot/compare/v0.17.5...v0.18.0
 [0.17.5]: https://github.com/he0119/CoolQBot/compare/v0.17.4...v0.17.5
 [0.17.4]: https://github.com/he0119/CoolQBot/compare/v0.17.3...v0.17.4
 [0.17.3]: https://github.com/he0119/CoolQBot/compare/v0.17.2...v0.17.3
