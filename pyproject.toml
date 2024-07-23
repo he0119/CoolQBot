@@ -64,6 +64,7 @@ dev-dependencies = [
 [tool.rye.scripts]
 test = "pytest --cov=src --cov-report xml -n auto"
 bump = "bump-my-version bump"
+show-bump = "bump-my-version show-bump"
 
 [tool.nonebot]
 plugin_dirs = ["src/plugins"]
@@ -124,5 +125,6 @@ replace = "[Unreleased]\n\n## [{new_version}] - {now:%Y-%m-%d}"
 
 [[tool.bumpversion.files]]
 filename = "CHANGELOG.md"
-search = "{current_version}...HEAD"
-replace = "{new_version}...HEAD\n[{new_version}]: https://github.com/he0119/CoolQBot/compare/v{current_version}...v{new_version}"
+regex = true
+search = "\\[unreleased\\]: (https://.+?)v{current_version}\\.\\.\\.HEAD"
+replace = "[unreleased]: \\1v{new_version}...HEAD\n[{new_version}]: \\1v{current_version}...v{new_version}"
