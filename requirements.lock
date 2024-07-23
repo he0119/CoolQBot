@@ -27,7 +27,7 @@ anyio==4.4.0
     # via watchfiles
 apscheduler==3.10.4
     # via nonebot-plugin-apscheduler
-arclet-alconna==1.8.18
+arclet-alconna==1.8.19
     # via arclet-alconna-tools
     # via nonebot-plugin-alconna
 arclet-alconna-tools==0.7.6
@@ -199,7 +199,7 @@ nonebot-adapter-red==0.9.0
 nonebot-adapter-satori==0.12.3
 nonebot-adapter-telegram==0.1.0b17
 nonebot-bison==0.9.2
-nonebot-plugin-alconna==0.49.0
+nonebot-plugin-alconna==0.50.2
     # via nonebot-plugin-memes
     # via nonebot-plugin-user
     # via nonebot-plugin-wordcloud
@@ -224,7 +224,7 @@ nonebot-plugin-localstore==0.6.0
     # via nonebot-plugin-orm
     # via nonebot-plugin-wordcloud
 nonebot-plugin-memes==0.6.2
-nonebot-plugin-orm==0.7.4
+nonebot-plugin-orm==0.7.5
     # via nonebot-plugin-chatrecorder
     # via nonebot-plugin-session-orm
     # via nonebot-plugin-user

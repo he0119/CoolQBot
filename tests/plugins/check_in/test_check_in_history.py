@@ -97,9 +97,10 @@ async def test_weight_record_history(
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message("你的目标体重是 NaNkg\n") + MessageSegment.image(image_url),
+            MessageSegment.at(10)
+            + MessageSegment.text("你的目标体重是 NaNkg\n")
+            + MessageSegment.image(image_url),
             True,
-            at_sender=True,
         )
         ctx.should_finished(history_cmd)
 
@@ -133,9 +134,10 @@ async def test_body_fat_record_history(
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message("你的目标体脂是 NaN%\n") + MessageSegment.image(image_url),
+            MessageSegment.at(10)
+            + MessageSegment.text("你的目标体脂是 NaN%\n")
+            + MessageSegment.image(image_url),
             True,
-            at_sender=True,
         )
         ctx.should_finished(history_cmd)
 
