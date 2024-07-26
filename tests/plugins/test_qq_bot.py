@@ -18,7 +18,7 @@ async def test_qq_bot(app: App, client: TestClient):
         assert response.status_code == 200
         assert response.json() == {"bot_appid": 123456}
 
-        # 如果是未连接的机器人
+        # 如果不是配置中的机器人
         response = client.get("/1234561.json")
         assert response.status_code == 404
         assert response.json() == {"detail": "Not Found"}
