@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 支持 QQ 机器人平台的校验文件
+
 ## [0.18.0] - 2024-07-22
 
 ### Added
