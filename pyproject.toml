@@ -65,6 +65,7 @@ dev-dependencies = [
 test = "pytest --cov=src --cov-report xml -n auto"
 bump = "bump-my-version bump"
 show-bump = "bump-my-version show-bump"
+gen-fflogs = "python src/plugins/ff14/generate_fflogs_data.py"
 
 [tool.nonebot]
 plugin_dirs = ["src/plugins"]
