@@ -18,6 +18,14 @@ class BossInfo(BaseModel):
     zone: int
     encounter: int
     difficulty: int
+    """副本难度难度
+
+    绝本的难度是 101
+
+    零式副本的难度是 101，普通的则是 100
+
+    极神也是 100
+    """
 
 
 class JobInfo(BaseModel):
@@ -114,6 +122,14 @@ class CharacterRanking(BaseModel):
     reportID: str
     fightID: int
     difficulty: int
+    """副本难度难度
+
+    绝本的难度是 101
+
+    零式副本的难度是 101，普通的则是 100
+
+    极神也是 100
+    """
     size: int
     characterID: int
     characterName: str

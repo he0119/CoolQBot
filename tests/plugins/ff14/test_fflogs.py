@@ -425,10 +425,10 @@ async def test_dps_job_rankings_empty(
         "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json"
     ).mock(return_value=httpx.Response(200, json=fflogs_data))
     fflogs_job_rankings_mock = respx_mock.get(
-        "https://cn.fflogs.com/v1/rankings/encounter/65?metric=rdps&difficulty=0&spec=13&page=1&filter=date.1681488000000.1681574400000&api_key=test"
+        "https://cn.fflogs.com/v1/rankings/encounter/65?metric=rdps&difficulty=101&spec=13&page=1&filter=date.1681488000000.1681574400000&api_key=test"
     ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings_empty))
     fflogs_job_rankings_mock_now = respx_mock.get(
-        "https://cn.fflogs.com/v1/rankings/encounter/65?metric=rdps&difficulty=0&spec=13&page=1&filter=date.1681401600000.1681488000000&api_key=test"
+        "https://cn.fflogs.com/v1/rankings/encounter/65?metric=rdps&difficulty=101&spec=13&page=1&filter=date.1681401600000.1681488000000&api_key=test"
     ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings_empty))
 
     # 使用职业昵称查询
@@ -477,10 +477,10 @@ async def test_dps_job_rankings(
         "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json"
     ).mock(return_value=httpx.Response(200, json=fflogs_data))
     fflogs_job_rankings_15_mock = respx_mock.get(
-        "https://cn.fflogs.com/v1/rankings/encounter/87?metric=rdps&difficulty=0&spec=13&page=1&filter=date.1681488000000.1681574400000&api_key=test"
+        "https://cn.fflogs.com/v1/rankings/encounter/87?metric=rdps&difficulty=101&spec=13&page=1&filter=date.1681488000000.1681574400000&api_key=test"
     ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings))
     fflogs_job_rankings_14_mock = respx_mock.get(
-        "https://cn.fflogs.com/v1/rankings/encounter/87?metric=rdps&difficulty=0&spec=13&page=1&filter=date.1681401600000.1681488000000&api_key=test"
+        "https://cn.fflogs.com/v1/rankings/encounter/87?metric=rdps&difficulty=101&spec=13&page=1&filter=date.1681401600000.1681488000000&api_key=test"
     ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings_empty))
 
     # 使用职业名查询

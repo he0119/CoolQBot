@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Added
 
 - 支持 QQ 机器人平台的校验文件
+- 通过脚本更新 fflogs 的数据
 
 ## [0.18.0] - 2024-07-22
 
