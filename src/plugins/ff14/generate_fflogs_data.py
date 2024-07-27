@@ -12,6 +12,7 @@ nonebot.init()
 nonebot.load_plugin("nonebot_plugin_alconna")
 
 from src.plugins.ff14.plugins.ff14_fflogs.api import fflogs
+from src.plugins.ff14.plugins.ff14_fflogs.models import Encounter, Zones
 
 DATA_FILE = Path(__file__).parent / "fflogs_data.json"
 
@@ -32,25 +33,40 @@ async def updata_job(data):
                 )
 
 
+def get_difficulty(zone: Zones, encounter: Encounter):
+    """副本难度难度
+
+    绝本的难度是 101
+
+    零式副本的难度是 101，普通的则是 100
+
+    极神也是 100
+    """
+    # 绝本是 101
+    if zone.name.startswith("Ultimates"):
+        return 101
+
+    return 100
+
+
 async def update_boss(data):
     bosses = {
         (boss["zone"], boss["encounter"], boss["difficulty"]): boss
         for boss in data["boss"]
     }
 
-    # FIXME: 有一些副本已经过时了
-    # 需要想想怎么处理
     zones = await fflogs.zones()
     for zone in zones:
         for encounter in zone.encounters:
-            if (zone.id, encounter.id, 100) not in bosses:
+            difficulty = get_difficulty(zone, encounter)
+            if (zone.id, encounter.id, difficulty) not in bosses:
                 data["boss"].append(
                     {
-                        "name": encounter.name,
-                        "nicknames": [],
+                        "name": f"{zone.name} {encounter.name}",
+                        "nicknames": [encounter.name],
                         "zone": zone.id,
                         "encounter": encounter.id,
-                        "difficulty": 100,
+                        "difficulty": difficulty,
                     }
                 )
 

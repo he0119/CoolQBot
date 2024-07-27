@@ -276,13 +276,7 @@ class FFLogs:
         except ValidationError:
             raise DataException("服务器没有正确返回数据")
 
-        # 提取所需的数据
-        # 零式副本的难度是 101，普通的则是 100
-        # 极神也是 100
-        if difficulty == 0:
-            ranking = [i for i in rankings if i.difficulty == 101]
-        else:
-            ranking = [i for i in rankings if i.difficulty == 100]
+        ranking = [i for i in rankings if i.difficulty == difficulty]
 
         if not ranking:
             raise DataException("网站里没有数据")

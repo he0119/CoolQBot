@@ -69,35 +69,35 @@
       "nicknames": ["p5s"],
       "zone": 49,
       "encounter": 83,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "零式万魔殿 炼净之狱2",
       "nicknames": ["p6s"],
       "zone": 49,
       "encounter": 84,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "零式万魔殿 炼净之狱3",
       "nicknames": ["p7s"],
       "zone": 49,
       "encounter": 85,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "零式万魔殿 炼净之狱4（门神）",
       "nicknames": ["p8s门神"],
       "zone": 49,
       "encounter": 86,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "零式万魔殿 炼净之狱4",
       "nicknames": ["p8s"],
       "zone": 49,
       "encounter": 87,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "佐迪亚克暝暗歼灭战",
@@ -153,35 +153,35 @@
       "nicknames": ["p1s"],
       "zone": 44,
       "encounter": 78,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "零式万魔殿 边境之狱2",
       "nicknames": ["p2s"],
       "zone": 44,
       "encounter": 79,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "零式万魔殿 边境之狱3",
       "nicknames": ["p3s"],
       "zone": 44,
       "encounter": 80,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "零式万魔殿 边境之狱4（门神）",
       "nicknames": ["p4s门神"],
       "zone": 44,
       "encounter": 81,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "零式万魔殿 边境之狱4",
       "nicknames": ["p4s"],
       "zone": 44,
       "encounter": 82,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "提坦妮雅歼殛战",
@@ -315,35 +315,35 @@
       "nicknames": ["e1s"],
       "zone": 29,
       "encounter": 65,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸零式希望乐园 觉醒之章2",
       "nicknames": ["e2s"],
       "zone": 29,
       "encounter": 66,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸零式希望乐园 觉醒之章3",
       "nicknames": ["e3s"],
       "zone": 29,
       "encounter": 67,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸零式希望乐园 觉醒之章4",
       "nicknames": ["e4s"],
       "zone": 29,
       "encounter": 68,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "亚历山大绝境战",
       "nicknames": ["绝亚"],
       "zone": 32,
       "encounter": 1050,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸希望乐园 共鸣之章1",
@@ -378,28 +378,28 @@
       "nicknames": ["e5s"],
       "zone": 33,
       "encounter": 69,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸零式希望乐园 共鸣之章2",
       "nicknames": ["e6s"],
       "zone": 33,
       "encounter": 70,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸零式希望乐园 共鸣之章3",
       "nicknames": ["e7s"],
       "zone": 33,
       "encounter": 71,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸零式希望乐园 共鸣之章4",
       "nicknames": ["e8s"],
       "zone": 33,
       "encounter": 72,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸希望乐园 再生之章1",
@@ -441,35 +441,35 @@
       "nicknames": ["e9s"],
       "zone": 38,
       "encounter": 73,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸零式希望乐园 再生之章2",
       "nicknames": ["e10s"],
       "zone": 38,
       "encounter": 74,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸零式希望乐园 再生之章3",
       "nicknames": ["e11s"],
       "zone": 38,
       "encounter": 75,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸零式希望乐园 再生之章4（门神）",
       "nicknames": ["e12s门神"],
       "zone": 38,
       "encounter": 76,
-      "difficulty": 0
+      "difficulty": 101
     },
     {
       "name": "伊甸零式希望乐园 再生之章4",
       "nicknames": ["e12s"],
       "zone": 38,
       "encounter": 77,
-      "difficulty": 0
+      "difficulty": 101
     }
   ],
   "job": [
