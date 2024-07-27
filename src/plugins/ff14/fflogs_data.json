@@ -2,186 +2,872 @@
   "version": "6.2",
   "boss": [
     {
-      "name": "究极神兵幻巧战",
-      "nicknames": ["幻神兵"],
-      "zone": 46,
-      "encounter": 3004,
+      "name": "空中神域不获岛",
+      "nicknames": [],
+      "zone": 2,
+      "encounter": 4500,
       "difficulty": 100
     },
     {
-      "name": "萨菲洛特幻巧战",
-      "nicknames": ["幻魔神"],
-      "zone": 46,
-      "encounter": 3005,
+      "name": "博物战舰无限回廊",
+      "nicknames": [],
+      "zone": 2,
+      "encounter": 4501,
       "difficulty": 100
     },
     {
-      "name": "终极之战",
-      "nicknames": ["极小鸟"],
-      "zone": 42,
-      "encounter": 1063,
+      "name": "圣茉莱娜的植物园",
+      "nicknames": [],
+      "zone": 2,
+      "encounter": 4502,
       "difficulty": 100
     },
     {
-      "name": "巴尔巴莉希娅歼殛战",
-      "nicknames": ["极巴"],
-      "zone": 50,
-      "encounter": 1066,
+      "name": "天狼星之塔（困难难度）",
+      "nicknames": [],
+      "zone": 2,
+      "encounter": 4503,
       "difficulty": 100
     },
     {
-      "name": "万魔殿 炼净之狱1",
-      "nicknames": ["p5"],
-      "zone": 49,
-      "encounter": 83,
+      "name": "倒吊之塔",
+      "nicknames": [],
+      "zone": 2,
+      "encounter": 4504,
       "difficulty": 100
     },
     {
-      "name": "万魔殿 炼净之狱2",
-      "nicknames": ["p6"],
-      "zone": 49,
-      "encounter": 84,
+      "name": "神圣遗迹无限城市街古迹",
+      "nicknames": [],
+      "zone": 2,
+      "encounter": 4505,
       "difficulty": 100
     },
     {
-      "name": "万魔殿 炼净之狱3",
-      "nicknames": ["p7"],
-      "zone": 49,
-      "encounter": 85,
+      "name": "天龙宫殿忆罪宫",
+      "nicknames": [],
+      "zone": 2,
+      "encounter": 4506,
       "difficulty": 100
     },
     {
-      "name": "万魔殿 炼净之狱4（门神）",
-      "nicknames": ["p8门神"],
-      "zone": 49,
-      "encounter": 86,
+      "name": "黑涡传说破舰岛",
+      "nicknames": [],
+      "zone": 2,
+      "encounter": 4507,
       "difficulty": 100
     },
     {
-      "name": "万魔殿 炼净之狱4",
-      "nicknames": ["p8"],
-      "zone": 49,
-      "encounter": 87,
+      "name": "险峻峡谷塞尔法特尔溪谷",
+      "nicknames": [],
+      "zone": 2,
+      "encounter": 4508,
       "difficulty": 100
     },
     {
-      "name": "零式万魔殿 炼净之狱1",
-      "nicknames": ["p5s"],
-      "zone": 49,
-      "encounter": 83,
+      "name": "秘本宝库迦巴勒幻想图书馆",
+      "nicknames": [],
+      "zone": 2,
+      "encounter": 4509,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 俾斯麦",
+      "nicknames": [],
+      "zone": 4,
+      "encounter": 1027,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 罗波那",
+      "nicknames": [],
+      "zone": 4,
+      "encounter": 1028,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 骑神托尔丹",
+      "nicknames": [],
+      "zone": 4,
+      "encounter": 1029,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 萨菲洛特",
+      "nicknames": [],
+      "zone": 4,
+      "encounter": 1031,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 尼德霍格",
+      "nicknames": [],
+      "zone": 4,
+      "encounter": 1033,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 索菲娅",
+      "nicknames": [],
+      "zone": 4,
+      "encounter": 1034,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 祖尔宛",
+      "nicknames": [],
+      "zone": 4,
+      "encounter": 1035,
+      "difficulty": 100
+    },
+    {
+      "name": "Void Ark 刻托",
+      "nicknames": [],
+      "zone": 5,
+      "encounter": 2000,
+      "difficulty": 100
+    },
+    {
+      "name": "Void Ark 天柱树",
+      "nicknames": [],
+      "zone": 5,
+      "encounter": 2001,
+      "difficulty": 100
+    },
+    {
+      "name": "Void Ark 丘库雷因",
+      "nicknames": [],
+      "zone": 5,
+      "encounter": 2002,
+      "difficulty": 100
+    },
+    {
+      "name": "Void Ark 艾奇德娜",
+      "nicknames": [],
+      "zone": 5,
+      "encounter": 2003,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: Gordias (Story) 压迫者",
+      "nicknames": [],
+      "zone": 6,
+      "encounter": 14,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: Gordias (Story) 戈耳狄俄斯之袖",
+      "nicknames": [],
+      "zone": 6,
+      "encounter": 15,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: Gordias (Story) 有生命活水",
+      "nicknames": [],
+      "zone": 6,
+      "encounter": 16,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: Gordias (Story) 操纵者",
+      "nicknames": [],
+      "zone": 6,
+      "encounter": 17,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: Gordias (Story) 浮士德",
+      "nicknames": [],
+      "zone": 6,
+      "encounter": 5000,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: Gordias (Savage) 压迫者",
+      "nicknames": [],
+      "zone": 7,
+      "encounter": 18,
       "difficulty": 101
     },
     {
-      "name": "零式万魔殿 炼净之狱2",
-      "nicknames": ["p6s"],
-      "zone": 49,
-      "encounter": 84,
+      "name": "Alexander: Gordias (Savage) 戈耳狄俄斯之袖",
+      "nicknames": [],
+      "zone": 7,
+      "encounter": 19,
       "difficulty": 101
     },
     {
-      "name": "零式万魔殿 炼净之狱3",
-      "nicknames": ["p7s"],
-      "zone": 49,
-      "encounter": 85,
+      "name": "Alexander: Gordias (Savage) 有生命活水",
+      "nicknames": [],
+      "zone": 7,
+      "encounter": 20,
       "difficulty": 101
     },
     {
-      "name": "零式万魔殿 炼净之狱4（门神）",
-      "nicknames": ["p8s门神"],
-      "zone": 49,
-      "encounter": 86,
+      "name": "Alexander: Gordias (Savage) 操纵者",
+      "nicknames": [],
+      "zone": 7,
+      "encounter": 21,
       "difficulty": 101
     },
     {
-      "name": "零式万魔殿 炼净之狱4",
-      "nicknames": ["p8s"],
-      "zone": 49,
-      "encounter": 87,
+      "name": "Alexander: Gordias (Savage) 浮士德",
+      "nicknames": [],
+      "zone": 7,
+      "encounter": 5001,
       "difficulty": 101
     },
     {
-      "name": "佐迪亚克暝暗歼灭战",
-      "nicknames": ["极佐迪亚克", "极黑", "佐爹", "极爹"],
-      "zone": 42,
-      "encounter": 1058,
+      "name": "The Weeping City of Mhach 阿剌克涅",
+      "nicknames": [],
+      "zone": 8,
+      "encounter": 2004,
       "difficulty": 100
     },
     {
-      "name": "海德林晖光歼灭战",
-      "nicknames": ["极海德林", "极白", "海妈", "极妈"],
-      "zone": 42,
-      "encounter": 1059,
+      "name": "The Weeping City of Mhach 弗加尔",
+      "nicknames": [],
+      "zone": 8,
+      "encounter": 2005,
       "difficulty": 100
     },
     {
-      "name": "万魔殿 边境之狱1",
-      "nicknames": ["p1"],
-      "zone": 44,
-      "encounter": 78,
+      "name": "The Weeping City of Mhach 奥兹玛",
+      "nicknames": [],
+      "zone": 8,
+      "encounter": 2006,
       "difficulty": 100
     },
     {
-      "name": "万魔殿 边境之狱2",
-      "nicknames": ["p2"],
-      "zone": 44,
-      "encounter": 79,
+      "name": "The Weeping City of Mhach 卡洛菲斯提莉",
+      "nicknames": [],
+      "zone": 8,
+      "encounter": 2007,
       "difficulty": 100
     },
     {
-      "name": "万魔殿 边境之狱3",
-      "nicknames": ["p3"],
-      "zone": 44,
-      "encounter": 80,
+      "name": "Alexander: Midas (Story) 奇才 拉特芬克斯",
+      "nicknames": [],
+      "zone": 9,
+      "encounter": 22,
       "difficulty": 100
     },
     {
-      "name": "万魔殿 边境之狱4（门神）",
-      "nicknames": ["p4门神"],
-      "zone": 44,
-      "encounter": 81,
+      "name": "Alexander: Midas (Story) 环旋者",
+      "nicknames": [],
+      "zone": 9,
+      "encounter": 23,
       "difficulty": 100
     },
     {
-      "name": "万魔殿 边境之狱4",
-      "nicknames": ["p4"],
-      "zone": 44,
-      "encounter": 82,
+      "name": "Alexander: Midas (Story) 万事通 奎克辛克斯",
+      "nicknames": [],
+      "zone": 9,
+      "encounter": 24,
       "difficulty": 100
     },
     {
-      "name": "零式万魔殿 边境之狱1",
-      "nicknames": ["p1s"],
-      "zone": 44,
-      "encounter": 78,
+      "name": "Alexander: Midas (Story) 残暴正义号",
+      "nicknames": [],
+      "zone": 9,
+      "encounter": 25,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: Midas (Story) 新型浮士德",
+      "nicknames": [],
+      "zone": 9,
+      "encounter": 5002,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: Midas (Story) 爆破者",
+      "nicknames": [],
+      "zone": 9,
+      "encounter": 5003,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: Midas (Story) 争斗者",
+      "nicknames": [],
+      "zone": 9,
+      "encounter": 5004,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: Midas (Story) 欺诈者",
+      "nicknames": [],
+      "zone": 9,
+      "encounter": 5005,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: Midas (Savage) 奇才 拉特芬克斯",
+      "nicknames": [],
+      "zone": 10,
+      "encounter": 26,
       "difficulty": 101
     },
     {
-      "name": "零式万魔殿 边境之狱2",
-      "nicknames": ["p2s"],
-      "zone": 44,
-      "encounter": 79,
+      "name": "Alexander: Midas (Savage) 弥达斯之袖",
+      "nicknames": [],
+      "zone": 10,
+      "encounter": 27,
       "difficulty": 101
     },
     {
-      "name": "零式万魔殿 边境之狱3",
-      "nicknames": ["p3s"],
-      "zone": 44,
-      "encounter": 80,
+      "name": "Alexander: Midas (Savage) 万事通 奎克辛克斯",
+      "nicknames": [],
+      "zone": 10,
+      "encounter": 28,
       "difficulty": 101
     },
     {
-      "name": "零式万魔殿 边境之狱4（门神）",
-      "nicknames": ["p4s门神"],
-      "zone": 44,
-      "encounter": 81,
+      "name": "Alexander: Midas (Savage) 残暴正义号",
+      "nicknames": [],
+      "zone": 10,
+      "encounter": 29,
       "difficulty": 101
     },
     {
-      "name": "零式万魔殿 边境之狱4",
-      "nicknames": ["p4s"],
-      "zone": 44,
-      "encounter": 82,
+      "name": "Alexander: Midas (Savage) 霍摩福斯特",
+      "nicknames": [],
+      "zone": 10,
+      "encounter": 5006,
       "difficulty": 101
+    },
+    {
+      "name": "Alexander: The Creator (Story) 废品翻新装置",
+      "nicknames": [],
+      "zone": 12,
+      "encounter": 30,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: The Creator (Story) 佣兵雷姆普里克斯",
+      "nicknames": [],
+      "zone": 12,
+      "encounter": 31,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: The Creator (Story) 巡航驱逐者",
+      "nicknames": [],
+      "zone": 12,
+      "encounter": 32,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: The Creator (Story) 至尊亚历山大",
+      "nicknames": [],
+      "zone": 12,
+      "encounter": 33,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: The Creator (Story) 终极浮士德",
+      "nicknames": [],
+      "zone": 12,
+      "encounter": 5007,
+      "difficulty": 100
+    },
+    {
+      "name": "Alexander: The Creator (Savage) 废品翻新装置",
+      "nicknames": [],
+      "zone": 13,
+      "encounter": 34,
+      "difficulty": 101
+    },
+    {
+      "name": "Alexander: The Creator (Savage) 佣兵雷姆普里克斯",
+      "nicknames": [],
+      "zone": 13,
+      "encounter": 35,
+      "difficulty": 101
+    },
+    {
+      "name": "Alexander: The Creator (Savage) 巡航驱逐者",
+      "nicknames": [],
+      "zone": 13,
+      "encounter": 36,
+      "difficulty": 101
+    },
+    {
+      "name": "Alexander: The Creator (Savage) 至尊亚历山大",
+      "nicknames": [],
+      "zone": 13,
+      "encounter": 37,
+      "difficulty": 101
+    },
+    {
+      "name": "Alexander: The Creator (Savage) 终极浮士德",
+      "nicknames": [],
+      "zone": 13,
+      "encounter": 5008,
+      "difficulty": 101
+    },
+    {
+      "name": "鏖战红莲阿拉米格",
+      "nicknames": [],
+      "zone": 14,
+      "encounter": 4510,
+      "difficulty": 100
+    },
+    {
+      "name": "恶党孤城黄金阁",
+      "nicknames": [],
+      "zone": 14,
+      "encounter": 4511,
+      "difficulty": 100
+    },
+    {
+      "name": "修行古刹星导寺",
+      "nicknames": [],
+      "zone": 14,
+      "encounter": 4512,
+      "difficulty": 100
+    },
+    {
+      "name": "沉没神殿斯卡拉遗迹",
+      "nicknames": [],
+      "zone": 14,
+      "encounter": 4513,
+      "difficulty": 100
+    },
+    {
+      "name": "红玉火山狱之盖",
+      "nicknames": [],
+      "zone": 14,
+      "encounter": 4514,
+      "difficulty": 100
+    },
+    {
+      "name": "疯狂战舰无限回廊",
+      "nicknames": [],
+      "zone": 14,
+      "encounter": 4515,
+      "difficulty": 100
+    },
+    {
+      "name": "风水灵庙岩燕庙",
+      "nicknames": [],
+      "zone": 14,
+      "encounter": 4516,
+      "difficulty": 100
+    },
+    {
+      "name": "死亡大地终末焦土",
+      "nicknames": [],
+      "zone": 14,
+      "encounter": 4517,
+      "difficulty": 100
+    },
+    {
+      "name": "污染庭园圣茉夏娜植物园",
+      "nicknames": [],
+      "zone": 14,
+      "encounter": 4518,
+      "difficulty": 100
+    },
+    {
+      "name": "国境战线基姆利特暗区",
+      "nicknames": [],
+      "zone": 14,
+      "encounter": 4519,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 须佐之男",
+      "nicknames": [],
+      "zone": 15,
+      "encounter": 1036,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 吉祥天女",
+      "nicknames": [],
+      "zone": 15,
+      "encounter": 1037,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 神龙",
+      "nicknames": [],
+      "zone": 15,
+      "encounter": 1038,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 白虎",
+      "nicknames": [],
+      "zone": 15,
+      "encounter": 1040,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 月读",
+      "nicknames": [],
+      "zone": 15,
+      "encounter": 1041,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 朱雀",
+      "nicknames": [],
+      "zone": 15,
+      "encounter": 1043,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Extreme) 青龙",
+      "nicknames": [],
+      "zone": 15,
+      "encounter": 1044,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Deltascape (Story) 老者",
+      "nicknames": [],
+      "zone": 16,
+      "encounter": 38,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Deltascape (Story) 灾变者",
+      "nicknames": [],
+      "zone": 16,
+      "encounter": 39,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Deltascape (Story) 哈利卡纳苏斯",
+      "nicknames": [],
+      "zone": 16,
+      "encounter": 40,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Deltascape (Story) 艾克斯迪司",
+      "nicknames": [],
+      "zone": 16,
+      "encounter": 41,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Deltascape (Savage) 老者",
+      "nicknames": [],
+      "zone": 17,
+      "encounter": 42,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Deltascape (Savage) 灾变者",
+      "nicknames": [],
+      "zone": 17,
+      "encounter": 43,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Deltascape (Savage) 哈利卡纳苏斯",
+      "nicknames": [],
+      "zone": 17,
+      "encounter": 44,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Deltascape (Savage) 艾克斯迪司",
+      "nicknames": [],
+      "zone": 17,
+      "encounter": 45,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Deltascape (Savage) 新生艾克斯迪司",
+      "nicknames": [],
+      "zone": 17,
+      "encounter": 46,
+      "difficulty": 101
+    },
+    {
+      "name": "The Royal City of Rabanastre 背德皇帝马提乌斯",
+      "nicknames": [],
+      "zone": 18,
+      "encounter": 2008,
+      "difficulty": 100
+    },
+    {
+      "name": "The Royal City of Rabanastre 统治者哈修马利姆",
+      "nicknames": [],
+      "zone": 18,
+      "encounter": 2009,
+      "difficulty": 100
+    },
+    {
+      "name": "The Royal City of Rabanastre 人马王洛弗卡勒",
+      "nicknames": [],
+      "zone": 18,
+      "encounter": 2010,
+      "difficulty": 100
+    },
+    {
+      "name": "The Royal City of Rabanastre 冷血剑阿加斯",
+      "nicknames": [],
+      "zone": 18,
+      "encounter": 2011,
+      "difficulty": 100
+    },
+    {
+      "name": "The Unending Coil of Bahamut 至尊巴哈姆特",
+      "nicknames": [],
+      "zone": 19,
+      "encounter": 1039,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Sigmascape (Story) 魔列车",
+      "nicknames": [],
+      "zone": 20,
+      "encounter": 47,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Sigmascape (Story) 恶魔查达奴克",
+      "nicknames": [],
+      "zone": 20,
+      "encounter": 48,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Sigmascape (Story) 守护者",
+      "nicknames": [],
+      "zone": 20,
+      "encounter": 49,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Sigmascape (Story) 凯夫卡",
+      "nicknames": [],
+      "zone": 20,
+      "encounter": 50,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Sigmascape (Savage) 魔列车",
+      "nicknames": [],
+      "zone": 21,
+      "encounter": 51,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Sigmascape (Savage) 恶魔查达奴克",
+      "nicknames": [],
+      "zone": 21,
+      "encounter": 52,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Sigmascape (Savage) 守护者",
+      "nicknames": [],
+      "zone": 21,
+      "encounter": 53,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Sigmascape (Savage) 凯夫卡",
+      "nicknames": [],
+      "zone": 21,
+      "encounter": 54,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Sigmascape (Savage) 神圣凯夫卡",
+      "nicknames": [],
+      "zone": 21,
+      "encounter": 55,
+      "difficulty": 101
+    },
+    {
+      "name": "The Ridorana Lighthouse 暗黑之云法姆弗里特",
+      "nicknames": [],
+      "zone": 22,
+      "encounter": 2012,
+      "difficulty": 100
+    },
+    {
+      "name": "The Ridorana Lighthouse 魔人贝利亚斯",
+      "nicknames": [],
+      "zone": 22,
+      "encounter": 2013,
+      "difficulty": 100
+    },
+    {
+      "name": "The Ridorana Lighthouse 劳动七号",
+      "nicknames": [],
+      "zone": 22,
+      "encounter": 2014,
+      "difficulty": 100
+    },
+    {
+      "name": "The Ridorana Lighthouse 鬼龙雅兹玛特",
+      "nicknames": [],
+      "zone": 22,
+      "encounter": 2015,
+      "difficulty": 100
+    },
+    {
+      "name": "The Weapon's Refrain 究极神兵",
+      "nicknames": [],
+      "zone": 23,
+      "encounter": 1042,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Alphascape (Story) 卡奥斯",
+      "nicknames": [],
+      "zone": 24,
+      "encounter": 56,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Alphascape (Story) 尘世幻龙",
+      "nicknames": [],
+      "zone": 24,
+      "encounter": 57,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Alphascape (Story) 欧米茄",
+      "nicknames": [],
+      "zone": 24,
+      "encounter": 58,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Alphascape (Story) 双生欧米茄",
+      "nicknames": [],
+      "zone": 24,
+      "encounter": 59,
+      "difficulty": 100
+    },
+    {
+      "name": "Omega: Alphascape (Savage) 卡奥斯",
+      "nicknames": [],
+      "zone": 25,
+      "encounter": 60,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Alphascape (Savage) 尘世幻龙",
+      "nicknames": [],
+      "zone": 25,
+      "encounter": 61,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Alphascape (Savage) 欧米茄",
+      "nicknames": [],
+      "zone": 25,
+      "encounter": 62,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Alphascape (Savage) 双生欧米茄",
+      "nicknames": [],
+      "zone": 25,
+      "encounter": 63,
+      "difficulty": 101
+    },
+    {
+      "name": "Omega: Alphascape (Savage) 至尊欧米茄",
+      "nicknames": [],
+      "zone": 25,
+      "encounter": 64,
+      "difficulty": 101
+    },
+    {
+      "name": "The Orbonne Monastery 机工士姆斯塔迪奥",
+      "nicknames": [],
+      "zone": 26,
+      "encounter": 2016,
+      "difficulty": 100
+    },
+    {
+      "name": "The Orbonne Monastery 圣骑士阿格莉亚丝",
+      "nicknames": [],
+      "zone": 26,
+      "encounter": 2017,
+      "difficulty": 100
+    },
+    {
+      "name": "The Orbonne Monastery 雷神西德",
+      "nicknames": [],
+      "zone": 26,
+      "encounter": 2018,
+      "difficulty": 100
+    },
+    {
+      "name": "The Orbonne Monastery 圣天使阿尔蒂玛",
+      "nicknames": [],
+      "zone": 26,
+      "encounter": 2019,
+      "difficulty": 100
+    },
+    {
+      "name": "末日暗影亚马乌罗提",
+      "nicknames": [],
+      "zone": 27,
+      "encounter": 4520,
+      "difficulty": 100
+    },
+    {
+      "name": "异界遗构希尔科斯孪晶塔",
+      "nicknames": [],
+      "zone": 27,
+      "encounter": 4521,
+      "difficulty": 100
+    },
+    {
+      "name": "创造机构阿尼德罗学院",
+      "nicknames": [],
+      "zone": 27,
+      "encounter": 4522,
+      "difficulty": 100
+    },
+    {
+      "name": "魔法宫殿宇宙宫",
+      "nicknames": [],
+      "zone": 27,
+      "encounter": 4523,
+      "difficulty": 100
+    },
+    {
+      "name": "黑风海底 阿尼德罗追忆馆",
+      "nicknames": [],
+      "zone": 27,
+      "encounter": 4524,
+      "difficulty": 100
+    },
+    {
+      "name": "漆黑决战",
+      "nicknames": [],
+      "zone": 27,
+      "encounter": 4525,
+      "difficulty": 100
+    },
+    {
+      "name": "魔术工房玛托雅工作室",
+      "nicknames": [],
+      "zone": 27,
+      "encounter": 4526,
+      "difficulty": 100
+    },
+    {
+      "name": "黄金平原帕戈尔赞草原",
+      "nicknames": [],
+      "zone": 27,
+      "encounter": 4527,
+      "difficulty": 100
     },
     {
       "name": "提坦妮雅歼殛战",
@@ -204,6 +890,174 @@
       "zone": 28,
       "encounter": 1046,
       "difficulty": 100
+    },
+    {
+      "name": "Trials I (Extreme) 哈迪斯",
+      "nicknames": [],
+      "zone": 28,
+      "encounter": 1049,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章1",
+      "nicknames": ["e1"],
+      "zone": 29,
+      "encounter": 65,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章1",
+      "nicknames": ["e1s"],
+      "zone": 29,
+      "encounter": 65,
+      "difficulty": 101
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章2",
+      "nicknames": ["e2"],
+      "zone": 29,
+      "encounter": 66,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章2",
+      "nicknames": ["e2s"],
+      "zone": 29,
+      "encounter": 66,
+      "difficulty": 101
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章3",
+      "nicknames": ["e3"],
+      "zone": 29,
+      "encounter": 67,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章3",
+      "nicknames": ["e3s"],
+      "zone": 29,
+      "encounter": 67,
+      "difficulty": 101
+    },
+    {
+      "name": "伊甸希望乐园 觉醒之章4",
+      "nicknames": ["e4"],
+      "zone": 29,
+      "encounter": 68,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 觉醒之章4",
+      "nicknames": ["e4s"],
+      "zone": 29,
+      "encounter": 68,
+      "difficulty": 101
+    },
+    {
+      "name": "Ultimates (Stormblood) 巴哈姆特绝境战",
+      "nicknames": [],
+      "zone": 30,
+      "encounter": 1047,
+      "difficulty": 101
+    },
+    {
+      "name": "Ultimates (Stormblood) 究极神兵绝境战",
+      "nicknames": [],
+      "zone": 30,
+      "encounter": 1048,
+      "difficulty": 101
+    },
+    {
+      "name": "The Copied Factory 多关节型：司令机",
+      "nicknames": [],
+      "zone": 31,
+      "encounter": 2020,
+      "difficulty": 100
+    },
+    {
+      "name": "The Copied Factory 霍布斯",
+      "nicknames": [],
+      "zone": 31,
+      "encounter": 2021,
+      "difficulty": 100
+    },
+    {
+      "name": "The Copied Factory 昂格士",
+      "nicknames": [],
+      "zone": 31,
+      "encounter": 2022,
+      "difficulty": 100
+    },
+    {
+      "name": "The Copied Factory 9S：接入多脚战车",
+      "nicknames": [],
+      "zone": 31,
+      "encounter": 2023,
+      "difficulty": 100
+    },
+    {
+      "name": "亚历山大绝境战",
+      "nicknames": ["绝亚"],
+      "zone": 32,
+      "encounter": 1050,
+      "difficulty": 101
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章1",
+      "nicknames": ["e5"],
+      "zone": 33,
+      "encounter": 69,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章1",
+      "nicknames": ["e5s"],
+      "zone": 33,
+      "encounter": 69,
+      "difficulty": 101
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章2",
+      "nicknames": ["e6"],
+      "zone": 33,
+      "encounter": 70,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章2",
+      "nicknames": ["e6s"],
+      "zone": 33,
+      "encounter": 70,
+      "difficulty": 101
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章3",
+      "nicknames": ["e7"],
+      "zone": 33,
+      "encounter": 71,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章3",
+      "nicknames": ["e7s"],
+      "zone": 33,
+      "encounter": 71,
+      "difficulty": 101
+    },
+    {
+      "name": "伊甸希望乐园 共鸣之章4",
+      "nicknames": ["e8"],
+      "zone": 33,
+      "encounter": 72,
+      "difficulty": 100
+    },
+    {
+      "name": "伊甸零式希望乐园 共鸣之章4",
+      "nicknames": ["e8s"],
+      "zone": 33,
+      "encounter": 72,
+      "difficulty": 101
     },
     {
       "name": "哈迪斯歼殛战",
@@ -241,24 +1095,31 @@
       "difficulty": 100
     },
     {
-      "name": "绿宝石神兵狂想作战1",
-      "nicknames": ["绿宝石1", "绿宝石神兵1", "绿宝石门神", "绿宝石神兵门神"],
-      "zone": 37,
-      "encounter": 1056,
+      "name": "The Puppets' Bunker 813P：装备据点防卫装置",
+      "nicknames": [],
+      "zone": 35,
+      "encounter": 2024,
       "difficulty": 100
     },
     {
-      "name": "绿宝石神兵狂想作战2",
-      "nicknames": ["绿宝石2", "绿宝石神兵2", "绿宝石本体", "绿宝石神兵本体"],
-      "zone": 37,
-      "encounter": 1055,
+      "name": "The Puppets' Bunker 强化型飞行单位",
+      "nicknames": [],
+      "zone": 35,
+      "encounter": 2025,
       "difficulty": 100
     },
     {
-      "name": "钻石神兵狂想作战",
-      "nicknames": ["钻石", "钻石神兵"],
-      "zone": 37,
-      "encounter": 1057,
+      "name": "The Puppets' Bunker 905P：重战单位",
+      "nicknames": [],
+      "zone": 35,
+      "encounter": 2026,
+      "difficulty": 100
+    },
+    {
+      "name": "The Puppets' Bunker 2P：融合体",
+      "nicknames": [],
+      "zone": 35,
+      "encounter": 2027,
       "difficulty": 100
     },
     {
@@ -283,157 +1144,31 @@
       "difficulty": 100
     },
     {
-      "name": "伊甸希望乐园 觉醒之章1",
-      "nicknames": ["e1"],
-      "zone": 29,
-      "encounter": 65,
+      "name": "绿宝石神兵狂想作战2",
+      "nicknames": ["绿宝石2", "绿宝石神兵2", "绿宝石本体", "绿宝石神兵本体"],
+      "zone": 37,
+      "encounter": 1055,
       "difficulty": 100
     },
     {
-      "name": "伊甸希望乐园 觉醒之章2",
-      "nicknames": ["e2"],
-      "zone": 29,
-      "encounter": 66,
+      "name": "绿宝石神兵狂想作战1",
+      "nicknames": ["绿宝石1", "绿宝石神兵1", "绿宝石门神", "绿宝石神兵门神"],
+      "zone": 37,
+      "encounter": 1056,
       "difficulty": 100
     },
     {
-      "name": "伊甸希望乐园 觉醒之章3",
-      "nicknames": ["e3"],
-      "zone": 29,
-      "encounter": 67,
+      "name": "钻石神兵狂想作战",
+      "nicknames": ["钻石", "钻石神兵"],
+      "zone": 37,
+      "encounter": 1057,
       "difficulty": 100
-    },
-    {
-      "name": "伊甸希望乐园 觉醒之章4",
-      "nicknames": ["e4"],
-      "zone": 29,
-      "encounter": 68,
-      "difficulty": 100
-    },
-    {
-      "name": "伊甸零式希望乐园 觉醒之章1",
-      "nicknames": ["e1s"],
-      "zone": 29,
-      "encounter": 65,
-      "difficulty": 101
-    },
-    {
-      "name": "伊甸零式希望乐园 觉醒之章2",
-      "nicknames": ["e2s"],
-      "zone": 29,
-      "encounter": 66,
-      "difficulty": 101
-    },
-    {
-      "name": "伊甸零式希望乐园 觉醒之章3",
-      "nicknames": ["e3s"],
-      "zone": 29,
-      "encounter": 67,
-      "difficulty": 101
-    },
-    {
-      "name": "伊甸零式希望乐园 觉醒之章4",
-      "nicknames": ["e4s"],
-      "zone": 29,
-      "encounter": 68,
-      "difficulty": 101
-    },
-    {
-      "name": "亚历山大绝境战",
-      "nicknames": ["绝亚"],
-      "zone": 32,
-      "encounter": 1050,
-      "difficulty": 101
-    },
-    {
-      "name": "伊甸希望乐园 共鸣之章1",
-      "nicknames": ["e5"],
-      "zone": 33,
-      "encounter": 69,
-      "difficulty": 100
-    },
-    {
-      "name": "伊甸希望乐园 共鸣之章2",
-      "nicknames": ["e6"],
-      "zone": 33,
-      "encounter": 70,
-      "difficulty": 100
-    },
-    {
-      "name": "伊甸希望乐园 共鸣之章3",
-      "nicknames": ["e7"],
-      "zone": 33,
-      "encounter": 71,
-      "difficulty": 100
-    },
-    {
-      "name": "伊甸希望乐园 共鸣之章4",
-      "nicknames": ["e8"],
-      "zone": 33,
-      "encounter": 72,
-      "difficulty": 100
-    },
-    {
-      "name": "伊甸零式希望乐园 共鸣之章1",
-      "nicknames": ["e5s"],
-      "zone": 33,
-      "encounter": 69,
-      "difficulty": 101
-    },
-    {
-      "name": "伊甸零式希望乐园 共鸣之章2",
-      "nicknames": ["e6s"],
-      "zone": 33,
-      "encounter": 70,
-      "difficulty": 101
-    },
-    {
-      "name": "伊甸零式希望乐园 共鸣之章3",
-      "nicknames": ["e7s"],
-      "zone": 33,
-      "encounter": 71,
-      "difficulty": 101
-    },
-    {
-      "name": "伊甸零式希望乐园 共鸣之章4",
-      "nicknames": ["e8s"],
-      "zone": 33,
-      "encounter": 72,
-      "difficulty": 101
     },
     {
       "name": "伊甸希望乐园 再生之章1",
       "nicknames": ["e9"],
       "zone": 38,
       "encounter": 73,
-      "difficulty": 100
-    },
-    {
-      "name": "伊甸希望乐园 再生之章2",
-      "nicknames": ["e10"],
-      "zone": 38,
-      "encounter": 74,
-      "difficulty": 100
-    },
-    {
-      "name": "伊甸希望乐园 再生之章3",
-      "nicknames": ["e11"],
-      "zone": 38,
-      "encounter": 75,
-      "difficulty": 100
-    },
-    {
-      "name": "伊甸希望乐园 再生之章4（门神）",
-      "nicknames": ["e12门神"],
-      "zone": 38,
-      "encounter": 76,
-      "difficulty": 100
-    },
-    {
-      "name": "伊甸希望乐园 再生之章4",
-      "nicknames": ["e12"],
-      "zone": 38,
-      "encounter": 77,
       "difficulty": 100
     },
     {
@@ -444,11 +1179,25 @@
       "difficulty": 101
     },
     {
+      "name": "伊甸希望乐园 再生之章2",
+      "nicknames": ["e10"],
+      "zone": 38,
+      "encounter": 74,
+      "difficulty": 100
+    },
+    {
       "name": "伊甸零式希望乐园 再生之章2",
       "nicknames": ["e10s"],
       "zone": 38,
       "encounter": 74,
       "difficulty": 101
+    },
+    {
+      "name": "伊甸希望乐园 再生之章3",
+      "nicknames": ["e11"],
+      "zone": 38,
+      "encounter": 75,
+      "difficulty": 100
     },
     {
       "name": "伊甸零式希望乐园 再生之章3",
@@ -458,6 +1207,13 @@
       "difficulty": 101
     },
     {
+      "name": "伊甸希望乐园 再生之章4（门神）",
+      "nicknames": ["e12门神"],
+      "zone": 38,
+      "encounter": 76,
+      "difficulty": 100
+    },
+    {
       "name": "伊甸零式希望乐园 再生之章4（门神）",
       "nicknames": ["e12s门神"],
       "zone": 38,
@@ -465,11 +1221,564 @@
       "difficulty": 101
     },
     {
+      "name": "伊甸希望乐园 再生之章4",
+      "nicknames": ["e12"],
+      "zone": 38,
+      "encounter": 77,
+      "difficulty": 100
+    },
+    {
       "name": "伊甸零式希望乐园 再生之章4",
       "nicknames": ["e12s"],
       "zone": 38,
       "encounter": 77,
       "difficulty": 101
+    },
+    {
+      "name": "Delubrum Reginae 求道之三位一体",
+      "nicknames": [],
+      "zone": 39,
+      "encounter": 2028,
+      "difficulty": 100
+    },
+    {
+      "name": "Delubrum Reginae 女王护卫",
+      "nicknames": [],
+      "zone": 39,
+      "encounter": 2029,
+      "difficulty": 100
+    },
+    {
+      "name": "Delubrum Reginae 誓约之三位一体",
+      "nicknames": [],
+      "zone": 39,
+      "encounter": 2030,
+      "difficulty": 100
+    },
+    {
+      "name": "Delubrum Reginae 天佑女王",
+      "nicknames": [],
+      "zone": 39,
+      "encounter": 2031,
+      "difficulty": 100
+    },
+    {
+      "name": "The Tower at Paradigm's Breach 杰克",
+      "nicknames": [],
+      "zone": 40,
+      "encounter": 2032,
+      "difficulty": 100
+    },
+    {
+      "name": "The Tower at Paradigm's Breach 韩塞尔与格雷特",
+      "nicknames": [],
+      "zone": 40,
+      "encounter": 2033,
+      "difficulty": 100
+    },
+    {
+      "name": "The Tower at Paradigm's Breach 红衣少女",
+      "nicknames": [],
+      "zone": 40,
+      "encounter": 2034,
+      "difficulty": 100
+    },
+    {
+      "name": "The Tower at Paradigm's Breach 伪造的神明",
+      "nicknames": [],
+      "zone": 40,
+      "encounter": 2035,
+      "difficulty": 100
+    },
+    {
+      "name": "The Tower at Paradigm's Breach 开花的神明",
+      "nicknames": [],
+      "zone": 40,
+      "encounter": 2036,
+      "difficulty": 100
+    },
+    {
+      "name": "最终幻想末世终迹",
+      "nicknames": [],
+      "zone": 41,
+      "encounter": 4528,
+      "difficulty": 100
+    },
+    {
+      "name": "乐园都市笑笑镇",
+      "nicknames": [],
+      "zone": 41,
+      "encounter": 4529,
+      "difficulty": 100
+    },
+    {
+      "name": "电脑梦境斯提格玛四",
+      "nicknames": [],
+      "zone": 41,
+      "encounter": 4530,
+      "difficulty": 100
+    },
+    {
+      "name": "近东秘宝阿尔扎达尔海底遗迹群",
+      "nicknames": [],
+      "zone": 41,
+      "encounter": 4531,
+      "difficulty": 100
+    },
+    {
+      "name": "异界孤城特罗亚宫廷",
+      "nicknames": [],
+      "zone": 41,
+      "encounter": 4532,
+      "difficulty": 100
+    },
+    {
+      "name": "雪山奥窟冥魂石洞",
+      "nicknames": [],
+      "zone": 41,
+      "encounter": 4534,
+      "difficulty": 100
+    },
+    {
+      "name": "间歇灵泉哈姆岛",
+      "nicknames": [],
+      "zone": 41,
+      "encounter": 4535,
+      "difficulty": 100
+    },
+    {
+      "name": "异界深渊月面地下溪谷",
+      "nicknames": [],
+      "zone": 41,
+      "encounter": 4537,
+      "difficulty": 100
+    },
+    {
+      "name": "佐迪亚克暝暗歼灭战",
+      "nicknames": ["极佐迪亚克", "极黑", "佐爹", "极爹"],
+      "zone": 42,
+      "encounter": 1058,
+      "difficulty": 100
+    },
+    {
+      "name": "海德林晖光歼灭战",
+      "nicknames": ["极海德林", "极白", "海妈", "极妈"],
+      "zone": 42,
+      "encounter": 1059,
+      "difficulty": 100
+    },
+    {
+      "name": "终极之战",
+      "nicknames": ["极小鸟"],
+      "zone": 42,
+      "encounter": 1063,
+      "difficulty": 100
+    },
+    {
+      "name": "Ultimates (Legacy) 巴哈姆特绝境战",
+      "nicknames": [],
+      "zone": 43,
+      "encounter": 1060,
+      "difficulty": 101
+    },
+    {
+      "name": "Ultimates (Legacy) 究极神兵绝境战",
+      "nicknames": [],
+      "zone": 43,
+      "encounter": 1061,
+      "difficulty": 101
+    },
+    {
+      "name": "Ultimates (Legacy) 亚历山大绝境战",
+      "nicknames": [],
+      "zone": 43,
+      "encounter": 1062,
+      "difficulty": 101
+    },
+    {
+      "name": "万魔殿 边境之狱1",
+      "nicknames": ["p1"],
+      "zone": 44,
+      "encounter": 78,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 边境之狱1",
+      "nicknames": ["p1s"],
+      "zone": 44,
+      "encounter": 78,
+      "difficulty": 101
+    },
+    {
+      "name": "万魔殿 边境之狱2",
+      "nicknames": ["p2"],
+      "zone": 44,
+      "encounter": 79,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 边境之狱2",
+      "nicknames": ["p2s"],
+      "zone": 44,
+      "encounter": 79,
+      "difficulty": 101
+    },
+    {
+      "name": "万魔殿 边境之狱3",
+      "nicknames": ["p3"],
+      "zone": 44,
+      "encounter": 80,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 边境之狱3",
+      "nicknames": ["p3s"],
+      "zone": 44,
+      "encounter": 80,
+      "difficulty": 101
+    },
+    {
+      "name": "万魔殿 边境之狱4（门神）",
+      "nicknames": ["p4门神"],
+      "zone": 44,
+      "encounter": 81,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 边境之狱4（门神）",
+      "nicknames": ["p4s门神"],
+      "zone": 44,
+      "encounter": 81,
+      "difficulty": 101
+    },
+    {
+      "name": "万魔殿 边境之狱4",
+      "nicknames": ["p4"],
+      "zone": 44,
+      "encounter": 82,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 边境之狱4",
+      "nicknames": ["p4s"],
+      "zone": 44,
+      "encounter": 82,
+      "difficulty": 101
+    },
+    {
+      "name": "Dragonsong's Reprise 幻想龙诗绝境战",
+      "nicknames": [],
+      "zone": 45,
+      "encounter": 1065,
+      "difficulty": 100
+    },
+    {
+      "name": "究极神兵幻巧战",
+      "nicknames": ["幻神兵"],
+      "zone": 46,
+      "encounter": 3004,
+      "difficulty": 100
+    },
+    {
+      "name": "萨菲洛特幻巧战",
+      "nicknames": ["幻魔神"],
+      "zone": 46,
+      "encounter": 3005,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Unreal) 索菲娅",
+      "nicknames": [],
+      "zone": 46,
+      "encounter": 3006,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Unreal) 祖尔宛",
+      "nicknames": [],
+      "zone": 46,
+      "encounter": 3007,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Unreal) 托尔丹",
+      "nicknames": [],
+      "zone": 46,
+      "encounter": 3008,
+      "difficulty": 100
+    },
+    {
+      "name": "Aglaia 比尔格",
+      "nicknames": [],
+      "zone": 47,
+      "encounter": 2037,
+      "difficulty": 100
+    },
+    {
+      "name": "Aglaia 拉尔戈",
+      "nicknames": [],
+      "zone": 47,
+      "encounter": 2038,
+      "difficulty": 100
+    },
+    {
+      "name": "Aglaia 阿泽玛",
+      "nicknames": [],
+      "zone": 47,
+      "encounter": 2039,
+      "difficulty": 100
+    },
+    {
+      "name": "Aglaia 纳尔札尔",
+      "nicknames": [],
+      "zone": 47,
+      "encounter": 2040,
+      "difficulty": 100
+    },
+    {
+      "name": "Delubrum Reginae 求道之三位一体",
+      "nicknames": [],
+      "zone": 48,
+      "encounter": 2041,
+      "difficulty": 100
+    },
+    {
+      "name": "Delubrum Reginae 女王护卫",
+      "nicknames": [],
+      "zone": 48,
+      "encounter": 2042,
+      "difficulty": 100
+    },
+    {
+      "name": "Delubrum Reginae 誓约之三位一体",
+      "nicknames": [],
+      "zone": 48,
+      "encounter": 2043,
+      "difficulty": 100
+    },
+    {
+      "name": "Delubrum Reginae 天佑女王",
+      "nicknames": [],
+      "zone": 48,
+      "encounter": 2044,
+      "difficulty": 100
+    },
+    {
+      "name": "万魔殿 炼净之狱1",
+      "nicknames": ["p5"],
+      "zone": 49,
+      "encounter": 83,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 炼净之狱1",
+      "nicknames": ["p5s"],
+      "zone": 49,
+      "encounter": 83,
+      "difficulty": 101
+    },
+    {
+      "name": "万魔殿 炼净之狱2",
+      "nicknames": ["p6"],
+      "zone": 49,
+      "encounter": 84,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 炼净之狱2",
+      "nicknames": ["p6s"],
+      "zone": 49,
+      "encounter": 84,
+      "difficulty": 101
+    },
+    {
+      "name": "万魔殿 炼净之狱3",
+      "nicknames": ["p7"],
+      "zone": 49,
+      "encounter": 85,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 炼净之狱3",
+      "nicknames": ["p7s"],
+      "zone": 49,
+      "encounter": 85,
+      "difficulty": 101
+    },
+    {
+      "name": "万魔殿 炼净之狱4（门神）",
+      "nicknames": ["p8门神"],
+      "zone": 49,
+      "encounter": 86,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 炼净之狱4（门神）",
+      "nicknames": ["p8s门神"],
+      "zone": 49,
+      "encounter": 86,
+      "difficulty": 101
+    },
+    {
+      "name": "万魔殿 炼净之狱4",
+      "nicknames": ["p8"],
+      "zone": 49,
+      "encounter": 87,
+      "difficulty": 100
+    },
+    {
+      "name": "零式万魔殿 炼净之狱4",
+      "nicknames": ["p8s"],
+      "zone": 49,
+      "encounter": 87,
+      "difficulty": 101
+    },
+    {
+      "name": "巴尔巴莉希娅歼殛战",
+      "nicknames": ["极巴"],
+      "zone": 50,
+      "encounter": 1066,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials II (Extreme) 卢比坎特",
+      "nicknames": [],
+      "zone": 50,
+      "encounter": 1067,
+      "difficulty": 100
+    },
+    {
+      "name": "异闻希拉狄哈水道",
+      "nicknames": [],
+      "zone": 51,
+      "encounter": 4533,
+      "difficulty": 100
+    },
+    {
+      "name": "异闻六根山",
+      "nicknames": [],
+      "zone": 51,
+      "encounter": 4536,
+      "difficulty": 100
+    },
+    {
+      "name": "异闻阿罗阿罗岛",
+      "nicknames": [],
+      "zone": 51,
+      "encounter": 4538,
+      "difficulty": 100
+    },
+    {
+      "name": "Euphrosyne 诺菲卡",
+      "nicknames": [],
+      "zone": 52,
+      "encounter": 2045,
+      "difficulty": 100
+    },
+    {
+      "name": "Euphrosyne 阿尔基克&妮美雅",
+      "nicknames": [],
+      "zone": 52,
+      "encounter": 2046,
+      "difficulty": 100
+    },
+    {
+      "name": "Euphrosyne 哈罗妮",
+      "nicknames": [],
+      "zone": 52,
+      "encounter": 2047,
+      "difficulty": 100
+    },
+    {
+      "name": "Euphrosyne 梅茵菲娜",
+      "nicknames": [],
+      "zone": 52,
+      "encounter": 2048,
+      "difficulty": 100
+    },
+    {
+      "name": "The Omega Protocol 欧米茄绝境验证战",
+      "nicknames": [],
+      "zone": 53,
+      "encounter": 1068,
+      "difficulty": 100
+    },
+    {
+      "name": "Anabaseios 科库托斯",
+      "nicknames": [],
+      "zone": 54,
+      "encounter": 88,
+      "difficulty": 100
+    },
+    {
+      "name": "Anabaseios 万魔殿",
+      "nicknames": [],
+      "zone": 54,
+      "encounter": 89,
+      "difficulty": 100
+    },
+    {
+      "name": "Anabaseios 特弥斯",
+      "nicknames": [],
+      "zone": 54,
+      "encounter": 90,
+      "difficulty": 100
+    },
+    {
+      "name": "Anabaseios 雅典娜",
+      "nicknames": [],
+      "zone": 54,
+      "encounter": 91,
+      "difficulty": 100
+    },
+    {
+      "name": "Anabaseios 帕拉斯雅典娜",
+      "nicknames": [],
+      "zone": 54,
+      "encounter": 92,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials III (Extreme) 高贝扎",
+      "nicknames": [],
+      "zone": 55,
+      "encounter": 1069,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials III (Extreme) 泽罗姆斯",
+      "nicknames": [],
+      "zone": 55,
+      "encounter": 1070,
+      "difficulty": 100
+    },
+    {
+      "name": "Thaleia 沙利亚克",
+      "nicknames": [],
+      "zone": 56,
+      "encounter": 2049,
+      "difficulty": 100
+    },
+    {
+      "name": "Thaleia 利姆莱茵",
+      "nicknames": [],
+      "zone": 56,
+      "encounter": 2050,
+      "difficulty": 100
+    },
+    {
+      "name": "Thaleia 奥修昂",
+      "nicknames": [],
+      "zone": 56,
+      "encounter": 2051,
+      "difficulty": 100
+    },
+    {
+      "name": "Thaleia 欧罗基亚",
+      "nicknames": [],
+      "zone": 56,
+      "encounter": 2052,
+      "difficulty": 100
     }
   ],
   "job": [
@@ -567,6 +1876,16 @@
       "name": "贤者",
       "nicknames": [],
       "spec": 19
+    },
+    {
+      "name": "Viper",
+      "nicknames": [],
+      "spec": 20
+    },
+    {
+      "name": "Pictomancer",
+      "nicknames": [],
+      "spec": 21
     }
   ]
 }
