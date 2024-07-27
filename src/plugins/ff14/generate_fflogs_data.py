@@ -33,8 +33,17 @@ async def updata_job(data):
                 )
 
 
+def get_name(zones: Zones, encounter: Encounter):
+    """副本名字"""
+    # 普通副本直接返回
+    if zones.name.startswith("Dungeons"):
+        return encounter.name
+
+    return f"{zones.name} {encounter.name}"
+
+
 def get_difficulty(zone: Zones, encounter: Encounter):
-    """副本难度难度
+    """副本难度
 
     绝本的难度是 101
 
@@ -61,12 +70,13 @@ async def update_boss(data):
     zones = await fflogs.zones()
     for zone in zones:
         for encounter in zone.encounters:
+            name = get_name(zone, encounter)
             difficulty = get_difficulty(zone, encounter)
             if (zone.id, encounter.id, difficulty) not in bosses:
                 data["boss"].append(
                     {
-                        "name": f"{zone.name} {encounter.name}",
-                        "nicknames": [encounter.name],
+                        "name": name,
+                        "nicknames": [],
                         "zone": zone.id,
                         "encounter": encounter.id,
                         "difficulty": difficulty,
