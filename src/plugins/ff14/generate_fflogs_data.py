@@ -38,6 +38,8 @@ async def update_boss(data):
         for boss in data["boss"]
     }
 
+    # FIXME: 有一些副本已经过时了
+    # 需要想想怎么处理
     zones = await fflogs.zones()
     for zone in zones:
         for encounter in zone.encounters:
@@ -59,6 +61,11 @@ async def main():
 
     await updata_job(fflogs_data)
     await update_boss(fflogs_data)
+
+    fflogs_data["job"] = sorted(fflogs_data["job"], key=lambda x: x["spec"])
+    fflogs_data["boss"] = sorted(
+        fflogs_data["boss"], key=lambda x: (x["zone"], x["encounter"], x["difficulty"])
+    )
 
     with DATA_FILE.open("w", encoding="utf-8") as f:
         json.dump(fflogs_data, f, ensure_ascii=False, indent=4)
