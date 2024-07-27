@@ -45,6 +45,9 @@ def get_difficulty(zone: Zones, encounter: Encounter):
     # 绝本是 101
     if zone.name.startswith("Ultimates"):
         return 101
+    # 零式是 101
+    if "Savage" in zone.name:
+        return 101
 
     return 100
 
