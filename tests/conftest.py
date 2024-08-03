@@ -3,7 +3,6 @@ from pathlib import Path
 
 import nonebot
 import pytest
-from loguru import logger
 from nonebug import NONEBOT_INIT_KWARGS
 from nonebug.app import App
 from pytest_mock import MockerFixture
@@ -71,13 +70,6 @@ async def app(app: App, tmp_path: Path, mocker: MockerFixture):
     await init_orm()
 
     return app
-
-
-@pytest.fixture()
-def caplog(caplog):
-    handler_id = logger.add(caplog.handler, format="{message}")
-    yield caplog
-    logger.remove(handler_id)
 
 
 @pytest.fixture()

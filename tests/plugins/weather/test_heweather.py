@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from _pytest.logging import LogCaptureFixture
 from nonebot.adapters.onebot.v11 import Message
 from nonebug import App
 from pytest_mock import MockerFixture
@@ -147,7 +148,9 @@ async def test_heweather_with_three_args(app: App, mocker: MockerFixture):
     )
 
 
-async def test_heweather_lookup_failed(app: App, mocker: MockerFixture, caplog):
+async def test_heweather_lookup_failed(
+    app: App, mocker: MockerFixture, caplog: LogCaptureFixture
+):
     """测试和风天气，城市查找失败"""
     from src.plugins.weather import weather_cmd
     from src.plugins.weather.heweather_api import plugin_config
