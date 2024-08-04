@@ -17,7 +17,7 @@ COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
 # 安装依赖
 RUN apt-get update \
   && apt-get -y upgrade \
-  && apt-get install -y --no-install-recommends curl locales fontconfig fonts-noto-cjk fonts-noto-color-emoji \
+  && apt-get install -y --no-install-recommends git curl locales fontconfig fonts-noto-cjk fonts-noto-color-emoji \
   && localedef -i zh_CN -c -f UTF-8 -A /usr/share/locale/locale.alias zh_CN.UTF-8 \
   && fc-cache -fv \
   && apt-get purge -y --auto-remove \
