@@ -5,7 +5,7 @@ description = "基于 NoneBot2 的聊天机器人"
 authors = [{ name = "uy_sun", email = "hmy0119@gmail.com" }]
 dependencies = [
     "pydantic>=2.8.2",
-    "eorzeaenv>=2.2.9",
+    "eorzeaenv @ git+https://github.com/he0119/EorzeaEnv.git@coolqbot",
     "matplotlib>=3.9.1",
     "uvicorn[standard]>=0.30.5",
     "uvicorn-worker>=0.2.0",
