@@ -3,7 +3,6 @@ from pathlib import Path
 
 import nonebot
 import pytest
-from loguru import logger
 from nonebug import NONEBOT_INIT_KWARGS
 from nonebug.app import App
 from pytest_mock import MockerFixture
@@ -30,7 +29,7 @@ def pytest_configure(config: pytest.Config) -> None:
     }
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 def _load_plugin(nonebug_init: None):
     from nonebot.adapters.onebot.v11 import Adapter as OneBotV11Adapter
     from nonebot.adapters.qq import Adapter as QQAdapter
@@ -51,7 +50,7 @@ def _load_plugin(nonebug_init: None):
 
 
 @pytest.fixture()
-async def app(tmp_path: Path, _load_plugin, mocker: MockerFixture):
+async def app(app: App, tmp_path: Path, mocker: MockerFixture):
     from nonebot_plugin_datastore.config import plugin_config
     from nonebot_plugin_orm import init_orm
 
@@ -60,24 +59,17 @@ async def app(tmp_path: Path, _load_plugin, mocker: MockerFixture):
     driver._bot_connection_hook.clear()
 
     # 插件数据目录
+    mocker.patch.object(plugin_config, "datastore_cache_dir", tmp_path / "cache")
+    mocker.patch.object(plugin_config, "datastore_config_dir", tmp_path / "config")
+    mocker.patch.object(plugin_config, "datastore_data_dir", tmp_path / "data")
     mocker.patch("nonebot_plugin_localstore.BASE_DATA_DIR", tmp_path / "data")
     mocker.patch("nonebot_plugin_localstore.BASE_CACHE_DIR", tmp_path / "cache")
     mocker.patch("nonebot_plugin_localstore.BASE_CONFIG_DIR", tmp_path / "config")
-    plugin_config.datastore_cache_dir = tmp_path / "cache"
-    plugin_config.datastore_config_dir = tmp_path / "config"
-    plugin_config.datastore_data_dir = tmp_path / "data"
     mocker.patch("nonebot_plugin_orm._data_dir", tmp_path / "orm")
 
     await init_orm()
 
-    return App()
-
-
-@pytest.fixture()
-def caplog(caplog):
-    handler_id = logger.add(caplog.handler, format="{message}")
-    yield caplog
-    logger.remove(handler_id)
+    return app
 
 
 @pytest.fixture()

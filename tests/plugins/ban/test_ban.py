@@ -54,7 +54,7 @@ async def test_ban_group_bot_is_owner(
             result=[],
         )
         ctx.should_call_send(event, Message("test"), True, at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(ban_cmd)
 
     render_expression.assert_called_once_with(EXPR_OK, duration=1)
 
@@ -108,7 +108,7 @@ async def test_ban_group_bot_is_admin(
                 result=[],
             )
             ctx.should_call_send(event, Message("test"), True, at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(ban_cmd)
 
     if event.sender.role == "admin":
         render_expression.assert_called_once_with(
@@ -165,7 +165,7 @@ async def test_ban_group_bot_is_member(
                 result=[{"role": "owner", "user_id": 100}],
             )
             ctx.should_call_send(event, Message("test"), True)
-        ctx.should_finished()
+        ctx.should_finished(ban_cmd)
 
     if event.sender.role == "owner":
         render_expression.assert_called_once_with(EXPR_OWNER)
@@ -212,7 +212,8 @@ async def test_ban_group_get_arg(
             result={"role": "owner"},
         )
         ctx.should_call_send(event, "你想被禁言多少分钟呢？", True)
-        ctx.should_rejected()
+        ctx.should_rejected(ban_cmd)
+
         ctx.receive_event(bot, next_event)
         ctx.should_call_api(
             "set_group_ban",
@@ -220,7 +221,7 @@ async def test_ban_group_get_arg(
             result=[],
         )
         ctx.should_call_send(next_event, Message("test"), True, at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(ban_cmd)
 
     render_expression.assert_called_once_with(EXPR_OK, duration=1)
 
@@ -250,10 +251,12 @@ async def test_ban_group_get_arg_invalid(
             result={"role": "owner"},
         )
         ctx.should_call_send(event, "你想被禁言多少分钟呢？", True)
-        ctx.should_rejected()
+        ctx.should_rejected(ban_cmd)
+
         ctx.receive_event(bot, next_event)
         ctx.should_call_send(next_event, "请只输入数字，不然我没法理解呢！", True)
-        ctx.should_rejected()
+        ctx.should_rejected(ban_cmd)
+
         ctx.receive_event(bot, final_event)
         ctx.should_call_api(
             "set_group_ban",
@@ -261,6 +264,6 @@ async def test_ban_group_get_arg_invalid(
             result=[],
         )
         ctx.should_call_send(final_event, Message("test"), True, at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(ban_cmd)
 
     render_expression.assert_called_once_with(EXPR_OK, duration=1)

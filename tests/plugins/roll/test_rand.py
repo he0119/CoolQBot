@@ -21,7 +21,7 @@ async def test_rand(app: App, mocker: MockerFixture):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你的点数是 1", "result", at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(rand_cmd)
 
     randint.assert_called_once_with(0, 100)
 
@@ -43,6 +43,6 @@ async def test_rand_probability(app: App, mocker: MockerFixture):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "今天是晴天的概率是 1%", "result", at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(rand_cmd)
 
     randint.assert_called_once_with(0, 100)

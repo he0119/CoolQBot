@@ -23,7 +23,7 @@ async def test_gete(app: App, mocker: MockerFixture):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, Message("test"), "result", at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(gate_cmd)
 
     randint.assert_called_once_with(1, 2)
     render_expression.assert_called_once_with(EXPR_GATE, direction="左边")
@@ -48,9 +48,11 @@ async def test_gete_ask_arg(app: App, mocker: MockerFixture):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "总共有多少个门呢？", "result")
+        ctx.should_rejected(gate_cmd)
+
         ctx.receive_event(bot, next_event)
         ctx.should_call_send(next_event, Message("test"), "result", at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(gate_cmd)
 
     randint.assert_called_once_with(1, 2)
     render_expression.assert_called_once_with(EXPR_GATE, direction="左边")
@@ -76,14 +78,17 @@ async def test_gete_ask_arg_error(app: App, mocker: MockerFixture):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "总共有多少个门呢？", "result")
+        ctx.should_rejected(gate_cmd)
+
         ctx.receive_event(bot, next_event)
         ctx.should_call_send(
             next_event, "暂时只支持两个门或者三个门的情况，请重新输入吧。", "result"
         )
-        ctx.should_rejected()
+        ctx.should_rejected(gate_cmd)
+
         ctx.receive_event(bot, final_event)
         ctx.should_call_send(final_event, Message("test"), "result", at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(gate_cmd)
 
     randint.assert_called_once_with(1, 2)
     render_expression.assert_called_once_with(EXPR_GATE, direction="左边")
@@ -108,9 +113,11 @@ async def test_gete_ask_arg_whitespace(app: App, mocker: MockerFixture):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "总共有多少个门呢？", "result")
+        ctx.should_rejected(gate_cmd)
+
         ctx.receive_event(bot, next_event)
         ctx.should_call_send(next_event, Message("test"), "result", at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(gate_cmd)
 
     randint.assert_called_once_with(1, 2)
     render_expression.assert_called_once_with(EXPR_GATE, direction="左边")

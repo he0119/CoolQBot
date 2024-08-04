@@ -44,7 +44,7 @@ async def test_music(app: App, mocker: MockerFixture):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.music("163", 1825190456), "result")
-        ctx.should_finished()
+        ctx.should_finished(music_cmd)
 
     get.assert_called_once_with("http://netease:3000/search?keywords=test")
 
@@ -72,14 +72,16 @@ async def test_music_get_arg(
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你想听哪首歌呢？", "result")
-        ctx.should_rejected()
+        ctx.should_rejected(music_cmd)
+
         ctx.receive_event(bot, next_event)
         ctx.should_call_send(next_event, "歌曲名不能为空呢，请重新输入！", "result")
-        ctx.should_rejected()
+        ctx.should_rejected(music_cmd)
+
         ctx.receive_event(bot, final_event)
         ctx.should_call_send(
             final_event, MessageSegment.music("163", 1825190456), "result"
         )
-        ctx.should_finished()
+        ctx.should_finished(music_cmd)
 
     get.assert_called_once_with("http://netease:3000/search?keywords=test")

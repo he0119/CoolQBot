@@ -73,7 +73,7 @@ async def test_rank(app: App):
         ctx.should_call_send(
             event, "Love Love Ranking\ntest：10.00%\n\n复读次数排行榜\ntest：10次", True
         )
-        ctx.should_finished()
+        ctx.should_finished(rank_cmd)
 
 
 @pytest.mark.usefixtures("_records")
@@ -96,7 +96,7 @@ async def test_rank_limit(app: App):
             "Love Love Ranking\ntest(100)：10.00%\n\n复读次数排行榜\ntest(100)：10次",
             True,
         )
-        ctx.should_finished()
+        ctx.should_finished(rank_cmd)
 
 
 async def test_rank_not_enabled(app: App):
@@ -109,4 +109,4 @@ async def test_rank_not_enabled(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "该群未开启复读功能，无法获取排行榜。", True)
-        ctx.should_finished()
+        ctx.should_finished(rank_cmd)

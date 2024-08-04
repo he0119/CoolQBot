@@ -45,7 +45,7 @@ async def test_repeat(app: App, mocker: MockerFixture):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, event.message, None)
-        ctx.should_finished()
+        ctx.should_finished(repeat_message)
 
     assert mocked_recorder_datetime.now.call_count == 3
 
@@ -61,7 +61,7 @@ async def test_repeat_enabled(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "复读功能开启中", None)
-        ctx.should_finished()
+        ctx.should_finished(repeat_cmd)
 
 
 async def test_repeat_not_enabled(app: App):
@@ -74,7 +74,7 @@ async def test_repeat_not_enabled(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "复读功能关闭中", None)
-        ctx.should_finished()
+        ctx.should_finished(repeat_cmd)
 
 
 async def test_repeat_enable(app: App):
@@ -87,7 +87,7 @@ async def test_repeat_enable(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群开启复读功能", None)
-        ctx.should_finished()
+        ctx.should_finished(repeat_cmd)
 
 
 @pytest.mark.usefixtures("_records")
@@ -101,7 +101,7 @@ async def test_repeat_disable(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭复读功能", None)
-        ctx.should_finished()
+        ctx.should_finished(repeat_cmd)
 
 
 async def test_repeat_disable_already_disabled(app: App):
@@ -114,4 +114,4 @@ async def test_repeat_disable_already_disabled(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭复读功能", None)
-        ctx.should_finished()
+        ctx.should_finished(repeat_cmd)

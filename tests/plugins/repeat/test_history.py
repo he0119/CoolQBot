@@ -50,7 +50,7 @@ async def test_history(app: App, mocker: MockerFixture):
             "2020 年 1 月数据\nLove Love Ranking\ntest(100)：10.00%\n\n复读次数排行榜\ntest(100)：10次",
             True,
         )
-        ctx.should_finished()
+        ctx.should_finished(history_cmd)
 
     mocked_datetime.now.assert_called_once()
     mocked_datetime.assert_called_once_with(year=2020, month=1, day=1)
@@ -93,6 +93,7 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你请输入你要查询的年份", True)
+        ctx.should_rejected(history_cmd)
 
         ctx.receive_event(bot, year_event)
         ctx.should_call_send(year_event, "你请输入你要查询的月份", True)
@@ -101,6 +102,7 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
         ctx.should_call_send(
             month_event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True
         )
+        ctx.should_rejected(history_cmd)
 
         ctx.receive_event(bot, day_event)
         ctx.should_call_api(
@@ -113,6 +115,7 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
             "2020 年 1 月数据\nLove Love Ranking\ntest(100)：10.00%\n\n复读次数排行榜\ntest(100)：10次",
             True,
         )
+        ctx.should_finished(history_cmd)
 
     mocked_datetime.now.assert_called_once()
     mocked_datetime.assert_called_once_with(year=2020, month=1, day=1)
@@ -148,7 +151,7 @@ async def test_history_get_invalid_args(app: App):
         ctx.should_call_send(
             invalid_month_event, "请只输入数字，不然我没法理解呢！", True
         )
-        ctx.should_rejected()
+        ctx.should_rejected(history_cmd)
 
         ctx.receive_event(bot, month_event)
         ctx.should_call_send(
@@ -171,4 +174,4 @@ async def test_history_not_enabled(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "该群未开启复读功能，无法获取历史排行榜。", True)
-        ctx.should_finished()
+        ctx.should_finished(history_cmd)

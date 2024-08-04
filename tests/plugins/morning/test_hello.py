@@ -24,7 +24,7 @@ async def test_hello_enabled(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "启动问候功能开启中", None)
-        ctx.should_finished()
+        ctx.should_finished(hello_cmd)
 
 
 async def test_hello_not_enabled(app: App):
@@ -38,7 +38,7 @@ async def test_hello_not_enabled(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "启动问候功能关闭中", None)
-        ctx.should_finished()
+        ctx.should_finished(hello_cmd)
 
 
 async def test_hello_enable(app: App):
@@ -58,7 +58,7 @@ async def test_hello_enable(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群开启启动问候功能", None)
-        ctx.should_finished()
+        ctx.should_finished(hello_cmd)
 
     async with get_session() as session:
         groups = (await session.scalars(select(Hello))).all()
@@ -85,7 +85,7 @@ async def test_hello_disable(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭启动问候功能", None)
-        ctx.should_finished()
+        ctx.should_finished(hello_cmd)
 
     async with get_session() as session:
         groups = (await session.scalars(select(Hello))).all()

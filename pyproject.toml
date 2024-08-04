@@ -55,6 +55,7 @@ dev-dependencies = [
     "pytest-mock>=3.14.0",
     "pytest-xdist>=3.6.1",
     "pytest-asyncio>=0.23.7",
+    "pytest-loguru>=0.4.0",
     "respx>=0.21.1",
     "freezegun>=1.5.1",
     "beautifulsoup4>=4.12.3",

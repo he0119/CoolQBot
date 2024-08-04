@@ -174,6 +174,7 @@ kiwisolver==1.4.5
 loguru==0.7.2
     # via meme-generator
     # via nonebot2
+    # via pytest-loguru
     # via sentry-sdk
 lxml==5.2.2
     # via nonebot-bison
@@ -386,6 +387,7 @@ pytest==8.2.2
     # via pytest-xdist
 pytest-asyncio==0.23.7
 pytest-cov==5.0.0
+pytest-loguru==0.4.0
 pytest-mock==3.14.0
     # via nonebug-saa
 pytest-xdist==3.6.1
