@@ -55,7 +55,7 @@ async def test_morning_enabled(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "每日早安功能开启中", None)
-        ctx.should_finished()
+        ctx.should_finished(morning_cmd)
 
 
 async def test_morning_not_enabled(app: App):
@@ -68,7 +68,7 @@ async def test_morning_not_enabled(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "每日早安功能关闭中", None)
-        ctx.should_finished()
+        ctx.should_finished(morning_cmd)
 
 
 async def test_morning_enable(app: App):
@@ -91,7 +91,7 @@ async def test_morning_enable(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群开启每日早安功能", None)
-        ctx.should_finished()
+        ctx.should_finished(morning_cmd)
 
     async with get_session() as session:
         groups = (await session.scalars(select(MorningGreeting))).all()
@@ -119,7 +119,7 @@ async def test_morning_disable(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭每日早安功能", None)
-        ctx.should_finished()
+        ctx.should_finished(morning_cmd)
 
     async with get_session() as session:
         groups = (await session.scalars(select(MorningGreeting))).all()
@@ -151,7 +151,7 @@ async def test_morning_today(app: App, mocker: MockerFixture):
             Message("test"),
             "result",
         )
-        ctx.should_finished()
+        ctx.should_finished(morning_cmd)
 
     mocked_date.today.assert_called()
     get.assert_called_once_with(

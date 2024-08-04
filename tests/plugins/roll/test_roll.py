@@ -21,7 +21,7 @@ async def test_roll(app: App, mocker: MockerFixture):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "d100=d100(1)=1", "result", at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(roll_cmd)
 
     randint.assert_called_once_with(1, 100)
 
@@ -48,10 +48,11 @@ async def test_roll_get_arg(app: App, mocker: MockerFixture):
             "欢迎使用 NGA 风格 ROLL 点插件\n请问你想怎么 ROLL 点\n你可以输入 d100\n也可以输入 2d100+2d50",
             "result",
         )
-        ctx.should_rejected()
+        ctx.should_rejected(roll_cmd)
+
         ctx.receive_event(bot, next_event)
         ctx.should_call_send(next_event, "d100=d100(1)=1", "result", at_sender=True)
-        ctx.should_finished()
+        ctx.should_finished(roll_cmd)
 
     randint.assert_called_once_with(1, 100)
 
@@ -73,7 +74,7 @@ async def test_roll_invalid(app: App, mocker: MockerFixture):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "请输入正确的参数 ~>_<~", "result")
-        ctx.should_finished()
+        ctx.should_finished(roll_cmd)
 
     randint.assert_not_called()
 
@@ -100,7 +101,7 @@ async def test_roll_complex(app: App, mocker: MockerFixture):
             "result",
             at_sender=True,
         )
-        ctx.should_finished()
+        ctx.should_finished(roll_cmd)
 
     randint.assert_has_calls(
         [

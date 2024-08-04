@@ -42,7 +42,7 @@ async def test_rounds(app: App, session: "AsyncSession"):
         ctx.should_call_send(
             event, MessageSegment.at(10) + "请问你现在有什么不适吗？", True
         )
-        ctx.should_rejected()
+        ctx.should_rejected(rounds_cmd)
 
         event = fake_group_message_event_v11(message=Message("头疼"), user_id=10)
         ctx.receive_event(bot, event)
@@ -61,7 +61,7 @@ async def test_rounds(app: App, session: "AsyncSession"):
         ctx.should_call_send(
             event, MessageSegment.at(10) + "请问你现在有什么不适吗？", True
         )
-        ctx.should_rejected()
+        ctx.should_rejected(rounds_cmd)
 
         event = fake_group_message_event_v11(message=Message("头疼"), user_id=10)
         ctx.receive_event(bot, event)
@@ -80,7 +80,7 @@ async def test_rounds(app: App, session: "AsyncSession"):
         ctx.should_call_send(
             event, MessageSegment.at(10) + "请问你现在有什么不适吗？", True
         )
-        ctx.should_rejected()
+        ctx.should_rejected(rounds_cmd)
 
         event = fake_group_message_event_v11(
             message=" " + MessageSegment.at(10), user_id=10
@@ -89,7 +89,7 @@ async def test_rounds(app: App, session: "AsyncSession"):
         ctx.should_call_send(
             event, MessageSegment.at(10) + "症状不能为空，请重新输入", True
         )
-        ctx.should_rejected()
+        ctx.should_rejected(rounds_cmd)
 
         event = fake_group_message_event_v11(message=Message("头疼"), user_id=10)
         ctx.receive_event(bot, event)
