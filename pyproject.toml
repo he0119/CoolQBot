@@ -113,7 +113,7 @@ asyncio_mode = "auto"
 [tool.bumpversion]
 current_version = "0.18.0"
 commit = true
-message = "chore(release): {new_version}"
+message = "chore(release): {new_version} [skip ci]"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
