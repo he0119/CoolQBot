@@ -27,10 +27,12 @@ anyio==4.4.0
     # via watchfiles
 apscheduler==3.10.4
     # via nonebot-plugin-apscheduler
-arclet-alconna==1.8.21
+arclet-alconna==1.8.25
     # via arclet-alconna-tools
+    # via meme-generator
     # via nonebot-plugin-alconna
-arclet-alconna-tools==0.7.8
+arclet-alconna-tools==0.7.9
+    # via meme-generator
     # via nonebot-plugin-alconna
 arrow==1.3.0
     # via cookiecutter
@@ -101,10 +103,9 @@ emoji==2.12.1
 eorzeaenv @ git+https://github.com/he0119/EorzeaEnv.git@11f61ca3f04f8c45ecd167f7a328f4432b17ea82
 execnet==2.1.1
     # via pytest-xdist
-expiringdict==1.2.2
-    # via nonebot-plugin-user
-expiringdictx==1.0.1
+expiringdictx==1.1.0
     # via nonebot-bison
+    # via nonebot-plugin-user
 fastapi==0.111.0
     # via meme-generator
     # via nonebot2
@@ -202,7 +203,7 @@ matplotlib==3.9.1
     # via wordcloud
 mdurl==0.1.2
     # via markdown-it-py
-meme-generator==0.0.20
+meme-generator==0.1.0
     # via nonebot-plugin-memes
 msgpack==1.0.8
     # via nonebot-adapter-onebot
@@ -210,7 +211,7 @@ multidict==6.0.5
     # via async-asgi-testclient
     # via yarl
 nb-cli==1.4.1
-nepattern==0.7.4
+nepattern==0.7.6
     # via arclet-alconna
     # via arclet-alconna-tools
     # via nonebot-plugin-alconna
@@ -225,7 +226,7 @@ nonebot-adapter-red==0.9.0
 nonebot-adapter-satori==0.12.3
 nonebot-adapter-telegram==0.1.0b17
 nonebot-bison @ git+https://github.com/MountainDash/nonebot-bison@dc0dc252e76aa27711f34295e8969bfedd6cee43
-nonebot-plugin-alconna==0.50.3
+nonebot-plugin-alconna==0.51.3
     # via nonebot-plugin-memes
     # via nonebot-plugin-user
     # via nonebot-plugin-wordcloud
@@ -249,9 +250,10 @@ nonebot-plugin-localstore==0.6.0
     # via nonebot-plugin-memes
     # via nonebot-plugin-orm
     # via nonebot-plugin-wordcloud
-nonebot-plugin-memes==0.6.2
-nonebot-plugin-orm==0.7.5
+nonebot-plugin-memes==0.7.3
+nonebot-plugin-orm==0.7.6
     # via nonebot-plugin-chatrecorder
+    # via nonebot-plugin-memes
     # via nonebot-plugin-session-orm
     # via nonebot-plugin-user
     # via nonebot-plugin-wordcloud
@@ -267,9 +269,10 @@ nonebot-plugin-session==0.3.1
     # via nonebot-plugin-user
 nonebot-plugin-session-orm==0.2.0
     # via nonebot-plugin-chatrecorder
+    # via nonebot-plugin-memes
 nonebot-plugin-status==0.8.1
 nonebot-plugin-treehelp==0.5.0
-nonebot-plugin-user==0.3.0
+nonebot-plugin-user==0.4.0
 nonebot-plugin-userinfo==0.2.4
     # via nonebot-plugin-memes
 nonebot-plugin-waiter==0.6.2
@@ -330,7 +333,6 @@ packaging==24.1
 pil-utils==0.1.10
     # via meme-generator
     # via nonebot-plugin-bawiki
-    # via nonebot-plugin-memes
 pillow==10.4.0
     # via matplotlib
     # via nonebot-bison
@@ -433,6 +435,7 @@ questionary==2.0.1
 rapidfuzz==3.9.5
     # via eorzeaenv
     # via nonebot-bison
+    # via nonebot-plugin-memes
 regex==2024.5.15
     # via dateparser
 requests==2.32.3
@@ -473,7 +476,7 @@ strenum==0.4.15
     # via nonebot-plugin-send-anything-anywhere
     # via nonebot-plugin-session
     # via nonebot-plugin-userinfo
-tarina==0.5.4
+tarina==0.5.5
     # via arclet-alconna
     # via nepattern
     # via nonebot-plugin-alconna
