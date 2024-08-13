@@ -124,7 +124,7 @@ freezegun==1.5.1
 greenlet==3.0.3
     # via playwright
     # via sqlalchemy
-gunicorn==22.0.0
+gunicorn==23.0.0
     # via uvicorn-worker
 h11==0.14.0
     # via httpcore
