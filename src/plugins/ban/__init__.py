@@ -2,18 +2,19 @@
 
 from enum import Enum
 
-from nonebot import on_command, on_notice
-from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
+from nonebot import on_notice, require
+from nonebot.adapters.onebot.v11 import Bot, MessageSegment
 from nonebot.adapters.onebot.v11.event import (
     GroupAdminNoticeEvent,
     GroupMessageEvent,
     PrivateMessageEvent,
 )
-from nonebot.params import Arg, CommandArg, Depends
 from nonebot.plugin import PluginMetadata
-from nonebot.typing import T_State
 
-from src.utils.helpers import parse_int, render_expression
+from src.utils.helpers import render_expression
+
+require("nonebot_plugin_alconna")
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 
 __plugin_meta__ = PluginMetadata(
     name="自主禁言",
@@ -22,7 +23,8 @@ __plugin_meta__ = PluginMetadata(
 /ban 30 (禁言 30 分钟)
 解除禁言
 /ban 0
-如果私聊，则需要再提供群号""",
+如果私聊，则需要再提供群号
+/ban 0 12345678""",
     supported_adapters={"~onebot.v11"},
 )
 
@@ -66,32 +68,42 @@ def get_ban_type(bot_role: str, sender_role: str) -> BanType:
     return BanType.OK
 
 
-ban_cmd = on_command("ban", aliases={"禁言"}, block=True)
+ban_cmd = on_alconna(
+    Alconna(
+        "禁言",
+        Args["duration?#时长（分钟）", int],
+        Args["group_id?#群号", int],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    aliases={"ban"},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @ban_cmd.handle()
 async def ban_handle_first_receive(
-    state: T_State, bot: Bot, args: Message = CommandArg()
+    bot: Bot, duration: Match[int], group_id: Match[int]
 ):
     """获取需要的参数"""
     # 如果没有获取机器人在群中的职位，则获取
     if not _bot_role:
         await refresh_bot_role(bot)
 
-    plaintext = args.extract_plain_text().strip()
-    if plaintext and plaintext.isdigit():
-        state["duration"] = int(plaintext)
+    if duration.available:
+        ban_cmd.set_path_arg("duration", duration.result)
+    if group_id.available:
+        ban_cmd.set_path_arg("group_id", group_id.result)
 
 
-@ban_cmd.got(
-    "duration",
-    prompt="你想被禁言多少分钟呢？",
-    parameterless=[Depends(parse_int("duration"))],
-)
+@ban_cmd.got_path("duration", prompt="你想被禁言多少分钟呢？")
 async def ban_handle_group_message(
     bot: Bot,
     event: GroupMessageEvent,
-    duration: int = Arg(),
+    duration: int,
 ):
     """如果在群里发送，则在当前群禁言/解除"""
     group_id = event.group_id
@@ -128,21 +140,13 @@ async def ban_handle_group_message(
         )
 
 
-@ban_cmd.got(
-    "duration",
-    prompt="你想被禁言多少分钟呢？",
-    parameterless=[Depends(parse_int("duration"))],
-)
-@ban_cmd.got(
-    "group_id",
-    prompt="请问你想针对哪个群？",
-    parameterless=[Depends(parse_int("group_id"))],
-)
+@ban_cmd.got_path("duration", prompt="你想被禁言多少分钟呢？")
+@ban_cmd.got_path("group_id", prompt="请问你想针对哪个群？")
 async def ban_handle_private_message(
     bot: Bot,
     event: PrivateMessageEvent,
-    duration: int = Arg(),
-    group_id: int = Arg(),
+    duration: int,
+    group_id: int,
 ):
     """如果私聊的话，则向用户请求群号，并仅在支持的群禁言/解除"""
     user_id = event.user_id
