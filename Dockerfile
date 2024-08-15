@@ -17,9 +17,8 @@ COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
 # 安装依赖
 RUN apt-get update \
   && apt-get -y upgrade \
-  && apt-get install -y --no-install-recommends git curl locales fontconfig fonts-noto-cjk fonts-noto-color-emoji \
+  && apt-get install -y --no-install-recommends git curl locales fontconfig fonts-noto-color-emoji \
   && localedef -i zh_CN -c -f UTF-8 -A /usr/share/locale/locale.alias zh_CN.UTF-8 \
-  && fc-cache -fv \
   && apt-get purge -y --auto-remove \
   && rm -rf /var/lib/apt/lists/*
 
@@ -27,8 +26,14 @@ RUN apt-get update \
 COPY requirements.lock ./
 RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 
-# 提前缓存插件所需数据
+# 安装浏览器
 RUN playwright install --with-deps chromium
+
+# 缓存表情包制作插件字体与图片
+RUN git clone --depth 1 https://github.com/MeetWq/meme-generator.git \
+  && cp -r ./meme-generator/resources/fonts /usr/share/fonts/meme-fonts \
+  && rm -rf ./meme-generator \
+  && fc-cache -fv
 RUN meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator/
 
 # Bot

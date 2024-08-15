@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 修复插件订阅 B 站和最终幻想XIV 出错的问题
 - 修复运行迁移脚本时加载插件报错
 - 修复未配置 QQ 机器人时的报错
+- 修复表情包插件字体缺失的问题
 
 ## [0.18.1] - 2024-08-07
 
