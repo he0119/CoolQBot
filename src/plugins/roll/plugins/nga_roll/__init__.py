@@ -2,11 +2,8 @@
 
 import re
 
-from nonebot import on_command
-from nonebot.adapters import Message
-from nonebot.params import Arg, CommandArg, Depends
-from nonebot.plugin import PluginMetadata
-from nonebot.typing import T_State
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 
 from .data_source import roll_dices
 
@@ -17,9 +14,21 @@ __plugin_meta__ = PluginMetadata(
 /roll d100
 roll 两次点数100和两次点数50
 /roll 2d100+2d50""",
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
 )
 
-roll_cmd = on_command("roll", block=True)
+roll_cmd = on_alconna(
+    Alconna(
+        "roll",
+        Args["input?#ROLL 点方式", str],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    use_cmd_start=True,
+    block=True,
+)
 
 
 def check_roll_syntax(input: str) -> bool:
@@ -29,35 +38,18 @@ def check_roll_syntax(input: str) -> bool:
 
 
 @roll_cmd.handle()
-async def roll_handle_first_receive(state: T_State, args: Message = CommandArg()):
-    plaintext = args.extract_plain_text().strip()
-
-    # 如果有输入，则直接检查，出错就直接提示并结束对话
-    if plaintext and not check_roll_syntax(plaintext):
-        await roll_cmd.finish("请输入正确的参数 ~>_<~")
-
-    if plaintext:
-        state["input"] = plaintext
+async def roll_handle_first_receive(input: Match[str]):
+    if input.available:
+        roll_cmd.set_path_arg("input", input.result)
 
 
-async def get_roll_input(input: str | Message = Arg()) -> str:
-    """检查输入是否能满足要求"""
-    if isinstance(input, Message):
-        input = input.extract_plain_text().strip()
-
-    if not input:
-        await roll_cmd.reject("ROLL 点方式不能为空呢，请重新输入")
-
-    if not check_roll_syntax(input):
-        await roll_cmd.reject("请输入正确的参数 ~>_<~")
-
-    return input
-
-
-@roll_cmd.got(
+@roll_cmd.got_path(
     "input",
     prompt="欢迎使用 NGA 风格 ROLL 点插件\n请问你想怎么 ROLL 点\n你可以输入 d100\n也可以输入 2d100+2d50",
 )
-async def roll_handle(input: str = Depends(get_roll_input)):
+async def roll_handle(input: str):
+    if not check_roll_syntax(input):
+        await roll_cmd.reject("请输入正确的参数 ~>_<~")
+
     str_data = roll_dices(input)
     await roll_cmd.finish(str_data, at_sender=True)

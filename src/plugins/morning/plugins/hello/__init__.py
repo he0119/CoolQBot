@@ -1,11 +1,12 @@
 """启动问候"""
 
 import nonebot
-from nonebot.adapters import Bot, Message
+from nonebot.adapters import Bot
 from nonebot.exception import ActionFailed
 from nonebot.log import logger
-from nonebot.params import CommandArg, Depends
-from nonebot.plugin import PluginMetadata, inherit_supported_adapters, on_command
+from nonebot.params import Depends
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 from nonebot_plugin_saa import PlatformTarget, Text, get_target
 from sqlalchemy import select
 
@@ -27,7 +28,9 @@ __plugin_meta__ = PluginMetadata(
 /hello on
 关闭启动问候功能
 /hello off""",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_saa"),
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_alconna", "nonebot_plugin_saa"
+    ),
     extra={"orm_version_location": migrations},
 )
 
@@ -53,18 +56,28 @@ async def hello_on_connect(bot: Bot, session: AsyncSession) -> None:
     logger.info("发送首次启动的问候")
 
 
-hello_cmd = on_command("hello", aliases={"问候"}, block=True)
+hello_cmd = on_alconna(
+    Alconna(
+        "问候",
+        Args["status?#是否开启启动问候（on/off）", str],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    aliases={"hello"},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @hello_cmd.handle()
 async def hello_handle(
     bot: Bot,
     session: AsyncSession,
-    arg: Message = CommandArg(),
+    status: Match[str],
     target: PlatformTarget = Depends(get_target),
 ):
-    args = arg.extract_plain_text()
-
     group = (
         await session.scalars(
             select(Hello)
@@ -73,8 +86,8 @@ async def hello_handle(
         )
     ).one_or_none()
 
-    if args:
-        if strtobool(args):
+    if status.available:
+        if strtobool(status.result):
             if not group:
                 session.add(Hello(target=target.model_dump(), bot_id=bot.self_id))
                 await session.commit()

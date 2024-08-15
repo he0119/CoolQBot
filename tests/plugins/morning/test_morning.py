@@ -2,7 +2,8 @@ import json
 from datetime import date
 from pathlib import Path
 
-from nonebot.adapters.onebot.v11 import Bot, Message
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
 from nonebug_saa import should_send_saa
 from pytest_mock import MockerFixture
@@ -50,9 +51,10 @@ async def test_morning_enabled(app: App):
         await session.commit()
 
     async with app.test_matcher(morning_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/morning"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/morning"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "每日早安功能开启中", None)
         ctx.should_finished(morning_cmd)
@@ -63,9 +65,10 @@ async def test_morning_not_enabled(app: App):
     from src.plugins.morning.plugins.morning_greeting import morning_cmd
 
     async with app.test_matcher(morning_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/morning"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/morning"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "每日早安功能关闭中", None)
         ctx.should_finished(morning_cmd)
@@ -86,9 +89,10 @@ async def test_morning_enable(app: App):
         assert len(groups) == 0
 
     async with app.test_matcher(morning_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/morning 1"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/morning 1"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群开启每日早安功能", None)
         ctx.should_finished(morning_cmd)
@@ -114,9 +118,10 @@ async def test_morning_disable(app: App):
         await session.commit()
 
     async with app.test_matcher(morning_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/morning 0"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/morning 0"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭每日早安功能", None)
         ctx.should_finished(morning_cmd)
@@ -142,9 +147,10 @@ async def test_morning_today(app: App, mocker: MockerFixture):
     render_expression.return_value = Message("test")
 
     async with app.test_matcher(morning_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/morning today"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/morning today"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,

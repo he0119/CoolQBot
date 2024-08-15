@@ -1,4 +1,5 @@
-from nonebot.adapters.onebot.v11 import Message
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -13,11 +14,12 @@ async def test_eorzean(app: App, mocker: MockerFixture):
     mocked_time.time.return_value = 1641619586
 
     async with app.test_matcher(weather_cmd) as ctx:
-        bot = ctx.create_bot()
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/天气 利姆萨·罗敏萨上层甲板")
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
@@ -37,9 +39,10 @@ async def test_eorzean_fuzzy(app: App, mocker: MockerFixture):
     mocked_time.time.return_value = 1641619586
 
     async with app.test_matcher(weather_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/天气 利姆萨·罗敏萨"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/天气 利姆萨·罗敏萨"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,

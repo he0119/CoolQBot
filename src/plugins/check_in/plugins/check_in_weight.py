@@ -1,13 +1,10 @@
-from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from nonebot.typing import T_State
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 from nonebot_plugin_user import UserSession
 
-from src.plugins.check_in import check_in
 from src.plugins.check_in.models import WeightRecord
 from src.plugins.check_in.utils import get_or_create_user_info
-from src.utils.annotated import AsyncSession, OptionalPlainTextArgs, PlainTextArgs
-from src.utils.helpers import parse_str
+from src.utils.annotated import AsyncSession
 
 __plugin_meta__ = PluginMetadata(
     name="体重打卡",
@@ -19,20 +16,30 @@ __plugin_meta__ = PluginMetadata(
 记录体重
 /体重打卡
 /体重打卡 60""",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_user"),
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_user", "nonebot_plugin_alconna"
+    ),
 )
-target_weight_cmd = check_in.command("weight", aliases={"目标体重"})
+
+target_weight_cmd = on_alconna(
+    Alconna(
+        "目标体重",
+        Args["target?#目标体重", str],
+        meta=CommandMeta(
+            description="设置和查看目标体重",
+            example="查看目标体重\n/目标体重\n设置目标体重\n/目标体重 60",
+        ),
+    ),
+    aliases={("check_in.target_weight")},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @target_weight_cmd.handle()
-async def _(
-    state: T_State,
-    session: AsyncSession,
-    user: UserSession,
-    content: OptionalPlainTextArgs,
-):
-    if content:
-        state["content"] = content
+async def _(session: AsyncSession, user: UserSession, target: Match[str]):
+    if target.available:
+        target_weight_cmd.set_path_arg("target", target.result)
     else:
         user_info = await get_or_create_user_info(user, session)
         if user_info.target_weight:
@@ -42,22 +49,14 @@ async def _(
             )
 
 
-@target_weight_cmd.got(
-    "content",
-    prompt="请输入你的目标体重哦～",
-    parameterless=[Depends(parse_str("content"))],
-)
-async def _(
-    session: AsyncSession,
-    user: UserSession,
-    content: str = Arg(),
-):
-    content = content.strip()
-    if not content:
+@target_weight_cmd.got_path("target", prompt="请输入你的目标体重哦～")
+async def _(session: AsyncSession, user: UserSession, target: str):
+    target = target.strip()
+    if not target:
         await target_weight_cmd.reject("目标体重不能为空，请重新输入", at_sender=True)
 
     try:
-        weight = float(content)
+        weight = float(target)
     except ValueError:
         await target_weight_cmd.reject(
             "目标体重只能输入数字哦，请重新输入", at_sender=True
@@ -77,28 +76,29 @@ async def _(
     )
 
 
-weight_record_cmd = check_in.command("weight_record", aliases={"记录体重", "体重打卡"})
+weight_record_cmd = on_alconna(
+    Alconna(
+        "体重打卡",
+        Args["content?#体重（kg）", str],
+        meta=CommandMeta(
+            description="记录体重",
+            example="记录体重\n/体重打卡\n/体重打卡 60",
+        ),
+    ),
+    aliases={"记录体重", "check_in.weight_record"},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @weight_record_cmd.handle()
-async def _(state: T_State, content: PlainTextArgs):
-    state["content"] = content
+async def _(content: Match[str]):
+    if content.available:
+        weight_record_cmd.set_path_arg("content", content.result)
 
 
-@weight_record_cmd.got(
-    "content",
-    prompt="今天你的体重是多少呢？",
-    parameterless=[Depends(parse_str("content"))],
-)
-async def _(
-    session: AsyncSession,
-    user: UserSession,
-    content: str = Arg(),
-):
-    content = content.strip()
-    if not content:
-        await target_weight_cmd.reject("体重不能为空，请重新输入", at_sender=True)
-
+@weight_record_cmd.got_path("content", prompt="今天你的体重是多少呢？")
+async def _(session: AsyncSession, user: UserSession, content: str):
     try:
         weight = float(content)
     except ValueError:

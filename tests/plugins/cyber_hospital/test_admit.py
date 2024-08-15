@@ -17,10 +17,10 @@ async def test_admin(app: App):
     async with app.test_matcher(admit_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/入院"), sender={"role": "admin"}
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "请 @ 需要入院的病人", True)
         ctx.should_finished(admit_cmd)
@@ -28,11 +28,11 @@ async def test_admin(app: App):
     async with app.test_matcher(admit_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/入院") + MessageSegment.at(123456),
             sender={"role": "admin"},
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.at(123456) + "入院成功", True)
         ctx.should_finished(admit_cmd)
@@ -40,11 +40,11 @@ async def test_admin(app: App):
     async with app.test_matcher(admit_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/入院") + MessageSegment.at(123456),
             sender={"role": "admin"},
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.at(123456) + "已入院", True)
         ctx.should_finished(admit_cmd)
@@ -63,11 +63,11 @@ async def test_admin_different_group(app: App, session: "AsyncSession"):
     async with app.test_matcher(admit_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/入院") + MessageSegment.at(123456),
             sender={"role": "admin"},
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.at(123456) + "入院成功", True)
         ctx.should_finished(admit_cmd)

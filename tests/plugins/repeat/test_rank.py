@@ -1,7 +1,8 @@
 from datetime import date, datetime
 
 import pytest
-from nonebot.adapters.onebot.v11 import Bot, Message
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
 from pytest_mock import MockerFixture
 from sqlalchemy.exc import IntegrityError
@@ -61,9 +62,10 @@ async def test_rank(app: App):
     from src.plugins.repeat.plugins.repeat_rank import rank_cmd
 
     async with app.test_matcher(rank_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/rank"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/rank"))
         ctx.receive_event(bot, event)
         ctx.should_call_api(
             "get_group_member_info",
@@ -82,9 +84,10 @@ async def test_rank_limit(app: App):
     from src.plugins.repeat.plugins.repeat_rank import rank_cmd
 
     async with app.test_matcher(rank_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/rank n0"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/rank n0"))
         ctx.receive_event(bot, event)
         ctx.should_call_api(
             "get_group_member_info",
@@ -104,9 +107,10 @@ async def test_rank_not_enabled(app: App):
     from src.plugins.repeat.plugins.repeat_rank import rank_cmd
 
     async with app.test_matcher(rank_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/rank"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/rank"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "该群未开启复读功能，无法获取排行榜。", True)
         ctx.should_finished(rank_cmd)

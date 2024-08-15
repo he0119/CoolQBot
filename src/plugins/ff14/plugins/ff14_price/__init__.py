@@ -1,12 +1,10 @@
 """查价"""
 
 import httpx
-from nonebot.adapters import Event, Message
-from nonebot.params import CommandArg
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, MultiVar, on_alconna
 from nonebot_plugin_datastore import get_plugin_data
-
-from src.plugins.ff14 import ff14
+from nonebot_plugin_user import UserSession
 
 from .data_source import get_item_price
 
@@ -21,19 +19,32 @@ __plugin_meta__ = PluginMetadata(
 /查价 默认值 静语庄园
 查询当前设置的默认值
 /查价 默认值""",
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_alconna", "nonebot_plugin_user"
+    ),
 )
 
 plugin_data = get_plugin_data()
 
-price_cmd = ff14.command("price", aliases={"查价"})
+price_cmd = on_alconna(
+    Alconna(
+        "查价",
+        Args["argv", MultiVar(str, flag="*")],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    aliases={"price"},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @price_cmd.handle()
-async def price_handle(event: Event, args: Message = CommandArg()):
+async def price_handle(session: UserSession, argv: tuple[str, ...]):
     """查价"""
-    argv = args.extract_plain_text().split()
-
-    user_id = event.get_user_id()
+    user_id = session.user_id
 
     if len(argv) == 0:
         await price_cmd.finish(f"最终幻想XIV 价格查询\n\n{__plugin_meta__.usage}")

@@ -1,6 +1,7 @@
 from datetime import date, datetime
 
-from nonebot.adapters.onebot.v11 import Bot, Message
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -35,10 +36,10 @@ async def test_history(app: App, mocker: MockerFixture):
         await session.commit()
 
     async with app.test_matcher(history_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
         event = fake_group_message_event_v11(message=Message("/history 2020-1-0"))
-
         ctx.receive_event(bot, event)
         ctx.should_call_api(
             "get_group_member_info",
@@ -84,34 +85,35 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
     mocked_datetime.return_value = datetime(2020, 1, 1)
 
     async with app.test_matcher(history_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(message=Message("/history"))
-
-        year_event = fake_group_message_event_v11(message=Message("2020"))
-        month_event = fake_group_message_event_v11(message=Message("1"))
-        day_event = fake_group_message_event_v11(message=Message("0"))
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你请输入你要查询的年份", True)
         ctx.should_rejected(history_cmd)
 
-        ctx.receive_event(bot, year_event)
-        ctx.should_call_send(year_event, "你请输入你要查询的月份", True)
+        event = fake_group_message_event_v11(message=Message("2020"))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "你请输入你要查询的月份", True)
+        ctx.should_rejected(history_cmd)
 
-        ctx.receive_event(bot, month_event)
+        event = fake_group_message_event_v11(message=Message("1"))
+        ctx.receive_event(bot, event)
         ctx.should_call_send(
-            month_event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True
+            event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True
         )
         ctx.should_rejected(history_cmd)
 
-        ctx.receive_event(bot, day_event)
+        event = fake_group_message_event_v11(message=Message("0"))
+        ctx.receive_event(bot, event)
         ctx.should_call_api(
             "get_group_member_info",
             data={"group_id": 10000, "user_id": 10},
             result={"card": "test"},
         )
         ctx.should_call_send(
-            day_event,
+            event,
             "2020 年 1 月数据\nLove Love Ranking\ntest(100)：10.00%\n\n复读次数排行榜\ntest(100)：10次",
             True,
         )
@@ -133,35 +135,35 @@ async def test_history_get_invalid_args(app: App):
         await session.commit()
 
     async with app.test_matcher(history_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(message=Message("/history"))
-
-        year_event = fake_group_message_event_v11(message=Message("2020"))
-        invalid_month_event = fake_group_message_event_v11(message=Message("test"))
-        month_event = fake_group_message_event_v11(message=Message("1"))
-        day_event = fake_group_message_event_v11(message=Message("0"))
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你请输入你要查询的年份", True)
+        ctx.should_rejected(history_cmd)
 
-        ctx.receive_event(bot, year_event)
-        ctx.should_call_send(year_event, "你请输入你要查询的月份", True)
+        event = fake_group_message_event_v11(message=Message("2020"))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "你请输入你要查询的月份", True)
+        ctx.should_rejected(history_cmd)
 
-        ctx.receive_event(bot, invalid_month_event)
+        event = fake_group_message_event_v11(message=Message("test"))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "请只输入数字，不然我没法理解呢！", True)
+        ctx.should_rejected(history_cmd)
+
+        event = fake_group_message_event_v11(message=Message("1"))
+        ctx.receive_event(bot, event)
         ctx.should_call_send(
-            invalid_month_event, "请只输入数字，不然我没法理解呢！", True
+            event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True
         )
         ctx.should_rejected(history_cmd)
 
-        ctx.receive_event(bot, month_event)
-        ctx.should_call_send(
-            month_event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True
-        )
-
-        ctx.receive_event(bot, day_event)
-        ctx.should_call_send(
-            day_event, "2020 年 1 月的数据不存在，请换个试试吧 0.0", True
-        )
+        event = fake_group_message_event_v11(message=Message("0"))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "2020 年 1 月的数据不存在，请换个试试吧 0.0", True)
+        ctx.should_finished(history_cmd)
 
 
 async def test_history_not_enabled(app: App):
@@ -169,9 +171,10 @@ async def test_history_not_enabled(app: App):
     from src.plugins.repeat.plugins.repeat_history import history_cmd
 
     async with app.test_matcher(history_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/history 2020-1-0"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/history 2020-1-0"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "该群未开启复读功能，无法获取历史排行榜。", True)
         ctx.should_finished(history_cmd)

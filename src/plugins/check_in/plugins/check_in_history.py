@@ -1,10 +1,18 @@
 from collections.abc import Sequence
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from io import BytesIO
 
 import matplotlib.pyplot as plt
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from nonebot_plugin_alconna import Alconna, Args, Image, Match, Text, on_alconna
+from nonebot_plugin_alconna import (
+    Alconna,
+    Args,
+    CommandMeta,
+    Image,
+    Match,
+    Text,
+    on_alconna,
+)
 from nonebot_plugin_user import UserSession
 from sqlalchemy import func, select
 
@@ -29,27 +37,37 @@ __plugin_meta__ = PluginMetadata(
 查看体脂历史
 /打卡历史 体脂""",
     supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_alconna", "nonebot_plugin_user"
+        "nonebot_plugin_user", "nonebot_plugin_alconna"
     ),
 )
 
-history_cmd = on_alconna(Alconna("打卡历史", Args["content?", str]), use_cmd_start=True)
+history_cmd = on_alconna(
+    Alconna(
+        "打卡历史",
+        Args["type?#历史类型", str],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    aliases={("check_in.history")},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @history_cmd.handle()
-async def handle_first_message(
-    session: AsyncSession,
-    user: UserSession,
-    content: Match[str],
-):
-    if not content.available:
-        await history_cmd.finish(__plugin_meta__.usage, at_sender=True)
+async def handle_first_message(type: Match[str]):
+    if type.available:
+        history_cmd.set_path_arg("type", type.result)
 
-    value = content.result.strip()
-    if value not in ["健身", "饮食", "体重", "体脂"]:
+
+@history_cmd.got_path("type", prompt="请选择要查看的历史记录（健身、饮食、体重、体脂）")
+async def _(session: AsyncSession, user: UserSession, type: str):
+    if type not in ["健身", "饮食", "体重", "体脂"]:
         await history_cmd.finish("不存在这项历史，请重新输入", at_sender=True)
 
-    match value:
+    match type:
         case "健身":
             # 仅获取当月记录
             now = (
@@ -143,7 +161,7 @@ def generate_graph(records: Sequence[WeightRecord] | Sequence[BodyFatRecord]) ->
     }
     fig, ax = plt.subplots(constrained_layout=True)
 
-    ax.plot(data.keys(), data.values())
+    ax.plot(data.keys(), data.values())  # type: ignore
     ax.set_title(title)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)

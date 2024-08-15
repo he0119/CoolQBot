@@ -41,10 +41,10 @@ async def test_record(app: App, session: "AsyncSession"):
     async with app.test_matcher(record_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/病历"), sender={"role": "admin"}
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "请 @ 需要查看记录的病人", True)
         ctx.should_finished(record_cmd)
@@ -52,11 +52,11 @@ async def test_record(app: App, session: "AsyncSession"):
     async with app.test_matcher(record_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/病历") + MessageSegment.at("10"),
             sender={"role": "admin"},
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.at("10") + f"\n{message}", True)
         ctx.should_finished(record_cmd)
@@ -74,11 +74,11 @@ async def test_record_empty(app: App, session: "AsyncSession"):
     async with app.test_matcher(record_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/病历") + MessageSegment.at("10"),
             sender={"role": "admin"},
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.at("10") + "暂时没有记录", True)
         ctx.should_finished(record_cmd)
@@ -86,11 +86,11 @@ async def test_record_empty(app: App, session: "AsyncSession"):
     async with app.test_matcher(record_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/病历") + MessageSegment.at(2),
             sender={"role": "admin"},
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, MessageSegment.at(2) + "未入院", True)
         ctx.should_finished(record_cmd)

@@ -14,6 +14,7 @@ from nonebot_plugin_alconna import (
     AlconnaMatcher,
     Args,
     At,
+    CommandMeta,
     Text,
     UniMessage,
     on_alconna,
@@ -52,9 +53,17 @@ __plugin_meta__ = PluginMetadata(
 hospital_service = Hospital()
 
 rounds_cmd = on_alconna(
-    Alconna("查房", Args["at?", At]["content?", str]),
+    Alconna(
+        "查房",
+        Args["at?#@病人", At]["content?#症状", str],
+        meta=CommandMeta(
+            description="查房并记录病情",
+            example="查看入院病人列表\n/查房\n查房并记录病情\n/查房 @病人\n直接记录病情\n/查房 @病人 症状",
+        ),
+    ),
     permission=admin_permission(),
     use_cmd_start=True,
+    block=True,
 )
 
 
@@ -124,9 +133,17 @@ async def _(at_uid: int, at_pid: str, content: str = ArgPlainText()):
 
 
 admit_cmd = on_alconna(
-    Alconna("入院", Args["at?", At]),
+    Alconna(
+        "入院",
+        Args["at?#@病人", At],
+        meta=CommandMeta(
+            description="病人入院",
+            example="病人入院\n/入院 @病人",
+        ),
+    ),
     permission=admin_permission(),
     use_cmd_start=True,
+    block=True,
 )
 
 
@@ -144,9 +161,17 @@ async def _(user: UserSession, at: At | None = None):
 
 
 discharge_cmd = on_alconna(
-    Alconna("出院", Args["at?", At]),
+    Alconna(
+        "出院",
+        Args["at?#@病人", At],
+        meta=CommandMeta(
+            description="病人出院",
+            example="病人出院\n/出院 @病人",
+        ),
+    ),
     permission=admin_permission(),
     use_cmd_start=True,
+    block=True,
 )
 
 
@@ -164,9 +189,17 @@ async def _(user: UserSession, at: At | None = None):
 
 
 record_cmd = on_alconna(
-    Alconna("病历", Args["at?", At]),
+    Alconna(
+        "病历",
+        Args["at?#@病人", At],
+        meta=CommandMeta(
+            description="查看病历",
+            example="查看病历\n/病历 @病人",
+        ),
+    ),
     permission=admin_permission(),
     use_cmd_start=True,
+    block=True,
 )
 
 
@@ -193,9 +226,17 @@ async def _(user: UserSession, at: At | None = None):
 
 
 history_cmd = on_alconna(
-    Alconna("入院记录", Args["at?", At]),
+    Alconna(
+        "入院记录",
+        Args["at?#@病人", At],
+        meta=CommandMeta(
+            description="查看所有人入院次数，或指定人出入院时间",
+            example="查看所有人入院次数\n/入院记录\n查看指定人出入院时间\n/入院记录 @病人",
+        ),
+    ),
     permission=admin_permission(),
     use_cmd_start=True,
+    block=True,
 )
 
 

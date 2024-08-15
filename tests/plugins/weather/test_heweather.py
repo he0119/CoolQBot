@@ -2,7 +2,8 @@ import json
 from pathlib import Path
 
 from _pytest.logging import LogCaptureFixture
-from nonebot.adapters.onebot.v11 import Message
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -50,9 +51,10 @@ async def test_heweather(app: App, mocker: MockerFixture):
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
     async with app.test_matcher(weather_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/天气 成都"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/天气 成都"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
@@ -86,9 +88,10 @@ async def test_heweather_with_adm(app: App, mocker: MockerFixture):
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
     async with app.test_matcher(weather_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/天气 成都 四川"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/天气 成都 四川"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
@@ -122,9 +125,10 @@ async def test_heweather_with_three_args(app: App, mocker: MockerFixture):
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
     async with app.test_matcher(weather_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/天气 成都 四川 啊哈哈"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/天气 成都 四川 啊哈哈"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
@@ -160,9 +164,10 @@ async def test_heweather_lookup_failed(
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
     async with app.test_matcher(weather_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/天气 fail"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/天气 fail"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,

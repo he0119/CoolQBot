@@ -18,7 +18,7 @@ def roll_dices(input_str: str) -> str:
     return f"{raw_str}={r}={add}"[1:].replace("=+", "=")
 
 
-def roll_single(args, add):
+def roll_single(args: list[str], add: int):
     """掷一次"""
     s1 = args[1]
     s2 = args[2]

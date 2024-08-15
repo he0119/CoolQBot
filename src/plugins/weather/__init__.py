@@ -1,10 +1,17 @@
 """天气插件"""
 
-from nonebot import on_command
-from nonebot.adapters import Message
-from nonebot.matcher import Matcher
-from nonebot.params import ArgPlainText, CommandArg
-from nonebot.plugin import PluginMetadata
+from nonebot import require
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+
+require("nonebot_plugin_alconna")
+from nonebot_plugin_alconna import (
+    Alconna,
+    Args,
+    CommandMeta,
+    Match,
+    MultiVar,
+    on_alconna,
+)
 
 from .eorzean_api import eorzean_weather
 from .heweather_api import heweather
@@ -22,26 +29,34 @@ __plugin_meta__ = PluginMetadata(
 /weather 格里达尼亚
 如果查询结果不对，还可以指定城市所属行政区划
 /weather 西安 黑龙江""",
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
 )
 
-weather_cmd = on_command("weather", aliases={"天气"}, block=True)
+weather_cmd = on_alconna(
+    Alconna(
+        "天气",
+        Args["location?#位置", MultiVar(str, flag="*")],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    aliases={"weather"},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @weather_cmd.handle()
-async def weather_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
-    plain_text = arg.extract_plain_text()
-
-    if plain_text:
-        matcher.set_arg("location", arg)
+async def weather_handle_first_receive(location: Match[tuple[str, ...]]):
+    if location.available:
+        weather_cmd.set_path_arg("location", location.result)
 
 
-@weather_cmd.got("location", prompt="你想查询哪个城市的天气呢？")
-async def weather_handle(location: str = ArgPlainText()):
+@weather_cmd.got_path("location", prompt="你想查询哪个城市的天气呢？")
+async def weather_handle(location: tuple[str, ...]):
     """查询天气"""
-    if not location:
-        await weather_cmd.reject("要查询的城市名称不能为空呢，请重新输入！")
-
-    weather_report = await get_weather_of_location(*location.split()[:2])
+    weather_report = await get_weather_of_location(*location[:2])
     await weather_cmd.finish(weather_report)
 
 

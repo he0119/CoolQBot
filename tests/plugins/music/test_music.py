@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -39,11 +41,14 @@ async def test_music(app: App, mocker: MockerFixture):
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
     async with app.test_matcher(music_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/music test"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/music test"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, MessageSegment.music("163", 1825190456), "result")
+        ctx.should_call_send(
+            event, Message(MessageSegment.music("163", 1825190456)), None
+        )
         ctx.should_finished(music_cmd)
 
     get.assert_called_once_with("http://netease:3000/search?keywords=test")
@@ -63,24 +68,25 @@ async def test_music_get_arg(
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
     async with app.test_matcher(music_cmd) as ctx:
-        bot = ctx.create_bot()
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(message=Message("/music"))
-        next_event = fake_group_message_event_v11(
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "你想听哪首歌呢？", None)
+        ctx.should_rejected(music_cmd)
+
+        event = fake_group_message_event_v11(
             message=Message(MessageSegment.image("12"))
         )
-        final_event = fake_group_message_event_v11(message=Message("test"))
-
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "你想听哪首歌呢？", "result")
+        ctx.should_call_send(event, "你想听哪首歌呢？", None)
         ctx.should_rejected(music_cmd)
 
-        ctx.receive_event(bot, next_event)
-        ctx.should_call_send(next_event, "歌曲名不能为空呢，请重新输入！", "result")
-        ctx.should_rejected(music_cmd)
-
-        ctx.receive_event(bot, final_event)
+        event = fake_group_message_event_v11(message=Message("test"))
+        ctx.receive_event(bot, event)
         ctx.should_call_send(
-            final_event, MessageSegment.music("163", 1825190456), "result"
+            event, Message(MessageSegment.music("163", 1825190456)), None
         )
         ctx.should_finished(music_cmd)
 

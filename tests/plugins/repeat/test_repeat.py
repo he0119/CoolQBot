@@ -1,7 +1,8 @@
 from datetime import datetime
 
 import pytest
-from nonebot.adapters.onebot.v11 import Bot, Message
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -40,9 +41,10 @@ async def test_repeat(app: App, mocker: MockerFixture):
     mocked_random().randint.return_value = 1
 
     async with app.test_matcher(repeat_message) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("123"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("123"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, event.message, None)
         ctx.should_finished(repeat_message)
@@ -56,9 +58,10 @@ async def test_repeat_enabled(app: App):
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/repeat"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/repeat"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "复读功能开启中", None)
         ctx.should_finished(repeat_cmd)
@@ -69,9 +72,10 @@ async def test_repeat_not_enabled(app: App):
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/repeat"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/repeat"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "复读功能关闭中", None)
         ctx.should_finished(repeat_cmd)
@@ -82,9 +86,10 @@ async def test_repeat_enable(app: App):
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/repeat 1"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/repeat 1"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群开启复读功能", None)
         ctx.should_finished(repeat_cmd)
@@ -96,9 +101,10 @@ async def test_repeat_disable(app: App):
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/repeat 0"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/repeat 0"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭复读功能", None)
         ctx.should_finished(repeat_cmd)
@@ -109,9 +115,10 @@ async def test_repeat_disable_already_disabled(app: App):
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
     async with app.test_matcher(repeat_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/repeat 0"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/repeat 0"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭复读功能", None)
         ctx.should_finished(repeat_cmd)

@@ -1,10 +1,8 @@
 """音乐插件"""
 
-from nonebot import on_command
-from nonebot.adapters.onebot.v11 import Message
-from nonebot.matcher import Matcher
-from nonebot.params import ArgPlainText, CommandArg, Depends
+from nonebot.adapters.onebot.v11 import Bot
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 
 from src.utils.helpers import render_expression
 
@@ -29,24 +27,30 @@ EXPR_NOT_FOUND = (
     "没有找到，要不要换个关键字试试？",
 )
 
-music_cmd = on_command("music", aliases={"点歌"}, block=True)
+music_cmd = on_alconna(
+    Alconna(
+        "点歌",
+        Args["keywords?#音乐名称或信息", str],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    aliases={"music"},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @music_cmd.handle()
-async def music_handle_first_receive(matcher: Matcher, arg: Message = CommandArg()):
-    if arg.extract_plain_text():
-        matcher.set_arg("name", arg)
+async def music_handle_first_receive(bot: Bot, keywords: Match[str]):
+    if keywords.available:
+        music_cmd.set_path_arg("keywords", keywords.result)
 
 
-async def get_name(name: str = ArgPlainText()) -> str:
-    if not name:
-        await music_cmd.reject("歌曲名不能为空呢，请重新输入！")
-    return name
-
-
-@music_cmd.got("name", prompt="你想听哪首歌呢？")
-async def music_handle(name: str = Depends(get_name)):
-    music_message = await call_netease_api(name)
+@music_cmd.got_path("keywords", prompt="你想听哪首歌呢？")
+async def music_handle(keywords: str):
+    music_message = await call_netease_api(keywords)
     if music_message:
         await music_cmd.finish(music_message)
     else:

@@ -1,4 +1,5 @@
-from nonebot.adapters.onebot.v11 import Bot, Message
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
 from sqlalchemy import select
 
@@ -19,9 +20,10 @@ async def test_hello_enabled(app: App):
         await session.commit()
 
     async with app.test_matcher(hello_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/hello"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/hello"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "启动问候功能开启中", None)
         ctx.should_finished(hello_cmd)
@@ -33,9 +35,10 @@ async def test_hello_not_enabled(app: App):
     from src.plugins.morning.plugins.hello import hello_cmd
 
     async with app.test_matcher(hello_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/hello"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/hello"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "启动问候功能关闭中", None)
         ctx.should_finished(hello_cmd)
@@ -53,9 +56,10 @@ async def test_hello_enable(app: App):
         assert len(groups) == 0
 
     async with app.test_matcher(hello_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/hello 1"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/hello 1"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群开启启动问候功能", None)
         ctx.should_finished(hello_cmd)
@@ -80,9 +84,10 @@ async def test_hello_disable(app: App):
         await session.commit()
 
     async with app.test_matcher(hello_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot)
-        event = fake_group_message_event_v11(message=Message("/hello 0"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/hello 0"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭启动问候功能", None)
         ctx.should_finished(hello_cmd)

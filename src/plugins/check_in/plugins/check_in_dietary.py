@@ -1,41 +1,52 @@
-from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from nonebot.typing import T_State
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 from nonebot_plugin_user import UserSession
 
-from src.plugins.check_in import check_in
 from src.plugins.check_in.models import DietaryRecord
-from src.utils.annotated import AsyncSession, PlainTextArgs
-from src.utils.helpers import parse_str
+from src.utils.annotated import AsyncSession
 
 __plugin_meta__ = PluginMetadata(
     name="饮食打卡",
     description="记录饮食是否健康",
     usage="""记录饮食是否健康
-/饮食打卡""",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_user"),
+/饮食打卡
+/饮食打卡 A""",
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_user", "nonebot_plugin_alconna"
+    ),
 )
-dietary_cmd = check_in.command("dietary", aliases={"饮食打卡"})
+
+dietary_cmd = on_alconna(
+    Alconna(
+        "饮食打卡",
+        Args["content?#A：健康饮食少油少糖 B：我摆了偷吃了炸鸡奶茶", str],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    aliases={("check_in.dietary")},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @dietary_cmd.handle()
-async def handle_first_message(state: T_State, content: PlainTextArgs):
-    state["content"] = content
+async def handle_first_message(content: Match[str]):
+    if content.available:
+        dietary_cmd.set_path_arg("content", content.result)
 
 
-@dietary_cmd.got(
+@dietary_cmd.got_path(
     "content",
     prompt="今天你吃的怎么样呢？请输入 A 或 B（A：健康饮食少油少糖 B：我摆了偷吃了炸鸡奶茶）",
-    parameterless=[Depends(parse_str("content"))],
 )
 async def _(
     session: AsyncSession,
     user: UserSession,
-    content: str = Arg(),
+    content: str,
 ):
     content = content.lower()
-    if not content:
-        await dietary_cmd.reject("饮食情况不能为空，请重新输入", at_sender=True)
 
     if content not in ("a", "b"):
         await dietary_cmd.reject(

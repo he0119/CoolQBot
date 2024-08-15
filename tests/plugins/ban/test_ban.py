@@ -1,5 +1,6 @@
 import pytest
-from nonebot.adapters.onebot.v11 import Bot, Message, MessageSegment
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message, MessageSegment
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -38,9 +39,10 @@ async def test_ban_group_bot_is_owner(
     render_expression.return_value = Message("test")
 
     async with app.test_matcher(ban_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot, self_id="1")
-        event = fake_group_message_event_v11(message=Message("/ban 1"), sender=sender)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
 
+        event = fake_group_message_event_v11(message=Message("/ban 1"), sender=sender)
         ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
         ctx.should_call_api(
@@ -82,9 +84,10 @@ async def test_ban_group_bot_is_admin(
     render_expression.return_value = Message("test")
 
     async with app.test_matcher(ban_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot, self_id="1")
-        event = fake_group_message_event_v11(message=Message("/ban 1"), sender=sender)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
 
+        event = fake_group_message_event_v11(message=Message("/ban 1"), sender=sender)
         ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
         ctx.should_call_api(
@@ -146,9 +149,10 @@ async def test_ban_group_bot_is_member(
     render_expression.return_value = Message("test")
 
     async with app.test_matcher(ban_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot, self_id="1")
-        event = fake_group_message_event_v11(message=Message("/ban 1"), sender=sender)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
 
+        event = fake_group_message_event_v11(message=Message("/ban 1"), sender=sender)
         ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
         ctx.should_call_api(
@@ -200,10 +204,10 @@ async def test_ban_group_get_arg(
     render_expression.return_value = Message("test")
 
     async with app.test_matcher(ban_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot, self_id="1")
-        event = fake_group_message_event_v11(message=Message("/ban"), sender=sender)
-        next_event = fake_group_message_event_v11(message=Message("1"), sender=sender)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
 
+        event = fake_group_message_event_v11(message=Message("/ban"), sender=sender)
         ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
         ctx.should_call_api(
@@ -214,13 +218,14 @@ async def test_ban_group_get_arg(
         ctx.should_call_send(event, "你想被禁言多少分钟呢？", True)
         ctx.should_rejected(ban_cmd)
 
-        ctx.receive_event(bot, next_event)
+        event = fake_group_message_event_v11(message=Message("1"), sender=sender)
+        ctx.receive_event(bot, event)
         ctx.should_call_api(
             "set_group_ban",
             data={"group_id": 10000, "user_id": 10, "duration": 60},
             result=[],
         )
-        ctx.should_call_send(next_event, Message("test"), True, at_sender=True)
+        ctx.should_call_send(event, Message("test"), True, at_sender=True)
         ctx.should_finished(ban_cmd)
 
     render_expression.assert_called_once_with(EXPR_OK, duration=1)
@@ -238,11 +243,10 @@ async def test_ban_group_get_arg_invalid(
     sender = {"role": "member"}
 
     async with app.test_matcher(ban_cmd) as ctx:
-        bot = ctx.create_bot(base=Bot, self_id="1")
-        event = fake_group_message_event_v11(message=Message("/ban"), sender=sender)
-        next_event = fake_group_message_event_v11(message=Message("a"), sender=sender)
-        final_event = fake_group_message_event_v11(message=Message("1"), sender=sender)
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
 
+        event = fake_group_message_event_v11(message=Message("/ban"), sender=sender)
         ctx.receive_event(bot, event)
         ctx.should_call_api("get_group_list", data={}, result=[{"group_id": 10000}])
         ctx.should_call_api(
@@ -253,17 +257,19 @@ async def test_ban_group_get_arg_invalid(
         ctx.should_call_send(event, "你想被禁言多少分钟呢？", True)
         ctx.should_rejected(ban_cmd)
 
-        ctx.receive_event(bot, next_event)
-        ctx.should_call_send(next_event, "请只输入数字，不然我没法理解呢！", True)
+        event = fake_group_message_event_v11(message=Message("a"), sender=sender)
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "你想被禁言多少分钟呢？", True)
         ctx.should_rejected(ban_cmd)
 
-        ctx.receive_event(bot, final_event)
+        event = fake_group_message_event_v11(message=Message("1"), sender=sender)
+        ctx.receive_event(bot, event)
         ctx.should_call_api(
             "set_group_ban",
             data={"group_id": 10000, "user_id": 10, "duration": 60},
             result=[],
         )
-        ctx.should_call_send(final_event, Message("test"), True, at_sender=True)
+        ctx.should_call_send(event, Message("test"), True, at_sender=True)
         ctx.should_finished(ban_cmd)
 
     render_expression.assert_called_once_with(EXPR_OK, duration=1)
