@@ -7,13 +7,13 @@ import httpx
 from nonebot.adapters.onebot.v11 import MessageSegment
 
 
-async def call_netease_api(name: str) -> MessageSegment | None:
+async def call_netease_api(keywords: str) -> MessageSegment | None:
     """网易云搜索 API"""
-    if not name:
+    if not keywords:
         return None
 
     # 构造请求数据
-    url = f"http://netease:3000/search?keywords={name}"
+    url = f"http://netease:3000/search?keywords={keywords}"
 
     try:
         # 使用 httpx 库发送最终的请求
