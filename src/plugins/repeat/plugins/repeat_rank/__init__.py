@@ -2,14 +2,13 @@
 
 import re
 
-from nonebot.adapters import Message
 from nonebot.adapters.onebot.v11 import Bot as V11Bot
 from nonebot.adapters.onebot.v12 import Bot as V12Bot
-from nonebot.params import Arg, CommandArg, Depends
+from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 
-from src.plugins.repeat import repeat
 from src.utils.annotated import GroupInfo
 from src.utils.helpers import parse_bool, parse_int
 
@@ -27,12 +26,25 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters={"~onebot.v11", "~onebot.v12"},
 )
 
-rank_cmd = repeat.command("rank", aliases={"rank", "排行榜"})
+rank_cmd = on_alconna(
+    Alconna(
+        "复读排行榜",
+        Args["arg?#排行榜参数", str],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    aliases={"repeat.rank", "rank"},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @rank_cmd.handle()
-async def rank_handle_first_receive(state: T_State, arg: Message = CommandArg()):
-    match = re.match(r"^(?:(\d+))?(?:n(\d+))?$", arg.extract_plain_text())
+async def rank_handle_first_receive(state: T_State, arg: Match[str]):
+    args = arg.result if arg.available else ""
+    match = re.match(r"^(?:(\d+))?(?:n(\d+))?$", args)
     if match:
         display_number = match.group(1)
         minimal_msg_number = match.group(2)

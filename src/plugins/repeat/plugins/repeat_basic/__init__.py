@@ -1,12 +1,11 @@
 """复读"""
 
 from nonebot import on_message
-from nonebot.adapters import Event, Message
-from nonebot.params import CommandArg
+from nonebot.adapters import Event
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 from sqlalchemy import select
 
-from src.plugins.repeat import repeat
 from src.plugins.repeat.models import Enabled
 from src.utils.annotated import AsyncSession, GroupInfo
 from src.utils.helpers import strtobool
@@ -34,22 +33,23 @@ async def repeat_message_handle(event: Event):
     await repeat_message.finish(event.get_message())
 
 
-repeat_cmd = repeat.command("basic", aliases={"repeat", "复读"})
-repeat_cmd.__doc__ = """
-复读
-
-查看当前群是否启用复读功能\n/repeat\n启用复读功能\n/repeat on\n关闭复读功能\n/repeat off
-"""
+repeat_cmd = on_alconna(
+    Alconna(
+        "复读",
+        Args["arg?#是否启用复读", str],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    aliases={"repeat.basic", "repeat"},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @repeat_cmd.handle()
-async def repeat_handle(
-    session: AsyncSession,
-    group_info: GroupInfo,
-    arg: Message = CommandArg(),
-):
-    args = arg.extract_plain_text()
-
+async def repeat_handle(session: AsyncSession, group_info: GroupInfo, arg: Match[str]):
     group = (
         await session.scalars(
             select(Enabled)
@@ -60,8 +60,8 @@ async def repeat_handle(
         )
     ).one_or_none()
 
-    if args:
-        if strtobool(args):
+    if arg.available:
+        if strtobool(arg.result):
             if not group:
                 session.add(Enabled(**group_info.model_dump()))
                 await session.commit()
