@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 使用 alc 改造插件
+
 ## [0.18.1] - 2024-08-07
 
 ### Added
