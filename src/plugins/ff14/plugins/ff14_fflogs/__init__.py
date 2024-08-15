@@ -7,7 +7,15 @@ from typing import Literal, cast
 
 from nonebot import get_driver, logger
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from nonebot_plugin_alconna import Alconna, Args, At, MultiVar, Text, on_alconna
+from nonebot_plugin_alconna import (
+    Alconna,
+    Args,
+    At,
+    CommandMeta,
+    MultiVar,
+    Text,
+    on_alconna,
+)
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_user import UserSession, get_user
 
@@ -48,8 +56,16 @@ __plugin_meta__ = PluginMetadata(
 plugin_data = get_plugin_data()
 
 fflogs_cmd = on_alconna(
-    Alconna("dps", Args["argv", MultiVar(At | str, flag="*")]),
+    Alconna(
+        "dps",
+        Args["argv", MultiVar(At | str, flag="*")],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
     use_cmd_start=True,
+    block=True,
 )
 
 

@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
 
-from nonebot.adapters.onebot.v11 import Message
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -44,9 +45,10 @@ async def test_price(app: App, mocker: MockerFixture):
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
     async with app.test_matcher(price_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/查价 萨维奈舞裙 猫小胖"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/查价 萨维奈舞裙 猫小胖"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
@@ -70,17 +72,19 @@ async def test_price_default(app: App, mocker: MockerFixture):
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
     async with app.test_matcher(price_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/查价 默认值"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/查价 默认值"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "当前设置的默认值为：猫小胖", True)
         ctx.should_finished(price_cmd)
 
     async with app.test_matcher(price_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/查价 萨维奈舞裙"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/查价 萨维奈舞裙"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
@@ -90,17 +94,19 @@ async def test_price_default(app: App, mocker: MockerFixture):
         ctx.should_finished(price_cmd)
 
     async with app.test_matcher(price_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/查价 默认值 静语庄园"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/查价 默认值 静语庄园"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "查询区域默认值设置成功！", True)
         ctx.should_finished(price_cmd)
 
     async with app.test_matcher(price_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/查价 默认值"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/查价 默认值"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "当前设置的默认值为：静语庄园", True)
         ctx.should_finished(price_cmd)
@@ -120,9 +126,10 @@ async def test_price_item_not_found(app: App, mocker: MockerFixture):
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
     async with app.test_matcher(price_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/查价 未命名 猫小胖"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/查价 未命名 猫小胖"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
@@ -143,9 +150,10 @@ async def test_price_world_not_found(app: App, mocker: MockerFixture):
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
     async with app.test_matcher(price_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/查价 萨维奈舞裙 静语"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/查价 萨维奈舞裙 静语"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
@@ -167,9 +175,10 @@ async def test_price_help(app: App):
     from src.plugins.ff14.plugins.ff14_price import price_cmd
 
     async with app.test_matcher(price_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/查价"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/查价"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,

@@ -1,4 +1,5 @@
-from nonebot.adapters.onebot.v11 import Message
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -18,11 +19,12 @@ async def test_gete(app: App, mocker: MockerFixture):
     randint.return_value = 1
 
     async with app.test_matcher(gate_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/gate 2"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/gate 2"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, Message("test"), "result", at_sender=True)
+        ctx.should_call_send(event, Message("test"), True, at_sender=True)
         ctx.should_finished(gate_cmd)
 
     randint.assert_called_once_with(1, 2)
@@ -42,16 +44,17 @@ async def test_gete_ask_arg(app: App, mocker: MockerFixture):
     randint.return_value = 1
 
     async with app.test_matcher(gate_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/gate"))
-        next_event = fake_group_message_event_v11(message=Message("2"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/gate"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "总共有多少个门呢？", "result")
+        ctx.should_call_send(event, "总共有多少个门呢？", True)
         ctx.should_rejected(gate_cmd)
 
-        ctx.receive_event(bot, next_event)
-        ctx.should_call_send(next_event, Message("test"), "result", at_sender=True)
+        event = fake_group_message_event_v11(message=Message("2"))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, Message("test"), True, at_sender=True)
         ctx.should_finished(gate_cmd)
 
     randint.assert_called_once_with(1, 2)
@@ -71,23 +74,24 @@ async def test_gete_ask_arg_error(app: App, mocker: MockerFixture):
     randint.return_value = 1
 
     async with app.test_matcher(gate_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/gate"))
-        next_event = fake_group_message_event_v11(message=Message("4"))
-        final_event = fake_group_message_event_v11(message=Message("2"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/gate"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "总共有多少个门呢？", "result")
+        ctx.should_call_send(event, "总共有多少个门呢？", True)
         ctx.should_rejected(gate_cmd)
 
-        ctx.receive_event(bot, next_event)
+        event = fake_group_message_event_v11(message=Message("4"))
+        ctx.receive_event(bot, event)
         ctx.should_call_send(
-            next_event, "暂时只支持两个门或者三个门的情况，请重新输入吧。", "result"
+            event, "暂时只支持两个门或者三个门的情况，请重新输入吧。", True
         )
         ctx.should_rejected(gate_cmd)
 
-        ctx.receive_event(bot, final_event)
-        ctx.should_call_send(final_event, Message("test"), "result", at_sender=True)
+        event = fake_group_message_event_v11(message=Message("2"))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, Message("test"), True, at_sender=True)
         ctx.should_finished(gate_cmd)
 
     randint.assert_called_once_with(1, 2)
@@ -107,16 +111,17 @@ async def test_gete_ask_arg_whitespace(app: App, mocker: MockerFixture):
     randint.return_value = 1
 
     async with app.test_matcher(gate_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/gate"))
-        next_event = fake_group_message_event_v11(message=Message(" 2 "))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/gate"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "总共有多少个门呢？", "result")
+        ctx.should_call_send(event, "总共有多少个门呢？", True)
         ctx.should_rejected(gate_cmd)
 
-        ctx.receive_event(bot, next_event)
-        ctx.should_call_send(next_event, Message("test"), "result", at_sender=True)
+        event = fake_group_message_event_v11(message=Message(" 2 "))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, Message("test"), True, at_sender=True)
         ctx.should_finished(gate_cmd)
 
     randint.assert_called_once_with(1, 2)
