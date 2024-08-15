@@ -29,7 +29,7 @@ RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 # 安装浏览器
 RUN playwright install --with-deps chromium
 
-# 添加字体
+# 缓存表情包制作插件字体与图片
 RUN git clone --depth 1 https://github.com/MeetWq/meme-generator.git \
   && cp -r ./meme-generator/resources/fonts /usr/share/fonts/meme-fonts \
   && rm -rf ./meme-generator \
