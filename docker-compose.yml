@@ -5,7 +5,6 @@ services:
     restart: always
     volumes:
       - "./data:/app/data"
-      - "./fonts:/usr/share/fonts/meme-fonts"
     ports:
       - "8080:8080"
     env_file:
