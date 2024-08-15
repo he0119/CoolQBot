@@ -1,3 +1,5 @@
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -16,9 +18,10 @@ async def test_roll(app: App, mocker: MockerFixture):
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/roll d100"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)  # noqa: F821
 
+        event = fake_group_message_event_v11(message=Message("/roll d100"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "d100=d100(1)=1", "result", at_sender=True)
         ctx.should_finished(roll_cmd)
@@ -38,10 +41,10 @@ async def test_roll_get_arg(app: App, mocker: MockerFixture):
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/roll"))
-        next_event = fake_group_message_event_v11(message=Message("d100"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/roll"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
@@ -50,8 +53,9 @@ async def test_roll_get_arg(app: App, mocker: MockerFixture):
         )
         ctx.should_rejected(roll_cmd)
 
-        ctx.receive_event(bot, next_event)
-        ctx.should_call_send(next_event, "d100=d100(1)=1", "result", at_sender=True)
+        event = fake_group_message_event_v11(message=Message("d100"))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "d100=d100(1)=1", "result", at_sender=True)
         ctx.should_finished(roll_cmd)
 
     randint.assert_called_once_with(1, 100)
@@ -69,12 +73,13 @@ async def test_roll_invalid(app: App, mocker: MockerFixture):
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/roll d100a"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/roll d100a"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "请输入正确的参数 ~>_<~", "result")
-        ctx.should_finished(roll_cmd)
+        ctx.should_rejected(roll_cmd)
 
     randint.assert_not_called()
 
@@ -91,7 +96,8 @@ async def test_roll_complex(app: App, mocker: MockerFixture):
     randint.return_value = 1
 
     async with app.test_matcher(roll_cmd) as ctx:
-        bot = ctx.create_bot()
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/roll d100+2d50"))
 
         ctx.receive_event(bot, event)

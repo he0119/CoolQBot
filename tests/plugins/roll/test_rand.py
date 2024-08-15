@@ -1,3 +1,5 @@
+from nonebot import get_adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot
 from nonebug import App
 from pytest_mock import MockerFixture
 
@@ -16,9 +18,10 @@ async def test_rand(app: App, mocker: MockerFixture):
     randint.return_value = 1
 
     async with app.test_matcher(rand_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/rand"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/rand"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你的点数是 1", "result", at_sender=True)
         ctx.should_finished(rand_cmd)
@@ -38,9 +41,10 @@ async def test_rand_probability(app: App, mocker: MockerFixture):
     randint.return_value = 1
 
     async with app.test_matcher(rand_cmd) as ctx:
-        bot = ctx.create_bot()
-        event = fake_group_message_event_v11(message=Message("/rand 今天是晴天的概率"))
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
+        event = fake_group_message_event_v11(message=Message("/rand 今天是晴天的概率"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "今天是晴天的概率是 1%", "result", at_sender=True)
         ctx.should_finished(rand_cmd)
