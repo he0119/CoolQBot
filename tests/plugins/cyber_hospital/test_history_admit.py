@@ -43,10 +43,10 @@ async def test_history(app: App, session: "AsyncSession"):
     async with app.test_matcher(history_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/入院记录"), sender={"role": "admin"}
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event, "nickname 入院次数：2\nnickname10000 入院次数：1", True
@@ -56,11 +56,11 @@ async def test_history(app: App, session: "AsyncSession"):
     async with app.test_matcher(history_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/入院记录") + MessageSegment.at("10"),
             sender={"role": "admin"},
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
@@ -72,11 +72,11 @@ async def test_history(app: App, session: "AsyncSession"):
     async with app.test_matcher(history_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/入院记录") + MessageSegment.at("1"),
             sender={"role": "admin"},
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
@@ -93,10 +93,10 @@ async def test_history_empty(app: App, session: "AsyncSession"):
     async with app.test_matcher(history_cmd) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
+
         event = fake_group_message_event_v11(
             message=Message("/入院记录"), sender={"role": "admin"}
         )
-
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "没有住院病人", True)
         ctx.should_finished(history_cmd)
