@@ -6,6 +6,7 @@ import nonebot
 from nonebot import get_driver, require
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
+require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
 require("nonebot_plugin_alconna")
 

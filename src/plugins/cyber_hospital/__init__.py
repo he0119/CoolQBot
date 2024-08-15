@@ -1,14 +1,15 @@
 """赛博查房"""
 
 from nonebot import require
-
-require("nonebot_plugin_user")
-
 from nonebot.matcher import Matcher
 from nonebot.params import ArgPlainText
 from nonebot.permission import Permission
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
+
+require("nonebot_plugin_orm")
+require("nonebot_plugin_user")
+require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import (
     Alconna,
     AlconnaMatcher,
