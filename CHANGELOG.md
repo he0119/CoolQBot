@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Added
 
 - 使用 alc 改造插件
+- memes 增加表情调用次数统计
 
 ### Fixed
 

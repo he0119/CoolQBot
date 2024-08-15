@@ -199,6 +199,7 @@ markupsafe==2.1.5
     # via mako
 matplotlib==3.9.1
     # via nonebot-plugin-bawiki
+    # via nonebot-plugin-memes
     # via pil-utils
     # via wordcloud
 mdurl==0.1.2
@@ -250,7 +251,7 @@ nonebot-plugin-localstore==0.6.0
     # via nonebot-plugin-memes
     # via nonebot-plugin-orm
     # via nonebot-plugin-wordcloud
-nonebot-plugin-memes==0.7.3
+nonebot-plugin-memes==0.7.5
 nonebot-plugin-orm==0.7.6
     # via nonebot-plugin-chatrecorder
     # via nonebot-plugin-memes
@@ -404,6 +405,7 @@ python-dateutil==2.9.0.post0
     # via dateparser
     # via freezegun
     # via matplotlib
+    # via nonebot-plugin-memes
 python-dotenv==1.0.1
     # via nonebot2
     # via pydantic-settings
