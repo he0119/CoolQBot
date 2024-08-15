@@ -1,10 +1,10 @@
 """每日早安"""
 
-from nonebot.adapters import Message
 from nonebot.exception import ActionFailed
 from nonebot.log import logger
-from nonebot.params import CommandArg, Depends
-from nonebot.plugin import PluginMetadata, inherit_supported_adapters, on_command
+from nonebot.params import Depends
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_orm import get_session
 from nonebot_plugin_saa import PlatformTarget, Text, get_target
@@ -33,7 +33,9 @@ __plugin_meta__ = PluginMetadata(
 /morning update
 获取今天的问好
 /morning today""",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_saa"),
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_alconna", "nonebot_plugin_saa"
+    ),
     extra={"orm_version_location": migrations},
 )
 
@@ -64,31 +66,42 @@ async def morning():
     logger.info("发送早安信息")
 
 
-morning_cmd = on_command("morning", aliases={"早安"}, block=True)
+morning_cmd = on_alconna(
+    Alconna(
+        "早安",
+        Args["arg?#功能选项（on/off/update/today）", str],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    aliases={"morning"},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @morning_cmd.handle()
 async def morning_handle(
     session: AsyncSession,
-    arg: Message = CommandArg(),
+    arg: Match[str],
     target: PlatformTarget = Depends(get_target),
 ):
-    args = arg.extract_plain_text()
+    if arg.available:
+        if arg.result == "today":
+            await morning_cmd.finish(await get_moring_message())
 
-    if args == "today":
-        await morning_cmd.finish(await get_moring_message())
-
-    if args == "update":
-        await HOLIDAYS_DATA.update()
-        await morning_cmd.finish("节假日数据更新成功")
+        if arg.result == "update":
+            await HOLIDAYS_DATA.update()
+            await morning_cmd.finish("节假日数据更新成功")
 
     group = (
         await session.scalars(
             select(MorningGreeting).where(MorningGreeting.target == target.model_dump())
         )
     ).one_or_none()
-    if args:
-        if strtobool(args):
+    if arg.available:
+        if strtobool(arg.result):
             if not group:
                 session.add(MorningGreeting(target=target.model_dump()))
                 await session.commit()
