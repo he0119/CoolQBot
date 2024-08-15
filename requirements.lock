@@ -178,14 +178,14 @@ markdown-it-py==3.0.0
 markupsafe==2.1.5
     # via jinja2
     # via mako
-matplotlib==3.9.1
+matplotlib==3.9.2
     # via nonebot-plugin-bawiki
     # via nonebot-plugin-memes
     # via pil-utils
     # via wordcloud
 mdurl==0.1.2
     # via markdown-it-py
-meme-generator==0.1.0
+meme-generator==0.1.1
     # via nonebot-plugin-memes
 msgpack==1.0.8
     # via nonebot-adapter-onebot
@@ -231,7 +231,7 @@ nonebot-plugin-localstore==0.6.0
     # via nonebot-plugin-memes
     # via nonebot-plugin-orm
     # via nonebot-plugin-wordcloud
-nonebot-plugin-memes==0.7.5
+nonebot-plugin-memes==0.7.7
 nonebot-plugin-orm==0.7.6
     # via nonebot-plugin-chatrecorder
     # via nonebot-plugin-memes

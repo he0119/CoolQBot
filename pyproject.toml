@@ -6,7 +6,7 @@ authors = [{ name = "uy_sun", email = "hmy0119@gmail.com" }]
 dependencies = [
     "pydantic>=2.8.2",
     "eorzeaenv @ git+https://github.com/he0119/EorzeaEnv.git@coolqbot",
-    "matplotlib>=3.9.1",
+    "matplotlib>=3.9.2",
     "uvicorn[standard]>=0.30.5",
     "uvicorn-worker>=0.2.0",
     "gunicorn>=23.0.0",
@@ -29,7 +29,7 @@ dependencies = [
     "nonebot-plugin-alconna>=0.51.3",
     "nonebot-plugin-datastore>=1.3.0",
     "nonebot-plugin-sentry>=2.0.0",
-    "nonebot-plugin-memes==0.7.5",
+    "nonebot-plugin-memes==0.7.7",
     "nonebot-bison @ git+https://github.com/MountainDash/nonebot-bison@dc0dc252e76aa27711f34295e8969bfedd6cee43",
     "nonebot-plugin-status==0.8.1",
     "nonebot-plugin-bawiki==0.11.3",
