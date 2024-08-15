@@ -1,14 +1,11 @@
-from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from nonebot.typing import T_State
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 from nonebot_plugin_user import UserSession
 from sqlalchemy import select
 
-from src.plugins.check_in import check_in
 from src.plugins.check_in.models import BodyFatRecord, UserInfo
 from src.plugins.check_in.utils import get_or_create_user_info
-from src.utils.annotated import AsyncSession, OptionalPlainTextArgs, PlainTextArgs
-from src.utils.helpers import parse_str
+from src.utils.annotated import AsyncSession
 
 __plugin_meta__ = PluginMetadata(
     name="体脂打卡",
@@ -19,23 +16,36 @@ __plugin_meta__ = PluginMetadata(
 /目标体脂 20
 记录体脂
 /体脂打卡
-/体制打卡 20""",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_user"),
+/体脂打卡 20""",
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_user", "nonebot_plugin_alconna"
+    ),
 )
 
-target_body_fat_cmd = check_in.command("body_fat", aliases={"目标体脂"})
+target_body_fat_cmd = on_alconna(
+    Alconna(
+        "目标体脂",
+        Args["target?#目标体脂（百分比）", str],
+        meta=CommandMeta(
+            description="设置和查看目标体脂",
+            example="查看目标体脂\n/目标体脂\n设置目标体脂\n/目标体脂 20",
+        ),
+    ),
+    aliases={"check_in.body_fat"},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @target_body_fat_cmd.handle()
 async def handle_first_message(
-    state: T_State,
     session: AsyncSession,
     user: UserSession,
-    content: OptionalPlainTextArgs,
+    target: Match[str],
 ):
     """目标体脂"""
-    if content:
-        state["content"] = content
+    if target.available:
+        target_body_fat_cmd.set_path_arg("target", target.result)
     else:
         target_body_fat = (
             await session.scalars(
@@ -48,22 +58,11 @@ async def handle_first_message(
             )
 
 
-@target_body_fat_cmd.got(
-    "content",
-    prompt="请输入你的目标体脂哦～",
-    parameterless=[Depends(parse_str("content"))],
-)
-async def _(
-    session: AsyncSession,
-    user: UserSession,
-    content: str = Arg(),
-):
+@target_body_fat_cmd.got_path("target", prompt="请输入你的目标体脂哦～")
+async def _(session: AsyncSession, user: UserSession, target: str):
     """目标体脂"""
-    if not content:
-        await target_body_fat_cmd.reject("目标体脂不能为空，请重新输入", at_sender=True)
-
     try:
-        body_fat = float(content)
+        body_fat = float(target)
     except ValueError:
         await target_body_fat_cmd.reject(
             "目标体脂只能输入数字哦，请重新输入", at_sender=True
@@ -83,29 +82,31 @@ async def _(
     )
 
 
-body_fat_record_cmd = check_in.command("body_record", aliases={"记录体脂", "体脂打卡"})
+body_fat_record_cmd = on_alconna(
+    Alconna(
+        "体脂打卡",
+        Args["content?#体脂（百分比）", str],
+        meta=CommandMeta(
+            description="记录体脂",
+            example="记录体脂\n/体脂打卡\n/体脂打卡 20",
+        ),
+    ),
+    aliases={"记录体脂", "check_in.body_record"},
+    use_cmd_start=True,
+    block=True,
+)
 
 
 @body_fat_record_cmd.handle()
-async def _(state: T_State, content: PlainTextArgs):
+async def _(content: Match[str]):
     """记录体脂"""
-    state["content"] = content
+    if content.available:
+        body_fat_record_cmd.set_path_arg("content", content.result)
 
 
-@body_fat_record_cmd.got(
-    "content",
-    prompt="今天你的体脂是多少呢？",
-    parameterless=[Depends(parse_str("content"))],
-)
-async def _(
-    session: AsyncSession,
-    user: UserSession,
-    content: str = Arg(),
-):
+@body_fat_record_cmd.got_path("content", prompt="今天你的体脂是多少呢？")
+async def _(session: AsyncSession, user: UserSession, content: str):
     """记录体脂"""
-    if not content:
-        await body_fat_record_cmd.reject("体脂不能为空，请重新输入", at_sender=True)
-
     try:
         body_fat = float(content)
     except ValueError:

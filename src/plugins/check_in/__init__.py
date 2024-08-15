@@ -3,10 +3,11 @@
 from pathlib import Path
 
 import nonebot
-from nonebot import CommandGroup, get_driver, require
+from nonebot import get_driver, require
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
 require("nonebot_plugin_user")
+require("nonebot_plugin_alconna")
 
 from . import migrations
 
@@ -14,11 +15,11 @@ __plugin_meta__ = PluginMetadata(
     name="打卡",
     description="每日打卡，记录健身数据",
     usage="",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_user"),
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_user", "nonebot_plugin_alconna"
+    ),
     extra={"orm_version_location": migrations},
 )
-
-check_in = CommandGroup("check_in", block=True)
 
 _sub_plugins = set()
 
