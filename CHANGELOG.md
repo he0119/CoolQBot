@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 使用 alc 改造插件
 
+### Fixed
+
+- 修复插件订阅 B 站和最终幻想XIV 出错的问题
+
 ## [0.18.1] - 2024-08-07
 
 ### Added
