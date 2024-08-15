@@ -29,7 +29,7 @@ dependencies = [
     "nonebot-plugin-alconna>=0.51.3",
     "nonebot-plugin-datastore>=1.3.0",
     "nonebot-plugin-sentry>=2.0.0",
-    "nonebot-plugin-memes==0.7.3",
+    "nonebot-plugin-memes==0.7.5",
     "nonebot-bison @ git+https://github.com/MountainDash/nonebot-bison@dc0dc252e76aa27711f34295e8969bfedd6cee43",
     "nonebot-plugin-status==0.8.1",
     "nonebot-plugin-bawiki==0.11.3",
