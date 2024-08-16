@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.19.0] - 2024-08-16
+
 ### Added
 
 - 使用 alc 改造插件
@@ -545,7 +547,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.18.1...HEAD
+[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.19.0...HEAD
+[0.19.0]: https://github.com/he0119/CoolQBot/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/he0119/CoolQBot/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/he0119/CoolQBot/compare/v0.17.5...v0.18.0
 [0.17.5]: https://github.com/he0119/CoolQBot/compare/v0.17.4...v0.17.5
