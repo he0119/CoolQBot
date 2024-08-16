@@ -206,7 +206,7 @@ nonebot-adapter-qq==1.5.0
 nonebot-adapter-red==0.9.0
 nonebot-adapter-satori==0.12.3
 nonebot-adapter-telegram==0.1.0b17
-nonebot-bison @ git+https://github.com/MountainDash/nonebot-bison@dc0dc252e76aa27711f34295e8969bfedd6cee43
+nonebot-bison @ git+https://github.com/MountainDash/nonebot-bison@d288c954b112d25e4bbec759202b7254b458469e
 nonebot-plugin-alconna==0.51.3
     # via nonebot-plugin-memes
     # via nonebot-plugin-user
