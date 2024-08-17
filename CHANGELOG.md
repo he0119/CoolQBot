@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.19.1] - 2024-08-17
+
 ### Added
 
 - 优化 NoneBot 的性能
@@ -551,7 +553,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.19.0...HEAD
+[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.19.1...HEAD
+[0.19.1]: https://github.com/he0119/CoolQBot/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/he0119/CoolQBot/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/he0119/CoolQBot/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/he0119/CoolQBot/compare/v0.17.5...v0.18.0
