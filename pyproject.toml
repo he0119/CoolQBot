@@ -10,7 +10,7 @@ dependencies = [
     "uvicorn[standard]>=0.30.5",
     "uvicorn-worker>=0.2.0",
     "gunicorn>=23.0.0",
-    "nonebot2[httpx,fastapi,websockets]>=2.3.2",
+    "nonebot2[httpx,fastapi,websockets] @ git+https://github.com/nonebot/nonebot2.git@b59b1be6ffa7201213aaf094fd86eced0c607870",
     "nb-cli>=1.4.1",
     "nonebot-adapter-discord>=0.1.8",
     "nonebot-adapter-dodo>=0.2.1",
