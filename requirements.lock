@@ -27,7 +27,7 @@ anyio==4.4.0
     # via watchfiles
 apscheduler==3.10.4
     # via nonebot-plugin-apscheduler
-arclet-alconna==1.8.25
+arclet-alconna==1.8.28
     # via arclet-alconna-tools
     # via meme-generator
     # via nonebot-plugin-alconna
@@ -47,9 +47,9 @@ bidict==0.23.1
     # via python-socketio
 binaryornot==0.4.4
     # via cookiecutter
-cachetools==5.3.3
+cachetools==5.4.0
     # via nonebot-plugin-userinfo
-cashews==7.1.0
+cashews==7.2.0
     # via nb-cli
 certifi==2024.7.4
     # via httpcore
@@ -64,7 +64,6 @@ click==8.1.7
     # via cookiecutter
     # via nb-cli
     # via nonebot-plugin-orm
-    # via typer
     # via uvicorn
 colorama==0.4.6 ; platform_system == 'Windows' or sys_platform == 'win32'
     # via click
@@ -81,10 +80,6 @@ dateparser==1.2.0
     # via meme-generator
 distlib==0.3.8
     # via virtualenv
-dnspython==2.6.1
-    # via email-validator
-email-validator==2.2.0
-    # via fastapi
 emoji==2.12.1
     # via nonebot-plugin-userinfo
     # via nonebot-plugin-wordcloud
@@ -92,11 +87,9 @@ eorzeaenv @ git+https://github.com/he0119/EorzeaEnv.git@11f61ca3f04f8c45ecd167f7
 expiringdictx==1.1.0
     # via nonebot-bison
     # via nonebot-plugin-user
-fastapi==0.111.0
+fastapi==0.112.1
     # via meme-generator
     # via nonebot2
-fastapi-cli==0.0.4
-    # via fastapi
 feedparser==6.0.11
     # via nonebot-bison
 filelock==3.15.4
@@ -127,7 +120,6 @@ httpcore==1.0.5
 httptools==0.6.1
     # via uvicorn
 httpx==0.27.0
-    # via fastapi
     # via hishel
     # via meme-generator
     # via nb-cli
@@ -136,23 +128,21 @@ httpx==0.27.0
     # via nonebot-plugin-memes
     # via nonebot-plugin-userinfo
     # via nonebot2
-humanize==4.9.0
+humanize==4.10.0
     # via nonebot-plugin-status
 hyperframe==6.0.1
     # via h2
 idna==3.7
     # via anyio
-    # via email-validator
     # via httpx
     # via requests
     # via yarl
-importlib-metadata==8.0.0
+importlib-metadata==8.2.0
     # via nonebot-plugin-alconna
 jieba==0.42.1
     # via nonebot-plugin-wordcloud
 jinja2==3.1.4
     # via cookiecutter
-    # via fastapi
     # via nb-cli
     # via nonebot-plugin-htmlrender
     # via nonebot-plugin-status
@@ -164,12 +154,12 @@ loguru==0.7.2
     # via sentry-sdk
 lru-dict==1.3.0
     # via expiringdictx
-lxml==5.2.2
+lxml==5.3.0
     # via nonebot-bison
     # via nonebot-plugin-bawiki
 mako==1.3.5
     # via alembic
-markdown==3.6
+markdown==3.7
     # via nonebot-plugin-htmlrender
     # via pymdown-extensions
     # via python-markdown-math
@@ -207,7 +197,7 @@ nonebot-adapter-red==0.9.0
 nonebot-adapter-satori==0.12.3
 nonebot-adapter-telegram==0.1.0b17
 nonebot-bison @ git+https://github.com/MountainDash/nonebot-bison@d288c954b112d25e4bbec759202b7254b458469e
-nonebot-plugin-alconna==0.51.3
+nonebot-plugin-alconna==0.51.4
     # via nonebot-plugin-memes
     # via nonebot-plugin-user
     # via nonebot-plugin-wordcloud
@@ -225,13 +215,13 @@ nonebot-plugin-datastore==1.3.0
 nonebot-plugin-htmlrender==0.3.3
     # via nonebot-bison
     # via nonebot-plugin-bawiki
-nonebot-plugin-localstore==0.6.0
+nonebot-plugin-localstore==0.7.1
     # via nonebot-plugin-chatrecorder
     # via nonebot-plugin-datastore
     # via nonebot-plugin-memes
     # via nonebot-plugin-orm
     # via nonebot-plugin-wordcloud
-nonebot-plugin-memes==0.7.7
+nonebot-plugin-memes==0.7.8
 nonebot-plugin-orm==0.7.6
     # via nonebot-plugin-chatrecorder
     # via nonebot-plugin-memes
@@ -242,7 +232,7 @@ nonebot-plugin-send-anything-anywhere==0.6.1
     # via nonebot-bison
     # via nonebot-plugin-cesaa
 nonebot-plugin-sentry==2.0.0
-nonebot-plugin-session==0.3.1
+nonebot-plugin-session==0.3.2
     # via nonebot-plugin-chatrecorder
     # via nonebot-plugin-memes
     # via nonebot-plugin-session-orm
@@ -253,9 +243,9 @@ nonebot-plugin-session-orm==0.2.0
 nonebot-plugin-status==0.8.1
 nonebot-plugin-treehelp==0.5.0
 nonebot-plugin-user==0.4.1
-nonebot-plugin-userinfo==0.2.4
+nonebot-plugin-userinfo==0.2.5
     # via nonebot-plugin-memes
-nonebot-plugin-waiter==0.6.2
+nonebot-plugin-waiter==0.7.1
     # via nonebot-plugin-alconna
 nonebot-plugin-wordcloud==0.8.0
 nonebot2 @ git+https://github.com/nonebot/nonebot2.git@b59b1be6ffa7201213aaf094fd86eced0c607870
@@ -290,7 +280,7 @@ nonebot2 @ git+https://github.com/nonebot/nonebot2.git@b59b1be6ffa7201213aaf094f
     # via nonebot-plugin-wordcloud
 noneprompt==0.1.9
     # via nb-cli
-numpy==1.26.4
+numpy==2.0.1
     # via contourpy
     # via eorzeaenv
     # via matplotlib
@@ -299,13 +289,11 @@ numpy==1.26.4
     # via wordcloud
 opencv-python-headless==4.10.0.84
     # via pil-utils
-orjson==3.10.6
-    # via fastapi
 packaging==24.1
     # via gunicorn
     # via matplotlib
     # via nonebot-adapter-red
-pil-utils==0.1.10
+pil-utils==0.1.11
     # via meme-generator
     # via nonebot-plugin-bawiki
 pillow==10.4.0
@@ -315,7 +303,7 @@ pillow==10.4.0
     # via wordcloud
 platformdirs==4.2.2
     # via virtualenv
-playwright==1.45.0
+playwright==1.46.0
     # via nonebot-plugin-htmlrender
 prompt-toolkit==3.0.47
     # via noneprompt
@@ -344,13 +332,13 @@ pygments==2.18.0
     # via rich
 pygtrie==2.5.0
     # via nonebot2
-pyjwt==2.8.0
+pyjwt==2.9.0
     # via nonebot-bison
-pymdown-extensions==10.8.1
+pymdown-extensions==10.9
     # via nonebot-plugin-htmlrender
 pyparsing==3.1.2
     # via matplotlib
-pypinyin==0.51.0
+pypinyin==0.52.0
     # via nonebot-plugin-bawiki
     # via nonebot-plugin-memes
 pypng==0.20220715.0
@@ -368,7 +356,6 @@ python-engineio==4.9.1
 python-markdown-math==0.8
     # via nonebot-plugin-htmlrender
 python-multipart==0.0.9
-    # via fastapi
     # via meme-generator
 python-slugify==8.0.4
     # via cookiecutter
@@ -378,31 +365,28 @@ pytz==2024.1
     # via apscheduler
     # via dateparser
     # via nonebot-plugin-bawiki
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via cookiecutter
     # via nonebot-plugin-memes
     # via pymdown-extensions
     # via uvicorn
 qrcode==7.4.2
     # via nonebot-bison
-rapidfuzz==3.9.5
+rapidfuzz==3.9.6
     # via eorzeaenv
     # via nonebot-bison
     # via nonebot-plugin-memes
-regex==2024.5.15
+regex==2024.7.24
     # via dateparser
 requests==2.32.3
     # via cookiecutter
 rich==13.7.1
     # via cookiecutter
     # via meme-generator
-    # via typer
-sentry-sdk==2.7.1
+sentry-sdk==2.13.0
     # via nonebot-plugin-sentry
 sgmllib3k==1.0.0
     # via feedparser
-shellingham==1.5.4
-    # via typer
 simple-websocket==1.0.0
     # via python-engineio
 six==1.16.0
@@ -411,13 +395,13 @@ six==1.16.0
 sniffio==1.3.1
     # via anyio
     # via httpx
-soupsieve==2.5
+soupsieve==2.6
     # via beautifulsoup4
-sqlalchemy==2.0.31
+sqlalchemy==2.0.32
     # via alembic
     # via nonebot-plugin-datastore
     # via nonebot-plugin-orm
-starlette==0.37.2
+starlette==0.38.2
     # via fastapi
 strenum==0.4.15
     # via nonebot-plugin-send-anything-anywhere
@@ -433,10 +417,8 @@ tinydb==4.8.0
     # via nonebot-bison
 toml==0.10.2
     # via meme-generator
-tomlkit==0.12.5
+tomlkit==0.13.2
     # via nb-cli
-typer==0.12.3
-    # via fastapi-cli
 types-python-dateutil==2.9.0.20240316
     # via arrow
 typing-extensions==4.12.2
@@ -459,29 +441,25 @@ typing-extensions==4.12.2
     # via qrcode
     # via sqlalchemy
     # via tarina
-    # via typer
 tzdata==2024.1
     # via nonebot-plugin-wordcloud
     # via tzlocal
 tzlocal==5.2
     # via apscheduler
     # via dateparser
-ujson==5.10.0
-    # via fastapi
 urllib3==2.2.2
     # via requests
     # via sentry-sdk
-uvicorn==0.30.5
-    # via fastapi
+uvicorn==0.30.6
     # via meme-generator
     # via nonebot2
     # via uvicorn-worker
 uvicorn-worker==0.2.0
-uvloop==0.19.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'
+uvloop==0.20.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'
     # via uvicorn
 virtualenv==20.26.3
     # via nb-cli
-watchfiles==0.22.0
+watchfiles==0.23.0
     # via nb-cli
     # via uvicorn
 wcwidth==0.2.13
@@ -501,5 +479,5 @@ yarl==1.9.4
     # via nonebot-bison
     # via nonebot-plugin-bawiki
     # via nonebot2
-zipp==3.19.2
+zipp==3.20.0
     # via importlib-metadata
