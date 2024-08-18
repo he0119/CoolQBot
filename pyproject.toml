@@ -130,3 +130,8 @@ filename = "CHANGELOG.md"
 regex = true
 search = "\\[unreleased\\]: (https://.+?)v{current_version}\\.\\.\\.HEAD"
 replace = "[unreleased]: \\1v{new_version}...HEAD\n[{new_version}]: \\1v{current_version}...v{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "Dockerfile"
+search = "ARG VERSION=\"{current_version}\""
+replace = "ARG VERSION=\"{new_version}\""

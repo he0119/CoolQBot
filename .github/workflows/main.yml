@@ -63,11 +63,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set version
-        run: sed -ri "s#SENTRY_RELEASE=version#SENTRY_RELEASE=$VERSION#g" Dockerfile
-        env:
-          VERSION: ${{ needs.test.outputs.version }}
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -98,6 +93,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ needs.test.outputs.version }}
 
       - name: Build for test
         if: github.event_name == 'pull_request'

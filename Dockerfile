@@ -1,18 +1,20 @@
 FROM python:3.12.4-slim
 
+# 编译参数
+ARG VERSION="0.19.1"
+
 WORKDIR /app
 
 # 设置时区
 ENV TZ=Asia/Shanghai
-ENV SENTRY_RELEASE=version
+ENV SENTRY_RELEASE=${VERSION}
 # 设置语言
 ENV LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
 
-# Gunicon 配置
+# Gunicorn 配置
+COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
 COPY ./docker/start.sh /start.sh
 RUN chmod +x /start.sh
-
-COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
 
 # 安装依赖
 RUN apt-get update \
@@ -36,9 +38,9 @@ RUN git clone --depth 1 https://github.com/MeetWq/meme-generator.git \
   && fc-cache -fv
 RUN meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator/
 
-# Bot
+# 机器人
 ENV APP_MODULE=bot:app
-# # 如果你有多个QQ，且存在 self_id 指定，多个 worker 会导致无法找到其他 websocket 连接
+# 如果你有多个QQ，且存在 self_id 指定，多个 worker 会导致无法找到其他 websocket 连接
 ENV MAX_WORKERS=1
 
 COPY bot.py pyproject.toml .env prestart.sh /app/
