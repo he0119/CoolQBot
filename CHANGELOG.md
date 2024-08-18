@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 再次修复运行迁移脚本时加载插件报错
+
 ## [0.19.1] - 2024-08-17
 
 ### Added

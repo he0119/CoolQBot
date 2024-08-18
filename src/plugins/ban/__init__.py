@@ -11,10 +11,10 @@ from nonebot.adapters.onebot.v11.event import (
 )
 from nonebot.plugin import PluginMetadata
 
-from src.utils.helpers import render_expression
-
 require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+
+from src.utils.helpers import render_expression
 
 __plugin_meta__ = PluginMetadata(
     name="自主禁言",

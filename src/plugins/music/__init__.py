@@ -1,7 +1,10 @@
 """音乐插件"""
 
+from nonebot import require
 from nonebot.adapters.onebot.v11 import Bot
 from nonebot.plugin import PluginMetadata
+
+require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 
 from src.utils.helpers import render_expression
