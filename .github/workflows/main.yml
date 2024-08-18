@@ -106,6 +106,8 @@ jobs:
           tags: he0119/coolqbot:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ needs.test.outputs.version }}
 
       - name: Test Image
         if: github.event_name == 'pull_request'
