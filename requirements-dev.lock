@@ -269,7 +269,7 @@ nonebot-plugin-userinfo==0.2.5
 nonebot-plugin-waiter==0.7.1
     # via nonebot-plugin-alconna
 nonebot-plugin-wordcloud==0.8.0
-nonebot2 @ git+https://github.com/nonebot/nonebot2.git@b59b1be6ffa7201213aaf094fd86eced0c607870
+nonebot2==2.3.3
     # via nonebot-adapter-discord
     # via nonebot-adapter-dodo
     # via nonebot-adapter-kaiheila
