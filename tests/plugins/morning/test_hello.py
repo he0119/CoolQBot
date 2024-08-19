@@ -19,7 +19,7 @@ async def test_hello_enabled(app: App):
         )
         await session.commit()
 
-    async with app.test_matcher(hello_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -29,12 +29,12 @@ async def test_hello_enabled(app: App):
         ctx.should_finished(hello_cmd)
 
 
-async def test_hello_not_enabled(app: App):
+async def test_hello_disabled(app: App):
     """测试启动问候关闭的情况"""
 
     from src.plugins.morning.plugins.hello import hello_cmd
 
-    async with app.test_matcher(hello_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -55,7 +55,7 @@ async def test_hello_enable(app: App):
         groups = (await session.scalars(select(Hello))).all()
         assert len(groups) == 0
 
-    async with app.test_matcher(hello_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -83,7 +83,7 @@ async def test_hello_disable(app: App):
         )
         await session.commit()
 
-    async with app.test_matcher(hello_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

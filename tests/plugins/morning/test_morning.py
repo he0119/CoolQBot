@@ -50,7 +50,7 @@ async def test_morning_enabled(app: App):
         session.add(MorningGreeting(target=TargetQQGroup(group_id=10000).model_dump()))
         await session.commit()
 
-    async with app.test_matcher(morning_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -60,11 +60,11 @@ async def test_morning_enabled(app: App):
         ctx.should_finished(morning_cmd)
 
 
-async def test_morning_not_enabled(app: App):
+async def test_morning_disabled(app: App):
     """测试每日早安关闭的情况"""
     from src.plugins.morning.plugins.morning_greeting import morning_cmd
 
-    async with app.test_matcher(morning_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -88,7 +88,7 @@ async def test_morning_enable(app: App):
         groups = (await session.scalars(select(MorningGreeting))).all()
         assert len(groups) == 0
 
-    async with app.test_matcher(morning_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -117,7 +117,7 @@ async def test_morning_disable(app: App):
         session.add(MorningGreeting(target=TargetQQGroup(group_id=10000).model_dump()))
         await session.commit()
 
-    async with app.test_matcher(morning_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -146,7 +146,7 @@ async def test_morning_today(app: App, mocker: MockerFixture):
     )
     render_expression.return_value = Message("test")
 
-    async with app.test_matcher(morning_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
