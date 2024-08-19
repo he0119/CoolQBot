@@ -14,7 +14,7 @@ async def test_admin(app: App):
     """测试病人入院"""
     from src.plugins.cyber_hospital import admit_cmd
 
-    async with app.test_matcher(admit_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -25,7 +25,7 @@ async def test_admin(app: App):
         ctx.should_call_send(event, "请 @ 需要入院的病人", True)
         ctx.should_finished(admit_cmd)
 
-    async with app.test_matcher(admit_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -37,7 +37,7 @@ async def test_admin(app: App):
         ctx.should_call_send(event, MessageSegment.at(123456) + "入院成功", True)
         ctx.should_finished(admit_cmd)
 
-    async with app.test_matcher(admit_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -60,7 +60,7 @@ async def test_admin_different_group(app: App, session: "AsyncSession"):
     session.add(patient)
     await session.commit()
 
-    async with app.test_matcher(admit_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

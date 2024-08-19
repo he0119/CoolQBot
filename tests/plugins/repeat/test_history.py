@@ -35,7 +35,7 @@ async def test_history(app: App, mocker: MockerFixture):
         )
         await session.commit()
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -84,7 +84,7 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
     mocked_datetime.now.return_value = datetime(2020, 1, 2)
     mocked_datetime.return_value = datetime(2020, 1, 1)
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -134,7 +134,7 @@ async def test_history_get_invalid_args(app: App):
         session.add(Enabled(platform="qq", group_id=10000))
         await session.commit()
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -170,7 +170,7 @@ async def test_history_not_enabled(app: App):
     """没有启用复读的情况"""
     from src.plugins.repeat.plugins.repeat_history import history_cmd
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

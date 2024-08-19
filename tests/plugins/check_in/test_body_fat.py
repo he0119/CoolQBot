@@ -9,7 +9,7 @@ async def test_target_body_fat(app: App):
     """测试设置目标体脂"""
     from src.plugins.check_in.plugins.check_in_body_fat import target_body_fat_cmd
 
-    async with app.test_matcher(target_body_fat_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -25,7 +25,7 @@ async def test_target_body_fat(app: App):
         )
         ctx.should_finished(target_body_fat_cmd)
 
-    async with app.test_matcher(target_body_fat_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -36,7 +36,7 @@ async def test_target_body_fat(app: App):
         )
         ctx.should_finished(target_body_fat_cmd)
 
-    async with app.test_matcher(target_body_fat_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -47,7 +47,7 @@ async def test_target_body_fat(app: App):
         )
         ctx.should_finished(target_body_fat_cmd)
 
-    async with app.test_matcher(target_body_fat_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -63,7 +63,7 @@ async def test_body_fat(app: App):
     """测试记录体脂"""
     from src.plugins.check_in.plugins.check_in_body_fat import body_fat_record_cmd
 
-    async with app.test_matcher(body_fat_record_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -74,7 +74,7 @@ async def test_body_fat(app: App):
         )
         ctx.should_finished(body_fat_record_cmd)
 
-    async with app.test_matcher(body_fat_record_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -95,7 +95,7 @@ async def test_body_fat_invalid(app: App):
     """测试记录体脂不符合标准"""
     from src.plugins.check_in.plugins.check_in_body_fat import body_fat_record_cmd
 
-    async with app.test_matcher(body_fat_record_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -111,7 +111,7 @@ async def test_body_fat_invalid(app: App):
         ctx.should_call_send(event, "今天你的体脂是多少呢？", True)
         ctx.should_rejected(body_fat_record_cmd)
 
-    async with app.test_matcher(body_fat_record_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -122,7 +122,7 @@ async def test_body_fat_invalid(app: App):
         )
         ctx.should_rejected(body_fat_record_cmd)
 
-    async with app.test_matcher(body_fat_record_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -133,7 +133,7 @@ async def test_body_fat_invalid(app: App):
         )
         ctx.should_rejected(body_fat_record_cmd)
 
-    async with app.test_matcher(body_fat_record_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

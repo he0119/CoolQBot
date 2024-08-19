@@ -77,7 +77,7 @@ async def test_dps_help(app: App, mocker: MockerFixture):
 
     mocker.patch.object(plugin_config, "fflogs_token", "test")
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps"), user_id=10000)
@@ -86,7 +86,7 @@ async def test_dps_help(app: App, mocker: MockerFixture):
         ctx.should_call_send(event, help_msg, True)
         ctx.should_finished(fflogs_cmd)
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps "), user_id=10000)
@@ -95,7 +95,7 @@ async def test_dps_help(app: App, mocker: MockerFixture):
         ctx.should_call_send(event, help_msg, True)
         ctx.should_finished(fflogs_cmd)
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
@@ -111,7 +111,7 @@ async def test_dps_missing_token(app: App):
     """测试 FFLOGS，缺少 Token 的情况"""
     from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps me"))
@@ -131,7 +131,7 @@ async def test_dps_cache(app: App, mocker: MockerFixture):
 
     mocker.patch.object(plugin_config, "fflogs_token", "test")
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps cache list"))
@@ -140,7 +140,7 @@ async def test_dps_cache(app: App, mocker: MockerFixture):
         ctx.should_call_send(event, "当前没有缓存副本。", True)
         ctx.should_finished(fflogs_cmd)
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps cache add p1s"))
@@ -149,7 +149,7 @@ async def test_dps_cache(app: App, mocker: MockerFixture):
         ctx.should_call_send(event, "已添加副本 p1s。", True)
         ctx.should_finished(fflogs_cmd)
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps cache list"))
@@ -158,7 +158,7 @@ async def test_dps_cache(app: App, mocker: MockerFixture):
         ctx.should_call_send(event, "当前缓存的副本有：\np1s", True)
         ctx.should_finished(fflogs_cmd)
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps cache del p2s"))
@@ -167,7 +167,7 @@ async def test_dps_cache(app: App, mocker: MockerFixture):
         ctx.should_call_send(event, "没有缓存 p2s，无法删除。", True)
         ctx.should_finished(fflogs_cmd)
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps cache del p1s"))
@@ -176,7 +176,7 @@ async def test_dps_cache(app: App, mocker: MockerFixture):
         ctx.should_call_send(event, "已删除副本 p1s。", True)
         ctx.should_finished(fflogs_cmd)
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps cache list"))
@@ -192,7 +192,7 @@ async def test_dps_permission(app: App, mocker: MockerFixture):
 
     mocker.patch.object(plugin_config, "fflogs_token", "test")
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
@@ -211,7 +211,7 @@ async def test_dps_bind(app: App, mocker: MockerFixture):
     mocker.patch.object(plugin_config, "fflogs_token", "test")
 
     # 查询自己的绑定角色
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps me"))
@@ -226,7 +226,7 @@ async def test_dps_bind(app: App, mocker: MockerFixture):
         ctx.should_finished(fflogs_cmd)
 
     # 查询别人的绑定角色
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
@@ -242,7 +242,7 @@ async def test_dps_bind(app: App, mocker: MockerFixture):
         ctx.should_finished(fflogs_cmd)
 
     # 绑定角色
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps me name server"))
@@ -252,7 +252,7 @@ async def test_dps_bind(app: App, mocker: MockerFixture):
         ctx.should_finished(fflogs_cmd)
 
     # 再次查询
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps me"))
@@ -265,7 +265,7 @@ async def test_dps_bind(app: App, mocker: MockerFixture):
         )
         ctx.should_finished(fflogs_cmd)
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
@@ -303,7 +303,7 @@ async def test_dps_character_rankings(
     ).mock(return_value=httpx.Response(200, json=fflogs_character_rankings))
 
     # 直接 @ 用户查询
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
@@ -319,7 +319,7 @@ async def test_dps_character_rankings(
         ctx.should_finished(fflogs_cmd)
 
     # 查询自己的角色
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps e1s me"))
@@ -333,7 +333,7 @@ async def test_dps_character_rankings(
         ctx.should_finished(fflogs_cmd)
 
     # 通过输入角色名和服务器名查询对应角色
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps e1s name server"))
@@ -356,7 +356,7 @@ async def test_dps_character_rankings_not_bind(app: App, mocker: MockerFixture):
 
     mocker.patch.object(plugin_config, "fflogs_token", "test")
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
@@ -389,7 +389,7 @@ async def test_dps_update_data(
         "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json"
     ).mock(return_value=httpx.Response(200, json=fflogs_data))
 
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps update"))
@@ -432,7 +432,7 @@ async def test_dps_job_rankings_empty(
     ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings_empty))
 
     # 使用职业昵称查询
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps e1s 白魔"))
@@ -484,7 +484,7 @@ async def test_dps_job_rankings(
     ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings_empty))
 
     # 使用职业名查询
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps p8s 白魔法师"))
@@ -498,7 +498,7 @@ async def test_dps_job_rankings(
         ctx.should_finished(fflogs_cmd)
 
     # 使用职业昵称查询
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps p8s 白魔"))
@@ -512,7 +512,7 @@ async def test_dps_job_rankings(
         ctx.should_finished(fflogs_cmd)
 
     # 查询 adps
-    async with app.test_matcher(fflogs_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/dps p8s 白魔 adps"))

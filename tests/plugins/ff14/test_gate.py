@@ -18,7 +18,7 @@ async def test_gete(app: App, mocker: MockerFixture):
     randint = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.randint")
     randint.return_value = 1
 
-    async with app.test_matcher(gate_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -43,7 +43,7 @@ async def test_gete_ask_arg(app: App, mocker: MockerFixture):
     randint = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.randint")
     randint.return_value = 1
 
-    async with app.test_matcher(gate_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -73,7 +73,7 @@ async def test_gete_ask_arg_error(app: App, mocker: MockerFixture):
     randint = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.randint")
     randint.return_value = 1
 
-    async with app.test_matcher(gate_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -110,7 +110,7 @@ async def test_gete_ask_arg_whitespace(app: App, mocker: MockerFixture):
     randint = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.randint")
     randint.return_value = 1
 
-    async with app.test_matcher(gate_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

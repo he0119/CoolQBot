@@ -27,7 +27,7 @@ async def test_get_daily_quests(app: App):
     """获取每日委托"""
     from src.plugins.ff14.plugins.ff14_daily_quests import daily_quests_cmd
 
-    async with app.test_matcher(daily_quests_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -41,7 +41,7 @@ async def test_set_daily_quests(app: App):
     """设置每日委托"""
     from src.plugins.ff14.plugins.ff14_daily_quests import daily_quests_cmd
 
-    async with app.test_matcher(daily_quests_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -60,7 +60,7 @@ async def test_set_daily_quests(app: App):
         )
         ctx.should_finished(daily_quests_cmd)
 
-    async with app.test_matcher(daily_quests_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -82,7 +82,7 @@ async def test_daily_quests_pair(app: App):
     """查询每日委托配对"""
     from src.plugins.ff14.plugins.ff14_daily_quests import daily_quests_cmd
 
-    async with app.test_matcher(daily_quests_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -96,7 +96,7 @@ async def test_daily_quests_pair(app: App):
         )
         ctx.should_finished(daily_quests_cmd)
 
-    async with app.test_matcher(daily_quests_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -110,7 +110,7 @@ async def test_daily_quests_pair(app: App):
         )
         ctx.should_finished(daily_quests_cmd)
 
-    async with app.test_matcher(daily_quests_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -129,7 +129,7 @@ async def test_daily_quests_pair(app: App):
         )
         ctx.should_finished(daily_quests_cmd)
 
-    async with app.test_matcher(daily_quests_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -149,7 +149,7 @@ async def test_daily_quests_pair(app: App):
         )
         ctx.should_finished(daily_quests_cmd)
 
-    async with app.test_matcher(daily_quests_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -163,7 +163,7 @@ async def test_daily_quests_pair(app: App):
         )
         ctx.should_finished(daily_quests_cmd)
 
-    async with app.test_matcher(daily_quests_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

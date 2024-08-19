@@ -40,7 +40,7 @@ async def test_repeat(app: App, mocker: MockerFixture):
     )
     mocked_random().randint.return_value = 1
 
-    async with app.test_matcher(repeat_message) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -57,7 +57,7 @@ async def test_repeat_enabled(app: App):
     """测试复读已开启的情况"""
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
-    async with app.test_matcher(repeat_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -71,7 +71,7 @@ async def test_repeat_not_enabled(app: App):
     """测试复读关闭的情况"""
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
-    async with app.test_matcher(repeat_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -85,7 +85,7 @@ async def test_repeat_enable(app: App):
     """测试复读，在群里启用的情况"""
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
-    async with app.test_matcher(repeat_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -100,7 +100,7 @@ async def test_repeat_disable(app: App):
     """测试复读，在群里关闭的情况"""
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
-    async with app.test_matcher(repeat_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -114,7 +114,7 @@ async def test_repeat_disable_already_disabled(app: App):
     """测试复读，群里已关闭的情况"""
     from src.plugins.repeat.plugins.repeat_basic import repeat_cmd
 
-    async with app.test_matcher(repeat_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

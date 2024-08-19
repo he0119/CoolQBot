@@ -29,7 +29,7 @@ async def test_fitness_history(
     )
     mocked_datetime.now.return_value = datetime(2023, 2, 10, 1, 1, 1)
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -55,7 +55,7 @@ async def test_dietary_history(app: App, session: "AsyncSession"):
     session.add(DietaryRecord(user_id=2, healthy=True))
     await session.commit()
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -89,7 +89,7 @@ async def test_weight_record_history(
     session.add(WeightRecord(user_id=2, weight=40))
     await session.commit()
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -126,7 +126,7 @@ async def test_body_fat_record_history(
     session.add(BodyFatRecord(user_id=2, body_fat=40))
     await session.commit()
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -148,7 +148,7 @@ async def test_history_get_arg(app: App):
     """测试获取参数"""
     from src.plugins.check_in.plugins.check_in_history import history_cmd
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -171,7 +171,7 @@ async def test_history_other(app: App):
     """测试其他情况"""
     from src.plugins.check_in.plugins.check_in_history import history_cmd
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -180,7 +180,7 @@ async def test_history_other(app: App):
         ctx.should_call_send(event, "不存在这项历史，请重新输入", True, at_sender=True)
         ctx.should_finished(history_cmd)
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -189,7 +189,7 @@ async def test_history_other(app: App):
         ctx.should_call_send(event, "你还没有健身打卡记录哦", True, at_sender=True)
         ctx.should_finished(history_cmd)
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -198,7 +198,7 @@ async def test_history_other(app: App):
         ctx.should_call_send(event, "你还没有饮食打卡记录哦", True, at_sender=True)
         ctx.should_finished(history_cmd)
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -207,7 +207,7 @@ async def test_history_other(app: App):
         ctx.should_call_send(event, "你还没有体重记录哦", True, at_sender=True)
         ctx.should_finished(history_cmd)
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

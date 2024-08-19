@@ -7,16 +7,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event_v11
 
 
-@pytest.fixture()
-async def app(app: App):
-    yield app
-
-    from src.plugins.ban import _bot_role
-
-    # 清空机器人角色缓存
-    _bot_role.clear()
-
-
 @pytest.mark.parametrize(
     "sender",
     [
@@ -38,7 +28,7 @@ async def test_ban_group_bot_is_owner(
     render_expression = mocker.patch("src.plugins.ban.render_expression")
     render_expression.return_value = Message("test")
 
-    async with app.test_matcher(ban_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
 
@@ -83,7 +73,7 @@ async def test_ban_group_bot_is_admin(
     render_expression = mocker.patch("src.plugins.ban.render_expression")
     render_expression.return_value = Message("test")
 
-    async with app.test_matcher(ban_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
 
@@ -148,7 +138,7 @@ async def test_ban_group_bot_is_member(
     render_expression = mocker.patch("src.plugins.ban.render_expression")
     render_expression.return_value = Message("test")
 
-    async with app.test_matcher(ban_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
 
@@ -203,7 +193,7 @@ async def test_ban_group_get_arg(
     render_expression = mocker.patch("src.plugins.ban.render_expression")
     render_expression.return_value = Message("test")
 
-    async with app.test_matcher(ban_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
 
@@ -242,7 +232,7 @@ async def test_ban_group_get_arg_invalid(
     render_expression.return_value = Message("test")
     sender = {"role": "member"}
 
-    async with app.test_matcher(ban_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="1")
 

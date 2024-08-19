@@ -17,7 +17,7 @@ async def test_discharge(app: App, session: "AsyncSession"):
     from src.plugins.cyber_hospital import discharge_cmd
     from src.plugins.cyber_hospital.model import Patient
 
-    async with app.test_matcher(discharge_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -28,7 +28,7 @@ async def test_discharge(app: App, session: "AsyncSession"):
         ctx.should_call_send(event, "请 @ 需要出院的病人", True)
         ctx.should_finished(discharge_cmd)
 
-    async with app.test_matcher(discharge_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -43,7 +43,7 @@ async def test_discharge(app: App, session: "AsyncSession"):
     session.add(patient)
     await session.commit()
 
-    async with app.test_matcher(discharge_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -54,7 +54,7 @@ async def test_discharge(app: App, session: "AsyncSession"):
         ctx.should_call_send(event, MessageSegment.at(10) + "出院成功", True)
         ctx.should_finished(discharge_cmd)
 
-    async with app.test_matcher(discharge_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

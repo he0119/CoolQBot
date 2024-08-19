@@ -9,7 +9,7 @@ async def test_dietary(app: App):
     """测试记录饮食"""
     from src.plugins.check_in.plugins.check_in_dietary import dietary_cmd
 
-    async with app.test_matcher(dietary_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -20,7 +20,7 @@ async def test_dietary(app: App):
         )
         ctx.should_finished(dietary_cmd)
 
-    async with app.test_matcher(dietary_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -31,7 +31,7 @@ async def test_dietary(app: App):
         )
         ctx.should_finished(dietary_cmd)
 
-    async with app.test_matcher(dietary_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -42,7 +42,7 @@ async def test_dietary(app: App):
         )
         ctx.should_finished(dietary_cmd)
 
-    async with app.test_matcher(dietary_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -67,7 +67,7 @@ async def test_dietary_invalid(app: App):
     """测试记录饮食不符合标准"""
     from src.plugins.check_in.plugins.check_in_dietary import dietary_cmd
 
-    async with app.test_matcher(dietary_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
