@@ -242,7 +242,7 @@ nonebot-plugin-session-orm==0.2.0
     # via nonebot-plugin-memes
 nonebot-plugin-status==0.8.1
 nonebot-plugin-treehelp==0.5.0
-nonebot-plugin-user==0.4.1
+nonebot-plugin-user==0.4.2
 nonebot-plugin-userinfo==0.2.5
     # via nonebot-plugin-memes
 nonebot-plugin-waiter==0.7.1
