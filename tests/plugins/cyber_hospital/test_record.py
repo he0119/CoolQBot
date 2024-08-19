@@ -38,7 +38,7 @@ async def test_record(app: App, session: "AsyncSession"):
 
     message = f"{record.time:%Y-%m-%d %H:%M} {record.content}"
 
-    async with app.test_matcher(record_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -49,7 +49,7 @@ async def test_record(app: App, session: "AsyncSession"):
         ctx.should_call_send(event, "请 @ 需要查看记录的病人", True)
         ctx.should_finished(record_cmd)
 
-    async with app.test_matcher(record_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -71,7 +71,7 @@ async def test_record_empty(app: App, session: "AsyncSession"):
     session.add(patient)
     await session.commit()
 
-    async with app.test_matcher(record_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -83,7 +83,7 @@ async def test_record_empty(app: App, session: "AsyncSession"):
         ctx.should_call_send(event, MessageSegment.at("10") + "暂时没有记录", True)
         ctx.should_finished(record_cmd)
 
-    async with app.test_matcher(record_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

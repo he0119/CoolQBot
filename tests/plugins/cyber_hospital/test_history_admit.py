@@ -40,7 +40,7 @@ async def test_history(app: App, session: "AsyncSession"):
     session.add(record)
     await session.commit()
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -53,7 +53,7 @@ async def test_history(app: App, session: "AsyncSession"):
         )
         ctx.should_finished(history_cmd)
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -69,7 +69,7 @@ async def test_history(app: App, session: "AsyncSession"):
         )
         ctx.should_finished(history_cmd)
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -90,7 +90,7 @@ async def test_history_empty(app: App, session: "AsyncSession"):
     """测试入院记录为空"""
     from src.plugins.cyber_hospital import history_cmd
 
-    async with app.test_matcher(history_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

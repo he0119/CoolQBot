@@ -17,7 +17,7 @@ async def test_roll(app: App, mocker: MockerFixture):
     randint = mocker.patch("src.plugins.roll.plugins.nga_roll.data_source.randint")
     randint.return_value = 1
 
-    async with app.test_matcher(roll_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)  # noqa: F821
 
@@ -40,7 +40,7 @@ async def test_roll_get_arg(app: App, mocker: MockerFixture):
     randint = mocker.patch("src.plugins.roll.plugins.nga_roll.data_source.randint")
     randint.return_value = 1
 
-    async with app.test_matcher(roll_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -72,7 +72,7 @@ async def test_roll_invalid(app: App, mocker: MockerFixture):
     randint = mocker.patch("src.plugins.roll.plugins.nga_roll.data_source.randint")
     randint.return_value = 1
 
-    async with app.test_matcher(roll_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -95,7 +95,7 @@ async def test_roll_complex(app: App, mocker: MockerFixture):
     randint = mocker.patch("src.plugins.roll.plugins.nga_roll.data_source.randint")
     randint.return_value = 1
 
-    async with app.test_matcher(roll_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(message=Message("/roll d100+2d50"))

@@ -44,7 +44,7 @@ async def test_price(app: App, mocker: MockerFixture):
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
-    async with app.test_matcher(price_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -71,7 +71,7 @@ async def test_price_default(app: App, mocker: MockerFixture):
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
-    async with app.test_matcher(price_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -80,7 +80,7 @@ async def test_price_default(app: App, mocker: MockerFixture):
         ctx.should_call_send(event, "当前设置的默认值为：猫小胖", True)
         ctx.should_finished(price_cmd)
 
-    async with app.test_matcher(price_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -93,7 +93,7 @@ async def test_price_default(app: App, mocker: MockerFixture):
         )
         ctx.should_finished(price_cmd)
 
-    async with app.test_matcher(price_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -102,7 +102,7 @@ async def test_price_default(app: App, mocker: MockerFixture):
         ctx.should_call_send(event, "查询区域默认值设置成功！", True)
         ctx.should_finished(price_cmd)
 
-    async with app.test_matcher(price_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -125,7 +125,7 @@ async def test_price_item_not_found(app: App, mocker: MockerFixture):
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
-    async with app.test_matcher(price_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -149,7 +149,7 @@ async def test_price_world_not_found(app: App, mocker: MockerFixture):
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
-    async with app.test_matcher(price_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -174,7 +174,7 @@ async def test_price_help(app: App):
     """测试查价，参数不足两个的情况"""
     from src.plugins.ff14.plugins.ff14_price import price_cmd
 
-    async with app.test_matcher(price_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

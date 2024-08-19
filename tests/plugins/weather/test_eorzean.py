@@ -13,7 +13,7 @@ async def test_eorzean(app: App, mocker: MockerFixture):
     mocked_time = mocker.patch("src.plugins.weather.eorzean_api.time")
     mocked_time.time.return_value = 1641619586
 
-    async with app.test_matcher(weather_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -38,7 +38,7 @@ async def test_eorzean_fuzzy(app: App, mocker: MockerFixture):
     mocked_time = mocker.patch("src.plugins.weather.eorzean_api.time")
     mocked_time.time.return_value = 1641619586
 
-    async with app.test_matcher(weather_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

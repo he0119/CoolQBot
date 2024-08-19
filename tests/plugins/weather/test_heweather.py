@@ -50,7 +50,7 @@ async def test_heweather(app: App, mocker: MockerFixture):
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
-    async with app.test_matcher(weather_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -87,7 +87,7 @@ async def test_heweather_with_adm(app: App, mocker: MockerFixture):
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
-    async with app.test_matcher(weather_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -124,7 +124,7 @@ async def test_heweather_with_three_args(app: App, mocker: MockerFixture):
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
-    async with app.test_matcher(weather_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -163,7 +163,7 @@ async def test_heweather_lookup_failed(
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
-    async with app.test_matcher(weather_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

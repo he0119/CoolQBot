@@ -40,7 +40,7 @@ async def test_music(app: App, mocker: MockerFixture):
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
-    async with app.test_matcher(music_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -67,7 +67,7 @@ async def test_music_get_arg(
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
-    async with app.test_matcher(music_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

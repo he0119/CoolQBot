@@ -9,7 +9,7 @@ async def test_fitness(app: App):
     """测试记录健身"""
     from src.plugins.check_in.plugins.check_in_fitness import fitness_cmd
 
-    async with app.test_matcher(fitness_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -20,7 +20,7 @@ async def test_fitness(app: App):
         )
         ctx.should_finished(fitness_cmd)
 
-    async with app.test_matcher(fitness_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

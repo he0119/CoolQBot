@@ -61,7 +61,7 @@ async def test_rank(app: App):
     """测试排行榜"""
     from src.plugins.repeat.plugins.repeat_rank import rank_cmd
 
-    async with app.test_matcher(rank_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -83,7 +83,7 @@ async def test_rank_limit(app: App):
     """不限制最低次数"""
     from src.plugins.repeat.plugins.repeat_rank import rank_cmd
 
-    async with app.test_matcher(rank_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -106,7 +106,7 @@ async def test_rank_not_enabled(app: App):
     """没有启用复读的情况"""
     from src.plugins.repeat.plugins.repeat_rank import rank_cmd
 
-    async with app.test_matcher(rank_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

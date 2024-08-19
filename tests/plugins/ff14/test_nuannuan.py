@@ -20,7 +20,7 @@ async def test_nuannuan(app: App, mocker: MockerFixture):
     r.json = mocker.MagicMock(return_value=data)
     async_client.return_value = r
 
-    async with app.test_matcher(nuannuan_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

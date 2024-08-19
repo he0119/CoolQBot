@@ -16,7 +16,7 @@ async def test_rounds(app: App, session: "AsyncSession"):
     from src.plugins.cyber_hospital import rounds_cmd
     from src.plugins.cyber_hospital.model import Patient
 
-    async with app.test_matcher(rounds_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -31,7 +31,7 @@ async def test_rounds(app: App, session: "AsyncSession"):
     session.add(patient)
     await session.commit()
 
-    async with app.test_matcher(rounds_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -49,7 +49,7 @@ async def test_rounds(app: App, session: "AsyncSession"):
         ctx.should_call_send(event, MessageSegment.at(10) + "记录成功", True)
         ctx.should_finished(rounds_cmd)
 
-    async with app.test_matcher(rounds_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -68,7 +68,7 @@ async def test_rounds(app: App, session: "AsyncSession"):
         ctx.should_call_send(event, MessageSegment.at(10) + "记录成功", True)
         ctx.should_finished(rounds_cmd)
 
-    async with app.test_matcher(rounds_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -106,7 +106,7 @@ async def test_rounds_with_record(app: App, session: "AsyncSession"):
     session.add(patient)
     await session.commit()
 
-    async with app.test_matcher(rounds_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 

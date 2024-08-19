@@ -17,7 +17,7 @@ async def test_rand(app: App, mocker: MockerFixture):
     randint = mocker.patch("src.plugins.roll.plugins.rand.data_source.randint")
     randint.return_value = 1
 
-    async with app.test_matcher(rand_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
@@ -40,7 +40,7 @@ async def test_rand_probability(app: App, mocker: MockerFixture):
     randint = mocker.patch("src.plugins.roll.plugins.rand.data_source.randint")
     randint.return_value = 1
 
-    async with app.test_matcher(rand_cmd) as ctx:
+    async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
