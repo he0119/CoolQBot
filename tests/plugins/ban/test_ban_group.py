@@ -7,16 +7,6 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event_v11
 
 
-@pytest.fixture()
-async def app(app: App):
-    yield app
-
-    from src.plugins.ban import _bot_role
-
-    # 清空机器人角色缓存
-    _bot_role.clear()
-
-
 @pytest.mark.parametrize(
     "sender",
     [
