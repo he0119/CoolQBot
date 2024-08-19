@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Fixed
 
 - 再次修复运行迁移脚本时加载插件报错
+- 修复无法正常启用和禁用启动问好的问题
 
 ## [0.19.1] - 2024-08-17
 
