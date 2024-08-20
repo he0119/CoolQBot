@@ -37,6 +37,12 @@ jobs:
       - name: Run tests
         run: rye run test
 
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
