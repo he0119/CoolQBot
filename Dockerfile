@@ -1,7 +1,7 @@
 FROM python:3.12.4-slim
 
 # 编译参数
-ARG VERSION="0.19.1"
+ARG VERSION="0.19.2"
 
 WORKDIR /app
 

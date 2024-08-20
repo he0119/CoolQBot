@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.19.2] - 2024-08-20
+
 ### Fixed
 
 - 再次修复运行迁移脚本时加载插件报错
@@ -559,7 +561,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.19.1...HEAD
+[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.19.2...HEAD
+[0.19.2]: https://github.com/he0119/CoolQBot/compare/v0.19.1...v0.19.2
 [0.19.1]: https://github.com/he0119/CoolQBot/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/he0119/CoolQBot/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/he0119/CoolQBot/compare/v0.18.0...v0.18.1
