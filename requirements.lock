@@ -195,7 +195,7 @@ matplotlib==3.9.2
     # via wordcloud
 mdurl==0.1.2
     # via markdown-it-py
-meme-generator==0.1.1
+meme-generator==0.1.2
     # via nonebot-plugin-memes
 msgpack==1.0.8
     # via nonebot-adapter-onebot
