@@ -13,9 +13,9 @@ aiodns==3.2.0 ; sys_platform == 'darwin' or sys_platform == 'linux'
     # via aiohttp
 aiofiles==24.1.0
     # via nonebot-plugin-htmlrender
-aiohappyeyeballs==2.3.7
+aiohappyeyeballs==2.4.0
     # via aiohttp
-aiohttp==3.10.4
+aiohttp==3.10.5
     # via nonebot2
 aiosignal==1.3.1
     # via aiohttp
@@ -61,7 +61,7 @@ brotli==1.1.0 ; platform_python_implementation == 'CPython'
     # via aiohttp
 brotlicffi==1.1.0.0 ; platform_python_implementation != 'CPython'
     # via aiohttp
-cachetools==5.4.0
+cachetools==5.5.0
     # via nonebot-plugin-userinfo
 cashews==7.2.0
     # via nb-cli
@@ -157,7 +157,7 @@ idna==3.7
     # via httpx
     # via requests
     # via yarl
-importlib-metadata==8.2.0
+importlib-metadata==8.3.0
     # via nonebot-plugin-alconna
 jieba==0.42.1
     # via nonebot-plugin-wordcloud
@@ -195,7 +195,7 @@ matplotlib==3.9.2
     # via wordcloud
 mdurl==0.1.2
     # via markdown-it-py
-meme-generator==0.1.1
+meme-generator==0.1.2
     # via nonebot-plugin-memes
 msgpack==1.0.8
     # via nonebot-adapter-onebot
@@ -213,7 +213,7 @@ nonebot-adapter-kaiheila==0.3.4
 nonebot-adapter-onebot==2.4.4
     # via nonebot-bison
     # via nonebot-plugin-bawiki
-nonebot-adapter-qq==1.5.0
+nonebot-adapter-qq==1.5.1
 nonebot-adapter-red==0.9.0
 nonebot-adapter-satori==0.12.3
 nonebot-adapter-telegram==0.1.0b17
@@ -301,7 +301,7 @@ nonebot2==2.3.3
     # via nonebot-plugin-wordcloud
 noneprompt==0.1.9
     # via nb-cli
-numpy==2.0.1
+numpy==2.1.0
     # via contourpy
     # via eorzeaenv
     # via matplotlib
@@ -314,7 +314,7 @@ packaging==24.1
     # via gunicorn
     # via matplotlib
     # via nonebot-adapter-red
-pil-utils==0.1.11
+pil-utils==0.1.12
     # via meme-generator
     # via nonebot-plugin-bawiki
 pillow==10.4.0
