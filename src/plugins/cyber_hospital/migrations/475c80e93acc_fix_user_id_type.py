@@ -1,7 +1,7 @@
 """fix user_id type
 
 修订 ID: 475c80e93acc
-父修订: ab1ae87b93e7
+父修订: c194c36434db
 创建时间: 2023-10-29 19:48:38.555866
 
 """
@@ -14,7 +14,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision: str = "475c80e93acc"
-down_revision: str | Sequence[str] | None = "ab1ae87b93e7"
+down_revision: str | Sequence[str] | None = "c194c36434db"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
