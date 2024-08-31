@@ -44,10 +44,7 @@ Repository = "https://github.com/he0119/CoolQBot.git"
 Issues = "https://github.com/he0119/CoolQBot/issues"
 Changelog = "https://github.com/he0119/CoolQBot/blob/master/CHANGELOG.md"
 
-[tool.rye]
-managed = true
-virtual = true
-universal = true
+[tool.uv]
 dev-dependencies = [
     "nonebug>=0.3.7",
     "nonebug-saa>=0.4.1",
@@ -60,9 +57,13 @@ dev-dependencies = [
     "freezegun>=1.5.1",
     "beautifulsoup4>=4.12.3",
     "bump-my-version>=0.24.3",
+    "poethepoet>=0.27.0",
 ]
 
-[tool.rye.scripts]
+[tool.uv.pip]
+universal = true
+
+[tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
 bump = "bump-my-version bump"
 show-bump = "bump-my-version show-bump"
