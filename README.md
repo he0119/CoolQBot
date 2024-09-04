@@ -32,9 +32,9 @@ vim .env
 
 ```shell
 # 初始化数据库
-nb orm upgrade
+uv run nb orm upgrade
 # 运行机器人
-nb run
+uv run nb run
 ```
 
 ### Docker
