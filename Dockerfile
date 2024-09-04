@@ -6,9 +6,9 @@ ARG VERSION="0.19.2"
 
 WORKDIR /app
 
+ENV SENTRY_RELEASE=${VERSION}
 # 设置时区
 ENV TZ=Asia/Shanghai
-ENV SENTRY_RELEASE=${VERSION}
 # 设置语言
 ENV LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
 
@@ -22,17 +22,17 @@ RUN apt-get update \
 
 # Python 依赖
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --compile-bytecode
+RUN uv sync --no-dev --frozen --compile-bytecode
 
 # 安装浏览器
-RUN uv run playwright install --with-deps chromium
+RUN uv run --no-dev playwright install --with-deps chromium
 
 # 缓存表情包制作插件字体与图片
 RUN git clone --depth 1 https://github.com/MeetWq/meme-generator.git \
   && cp -r ./meme-generator/resources/fonts /usr/share/fonts/meme-fonts \
   && rm -rf ./meme-generator \
   && fc-cache -fv
-RUN uv run meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator/
+RUN uv run --no-dev meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator/
 
 # Gunicorn 配置
 COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
@@ -47,4 +47,4 @@ ENV MAX_WORKERS=1
 COPY bot.py .env prestart.sh /app/
 COPY src /app/src/
 
-CMD ["uv", "run", "/start.sh"]
+CMD ["uv", "run", "--no-dev", "/start.sh"]
