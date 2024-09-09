@@ -27,7 +27,7 @@ jobs:
         run: sudo timedatectl set-timezone 'Asia/Shanghai'
 
       - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@v1
+        uses: astral-sh/setup-uv@v2
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
