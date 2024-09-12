@@ -14,7 +14,6 @@ from src.plugins.morning import plugin_config
 from src.utils.annotated import AsyncSession
 from src.utils.helpers import strtobool
 
-from . import migrations
 from .data_source import HOLIDAYS_DATA, get_moring_message
 from .models import MorningGreeting
 
@@ -36,7 +35,6 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters=inherit_supported_adapters(
         "nonebot_plugin_alconna", "nonebot_plugin_saa"
     ),
-    extra={"orm_version_location": migrations},
 )
 
 

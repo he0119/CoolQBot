@@ -15,7 +15,6 @@ require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
 require("nonebot_plugin_alconna")
 
-from . import migrations
 from .config import Config
 
 __plugin_meta__ = PluginMetadata(
@@ -23,7 +22,6 @@ __plugin_meta__ = PluginMetadata(
     description="与复读有关的功能",
     usage="与复读有关的功能",
     supported_adapters={"~onebot.v11", "~onebot.v12"},
-    extra={"orm_version_location": migrations},
 )
 
 _sub_plugins = set()

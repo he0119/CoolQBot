@@ -22,7 +22,6 @@ from nonebot_plugin_user import UserSession, get_user
 from src.utils.helpers import strtobool
 from src.utils.permission import is_superuser
 
-from . import migrations
 from .api import fflogs
 from .config import plugin_config
 from .data import FFLOGS_DATA
@@ -50,7 +49,6 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters=inherit_supported_adapters(
         "nonebot_plugin_alconna", "nonebot_plugin_user"
     ),
-    extra={"orm_version_location": migrations},
 )
 
 plugin_data = get_plugin_data()

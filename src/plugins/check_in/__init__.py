@@ -10,8 +10,6 @@ require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
 require("nonebot_plugin_alconna")
 
-from . import migrations
-
 __plugin_meta__ = PluginMetadata(
     name="打卡",
     description="每日打卡，记录健身数据",
@@ -19,7 +17,6 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters=inherit_supported_adapters(
         "nonebot_plugin_user", "nonebot_plugin_alconna"
     ),
-    extra={"orm_version_location": migrations},
 )
 
 _sub_plugins = set()
