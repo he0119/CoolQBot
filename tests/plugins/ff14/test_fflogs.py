@@ -296,7 +296,7 @@ async def test_dps_character_rankings(
     await fflogs.set_character(1, "name", "server")
 
     fflogs_data_mock = respx_mock.get(
-        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json"
+        "https://he0119.github.io/CoolQBot/fflogs_data.json"
     ).mock(return_value=httpx.Response(200, json=fflogs_data))
     user_dps_mock = respx_mock.get(
         "https://cn.fflogs.com/v1/rankings/character/name/server/CN?zone=29&encounter=65&metric=rdps&api_key=test"
@@ -386,7 +386,7 @@ async def test_dps_update_data(
     await fflogs.set_character(2, "name", "server")
 
     fflogs_data_mock = respx_mock.get(
-        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json"
+        "https://he0119.github.io/CoolQBot/fflogs_data.json"
     ).mock(return_value=httpx.Response(200, json=fflogs_data))
 
     async with app.test_matcher() as ctx:
@@ -422,7 +422,7 @@ async def test_dps_job_rankings_empty(
     mocked_datatime.now.return_value = datetime(2023, 4, 16, 12, 0, 0)
 
     fflogs_data_mock = respx_mock.get(
-        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json"
+        "https://he0119.github.io/CoolQBot/fflogs_data.json"
     ).mock(return_value=httpx.Response(200, json=fflogs_data))
     fflogs_job_rankings_mock = respx_mock.get(
         "https://cn.fflogs.com/v1/rankings/encounter/65?metric=rdps&difficulty=101&spec=13&page=1&filter=date.1681488000000.1681574400000&api_key=test"
@@ -474,7 +474,7 @@ async def test_dps_job_rankings(
     mocked_datatime.now.return_value = datetime(2023, 4, 16, 12, 0, 0)
 
     fflogs_data_mock = respx_mock.get(
-        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/fflogs_data.json"
+        "https://he0119.github.io/CoolQBot/fflogs_data.json"
     ).mock(return_value=httpx.Response(200, json=fflogs_data))
     fflogs_job_rankings_15_mock = respx_mock.get(
         "https://cn.fflogs.com/v1/rankings/encounter/87?metric=rdps&difficulty=101&spec=13&page=1&filter=date.1681488000000.1681574400000&api_key=test"
