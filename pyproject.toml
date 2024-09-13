@@ -42,7 +42,7 @@ requires-python = ">= 3.12, < 3.13"
 Homepage = "https://github.com/he0119/CoolQBot"
 Repository = "https://github.com/he0119/CoolQBot.git"
 Issues = "https://github.com/he0119/CoolQBot/issues"
-Changelog = "https://github.com/he0119/CoolQBot/blob/master/CHANGELOG.md"
+Changelog = "https://github.com/he0119/CoolQBot/blob/main/CHANGELOG.md"
 
 [tool.uv]
 dev-dependencies = [

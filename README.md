@@ -4,7 +4,7 @@
 # CoolQBot
 
 ![CI](https://github.com/he0119/CoolQBot/workflows/CI/badge.svg)
-[![codecov](https://codecov.io/gh/he0119/CoolQBot/branch/master/graph/badge.svg?token=QEC2IWAREH)](https://codecov.io/gh/he0119/CoolQBot)
+[![codecov](https://codecov.io/gh/he0119/CoolQBot/branch/main/graph/badge.svg?token=QEC2IWAREH)](https://codecov.io/gh/he0119/CoolQBot)
 [![Powered by NoneBot](https://img.shields.io/badge/Powered%20%20by-NoneBot-red)](https://github.com/nonebot/nonebot2)
 
 </div>
