@@ -16,9 +16,7 @@ async def app(app: App, respx_mock: MockRouter):
     with path.open("r", encoding="utf-8") as f:
         data = json.load(f)
 
-    respx_mock.get(
-        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/ff14/plugins/ff14_daily_quests/mogu.json"
-    ).respond(json=data)
+    respx_mock.get("https://he0119.github.io/CoolQBot/mogu.json").respond(json=data)
 
     return app
 

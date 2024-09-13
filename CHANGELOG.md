@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [0.19.2] - 2024-08-20
 
+### Changed
+
+- 使用 GitHub Pages 上的 json 文件
+
 ### Fixed
 
 - 再次修复运行迁移脚本时加载插件报错

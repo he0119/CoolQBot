@@ -25,10 +25,7 @@ def mocked_get(url: str, **kwargs):
             return json.dumps(self._json).encode("utf-8")
 
     test_dir = Path(__file__).parent
-    if (
-        url
-        == "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/morning/holidays.json"
-    ):
+    if url == "https://he0119.github.io/CoolQBot/holidays.json":
         with open(test_dir / "holidays.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
@@ -160,9 +157,7 @@ async def test_morning_today(app: App, mocker: MockerFixture):
         ctx.should_finished(morning_cmd)
 
     mocked_date.today.assert_called()
-    get.assert_called_once_with(
-        "https://raw.githubusercontent.com/he0119/CoolQBot/master/src/plugins/morning/holidays.json"
-    )
+    get.assert_called_once_with("https://he0119.github.io/CoolQBot/holidays.json")
     render_expression.assert_called_once_with(
         EXPR_MORNING,
         message="今天就是元旦，好好玩吧！",
