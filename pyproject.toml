@@ -123,16 +123,11 @@ replace = "version = \"{new_version}\""
 
 [[tool.bumpversion.files]]
 filename = "CHANGELOG.md"
-search = "[Unreleased]"
-replace = "[Unreleased]\n\n## [{new_version}] - {now:%Y-%m-%d}"
+search = "## [Unreleased]"
+replace = "## [Unreleased]\n\n## [{new_version}] - {now:%Y-%m-%d}"
 
 [[tool.bumpversion.files]]
 filename = "CHANGELOG.md"
 regex = true
-search = "\\[unreleased\\]: (https://.+?)v{current_version}\\.\\.\\.HEAD"
-replace = "[unreleased]: \\1v{new_version}...HEAD\n[{new_version}]: \\1v{current_version}...v{new_version}"
-
-[[tool.bumpversion.files]]
-filename = "Dockerfile"
-search = "ARG VERSION=\"{current_version}\""
-replace = "ARG VERSION=\"{new_version}\""
+search = "\\[Unreleased\\]: (https://.+?)v{current_version}\\.\\.\\.HEAD"
+replace = "[Unreleased]: \\1v{new_version}...HEAD\n[{new_version}]: \\1v{current_version}...v{new_version}"

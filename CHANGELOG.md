@@ -7,13 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
-### Fixed
-
-- 修正子插件的迁移脚本父修订版本号
-
 ### Changed
 
 - 使用 GitHub Pages 上的 json 文件
+
+### Fixed
+
+- 修正子插件的迁移脚本父修订版本号
 
 ## [0.19.2] - 2024-08-20
 
@@ -276,14 +276,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [0.12.1] - 2020-02-13
 
+### Changed
+
+- 用 `httpx` 替换 `requests`
+
 ### Fixed
 
 - 更新 `nonebot` 至 `1.4.1` 以修复 `render_expression` 的错误
 - 修复藏宝选门插件未正确处理不符合参数的问题
-
-### Changed
-
-- 用 `httpx` 替换 `requests`
 
 ## [0.12.0] - 2020-02-13
 
@@ -569,7 +569,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[unreleased]: https://github.com/he0119/CoolQBot/compare/v0.19.2...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.19.2...HEAD
 [0.19.2]: https://github.com/he0119/CoolQBot/compare/v0.19.1...v0.19.2
 [0.19.1]: https://github.com/he0119/CoolQBot/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/he0119/CoolQBot/compare/v0.18.1...v0.19.0
