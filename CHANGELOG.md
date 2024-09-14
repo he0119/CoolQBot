@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
-## [0.19.2] - 2024-08-20
+### Fixed
+
+- 修正子插件的迁移脚本父修订版本号
 
 ### Changed
 
 - 使用 GitHub Pages 上的 json 文件
+
+## [0.19.2] - 2024-08-20
 
 ### Fixed
 
