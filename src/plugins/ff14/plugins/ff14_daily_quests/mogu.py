@@ -17,7 +17,7 @@ plugin_data = get_plugin_data()
 
 
 MOGU_DATA = plugin_data.network_file(
-    "https://he0119.github.io/CoolQBot/mogu.json",
+    "https://bot-docs.hehome.xyz/mogu.json",
     "mogu_data.json",
     cache=True,
 )
