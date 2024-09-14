@@ -49,7 +49,7 @@ def _load_plugin(nonebug_init: None):
     nonebot.load_plugins(str(Path(__file__).parent.parent / "src" / "plugins"))
 
 
-@pytest.fixture()
+@pytest.fixture
 async def app(app: App, tmp_path: Path, mocker: MockerFixture):
     from nonebot_plugin_datastore.config import plugin_config
     from nonebot_plugin_orm import init_orm
@@ -72,7 +72,7 @@ async def app(app: App, tmp_path: Path, mocker: MockerFixture):
     return app
 
 
-@pytest.fixture()
+@pytest.fixture
 async def _default_user(app: App):
     from nonebot_plugin_orm import get_session
     from nonebot_plugin_user.models import Bind, User

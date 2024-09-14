@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from tests.fake import fake_group_message_event_v11
 
 
-@pytest.fixture()
+@pytest.fixture
 async def _records(app: App, mocker: MockerFixture):
     from nonebot_plugin_orm import get_session
 

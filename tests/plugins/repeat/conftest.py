@@ -3,7 +3,7 @@ from nonebug import App
 from sqlalchemy import delete
 
 
-@pytest.fixture()
+@pytest.fixture
 async def app(app: App):
     yield app
 

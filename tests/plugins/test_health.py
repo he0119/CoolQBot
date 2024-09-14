@@ -6,7 +6,7 @@ from nonebot.adapters.onebot.v11 import Bot
 from nonebug import App
 
 
-@pytest.fixture()
+@pytest.fixture
 def client(app: App):
     fastapi_app: FastAPI = nonebot.get_app()
 

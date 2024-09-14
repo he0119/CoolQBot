@@ -10,7 +10,7 @@ from respx import MockRouter
 from tests.fake import fake_group_message_event_v11
 
 
-@pytest.fixture()
+@pytest.fixture
 async def app(app: App, respx_mock: MockRouter):
     path = Path(__file__).parent / "mogu.json"
     with path.open("r", encoding="utf-8") as f:
