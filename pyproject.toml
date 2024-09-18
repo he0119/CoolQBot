@@ -30,7 +30,7 @@ dependencies = [
     "nonebot-plugin-datastore>=1.3.0",
     "nonebot-plugin-sentry>=2.0.0",
     "nonebot-plugin-memes==0.7.10",
-    "nonebot-bison @ git+https://github.com/MountainDash/nonebot-bison",
+    "nonebot-bison==0.9.4",
     "nonebot-plugin-status==0.9.0",
     "nonebot-plugin-bawiki==0.11.3",
 ]
