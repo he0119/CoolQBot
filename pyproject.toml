@@ -4,7 +4,7 @@ version = "0.19.2"
 description = "基于 NoneBot2 的聊天机器人"
 authors = [{ name = "uy_sun", email = "hmy0119@gmail.com" }]
 dependencies = [
-    "pydantic>=2.9.1",
+    "pydantic>=2.9.2",
     "eorzeaenv @ git+https://github.com/he0119/EorzeaEnv.git@coolqbot",
     "matplotlib>=3.9.2",
     "uvicorn[standard]>=0.30.6",
@@ -15,7 +15,7 @@ dependencies = [
     "nonebot-adapter-discord>=0.1.8",
     "nonebot-adapter-dodo>=0.2.1",
     "nonebot-adapter-kaiheila>=0.3.4",
-    "nonebot-adapter-onebot>=2.4.4",
+    "nonebot-adapter-onebot>=2.4.5",
     "nonebot-adapter-qq>=1.5.1",
     "nonebot-adapter-red>=0.9.0",
     "nonebot-adapter-satori>=0.12.5",
@@ -56,7 +56,7 @@ dev-dependencies = [
     "respx>=0.21.1",
     "freezegun>=1.5.1",
     "beautifulsoup4>=4.12.3",
-    "bump-my-version>=0.26.0",
+    "bump-my-version>=0.26.1",
     "poethepoet>=0.28.0",
 ]
 
