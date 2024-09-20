@@ -12,7 +12,7 @@ from sqlalchemy import select
 
 from src.plugins.morning import plugin_config
 from src.utils.annotated import AsyncSession
-from src.utils.helpers import strtobool
+from src.utils.helpers import admin_permission, strtobool
 
 from .data_source import HOLIDAYS_DATA, get_moring_message
 from .models import MorningGreeting
@@ -76,6 +76,7 @@ morning_cmd = on_alconna(
     aliases={"morning"},
     use_cmd_start=True,
     block=True,
+    permission=admin_permission(),
 )
 
 
