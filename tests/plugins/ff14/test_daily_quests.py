@@ -1,24 +1,8 @@
-import json
-from pathlib import Path
-
-import pytest
 from nonebot import get_adapter
 from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
-from respx import MockRouter
 
 from tests.fake import fake_group_message_event_v11
-
-
-@pytest.fixture
-async def app(app: App, respx_mock: MockRouter):
-    path = Path(__file__).parent / "mogu.json"
-    with path.open("r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    respx_mock.get("https://bot-docs.hehome.xyz/mogu.json").respond(json=data)
-
-    return app
 
 
 async def test_get_daily_quests(app: App):
@@ -52,7 +36,7 @@ async def test_set_daily_quests(app: App):
             "与你每日委托相同的群友：\n"
             "乐园都市笑笑镇：无\n"
             "伊弗利特歼灭战：无\n"
-            "影之国（7）：无",
+            "影之国：无",
             True,
             at_sender=True,
         )
@@ -69,7 +53,7 @@ async def test_set_daily_quests(app: App):
             "与你每日委托相同的群友：\n"
             "乐园都市笑笑镇：无\n"
             "伊弗利特歼灭战：无\n"
-            "影之国（7）：无",
+            "影之国：无",
             True,
             at_sender=True,
         )
