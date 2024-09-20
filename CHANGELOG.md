@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 支持通过脚本自动生成节假日信息
+
 ### Changed
 
 - 使用 GitHub Pages 上的 json 文件
