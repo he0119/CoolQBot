@@ -11,7 +11,7 @@ from nonebot_plugin_saa import PlatformTarget, Text, get_target
 from sqlalchemy import select
 
 from src.utils.annotated import AsyncSession
-from src.utils.helpers import strtobool
+from src.utils.helpers import admin_permission, strtobool
 
 from .data_source import get_first_connect_message
 from .models import Hello
@@ -66,6 +66,7 @@ hello_cmd = on_alconna(
     aliases={"hello"},
     use_cmd_start=True,
     block=True,
+    permission=admin_permission(),
 )
 
 
