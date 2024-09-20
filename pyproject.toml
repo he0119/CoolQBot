@@ -67,7 +67,7 @@ universal = true
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
 bump = "bump-my-version bump"
 show-bump = "bump-my-version show-bump"
-"gen:fflogs" = "python src/plugins/ff14/generate_fflogs_data.py"
+"gen:fflogs" = "python src/plugins/ff14/plugins/ff14_fflogs/generate_fflogs_data.py"
 "gen:holidays" = "python src/plugins/morning/plugins/morning_greeting/generate_holidays.py"
 
 [tool.nonebot]
