@@ -14,7 +14,7 @@ nonebot.load_plugin("nonebot_plugin_alconna")
 from src.plugins.ff14.plugins.ff14_fflogs.api import fflogs
 from src.plugins.ff14.plugins.ff14_fflogs.models import Encounter, Zones
 
-DATA_FILE = Path(__file__).parent / "fflogs_data.json"
+DATA_FILE = Path.cwd() / "public" / "fflogs_data.json"
 
 
 async def updata_job(data):
