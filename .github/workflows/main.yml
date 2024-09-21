@@ -26,10 +26,9 @@ jobs:
         run: sudo timedatectl set-timezone 'Asia/Shanghai'
 
       - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@v2
+        uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
-          cache-dependency-glob: "uv.lock"
 
       - name: Run tests
         run: uv run poe test
