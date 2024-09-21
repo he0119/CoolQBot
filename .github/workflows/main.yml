@@ -29,7 +29,6 @@ jobs:
         uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
-          cache-dependency-glob: "uv.lock"
 
       - name: Run tests
         run: uv run poe test
