@@ -2,7 +2,7 @@ FROM python:3.12.4-slim
 COPY --from=ghcr.io/astral-sh/uv:0.4.14 /uv /bin/uv
 
 # 编译参数
-ARG VERSION="0.19.2"
+ARG VERSION="0.20.0"
 
 WORKDIR /app
 

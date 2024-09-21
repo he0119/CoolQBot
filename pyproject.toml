@@ -1,6 +1,6 @@
 [project]
 name = "coolqbot"
-version = "0.19.2"
+version = "0.20.0"
 description = "基于 NoneBot2 的聊天机器人"
 authors = [{ name = "uy_sun", email = "hmy0119@gmail.com" }]
 dependencies = [
@@ -113,7 +113,7 @@ addopts = ["--import-mode=importlib"]
 asyncio_mode = "auto"
 
 [tool.bumpversion]
-current_version = "0.19.2"
+current_version = "0.20.0"
 commit = true
 message = "chore(release): {new_version} [skip ci]"
 
