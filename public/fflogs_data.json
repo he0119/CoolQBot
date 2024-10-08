@@ -1,5 +1,5 @@
 {
-  "version": "6.5",
+  "version": "7.0",
   "boss": [
     {
       "name": "空中神域不获岛",
@@ -1778,6 +1778,125 @@
       "nicknames": [],
       "zone": 56,
       "encounter": 2052,
+      "difficulty": 100
+    },
+    {
+      "name": "忆中金曦亚历山德里亚",
+      "nicknames": [],
+      "zone": 57,
+      "encounter": 4539,
+      "difficulty": 100
+    },
+    {
+      "name": "荒野秘境仙人刺谷",
+      "nicknames": [],
+      "zone": 57,
+      "encounter": 4540,
+      "difficulty": 100
+    },
+    {
+      "name": "噩梦乐园迷途鬼区",
+      "nicknames": [],
+      "zone": 57,
+      "encounter": 4541,
+      "difficulty": 100
+    },
+    {
+      "name": "艳翼蛇鸟歼殛战",
+      "nicknames": ["极鸟", "武器神"],
+      "zone": 58,
+      "encounter": 1071,
+      "difficulty": 100
+    },
+    {
+      "name": "佐拉加歼殛战",
+      "nicknames": ["极佐", "首饰神"],
+      "zone": 58,
+      "encounter": 1072,
+      "difficulty": 100
+    },
+    {
+      "name": "Ultimates (Legacy) 巴哈姆特绝境战",
+      "nicknames": [],
+      "zone": 59,
+      "encounter": 1073,
+      "difficulty": 101
+    },
+    {
+      "name": "Ultimates (Legacy) 究极神兵绝境战",
+      "nicknames": [],
+      "zone": 59,
+      "encounter": 1074,
+      "difficulty": 101
+    },
+    {
+      "name": "Ultimates (Legacy) 亚历山大绝境战",
+      "nicknames": [],
+      "zone": 59,
+      "encounter": 1075,
+      "difficulty": 101
+    },
+    {
+      "name": "Ultimates (Legacy) 幻想龙诗绝境战",
+      "nicknames": [],
+      "zone": 59,
+      "encounter": 1076,
+      "difficulty": 101
+    },
+    {
+      "name": "Ultimates (Legacy) 欧米茄绝境验证战",
+      "nicknames": [],
+      "zone": 59,
+      "encounter": 1077,
+      "difficulty": 101
+    },
+    {
+      "name": "Delubrum Reginae 求道之三位一体",
+      "nicknames": [],
+      "zone": 60,
+      "encounter": 2053,
+      "difficulty": 100
+    },
+    {
+      "name": "Delubrum Reginae 女王护卫",
+      "nicknames": [],
+      "zone": 60,
+      "encounter": 2054,
+      "difficulty": 100
+    },
+    {
+      "name": "Delubrum Reginae 誓约之三位一体",
+      "nicknames": [],
+      "zone": 60,
+      "encounter": 2055,
+      "difficulty": 100
+    },
+    {
+      "name": "Delubrum Reginae 天佑女王",
+      "nicknames": [],
+      "zone": 60,
+      "encounter": 2056,
+      "difficulty": 100
+    },
+    {
+      "name": "异闻希拉狄哈水道",
+      "nicknames": [],
+      "zone": 61,
+      "encounter": 4542,
+      "difficulty": 100
+    },
+    {
+      "name": "异闻六根山",
+      "nicknames": [],
+      "zone": 61,
+      "encounter": 4543,
+      "difficulty": 100
+    },
+    {
+      "name": "异闻阿罗阿罗岛",
+      "nicknames": [],
+      "zone": 61,
+      "encounter": 4544,
       "difficulty": 100
     }
   ],
