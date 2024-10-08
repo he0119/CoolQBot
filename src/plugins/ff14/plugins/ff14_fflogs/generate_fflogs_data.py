@@ -76,7 +76,7 @@ async def update_boss(data):
                 data["boss"].append(
                     {
                         "name": name,
-                        "nicknames": [name.replace(" ", "-")],
+                        "nicknames": [name.replace(" ", "-").lower()],
                         "zone": zone.id,
                         "encounter": encounter.id,
                         "difficulty": difficulty,

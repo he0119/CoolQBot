@@ -73,336 +73,336 @@
     },
     {
       "name": "Trials (Extreme) 俾斯麦",
-      "nicknames": ["Trials-(Extreme)-俾斯麦"],
+      "nicknames": ["trials-(extreme)-俾斯麦"],
       "zone": 4,
       "encounter": 1027,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 罗波那",
-      "nicknames": ["Trials-(Extreme)-罗波那"],
+      "nicknames": ["trials-(extreme)-罗波那"],
       "zone": 4,
       "encounter": 1028,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 骑神托尔丹",
-      "nicknames": ["Trials-(Extreme)-骑神托尔丹"],
+      "nicknames": ["trials-(extreme)-骑神托尔丹"],
       "zone": 4,
       "encounter": 1029,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 萨菲洛特",
-      "nicknames": ["Trials-(Extreme)-萨菲洛特"],
+      "nicknames": ["trials-(extreme)-萨菲洛特"],
       "zone": 4,
       "encounter": 1031,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 尼德霍格",
-      "nicknames": ["Trials-(Extreme)-尼德霍格"],
+      "nicknames": ["trials-(extreme)-尼德霍格"],
       "zone": 4,
       "encounter": 1033,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 索菲娅",
-      "nicknames": ["Trials-(Extreme)-索菲娅"],
+      "nicknames": ["trials-(extreme)-索菲娅"],
       "zone": 4,
       "encounter": 1034,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 祖尔宛",
-      "nicknames": ["Trials-(Extreme)-祖尔宛"],
+      "nicknames": ["trials-(extreme)-祖尔宛"],
       "zone": 4,
       "encounter": 1035,
       "difficulty": 100
     },
     {
       "name": "Void Ark 刻托",
-      "nicknames": ["Void-Ark-刻托"],
+      "nicknames": ["void-ark-刻托"],
       "zone": 5,
       "encounter": 2000,
       "difficulty": 100
     },
     {
       "name": "Void Ark 天柱树",
-      "nicknames": ["Void-Ark-天柱树"],
+      "nicknames": ["void-ark-天柱树"],
       "zone": 5,
       "encounter": 2001,
       "difficulty": 100
     },
     {
       "name": "Void Ark 丘库雷因",
-      "nicknames": ["Void-Ark-丘库雷因"],
+      "nicknames": ["void-ark-丘库雷因"],
       "zone": 5,
       "encounter": 2002,
       "difficulty": 100
     },
     {
       "name": "Void Ark 艾奇德娜",
-      "nicknames": ["Void-Ark-艾奇德娜"],
+      "nicknames": ["void-ark-艾奇德娜"],
       "zone": 5,
       "encounter": 2003,
       "difficulty": 100
     },
     {
       "name": "Alexander: Gordias (Story) 压迫者",
-      "nicknames": ["Alexander:-Gordias-(Story)-压迫者"],
+      "nicknames": ["alexander:-gordias-(story)-压迫者"],
       "zone": 6,
       "encounter": 14,
       "difficulty": 100
     },
     {
       "name": "Alexander: Gordias (Story) 戈耳狄俄斯之袖",
-      "nicknames": ["Alexander:-Gordias-(Story)-戈耳狄俄斯之袖"],
+      "nicknames": ["alexander:-gordias-(story)-戈耳狄俄斯之袖"],
       "zone": 6,
       "encounter": 15,
       "difficulty": 100
     },
     {
       "name": "Alexander: Gordias (Story) 有生命活水",
-      "nicknames": ["Alexander:-Gordias-(Story)-有生命活水"],
+      "nicknames": ["alexander:-gordias-(story)-有生命活水"],
       "zone": 6,
       "encounter": 16,
       "difficulty": 100
     },
     {
       "name": "Alexander: Gordias (Story) 操纵者",
-      "nicknames": ["Alexander:-Gordias-(Story)-操纵者"],
+      "nicknames": ["alexander:-gordias-(story)-操纵者"],
       "zone": 6,
       "encounter": 17,
       "difficulty": 100
     },
     {
       "name": "Alexander: Gordias (Story) 浮士德",
-      "nicknames": ["Alexander:-Gordias-(Story)-浮士德"],
+      "nicknames": ["alexander:-gordias-(story)-浮士德"],
       "zone": 6,
       "encounter": 5000,
       "difficulty": 100
     },
     {
       "name": "Alexander: Gordias (Savage) 压迫者",
-      "nicknames": ["Alexander:-Gordias-(Savage)-压迫者"],
+      "nicknames": ["alexander:-gordias-(savage)-压迫者"],
       "zone": 7,
       "encounter": 18,
       "difficulty": 101
     },
     {
       "name": "Alexander: Gordias (Savage) 戈耳狄俄斯之袖",
-      "nicknames": ["Alexander:-Gordias-(Savage)-戈耳狄俄斯之袖"],
+      "nicknames": ["alexander:-gordias-(savage)-戈耳狄俄斯之袖"],
       "zone": 7,
       "encounter": 19,
       "difficulty": 101
     },
     {
       "name": "Alexander: Gordias (Savage) 有生命活水",
-      "nicknames": ["Alexander:-Gordias-(Savage)-有生命活水"],
+      "nicknames": ["alexander:-gordias-(savage)-有生命活水"],
       "zone": 7,
       "encounter": 20,
       "difficulty": 101
     },
     {
       "name": "Alexander: Gordias (Savage) 操纵者",
-      "nicknames": ["Alexander:-Gordias-(Savage)-操纵者"],
+      "nicknames": ["alexander:-gordias-(savage)-操纵者"],
       "zone": 7,
       "encounter": 21,
       "difficulty": 101
     },
     {
       "name": "Alexander: Gordias (Savage) 浮士德",
-      "nicknames": ["Alexander:-Gordias-(Savage)-浮士德"],
+      "nicknames": ["alexander:-gordias-(savage)-浮士德"],
       "zone": 7,
       "encounter": 5001,
       "difficulty": 101
     },
     {
       "name": "The Weeping City of Mhach 阿剌克涅",
-      "nicknames": ["The-Weeping-City-of-Mhach-阿剌克涅"],
+      "nicknames": ["the-weeping-city-of-mhach-阿剌克涅"],
       "zone": 8,
       "encounter": 2004,
       "difficulty": 100
     },
     {
       "name": "The Weeping City of Mhach 弗加尔",
-      "nicknames": ["The-Weeping-City-of-Mhach-弗加尔"],
+      "nicknames": ["the-weeping-city-of-mhach-弗加尔"],
       "zone": 8,
       "encounter": 2005,
       "difficulty": 100
     },
     {
       "name": "The Weeping City of Mhach 奥兹玛",
-      "nicknames": ["The-Weeping-City-of-Mhach-奥兹玛"],
+      "nicknames": ["the-weeping-city-of-mhach-奥兹玛"],
       "zone": 8,
       "encounter": 2006,
       "difficulty": 100
     },
     {
       "name": "The Weeping City of Mhach 卡洛菲斯提莉",
-      "nicknames": ["The-Weeping-City-of-Mhach-卡洛菲斯提莉"],
+      "nicknames": ["the-weeping-city-of-mhach-卡洛菲斯提莉"],
       "zone": 8,
       "encounter": 2007,
       "difficulty": 100
     },
     {
       "name": "Alexander: Midas (Story) 奇才 拉特芬克斯",
-      "nicknames": ["Alexander:-Midas-(Story)-奇才-拉特芬克斯"],
+      "nicknames": ["alexander:-midas-(story)-奇才-拉特芬克斯"],
       "zone": 9,
       "encounter": 22,
       "difficulty": 100
     },
     {
       "name": "Alexander: Midas (Story) 环旋者",
-      "nicknames": ["Alexander:-Midas-(Story)-环旋者"],
+      "nicknames": ["alexander:-midas-(story)-环旋者"],
       "zone": 9,
       "encounter": 23,
       "difficulty": 100
     },
     {
       "name": "Alexander: Midas (Story) 万事通 奎克辛克斯",
-      "nicknames": ["Alexander:-Midas-(Story)-万事通-奎克辛克斯"],
+      "nicknames": ["alexander:-midas-(story)-万事通-奎克辛克斯"],
       "zone": 9,
       "encounter": 24,
       "difficulty": 100
     },
     {
       "name": "Alexander: Midas (Story) 残暴正义号",
-      "nicknames": ["Alexander:-Midas-(Story)-残暴正义号"],
+      "nicknames": ["alexander:-midas-(story)-残暴正义号"],
       "zone": 9,
       "encounter": 25,
       "difficulty": 100
     },
     {
       "name": "Alexander: Midas (Story) 新型浮士德",
-      "nicknames": ["Alexander:-Midas-(Story)-新型浮士德"],
+      "nicknames": ["alexander:-midas-(story)-新型浮士德"],
       "zone": 9,
       "encounter": 5002,
       "difficulty": 100
     },
     {
       "name": "Alexander: Midas (Story) 爆破者",
-      "nicknames": ["Alexander:-Midas-(Story)-爆破者"],
+      "nicknames": ["alexander:-midas-(story)-爆破者"],
       "zone": 9,
       "encounter": 5003,
       "difficulty": 100
     },
     {
       "name": "Alexander: Midas (Story) 争斗者",
-      "nicknames": ["Alexander:-Midas-(Story)-争斗者"],
+      "nicknames": ["alexander:-midas-(story)-争斗者"],
       "zone": 9,
       "encounter": 5004,
       "difficulty": 100
     },
     {
       "name": "Alexander: Midas (Story) 欺诈者",
-      "nicknames": ["Alexander:-Midas-(Story)-欺诈者"],
+      "nicknames": ["alexander:-midas-(story)-欺诈者"],
       "zone": 9,
       "encounter": 5005,
       "difficulty": 100
     },
     {
       "name": "Alexander: Midas (Savage) 奇才 拉特芬克斯",
-      "nicknames": ["Alexander:-Midas-(Savage)-奇才-拉特芬克斯"],
+      "nicknames": ["alexander:-midas-(savage)-奇才-拉特芬克斯"],
       "zone": 10,
       "encounter": 26,
       "difficulty": 101
     },
     {
       "name": "Alexander: Midas (Savage) 弥达斯之袖",
-      "nicknames": ["Alexander:-Midas-(Savage)-弥达斯之袖"],
+      "nicknames": ["alexander:-midas-(savage)-弥达斯之袖"],
       "zone": 10,
       "encounter": 27,
       "difficulty": 101
     },
     {
       "name": "Alexander: Midas (Savage) 万事通 奎克辛克斯",
-      "nicknames": ["Alexander:-Midas-(Savage)-万事通-奎克辛克斯"],
+      "nicknames": ["alexander:-midas-(savage)-万事通-奎克辛克斯"],
       "zone": 10,
       "encounter": 28,
       "difficulty": 101
     },
     {
       "name": "Alexander: Midas (Savage) 残暴正义号",
-      "nicknames": ["Alexander:-Midas-(Savage)-残暴正义号"],
+      "nicknames": ["alexander:-midas-(savage)-残暴正义号"],
       "zone": 10,
       "encounter": 29,
       "difficulty": 101
     },
     {
       "name": "Alexander: Midas (Savage) 霍摩福斯特",
-      "nicknames": ["Alexander:-Midas-(Savage)-霍摩福斯特"],
+      "nicknames": ["alexander:-midas-(savage)-霍摩福斯特"],
       "zone": 10,
       "encounter": 5006,
       "difficulty": 101
     },
     {
       "name": "Alexander: The Creator (Story) 废品翻新装置",
-      "nicknames": ["Alexander:-The-Creator-(Story)-废品翻新装置"],
+      "nicknames": ["alexander:-the-creator-(story)-废品翻新装置"],
       "zone": 12,
       "encounter": 30,
       "difficulty": 100
     },
     {
       "name": "Alexander: The Creator (Story) 佣兵雷姆普里克斯",
-      "nicknames": ["Alexander:-The-Creator-(Story)-佣兵雷姆普里克斯"],
+      "nicknames": ["alexander:-the-creator-(story)-佣兵雷姆普里克斯"],
       "zone": 12,
       "encounter": 31,
       "difficulty": 100
     },
     {
       "name": "Alexander: The Creator (Story) 巡航驱逐者",
-      "nicknames": ["Alexander:-The-Creator-(Story)-巡航驱逐者"],
+      "nicknames": ["alexander:-the-creator-(story)-巡航驱逐者"],
       "zone": 12,
       "encounter": 32,
       "difficulty": 100
     },
     {
       "name": "Alexander: The Creator (Story) 至尊亚历山大",
-      "nicknames": ["Alexander:-The-Creator-(Story)-至尊亚历山大"],
+      "nicknames": ["alexander:-the-creator-(story)-至尊亚历山大"],
       "zone": 12,
       "encounter": 33,
       "difficulty": 100
     },
     {
       "name": "Alexander: The Creator (Story) 终极浮士德",
-      "nicknames": ["Alexander:-The-Creator-(Story)-终极浮士德"],
+      "nicknames": ["alexander:-the-creator-(story)-终极浮士德"],
       "zone": 12,
       "encounter": 5007,
       "difficulty": 100
     },
     {
       "name": "Alexander: The Creator (Savage) 废品翻新装置",
-      "nicknames": ["Alexander:-The-Creator-(Savage)-废品翻新装置"],
+      "nicknames": ["alexander:-the-creator-(savage)-废品翻新装置"],
       "zone": 13,
       "encounter": 34,
       "difficulty": 101
     },
     {
       "name": "Alexander: The Creator (Savage) 佣兵雷姆普里克斯",
-      "nicknames": ["Alexander:-The-Creator-(Savage)-佣兵雷姆普里克斯"],
+      "nicknames": ["alexander:-the-creator-(savage)-佣兵雷姆普里克斯"],
       "zone": 13,
       "encounter": 35,
       "difficulty": 101
     },
     {
       "name": "Alexander: The Creator (Savage) 巡航驱逐者",
-      "nicknames": ["Alexander:-The-Creator-(Savage)-巡航驱逐者"],
+      "nicknames": ["alexander:-the-creator-(savage)-巡航驱逐者"],
       "zone": 13,
       "encounter": 36,
       "difficulty": 101
     },
     {
       "name": "Alexander: The Creator (Savage) 至尊亚历山大",
-      "nicknames": ["Alexander:-The-Creator-(Savage)-至尊亚历山大"],
+      "nicknames": ["alexander:-the-creator-(savage)-至尊亚历山大"],
       "zone": 13,
       "encounter": 37,
       "difficulty": 101
     },
     {
       "name": "Alexander: The Creator (Savage) 终极浮士德",
-      "nicknames": ["Alexander:-The-Creator-(Savage)-终极浮士德"],
+      "nicknames": ["alexander:-the-creator-(savage)-终极浮士德"],
       "zone": 13,
       "encounter": 5008,
       "difficulty": 101
@@ -479,336 +479,336 @@
     },
     {
       "name": "Trials (Extreme) 须佐之男",
-      "nicknames": ["Trials-(Extreme)-须佐之男"],
+      "nicknames": ["trials-(extreme)-须佐之男"],
       "zone": 15,
       "encounter": 1036,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 吉祥天女",
-      "nicknames": ["Trials-(Extreme)-吉祥天女"],
+      "nicknames": ["trials-(extreme)-吉祥天女"],
       "zone": 15,
       "encounter": 1037,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 神龙",
-      "nicknames": ["Trials-(Extreme)-神龙"],
+      "nicknames": ["trials-(extreme)-神龙"],
       "zone": 15,
       "encounter": 1038,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 白虎",
-      "nicknames": ["Trials-(Extreme)-白虎"],
+      "nicknames": ["trials-(extreme)-白虎"],
       "zone": 15,
       "encounter": 1040,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 月读",
-      "nicknames": ["Trials-(Extreme)-月读"],
+      "nicknames": ["trials-(extreme)-月读"],
       "zone": 15,
       "encounter": 1041,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 朱雀",
-      "nicknames": ["Trials-(Extreme)-朱雀"],
+      "nicknames": ["trials-(extreme)-朱雀"],
       "zone": 15,
       "encounter": 1043,
       "difficulty": 100
     },
     {
       "name": "Trials (Extreme) 青龙",
-      "nicknames": ["Trials-(Extreme)-青龙"],
+      "nicknames": ["trials-(extreme)-青龙"],
       "zone": 15,
       "encounter": 1044,
       "difficulty": 100
     },
     {
       "name": "Omega: Deltascape (Story) 老者",
-      "nicknames": ["Omega:-Deltascape-(Story)-老者"],
+      "nicknames": ["omega:-deltascape-(story)-老者"],
       "zone": 16,
       "encounter": 38,
       "difficulty": 100
     },
     {
       "name": "Omega: Deltascape (Story) 灾变者",
-      "nicknames": ["Omega:-Deltascape-(Story)-灾变者"],
+      "nicknames": ["omega:-deltascape-(story)-灾变者"],
       "zone": 16,
       "encounter": 39,
       "difficulty": 100
     },
     {
       "name": "Omega: Deltascape (Story) 哈利卡纳苏斯",
-      "nicknames": ["Omega:-Deltascape-(Story)-哈利卡纳苏斯"],
+      "nicknames": ["omega:-deltascape-(story)-哈利卡纳苏斯"],
       "zone": 16,
       "encounter": 40,
       "difficulty": 100
     },
     {
       "name": "Omega: Deltascape (Story) 艾克斯迪司",
-      "nicknames": ["Omega:-Deltascape-(Story)-艾克斯迪司"],
+      "nicknames": ["omega:-deltascape-(story)-艾克斯迪司"],
       "zone": 16,
       "encounter": 41,
       "difficulty": 100
     },
     {
       "name": "Omega: Deltascape (Savage) 老者",
-      "nicknames": ["Omega:-Deltascape-(Savage)-老者"],
+      "nicknames": ["omega:-deltascape-(savage)-老者"],
       "zone": 17,
       "encounter": 42,
       "difficulty": 101
     },
     {
       "name": "Omega: Deltascape (Savage) 灾变者",
-      "nicknames": ["Omega:-Deltascape-(Savage)-灾变者"],
+      "nicknames": ["omega:-deltascape-(savage)-灾变者"],
       "zone": 17,
       "encounter": 43,
       "difficulty": 101
     },
     {
       "name": "Omega: Deltascape (Savage) 哈利卡纳苏斯",
-      "nicknames": ["Omega:-Deltascape-(Savage)-哈利卡纳苏斯"],
+      "nicknames": ["omega:-deltascape-(savage)-哈利卡纳苏斯"],
       "zone": 17,
       "encounter": 44,
       "difficulty": 101
     },
     {
       "name": "Omega: Deltascape (Savage) 艾克斯迪司",
-      "nicknames": ["Omega:-Deltascape-(Savage)-艾克斯迪司"],
+      "nicknames": ["omega:-deltascape-(savage)-艾克斯迪司"],
       "zone": 17,
       "encounter": 45,
       "difficulty": 101
     },
     {
       "name": "Omega: Deltascape (Savage) 新生艾克斯迪司",
-      "nicknames": ["Omega:-Deltascape-(Savage)-新生艾克斯迪司"],
+      "nicknames": ["omega:-deltascape-(savage)-新生艾克斯迪司"],
       "zone": 17,
       "encounter": 46,
       "difficulty": 101
     },
     {
       "name": "The Royal City of Rabanastre 背德皇帝马提乌斯",
-      "nicknames": ["The-Royal-City-of-Rabanastre-背德皇帝马提乌斯"],
+      "nicknames": ["the-royal-city-of-rabanastre-背德皇帝马提乌斯"],
       "zone": 18,
       "encounter": 2008,
       "difficulty": 100
     },
     {
       "name": "The Royal City of Rabanastre 统治者哈修马利姆",
-      "nicknames": ["The-Royal-City-of-Rabanastre-统治者哈修马利姆"],
+      "nicknames": ["the-royal-city-of-rabanastre-统治者哈修马利姆"],
       "zone": 18,
       "encounter": 2009,
       "difficulty": 100
     },
     {
       "name": "The Royal City of Rabanastre 人马王洛弗卡勒",
-      "nicknames": ["The-Royal-City-of-Rabanastre-人马王洛弗卡勒"],
+      "nicknames": ["the-royal-city-of-rabanastre-人马王洛弗卡勒"],
       "zone": 18,
       "encounter": 2010,
       "difficulty": 100
     },
     {
       "name": "The Royal City of Rabanastre 冷血剑阿加斯",
-      "nicknames": ["The-Royal-City-of-Rabanastre-冷血剑阿加斯"],
+      "nicknames": ["the-royal-city-of-rabanastre-冷血剑阿加斯"],
       "zone": 18,
       "encounter": 2011,
       "difficulty": 100
     },
     {
       "name": "The Unending Coil of Bahamut 至尊巴哈姆特",
-      "nicknames": ["The-Unending-Coil-of-Bahamut-至尊巴哈姆特"],
+      "nicknames": ["the-unending-coil-of-bahamut-至尊巴哈姆特"],
       "zone": 19,
       "encounter": 1039,
       "difficulty": 100
     },
     {
       "name": "Omega: Sigmascape (Story) 魔列车",
-      "nicknames": ["Omega:-Sigmascape-(Story)-魔列车"],
+      "nicknames": ["omega:-sigmascape-(story)-魔列车"],
       "zone": 20,
       "encounter": 47,
       "difficulty": 100
     },
     {
       "name": "Omega: Sigmascape (Story) 恶魔查达奴克",
-      "nicknames": ["Omega:-Sigmascape-(Story)-恶魔查达奴克"],
+      "nicknames": ["omega:-sigmascape-(story)-恶魔查达奴克"],
       "zone": 20,
       "encounter": 48,
       "difficulty": 100
     },
     {
       "name": "Omega: Sigmascape (Story) 守护者",
-      "nicknames": ["Omega:-Sigmascape-(Story)-守护者"],
+      "nicknames": ["omega:-sigmascape-(story)-守护者"],
       "zone": 20,
       "encounter": 49,
       "difficulty": 100
     },
     {
       "name": "Omega: Sigmascape (Story) 凯夫卡",
-      "nicknames": ["Omega:-Sigmascape-(Story)-凯夫卡"],
+      "nicknames": ["omega:-sigmascape-(story)-凯夫卡"],
       "zone": 20,
       "encounter": 50,
       "difficulty": 100
     },
     {
       "name": "Omega: Sigmascape (Savage) 魔列车",
-      "nicknames": ["Omega:-Sigmascape-(Savage)-魔列车"],
+      "nicknames": ["omega:-sigmascape-(savage)-魔列车"],
       "zone": 21,
       "encounter": 51,
       "difficulty": 101
     },
     {
       "name": "Omega: Sigmascape (Savage) 恶魔查达奴克",
-      "nicknames": ["Omega:-Sigmascape-(Savage)-恶魔查达奴克"],
+      "nicknames": ["omega:-sigmascape-(savage)-恶魔查达奴克"],
       "zone": 21,
       "encounter": 52,
       "difficulty": 101
     },
     {
       "name": "Omega: Sigmascape (Savage) 守护者",
-      "nicknames": ["Omega:-Sigmascape-(Savage)-守护者"],
+      "nicknames": ["omega:-sigmascape-(savage)-守护者"],
       "zone": 21,
       "encounter": 53,
       "difficulty": 101
     },
     {
       "name": "Omega: Sigmascape (Savage) 凯夫卡",
-      "nicknames": ["Omega:-Sigmascape-(Savage)-凯夫卡"],
+      "nicknames": ["omega:-sigmascape-(savage)-凯夫卡"],
       "zone": 21,
       "encounter": 54,
       "difficulty": 101
     },
     {
       "name": "Omega: Sigmascape (Savage) 神圣凯夫卡",
-      "nicknames": ["Omega:-Sigmascape-(Savage)-神圣凯夫卡"],
+      "nicknames": ["omega:-sigmascape-(savage)-神圣凯夫卡"],
       "zone": 21,
       "encounter": 55,
       "difficulty": 101
     },
     {
       "name": "The Ridorana Lighthouse 暗黑之云法姆弗里特",
-      "nicknames": ["The-Ridorana-Lighthouse-暗黑之云法姆弗里特"],
+      "nicknames": ["the-ridorana-lighthouse-暗黑之云法姆弗里特"],
       "zone": 22,
       "encounter": 2012,
       "difficulty": 100
     },
     {
       "name": "The Ridorana Lighthouse 魔人贝利亚斯",
-      "nicknames": ["The-Ridorana-Lighthouse-魔人贝利亚斯"],
+      "nicknames": ["the-ridorana-lighthouse-魔人贝利亚斯"],
       "zone": 22,
       "encounter": 2013,
       "difficulty": 100
     },
     {
       "name": "The Ridorana Lighthouse 劳动七号",
-      "nicknames": ["The-Ridorana-Lighthouse-劳动七号"],
+      "nicknames": ["the-ridorana-lighthouse-劳动七号"],
       "zone": 22,
       "encounter": 2014,
       "difficulty": 100
     },
     {
       "name": "The Ridorana Lighthouse 鬼龙雅兹玛特",
-      "nicknames": ["The-Ridorana-Lighthouse-鬼龙雅兹玛特"],
+      "nicknames": ["the-ridorana-lighthouse-鬼龙雅兹玛特"],
       "zone": 22,
       "encounter": 2015,
       "difficulty": 100
     },
     {
       "name": "The Weapon's Refrain 究极神兵",
-      "nicknames": ["The-Weapon's-Refrain-究极神兵"],
+      "nicknames": ["the-weapon's-refrain-究极神兵"],
       "zone": 23,
       "encounter": 1042,
       "difficulty": 100
     },
     {
       "name": "Omega: Alphascape (Story) 卡奥斯",
-      "nicknames": ["Omega:-Alphascape-(Story)-卡奥斯"],
+      "nicknames": ["omega:-alphascape-(story)-卡奥斯"],
       "zone": 24,
       "encounter": 56,
       "difficulty": 100
     },
     {
       "name": "Omega: Alphascape (Story) 尘世幻龙",
-      "nicknames": ["Omega:-Alphascape-(Story)-尘世幻龙"],
+      "nicknames": ["omega:-alphascape-(story)-尘世幻龙"],
       "zone": 24,
       "encounter": 57,
       "difficulty": 100
     },
     {
       "name": "Omega: Alphascape (Story) 欧米茄",
-      "nicknames": ["Omega:-Alphascape-(Story)-欧米茄"],
+      "nicknames": ["omega:-alphascape-(story)-欧米茄"],
       "zone": 24,
       "encounter": 58,
       "difficulty": 100
     },
     {
       "name": "Omega: Alphascape (Story) 双生欧米茄",
-      "nicknames": ["Omega:-Alphascape-(Story)-双生欧米茄"],
+      "nicknames": ["omega:-alphascape-(story)-双生欧米茄"],
       "zone": 24,
       "encounter": 59,
       "difficulty": 100
     },
     {
       "name": "Omega: Alphascape (Savage) 卡奥斯",
-      "nicknames": ["Omega:-Alphascape-(Savage)-卡奥斯"],
+      "nicknames": ["omega:-alphascape-(savage)-卡奥斯"],
       "zone": 25,
       "encounter": 60,
       "difficulty": 101
     },
     {
       "name": "Omega: Alphascape (Savage) 尘世幻龙",
-      "nicknames": ["Omega:-Alphascape-(Savage)-尘世幻龙"],
+      "nicknames": ["omega:-alphascape-(savage)-尘世幻龙"],
       "zone": 25,
       "encounter": 61,
       "difficulty": 101
     },
     {
       "name": "Omega: Alphascape (Savage) 欧米茄",
-      "nicknames": ["Omega:-Alphascape-(Savage)-欧米茄"],
+      "nicknames": ["omega:-alphascape-(savage)-欧米茄"],
       "zone": 25,
       "encounter": 62,
       "difficulty": 101
     },
     {
       "name": "Omega: Alphascape (Savage) 双生欧米茄",
-      "nicknames": ["Omega:-Alphascape-(Savage)-双生欧米茄"],
+      "nicknames": ["omega:-alphascape-(savage)-双生欧米茄"],
       "zone": 25,
       "encounter": 63,
       "difficulty": 101
     },
     {
       "name": "Omega: Alphascape (Savage) 至尊欧米茄",
-      "nicknames": ["Omega:-Alphascape-(Savage)-至尊欧米茄"],
+      "nicknames": ["omega:-alphascape-(savage)-至尊欧米茄"],
       "zone": 25,
       "encounter": 64,
       "difficulty": 101
     },
     {
       "name": "The Orbonne Monastery 机工士姆斯塔迪奥",
-      "nicknames": ["The-Orbonne-Monastery-机工士姆斯塔迪奥"],
+      "nicknames": ["the-orbonne-monastery-机工士姆斯塔迪奥"],
       "zone": 26,
       "encounter": 2016,
       "difficulty": 100
     },
     {
       "name": "The Orbonne Monastery 圣骑士阿格莉亚丝",
-      "nicknames": ["The-Orbonne-Monastery-圣骑士阿格莉亚丝"],
+      "nicknames": ["the-orbonne-monastery-圣骑士阿格莉亚丝"],
       "zone": 26,
       "encounter": 2017,
       "difficulty": 100
     },
     {
       "name": "The Orbonne Monastery 雷神西德",
-      "nicknames": ["The-Orbonne-Monastery-雷神西德"],
+      "nicknames": ["the-orbonne-monastery-雷神西德"],
       "zone": 26,
       "encounter": 2018,
       "difficulty": 100
     },
     {
       "name": "The Orbonne Monastery 圣天使阿尔蒂玛",
-      "nicknames": ["The-Orbonne-Monastery-圣天使阿尔蒂玛"],
+      "nicknames": ["the-orbonne-monastery-圣天使阿尔蒂玛"],
       "zone": 26,
       "encounter": 2019,
       "difficulty": 100
@@ -956,42 +956,42 @@
     },
     {
       "name": "Ultimates (Stormblood) 巴哈姆特绝境战",
-      "nicknames": ["Ultimates-(Stormblood)-巴哈姆特绝境战"],
+      "nicknames": ["ultimates-(stormblood)-巴哈姆特绝境战"],
       "zone": 30,
       "encounter": 1047,
       "difficulty": 101
     },
     {
       "name": "Ultimates (Stormblood) 究极神兵绝境战",
-      "nicknames": ["Ultimates-(Stormblood)-究极神兵绝境战"],
+      "nicknames": ["ultimates-(stormblood)-究极神兵绝境战"],
       "zone": 30,
       "encounter": 1048,
       "difficulty": 101
     },
     {
       "name": "The Copied Factory 多关节型：司令机",
-      "nicknames": ["The-Copied-Factory-多关节型：司令机"],
+      "nicknames": ["the-copied-factory-多关节型：司令机"],
       "zone": 31,
       "encounter": 2020,
       "difficulty": 100
     },
     {
       "name": "The Copied Factory 霍布斯",
-      "nicknames": ["The-Copied-Factory-霍布斯"],
+      "nicknames": ["the-copied-factory-霍布斯"],
       "zone": 31,
       "encounter": 2021,
       "difficulty": 100
     },
     {
       "name": "The Copied Factory 昂格士",
-      "nicknames": ["The-Copied-Factory-昂格士"],
+      "nicknames": ["the-copied-factory-昂格士"],
       "zone": 31,
       "encounter": 2022,
       "difficulty": 100
     },
     {
       "name": "The Copied Factory 9S：接入多脚战车",
-      "nicknames": ["The-Copied-Factory-9S：接入多脚战车"],
+      "nicknames": ["the-copied-factory-9s：接入多脚战车"],
       "zone": 31,
       "encounter": 2023,
       "difficulty": 100
@@ -1096,28 +1096,28 @@
     },
     {
       "name": "The Puppets' Bunker 813P：装备据点防卫装置",
-      "nicknames": ["The-Puppets'-Bunker-813P：装备据点防卫装置"],
+      "nicknames": ["the-puppets'-bunker-813p：装备据点防卫装置"],
       "zone": 35,
       "encounter": 2024,
       "difficulty": 100
     },
     {
       "name": "The Puppets' Bunker 强化型飞行单位",
-      "nicknames": ["The-Puppets'-Bunker-强化型飞行单位"],
+      "nicknames": ["the-puppets'-bunker-强化型飞行单位"],
       "zone": 35,
       "encounter": 2025,
       "difficulty": 100
     },
     {
       "name": "The Puppets' Bunker 905P：重战单位",
-      "nicknames": ["The-Puppets'-Bunker-905P：重战单位"],
+      "nicknames": ["the-puppets'-bunker-905p：重战单位"],
       "zone": 35,
       "encounter": 2026,
       "difficulty": 100
     },
     {
       "name": "The Puppets' Bunker 2P：融合体",
-      "nicknames": ["The-Puppets'-Bunker-2P：融合体"],
+      "nicknames": ["the-puppets'-bunker-2p：融合体"],
       "zone": 35,
       "encounter": 2027,
       "difficulty": 100
@@ -1236,63 +1236,63 @@
     },
     {
       "name": "Delubrum Reginae 求道之三位一体",
-      "nicknames": ["Delubrum-Reginae-求道之三位一体"],
+      "nicknames": ["delubrum-reginae-求道之三位一体"],
       "zone": 39,
       "encounter": 2028,
       "difficulty": 100
     },
     {
       "name": "Delubrum Reginae 女王护卫",
-      "nicknames": ["Delubrum-Reginae-女王护卫"],
+      "nicknames": ["delubrum-reginae-女王护卫"],
       "zone": 39,
       "encounter": 2029,
       "difficulty": 100
     },
     {
       "name": "Delubrum Reginae 誓约之三位一体",
-      "nicknames": ["Delubrum-Reginae-誓约之三位一体"],
+      "nicknames": ["delubrum-reginae-誓约之三位一体"],
       "zone": 39,
       "encounter": 2030,
       "difficulty": 100
     },
     {
       "name": "Delubrum Reginae 天佑女王",
-      "nicknames": ["Delubrum-Reginae-天佑女王"],
+      "nicknames": ["delubrum-reginae-天佑女王"],
       "zone": 39,
       "encounter": 2031,
       "difficulty": 100
     },
     {
       "name": "The Tower at Paradigm's Breach 杰克",
-      "nicknames": ["The-Tower-at-Paradigm's-Breach-杰克"],
+      "nicknames": ["the-tower-at-paradigm's-breach-杰克"],
       "zone": 40,
       "encounter": 2032,
       "difficulty": 100
     },
     {
       "name": "The Tower at Paradigm's Breach 韩塞尔与格雷特",
-      "nicknames": ["The-Tower-at-Paradigm's-Breach-韩塞尔与格雷特"],
+      "nicknames": ["the-tower-at-paradigm's-breach-韩塞尔与格雷特"],
       "zone": 40,
       "encounter": 2033,
       "difficulty": 100
     },
     {
       "name": "The Tower at Paradigm's Breach 红衣少女",
-      "nicknames": ["The-Tower-at-Paradigm's-Breach-红衣少女"],
+      "nicknames": ["the-tower-at-paradigm's-breach-红衣少女"],
       "zone": 40,
       "encounter": 2034,
       "difficulty": 100
     },
     {
       "name": "The Tower at Paradigm's Breach 伪造的神明",
-      "nicknames": ["The-Tower-at-Paradigm's-Breach-伪造的神明"],
+      "nicknames": ["the-tower-at-paradigm's-breach-伪造的神明"],
       "zone": 40,
       "encounter": 2035,
       "difficulty": 100
     },
     {
       "name": "The Tower at Paradigm's Breach 开花的神明",
-      "nicknames": ["The-Tower-at-Paradigm's-Breach-开花的神明"],
+      "nicknames": ["the-tower-at-paradigm's-breach-开花的神明"],
       "zone": 40,
       "encounter": 2036,
       "difficulty": 100
@@ -1376,21 +1376,21 @@
     },
     {
       "name": "Ultimates (Legacy) 巴哈姆特绝境战",
-      "nicknames": ["Ultimates-(Legacy)-巴哈姆特绝境战"],
+      "nicknames": ["ultimates-(legacy)-巴哈姆特绝境战"],
       "zone": 43,
       "encounter": 1060,
       "difficulty": 101
     },
     {
       "name": "Ultimates (Legacy) 究极神兵绝境战",
-      "nicknames": ["Ultimates-(Legacy)-究极神兵绝境战"],
+      "nicknames": ["ultimates-(legacy)-究极神兵绝境战"],
       "zone": 43,
       "encounter": 1061,
       "difficulty": 101
     },
     {
       "name": "Ultimates (Legacy) 亚历山大绝境战",
-      "nicknames": ["Ultimates-(Legacy)-亚历山大绝境战"],
+      "nicknames": ["ultimates-(legacy)-亚历山大绝境战"],
       "zone": 43,
       "encounter": 1062,
       "difficulty": 101
@@ -1467,7 +1467,7 @@
     },
     {
       "name": "Dragonsong's Reprise 幻想龙诗绝境战",
-      "nicknames": ["Dragonsong's-Reprise-幻想龙诗绝境战"],
+      "nicknames": ["dragonsong's-reprise-幻想龙诗绝境战"],
       "zone": 45,
       "encounter": 1065,
       "difficulty": 100
@@ -1488,77 +1488,77 @@
     },
     {
       "name": "Trials (Unreal) 索菲娅",
-      "nicknames": ["Trials-(Unreal)-索菲娅"],
+      "nicknames": ["trials-(unreal)-索菲娅"],
       "zone": 46,
       "encounter": 3006,
       "difficulty": 100
     },
     {
       "name": "Trials (Unreal) 祖尔宛",
-      "nicknames": ["Trials-(Unreal)-祖尔宛"],
+      "nicknames": ["trials-(unreal)-祖尔宛"],
       "zone": 46,
       "encounter": 3007,
       "difficulty": 100
     },
     {
       "name": "Trials (Unreal) 托尔丹",
-      "nicknames": ["Trials-(Unreal)-托尔丹"],
+      "nicknames": ["trials-(unreal)-托尔丹"],
       "zone": 46,
       "encounter": 3008,
       "difficulty": 100
     },
     {
       "name": "Aglaia 比尔格",
-      "nicknames": ["Aglaia-比尔格"],
+      "nicknames": ["aglaia-比尔格"],
       "zone": 47,
       "encounter": 2037,
       "difficulty": 100
     },
     {
       "name": "Aglaia 拉尔戈",
-      "nicknames": ["Aglaia-拉尔戈"],
+      "nicknames": ["aglaia-拉尔戈"],
       "zone": 47,
       "encounter": 2038,
       "difficulty": 100
     },
     {
       "name": "Aglaia 阿泽玛",
-      "nicknames": ["Aglaia-阿泽玛"],
+      "nicknames": ["aglaia-阿泽玛"],
       "zone": 47,
       "encounter": 2039,
       "difficulty": 100
     },
     {
       "name": "Aglaia 纳尔札尔",
-      "nicknames": ["Aglaia-纳尔札尔"],
+      "nicknames": ["aglaia-纳尔札尔"],
       "zone": 47,
       "encounter": 2040,
       "difficulty": 100
     },
     {
       "name": "Delubrum Reginae 求道之三位一体",
-      "nicknames": ["Delubrum-Reginae-求道之三位一体"],
+      "nicknames": ["delubrum-reginae-求道之三位一体"],
       "zone": 48,
       "encounter": 2041,
       "difficulty": 100
     },
     {
       "name": "Delubrum Reginae 女王护卫",
-      "nicknames": ["Delubrum-Reginae-女王护卫"],
+      "nicknames": ["delubrum-reginae-女王护卫"],
       "zone": 48,
       "encounter": 2042,
       "difficulty": 100
     },
     {
       "name": "Delubrum Reginae 誓约之三位一体",
-      "nicknames": ["Delubrum-Reginae-誓约之三位一体"],
+      "nicknames": ["delubrum-reginae-誓约之三位一体"],
       "zone": 48,
       "encounter": 2043,
       "difficulty": 100
     },
     {
       "name": "Delubrum Reginae 天佑女王",
-      "nicknames": ["Delubrum-Reginae-天佑女王"],
+      "nicknames": ["delubrum-reginae-天佑女王"],
       "zone": 48,
       "encounter": 2044,
       "difficulty": 100
@@ -1642,7 +1642,7 @@
     },
     {
       "name": "Trials II (Extreme) 卢比坎特",
-      "nicknames": ["Trials-II-(Extreme)-卢比坎特"],
+      "nicknames": ["trials-ii-(extreme)-卢比坎特"],
       "zone": 50,
       "encounter": 1067,
       "difficulty": 100
@@ -1670,112 +1670,112 @@
     },
     {
       "name": "Euphrosyne 诺菲卡",
-      "nicknames": ["Euphrosyne-诺菲卡"],
+      "nicknames": ["euphrosyne-诺菲卡"],
       "zone": 52,
       "encounter": 2045,
       "difficulty": 100
     },
     {
       "name": "Euphrosyne 阿尔基克&妮美雅",
-      "nicknames": ["Euphrosyne-阿尔基克&妮美雅"],
+      "nicknames": ["euphrosyne-阿尔基克&妮美雅"],
       "zone": 52,
       "encounter": 2046,
       "difficulty": 100
     },
     {
       "name": "Euphrosyne 哈罗妮",
-      "nicknames": ["Euphrosyne-哈罗妮"],
+      "nicknames": ["euphrosyne-哈罗妮"],
       "zone": 52,
       "encounter": 2047,
       "difficulty": 100
     },
     {
       "name": "Euphrosyne 梅茵菲娜",
-      "nicknames": ["Euphrosyne-梅茵菲娜"],
+      "nicknames": ["euphrosyne-梅茵菲娜"],
       "zone": 52,
       "encounter": 2048,
       "difficulty": 100
     },
     {
       "name": "The Omega Protocol 欧米茄绝境验证战",
-      "nicknames": ["The-Omega-Protocol-欧米茄绝境验证战"],
+      "nicknames": ["the-omega-protocol-欧米茄绝境验证战"],
       "zone": 53,
       "encounter": 1068,
       "difficulty": 100
     },
     {
       "name": "Anabaseios 科库托斯",
-      "nicknames": ["Anabaseios-科库托斯"],
+      "nicknames": ["anabaseios-科库托斯"],
       "zone": 54,
       "encounter": 88,
       "difficulty": 100
     },
     {
       "name": "Anabaseios 万魔殿",
-      "nicknames": ["Anabaseios-万魔殿"],
+      "nicknames": ["anabaseios-万魔殿"],
       "zone": 54,
       "encounter": 89,
       "difficulty": 100
     },
     {
       "name": "Anabaseios 特弥斯",
-      "nicknames": ["Anabaseios-特弥斯"],
+      "nicknames": ["anabaseios-特弥斯"],
       "zone": 54,
       "encounter": 90,
       "difficulty": 100
     },
     {
       "name": "Anabaseios 雅典娜",
-      "nicknames": ["Anabaseios-雅典娜"],
+      "nicknames": ["anabaseios-雅典娜"],
       "zone": 54,
       "encounter": 91,
       "difficulty": 100
     },
     {
       "name": "Anabaseios 帕拉斯雅典娜",
-      "nicknames": ["Anabaseios-帕拉斯雅典娜"],
+      "nicknames": ["anabaseios-帕拉斯雅典娜"],
       "zone": 54,
       "encounter": 92,
       "difficulty": 100
     },
     {
       "name": "Trials III (Extreme) 高贝扎",
-      "nicknames": ["Trials-III-(Extreme)-高贝扎"],
+      "nicknames": ["trials-iii-(extreme)-高贝扎"],
       "zone": 55,
       "encounter": 1069,
       "difficulty": 100
     },
     {
       "name": "Trials III (Extreme) 泽罗姆斯",
-      "nicknames": ["Trials-III-(Extreme)-泽罗姆斯"],
+      "nicknames": ["trials-iii-(extreme)-泽罗姆斯"],
       "zone": 55,
       "encounter": 1070,
       "difficulty": 100
     },
     {
       "name": "Thaleia 沙利亚克",
-      "nicknames": ["Thaleia-沙利亚克"],
+      "nicknames": ["thaleia-沙利亚克"],
       "zone": 56,
       "encounter": 2049,
       "difficulty": 100
     },
     {
       "name": "Thaleia 利姆莱茵",
-      "nicknames": ["Thaleia-利姆莱茵"],
+      "nicknames": ["thaleia-利姆莱茵"],
       "zone": 56,
       "encounter": 2050,
       "difficulty": 100
     },
     {
       "name": "Thaleia 奥修昂",
-      "nicknames": ["Thaleia-奥修昂"],
+      "nicknames": ["thaleia-奥修昂"],
       "zone": 56,
       "encounter": 2051,
       "difficulty": 100
     },
     {
       "name": "Thaleia 欧罗基亚",
-      "nicknames": ["Thaleia-欧罗基亚"],
+      "nicknames": ["thaleia-欧罗基亚"],
       "zone": 56,
       "encounter": 2052,
       "difficulty": 100
@@ -1817,63 +1817,63 @@
     },
     {
       "name": "Ultimates (Legacy) 巴哈姆特绝境战",
-      "nicknames": ["Ultimates-(Legacy)-巴哈姆特绝境战"],
+      "nicknames": ["ultimates-(legacy)-巴哈姆特绝境战"],
       "zone": 59,
       "encounter": 1073,
       "difficulty": 101
     },
     {
       "name": "Ultimates (Legacy) 究极神兵绝境战",
-      "nicknames": ["Ultimates-(Legacy)-究极神兵绝境战"],
+      "nicknames": ["ultimates-(legacy)-究极神兵绝境战"],
       "zone": 59,
       "encounter": 1074,
       "difficulty": 101
     },
     {
       "name": "Ultimates (Legacy) 亚历山大绝境战",
-      "nicknames": ["Ultimates-(Legacy)-亚历山大绝境战"],
+      "nicknames": ["ultimates-(legacy)-亚历山大绝境战"],
       "zone": 59,
       "encounter": 1075,
       "difficulty": 101
     },
     {
       "name": "Ultimates (Legacy) 幻想龙诗绝境战",
-      "nicknames": ["Ultimates-(Legacy)-幻想龙诗绝境战"],
+      "nicknames": ["ultimates-(legacy)-幻想龙诗绝境战"],
       "zone": 59,
       "encounter": 1076,
       "difficulty": 101
     },
     {
       "name": "Ultimates (Legacy) 欧米茄绝境验证战",
-      "nicknames": ["Ultimates-(Legacy)-欧米茄绝境验证战"],
+      "nicknames": ["ultimates-(legacy)-欧米茄绝境验证战"],
       "zone": 59,
       "encounter": 1077,
       "difficulty": 101
     },
     {
       "name": "Delubrum Reginae 求道之三位一体",
-      "nicknames": ["Delubrum-Reginae-求道之三位一体"],
+      "nicknames": ["delubrum-reginae-求道之三位一体"],
       "zone": 60,
       "encounter": 2053,
       "difficulty": 100
     },
     {
       "name": "Delubrum Reginae 女王护卫",
-      "nicknames": ["Delubrum-Reginae-女王护卫"],
+      "nicknames": ["delubrum-reginae-女王护卫"],
       "zone": 60,
       "encounter": 2054,
       "difficulty": 100
     },
     {
       "name": "Delubrum Reginae 誓约之三位一体",
-      "nicknames": ["Delubrum-Reginae-誓约之三位一体"],
+      "nicknames": ["delubrum-reginae-誓约之三位一体"],
       "zone": 60,
       "encounter": 2055,
       "difficulty": 100
     },
     {
       "name": "Delubrum Reginae 天佑女王",
-      "nicknames": ["Delubrum-Reginae-天佑女王"],
+      "nicknames": ["delubrum-reginae-天佑女王"],
       "zone": 60,
       "encounter": 2056,
       "difficulty": 100
