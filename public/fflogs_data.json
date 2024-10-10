@@ -1810,7 +1810,7 @@
     },
     {
       "name": "佐拉加歼殛战",
-      "nicknames": ["极佐", "首饰神"],
+      "nicknames": ["极佐", "首饰神", "饰品神"],
       "zone": 58,
       "encounter": 1072,
       "difficulty": 100
@@ -1997,13 +1997,13 @@
       "spec": 19
     },
     {
-      "name": "Viper",
-      "nicknames": [],
+      "name": "蝰蛇剑士",
+      "nicknames": ["viper", "双剑", "蛇剑", "蛇武士"],
       "spec": 20
     },
     {
-      "name": "Pictomancer",
-      "nicknames": [],
+      "name": "绘灵法师",
+      "nicknames": ["画家", "小画家", "彩笔", "彩笔法师"],
       "spec": 21
     }
   ]
