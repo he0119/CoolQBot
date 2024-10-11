@@ -14,7 +14,7 @@ nonebot.load_plugin("nonebot_plugin_alconna")
 from src.plugins.ff14.plugins.ff14_fflogs.api import fflogs
 from src.plugins.ff14.plugins.ff14_fflogs.models import Encounter, Zones
 
-DATA_FILE = Path.cwd() / "public" / "fflogs_data.json"
+DATA_FILE = Path(__file__).parents[5] / "public" / "fflogs_data.json"
 
 
 async def updata_job(data):
@@ -38,6 +38,12 @@ def get_name(zones: Zones, encounter: Encounter):
     # 普通副本直接返回
     if zones.name.startswith("Dungeons"):
         return encounter.name
+    # 绝本
+    # TODO: 暂时不支持多个版本的绝本查询
+    # 还需要添加 partition 支持才行
+    # 没有加 partition 参数默认获取的是最新版本的绝本
+    if zones.name == "Ultimates (Legacy)":
+        return f"{encounter.name}({zones.brackets.max:.1f})"
 
     return f"{zones.name} {encounter.name}"
 
