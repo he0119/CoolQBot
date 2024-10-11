@@ -955,15 +955,15 @@
       "difficulty": 101
     },
     {
-      "name": "Ultimates (Stormblood) 巴哈姆特绝境战",
-      "nicknames": ["ultimates-(stormblood)-巴哈姆特绝境战"],
+      "name": "巴哈姆特绝境战(4.x)",
+      "nicknames": ["巴哈姆特绝境战(4.x)"],
       "zone": 30,
       "encounter": 1047,
       "difficulty": 101
     },
     {
-      "name": "Ultimates (Stormblood) 究极神兵绝境战",
-      "nicknames": ["ultimates-(stormblood)-究极神兵绝境战"],
+      "name": "究极神兵绝境战(4.x)",
+      "nicknames": ["究极神兵绝境战(4.x)"],
       "zone": 30,
       "encounter": 1048,
       "difficulty": 101
@@ -1375,22 +1375,22 @@
       "difficulty": 100
     },
     {
-      "name": "Ultimates (Legacy) 巴哈姆特绝境战",
-      "nicknames": ["ultimates-(legacy)-巴哈姆特绝境战"],
+      "name": "巴哈姆特绝境战(6.5)",
+      "nicknames": ["巴哈姆特绝境战(6.5)"],
       "zone": 43,
       "encounter": 1060,
       "difficulty": 101
     },
     {
-      "name": "Ultimates (Legacy) 究极神兵绝境战",
-      "nicknames": ["ultimates-(legacy)-究极神兵绝境战"],
+      "name": "究极神兵绝境战(6.5)",
+      "nicknames": ["究极神兵绝境战(6.5)"],
       "zone": 43,
       "encounter": 1061,
       "difficulty": 101
     },
     {
-      "name": "Ultimates (Legacy) 亚历山大绝境战",
-      "nicknames": ["ultimates-(legacy)-亚历山大绝境战"],
+      "name": "亚历山大绝境战(6.5)",
+      "nicknames": ["亚历山大绝境战(6.5)"],
       "zone": 43,
       "encounter": 1062,
       "difficulty": 101
@@ -1816,22 +1816,22 @@
       "difficulty": 100
     },
     {
-      "name": "Ultimates (Legacy) 巴哈姆特绝境战",
-      "nicknames": ["ultimates-(legacy)-巴哈姆特绝境战"],
+      "name": "巴哈姆特绝境战(7.0)",
+      "nicknames": ["巴哈姆特绝境战(7.0)"],
       "zone": 59,
       "encounter": 1073,
       "difficulty": 101
     },
     {
-      "name": "Ultimates (Legacy) 究极神兵绝境战",
-      "nicknames": ["ultimates-(legacy)-究极神兵绝境战"],
+      "name": "究极神兵绝境战(7.0)",
+      "nicknames": ["究极神兵绝境战(7.0)"],
       "zone": 59,
       "encounter": 1074,
       "difficulty": 101
     },
     {
-      "name": "Ultimates (Legacy) 亚历山大绝境战",
-      "nicknames": ["ultimates-(legacy)-亚历山大绝境战"],
+      "name": "亚历山大绝境战(7.0)",
+      "nicknames": ["亚历山大绝境战(7.0)"],
       "zone": 59,
       "encounter": 1075,
       "difficulty": 101
