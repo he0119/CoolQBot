@@ -1,3 +1,8 @@
+"""生成节假日信息
+
+https://sousuo.www.gov.cn/sousuo/search.shtml?code=17da70961a7&searchWord=部分节假日安排的通知&dataTypeId=15&sign=&pageNo=1
+"""
+
 import json
 import re
 import sys
@@ -92,7 +97,7 @@ def parse_holidays(url: str):
     # 定义正则表达式模式
     year_pattern = re.compile(r"国务院办公厅关于(\d{4})年")
     pattern = re.compile(
-        r"[一二三四五六七]、(\S+?)：(\d+月\d+日(?:至\d+日)?)放假(?:调休，共(\d+)天)?(?:，与周末连休)?(?:。(\d+月\d+日（星期[一二三四五六日]）(?:、\d+月\d+日（星期[一二三四五六日]）)?上班)?)?"
+        r"[一二三四五六七]、(\S+?)：(?:(\d+月\d+日)(?:（\S+?）)?(?:至\d+日(?:（\S+?）)?)?)放假(?:调休，共(\d+)天)?(?:，与周末连休)?(?:。(\d+月\d+日（周[一二三四五六日]）(?:、\d+月\d+日（周[一二三四五六日]）)?上班)?)?"
     )
 
     # 匹配所有节假日信息
