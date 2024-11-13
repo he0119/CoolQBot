@@ -1,5 +1,5 @@
 {
-  "version": "7.0",
+  "version": "7.05",
   "boss": [
     {
       "name": "空中神域不获岛",
@@ -1802,6 +1802,13 @@
       "difficulty": 100
     },
     {
+      "name": "Yuweyawata Field Station",
+      "nicknames": ["yuweyawata-field-station"],
+      "zone": 57,
+      "encounter": 4545,
+      "difficulty": 100
+    },
+    {
       "name": "艳翼蛇鸟歼殛战",
       "nicknames": ["极鸟", "武器神"],
       "zone": 58,
@@ -1813,6 +1820,13 @@
       "nicknames": ["极佐", "首饰神", "饰品神"],
       "zone": 58,
       "encounter": 1072,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials I (Extreme) Queen Eternal",
+      "nicknames": ["trials-i-(extreme)-queen-eternal"],
+      "zone": 58,
+      "encounter": 1078,
       "difficulty": 100
     },
     {
@@ -1898,6 +1912,62 @@
       "zone": 61,
       "encounter": 4544,
       "difficulty": 100
+    },
+    {
+      "name": "阿卡狄亚登天斗技场 轻量级1",
+      "nicknames": ["m1"],
+      "zone": 62,
+      "encounter": 93,
+      "difficulty": 100
+    },
+    {
+      "name": "阿卡狄亚零式登天斗技场 轻量级1",
+      "nicknames": ["m1s"],
+      "zone": 62,
+      "encounter": 93,
+      "difficulty": 101
+    },
+    {
+      "name": "阿卡狄亚登天斗技场 轻量级2",
+      "nicknames": ["m2"],
+      "zone": 62,
+      "encounter": 94,
+      "difficulty": 100
+    },
+    {
+      "name": "阿卡狄亚零式登天斗技场 轻量级2",
+      "nicknames": ["m2s"],
+      "zone": 62,
+      "encounter": 94,
+      "difficulty": 101
+    },
+    {
+      "name": "阿卡狄亚登天斗技场 轻量级3",
+      "nicknames": ["m3"],
+      "zone": 62,
+      "encounter": 95,
+      "difficulty": 101
+    },
+    {
+      "name": "阿卡狄亚零式登天斗技场 轻量级3",
+      "nicknames": ["m3s"],
+      "zone": 62,
+      "encounter": 95,
+      "difficulty": 101
+    },
+    {
+      "name": "阿卡狄亚登天斗技场 轻量级4",
+      "nicknames": ["m4"],
+      "zone": 62,
+      "encounter": 96,
+      "difficulty": 100
+    },
+    {
+      "name": "阿卡狄亚零式登天斗技场 轻量级4",
+      "nicknames": ["m4s"],
+      "zone": 62,
+      "encounter": 96,
+      "difficulty": 101
     }
   ],
   "job": [
