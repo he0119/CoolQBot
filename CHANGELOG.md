@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加 OpenAI 插件
+
 ## [0.20.0] - 2024-09-21
 
 ### Added

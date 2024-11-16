@@ -33,6 +33,7 @@ dependencies = [
     "nonebot-bison==0.9.4",
     "nonebot-plugin-status==0.9.0",
     "nonebot-plugin-bawiki==0.11.3",
+    "openai>=1.54.4",
 ]
 readme = "README.md"
 license = { file = "LICENSE" }
