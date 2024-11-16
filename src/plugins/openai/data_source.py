@@ -1,14 +1,17 @@
 from nonebot import logger
 from nonebot_plugin_datastore import get_plugin_data
 
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, DefaultAsyncHttpxClient
 from openai.types.beta.threads import MessageContent
 
 from .config import plugin_config
 
 plugin_data = get_plugin_data()
 
-client = AsyncOpenAI(api_key=plugin_config.openai_api_key)
+client = AsyncOpenAI(
+    api_key=plugin_config.openai_api_key,
+    http_client=DefaultAsyncHttpxClient(proxy=plugin_config.openai_proxy),
+)
 
 
 class Assistant:
