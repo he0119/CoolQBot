@@ -1,5 +1,6 @@
 from nonebot import on_message, require
 from nonebot.adapters import Event
+from nonebot.params import Depends
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.rule import to_me
 
@@ -10,14 +11,8 @@ from nonebot_plugin_alconna import Alconna, Args, CommandMeta, on_alconna
 from nonebot_plugin_user import UserSession
 
 from .config import plugin_config
-from .data_source import (
-    add_message_to_thread,
-    create_assistant,
-    create_thread,
-    run,
-    set_assistant,
-    set_thread,
-)
+from .data_source import Assistant
+from .depends import get_assistant
 
 __plugin_meta__ = PluginMetadata(
     name="OpenAI",
@@ -53,12 +48,15 @@ openai_message = on_message(block=True, priority=99, rule=to_me() & openai_rule)
 
 
 @openai_message.handle()
-async def handle_openai_message(event: Event, user: UserSession):
-    message = await add_message_to_thread(event.get_plaintext(), user.group_session_id)
+async def handle_openai_message(
+    event: Event,
+    assistant: Assistant = Depends(get_assistant),
+):
+    message = await assistant.add_message_to_thread(event.get_plaintext())
     if message:
         await openai_message.finish(message)
 
-    message = await run(user.group_session_id)
+    message = await assistant.run()
     if message:
         await openai_message.finish(message)
 
@@ -86,11 +84,14 @@ async def assistant_handle_first_receive(id: str):
 
 
 @assistant_cmd.got_path("id", prompt="请输入助手 ID（new 表示新建助手）")
-async def assistant_handle_group_message(id: str, user: UserSession):
+async def assistant_handle_group_message(
+    id: str,
+    assistant: Assistant = Depends(get_assistant),
+):
     if id == "new":
-        msg = await create_assistant(user.group_session_id)
+        msg = await assistant.create_assistant()
     else:
-        msg = await set_assistant(id, user.group_session_id)
+        msg = await assistant.set_assistant(id)
     await assistant_cmd.finish(msg)
 
 
@@ -117,9 +118,12 @@ async def thread_handle_first_receive(id: str):
 
 
 @thread_cmd.got_path("id", prompt="请输入会话 ID（new 表示新建会话）")
-async def thread_handle_group_message(id: str, user: UserSession):
+async def thread_handle_group_message(
+    id: str,
+    assistant: Assistant = Depends(get_assistant),
+):
     if id == "new":
-        msg = await create_thread(user.group_session_id)
+        msg = await assistant.create_thread()
     else:
-        msg = await set_thread(id, user.group_session_id)
+        msg = await assistant.set_thread(id)
     await thread_cmd.finish(msg)
