@@ -10,6 +10,8 @@ require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, on_alconna
 from nonebot_plugin_user import UserSession
 
+from src.utils.helpers import admin_permission
+
 from .config import plugin_config
 from .data_source import Assistant
 from .depends import get_assistant
@@ -74,6 +76,7 @@ assistant_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     rule=openai_rule,
+    permission=admin_permission(),
 )
 
 
@@ -90,6 +93,8 @@ async def assistant_handle_group_message(
 ):
     if id == "new":
         msg = await assistant.create_assistant()
+    elif id == "show":
+        msg = f"当前助手 ID 为 {assistant.assistant_id}"
     else:
         msg = await assistant.set_assistant(id)
     await assistant_cmd.finish(msg)
@@ -108,6 +113,7 @@ thread_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     rule=openai_rule,
+    permission=admin_permission(),
 )
 
 
@@ -124,6 +130,8 @@ async def thread_handle_group_message(
 ):
     if id == "new":
         msg = await assistant.create_thread()
+    elif id == "show":
+        msg = f"当前会话 ID 为 {assistant.thread_id}"
     else:
         msg = await assistant.set_thread(id)
     await thread_cmd.finish(msg)

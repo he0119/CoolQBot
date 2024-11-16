@@ -33,18 +33,12 @@ class Assistant:
     async def init(self):
         """初始化
 
-        获取助手 ID，如果不存在则创建一个新的助手
-        获取会话 ID，如果不存在则创建一个新的会话
+        从配置中获取助手 ID，会话 ID
         """
         self.assistant_id = await plugin_data.config.get(self.assistant_key)
-        if not self.assistant_id:
-            self.assistant_id = await self.create_assistant()
-
         self.thread_id = await plugin_data.config.get(self.thread_key)
-        if not self.thread_id:
-            self.thread_id = await self.create_thread()
 
-        logger.debug(f"assistant: {self.assistant_id}, thread: {self.thread_id}")
+        logger.debug(f"助手: {self.assistant_id}, 会话: {self.thread_id}")
 
     async def create_assistant(self):
         assistant = await client.beta.assistants.create(
