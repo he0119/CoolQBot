@@ -48,18 +48,18 @@ class Assistant:
             model=plugin_config.openai_model,
         )
 
-        await plugin_data.config.set(self.assistant_key, self.assistant_id)
+        await plugin_data.config.set(self.assistant_key, assistant.id)
 
         logger.debug(f"assistant created: {assistant.id}")
-        return assistant.id
+        return f"助手 {assistant.id} 已创建"
 
     async def create_thread(self) -> str:
         thread = await client.beta.threads.create()
 
-        await plugin_data.config.set(self.thread_key, self.thread_id)
+        await plugin_data.config.set(self.thread_key, thread.id)
 
         logger.debug(f"thread created: {thread.id}")
-        return thread.id
+        return f"会话 {thread.id} 已创建"
 
     async def set_assistant(self, id: str) -> str:
         await plugin_data.config.set(self.assistant_key, id)
