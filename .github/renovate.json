@@ -23,10 +23,12 @@
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
-      "groupName": "all non-major dependencies",
-      "groupSlug": "all-minor-patch",
-      "matchPackageNames": ["*"],
-      "matchUpdateTypes": ["minor", "patch"]
+      "groupName": "GitHub actions dependencies",
+      "matchManagers": ["github-actions"]
+    },
+    {
+      "groupName": "Docker dependencies",
+      "matchManagers": ["docker", "dockerfile", "docker-compose"]
     }
   ]
 }
