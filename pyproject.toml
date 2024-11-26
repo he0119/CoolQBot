@@ -47,8 +47,8 @@ Changelog = "https://github.com/he0119/CoolQBot/blob/main/CHANGELOG.md"
 
 [tool.uv]
 dev-dependencies = [
-    "nonebug>=0.3.7",
-    "nonebug-saa>=0.4.1",
+    "nonebug>=0.4.2",
+    "nonebug-saa>=0.5.0",
     "pytest-cov>=6.0.0",
     "pytest-mock>=3.14.0",
     "pytest-xdist>=3.6.1",
@@ -57,8 +57,8 @@ dev-dependencies = [
     "respx>=0.21.1",
     "freezegun>=1.5.1",
     "beautifulsoup4>=4.12.3",
-    "bump-my-version>=0.27.0",
-    "poethepoet>=0.29.0",
+    "bump-my-version>=0.28.1",
+    "poethepoet>=0.31.1",
 ]
 
 [tool.uv.pip]

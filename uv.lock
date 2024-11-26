@@ -321,7 +321,7 @@ wheels = [
 
 [[package]]
 name = "bump-my-version"
-version = "0.27.0"
+version = "0.28.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -333,9 +333,9 @@ dependencies = [
     { name = "tomlkit" },
     { name = "wcmatch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/00/70/81d4f2c9f29e9289951aabf8db8f2fe6372eaa745a340d9f53f1ef91cf2c/bump_my_version-0.27.0.tar.gz", hash = "sha256:483c517af91559644d45036648e5d99f4f8c85f8d01394097d3d3e42c9e6acad", size = 112627 }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/44/8f4f5dc472a054634bffd86e4941b2624e0b050f15578d40ec15e670d8e5/bump_my_version-0.28.1.tar.gz", hash = "sha256:e608def5191baf505b6cde88bd679a0a95fc4cfeace4247adb60ac0f8a7e57ee", size = 983509 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6c/8b/0311c32b584fc9937bec64b75a446a3f7fe21456cb9f2644cac23596d045/bump_my_version-0.27.0-py3-none-any.whl", hash = "sha256:911bfaf7d847d4348844c8fd16f7a11322233fb8dc90123f638069a369003642", size = 52408 },
+    { url = "https://files.pythonhosted.org/packages/ad/2c/10f770bf71116ecfcc8b2e67dd6752e7e135998579bc1dc98a6edb47bafc/bump_my_version-0.28.1-py3-none-any.whl", hash = "sha256:df7fdb02a1b43c122a6714df6d1fe4efc7a1220b5638ca5a0eb3018813c1b222", size = 52210 },
 ]
 
 [[package]]
@@ -571,11 +571,11 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "beautifulsoup4", specifier = ">=4.12.3" },
-    { name = "bump-my-version", specifier = ">=0.27.0" },
+    { name = "bump-my-version", specifier = ">=0.28.1" },
     { name = "freezegun", specifier = ">=1.5.1" },
-    { name = "nonebug", specifier = ">=0.3.7" },
-    { name = "nonebug-saa", specifier = ">=0.4.1" },
-    { name = "poethepoet", specifier = ">=0.29.0" },
+    { name = "nonebug", specifier = ">=0.4.2" },
+    { name = "nonebug-saa", specifier = ">=0.5.0" },
+    { name = "poethepoet", specifier = ">=0.31.1" },
     { name = "pytest-asyncio", specifier = ">=0.24.0" },
     { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "pytest-loguru", specifier = ">=0.4.0" },
@@ -1761,7 +1761,7 @@ httpx = [
 
 [[package]]
 name = "nonebug"
-version = "0.3.7"
+version = "0.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
@@ -1770,23 +1770,23 @@ dependencies = [
     { name = "pytest" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/eb/db/8169185d55bfbdfcc4c5757de2829aa8998c4ebd2ccb9c0a93194ae19c3b/nonebug-0.3.7.tar.gz", hash = "sha256:8a75183400681f34eafc7caa2bb6dd511c3b5660c59264f1c379a088c7ac2247", size = 11225 }
+sdist = { url = "https://files.pythonhosted.org/packages/29/56/01eb465dc135787e463423bf4762b883159a639d02c3a577ab4efc8f9d56/nonebug-0.4.2.tar.gz", hash = "sha256:002dac00fed1fbff97574f3dffab2237fc41473b3bf3e73d2730ae34895bc137", size = 12118 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/59/29/b5d7e9586ece90a86a370f689e01eb37a5b8cf723b3ccb51a73daf35625f/nonebug-0.3.7-py3-none-any.whl", hash = "sha256:c39f462aafe20660602a8b789a575db6c9346ab5b6f1985eb9d98b861528299a", size = 14396 },
+    { url = "https://files.pythonhosted.org/packages/a0/4a/7592e899cd5074a9b70df007afe9b6f8bbaa02b8e9c1ce7f5c5498634cb7/nonebug-0.4.2-py3-none-any.whl", hash = "sha256:83d9229ec899819e9f5786eabc0c27b9dd0cd5d6e2e7438f59923ab822d5c555", size = 15030 },
 ]
 
 [[package]]
 name = "nonebug-saa"
-version = "0.4.1"
+version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "nonebot-plugin-send-anything-anywhere" },
     { name = "nonebug" },
     { name = "pytest-mock" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/51/8b/3a1e3870bfc2227bb7ec625848f3aeff90f89698d46c9406be8aceec51bb/nonebug_saa-0.4.1.tar.gz", hash = "sha256:8acbce958207c837a02a79c589f10f99f34fa0142dfa90845683dc7982d3dc57", size = 2353 }
+sdist = { url = "https://files.pythonhosted.org/packages/59/2d/839d67f391c19289839279e2b8610bdce014e9eac57f851bc4fe3a79b74f/nonebug_saa-0.5.0.tar.gz", hash = "sha256:097b7df0d4cedf95ff6501b1201d575b0548355e259876f80237447db17895ea", size = 2424 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a9/17/1c7965c4c0aa665fa07172d83d9044636b721790a81037ac38c4e9b4918c/nonebug_saa-0.4.1-py3-none-any.whl", hash = "sha256:5032cc3889eb8f0d0c8881a1a5af2cd2ece010011b51edd2f978850d6d58e2b3", size = 2912 },
+    { url = "https://files.pythonhosted.org/packages/55/77/77f9cabf734f4dfe5bdf3c0bf694cb28a5d8f79232d3828549158d3e80e7/nonebug_saa-0.5.0-py3-none-any.whl", hash = "sha256:4ee468e186c1725bf0eff0881f6d5411d033d509a49d3ac688837dd6827385fc", size = 2903 },
 ]
 
 [[package]]
@@ -1947,15 +1947,15 @@ wheels = [
 
 [[package]]
 name = "poethepoet"
-version = "0.29.0"
+version = "0.31.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pastel" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/dc/7a/7144e47128022146502e179e259b312335bc1465384025eee92d4c7e16b2/poethepoet-0.29.0.tar.gz", hash = "sha256:676842302f2304a86b31ac56398dd672fae8471128d2086896393384dbafc095", size = 58619 }
+sdist = { url = "https://files.pythonhosted.org/packages/8f/96/15bce512c8027696b20586b18ac4b239afe8d312dbaa2a0099e8fb8f8424/poethepoet-0.31.1.tar.gz", hash = "sha256:d6b66074edf85daf115bb916eae0afd6387d19e1562e1c9ef7d61d5c585696aa", size = 61520 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b5/7d/871be58cc970ab4c9a541d64b77b7454d150a409c3e48b53fc9eac7a8967/poethepoet-0.29.0-py3-none-any.whl", hash = "sha256:f8dfe55006dcfb5cf31bcb1904e1262e1c642a4502fee3688cbf1bddfe5c7601", size = 76069 },
+    { url = "https://files.pythonhosted.org/packages/06/e1/04f56c9d848d6135ca3328c5a2ca84d3303c358ad7828db290385e36a8cc/poethepoet-0.31.1-py3-none-any.whl", hash = "sha256:7fdfa0ac6074be9936723e7231b5bfaad2923e96c674a9857e81d326cf8ccdc2", size = 80238 },
 ]
 
 [[package]]
