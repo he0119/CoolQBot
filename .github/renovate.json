@@ -28,7 +28,7 @@
     },
     {
       "groupName": "Docker dependencies",
-      "matchManagers": ["docker", "dockerfile", "docker-compose"]
+      "matchManagers": ["dockerfile", "docker-compose"]
     }
   ]
 }
