@@ -47,7 +47,7 @@ jobs:
       - name: Set build version
         id: setVersion
         run: |
-          VERSION=$(uv tree -d0 | grep -oP 'coolqbot v\K[0-9]+\.[0-9]+\.[0-9]+')
+          VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.version)
           COMMIT_ID=$(git rev-parse --short HEAD)
           if [[ "${{github.event_name}}" == "release" && "${{github.event.action}}" == "published" ]]; then
             echo "environment=prod" >> $GITHUB_OUTPUT
