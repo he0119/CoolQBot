@@ -1,34 +1,51 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "dependencyDashboard": true,
-  "extends": [
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  dependencyDashboard: true,
+  extends: [
     "config:recommended",
     "schedule:weekly",
-    ":semanticCommitTypeAll(chore)"
+    ":semanticCommitTypeAll(chore)",
   ],
-  "labels": ["dependencies"],
-  "rangeStrategy": "bump",
-  "ignoreDeps": ["python", "eorzeaenv"],
-  "packageRules": [
+  labels: ["dependencies"],
+  rangeStrategy: "bump",
+  ignoreDeps: ["eorzeaenv"],
+  packageRules: [
     {
-      "groupName": "Python dependencies",
-      "matchManagers": ["pep621"],
-      "matchDepTypes": ["project.dependencies"],
-      "matchUpdateTypes": ["minor", "patch"]
+      groupName: "Python dependencies",
+      // https://docs.renovatebot.com/modules/manager/pep621/
+      matchManagers: ["pep621"],
+      matchDepTypes: ["project.dependencies"],
+      matchUpdateTypes: ["minor", "patch"],
+      description: "Weekly update of Python dependencies",
     },
     {
-      "groupName": "Python dev-dependencies",
-      "matchManagers": ["pep621"],
-      "matchDepTypes": ["tool.uv.dev-dependencies"],
-      "matchUpdateTypes": ["minor", "patch"]
+      groupName: "Python dev-dependencies",
+      // https://docs.renovatebot.com/modules/manager/pep621/
+      matchManagers: ["pep621"],
+      matchDepTypes: ["tool.uv.dev-dependencies"],
+      matchUpdateTypes: ["minor", "patch"],
+      description: "Weekly update of Python dev-dependencies",
     },
     {
-      "groupName": "GitHub actions dependencies",
-      "matchManagers": ["github-actions"]
+      groupName: "GitHub actions dependencies",
+      // https://docs.renovatebot.com/modules/manager/github-actions/
+      matchManagers: ["github-actions"],
+      description: "Weekly update of GitHub actions dependencies",
     },
     {
-      "groupName": "Docker dependencies",
-      "matchManagers": ["dockerfile", "docker-compose"]
-    }
-  ]
+      // 更新 Python 版本时，需要同时更新这几个文件
+      groupName: "Docker dependencies",
+      // https://docs.renovatebot.com/modules/manager/dockerfile/
+      // https://docs.renovatebot.com/modules/manager/docker-compose/
+      // https://docs.renovatebot.com/modules/manager/pyenv/
+      matchManagers: ["dockerfile", "docker-compose", "pyenv"],
+      description: "Weekly update of Docker dependencies",
+    },
+    {
+      groupName: "pre-commit dependencies",
+      // https://docs.renovatebot.com/modules/manager/pre-commit/
+      matchManagers: ["pre-commit"],
+      description: "Weekly update of pre-commit dependencies",
+    },
+  ],
 }
