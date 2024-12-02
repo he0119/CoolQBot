@@ -548,7 +548,7 @@ requires-dist = [
     { name = "nonebot-adapter-red", specifier = ">=0.9.0" },
     { name = "nonebot-adapter-satori", specifier = ">=0.12.6" },
     { name = "nonebot-adapter-telegram", specifier = ">=0.1.0b18" },
-    { name = "nonebot-bison", specifier = "==0.9.4" },
+    { name = "nonebot-bison", specifier = "==0.9.5" },
     { name = "nonebot-plugin-alconna", specifier = ">=0.53.0" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-bawiki", specifier = "==0.11.3" },
@@ -1372,7 +1372,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-bison"
-version = "0.9.4"
+version = "0.9.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1396,9 +1396,9 @@ dependencies = [
     { name = "tinydb" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ac/39/94309f6bffb544cb8ec125c4f7b778b1160c549b47434c5ecc38ca6fb759/nonebot_bison-0.9.4.tar.gz", hash = "sha256:e122b0211e770e25af41977ca8e40ca770dfbc438898f5124018117127449f94", size = 2882360 }
+sdist = { url = "https://files.pythonhosted.org/packages/70/b8/37fae15f4e1dc598bc43b64c9a2fc4119ee3223c7af3503e3b1ef48468a9/nonebot_bison-0.9.5.tar.gz", hash = "sha256:931a7f0511f1a29b9b10b84ddcd823ee45eaea7068adc72d263602b0358867e6", size = 2884339 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2f/ca/e3b994d12ce4adeeb43717bec9867eb8e85c28e4a6af5b728df7356ae69d/nonebot_bison-0.9.4-py3-none-any.whl", hash = "sha256:d778ffbac80c0331b15cfb37807a6ad22c2182918df878298bc7a1e5815fd8e9", size = 2929657 },
+    { url = "https://files.pythonhosted.org/packages/37/55/090f742e26dcca9fe1d314797bd8f170aa62c8975ee56e8a3af8e861665d/nonebot_bison-0.9.5-py3-none-any.whl", hash = "sha256:39d5cbc802aedb53bd252aaef19c4c581e5e742cd7e1ae89457b5713f8ad4d35", size = 2932231 },
 ]
 
 [[package]]
