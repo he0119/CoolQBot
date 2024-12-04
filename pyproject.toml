@@ -3,6 +3,9 @@ name = "coolqbot"
 version = "0.20.1"
 description = "基于 NoneBot2 的聊天机器人"
 authors = [{ name = "uy_sun", email = "hmy0119@gmail.com" }]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">= 3.12"
 dependencies = [
     "pydantic>=2.9.2",
     "eorzeaenv @ git+https://github.com/he0119/EorzeaEnv.git@coolqbot",
@@ -35,9 +38,6 @@ dependencies = [
     "nonebot-plugin-bawiki==0.11.3",
     "openai>=1.54.4",
 ]
-readme = "README.md"
-license = { file = "LICENSE" }
-requires-python = ">= 3.12, < 3.13"
 
 [project.urls]
 Homepage = "https://github.com/he0119/CoolQBot"
