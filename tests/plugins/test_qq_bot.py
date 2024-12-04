@@ -1,8 +1,12 @@
+from typing import TYPE_CHECKING
+
 import nonebot
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from nonebug import App
+
+if TYPE_CHECKING:
+    from fastapi import FastAPI
 
 
 @pytest.fixture

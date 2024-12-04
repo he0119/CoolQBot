@@ -19,7 +19,7 @@ async def bot_check(bot_id: str | None = None):
         return JSONResponse({"status": "ok"}, status_code=200)
     except Exception as e:
         return JSONResponse(
-            {"status": "error", "message": f"Failed to get bot: {str(e)}"},
+            {"status": "error", "message": f"Failed to get bot: {e!s}"},
             status_code=500,
         )
 

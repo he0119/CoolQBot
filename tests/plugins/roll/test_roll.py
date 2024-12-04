@@ -19,7 +19,7 @@ async def test_roll(app: App, mocker: MockerFixture):
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
-        bot = ctx.create_bot(base=Bot, adapter=adapter)  # noqa: F821
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
 
         event = fake_group_message_event_v11(message=Message("/roll d100"))
         ctx.receive_event(bot, event)

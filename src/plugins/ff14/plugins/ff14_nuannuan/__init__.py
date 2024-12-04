@@ -10,7 +10,7 @@ __plugin_meta__ = PluginMetadata(
     description="获取最新的满分攻略",
     usage="""获取最新的满分攻略
 /时尚品鉴""",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),  # noqa: F821
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
 )
 
 nuannuan_cmd = on_alconna(

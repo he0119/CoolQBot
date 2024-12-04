@@ -8,14 +8,18 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from alembic import op
 from nonebot import logger
 from sqlalchemy import Connection, inspect, select
-from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sqlalchemy.ext.asyncio import AsyncConnection
 
 revision: str = "3d228011e96b"
 down_revision: str | Sequence[str] | None = "65a94a4a643b"

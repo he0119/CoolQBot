@@ -5,6 +5,7 @@
 """
 
 from datetime import date, datetime, timedelta
+from typing import ClassVar
 
 from nonebot import get_driver
 from nonebot.log import logger
@@ -32,7 +33,7 @@ def update(data: dict) -> dict:
         if not plugin_config.repeat_migration_group_id:
             raise RuntimeError("未配置群，无法升级数据")
         # 判断是那种类型的数据
-        if isinstance(list(data.values())[0], int):
+        if isinstance(next(iter(data.values())), int):
             return update_old_1(data, plugin_config.repeat_migration_group_id)
         else:
             return update_old_2(data, plugin_config.repeat_migration_group_id)
@@ -88,7 +89,7 @@ def update_old_2(data: dict, group_id: int):
 
 
 class Singleton(type):
-    _instances = {}
+    _instances: ClassVar = {}
 
     def __call__(cls, group_info: GroupInfo):
         if group_info not in cls._instances:
