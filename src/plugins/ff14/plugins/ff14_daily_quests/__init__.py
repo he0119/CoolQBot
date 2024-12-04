@@ -58,7 +58,7 @@ async def daily_quests_handle(session: UserSession, quests: Match[tuple[str, ...
     elif quests.result == ("总览",):
         reply = await get_daily_quests_overview()
     else:
-        set_daily_quests(session.user_id, list(quests.result))
+        set_daily_quests(session.user_id, [quest.strip() for quest in quests.result])
         reply = await get_daily_quests_pair(session.user_id)
 
     await daily_quests_cmd.finish(reply, at_sender=True)
