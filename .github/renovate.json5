@@ -33,13 +33,20 @@
       description: "Weekly update of GitHub actions dependencies",
     },
     {
-      // 更新 Python 版本时，需要同时更新这几个文件
       groupName: "Docker dependencies",
       // https://docs.renovatebot.com/modules/manager/dockerfile/
       // https://docs.renovatebot.com/modules/manager/docker-compose/
-      // https://docs.renovatebot.com/modules/manager/pyenv/
-      matchManagers: ["dockerfile", "docker-compose", "pyenv"],
+      matchManagers: ["dockerfile", "docker-compose"],
       description: "Weekly update of Docker dependencies",
+    },
+    {
+      // 更新 Python 版本时，需要同时更新这几个文件
+      groupName: "Python version",
+      matchPackageNames: ["python"],
+      // https://docs.renovatebot.com/modules/manager/dockerfile/
+      // https://docs.renovatebot.com/modules/manager/pyenv/
+      matchManagers: ["dockerfile", "pyenv"],
+      description: "Weekly update of Python version",
     },
     {
       groupName: "pre-commit dependencies",
