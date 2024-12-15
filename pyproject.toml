@@ -48,12 +48,12 @@ Changelog = "https://github.com/he0119/CoolQBot/blob/main/CHANGELOG.md"
 
 [tool.uv]
 dev-dependencies = [
-    "nonebug>=0.4.2",
+    "nonebug>=0.4.3",
     "nonebug-saa>=0.5.0",
     "pytest-cov>=6.0.0",
     "pytest-mock>=3.14.0",
     "pytest-xdist>=3.6.1",
-    "pytest-asyncio>=0.24.0",
+    "pytest-asyncio>=0.25.0",
     "pytest-loguru>=0.4.0",
     "respx>=0.21.1",
     "freezegun>=1.5.1",
