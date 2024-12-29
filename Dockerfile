@@ -61,6 +61,6 @@ COPY bot.py .env prestart.sh /app/
 COPY src /app/src/
 
 # 健康检查
-HEALTHCHECK --interval=10s --timeout=5s --start-period=180s --retries=5 CMD curl -f http://localhost:${PORT:-8080}/health || exit 1
+HEALTHCHECK --interval=5s --timeout=4s --start-period=180s --retries=5 CMD curl -f http://localhost:${PORT:-8080}/health || exit 1
 
 CMD ["uv", "run", "--no-dev", "/start.sh"]
