@@ -85,6 +85,27 @@ jobs:
         with:
           images: he0119/coolqbot
 
+      - name: Cache buildkit
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: |
+            var-cache-apt
+            var-lib-apt
+            root-cache-uv
+          key: cache-${{ hashFiles('Dockerfile') }}
+
+      - name: Inject cache into docker
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.2
+        with:
+          cache-map: |
+            {
+              "var-cache-apt": "/var/cache/apt",
+              "var-lib-apt": "/var/lib/apt",
+              "root-cache-uv": "/root/.cache/uv"
+            }
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+
       - name: Build and push
         if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v6
