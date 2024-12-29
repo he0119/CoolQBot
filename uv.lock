@@ -1,9 +1,9 @@
 version = 1
 requires-python = ">=3.12"
 resolution-markers = [
-    "platform_system == 'Darwin'",
-    "platform_machine == 'aarch64' and platform_system == 'Linux'",
-    "(platform_machine != 'aarch64' and platform_system != 'Darwin') or (platform_system != 'Darwin' and platform_system != 'Linux')",
+    "sys_platform == 'darwin'",
+    "platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "(platform_machine != 'aarch64' and sys_platform == 'linux') or (sys_platform != 'darwin' and sys_platform != 'linux')",
 ]
 
 [[package]]
@@ -347,7 +347,7 @@ wheels = [
 
 [[package]]
 name = "bump-my-version"
-version = "0.28.1"
+version = "0.29.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -359,9 +359,9 @@ dependencies = [
     { name = "tomlkit" },
     { name = "wcmatch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1d/44/8f4f5dc472a054634bffd86e4941b2624e0b050f15578d40ec15e670d8e5/bump_my_version-0.28.1.tar.gz", hash = "sha256:e608def5191baf505b6cde88bd679a0a95fc4cfeace4247adb60ac0f8a7e57ee", size = 983509 }
+sdist = { url = "https://files.pythonhosted.org/packages/a1/53/277e3748f0e45758210e971ed2c54c93f1f768a5bc9c66f8cb58a604a415/bump_my_version-0.29.0.tar.gz", hash = "sha256:e4149ed63b4772f5868b3fcabb8fa5e1191b8abae6d35effd0be980d4b0f55e3", size = 1013425 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ad/2c/10f770bf71116ecfcc8b2e67dd6752e7e135998579bc1dc98a6edb47bafc/bump_my_version-0.28.1-py3-none-any.whl", hash = "sha256:df7fdb02a1b43c122a6714df6d1fe4efc7a1220b5638ca5a0eb3018813c1b222", size = 52210 },
+    { url = "https://files.pythonhosted.org/packages/00/59/0c78849320b0dbe17f7e67a125b6c4adcbba069c4993bf4064aea42add13/bump_my_version-0.29.0-py3-none-any.whl", hash = "sha256:6566ab25bd3eeeec109f4ac7e4464227a3ac1fd57f847d259a24800423cd9037", size = 52132 },
 ]
 
 [[package]]
@@ -477,7 +477,7 @@ name = "click"
 version = "8.1.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/96/d3/f04c7bfcf5c1862a2a5b845c6b2b360488cf47af55dfa79c98f6a6bf98b5/click-8.1.7.tar.gz", hash = "sha256:ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de", size = 336121 }
 wheels = [
@@ -645,17 +645,17 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "beautifulsoup4", specifier = ">=4.12.3" },
-    { name = "bump-my-version", specifier = ">=0.28.1" },
+    { name = "bump-my-version", specifier = ">=0.29.0" },
     { name = "freezegun", specifier = ">=1.5.1" },
     { name = "nonebug", specifier = ">=0.4.3" },
     { name = "nonebug-saa", specifier = ">=0.5.0" },
-    { name = "poethepoet", specifier = ">=0.31.1" },
+    { name = "poethepoet", specifier = ">=0.32.0" },
     { name = "pytest-asyncio", specifier = ">=0.25.0" },
     { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "pytest-loguru", specifier = ">=0.4.0" },
     { name = "pytest-mock", specifier = ">=3.14.0" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
-    { name = "respx", specifier = ">=0.21.1" },
+    { name = "respx", specifier = ">=0.22.0" },
 ]
 
 [[package]]
@@ -2148,7 +2148,7 @@ name = "opencv-python-headless"
 version = "4.10.0.84"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", marker = "python_full_version >= '3.12'" },
+    { name = "numpy" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/2f/7e/d20f68a5f1487adf19d74378d349932a386b1ece3be9be9915e5986db468/opencv-python-headless-4.10.0.84.tar.gz", hash = "sha256:f2017c6101d7c2ef8d7bc3b414c37ff7f54d64413a1847d89970b6b7069b4e1a", size = 95117755 }
 wheels = [
@@ -2263,15 +2263,15 @@ wheels = [
 
 [[package]]
 name = "poethepoet"
-version = "0.31.1"
+version = "0.32.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pastel" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8f/96/15bce512c8027696b20586b18ac4b239afe8d312dbaa2a0099e8fb8f8424/poethepoet-0.31.1.tar.gz", hash = "sha256:d6b66074edf85daf115bb916eae0afd6387d19e1562e1c9ef7d61d5c585696aa", size = 61520 }
+sdist = { url = "https://files.pythonhosted.org/packages/8a/f6/1692a42cf426494d89dbc693ba55ebd653bd2e84bbb6b3da4127b87956df/poethepoet-0.32.0.tar.gz", hash = "sha256:a700be02e932e1a8907ae630928fc769ea9a77986189ba6867e6e3fd8f60e5b7", size = 62962 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/06/e1/04f56c9d848d6135ca3328c5a2ca84d3303c358ad7828db290385e36a8cc/poethepoet-0.31.1-py3-none-any.whl", hash = "sha256:7fdfa0ac6074be9936723e7231b5bfaad2923e96c674a9857e81d326cf8ccdc2", size = 80238 },
+    { url = "https://files.pythonhosted.org/packages/27/12/2994011e33d37772228439fe215fc022ff180b161ab7bd8ea5ac92717556/poethepoet-0.32.0-py3-none-any.whl", hash = "sha256:fba84c72d923feac228d1ea7734c5a54701f2e71fad42845f027c0fbf998a073", size = 81717 },
 ]
 
 [[package]]
@@ -2736,7 +2736,7 @@ name = "qrcode"
 version = "7.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "pypng" },
     { name = "typing-extensions" },
 ]
@@ -2850,14 +2850,14 @@ wheels = [
 
 [[package]]
 name = "respx"
-version = "0.21.1"
+version = "0.22.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fd/72/979e475ade69bcbb18288604aacbdc77b44b3bd1133e2c16660282a9f4b8/respx-0.21.1.tar.gz", hash = "sha256:0bd7fe21bfaa52106caa1223ce61224cf30786985f17c63c5d71eff0307ee8af", size = 28306 }
+sdist = { url = "https://files.pythonhosted.org/packages/f4/7c/96bd0bc759cf009675ad1ee1f96535edcb11e9666b985717eb8c87192a95/respx-0.22.0.tar.gz", hash = "sha256:3c8924caa2a50bd71aefc07aa812f2466ff489f1848c96e954a5362d17095d91", size = 28439 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/5c/428523509b26c243c1e93aa2ae385def597ef1fbdbbd47978430ba19037d/respx-0.21.1-py2.py3-none-any.whl", hash = "sha256:05f45de23f0c785862a2c92a3e173916e8ca88e4caad715dd5f68584d6053c20", size = 25130 },
+    { url = "https://files.pythonhosted.org/packages/8e/67/afbb0978d5399bc9ea200f1d4489a23c9a1dad4eee6376242b8182389c79/respx-0.22.0-py2.py3-none-any.whl", hash = "sha256:631128d4c9aba15e56903fb5f66fb1eff412ce28dd387ca3a81339e52dbd3ad0", size = 25127 },
 ]
 
 [[package]]
@@ -2955,7 +2955,7 @@ name = "sqlalchemy"
 version = "2.0.36"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "greenlet", marker = "(python_full_version < '3.13' and platform_machine == 'AMD64' and python_full_version >= '3.12') or (python_full_version < '3.13' and platform_machine == 'WIN32' and python_full_version >= '3.12') or (python_full_version < '3.13' and platform_machine == 'aarch64' and python_full_version >= '3.12') or (python_full_version < '3.13' and platform_machine == 'amd64' and python_full_version >= '3.12') or (python_full_version < '3.13' and platform_machine == 'ppc64le' and python_full_version >= '3.12') or (python_full_version < '3.13' and platform_machine == 'win32' and python_full_version >= '3.12') or (python_full_version < '3.13' and platform_machine == 'x86_64' and python_full_version >= '3.12')" },
+    { name = "greenlet", marker = "(python_full_version < '3.13' and platform_machine == 'AMD64') or (python_full_version < '3.13' and platform_machine == 'WIN32') or (python_full_version < '3.13' and platform_machine == 'aarch64') or (python_full_version < '3.13' and platform_machine == 'amd64') or (python_full_version < '3.13' and platform_machine == 'ppc64le') or (python_full_version < '3.13' and platform_machine == 'win32') or (python_full_version < '3.13' and platform_machine == 'x86_64')" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/65/9cbc9c4c3287bed2499e05033e207473504dc4df999ce49385fb1f8b058a/sqlalchemy-2.0.36.tar.gz", hash = "sha256:7f2767680b6d2398aea7082e45a774b2b0767b5c8d8ffb9c8b683088ea9b29c5", size = 9574485 }
@@ -3090,7 +3090,7 @@ name = "tqdm"
 version = "4.67.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a8/4b/29b4ef32e036bb34e4ab51796dd745cdba7ed47ad142a9f4a1eb8e0c744d/tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2", size = 169737 }
 wheels = [
@@ -3129,7 +3129,7 @@ name = "tzlocal"
 version = "5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "tzdata", marker = "platform_system == 'Windows'" },
+    { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/04/d3/c19d65ae67636fe63953b20c2e4a8ced4497ea232c43ff8d01db16de8dc0/tzlocal-5.2.tar.gz", hash = "sha256:8d399205578f1a9342816409cc1e46a93ebd5755e39ea2d85334bea911bf0e6e", size = 30201 }
 wheels = [
