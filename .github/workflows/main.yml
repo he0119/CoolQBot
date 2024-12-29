@@ -25,8 +25,8 @@ jobs:
       - name: Set timezone
         run: sudo timedatectl set-timezone 'Asia/Shanghai'
 
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@v4
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
 
@@ -85,6 +85,27 @@ jobs:
         with:
           images: he0119/coolqbot
 
+      - name: Cache buildkit
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: |
+            var-cache-apt
+            var-lib-apt
+            root-cache-uv
+          key: cache-${{ hashFiles('Dockerfile') }}
+
+      - name: Inject cache into docker
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.2
+        with:
+          cache-map: |
+            {
+              "var-cache-apt": "/var/cache/apt",
+              "var-lib-apt": "/var/lib/apt",
+              "root-cache-uv": "/root/.cache/uv"
+            }
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+
       - name: Build and push
         if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v6
@@ -114,21 +135,50 @@ jobs:
       - name: Test Image
         if: github.event_name == 'pull_request'
         run: |
+          cleanup_container() {
+              docker rm -f test-docker-container > /dev/null 2>&1 || true
+          }
+
+          check_container() {
+              CONTAINER_STATE=$(docker ps -f name=test-docker-container -a --format '{{.State}}')
+              HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' test-docker-container 2>/dev/null || echo "unknown")
+
+              echo "状态: $CONTAINER_STATE, 健康状态: $HEALTH_STATUS"
+          }
+
+          # 启动容器
+          echo "正在启动容器..."
           docker run --name test-docker-container -d he0119/coolqbot:test > /dev/null
 
-          sleep 10
+          TIMEOUT=60
+          ELAPSED=0
+          INTERVAL=5
 
-          CONTAINER_STATE=$(docker ps -f name=test-docker-container -a --format '{{.State}}')
-          if [[ $CONTAINER_STATE = "running" ]]; then
-              echo "container still running, check passed"
-              docker rm -f test-docker-container > /dev/null
-              exit
-          else
-              echo "container exited"
-              docker logs test-docker-container
-              docker rm test-docker-container > /dev/null
-              exit 1
-          fi
+          while [ $ELAPSED -lt $TIMEOUT ]; do
+              check_container
+
+              if [[ $CONTAINER_STATE = "running" && $HEALTH_STATUS = "healthy" ]]; then
+                  echo "✅ 容器健康检查通过"
+                  cleanup_container
+                  exit 0
+              fi
+
+              if [[ $CONTAINER_STATE != "running" ]]; then
+                  echo "❌ 容器异常停止"
+                  docker logs test-docker-container
+                  cleanup_container
+                  exit 1
+              fi
+
+              echo "⏳ 等待健康检查... (${ELAPSED}/${TIMEOUT}s)"
+              sleep $INTERVAL
+              ELAPSED=$((ELAPSED + INTERVAL))
+          done
+
+          echo "❌ 健康检查超时"
+          docker logs test-docker-container
+          cleanup_container
+          exit 1
 
   deploy_dev:
     name: Deploy Dev

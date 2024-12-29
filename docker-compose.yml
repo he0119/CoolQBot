@@ -9,12 +9,6 @@ services:
       - "8080:8080"
     env_file:
       - ".env"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8080}/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 180s
 
   netease:
     image: binaryify/netease_cloud_music_api
