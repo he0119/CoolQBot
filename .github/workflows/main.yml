@@ -137,17 +137,22 @@ jobs:
         run: |
           docker run --name test-docker-container -d he0119/coolqbot:test > /dev/null
 
-          sleep 10
+          echo "等待容器启动..."
+          sleep 20
 
+          # 检查容器状态和健康状态
           CONTAINER_STATE=$(docker ps -f name=test-docker-container -a --format '{{.State}}')
-          if [[ $CONTAINER_STATE = "running" ]]; then
-              echo "container still running, check passed"
+          HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' test-docker-container)
+
+          if [[ $CONTAINER_STATE = "running" && $HEALTH_STATUS = "healthy" ]]; then
+              echo "容器运行中且健康状态正常"
               docker rm -f test-docker-container > /dev/null
-              exit
+              exit 0
           else
-              echo "container exited"
+              echo "容器状态: $CONTAINER_STATE"
+              echo "健康状态: $HEALTH_STATUS"
               docker logs test-docker-container
-              docker rm test-docker-container > /dev/null
+              docker rm -f test-docker-container > /dev/null
               exit 1
           fi
 
