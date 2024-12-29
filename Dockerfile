@@ -1,5 +1,5 @@
 FROM python:3.12.8-slim
-COPY --from=ghcr.io/astral-sh/uv:0.5.9 /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.5.13 /uv /bin/uv
 
 # 编译参数
 ARG VERSION
