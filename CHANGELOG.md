@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 修复 memes 和 bison 的依赖问题
+
 ## [0.20.2] - 2024-12-30
 
 ### Added

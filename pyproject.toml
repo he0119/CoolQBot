@@ -23,7 +23,7 @@ dependencies = [
     "nonebot-adapter-red>=0.9.0",
     "nonebot-adapter-satori>=0.13.1",
     "nonebot-adapter-telegram>=0.1.0b20",
-    "nonebot-plugin-wordcloud>=0.8.1",
+    "nonebot-plugin-wordcloud>=0.8.2",
     "nonebot-plugin-treehelp>=0.5.0",
     "nonebot-plugin-user>=0.4.4",
     "nonebot-plugin-orm[default]>=0.7.6",
@@ -37,7 +37,8 @@ dependencies = [
     "nonebot-plugin-status==0.9.0",
     "nonebot-plugin-bawiki==0.11.3",
     "openai>=1.58.1",
-    "httpx==0.28.1",
+    "httpx<0.28.0",
+    "nonebot-session-to-uninfo>=0.0.2",
 ]
 
 [project.urls]
