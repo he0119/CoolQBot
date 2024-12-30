@@ -575,6 +575,7 @@ dependencies = [
     { name = "nonebot-plugin-treehelp" },
     { name = "nonebot-plugin-user" },
     { name = "nonebot-plugin-wordcloud" },
+    { name = "nonebot-session-to-uninfo" },
     { name = "nonebot2", extra = ["aiohttp", "fastapi", "httpx"] },
     { name = "openai" },
     { name = "pydantic" },
@@ -626,6 +627,7 @@ requires-dist = [
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-user", specifier = ">=0.4.4" },
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.8.2" },
+    { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
     { name = "nonebot2", extras = ["httpx", "fastapi", "aiohttp"], specifier = ">=2.4.1" },
     { name = "openai", specifier = ">=1.58.1" },
     { name = "pydantic", specifier = ">=2.10.4" },
@@ -1997,6 +1999,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/17/c6/0bad901f3ca9c0e18c1dc5c259e8002e36d702ed605a6de55931561a463d/nonebot_plugin_wordcloud-0.8.2.tar.gz", hash = "sha256:db19f85155895d92fb07db31e045b17859c2d862dc49de029aa735a327584ae8", size = 7219971 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/eb/10/c8ae3d5416aca77e2e1715022fdffdb12179746437b407b1061f71ce3f9b/nonebot_plugin_wordcloud-0.8.2-py3-none-any.whl", hash = "sha256:0a9a5e3495b3ca827f15f49ac1fa348131d3e7dfd305f07004369a69c3c72073", size = 7225185 },
+]
+
+[[package]]
+name = "nonebot-session-to-uninfo"
+version = "0.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "alembic" },
+    { name = "sqlalchemy" },
+    { name = "strenum" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/09/04/4ebea55a53c507195c1cf923d31897ef7ab8b7b49532406b2419f61342f9/nonebot_session_to_uninfo-0.0.2.tar.gz", hash = "sha256:10d3540fa85293cdd669065cb3898f07af625e2a640a2ab2fa0360a444eef3ab", size = 4624 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2e/ea/f9e31d29facf907f96aad32ac184b879a6a80d3f4f43437c735a425e26b1/nonebot_session_to_uninfo-0.0.2-py3-none-any.whl", hash = "sha256:6639f252f371ee50f414904011757f480916a771f2cea8dcf5bc24792b168330", size = 5111 },
 ]
 
 [[package]]
