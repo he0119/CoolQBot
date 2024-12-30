@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.20.2] - 2024-12-30
+
 ### Added
 
 - QQ 适配器支持 Webhook
@@ -587,7 +589,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.20.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.20.2...HEAD
+[0.20.2]: https://github.com/he0119/CoolQBot/compare/v0.20.1...v0.20.2
 [0.20.1]: https://github.com/he0119/CoolQBot/compare/v0.20.0...v0.20.1
 [0.20.0]: https://github.com/he0119/CoolQBot/compare/v0.19.2...v0.20.0
 [0.19.2]: https://github.com/he0119/CoolQBot/compare/v0.19.1...v0.19.2
