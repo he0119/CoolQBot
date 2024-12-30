@@ -546,7 +546,7 @@ wheels = [
 
 [[package]]
 name = "coolqbot"
-version = "0.20.1"
+version = "0.20.2"
 source = { virtual = "." }
 dependencies = [
     { name = "eorzeaenv" },
@@ -625,7 +625,7 @@ requires-dist = [
     { name = "nonebot-plugin-status", specifier = "==0.9.0" },
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-user", specifier = ">=0.4.4" },
-    { name = "nonebot-plugin-wordcloud", specifier = ">=0.8.1" },
+    { name = "nonebot-plugin-wordcloud", specifier = ">=0.8.2" },
     { name = "nonebot2", extras = ["httpx", "fastapi", "aiohttp"], specifier = ">=2.4.1" },
     { name = "openai", specifier = ">=1.58.1" },
     { name = "pydantic", specifier = ">=2.10.4" },
@@ -1732,16 +1732,16 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-cesaa"
-version = "0.4.1"
+version = "0.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "nonebot-plugin-chatrecorder" },
     { name = "nonebot-plugin-send-anything-anywhere" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/94/01/3f371eada2f82df58eec462351ac319598171384d150938f766d54747ea2/nonebot_plugin_cesaa-0.4.1.tar.gz", hash = "sha256:1bb9150aa9eb766ce5b0e027308aa5ad4af9c1cd116f3a3d82ca7b83453cfd11", size = 6515 }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/a6/a5608adf9d9763e34b606c244a28d56d7f98a3c66c8206f786bc30197dc0/nonebot_plugin_cesaa-0.4.2.tar.gz", hash = "sha256:719460b40c9d9d0ad67630a186e924ef9d6c58fdc4449844162d724b9e3fe808", size = 6666 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4b/08/632d35e0df5e23f5043d53bef90a384c96522bc747d18d1990456bc1333a/nonebot_plugin_cesaa-0.4.1-py3-none-any.whl", hash = "sha256:87186d35178ced9b9629a02a26093826963b880274809a5f9a2ad90470de3ae4", size = 6011 },
+    { url = "https://files.pythonhosted.org/packages/3a/49/204ab8df9b084ba52437ca27ff217d5cb4cb1fede02d749aa46d5a5c7d27/nonebot_plugin_cesaa-0.4.2-py3-none-any.whl", hash = "sha256:9f36b0617b7c46eddd315bc853948ba931fcc78af97cbe56867d513e416f24a6", size = 6020 },
 ]
 
 [[package]]
@@ -1979,7 +1979,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.8.1"
+version = "0.8.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "emoji" },
@@ -1994,9 +1994,9 @@ dependencies = [
     { name = "tzdata" },
     { name = "wordcloud" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/68/59/1e0432d04d0394e295e41e23d84f61bf3c9b9575327f093bec16691d4f6b/nonebot_plugin_wordcloud-0.8.1.tar.gz", hash = "sha256:f54d0effef042c975fbd41c93b56979f95b50e9569a0ad032f68b4159aafd608", size = 7219966 }
+sdist = { url = "https://files.pythonhosted.org/packages/17/c6/0bad901f3ca9c0e18c1dc5c259e8002e36d702ed605a6de55931561a463d/nonebot_plugin_wordcloud-0.8.2.tar.gz", hash = "sha256:db19f85155895d92fb07db31e045b17859c2d862dc49de029aa735a327584ae8", size = 7219971 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fd/08/d0acf46755936597880349caf41de3000c1a74448b0d897fa2f73d94cdcc/nonebot_plugin_wordcloud-0.8.1-py3-none-any.whl", hash = "sha256:85795b4121698ecc9ee461fbd7362fd7d34cb0d53776f480088373c089cc60e6", size = 7225182 },
+    { url = "https://files.pythonhosted.org/packages/eb/10/c8ae3d5416aca77e2e1715022fdffdb12179746437b407b1061f71ce3f9b/nonebot_plugin_wordcloud-0.8.2-py3-none-any.whl", hash = "sha256:0a9a5e3495b3ca827f15f49ac1fa348131d3e7dfd305f07004369a69c3c72073", size = 7225185 },
 ]
 
 [[package]]
