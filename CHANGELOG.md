@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- QQ 适配器支持 Webhook
+- 镜像自带 healthcheck
+
 ## [0.20.1] - 2024-12-02
 
 ### Added
