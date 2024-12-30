@@ -87,7 +87,14 @@ plugins = [
 [tool.pyright]
 pythonVersion = "3.12"
 pythonPlatform = "All"
-typeCheckingMode = "basic"
+typeCheckingMode = "standard"
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.format]
+line-ending = "lf"
 
 [tool.ruff.lint]
 select = [
@@ -119,6 +126,7 @@ omit = ["*/migrations/*"]
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib"]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
 
 [tool.bumpversion]
 current_version = "0.20.1"
