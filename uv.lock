@@ -543,7 +543,7 @@ wheels = [
 
 [[package]]
 name = "coolqbot"
-version = "0.20.2"
+version = "0.20.3"
 source = { virtual = "." }
 dependencies = [
     { name = "eorzeaenv" },
@@ -1951,15 +1951,15 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-uninfo"
-version = "0.6.2"
+version = "0.6.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "importlib-metadata" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b6/98/d861e72dad163d3aa6d7f34ceaf72afab47fab179432dd04344615cc0d1b/nonebot_plugin_uninfo-0.6.2.tar.gz", hash = "sha256:8f8b1351d4ae1a34766c68dee2b05f358416b310314fead4d9d6776a4b3535f3", size = 34682 }
+sdist = { url = "https://files.pythonhosted.org/packages/3c/61/56783eac1b9f128b5d20ecf06667108def386a14592b77060fc7f0afe139/nonebot_plugin_uninfo-0.6.4.tar.gz", hash = "sha256:9d4fcfc26f757c88ff77546bfda1aacb551dc33cb9b714579bd6fa4e2e477c55", size = 34690 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fe/9c/c2b3b16d9e4d898aeb582c15eff3ab31585228c31e61ec21e0819802726f/nonebot_plugin_uninfo-0.6.2-py3-none-any.whl", hash = "sha256:6d53559ab3ef23fe750a445cbc1ffd6abbbd7ba6dd6ab375a0c7d7d55bdc5175", size = 54535 },
+    { url = "https://files.pythonhosted.org/packages/01/84/662db97046b8afce189b2853b487e51567e7a35f56e372386adfd9617045/nonebot_plugin_uninfo-0.6.4-py3-none-any.whl", hash = "sha256:ebb8468a0680d3d986695a60cf17ff383930084395004d3262f2188267beb012", size = 54592 },
 ]
 
 [[package]]
