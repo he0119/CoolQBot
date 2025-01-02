@@ -3,7 +3,7 @@ from nonebug import App
 
 
 @pytest.fixture
-async def app(app: App, _default_user):
+async def app(app: App):
     yield app
 
     from src.plugins.ban import _bot_role
