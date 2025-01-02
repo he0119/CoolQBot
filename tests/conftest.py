@@ -3,8 +3,11 @@ from pathlib import Path
 
 import nonebot
 import pytest
+from nonebot.adapters.onebot.v11 import Adapter as OneBotV11Adapter
+from nonebot.adapters.qq import Adapter as QQAdapter
 from nonebug import NONEBOT_INIT_KWARGS
 from nonebug.app import App
+from pytest_asyncio import is_async_test
 from pytest_mock import MockerFixture
 from sqlalchemy import StaticPool, delete
 
@@ -29,23 +32,26 @@ def pytest_configure(config: pytest.Config) -> None:
     }
 
 
-@pytest.fixture(scope="session", autouse=True)
-def _load_plugin(nonebug_init: None):
-    from nonebot.adapters.onebot.v11 import Adapter as OneBotV11Adapter
-    from nonebot.adapters.qq import Adapter as QQAdapter
+def pytest_collection_modifyitems(items: list[pytest.Item]):
+    pytest_asyncio_tests = (item for item in items if is_async_test(item))
+    session_scope_marker = pytest.mark.asyncio(loop_scope="session")
+    for async_test in pytest_asyncio_tests:
+        async_test.add_marker(session_scope_marker, append=False)
 
+
+@pytest.fixture(scope="session", autouse=True)
+async def after_nonebot_init(after_nonebot_init: None):
+    # 加载适配器
     driver = nonebot.get_driver()
     driver.register_adapter(OneBotV11Adapter)
     driver.register_adapter(QQAdapter)
 
-    nonebot.require("nonebot_plugin_localstore")
-    nonebot.require("nonebot_plugin_datastore")
-    nonebot.require("nonebot_plugin_orm")
-    nonebot.require("nonebot_plugin_apscheduler")
-    nonebot.require("nonebot_plugin_saa")
-    nonebot.require("nonebot_plugin_alconna")
-    nonebot.require("nonebot_plugin_user")
+    # 替换内置权限
+    from src.utils.permission import patch_permission
 
+    patch_permission()
+
+    # 加载插件
     nonebot.load_plugins(str(Path(__file__).parent.parent / "src" / "plugins"))
 
 
@@ -72,8 +78,9 @@ async def app(app: App, tmp_path: Path, mocker: MockerFixture):
     return app
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 async def _default_user(app: App):
+    """设置默认用户名"""
     from nonebot_plugin_orm import get_session
     from nonebot_plugin_user.models import Bind, User
     from nonebot_plugin_user.utils import get_user, set_user_name

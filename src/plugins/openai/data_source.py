@@ -8,11 +8,6 @@ from .config import plugin_config
 
 plugin_data = get_plugin_data()
 
-client = AsyncOpenAI(
-    api_key=plugin_config.openai_api_key,
-    http_client=DefaultAsyncHttpxClient(proxy=plugin_config.openai_proxy),
-)
-
 
 class Assistant:
     """助手"""
@@ -21,6 +16,10 @@ class Assistant:
         self.session_id = session_id
         self.assistant_id: str | None = None
         self.thread_id: str | None = None
+        self.client = AsyncOpenAI(
+            api_key=plugin_config.openai_api_key,
+            http_client=DefaultAsyncHttpxClient(proxy=plugin_config.openai_proxy),
+        )
 
     @property
     def assistant_key(self):
@@ -41,7 +40,7 @@ class Assistant:
         logger.debug(f"助手: {self.assistant_id}, 会话: {self.thread_id}")
 
     async def create_assistant(self):
-        assistant = await client.beta.assistants.create(
+        assistant = await self.client.beta.assistants.create(
             name="Assistant",
             instructions="you are a helpful assistant.",
             tools=[{"type": "code_interpreter"}],
@@ -54,7 +53,7 @@ class Assistant:
         return f"助手 {assistant.id} 已创建"
 
     async def create_thread(self) -> str:
-        thread = await client.beta.threads.create()
+        thread = await self.client.beta.threads.create()
 
         await plugin_data.config.set(self.thread_key, thread.id)
 
@@ -75,7 +74,7 @@ class Assistant:
         if not self.thread_id:
             return "请先创建/指定会话"
 
-        await client.beta.threads.messages.create(
+        await self.client.beta.threads.messages.create(
             thread_id=self.thread_id,
             role="user",
             content=message,
@@ -88,13 +87,15 @@ class Assistant:
         if not self.thread_id:
             return "请先创建/指定会话"
 
-        run = await client.beta.threads.runs.create_and_poll(
+        run = await self.client.beta.threads.runs.create_and_poll(
             thread_id=self.thread_id,
             assistant_id=self.assistant_id,
         )
 
         if run.status == "completed":
-            messages = await client.beta.threads.messages.list(thread_id=self.thread_id)
+            messages = await self.client.beta.threads.messages.list(
+                thread_id=self.thread_id
+            )
             return self.get_plaintext(messages.data[0].content)
         else:
             return "网络繁忙，请稍后再试"

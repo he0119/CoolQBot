@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 修复未提供 openai_api_key 时报错的问题
+
 ## [0.20.3] - 2024-12-30
 
 ### Fixed
