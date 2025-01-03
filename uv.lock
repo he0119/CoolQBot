@@ -607,7 +607,7 @@ requires-dist = [
     { name = "nonebot-adapter-dodo", specifier = ">=0.2.1" },
     { name = "nonebot-adapter-kaiheila", specifier = ">=0.3.4" },
     { name = "nonebot-adapter-onebot", specifier = ">=2.4.6" },
-    { name = "nonebot-adapter-qq", specifier = ">=1.6.0" },
+    { name = "nonebot-adapter-qq", git = "https://github.com/nonebot/adapter-qq.git" },
     { name = "nonebot-adapter-red", specifier = ">=0.9.0" },
     { name = "nonebot-adapter-satori", specifier = ">=0.13.1" },
     { name = "nonebot-adapter-telegram", specifier = ">=0.1.0b20" },
@@ -1603,17 +1603,13 @@ wheels = [
 [[package]]
 name = "nonebot-adapter-qq"
 version = "1.6.0"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/nonebot/adapter-qq.git#580e6eb193edfddafb308469edb8190aa0468c8e" }
 dependencies = [
     { name = "cryptography" },
     { name = "nonebot2" },
     { name = "pydantic" },
     { name = "typing-extensions" },
     { name = "yarl" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/bf/5c/8ce4231979584937860e7b4ebb0c4554a27684ad88ac77f7c2cd7ac88a79/nonebot_adapter_qq-1.6.0.tar.gz", hash = "sha256:6471fefb77f3d131f95a11b380bbcd87ce7ac8932148614f20327d3ed36d9962", size = 31087 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/60/8b/f8d512451bf7f6092967cac3dd7323cc90f22b40cc9acbaa87a55e969716/nonebot_adapter_qq-1.6.0-py3-none-any.whl", hash = "sha256:a727ce1905d705ee6cb9bad37a2d9384b8fc80c12b2b341679fa4a139fa999a6", size = 34900 },
 ]
 
 [[package]]
