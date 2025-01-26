@@ -13,6 +13,7 @@ if plugin_config.openai_api_key:
     _openai_client = AsyncOpenAI(
         api_key=plugin_config.openai_api_key,
         http_client=DefaultAsyncHttpxClient(proxy=plugin_config.openai_proxy),
+        base_url=plugin_config.openai_base_url,
     )
 
 
