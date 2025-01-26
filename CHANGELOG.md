@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 升级词云插件 0.9.0
+
 ### Fixed
 
 - 修复未提供 openai_api_key 时报错的问题
