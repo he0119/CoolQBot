@@ -32,6 +32,8 @@ jobs:
 
       - name: Run tests
         run: uv run poe test
+        env:
+          TZ: Asia/Shanghai
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}

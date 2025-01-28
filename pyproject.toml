@@ -19,11 +19,11 @@ dependencies = [
     "nonebot-adapter-dodo>=0.2.1",
     "nonebot-adapter-kaiheila>=0.3.4",
     "nonebot-adapter-onebot>=2.4.6",
-    "nonebot-adapter-qq>=1.6.0",
+    "nonebot-adapter-qq>=1.6.1",
     "nonebot-adapter-red>=0.9.0",
     "nonebot-adapter-satori>=0.13.1",
     "nonebot-adapter-telegram>=0.1.0b20",
-    "nonebot-plugin-wordcloud>=0.8.2",
+    "nonebot-plugin-wordcloud>=0.9.0",
     "nonebot-plugin-treehelp>=0.5.0",
     "nonebot-plugin-user>=0.4.4",
     "nonebot-plugin-orm[default]>=0.7.6",
@@ -65,9 +65,6 @@ dev-dependencies = [
 
 [tool.uv.pip]
 universal = true
-
-[tool.uv.sources]
-nonebot-adapter-qq = { git = "https://github.com/nonebot/adapter-qq.git" }
 
 [tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
