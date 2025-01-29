@@ -566,6 +566,7 @@ dependencies = [
     { name = "nonebot-plugin-apscheduler" },
     { name = "nonebot-plugin-bawiki" },
     { name = "nonebot-plugin-datastore" },
+    { name = "nonebot-plugin-deepseek" },
     { name = "nonebot-plugin-memes" },
     { name = "nonebot-plugin-orm", extra = ["default"] },
     { name = "nonebot-plugin-send-anything-anywhere" },
@@ -617,6 +618,7 @@ requires-dist = [
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-bawiki", specifier = "==0.11.3" },
     { name = "nonebot-plugin-datastore", specifier = ">=1.3.0" },
+    { name = "nonebot-plugin-deepseek", specifier = ">=0.1.0" },
     { name = "nonebot-plugin-memes", specifier = "==0.7.12" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.7.6" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
@@ -1783,6 +1785,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/0d/63/896c034e84f6ef0a1f3dc75690fcdfca635ebebc4b18eb5b52dea8f2424b/nonebot_plugin_datastore-1.3.0.tar.gz", hash = "sha256:0e5e54968daeb5a12287e0b509f0b991cd0cc081928cd5ce5bd6815b78305207", size = 22055 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d6/e1/a0e4b1214dfda937e6c2da90a077b388b37148559f2455a74d763653923e/nonebot_plugin_datastore-1.3.0-py3-none-any.whl", hash = "sha256:68c74686a71f3f3c48f2b5f9860282d3a4f31faf97a3252859be919975f0a385", size = 26130 },
+]
+
+[[package]]
+name = "nonebot-plugin-deepseek"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "nonebot-plugin-alconna" },
+    { name = "nonebot2" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f5/2e/bf3c25159b254b5ae137f6397f25c84b91ab064c1b20455debbb5bbe75c6/nonebot_plugin_deepseek-0.1.0.tar.gz", hash = "sha256:543cd813e1b8c2b38439739acc825abea109a06e398e7bcb3a6a47bcc1b5534b", size = 10390 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fb/ae/cca20b96712c27499b3e4045d8172e97db770da858ea277d87322a9b54cf/nonebot_plugin_deepseek-0.1.0-py3-none-any.whl", hash = "sha256:6df3ca4209f70f3c97e6f4c42f0546e64c278901c5677884420ee0517f2b7544", size = 12311 },
 ]
 
 [[package]]
