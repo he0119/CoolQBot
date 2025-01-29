@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Added
 
 - 升级词云插件 0.9.0
+- 添加 deepseek 插件
 
 ### Fixed
 
