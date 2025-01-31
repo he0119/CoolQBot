@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 修复 deepseek 插件无法临时使用其他模型的问题
+
 ## [0.21.0] - 2025-01-31
 
 ### Added

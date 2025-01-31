@@ -546,7 +546,7 @@ wheels = [
 
 [[package]]
 name = "coolqbot"
-version = "0.20.3"
+version = "0.21.0"
 source = { virtual = "." }
 dependencies = [
     { name = "eorzeaenv" },
@@ -618,7 +618,7 @@ requires-dist = [
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-bawiki", specifier = "==0.11.3" },
     { name = "nonebot-plugin-datastore", specifier = ">=1.3.0" },
-    { name = "nonebot-plugin-deepseek", specifier = "==0.1.3" },
+    { name = "nonebot-plugin-deepseek", specifier = "==0.1.4" },
     { name = "nonebot-plugin-memes", specifier = "==0.7.12" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.7.6" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
@@ -1789,7 +1789,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-deepseek"
-version = "0.1.3"
+version = "0.1.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1798,9 +1798,9 @@ dependencies = [
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bf/b7/4fddcd6a82514054ad0cd2ed22c35906636f226688e9e9e71af5de9a97f3/nonebot_plugin_deepseek-0.1.3.tar.gz", hash = "sha256:6f0f9d7f12c954e181ce56bd18ba7418056a82905a4a0491d061cc7bbbbc25ec", size = 17220 }
+sdist = { url = "https://files.pythonhosted.org/packages/88/ab/62076ca3aa4d814d618ba17b8c739f6dc7ee9995401eccea0770fcf1c708/nonebot_plugin_deepseek-0.1.4.tar.gz", hash = "sha256:c689b2a18f4312d87691d38fb7053f8ca73b2f76fd34965d1d548c12e9d321bc", size = 17294 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/11/46/d0a9996f6cfbd2a6aa23e19ef885767b5b2ee57bc6ddcd1f2e3953400ef2/nonebot_plugin_deepseek-0.1.3-py3-none-any.whl", hash = "sha256:ddd525b15337609f021bd23ca90998fea43cb4fb13e782865fabed7911ea03ec", size = 19769 },
+    { url = "https://files.pythonhosted.org/packages/71/38/4abb5219613d7a28b410b8b2a13c1f9d18d623af9e0f3c731c195881c0bd/nonebot_plugin_deepseek-0.1.4-py3-none-any.whl", hash = "sha256:9e5e9b870eb10c892819bce40a639e50086f727529e7909a6582adf598c20afd", size = 19838 },
 ]
 
 [[package]]
