@@ -618,7 +618,7 @@ requires-dist = [
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-bawiki", specifier = "==0.11.3" },
     { name = "nonebot-plugin-datastore", specifier = ">=1.3.0" },
-    { name = "nonebot-plugin-deepseek", specifier = "==0.1.2" },
+    { name = "nonebot-plugin-deepseek", specifier = "==0.1.3" },
     { name = "nonebot-plugin-memes", specifier = "==0.7.12" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.7.6" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
@@ -1789,7 +1789,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-deepseek"
-version = "0.1.2"
+version = "0.1.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1798,9 +1798,9 @@ dependencies = [
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/33/c9/95cb67065e1ffa69cf7adebe1c52dce730ad2a3fbbc2adecb9492073de6c/nonebot_plugin_deepseek-0.1.2.tar.gz", hash = "sha256:69808145bbda832de5369166a097cc376f33d5deeb0ca51b9bb81c29c39b5533", size = 16111 }
+sdist = { url = "https://files.pythonhosted.org/packages/bf/b7/4fddcd6a82514054ad0cd2ed22c35906636f226688e9e9e71af5de9a97f3/nonebot_plugin_deepseek-0.1.3.tar.gz", hash = "sha256:6f0f9d7f12c954e181ce56bd18ba7418056a82905a4a0491d061cc7bbbbc25ec", size = 17220 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a2/39/dd2cad49724b247b01d2d990dc1e1cb3e7f51351ab9df65de4c114af041b/nonebot_plugin_deepseek-0.1.2-py3-none-any.whl", hash = "sha256:fed33ce70fe5b4cb7060f7d3d9d55ff930ca0baa8190a74a95e18c04aa960c4c", size = 19255 },
+    { url = "https://files.pythonhosted.org/packages/11/46/d0a9996f6cfbd2a6aa23e19ef885767b5b2ee57bc6ddcd1f2e3953400ef2/nonebot_plugin_deepseek-0.1.3-py3-none-any.whl", hash = "sha256:ddd525b15337609f021bd23ca90998fea43cb4fb13e782865fabed7911ea03ec", size = 19769 },
 ]
 
 [[package]]
