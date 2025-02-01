@@ -67,6 +67,9 @@ override-dependencies = ["pillow>=10.0.0"]
 [tool.uv.pip]
 universal = true
 
+[tool.uv.sources]
+nonebot-plugin-deepseek = { git = "https://github.com/he0119/nonebot-plugin-deepseek.git", rev = "coolqbot" }
+
 [tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
 bump = "bump-my-version bump"
