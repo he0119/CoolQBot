@@ -1790,7 +1790,7 @@ wheels = [
 [[package]]
 name = "nonebot-plugin-deepseek"
 version = "0.1.4"
-source = { git = "https://github.com/he0119/nonebot-plugin-deepseek.git?rev=coolqbot#3a90bed13b5dd976c6720905979df30197e24b94" }
+source = { git = "https://github.com/he0119/nonebot-plugin-deepseek.git?rev=coolqbot#9a16b2311bcd4ec3e5528efb034851e4121579db" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "httpx" },
