@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.21.1] - 2025-02-12
+
 ### Fixed
 
 - 修复 deepseek 插件无法临时使用其他模型的问题
@@ -610,7 +612,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.21.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.21.1...HEAD
+[0.21.1]: https://github.com/he0119/CoolQBot/compare/v0.21.0...v0.21.1
 [0.21.0]: https://github.com/he0119/CoolQBot/compare/v0.20.3...v0.21.0
 [0.20.3]: https://github.com/he0119/CoolQBot/compare/v0.20.2...v0.20.3
 [0.20.2]: https://github.com/he0119/CoolQBot/compare/v0.20.1...v0.20.2
