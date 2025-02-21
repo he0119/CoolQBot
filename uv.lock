@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.12"
 resolution-markers = [
     "sys_platform == 'darwin'",
@@ -546,7 +547,7 @@ wheels = [
 
 [[package]]
 name = "coolqbot"
-version = "0.21.0"
+version = "0.21.1"
 source = { virtual = "." }
 dependencies = [
     { name = "eorzeaenv" },
@@ -569,6 +570,7 @@ dependencies = [
     { name = "nonebot-plugin-deepseek" },
     { name = "nonebot-plugin-memes" },
     { name = "nonebot-plugin-orm", extra = ["default"] },
+    { name = "nonebot-plugin-prometheus" },
     { name = "nonebot-plugin-send-anything-anywhere" },
     { name = "nonebot-plugin-sentry" },
     { name = "nonebot-plugin-status" },
@@ -621,6 +623,7 @@ requires-dist = [
     { name = "nonebot-plugin-deepseek", specifier = "==0.1.8" },
     { name = "nonebot-plugin-memes", specifier = "==0.7.12" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.7.6" },
+    { name = "nonebot-plugin-prometheus", specifier = ">=0.3.7" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
     { name = "nonebot-plugin-sentry", specifier = ">=2.0.0" },
     { name = "nonebot-plugin-status", specifier = "==0.9.0" },
@@ -1882,6 +1885,19 @@ default = [
 ]
 
 [[package]]
+name = "nonebot-plugin-prometheus"
+version = "0.3.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "nonebot2" },
+    { name = "prometheus-client" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c0/a3/4cc06d4f7b267a4292a03fe891bdb63b6d0b5131780ae4458177f15c9a6b/nonebot_plugin_prometheus-0.3.7.tar.gz", hash = "sha256:5f96cd622a2a06ab86a7ebd73d3487ceac959cdc10d4b0282dc980981f08d60b", size = 5124 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d3/4a/0e4290dbe57f246b947e464000be0656d135247b88f8313a77eb8b0a4794/nonebot_plugin_prometheus-0.3.7-py3-none-any.whl", hash = "sha256:b9cbf048b479c58a9aa7ad7fe4705c79c84d0b31b7b0dac11c708434fc17190b", size = 6065 },
+]
+
+[[package]]
 name = "nonebot-plugin-send-anything-anywhere"
 version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2304,6 +2320,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ee/c6/4bc7e21166726fc96f82f58b31fd032fdf8864d3aa17e2622578cb96c24d/poethepoet-0.32.2.tar.gz", hash = "sha256:1d68871dac1b191e27bd68fea57d0e01e9afbba3fcd01dbe6f6bc3fcb071fe4c", size = 61381 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b1/1f/4e7a9b6b33a085172a826d1f9d0a19a2e77982298acea13d40442f14ef28/poethepoet-0.32.2-py3-none-any.whl", hash = "sha256:97e165de8e00b07d33fd8d72896fad8b20ccafcd327b1118bb6a3da26af38d33", size = 81726 },
+]
+
+[[package]]
+name = "prometheus-client"
+version = "0.21.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/62/14/7d0f567991f3a9af8d1cd4f619040c93b68f09a02b6d0b6ab1b2d1ded5fe/prometheus_client-0.21.1.tar.gz", hash = "sha256:252505a722ac04b0456be05c05f75f45d760c2911ffc45f2a06bcaed9f3ae3fb", size = 78551 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ff/c2/ab7d37426c179ceb9aeb109a85cda8948bb269b7561a0be870cc656eefe4/prometheus_client-0.21.1-py3-none-any.whl", hash = "sha256:594b45c410d6f4f8888940fe80b5cc2521b305a1fafe1c58609ef715a001f301", size = 54682 },
 ]
 
 [[package]]
