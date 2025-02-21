@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 新增 prometheus 插件
+
 ## [0.21.1] - 2025-02-12
 
 ### Fixed
