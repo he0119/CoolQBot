@@ -10,7 +10,6 @@ dependencies = [
     "pydantic>=2.10.6",
     "eorzeaenv @ git+https://github.com/he0119/EorzeaEnv.git@coolqbot",
     "matplotlib>=3.10.0",
-    "openai>=1.60.2",
     "uvicorn[standard]>=0.34.0",
     "uvicorn-worker>=0.3.0",
     "gunicorn>=23.0.0",
