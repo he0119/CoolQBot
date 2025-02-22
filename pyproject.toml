@@ -59,8 +59,8 @@ dev-dependencies = [
     "pytest-loguru>=0.4.0",
     "respx>=0.22.0",
     "freezegun>=1.5.1",
-    "beautifulsoup4>=4.12.3",
-    "bump-my-version>=0.30.0",
+    "beautifulsoup4>=4.13.3",
+    "bump-my-version>=0.32.1",
     "poethepoet>=0.32.2",
 ]
 override-dependencies = ["pillow>=10.0.0"]
