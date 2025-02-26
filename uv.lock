@@ -353,7 +353,7 @@ wheels = [
 
 [[package]]
 name = "bump-my-version"
-version = "0.32.1"
+version = "0.32.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -366,9 +366,9 @@ dependencies = [
     { name = "tomlkit" },
     { name = "wcmatch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/04/5c/ed627df6d8220193392a149973db1e97e7e57a1319534a651b06319b5e29/bump_my_version-0.32.1.tar.gz", hash = "sha256:cb537096cba01a2832972902bfff9e0e0d6e8f8dc9fe31c742096a331262e2aa", size = 1066239 }
+sdist = { url = "https://files.pythonhosted.org/packages/b9/4c/535904dd2575b40ba672e333808521a8f93a8e30c5fb0bfb9051813fa17e/bump_my_version-0.32.2.tar.gz", hash = "sha256:fc1c686af66c39c44d2f19c4d29597fcc2f938bc19046b8df26bfa44c93f11c0", size = 1068097 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2b/78/9e6c5211e5efe4fe03316705e433b2071b489b9f97d37be0d7e25f545b87/bump_my_version-0.32.1-py3-none-any.whl", hash = "sha256:76605d0f98d0627b4cff972b4fcd56ff5423357047d954421fe6b721304e5ceb", size = 57574 },
+    { url = "https://files.pythonhosted.org/packages/9b/4b/1bc70caa460d41243d30ba02b96ee8e726da679e541231ccc9cff86051bb/bump_my_version-0.32.2-py3-none-any.whl", hash = "sha256:fb93c5a70a2368354bcac4457d22f282dc66a7bd241241f5a4e3d49002dece36", size = 57614 },
 ]
 
 [[package]]
@@ -641,7 +641,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "beautifulsoup4", specifier = ">=4.13.3" },
-    { name = "bump-my-version", specifier = ">=0.32.1" },
+    { name = "bump-my-version", specifier = ">=0.32.2" },
     { name = "freezegun", specifier = ">=1.5.1" },
     { name = "nonebug", specifier = ">=0.4.3" },
     { name = "nonebug-saa", specifier = ">=0.5.0" },
