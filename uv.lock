@@ -624,7 +624,7 @@ requires-dist = [
     { name = "nonebot-plugin-deepseek", specifier = "==0.1.8" },
     { name = "nonebot-plugin-memes", specifier = "==0.7.12" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.7.6" },
-    { name = "nonebot-plugin-prometheus", specifier = "==0.3.10" },
+    { name = "nonebot-plugin-prometheus", specifier = "==0.3.11" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
     { name = "nonebot-plugin-sentry", specifier = ">=2.0.0" },
     { name = "nonebot-plugin-status", specifier = "==0.9.0" },
@@ -1842,16 +1842,16 @@ default = [
 
 [[package]]
 name = "nonebot-plugin-prometheus"
-version = "0.3.10"
+version = "0.3.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "nonebot-plugin-alconna" },
     { name = "nonebot2" },
     { name = "prometheus-client" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e6/0b/05383586ebec761edeb982e90edb4aa7af80906a962b1bfaeabaf3996207/nonebot_plugin_prometheus-0.3.10.tar.gz", hash = "sha256:45a761fe590692090683080fcc0c5d4857e8eae19514f75be58c8c485933dd62", size = 5774 }
+sdist = { url = "https://files.pythonhosted.org/packages/b1/c9/32661d8277795fdb57606fb08dbf4e4c68be302c92d742f1f126538765a8/nonebot_plugin_prometheus-0.3.11.tar.gz", hash = "sha256:9bdb84f805751c212408ad192b29753330763bc8df043b3ac91b6d9af1337045", size = 6134 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d3/f3/60f026122ba8c67380370a59712506b34ae8f4cb7e5b98a9320dfe8c5a50/nonebot_plugin_prometheus-0.3.10-py3-none-any.whl", hash = "sha256:eaf5c0f985e56210ba428931414772f3049b78d90cba6636fdfdda87627864ba", size = 7085 },
+    { url = "https://files.pythonhosted.org/packages/80/41/d83eb39cbe4956e5b99f88328653feaa7b8054e858a2d96acaa4b22e7924/nonebot_plugin_prometheus-0.3.11-py3-none-any.whl", hash = "sha256:5be35a57f8e69877db90072c84bae8bab246220292d3d956ef6d2d0d9a2d01f9", size = 7463 },
 ]
 
 [[package]]
