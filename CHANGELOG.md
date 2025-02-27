@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.22.0] - 2025-02-27
+
 ### Added
 
 - 新增 prometheus 插件
@@ -620,7 +622,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.21.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.22.0...HEAD
+[0.22.0]: https://github.com/he0119/CoolQBot/compare/v0.21.1...v0.22.0
 [0.21.1]: https://github.com/he0119/CoolQBot/compare/v0.21.0...v0.21.1
 [0.21.0]: https://github.com/he0119/CoolQBot/compare/v0.20.3...v0.21.0
 [0.20.3]: https://github.com/he0119/CoolQBot/compare/v0.20.2...v0.20.3
