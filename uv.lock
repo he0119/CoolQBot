@@ -467,6 +467,20 @@ wheels = [
 ]
 
 [[package]]
+name = "cli-lite"
+version = "0.10.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "arclet-alconna" },
+    { name = "arclet-alconna-tools" },
+    { name = "importlib-metadata" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c1/07/f3a7f0724d364c04e735a58618c2728f974285fb13cb728686acfef7481e/cli_lite-0.10.2.tar.gz", hash = "sha256:2cb62cfa89c0eddf81328253fbe6994d7e57bb2aea91d10ceb378a61e03753d3", size = 6551 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ad/3f/d59f76caa4ffd71731360887c69ab572a4b5233e996ccfc4420bb8dfb5fa/cli_lite-0.10.2-py3-none-any.whl", hash = "sha256:a4835512d13c82bd596c7dd343c0dcdfd7c18226d8092c05ae6726f3539b0887", size = 7807 },
+]
+
+[[package]]
 name = "click"
 version = "8.1.8"
 source = { registry = "https://pypi.org/simple" }
@@ -621,7 +635,7 @@ requires-dist = [
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-bawiki", specifier = "==0.11.3" },
     { name = "nonebot-plugin-datastore", specifier = ">=1.3.0" },
-    { name = "nonebot-plugin-deepseek", specifier = "==0.1.8" },
+    { name = "nonebot-plugin-deepseek", specifier = "==0.1.9" },
     { name = "nonebot-plugin-memes", specifier = "==0.7.12" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.7.6" },
     { name = "nonebot-plugin-prometheus", specifier = "==0.3.12" },
@@ -1748,18 +1762,19 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-deepseek"
-version = "0.1.8"
+version = "0.1.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
+    { name = "cli-lite" },
     { name = "httpx", extra = ["http2"] },
     { name = "nonebot-plugin-alconna" },
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/24/7c/c5b820651480ab84e10ab881cf580d252e3b06f893288f994d8adcf307bb/nonebot_plugin_deepseek-0.1.8.tar.gz", hash = "sha256:7f7197f4ef94981b5d5eb30bdb63f04be2d32492efde82a54163bcc03e04eb57", size = 23949 }
+sdist = { url = "https://files.pythonhosted.org/packages/d6/ab/df8e418eaff7eaa802abb4002b7847babb5ef8a418ec17564363b28b33cc/nonebot_plugin_deepseek-0.1.9.tar.gz", hash = "sha256:62f6ca1342060d1f11bd1e59aca718f929d23637990110c1fc92cf7291696768", size = 29113 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/31/cd/f9c738bd752de76fcfa75cae8805ced1e45eab2c8f5f0981e8dea2f24eaa/nonebot_plugin_deepseek-0.1.8-py3-none-any.whl", hash = "sha256:69f084a83f9dea06117016d9fc4e3c68ab3cc298c4ee949781529247891e24cc", size = 26003 },
+    { url = "https://files.pythonhosted.org/packages/8a/fc/ac6ac4af1ccee54d375f9e57e00d936eb128f3e64011fc604a6581eb8105/nonebot_plugin_deepseek-0.1.9-py3-none-any.whl", hash = "sha256:49071059696856dae256610ada42ab074d4036ed7ba4bd512ad4b23e6373269e", size = 32565 },
 ]
 
 [[package]]
