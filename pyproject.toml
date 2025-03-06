@@ -9,7 +9,7 @@ requires-python = ">= 3.12"
 dependencies = [
     "pydantic>=2.10.6",
     "eorzeaenv @ git+https://github.com/he0119/EorzeaEnv.git@coolqbot",
-    "matplotlib>=3.10.0",
+    "matplotlib>=3.10.1",
     "uvicorn[standard]>=0.34.0",
     "uvicorn-worker>=0.3.0",
     "gunicorn>=23.0.0",
@@ -34,7 +34,7 @@ dependencies = [
     "nonebot-session-to-uninfo>=0.0.2",
     "nonebot-plugin-sentry>=2.0.0",
     "nonebot-plugin-memes==0.7.12",
-    "nonebot-bison==0.9.6rc2",
+    "nonebot-bison==0.9.7",
     "nonebot-plugin-status==0.9.0",
     "nonebot-plugin-bawiki==0.11.3",
     "nonebot-plugin-deepseek==0.1.9",

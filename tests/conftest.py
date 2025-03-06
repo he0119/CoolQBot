@@ -5,14 +5,14 @@ import nonebot
 import pytest
 from nonebot.adapters.onebot.v11 import Adapter as OneBotV11Adapter
 from nonebot.adapters.qq import Adapter as QQAdapter
-from nonebug import NONEBOT_INIT_KWARGS
+from nonebug import NONEBOT_INIT_KWARGS, NONEBOT_START_LIFESPAN
 from nonebug.app import App
 from pytest_asyncio import is_async_test
 from pytest_mock import MockerFixture
 from sqlalchemy import StaticPool, delete
 
-home_dir = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(home_dir))
+HOME_DIR = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(HOME_DIR))
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -30,6 +30,9 @@ def pytest_configure(config: pytest.Config) -> None:
             },
         ],
     }
+    # 如果不设置为 False，会运行插件的 on_startup 函数
+    # 会导致 orm 的 init_orm 函数在 patch 之前被调用
+    config.stash[NONEBOT_START_LIFESPAN] = False
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]):
@@ -52,7 +55,7 @@ async def after_nonebot_init(after_nonebot_init: None):
     patch_permission()
 
     # 加载插件
-    nonebot.load_plugins(str(Path(__file__).parent.parent / "src" / "plugins"))
+    nonebot.load_plugins(str(HOME_DIR / "src" / "plugins"))
 
 
 @pytest.fixture
