@@ -38,7 +38,7 @@ dependencies = [
     "nonebot-plugin-status==0.9.0",
     "nonebot-plugin-bawiki==0.11.3",
     "nonebot-plugin-deepseek==0.1.9",
-    "nonebot-plugin-prometheus==0.3.12",
+    "nonebot-plugin-prometheus==0.3.13",
 ]
 
 [project.urls]
