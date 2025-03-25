@@ -54,13 +54,13 @@ dev-dependencies = [
     "pytest-cov>=6.0.0",
     "pytest-mock>=3.14.0",
     "pytest-xdist>=3.6.1",
-    "pytest-asyncio>=0.25.3",
+    "pytest-asyncio>=0.26.0",
     "pytest-loguru>=0.4.0",
     "respx>=0.22.0",
     "freezegun>=1.5.1",
     "beautifulsoup4>=4.13.3",
-    "bump-my-version>=1.0.1",
-    "poethepoet>=0.32.2",
+    "bump-my-version>=1.1.1",
+    "poethepoet>=0.33.1",
 ]
 override-dependencies = ["pillow>=10.0.0"]
 
