@@ -121,7 +121,7 @@ class FFLogs:
     async def cache_data(self) -> None:
         """缓存数据"""
         data = await FFLOGS_DATA.data
-        data = cast(FFlogsDataModel, data)
+        data = cast("FFlogsDataModel", data)
         cache_boss = await plugin_data.config.get("cache_boss", [])
         for boss in cache_boss:
             for job in data.job:
@@ -152,7 +152,7 @@ class FFLogs:
     ) -> list[Ranking]:
         """获取指定 boss，指定职业，指定一天中的排名数据"""
         # 查看是否有缓存
-        cache_name = f'{boss}_{difficulty}_{job}_{date.strftime("%Y%m%d")}.pkl'
+        cache_name = f"{boss}_{difficulty}_{job}_{date.strftime('%Y%m%d')}.pkl"
         if plugin_data.exists(cache_name, cache=True):
             data = plugin_data.load_pkl(cache_name, cache=True)
             # 为了兼容以前的数据，以前的数据是字典格式

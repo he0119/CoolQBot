@@ -19,11 +19,11 @@ async def get_mentioned_user(args: Message = CommandArg()) -> MentionedUser | No
     """获取提到的用户信息"""
     if isinstance(args, OneBotV11Message) and (at := args["at"]):
         at = at[0]
-        at = cast(MessageSegment, at)
+        at = cast("MessageSegment", at)
         return MentionedUser(id=at.data["qq"], segment=at)
     if isinstance(args, OneBotV12Message) and (mention := args["mention"]):
         mention = mention[0]
-        mention = cast(MessageSegment, mention)
+        mention = cast("MessageSegment", mention)
         return MentionedUser(id=mention.data["user_id"], segment=mention)
 
 
