@@ -193,10 +193,10 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
     if len(argv) == 3:
         # <BOSS名> <职业名> <DPS种类>
         # <BOSS名> <角色名> <服务器名>
-        args = cast(tuple[str, str, str], argv)
+        args = cast("tuple[str, str, str]", argv)
         dps_type = args[2].lower()
         if dps_type in ["adps", "rdps", "pdps", "ndps"]:
-            dps_type = cast(Literal["adps", "rdps", "pdps", "ndps"], dps_type)
+            dps_type = cast("Literal['adps', 'rdps', 'pdps', 'ndps']", dps_type)
             data = await fflogs.dps(args[0], args[1], dps_type)
         else:
             data = await fflogs.character_dps(args[0], args[1], args[2])

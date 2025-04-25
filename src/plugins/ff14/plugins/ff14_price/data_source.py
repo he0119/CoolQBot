@@ -89,7 +89,7 @@ async def get_item_price(name: str, world_or_dc: str) -> str:
             items_info.insert(0, f"{item.Name} 在市场的价格是:")
             # 使用本地时区
             items_info.append(
-                f'数据更新时间: {data.lastUploadTime.astimezone().strftime("%Y年%m月%d日 %H时%M分")}'
+                f"数据更新时间: {data.lastUploadTime.astimezone().strftime('%Y年%m月%d日 %H时%M分')}"
             )
             return "\n".join(items_info)
         return f"抱歉，没有找到 {item.Name} 的价格。"

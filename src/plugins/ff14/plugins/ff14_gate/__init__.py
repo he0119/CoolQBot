@@ -47,6 +47,6 @@ async def gate_handle(door_number: str):
     if number not in [2, 3]:
         await gate_cmd.reject("暂时只支持两个门或者三个门的情况，请重新输入吧。")
 
-    number = cast(Literal[2, 3], number)
+    number = cast("Literal[2, 3]", number)
     direction = get_direction(number)
     await gate_cmd.finish(direction, at_sender=True)

@@ -153,19 +153,19 @@ async def get_holiday_message() -> str:
 
     # 先处理今天是节假日的情况
     if holiday and holiday_rest == 0:
-        return f'今天就是{holiday["name"]}，好好玩吧！'
+        return f"今天就是{holiday['name']}，好好玩吧！"
 
     # 处理今天是调休的情况
     if workday and workday_rest == 0:
         if workday["after"]:
-            return f'{workday["name"]}才刚刚过完。今天是{workday["name"]}后调休，老老实实上班吧。'
+            return f"{workday['name']}才刚刚过完。今天是{workday['name']}后调休，老老实实上班吧。"
         # 不需要考虑节假日不存在的情况
         # 因为如果调休在节假日前，说明调休后一定有节假日
         # 调休的第二天就是节假日
         elif holiday_rest == 1:
-            return f'今天是{workday["name"]}前调休，明天就是{workday["name"]}了，加油！'
+            return f"今天是{workday['name']}前调休，明天就是{workday['name']}了，加油！"
         else:
-            return f'今天是{workday["name"]}前调休，马上就是{workday["name"]}了，还有{holiday_rest}天，加油！'
+            return f"今天是{workday['name']}前调休，马上就是{workday['name']}了，还有{holiday_rest}天，加油！"
 
     # 处理今天是周末，且不是节假日或者调休的情况
     if today.weekday() == 5:
@@ -178,27 +178,27 @@ async def get_holiday_message() -> str:
         if workday["after"]:
             weekend_name = "周六" if workday_rest == 1 else "周日"
             if holiday:
-                return f'很遗憾的告诉您，这{weekend_name}要{workday["name"]}后调休。最近的一个节日是{holiday["name"]}。还要{holiday_rest}天。早着呢！'
+                return f"很遗憾的告诉您，这{weekend_name}要{workday['name']}后调休。最近的一个节日是{holiday['name']}。还要{holiday_rest}天。早着呢！"
             else:
-                return f'很遗憾的告诉您，这{weekend_name}要{workday["name"]}后调休。'
+                return f"很遗憾的告诉您，这{weekend_name}要{workday['name']}后调休。"
         # 不需要考虑节假日不存在的情况
         # 因为如果调休在节假日前，说明调休后一定有节假日
         elif workday_rest == 1:
-            return f'明天是{workday["name"]}前调休，记得设置好闹钟，上班别迟到了。再过{holiday_rest}天是{workday["name"]}。'
+            return f"明天是{workday['name']}前调休，记得设置好闹钟，上班别迟到了。再过{holiday_rest}天是{workday['name']}。"
         else:
-            return f'明天就是周六了，今天努力工作哦！周日是{workday["name"]}前调休，记得设置好闹钟，上班别迟到了。再过{holiday_rest}天是{workday["name"]}。'
+            return f"明天就是周六了，今天努力工作哦！周日是{workday['name']}前调休，记得设置好闹钟，上班别迟到了。再过{holiday_rest}天是{workday['name']}。"
 
     # 处理第二天是节假日的情况
     if holiday and holiday_rest == 1:
-        return f'明天就是{holiday["name"]}了，开不开心？'
+        return f"明天就是{holiday['name']}了，开不开心？"
 
     # 处理还有五天内就节假日的情况
     if holiday and holiday_rest < 6:
-        return f'还有{holiday_rest}天就是{holiday["name"]}了，别着急。'
+        return f"还有{holiday_rest}天就是{holiday['name']}了，别着急。"
 
     # 其他所有情况
     if holiday:
-        return f'还有{weekend_rest}天就是周六了，先好好工作吧！最近的一个节日是{holiday["name"]}，还要{holiday_rest}天。早着呢！'
+        return f"还有{weekend_rest}天就是周六了，先好好工作吧！最近的一个节日是{holiday['name']}，还要{holiday_rest}天。早着呢！"
 
     return f"还有{weekend_rest}天就是周六了，先好好工作吧！"
 

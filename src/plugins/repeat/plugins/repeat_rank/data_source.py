@@ -117,7 +117,7 @@ class Ranking:
                         str_data += f"\n{name}({self.msg_number_list[user_id]})："
                     else:
                         str_data += f"\n{name}："
-                    str_data += f"{v*100:.2f}%" if list_type == "rate" else f"{v}次"
+                    str_data += f"{v * 100:.2f}%" if list_type == "rate" else f"{v}次"
                     i += 1
             else:
                 return str_data
