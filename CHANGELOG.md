@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 修复 prometheus 插件无法记录非 alconna 响应器发送消息的问题
+
 ## [0.22.0] - 2025-02-27
 
 ### Added
