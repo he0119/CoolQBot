@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.22.1] - 2025-04-27
+
 ### Fixed
 
 - 修复 prometheus 插件无法记录非 alconna 响应器发送消息的问题
@@ -626,7 +628,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.22.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.22.1...HEAD
+[0.22.1]: https://github.com/he0119/CoolQBot/compare/v0.22.0...v0.22.1
 [0.22.0]: https://github.com/he0119/CoolQBot/compare/v0.21.1...v0.22.0
 [0.21.1]: https://github.com/he0119/CoolQBot/compare/v0.21.0...v0.21.1
 [0.21.0]: https://github.com/he0119/CoolQBot/compare/v0.20.3...v0.21.0
