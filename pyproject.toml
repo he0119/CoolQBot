@@ -5,7 +5,7 @@ description = "基于 NoneBot2 的聊天机器人"
 authors = [{ name = "uy_sun", email = "hmy0119@gmail.com" }]
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">= 3.12"
+requires-python = ">=3.13.3"
 dependencies = [
     "pydantic>=2.10.6",
     "eorzeaenv @ git+https://github.com/he0119/EorzeaEnv.git@coolqbot",
