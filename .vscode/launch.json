@@ -22,9 +22,12 @@
       "justMyCode": false
     },
     {
-      "name": "Debug Unit Test",
+      "name": "Python: Debug Tests",
       "type": "debugpy",
-      "request": "test",
+      "request": "launch",
+      "program": "${file}",
+      "purpose": ["debug-test"],
+      "console": "internalConsole",
       "justMyCode": false
     }
   ]
