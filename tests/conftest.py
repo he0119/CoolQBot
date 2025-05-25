@@ -27,6 +27,7 @@ def pytest_configure(config: pytest.Config) -> None:
                 "secret": "secret",
             },
         ],
+        "alconna_cache_message": False,
     }
     # 如果不设置为 False，会运行插件的 on_startup 函数
     # 会导致 orm 的 init_orm 函数在 patch 之前被调用
