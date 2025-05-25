@@ -83,18 +83,53 @@ async def app(app: App, tmp_path: Path, mocker: MockerFixture):
 @pytest.fixture(autouse=True)
 async def _default_user(app: App):
     """设置默认用户名"""
-    from nonebot_plugin_orm import get_session
-    from nonebot_plugin_user.models import Bind, User
+
+    # 添加 user 缓存
     from nonebot_plugin_user.utils import get_user, set_user_name
 
-    await get_user("qq", "10")
-    await set_user_name("qq", "10", "nickname")
-    await get_user("qq", "10000")
-    await set_user_name("qq", "10000", "nickname10000")
+    await get_user("QQClient", "10")
+    await set_user_name("QQClient", "10", "nickname")
+    await get_user("QQClient", "10000")
+    await set_user_name("QQClient", "10000", "nickname10000")
+
+    # 添加 uninfo 缓存
+    from nonebot_plugin_uninfo import Member, Scene, SceneType, Session, User
+    from nonebot_plugin_uninfo.adapters import INFO_FETCHER_MAPPING
+
+    uninfo_cache = INFO_FETCHER_MAPPING["OneBot V11"].session_cache
+    uninfo_cache["group_10000_10"] = Session(
+        self_id="123456",
+        adapter="OneBot V11",
+        scope="QQClient",
+        scene=Scene(
+            id="10000",
+            type=SceneType.GROUP,
+        ),
+        user=User(id="10", name="nickname"),
+        member=Member(
+            user=User(id="10", name="nickname"),
+        ),
+    )
+    uninfo_cache["group_10000_10000"] = Session(
+        self_id="123456",
+        adapter="OneBot V11",
+        scope="QQClient",
+        scene=Scene(
+            id="10000",
+            type=SceneType.GROUP,
+        ),
+        user=User(id="10000", name="nickname10000"),
+        member=Member(
+            user=User(id="10000", name="nickname10000"),
+        ),
+    )
 
     yield
 
     # 清除数据库
+    from nonebot_plugin_orm import get_session
+    from nonebot_plugin_user.models import Bind, User
+
     async with get_session() as session, session.begin():
         await session.execute(delete(User))
         await session.execute(delete(Bind))
