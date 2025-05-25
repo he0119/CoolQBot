@@ -9,7 +9,7 @@ from nonebug import NONEBOT_INIT_KWARGS, NONEBOT_START_LIFESPAN
 from nonebug.app import App
 from pytest_asyncio import is_async_test
 from pytest_mock import MockerFixture
-from sqlalchemy import StaticPool, delete
+from sqlalchemy import delete
 
 HOME_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HOME_DIR))
@@ -17,8 +17,6 @@ sys.path.insert(0, str(HOME_DIR))
 
 def pytest_configure(config: pytest.Config) -> None:
     config.stash[NONEBOT_INIT_KWARGS] = {
-        "sqlalchemy_database_url": "sqlite+aiosqlite:///:memory:",
-        "sqlalchemy_engine_options": {"poolclass": StaticPool},
         "alembic_startup_check": False,
         "superusers": ["nickname"],
         "qq_bots": [
@@ -74,7 +72,7 @@ async def app(app: App, tmp_path: Path, mocker: MockerFixture):
     mocker.patch("nonebot_plugin_localstore.BASE_DATA_DIR", tmp_path / "data")
     mocker.patch("nonebot_plugin_localstore.BASE_CACHE_DIR", tmp_path / "cache")
     mocker.patch("nonebot_plugin_localstore.BASE_CONFIG_DIR", tmp_path / "config")
-    mocker.patch("nonebot_plugin_orm._data_dir", tmp_path / "orm")
+    mocker.patch("nonebot_plugin_orm._data_dir", tmp_path)
 
     await init_orm()
 
