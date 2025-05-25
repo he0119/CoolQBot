@@ -353,7 +353,7 @@ wheels = [
 
 [[package]]
 name = "bump-my-version"
-version = "1.1.2"
+version = "1.1.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -366,9 +366,9 @@ dependencies = [
     { name = "tomlkit" },
     { name = "wcmatch" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/13/0a/544e8eb6d46baa99bf16d180b4ddb4509631fa8476e686c8e6c47681afb4/bump_my_version-1.1.2.tar.gz", hash = "sha256:0122845a78502b5a5a635ca17c1efb3e1ec05e77d72d13b2314186b9806882fb", size = 1120309, upload-time = "2025-04-12T14:21:02.174Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/64/0e/aead863992499caece72c0cd81ed0b25c2c8bc328f9794038afcc235d95d/bump_my_version-1.1.4.tar.gz", hash = "sha256:5e6928a24a73bae11aa28184936d0f2a8071bb2f033f36d310ff194f7f8d6be8", size = 1135242, upload-time = "2025-05-21T11:58:47.435Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/dc/a9/026894e86ce2838d029af1344c71fd57560d1b6e2ce6513c340cbf8e00cb/bump_my_version-1.1.2-py3-none-any.whl", hash = "sha256:71a2a8c3940c87749c4cc404b2ada2fafbeab4e478e0ef54537686905ae58e0d", size = 59495, upload-time = "2025-04-12T14:21:00.872Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/4e/cd8818804a195f06b20505f89fea49628e22c4548519555ab2951bea57d0/bump_my_version-1.1.4-py3-none-any.whl", hash = "sha256:e4fd5cc092f32b6166dbc5aee5e8e4399c5543c95a5782cf727e2ab3e15ad99c", size = 59507, upload-time = "2025-05-21T11:58:45.671Z" },
 ]
 
 [[package]]
@@ -655,8 +655,8 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "beautifulsoup4", specifier = ">=4.13.4" },
-    { name = "bump-my-version", specifier = ">=1.1.2" },
-    { name = "freezegun", specifier = ">=1.5.1" },
+    { name = "bump-my-version", specifier = ">=1.1.4" },
+    { name = "freezegun", specifier = ">=1.5.2" },
     { name = "nonebug", specifier = ">=0.4.3" },
     { name = "nonebug-saa", specifier = ">=0.5.0" },
     { name = "poethepoet", specifier = ">=0.34.0" },
@@ -889,14 +889,14 @@ wheels = [
 
 [[package]]
 name = "freezegun"
-version = "1.5.1"
+version = "1.5.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "python-dateutil" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2c/ef/722b8d71ddf4d48f25f6d78aa2533d505bf3eec000a7cacb8ccc8de61f2f/freezegun-1.5.1.tar.gz", hash = "sha256:b29dedfcda6d5e8e083ce71b2b542753ad48cfec44037b3fc79702e2980a89e9", size = 33697, upload-time = "2024-05-11T17:32:53.911Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c7/75/0455fa5029507a2150da59db4f165fbc458ff8bb1c4f4d7e8037a14ad421/freezegun-1.5.2.tar.gz", hash = "sha256:a54ae1d2f9c02dbf42e02c18a3ab95ab4295818b549a34dac55592d72a905181", size = 34855, upload-time = "2025-05-24T12:38:47.051Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/51/0b/0d7fee5919bccc1fdc1c2a7528b98f65c6f69b223a3fd8f809918c142c36/freezegun-1.5.1-py3-none-any.whl", hash = "sha256:bf111d7138a8abe55ab48a71755673dbaa4ab87f4cff5634a4442dfec34c15f1", size = 17569, upload-time = "2024-05-11T17:32:51.715Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/b2/68d4c9b6431121b6b6aa5e04a153cac41dcacc79600ed6e2e7c3382156f5/freezegun-1.5.2-py3-none-any.whl", hash = "sha256:5aaf3ba229cda57afab5bd311f0108d86b6fb119ae89d2cd9c43ec8c1733c85b", size = 18715, upload-time = "2025-05-24T12:38:45.274Z" },
 ]
 
 [[package]]
