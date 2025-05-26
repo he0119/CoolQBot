@@ -575,7 +575,7 @@ requires-dist = [
     { name = "nonebot-plugin-sentry", specifier = ">=2.0.0" },
     { name = "nonebot-plugin-status", specifier = "==0.9.0" },
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
-    { name = "nonebot-plugin-user", specifier = ">=0.4.4" },
+    { name = "nonebot-plugin-user", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.9.0" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
     { name = "nonebot2", extras = ["httpx", "fastapi", "aiohttp"], specifier = ">=2.4.1" },
@@ -1690,19 +1690,6 @@ wheels = [
 ]
 
 [[package]]
-name = "nonebot-plugin-session"
-version = "0.3.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "nonebot2" },
-    { name = "strenum" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/09/1a/95a465074f566a1552c00a0045d9e67fea41401eaf6af3f7c88b644da0f1/nonebot_plugin_session-0.3.2.tar.gz", hash = "sha256:da0dabe9108151052a6e83d9923068d2ec43a93810ad37b264ed65aee2c69f93", size = 10378, upload-time = "2024-08-03T07:22:50.307Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b2/81/07c38c920dc6bab000a12d79af78482dcf0695f8a6e0b7b85fd993ef7483/nonebot_plugin_session-0.3.2-py3-none-any.whl", hash = "sha256:785e74ff656e46d84c4dbbac125f9a9adebcc4b9ff7db700527e6e47d47aabd6", size = 14815, upload-time = "2024-08-03T07:22:49.046Z" },
-]
-
-[[package]]
 name = "nonebot-plugin-status"
 version = "0.9.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1731,31 +1718,31 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-uninfo"
-version = "0.6.8"
+version = "0.7.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "importlib-metadata" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/42/f1/4ee11e5c73d1ac2f0e7f4900e1c5f1eff037e6afcf960ee60df86666bb91/nonebot_plugin_uninfo-0.6.8.tar.gz", hash = "sha256:0a30b500b1172fa15cc175b370c7a5935eb2f0515d188a2c73bf8e8ed7ae81d1", size = 35674, upload-time = "2025-01-25T07:20:29.1Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/de/12/b8373d42522f01bb25ad1dc6bb3f5b90872811798e2f0ced5fffb7690703/nonebot_plugin_uninfo-0.7.4.tar.gz", hash = "sha256:91a461f39ffd30629bfcf32c6f262ded322c5651d6cfbf7ced4f6a5c251afee3", size = 39196, upload-time = "2025-05-21T08:14:36.993Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/76/20/2bf1e9e45306fe8c8fb78d0b462f1bb1a1570e6fbb0e7814c784db092b04/nonebot_plugin_uninfo-0.6.8-py3-none-any.whl", hash = "sha256:0adc7e731885883bfcb873ec715c69cff75b878092884d28c7d6ff314940ad6b", size = 56093, upload-time = "2025-01-25T07:20:26.919Z" },
+    { url = "https://files.pythonhosted.org/packages/71/d9/96654feb3ee6a3e26ca1ecd96c10853c688900bdd14837f0a87974249a60/nonebot_plugin_uninfo-0.7.4-py3-none-any.whl", hash = "sha256:673b2f3c0c0a6049eed3ca66de6992793c7a85ff831223c2ef920b532b29a244", size = 61494, upload-time = "2025-05-21T08:14:35.689Z" },
 ]
 
 [[package]]
 name = "nonebot-plugin-user"
-version = "0.4.4"
+version = "0.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "expiringdictx" },
     { name = "nonebot-plugin-alconna" },
     { name = "nonebot-plugin-orm" },
-    { name = "nonebot-plugin-session" },
+    { name = "nonebot-plugin-uninfo" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/87/50/c3959b3b84685f6421571e89236392ac192f586ee331ee8622dcefa37db9/nonebot_plugin_user-0.4.4.tar.gz", hash = "sha256:9066ac63aa3ef9b1c895bdc08aa313b355f942b4d2f214e3d1d4d87e9261d626", size = 9829, upload-time = "2024-10-19T11:57:28.003Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/97/8f/fab3cc5144287ca225cadf2dad797fe0bfaa959e68ee3aebd3df581ef6f6/nonebot_plugin_user-0.5.0.tar.gz", hash = "sha256:fba83360886285cfece97c404ec14db7957d3ea0c78fdfda8bc9dc9e5131ccd2", size = 10562, upload-time = "2025-05-21T08:18:13.299Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3a/95/7f8369d71d02033c4b9e8a205c063e488728b8e3f95c7c56806a99bf0349/nonebot_plugin_user-0.4.4-py3-none-any.whl", hash = "sha256:cab16b9cf581f80ddb29d6339cb782945a8d12de2f3189ed0d3726415c778062", size = 12589, upload-time = "2024-10-19T11:57:26.452Z" },
+    { url = "https://files.pythonhosted.org/packages/71/b5/0ac913f83c31f643e1f55c937c6ebc80a84a7d09c31c54f79ffd465d4901/nonebot_plugin_user-0.5.0-py3-none-any.whl", hash = "sha256:2f6641893dc2d6365d85a905bc2776330c2d58dc5f58204752a74bdd34ec401a", size = 13895, upload-time = "2025-05-21T08:18:11.758Z" },
 ]
 
 [[package]]
@@ -1808,7 +1795,7 @@ wheels = [
 
 [[package]]
 name = "nonebot2"
-version = "2.4.1"
+version = "2.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1820,9 +1807,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/58/ae/b56153fb5726183bd2708fb5b000ae5cbab61aa706ad2754d1350a38ccc5/nonebot2-2.4.1.tar.gz", hash = "sha256:8fea364318501ed79721403a8ecd76587bc884d58c356260f691a8bbda9b05e6", size = 96396, upload-time = "2024-12-25T07:22:27.692Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1c/06/754d4aea53d1a6622956c9d9a261760b15df03f95d7540666b85ba48d653/nonebot2-2.4.2.tar.gz", hash = "sha256:cf72d5920503ff373ba1d7963f3ddf573db913eb504e3b68ee347efb937db27d", size = 94868, upload-time = "2025-03-12T03:57:45.705Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/97/3d/f27209daac042575b46f586eedde852d29b29f24e42ba4bd2bc8e68e6dd9/nonebot2-2.4.1-py3-none-any.whl", hash = "sha256:fec95f075efc89dbe9ce148618b413b02f46ba284200367749b035e794695111", size = 114703, upload-time = "2024-12-25T07:22:23.77Z" },
+    { url = "https://files.pythonhosted.org/packages/26/a8/18b79572cb6178a18bc2da76a041fc6b9f6308c5d376f5c7cbd84f4acf2d/nonebot2-2.4.2-py3-none-any.whl", hash = "sha256:ed3e970cdb6c885fb23349b65a045c08cf3ac7f43e28564ae0c72d3671ecda74", size = 115183, upload-time = "2025-03-12T03:57:43.988Z" },
 ]
 
 [package.optional-dependencies]

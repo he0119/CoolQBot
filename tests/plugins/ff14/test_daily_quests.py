@@ -117,7 +117,7 @@ async def test_daily_quests_pair(app: App):
 
         event = fake_group_message_event_v11(
             message=Message("/每日委托 乐园都市笑笑镇，伊弗利特歼灭战, 神龙歼灭战1"),
-            user_id=2,
+            user_id=10000,
         )
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -139,7 +139,7 @@ async def test_daily_quests_pair(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "与你每日委托相同的群友：\n乐园都市笑笑镇：qq-2\n伊弗利特歼灭战：qq-2\n神龙歼灭战：无",
+            "与你每日委托相同的群友：\n乐园都市笑笑镇：nickname10000\n伊弗利特歼灭战：nickname10000\n神龙歼灭战：无",
             True,
             at_sender=True,
         )
@@ -153,7 +153,7 @@ async def test_daily_quests_pair(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "今日所有委托：\n乐园都市笑笑镇：nickname, qq-2\n伊弗利特歼灭战：nickname, qq-2\n神龙歼灭战：nickname\n神龙歼灭战1：qq-2",
+            "今日所有委托：\n乐园都市笑笑镇：nickname, nickname10000\n伊弗利特歼灭战：nickname, nickname10000\n神龙歼灭战：nickname\n神龙歼灭战1：nickname10000",
             True,
             at_sender=True,
         )
