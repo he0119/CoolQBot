@@ -523,7 +523,7 @@ dependencies = [
     { name = "nonebot-plugin-sentry" },
     { name = "nonebot-plugin-status" },
     { name = "nonebot-plugin-treehelp" },
-    { name = "nonebot-plugin-user" },
+    { name = "nonebot-plugin-user", extra = ["inspect"] },
     { name = "nonebot-plugin-wordcloud" },
     { name = "nonebot-session-to-uninfo" },
     { name = "nonebot2", extra = ["aiohttp", "fastapi", "httpx"] },
@@ -575,7 +575,7 @@ requires-dist = [
     { name = "nonebot-plugin-sentry", specifier = ">=2.0.0" },
     { name = "nonebot-plugin-status", specifier = "==0.9.0" },
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
-    { name = "nonebot-plugin-user", specifier = ">=0.5.0" },
+    { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.5.0" },
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.9.0" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
     { name = "nonebot2", extras = ["httpx", "fastapi", "aiohttp"], specifier = ">=2.4.2" },
@@ -1560,6 +1560,19 @@ wheels = [
 ]
 
 [[package]]
+name = "nonebot-plugin-inspect"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "nonebot-plugin-alconna" },
+    { name = "nonebot-plugin-uninfo" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/63/2e/c26187005763d38776bc968ed718ebd4f4b56d7d8abbe291842ef503e7b8/nonebot_plugin_inspect-0.2.0.tar.gz", hash = "sha256:b70303f785cef98d90239d077a9805c1d56a73ebbc5fb74aa68765d57f3443b2", size = 5546, upload-time = "2024-10-05T09:13:06.215Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b7/81/4286208743b3e552a47647b492705a3433dbe6a813ec7cf37f1eca7f00c6/nonebot_plugin_inspect-0.2.0-py3-none-any.whl", hash = "sha256:b523df6aae0c96bdc40c1bab68336fd0b21727cd29aa2ceb6076f141fd9bc3d5", size = 10318, upload-time = "2024-10-05T09:13:04.534Z" },
+]
+
+[[package]]
 name = "nonebot-plugin-localstore"
 version = "0.7.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1714,6 +1727,11 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/97/8f/fab3cc5144287ca225cadf2dad797fe0bfaa959e68ee3aebd3df581ef6f6/nonebot_plugin_user-0.5.0.tar.gz", hash = "sha256:fba83360886285cfece97c404ec14db7957d3ea0c78fdfda8bc9dc9e5131ccd2", size = 10562, upload-time = "2025-05-21T08:18:13.299Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/71/b5/0ac913f83c31f643e1f55c937c6ebc80a84a7d09c31c54f79ffd465d4901/nonebot_plugin_user-0.5.0-py3-none-any.whl", hash = "sha256:2f6641893dc2d6365d85a905bc2776330c2d58dc5f58204752a74bdd34ec401a", size = 13895, upload-time = "2025-05-21T08:18:11.758Z" },
+]
+
+[package.optional-dependencies]
+inspect = [
+    { name = "nonebot-plugin-inspect" },
 ]
 
 [[package]]
