@@ -37,7 +37,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # 安装浏览器
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
-  uv run --no-dev playwright install --with-deps chromium
+  uv run --no-dev playwright install --with-deps chromium firefox
 
 # 缓存表情包制作插件字体
 RUN git clone --depth 1 https://github.com/MemeCrafters/meme-generator-rs.git \
