@@ -39,13 +39,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   uv run --no-dev playwright install --with-deps chromium
 
-# 缓存表情包制作插件字体与图片
-RUN git clone --depth 1 https://github.com/MeetWq/meme-generator.git \
-  && cp -r ./meme-generator/resources/fonts /usr/share/fonts/meme-fonts \
-  && rm -rf ./meme-generator \
-  && fc-cache -fv
-RUN uv run --no-dev meme download --url https://raw.githubusercontent.com/MeetWq/meme-generator/
-
 # Gunicorn 配置
 COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
 COPY ./docker/start.sh /start.sh

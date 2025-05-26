@@ -33,7 +33,7 @@ dependencies = [
     "nonebot-plugin-datastore>=1.3.0",
     "nonebot-session-to-uninfo>=0.0.2",
     "nonebot-plugin-sentry>=2.0.0",
-    "nonebot-plugin-memes==0.7.12",
+    "nonebot-plugin-memes==0.8.1",
     "nonebot-bison==0.9.7",
     "nonebot-plugin-status==0.9.0",
     "nonebot-plugin-bawiki==0.11.3",
