@@ -7,9 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.23.0] - 2025-05-26
+
 ### Added
 
 - 添加 zssm 插件
+- 升级 user 插件至 0.5.1
+- 升级 memes 插件至 0.8.1
+
+### Changed
+
+- 使用 inspect 插件替代 user 的内置命令
 
 ## [0.22.1] - 2025-04-27
 
@@ -632,7 +640,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.22.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.23.0...HEAD
+[0.23.0]: https://github.com/he0119/CoolQBot/compare/v0.22.1...v0.23.0
 [0.22.1]: https://github.com/he0119/CoolQBot/compare/v0.22.0...v0.22.1
 [0.22.0]: https://github.com/he0119/CoolQBot/compare/v0.21.1...v0.22.0
 [0.21.1]: https://github.com/he0119/CoolQBot/compare/v0.21.0...v0.21.1
