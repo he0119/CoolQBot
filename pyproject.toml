@@ -8,7 +8,7 @@ license = { file = "LICENSE" }
 requires-python = ">=3.13.3"
 dependencies = [
     "pydantic>=2.11.5",
-    "eorzeaenv @ git+https://github.com/he0119/EorzeaEnv.git@coolqbot",
+    "eorzeaenv",
     "matplotlib>=3.10.3",
     "uvicorn[standard]>=0.34.2",
     "uvicorn-worker>=0.3.0",
@@ -29,7 +29,7 @@ dependencies = [
     "nonebot-plugin-orm[default]>=0.8.0",
     "nonebot-plugin-apscheduler>=0.5.0",
     "nonebot-plugin-send-anything-anywhere>=0.7.1",
-    "nonebot-plugin-alconna>=0.57.6",
+    "nonebot-plugin-alconna>=0.58.0",
     "nonebot-plugin-datastore>=1.3.0",
     "nonebot-session-to-uninfo>=0.0.2",
     "nonebot-plugin-sentry>=2.0.0",
@@ -69,7 +69,7 @@ override-dependencies = ["pillow>=10.0.0"]
 universal = true
 
 [tool.uv.sources]
-nonebot-plugin-alconna = { git = "https://github.com/nonebot/plugin-alconna.git" }
+eorzeaenv = { git = "https://github.com/he0119/EorzeaEnv.git", rev = "coolqbot" }
 
 [tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
