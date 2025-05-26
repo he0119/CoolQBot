@@ -39,6 +39,7 @@ dependencies = [
     "nonebot-plugin-bawiki==0.11.3",
     "nonebot-plugin-deepseek==0.1.9",
     "nonebot-plugin-prometheus==0.3.16",
+    "nonebot-plugin-zssm==0.3.5",
 ]
 
 [project.urls]
@@ -90,6 +91,7 @@ plugins = [
     "nonebot_plugin_deepseek",
     "nonebot_plugin_prometheus",
     "nonebot_plugin_inspect",
+    "nonebot_plugin_zssm",
 ]
 
 [tool.pyright]
