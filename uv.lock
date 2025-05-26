@@ -576,7 +576,7 @@ requires-dist = [
     { name = "nonebot-plugin-sentry", specifier = ">=2.0.0" },
     { name = "nonebot-plugin-status", specifier = "==0.9.0" },
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
-    { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.5.0" },
+    { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.5.1" },
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.9.0" },
     { name = "nonebot-plugin-zssm", specifier = "==0.3.5" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
@@ -1717,7 +1717,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-user"
-version = "0.5.0"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "expiringdictx" },
@@ -1726,9 +1726,9 @@ dependencies = [
     { name = "nonebot-plugin-uninfo" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/97/8f/fab3cc5144287ca225cadf2dad797fe0bfaa959e68ee3aebd3df581ef6f6/nonebot_plugin_user-0.5.0.tar.gz", hash = "sha256:fba83360886285cfece97c404ec14db7957d3ea0c78fdfda8bc9dc9e5131ccd2", size = 10562, upload-time = "2025-05-21T08:18:13.299Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9d/6d/51bc6b251e9a6d8ba2e8b3230cfa64d3d295469d5d77b1f0958019e15d72/nonebot_plugin_user-0.5.1.tar.gz", hash = "sha256:69a1ad64c385c94dea57427423425216dc317c037e1be2b09a9b9ed4952c4452", size = 10685, upload-time = "2025-05-26T03:48:47.277Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/71/b5/0ac913f83c31f643e1f55c937c6ebc80a84a7d09c31c54f79ffd465d4901/nonebot_plugin_user-0.5.0-py3-none-any.whl", hash = "sha256:2f6641893dc2d6365d85a905bc2776330c2d58dc5f58204752a74bdd34ec401a", size = 13895, upload-time = "2025-05-21T08:18:11.758Z" },
+    { url = "https://files.pythonhosted.org/packages/8d/c6/40447ed9f5a957e88edc129a44acba891d110f4221fd7b16db5238a4f0bd/nonebot_plugin_user-0.5.1-py3-none-any.whl", hash = "sha256:acc14095e1f01a4a0730fe91d4508cb18859264248613935a1e501856463c9b5", size = 14055, upload-time = "2025-05-26T03:48:46.083Z" },
 ]
 
 [package.optional-dependencies]
