@@ -28,11 +28,20 @@ async def bot_check(bot_id: str | None = None):
 class HealthCheckFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:  # pragma: no cover
         # complete query string (so parameter and other value included)
-        query_string: str = record.args[2]  # type: ignore
+        args = record.args
+        if not isinstance(args, tuple) or len(args) < 3 or not isinstance(args[2], str):
+            # if args is not a tuple or does not have enough elements,
+            # we assume it's not a health check request
+            return True
+
+        query_string = args[2]
 
         if query_string.startswith("/health"):
             return False
         if query_string.startswith("/secret/bot_health"):
+            return False
+        # 顺便过滤掉 prometheus 的 metrics 请求
+        if query_string.startswith("/secret/metrics"):
             return False
 
         return True
