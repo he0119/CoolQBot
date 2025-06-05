@@ -580,7 +580,7 @@ requires-dist = [
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.5.1" },
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.9.0" },
-    { name = "nonebot-plugin-zssm", specifier = "==0.3.5" },
+    { name = "nonebot-plugin-zssm", specifier = "==0.3.7" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
     { name = "nonebot2", extras = ["httpx", "fastapi", "aiohttp"], specifier = ">=2.4.2" },
     { name = "pydantic", specifier = ">=2.11.5" },
@@ -1824,7 +1824,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-zssm"
-version = "0.3.5"
+version = "0.3.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
@@ -1834,9 +1834,9 @@ dependencies = [
     { name = "playwright" },
     { name = "pymupdf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d7/9a/aa56d5126dce7c431ca91a283865040f828ae446fde60db148745fcfbb93/nonebot_plugin_zssm-0.3.5.tar.gz", hash = "sha256:0c95b2101378dab1ccd0d23fc3d2dc4e587400f1e85cd04574ffdb3871a34054", size = 14756, upload-time = "2025-05-11T05:59:01.236Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/68/60/5c738da5892363dc5001544e3b5c8b22091103fb926bfbe0e356d34c02c5/nonebot_plugin_zssm-0.3.7.tar.gz", hash = "sha256:18a92faca606851fc646bef778ead99ddbbadf425be84939f3d1902145a5868c", size = 16100, upload-time = "2025-06-03T14:47:55.215Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/55/40/72b9176856752a4a69208d13f6a90950f4d0bf4f294698f088751a8a7cb2/nonebot_plugin_zssm-0.3.5-py3-none-any.whl", hash = "sha256:13a71e5f044b47caa3b750d8cad78aa0d586eaa02b08374ba693dac2c6ad946b", size = 18339, upload-time = "2025-05-11T05:59:00.108Z" },
+    { url = "https://files.pythonhosted.org/packages/51/2a/53011a3dda4a0953e5acb11834e57422cd5d0a8690ae1567134044a5cf7a/nonebot_plugin_zssm-0.3.7-py3-none-any.whl", hash = "sha256:c6cd13d05d97e6a9f31b004cf45912400ca7292e104f2a1178e3f7acbbda1921", size = 19660, upload-time = "2025-06-03T14:47:54.183Z" },
 ]
 
 [[package]]
