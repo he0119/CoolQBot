@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 修复 zssm 插件每次启动都需要安装浏览器的问题
+
 ## [0.23.0] - 2025-05-26
 
 ### Added
