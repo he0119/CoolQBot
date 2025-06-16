@@ -1,4 +1,4 @@
-FROM python:3.13.4-slim
+FROM python:3.13.5-slim
 COPY --from=ghcr.io/astral-sh/uv:0.7.11 /uv /bin/uv
 
 # 编译参数
