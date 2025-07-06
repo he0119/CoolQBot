@@ -4,11 +4,7 @@ from enum import Enum
 
 from nonebot import on_notice, require
 from nonebot.adapters.onebot.v11 import Bot, MessageSegment
-from nonebot.adapters.onebot.v11.event import (
-    GroupAdminNoticeEvent,
-    GroupMessageEvent,
-    PrivateMessageEvent,
-)
+from nonebot.adapters.onebot.v11.event import GroupAdminNoticeEvent, GroupMessageEvent, PrivateMessageEvent
 from nonebot.plugin import PluginMetadata
 
 require("nonebot_plugin_alconna")
@@ -85,9 +81,7 @@ ban_cmd = on_alconna(
 
 
 @ban_cmd.handle()
-async def ban_handle_first_receive(
-    bot: Bot, duration: Match[int], group_id: Match[int]
-):
+async def ban_handle_first_receive(bot: Bot, duration: Match[int], group_id: Match[int]):
     """获取需要的参数"""
     # 如果没有获取机器人在群中的职位，则获取
     if not _bot_role:
@@ -100,11 +94,7 @@ async def ban_handle_first_receive(
 
 
 @ban_cmd.got_path("duration", prompt="你想被禁言多少分钟呢？")
-async def ban_handle_group_message(
-    bot: Bot,
-    event: GroupMessageEvent,
-    duration: int,
-):
+async def ban_handle_group_message(bot: Bot, event: GroupMessageEvent, duration: int):
     """如果在群里发送，则在当前群禁言/解除"""
     group_id = event.group_id
     user_id = event.user_id
@@ -132,22 +122,13 @@ async def ban_handle_group_message(
             )
         )
     else:
-        await bot.set_group_ban(
-            group_id=group_id, user_id=user_id, duration=duration_sec
-        )
-        await ban_cmd.finish(
-            render_expression(EXPR_OK, duration=duration), at_sender=True
-        )
+        await bot.set_group_ban(group_id=group_id, user_id=user_id, duration=duration_sec)
+        await ban_cmd.finish(render_expression(EXPR_OK, duration=duration), at_sender=True)
 
 
 @ban_cmd.got_path("duration", prompt="你想被禁言多少分钟呢？")
 @ban_cmd.got_path("group_id", prompt="请问你想针对哪个群？")
-async def ban_handle_private_message(
-    bot: Bot,
-    event: PrivateMessageEvent,
-    duration: int,
-    group_id: int,
-):
+async def ban_handle_private_message(bot: Bot, event: PrivateMessageEvent, duration: int, group_id: int):
     """如果私聊的话，则向用户请求群号，并仅在支持的群禁言/解除"""
     user_id = event.user_id
 
@@ -177,9 +158,7 @@ async def ban_handle_private_message(
         )
         await ban_cmd.finish("帮你@群主了，请耐心等待。")
     else:
-        await bot.set_group_ban(
-            group_id=group_id, user_id=user_id, duration=duration_sec
-        )
+        await bot.set_group_ban(group_id=group_id, user_id=user_id, duration=duration_sec)
         await ban_cmd.finish(render_expression(EXPR_OK, duration=duration))
 
 
@@ -193,9 +172,7 @@ async def get_owner_id(group_id: int, bot: Bot) -> int | None:
 
 async def get_user_role_in_group(user_id: int, group_id: int, bot: Bot) -> str:
     """获取用户在群内的身份"""
-    group_member_info = await bot.get_group_member_info(
-        user_id=user_id, group_id=group_id
-    )
+    group_member_info = await bot.get_group_member_info(user_id=user_id, group_id=group_id)
     return group_member_info["role"]
 
 
@@ -208,9 +185,7 @@ async def refresh_bot_role(bot: Bot) -> None:
     """更新机器人在群内的身份"""
     group_list = await bot.get_group_list()
     for group in group_list:
-        member_info = await bot.get_group_member_info(
-            group_id=group["group_id"], user_id=int(bot.self_id)
-        )
+        member_info = await bot.get_group_member_info(group_id=group["group_id"], user_id=int(bot.self_id))
         _bot_role[group["group_id"]] = member_info["role"]
 
 

@@ -32,9 +32,7 @@ __plugin_meta__ = PluginMetadata(
 /morning update
 获取今天的问好
 /morning today""",
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_alconna", "nonebot_plugin_saa"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_saa"),
 )
 
 
@@ -81,11 +79,7 @@ morning_cmd = on_alconna(
 
 
 @morning_cmd.handle()
-async def morning_handle(
-    session: AsyncSession,
-    arg: Match[str],
-    target: PlatformTarget = Depends(get_target),
-):
+async def morning_handle(session: AsyncSession, arg: Match[str], target: PlatformTarget = Depends(get_target)):
     if arg.available:
         if arg.result == "today":
             await morning_cmd.finish(await get_moring_message())
@@ -95,9 +89,7 @@ async def morning_handle(
             await morning_cmd.finish("节假日数据更新成功")
 
     group = (
-        await session.scalars(
-            select(MorningGreeting).where(MorningGreeting.target == target.model_dump())
-        )
+        await session.scalars(select(MorningGreeting).where(MorningGreeting.target == target.model_dump()))
     ).one_or_none()
     if arg.available:
         if strtobool(arg.result):

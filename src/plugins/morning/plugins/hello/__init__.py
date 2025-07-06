@@ -27,9 +27,7 @@ __plugin_meta__ = PluginMetadata(
 /hello on
 关闭启动问候功能
 /hello off""",
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_alconna", "nonebot_plugin_saa"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_saa"),
 )
 
 driver = nonebot.get_driver()
@@ -38,9 +36,7 @@ driver = nonebot.get_driver()
 @driver.on_bot_connect
 async def hello_on_connect(bot: Bot, session: AsyncSession) -> None:
     """启动时发送问候"""
-    groups = (
-        await session.scalars(select(Hello).where(Hello.bot_id == bot.self_id))
-    ).all()
+    groups = (await session.scalars(select(Hello).where(Hello.bot_id == bot.self_id))).all()
     if not groups:
         return
 
@@ -79,9 +75,7 @@ async def hello_handle(
 ):
     group = (
         await session.scalars(
-            select(Hello)
-            .where(Hello.target == target.model_dump())
-            .where(Hello.bot_id == bot.self_id)
+            select(Hello).where(Hello.target == target.model_dump()).where(Hello.bot_id == bot.self_id)
         )
     ).one_or_none()
 

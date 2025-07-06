@@ -11,9 +11,7 @@ __plugin_meta__ = PluginMetadata(
     usage="""记录饮食是否健康
 /饮食打卡
 /饮食打卡 A""",
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_user", "nonebot_plugin_alconna"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_user", "nonebot_plugin_alconna"),
 )
 
 dietary_cmd = on_alconna(
@@ -41,27 +39,17 @@ async def handle_first_message(content: Match[str]):
     "content",
     prompt="今天你吃的怎么样呢？请输入 A 或 B（A：健康饮食少油少糖 B：我摆了偷吃了炸鸡奶茶）",
 )
-async def _(
-    session: AsyncSession,
-    user: UserSession,
-    content: str,
-):
+async def _(session: AsyncSession, user: UserSession, content: str):
     content = content.lower()
 
     if content not in ("a", "b"):
-        await dietary_cmd.reject(
-            "饮食情况只能输入 A 或 B 哦，请重新输入", at_sender=True
-        )
+        await dietary_cmd.reject("饮食情况只能输入 A 或 B 哦，请重新输入", at_sender=True)
 
     healthy = content == "a"
     session.add(DietaryRecord(user_id=user.user_id, healthy=healthy))
     await session.commit()
 
     if healthy:
-        await dietary_cmd.finish(
-            "已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True
-        )
+        await dietary_cmd.finish("已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True)
     else:
-        await dietary_cmd.finish(
-            "摸摸你的小肚子，下次不可以再这样了哦～", at_sender=True
-        )
+        await dietary_cmd.finish("摸摸你的小肚子，下次不可以再这样了哦～", at_sender=True)

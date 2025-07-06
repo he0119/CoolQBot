@@ -4,24 +4,11 @@ from io import BytesIO
 
 import matplotlib.pyplot as plt
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from nonebot_plugin_alconna import (
-    Alconna,
-    Args,
-    CommandMeta,
-    Image,
-    Match,
-    Text,
-    on_alconna,
-)
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Image, Match, Text, on_alconna
 from nonebot_plugin_user import UserSession
 from sqlalchemy import func, select
 
-from src.plugins.check_in.models import (
-    BodyFatRecord,
-    DietaryRecord,
-    FitnessRecord,
-    WeightRecord,
-)
+from src.plugins.check_in.models import BodyFatRecord, DietaryRecord, FitnessRecord, WeightRecord
 from src.plugins.check_in.utils import get_or_create_user_info
 from src.utils.annotated import AsyncSession
 
@@ -36,9 +23,7 @@ __plugin_meta__ = PluginMetadata(
 /打卡历史 体重
 查看体脂历史
 /打卡历史 体脂""",
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_user", "nonebot_plugin_alconna"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_user", "nonebot_plugin_alconna"),
 )
 
 history_cmd = on_alconna(
@@ -78,16 +63,12 @@ async def _(session: AsyncSession, user: UserSession, type: str):
             )
             fitness_records = (
                 await session.scalars(
-                    select(FitnessRecord)
-                    .where(FitnessRecord.user_id == user.user_id)
-                    .where(FitnessRecord.time >= now)
+                    select(FitnessRecord).where(FitnessRecord.user_id == user.user_id).where(FitnessRecord.time >= now)
                 )
             ).all()
             if not fitness_records:
                 await history_cmd.finish("你还没有健身打卡记录哦", at_sender=True)
-            msgs = [
-                f"你已成功打卡 {len(fitness_records)} 次，以下是你当月的健身情况哦～："
-            ]
+            msgs = [f"你已成功打卡 {len(fitness_records)} 次，以下是你当月的健身情况哦～："]
             for record in fitness_records:
                 msgs.append(f"{record.time.date()} {record.message}")
             await history_cmd.finish("\n".join(msgs), at_sender=True)
@@ -109,9 +90,7 @@ async def _(session: AsyncSession, user: UserSession, type: str):
             await history_cmd.finish(msg, at_sender=True)
         case "体重":
             weight_records = (
-                await session.scalars(
-                    select(WeightRecord).where(WeightRecord.user_id == user.user_id)
-                )
+                await session.scalars(select(WeightRecord).where(WeightRecord.user_id == user.user_id))
             ).all()
             if not weight_records:
                 await history_cmd.finish("你还没有体重记录哦", at_sender=True)
@@ -126,9 +105,7 @@ async def _(session: AsyncSession, user: UserSession, type: str):
             )
         case "体脂":
             body_fat_records = (
-                await session.scalars(
-                    select(BodyFatRecord).where(BodyFatRecord.user_id == user.user_id)
-                )
+                await session.scalars(select(BodyFatRecord).where(BodyFatRecord.user_id == user.user_id))
             ).all()
             if not body_fat_records:
                 await history_cmd.finish("你还没有体脂记录哦", at_sender=True)

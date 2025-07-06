@@ -15,9 +15,7 @@ async def test_history(app: App, mocker: MockerFixture):
     from src.plugins.repeat.models import Enabled, MessageRecord
     from src.plugins.repeat.plugins.repeat_history import history_cmd
 
-    mocked_datetime = mocker.patch(
-        "src.plugins.repeat.plugins.repeat_history.data_source.datetime"
-    )
+    mocked_datetime = mocker.patch("src.plugins.repeat.plugins.repeat_history.data_source.datetime")
     mocked_datetime.now.return_value = datetime(2020, 1, 2)
     mocked_datetime.return_value = datetime(2020, 1, 1)
 
@@ -78,9 +76,7 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
         )
         await session.commit()
 
-    mocked_datetime = mocker.patch(
-        "src.plugins.repeat.plugins.repeat_history.data_source.datetime"
-    )
+    mocked_datetime = mocker.patch("src.plugins.repeat.plugins.repeat_history.data_source.datetime")
     mocked_datetime.now.return_value = datetime(2020, 1, 2)
     mocked_datetime.return_value = datetime(2020, 1, 1)
 
@@ -100,9 +96,7 @@ async def test_history_get_arg(app: App, mocker: MockerFixture):
 
         event = fake_group_message_event_v11(message=Message("1"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(
-            event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True
-        )
+        ctx.should_call_send(event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True)
         ctx.should_rejected(history_cmd)
 
         event = fake_group_message_event_v11(message=Message("0"))
@@ -155,9 +149,7 @@ async def test_history_get_invalid_args(app: App):
 
         event = fake_group_message_event_v11(message=Message("1"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(
-            event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True
-        )
+        ctx.should_call_send(event, "你请输入你要查询的日期（如查询整月排名请输入 0）", True)
         ctx.should_rejected(history_cmd)
 
         event = fake_group_message_event_v11(message=Message("0"))

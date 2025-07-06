@@ -11,9 +11,7 @@ async def test_gete(app: App, mocker: MockerFixture):
     from src.plugins.ff14.plugins.ff14_gate import gate_cmd
     from src.plugins.ff14.plugins.ff14_gate.data_source import EXPR_GATE
 
-    render_expression = mocker.patch(
-        "src.plugins.ff14.plugins.ff14_gate.data_source.render_expression"
-    )
+    render_expression = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.render_expression")
     render_expression.return_value = Message("test")
     randint = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.randint")
     randint.return_value = 1
@@ -36,9 +34,7 @@ async def test_gete_ask_arg(app: App, mocker: MockerFixture):
     from src.plugins.ff14.plugins.ff14_gate import gate_cmd
     from src.plugins.ff14.plugins.ff14_gate.data_source import EXPR_GATE
 
-    render_expression = mocker.patch(
-        "src.plugins.ff14.plugins.ff14_gate.data_source.render_expression"
-    )
+    render_expression = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.render_expression")
     render_expression.return_value = Message("test")
     randint = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.randint")
     randint.return_value = 1
@@ -66,9 +62,7 @@ async def test_gete_ask_arg_error(app: App, mocker: MockerFixture):
     from src.plugins.ff14.plugins.ff14_gate import gate_cmd
     from src.plugins.ff14.plugins.ff14_gate.data_source import EXPR_GATE
 
-    render_expression = mocker.patch(
-        "src.plugins.ff14.plugins.ff14_gate.data_source.render_expression"
-    )
+    render_expression = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.render_expression")
     render_expression.return_value = Message("test")
     randint = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.randint")
     randint.return_value = 1
@@ -84,9 +78,7 @@ async def test_gete_ask_arg_error(app: App, mocker: MockerFixture):
 
         event = fake_group_message_event_v11(message=Message("4"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(
-            event, "暂时只支持两个门或者三个门的情况，请重新输入吧。", True
-        )
+        ctx.should_call_send(event, "暂时只支持两个门或者三个门的情况，请重新输入吧。", True)
         ctx.should_rejected(gate_cmd)
 
         event = fake_group_message_event_v11(message=Message("2"))
@@ -103,9 +95,7 @@ async def test_gete_ask_arg_whitespace(app: App, mocker: MockerFixture):
     from src.plugins.ff14.plugins.ff14_gate import gate_cmd
     from src.plugins.ff14.plugins.ff14_gate.data_source import EXPR_GATE
 
-    render_expression = mocker.patch(
-        "src.plugins.ff14.plugins.ff14_gate.data_source.render_expression"
-    )
+    render_expression = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.render_expression")
     render_expression.return_value = Message("test")
     randint = mocker.patch("src.plugins.ff14.plugins.ff14_gate.data_source.randint")
     randint.return_value = 1

@@ -36,9 +36,7 @@ def upgrade(name: str = "") -> None:
         info={"bind_key": "ff14_fflogs"},
     )
     with op.batch_alter_table("ff14_fflogs_user", schema=None) as batch_op:
-        batch_op.create_index(
-            batch_op.f("ix_ff14_fflogs_user_user_id"), ["user_id"], unique=True
-        )
+        batch_op.create_index(batch_op.f("ix_ff14_fflogs_user_user_id"), ["user_id"], unique=True)
 
     # ### end Alembic commands ###
 

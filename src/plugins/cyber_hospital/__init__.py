@@ -10,16 +10,7 @@ from nonebot.typing import T_State
 require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
 require("nonebot_plugin_alconna")
-from nonebot_plugin_alconna import (
-    Alconna,
-    AlconnaMatcher,
-    Args,
-    At,
-    CommandMeta,
-    Text,
-    UniMessage,
-    on_alconna,
-)
+from nonebot_plugin_alconna import Alconna, AlconnaMatcher, Args, At, CommandMeta, Text, UniMessage, on_alconna
 from nonebot_plugin_user import User, UserSession, get_user, get_user_by_id
 
 from src.utils.helpers import admin_permission
@@ -44,9 +35,7 @@ __plugin_meta__ = PluginMetadata(
 查看所有人入院次数，或指定人出入院时间
 /入院记录
 /入院记录 @病人""",
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_alconna", "nonebot_plugin_user"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
 hospital_service = Hospital()
@@ -216,12 +205,7 @@ async def _(user: UserSession, at: At | None = None):
         await record_cmd.finish(at + Text("暂时没有记录"))
 
     msg = at + Text("\n")
-    await record_cmd.finish(
-        msg
-        + "\n".join(
-            f"{record.time:%Y-%m-%d %H:%M} {record.content}" for record in records
-        )
-    )
+    await record_cmd.finish(msg + "\n".join(f"{record.time:%Y-%m-%d %H:%M} {record.content}" for record in records))
 
 
 history_cmd = on_alconna(

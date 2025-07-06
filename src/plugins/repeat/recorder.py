@@ -279,9 +279,7 @@ async def data_migration():
                     record_date = record_date.replace(day=day)
                     date_str = record_date.strftime("%Y-%m-%d")
                     for user_id, repeat_time in days[day].items():
-                        users[(date_str, group_id, user_id)] = {
-                            "repeat_time": repeat_time
-                        }
+                        users[(date_str, group_id, user_id)] = {"repeat_time": repeat_time}
             for group_id, days in data["msg_number_list"].items():
                 for day in days:
                     if day == 0:
@@ -290,13 +288,9 @@ async def data_migration():
                     date_str = record_date.strftime("%Y-%m-%d")
                     for user_id, msg_number in days[day].items():
                         if (date_str, group_id, user_id) in users:
-                            users[(date_str, group_id, user_id)]["msg_number"] = (
-                                msg_number
-                            )
+                            users[(date_str, group_id, user_id)]["msg_number"] = msg_number
                         else:
-                            users[(date_str, group_id, user_id)] = {
-                                "msg_number": msg_number
-                            }
+                            users[(date_str, group_id, user_id)] = {"msg_number": msg_number}
             for (date_str, group_id, user_id), values in users.items():
                 record = MessageRecord(
                     date=datetime.strptime(date_str, "%Y-%m-%d").date(),

@@ -27,16 +27,11 @@ async def test_set_daily_quests(app: App):
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
-        event = fake_group_message_event_v11(
-            message=Message("/每日委托 乐园都市笑笑镇，伊弗利特歼灭战, 影之国")
-        )
+        event = fake_group_message_event_v11(message=Message("/每日委托 乐园都市笑笑镇，伊弗利特歼灭战, 影之国"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "与你每日委托相同的群友：\n"
-            "乐园都市笑笑镇：无\n"
-            "伊弗利特歼灭战：无\n"
-            "影之国：无",
+            "与你每日委托相同的群友：\n乐园都市笑笑镇：无\n伊弗利特歼灭战：无\n影之国：无",
             True,
             at_sender=True,
         )
@@ -50,10 +45,7 @@ async def test_set_daily_quests(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "与你每日委托相同的群友：\n"
-            "乐园都市笑笑镇：无\n"
-            "伊弗利特歼灭战：无\n"
-            "影之国：无",
+            "与你每日委托相同的群友：\n乐园都市笑笑镇：无\n伊弗利特歼灭战：无\n影之国：无",
             True,
             at_sender=True,
         )
@@ -96,16 +88,11 @@ async def test_daily_quests_pair(app: App):
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
-        event = fake_group_message_event_v11(
-            message=Message("/每日委托 乐园都市笑笑镇，伊弗利特歼灭战, 神龙歼灭战")
-        )
+        event = fake_group_message_event_v11(message=Message("/每日委托 乐园都市笑笑镇，伊弗利特歼灭战, 神龙歼灭战"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "与你每日委托相同的群友：\n"
-            "乐园都市笑笑镇：无\n"
-            "伊弗利特歼灭战：无\n"
-            "神龙歼灭战：无",
+            "与你每日委托相同的群友：\n乐园都市笑笑镇：无\n伊弗利特歼灭战：无\n神龙歼灭战：无",
             True,
             at_sender=True,
         )
@@ -122,10 +109,7 @@ async def test_daily_quests_pair(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "与你每日委托相同的群友：\n"
-            "乐园都市笑笑镇：nickname\n"
-            "伊弗利特歼灭战：nickname\n"
-            "神龙歼灭战1：无",
+            "与你每日委托相同的群友：\n乐园都市笑笑镇：nickname\n伊弗利特歼灭战：nickname\n神龙歼灭战1：无",
             True,
             at_sender=True,
         )

@@ -18,9 +18,7 @@ __plugin_meta__ = PluginMetadata(
     name="问好",
     description="早上好下午好晚上好",
     usage="",
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_alconna", "nonebot_plugin_saa"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_saa"),
 )
 
 _sub_plugins = set()

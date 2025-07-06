@@ -10,9 +10,7 @@ from src.plugins.repeat.recorder import Recorder
 from src.utils.annotated import GroupInfo
 
 
-async def get_history(
-    bot: Bot, year: int, month: int, day: int, group_info: GroupInfo
-) -> str:
+async def get_history(bot: Bot, year: int, month: int, day: int, group_info: GroupInfo) -> str:
     """获取历史数据"""
     recorder = Recorder(group_info)
     if not await recorder.is_enabled():

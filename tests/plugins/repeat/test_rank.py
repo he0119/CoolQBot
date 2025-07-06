@@ -72,9 +72,7 @@ async def test_rank(app: App):
             data={"group_id": 10000, "user_id": 10},
             result={"card": "test"},
         )
-        ctx.should_call_send(
-            event, "Love Love Ranking\ntest：10.00%\n\n复读次数排行榜\ntest：10次", True
-        )
+        ctx.should_call_send(event, "Love Love Ranking\ntest：10.00%\n\n复读次数排行榜\ntest：10次", True)
         ctx.should_finished(rank_cmd)
 
 

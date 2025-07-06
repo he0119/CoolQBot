@@ -49,9 +49,7 @@ async def get_user_info(bot: OneBotV11Bot | OneBotV12Bot, event: Event) -> UserI
 
 async def get_group_info(
     bot: OneBotV11Bot | OneBotV12Bot,
-    event: OneBotV11GroupMessageEvent
-    | OneBotV12GroupMessageEvent
-    | OneBotV12ChannelMessageEvent,
+    event: OneBotV11GroupMessageEvent | OneBotV12GroupMessageEvent | OneBotV12ChannelMessageEvent,
 ) -> GroupInfo:
     """获取群号或频道号信息"""
     if isinstance(bot, OneBotV11Bot):

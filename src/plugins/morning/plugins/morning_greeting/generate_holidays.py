@@ -112,9 +112,7 @@ def parse_holidays(url: str):
     for match in matches:
         name, date_range, days_off, work_days = match
         start_date_str = date_range.split("至")[0]
-        start_date = datetime.strptime(
-            f"{current_year}-{start_date_str}", "%Y-%m月%d日"
-        )
+        start_date = datetime.strptime(f"{current_year}-{start_date_str}", "%Y-%m月%d日")
         start_date_iso = start_date.isoformat()[:10]
 
         # 处理 与周末连休 的情况
@@ -139,9 +137,7 @@ def parse_holidays(url: str):
             "name": name,
             "duration": duration,
             "workdays": [
-                datetime.strptime(
-                    f"{current_year}-{day.split('（')[0]}", "%Y-%m月%d日"
-                ).isoformat()[:10]
+                datetime.strptime(f"{current_year}-{day.split('（')[0]}", "%Y-%m月%d日").isoformat()[:10]
                 for day in work_days.split("、")
             ]
             if work_days

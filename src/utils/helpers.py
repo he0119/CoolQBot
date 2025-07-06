@@ -49,9 +49,7 @@ def strtobool(val: str) -> bool:
 def parse_int(key: str):
     """解析数字，并将结果存入 state 中"""
 
-    async def _key_parser(
-        matcher: Matcher, state: T_State, input: int | Message = Arg(key)
-    ):
+    async def _key_parser(matcher: Matcher, state: T_State, input: int | Message = Arg(key)):
         if isinstance(input, int):
             return
 
@@ -128,9 +126,7 @@ async def get_nickname(
     if isinstance(bot, OneBotV11Bot):
         if group_id:
             try:
-                msg = await bot.get_group_member_info(
-                    group_id=int(group_id), user_id=int(user_id)
-                )
+                msg = await bot.get_group_member_info(group_id=int(group_id), user_id=int(user_id))
                 if msg["card"]:
                     return msg["card"]
                 return msg["nickname"]
@@ -142,9 +138,7 @@ async def get_nickname(
     else:
         if group_id:
             try:
-                msg = await bot.get_group_member_info(
-                    group_id=group_id, user_id=user_id
-                )
+                msg = await bot.get_group_member_info(group_id=group_id, user_id=user_id)
                 if msg["user_displayname"]:
                     return msg["user_displayname"]
                 return msg["user_name"]
@@ -152,9 +146,7 @@ async def get_nickname(
                 pass
         elif channel_id and guild_id:
             try:
-                msg = await bot.get_channel_member_info(
-                    guild_id=guild_id, channel_id=channel_id, user_id=user_id
-                )
+                msg = await bot.get_channel_member_info(guild_id=guild_id, channel_id=channel_id, user_id=user_id)
                 if msg["user_displayname"]:
                     return msg["user_displayname"]
                 return msg["user_name"]
@@ -162,9 +154,7 @@ async def get_nickname(
                 pass
         elif guild_id:
             try:
-                msg = await bot.get_guild_member_info(
-                    guild_id=guild_id, user_id=user_id
-                )
+                msg = await bot.get_guild_member_info(guild_id=guild_id, user_id=user_id)
                 if msg["user_displayname"]:
                     return msg["user_displayname"]
                 return msg["user_name"]

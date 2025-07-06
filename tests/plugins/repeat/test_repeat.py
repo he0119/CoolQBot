@@ -25,9 +25,7 @@ async def test_repeat(app: App, mocker: MockerFixture):
     """测试复读"""
     from src.plugins.repeat.plugins.repeat_basic import repeat_message
 
-    mocked_rule_datetime = mocker.patch(
-        "src.plugins.repeat.plugins.repeat_basic.repeat_rule.datetime"
-    )
+    mocked_rule_datetime = mocker.patch("src.plugins.repeat.plugins.repeat_basic.repeat_rule.datetime")
     mocked_rule_datetime.now.return_value = datetime(2021, 1, 1, 0, 0, 0)
     mocked_recorder_datetime = mocker.patch("src.plugins.repeat.recorder.datetime")
     mocked_recorder_datetime.now.side_effect = [
@@ -35,9 +33,7 @@ async def test_repeat(app: App, mocker: MockerFixture):
         datetime(2021, 1, 1, 1, 0, 0),  # add_repeat_list
         datetime(2021, 1, 1, 2, 0, 0),  # reset_last_message_on
     ]
-    mocked_random = mocker.patch(
-        "src.plugins.repeat.plugins.repeat_basic.repeat_rule.secrets.SystemRandom"
-    )
+    mocked_random = mocker.patch("src.plugins.repeat.plugins.repeat_basic.repeat_rule.secrets.SystemRandom")
     mocked_random().randint.return_value = 1
 
     async with app.test_matcher() as ctx:

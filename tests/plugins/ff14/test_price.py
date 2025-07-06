@@ -138,9 +138,7 @@ async def test_price_item_not_found(app: App, mocker: MockerFixture):
         )
         ctx.should_finished(price_cmd)
 
-    get.assert_called_once_with(
-        "https://cafemaker.wakingsands.com/search?string=未命名"
-    )
+    get.assert_called_once_with("https://cafemaker.wakingsands.com/search?string=未命名")
 
 
 async def test_price_world_not_found(app: App, mocker: MockerFixture):

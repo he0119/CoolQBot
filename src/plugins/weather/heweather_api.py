@@ -16,9 +16,7 @@ async def get(url: str) -> dict:
         return resp.json()
 
 
-async def lookup_location(
-    location: str, adm: str | None = None
-) -> tuple[str, str] | None:
+async def lookup_location(location: str, adm: str | None = None) -> tuple[str, str] | None:
     """根据地名和行政区名查询地点的ID和展示的名称
 
     '101270101', '中国 四川省 成都'

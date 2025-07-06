@@ -11,9 +11,7 @@ __plugin_meta__ = PluginMetadata(
     usage="""记录健身情况
 /健身打卡
 /健身打卡 跑步 30 分钟""",
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_user", "nonebot_plugin_alconna"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_user", "nonebot_plugin_alconna"),
 )
 
 fitness_cmd = on_alconna(
@@ -38,14 +36,8 @@ async def handle_first_message(content: Match[str]):
 
 
 @fitness_cmd.got_path("content", prompt="请问你做了什么运动？")
-async def _(
-    session: AsyncSession,
-    user: UserSession,
-    content: str,
-):
+async def _(session: AsyncSession, user: UserSession, content: str):
     session.add(FitnessRecord(user_id=user.user_id, message=content))
     await session.commit()
 
-    await fitness_cmd.finish(
-        "已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True
-    )
+    await fitness_cmd.finish("已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True)

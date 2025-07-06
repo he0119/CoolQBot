@@ -46,9 +46,7 @@ async def test_music(app: App, mocker: MockerFixture):
 
         event = fake_group_message_event_v11(message=Message("/music test"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(
-            event, Message(MessageSegment.music("163", 1825190456)), None
-        )
+        ctx.should_call_send(event, Message(MessageSegment.music("163", 1825190456)), None)
         ctx.should_finished(music_cmd)
 
     get.assert_called_once_with("http://netease:3000/search?keywords=test")
@@ -76,18 +74,14 @@ async def test_music_get_arg(
         ctx.should_call_send(event, "你想听哪首歌呢？", None)
         ctx.should_rejected(music_cmd)
 
-        event = fake_group_message_event_v11(
-            message=Message(MessageSegment.image("12"))
-        )
+        event = fake_group_message_event_v11(message=Message(MessageSegment.image("12")))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "你想听哪首歌呢？", None)
         ctx.should_rejected(music_cmd)
 
         event = fake_group_message_event_v11(message=Message("test"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(
-            event, Message(MessageSegment.music("163", 1825190456)), None
-        )
+        ctx.should_call_send(event, Message(MessageSegment.music("163", 1825190456)), None)
         ctx.should_finished(music_cmd)
 
     get.assert_called_once_with("http://netease:3000/search?keywords=test")
