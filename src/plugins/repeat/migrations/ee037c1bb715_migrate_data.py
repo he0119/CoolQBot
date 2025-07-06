@@ -29,10 +29,7 @@ depends_on: str | Sequence[str] | None = None
 
 def _migrate_old_data(ds_conn: Connection):
     insp = inspect(ds_conn)
-    if (
-        "repeat_record" not in insp.get_table_names()
-        or "repeat_alembic_version" not in insp.get_table_names()
-    ):
+    if "repeat_record" not in insp.get_table_names() or "repeat_alembic_version" not in insp.get_table_names():
         logger.info("repeat: 未发现来自 datastore 的数据")
         return
 

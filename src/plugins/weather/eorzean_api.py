@@ -18,11 +18,7 @@ def eorzean_weather(location: str) -> str | None:
 
         weathers: list[str] = []
         for t in EorzeaTime.weather_period(10, now):
-            weathers.append(
-                EorzeaWeather.forecast(
-                    place_name, t, lang=EorzeaLang.ZH_SC, strict=True
-                )
-            )
+            weathers.append(EorzeaWeather.forecast(place_name, t, lang=EorzeaLang.ZH_SC, strict=True))
         str_data = f"{place_name.value}\n当前天气：{weathers[0]}"
         for num, weather in enumerate(weathers[1:]):
             str_data += f"\n还剩{next_weather_time(int(now), num)}切换到天气：{weather}"

@@ -22,12 +22,7 @@ from pydantic import TypeAdapter, ValidationError
 from sqlalchemy import select
 
 from .config import plugin_config
-from .data import (
-    FFLOGS_DATA,
-    FFlogsDataModel,
-    get_boss_info_by_nickname,
-    get_job_info_by_nickname,
-)
+from .data import FFLOGS_DATA, FFlogsDataModel, get_boss_info_by_nickname, get_job_info_by_nickname
 from .models import CharacterRanking, Class, FFLogsRanking, Ranking, User, Zones
 
 plugin_data = get_plugin_data()
@@ -93,9 +88,7 @@ class FFLogs:
         else:
             return False
 
-    async def set_character(
-        self, uid: int, character_name: str, server_name: str
-    ) -> None:
+    async def set_character(self, uid: int, character_name: str, server_name: str) -> None:
         """设置角色名和服务器名"""
         async with get_session() as session:
             user = await session.scalar(select(User).where(User.user_id == uid))
@@ -147,9 +140,7 @@ class FFLogs:
             # 抛出上面任何异常，说明调用失败
             return None
 
-    async def _get_one_day_ranking(
-        self, boss: int, difficulty: int, job: int, date: datetime
-    ) -> list[Ranking]:
+    async def _get_one_day_ranking(self, boss: int, difficulty: int, job: int, date: datetime) -> list[Ranking]:
         """获取指定 boss，指定职业，指定一天中的排名数据"""
         # 查看是否有缓存
         cache_name = f"{boss}_{difficulty}_{job}_{date.strftime('%Y%m%d')}.pkl"
@@ -323,9 +314,7 @@ class FFLogs:
         # 排名从前一天开始排，因为今天的数据并不全
         date = datetime.now() - timedelta(days=1)
         try:
-            rankings = await self._get_whole_ranking(
-                boss.encounter, boss.difficulty, job.spec, dps_type, date
-            )
+            rankings = await self._get_whole_ranking(boss.encounter, boss.difficulty, job.spec, dps_type, date)
         except DataException as e:
             return f"{e}，请稍后再试"
 

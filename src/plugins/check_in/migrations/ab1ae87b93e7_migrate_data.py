@@ -29,10 +29,7 @@ depends_on: str | Sequence[str] | None = None
 
 def _migrate_old_data(ds_conn: Connection):
     insp = inspect(ds_conn)
-    if (
-        "check_in_userinfo" not in insp.get_table_names()
-        or "check_in_alembic_version" not in insp.get_table_names()
-    ):
+    if "check_in_userinfo" not in insp.get_table_names() or "check_in_alembic_version" not in insp.get_table_names():
         logger.info("check_in: 未发现来自 datastore 的数据")
         return
 
@@ -46,8 +43,7 @@ def _migrate_old_data(ds_conn: Connection):
         return
     if version_num != "6c3d023e73d4":
         logger.warning(
-            "check_in: 发现旧版本的数据，请先安装 0.16.1 版本，"
-            "并运行 nb datastore upgrade 完成数据迁移之后再安装新版本"
+            "check_in: 发现旧版本的数据，请先安装 0.16.1 版本，并运行 nb datastore upgrade 完成数据迁移之后再安装新版本"
         )
         raise RuntimeError("check_in: 请先安装 0.16.1 版本完成迁移之后再升级")
 

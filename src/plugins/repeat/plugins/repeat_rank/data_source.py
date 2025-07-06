@@ -65,12 +65,8 @@ class Ranking:
 
     async def ranking(self):
         """合并两个排行榜"""
-        self.repeat_list = {
-            record.user_id: record.repeat_time for record in self.records
-        }
-        self.msg_number_list = {
-            record.user_id: record.msg_number for record in self.records
-        }
+        self.repeat_list = {record.user_id: record.repeat_time for record in self.records}
+        self.msg_number_list = {record.user_id: record.msg_number for record in self.records}
 
         repeat_rate_ranking = await self.repeat_rate_ranking()
         repeat_number_ranking = await self.repeat_number_ranking()
@@ -80,9 +76,7 @@ class Ranking:
 
     async def repeat_number_ranking(self):
         """获取次数排行榜"""
-        od = collections.OrderedDict(
-            sorted(self.repeat_list.items(), key=itemgetter(1), reverse=True)
-        )
+        od = collections.OrderedDict(sorted(self.repeat_list.items(), key=itemgetter(1), reverse=True))
 
         str_data = await self.ranking_str(od, "number")
 
@@ -94,9 +88,7 @@ class Ranking:
     async def repeat_rate_ranking(self):
         """获取复读概率排行榜"""
         repeat_rate = self.get_repeat_rate(self.repeat_list, self.msg_number_list)
-        od = collections.OrderedDict(
-            sorted(repeat_rate.items(), key=itemgetter(1), reverse=True)
-        )
+        od = collections.OrderedDict(sorted(repeat_rate.items(), key=itemgetter(1), reverse=True))
 
         str_data = await self.ranking_str(od, "rate")
 
@@ -134,8 +126,6 @@ class Ranking:
         if user_id in self._nickname_cache:
             return self._nickname_cache[user_id]
         else:
-            name = await get_nickname(
-                self.bot, user_id, **self.group_info.model_dump(exclude={"platform"})
-            )
+            name = await get_nickname(self.bot, user_id, **self.group_info.model_dump(exclude={"platform"}))
             self._nickname_cache[user_id] = name
             return name

@@ -18,9 +18,7 @@ async def test_admin(app: App):
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
-        event = fake_group_message_event_v11(
-            message=Message("/入院"), sender={"role": "admin"}
-        )
+        event = fake_group_message_event_v11(message=Message("/入院"), sender={"role": "admin"})
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "请 @ 需要入院的病人", True)
         ctx.should_finished(admit_cmd)

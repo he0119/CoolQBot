@@ -12,9 +12,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio.session import AsyncSession
 
 
-async def test_fitness_history(
-    app: App, session: "AsyncSession", mocker: MockerFixture
-):
+async def test_fitness_history(app: App, session: "AsyncSession", mocker: MockerFixture):
     """测试健身历史记录"""
     from src.plugins.check_in.models import FitnessRecord
     from src.plugins.check_in.plugins.check_in_history import history_cmd
@@ -24,9 +22,7 @@ async def test_fitness_history(
     session.add(FitnessRecord(user_id=2, message="健身记录"))
     await session.commit()
 
-    mocked_datetime = mocker.patch(
-        "src.plugins.check_in.plugins.check_in_history.datetime"
-    )
+    mocked_datetime = mocker.patch("src.plugins.check_in.plugins.check_in_history.datetime")
     mocked_datetime.now.return_value = datetime(2023, 2, 10, 1, 1, 1)
 
     async with app.test_matcher() as ctx:
@@ -70,9 +66,7 @@ async def test_dietary_history(app: App, session: "AsyncSession"):
         ctx.should_finished(history_cmd)
 
 
-async def test_weight_record_history(
-    app: App, session: "AsyncSession", mocker: MockerFixture
-):
+async def test_weight_record_history(app: App, session: "AsyncSession", mocker: MockerFixture):
     """测试体重历史记录"""
     from src.plugins.check_in.models import WeightRecord
     from src.plugins.check_in.plugins.check_in_history import history_cmd
@@ -97,9 +91,7 @@ async def test_weight_record_history(
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            MessageSegment.at(10)
-            + MessageSegment.text("你的目标体重是 NaNkg\n")
-            + MessageSegment.image(image_url),
+            MessageSegment.at(10) + MessageSegment.text("你的目标体重是 NaNkg\n") + MessageSegment.image(image_url),
             True,
         )
         ctx.should_finished(history_cmd)
@@ -107,9 +99,7 @@ async def test_weight_record_history(
     mocked_gerenate_graph.assert_called_once()
 
 
-async def test_body_fat_record_history(
-    app: App, session: "AsyncSession", mocker: MockerFixture
-):
+async def test_body_fat_record_history(app: App, session: "AsyncSession", mocker: MockerFixture):
     """测试体脂历史记录"""
     from src.plugins.check_in.models import BodyFatRecord
     from src.plugins.check_in.plugins.check_in_history import history_cmd
@@ -134,9 +124,7 @@ async def test_body_fat_record_history(
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            MessageSegment.at(10)
-            + MessageSegment.text("你的目标体脂是 NaN%\n")
-            + MessageSegment.image(image_url),
+            MessageSegment.at(10) + MessageSegment.text("你的目标体脂是 NaN%\n") + MessageSegment.image(image_url),
             True,
         )
         ctx.should_finished(history_cmd)

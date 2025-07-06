@@ -42,9 +42,7 @@ async def test_record(app: App, session: "AsyncSession"):
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
-        event = fake_group_message_event_v11(
-            message=Message("/病历"), sender={"role": "admin"}
-        )
+        event = fake_group_message_event_v11(message=Message("/病历"), sender={"role": "admin"})
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "请 @ 需要查看记录的病人", True)
         ctx.should_finished(record_cmd)

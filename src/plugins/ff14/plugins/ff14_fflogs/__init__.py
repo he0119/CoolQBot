@@ -7,15 +7,7 @@ from typing import Literal, cast
 
 from nonebot import get_driver, logger
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from nonebot_plugin_alconna import (
-    Alconna,
-    Args,
-    At,
-    CommandMeta,
-    MultiVar,
-    Text,
-    on_alconna,
-)
+from nonebot_plugin_alconna import Alconna, Args, At, CommandMeta, MultiVar, Text, on_alconna
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_user import UserSession, get_user
 
@@ -46,9 +38,7 @@ __plugin_meta__ = PluginMetadata(
 /dps me 角色名 服务器名
 查询他人绑定的角色
 /dps @他人""",
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_alconna", "nonebot_plugin_user"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
 plugin_data = get_plugin_data()
@@ -74,9 +64,7 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
 
     # 检查 Token 是否设置
     if not plugin_config.fflogs_token:
-        await fflogs_cmd.finish(
-            "对不起，Token 未设置，无法查询数据。\n请先在 .env 中配置好 Token 后再尝试查询数据。"
-        )
+        await fflogs_cmd.finish("对不起，Token 未设置，无法查询数据。\n请先在 .env 中配置好 Token 后再尝试查询数据。")
 
     if argv[0] == "update" and len(argv) == 1:
         await FFLOGS_DATA.update()
@@ -128,16 +116,12 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
         if not character:
             await fflogs_cmd.finish(
                 At(flag="user", target=session.platform_id)
-                + Text(
-                    "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。"
-                )
+                + Text("抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me 角色名 服务器名\n绑定自己的角色。")
             )
 
         await fflogs_cmd.finish(
             At(flag="user", target=session.platform_id)
-            + Text(
-                f"你当前绑定的角色：\n角色：{character.character_name}\n服务器：{character.server_name}"
-            )
+            + Text(f"你当前绑定的角色：\n角色：{character.character_name}\n服务器：{character.server_name}")
         )
 
     if isinstance(argv[0], At) and len(argv) == 1:
@@ -145,22 +129,16 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
         character = await fflogs.get_character(at_user.id)
         if not character:
             await fflogs_cmd.finish(
-                At(flag="user", target=session.platform_id)
-                + Text("抱歉，该用户没有绑定最终幻想14的角色。")
+                At(flag="user", target=session.platform_id) + Text("抱歉，该用户没有绑定最终幻想14的角色。")
             )
 
         await fflogs_cmd.finish(
-            argv[0]
-            + Text(
-                f"当前绑定的角色：\n角色：{character.character_name}\n服务器：{character.server_name}"
-            )
+            argv[0] + Text(f"当前绑定的角色：\n角色：{character.character_name}\n服务器：{character.server_name}")
         )
 
     if argv[0] == "me" and len(argv) == 3:
         await fflogs.set_character(session.user_id, str(argv[1]), str(argv[2]))
-        await fflogs_cmd.finish(
-            At(flag="user", target=session.platform_id) + Text("角色绑定成功！")
-        )
+        await fflogs_cmd.finish(At(flag="user", target=session.platform_id) + Text("角色绑定成功！"))
 
     if argv[0] == "classes" and len(argv) == 1:
         data = await fflogs.classes()
@@ -180,11 +158,7 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
             # @他人的格式
             at_user = await get_user(session.platform, argv[1].target)
             data = await get_character_dps_by_user_id(argv[0], at_user.id)
-        elif (
-            isinstance(argv[0], str)
-            and isinstance(argv[1], str)
-            and argv[1].lower() == "me"
-        ):
+        elif isinstance(argv[0], str) and isinstance(argv[1], str) and argv[1].lower() == "me":
             data = await get_character_dps_by_user_id(argv[0], session.user_id)
         else:
             data = await fflogs.dps(*argv)  # type:ignore
@@ -210,9 +184,7 @@ async def get_character_dps_by_user_id(boss_nickname: str, uid: int):
     user = await fflogs.get_character(uid)
     if not user:
         return "抱歉，你没有绑定最终幻想14的角色。\n请使用\n/dps me <角色名> <服务器名>\n绑定自己的角色。"
-    return await fflogs.character_dps(
-        boss_nickname, user.character_name, user.server_name
-    )
+    return await fflogs.character_dps(boss_nickname, user.character_name, user.server_name)
 
 
 @get_driver().on_startup

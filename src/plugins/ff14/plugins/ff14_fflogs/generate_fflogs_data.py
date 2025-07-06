@@ -62,10 +62,7 @@ def get_difficulty(zone: Zones, encounter: Encounter):
 
 
 async def update_boss(data):
-    bosses = {
-        (boss["zone"], boss["encounter"], boss["difficulty"]): boss
-        for boss in data["boss"]
-    }
+    bosses = {(boss["zone"], boss["encounter"], boss["difficulty"]): boss for boss in data["boss"]}
 
     zones = await fflogs.zones()
     for zone in zones:
@@ -92,9 +89,7 @@ async def main():
     await update_boss(fflogs_data)
 
     fflogs_data["job"] = sorted(fflogs_data["job"], key=lambda x: x["spec"])
-    fflogs_data["boss"] = sorted(
-        fflogs_data["boss"], key=lambda x: (x["zone"], x["encounter"], x["difficulty"])
-    )
+    fflogs_data["boss"] = sorted(fflogs_data["boss"], key=lambda x: (x["zone"], x["encounter"], x["difficulty"]))
 
     with DATA_FILE.open("w", encoding="utf-8") as f:
         json.dump(fflogs_data, f, ensure_ascii=False, indent=4)

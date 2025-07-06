@@ -17,9 +17,7 @@ async def test_eorzean(app: App, mocker: MockerFixture):
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
-        event = fake_group_message_event_v11(
-            message=Message("/天气 利姆萨·罗敏萨上层甲板")
-        )
+        event = fake_group_message_event_v11(message=Message("/天气 利姆萨·罗敏萨上层甲板"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,

@@ -19,9 +19,7 @@ __plugin_meta__ = PluginMetadata(
 /查价 默认值 静语庄园
 查询当前设置的默认值
 /查价 默认值""",
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_alconna", "nonebot_plugin_user"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
 plugin_data = get_plugin_data()

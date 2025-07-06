@@ -34,9 +34,7 @@ def upgrade(name: str = "") -> None:
         sa.Column("guild_id", sa.String(), nullable=False),
         sa.Column("channel_id", sa.String(), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_repeat_enabled")),
-        sa.UniqueConstraint(
-            "platform", "group_id", "guild_id", "channel_id", name="unique_enabled"
-        ),
+        sa.UniqueConstraint("platform", "group_id", "guild_id", "channel_id", name="unique_enabled"),
         info={"bind_key": "repeat"},
     )
     op.create_table(

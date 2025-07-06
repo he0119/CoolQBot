@@ -41,17 +41,12 @@ async def need_repeat(event: Event, group_info: GroupInfo) -> bool:
         return False
 
     # 不要复读带网址的消息
-    if (
-        "http://" in event.get_plaintext().lower()
-        or "https://" in event.get_plaintext().lower()
-    ):
+    if "http://" in event.get_plaintext().lower() or "https://" in event.get_plaintext().lower():
         return False
 
     # 复读之后一定时间内不再复读
     time = recorder.last_message_on()
-    if time is not None and now < time + timedelta(
-        minutes=plugin_config.repeat_interval
-    ):
+    if time is not None and now < time + timedelta(minutes=plugin_config.repeat_interval):
         return False
 
     repeat_rate = plugin_config.repeat_rate

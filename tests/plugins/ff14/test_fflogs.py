@@ -98,9 +98,7 @@ async def test_dps_help(app: App, mocker: MockerFixture):
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(
-            message=Message("/dps test"), user_id=10000
-        )
+        event = fake_group_message_event_v11(message=Message("/dps test"), user_id=10000)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, help_msg, True)
@@ -195,9 +193,7 @@ async def test_dps_permission(app: App, mocker: MockerFixture):
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(
-            message=Message("/dps cache del p2s"), user_id=10000
-        )
+        event = fake_group_message_event_v11(message=Message("/dps cache del p2s"), user_id=10000)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "抱歉，你没有权限设置缓存。", True)
@@ -229,9 +225,7 @@ async def test_dps_bind(app: App, mocker: MockerFixture):
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(
-            message=Message("/dps" + MessageSegment.at(10))
-        )
+        event = fake_group_message_event_v11(message=Message("/dps" + MessageSegment.at(10)))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -268,9 +262,7 @@ async def test_dps_bind(app: App, mocker: MockerFixture):
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(
-            message=Message("/dps" + MessageSegment.at(10))
-        )
+        event = fake_group_message_event_v11(message=Message("/dps" + MessageSegment.at(10)))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -295,9 +287,9 @@ async def test_dps_character_rankings(
     mocker.patch.object(plugin_config, "fflogs_token", "test")
     await fflogs.set_character(1, "name", "server")
 
-    fflogs_data_mock = respx_mock.get(
-        "https://bot-docs.hehome.xyz/fflogs_data.json"
-    ).mock(return_value=httpx.Response(200, json=fflogs_data))
+    fflogs_data_mock = respx_mock.get("https://bot-docs.hehome.xyz/fflogs_data.json").mock(
+        return_value=httpx.Response(200, json=fflogs_data)
+    )
     user_dps_mock = respx_mock.get(
         "https://cn.fflogs.com/v1/rankings/character/name/server/CN?zone=29&encounter=65&metric=rdps&api_key=test"
     ).mock(return_value=httpx.Response(200, json=fflogs_character_rankings))
@@ -306,9 +298,7 @@ async def test_dps_character_rankings(
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(
-            message=Message("/dps e1s" + MessageSegment.at(10))
-        )
+        event = fake_group_message_event_v11(message=Message("/dps e1s" + MessageSegment.at(10)))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -359,9 +349,7 @@ async def test_dps_character_rankings_not_bind(app: App, mocker: MockerFixture):
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(
-            message=Message("/dps" + MessageSegment.at(10000))
-        )
+        event = fake_group_message_event_v11(message=Message("/dps" + MessageSegment.at(10000)))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -385,9 +373,9 @@ async def test_dps_update_data(
     mocker.patch.object(plugin_config, "fflogs_token", "test")
     await fflogs.set_character(2, "name", "server")
 
-    fflogs_data_mock = respx_mock.get(
-        "https://bot-docs.hehome.xyz/fflogs_data.json"
-    ).mock(return_value=httpx.Response(200, json=fflogs_data))
+    fflogs_data_mock = respx_mock.get("https://bot-docs.hehome.xyz/fflogs_data.json").mock(
+        return_value=httpx.Response(200, json=fflogs_data)
+    )
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -421,9 +409,9 @@ async def test_dps_job_rankings_empty(
     )
     mocked_datatime.now.return_value = datetime(2023, 4, 16, 12, 0, 0)
 
-    fflogs_data_mock = respx_mock.get(
-        "https://bot-docs.hehome.xyz/fflogs_data.json"
-    ).mock(return_value=httpx.Response(200, json=fflogs_data))
+    fflogs_data_mock = respx_mock.get("https://bot-docs.hehome.xyz/fflogs_data.json").mock(
+        return_value=httpx.Response(200, json=fflogs_data)
+    )
     fflogs_job_rankings_mock = respx_mock.get(
         "https://cn.fflogs.com/v1/rankings/encounter/65?metric=rdps&difficulty=101&spec=13&page=1&filter=date.1681488000000.1681574400000&api_key=test"
     ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings_empty))
@@ -473,9 +461,9 @@ async def test_dps_job_rankings(
     )
     mocked_datatime.now.return_value = datetime(2023, 4, 16, 12, 0, 0)
 
-    fflogs_data_mock = respx_mock.get(
-        "https://bot-docs.hehome.xyz/fflogs_data.json"
-    ).mock(return_value=httpx.Response(200, json=fflogs_data))
+    fflogs_data_mock = respx_mock.get("https://bot-docs.hehome.xyz/fflogs_data.json").mock(
+        return_value=httpx.Response(200, json=fflogs_data)
+    )
     fflogs_job_rankings_15_mock = respx_mock.get(
         "https://cn.fflogs.com/v1/rankings/encounter/87?metric=rdps&difficulty=101&spec=13&page=1&filter=date.1681488000000.1681574400000&api_key=test"
     ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings))

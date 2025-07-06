@@ -47,9 +47,7 @@ class Hospital:
         """获取所有入院病人"""
         async with get_session() as session:
             statement = (
-                select(Patient)
-                .where(Patient.group_id == group_id)
-                .where(Patient.discharged_at == None)
+                select(Patient).where(Patient.group_id == group_id).where(Patient.discharged_at == None)
             ).options(selectinload(Patient.records))
             results = await session.scalars(statement)
             return results.all()
@@ -57,11 +55,7 @@ class Hospital:
     async def get_admitted_patient(self, uid: int) -> Patient | None:
         """获取入院病人"""
         async with get_session() as session:
-            statement = (
-                select(Patient)
-                .where(Patient.user_id == uid)
-                .where(Patient.discharged_at == None)
-            )
+            statement = select(Patient).where(Patient.user_id == uid).where(Patient.discharged_at == None)
             results = await session.scalars(statement)
             return results.first()
 
@@ -81,11 +75,7 @@ class Hospital:
 
     async def add_record(self, uid: int, content: str) -> None:
         async with get_session() as session:
-            statement = (
-                select(Patient)
-                .where(Patient.user_id == uid)
-                .where(Patient.discharged_at == None)
-            )
+            statement = select(Patient).where(Patient.user_id == uid).where(Patient.discharged_at == None)
             results = await session.scalars(statement)
             patient = results.first()
             if patient is None:
@@ -109,10 +99,6 @@ class Hospital:
     async def get_patient(self, user_id: int, group_id: str) -> Sequence[Patient]:
         """获取病人所有住院记录"""
         async with get_session() as session:
-            statement = (
-                select(Patient)
-                .where(Patient.user_id == user_id)
-                .where(Patient.group_id == group_id)
-            )
+            statement = select(Patient).where(Patient.user_id == user_id).where(Patient.group_id == group_id)
             results = await session.scalars(statement)
             return results.all()

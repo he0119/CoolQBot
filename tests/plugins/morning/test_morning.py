@@ -133,14 +133,10 @@ async def test_morning_today(app: App, mocker: MockerFixture):
     from src.plugins.morning.plugins.morning_greeting import morning_cmd
     from src.plugins.morning.plugins.morning_greeting.data_source import EXPR_MORNING
 
-    mocked_date = mocker.patch(
-        "src.plugins.morning.plugins.morning_greeting.data_source.date"
-    )
+    mocked_date = mocker.patch("src.plugins.morning.plugins.morning_greeting.data_source.date")
     mocked_date.today.return_value = date(2022, 1, 1)
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
-    render_expression = mocker.patch(
-        "src.plugins.morning.plugins.morning_greeting.data_source.render_expression"
-    )
+    render_expression = mocker.patch("src.plugins.morning.plugins.morning_greeting.data_source.render_expression")
     render_expression.return_value = Message("test")
 
     async with app.test_matcher() as ctx:
@@ -171,9 +167,7 @@ async def test_morning_push(app: App, mocker: MockerFixture):
 
     from src.plugins.morning.plugins.morning_greeting import MorningGreeting, morning
 
-    get_moring_message = mocker.patch(
-        "src.plugins.morning.plugins.morning_greeting.get_moring_message"
-    )
+    get_moring_message = mocker.patch("src.plugins.morning.plugins.morning_greeting.get_moring_message")
     get_moring_message.return_value = Message("test")
 
     text = Text("test")

@@ -4,14 +4,7 @@ from nonebot import require
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
 require("nonebot_plugin_alconna")
-from nonebot_plugin_alconna import (
-    Alconna,
-    Args,
-    CommandMeta,
-    Match,
-    MultiVar,
-    on_alconna,
-)
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, MultiVar, on_alconna
 
 from .eorzean_api import eorzean_weather
 from .heweather_api import heweather

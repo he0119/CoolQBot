@@ -1,22 +1,11 @@
 """每日委托配对"""
 
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from nonebot_plugin_alconna import (
-    Alconna,
-    Args,
-    CommandMeta,
-    Match,
-    MultiVar,
-    on_alconna,
-)
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, MultiVar, on_alconna
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_user import UserSession
 
-from .data_source import (
-    get_daily_quests_overview,
-    get_daily_quests_pair,
-    set_daily_quests,
-)
+from .data_source import get_daily_quests_overview, get_daily_quests_pair, set_daily_quests
 
 __plugin_meta__ = PluginMetadata(
     name="每日委托",
@@ -28,9 +17,7 @@ __plugin_meta__ = PluginMetadata(
 查看今日所有委托
 /每日委托 总览
 """,
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_alconna", "nonebot_plugin_user"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
 plugin_data = get_plugin_data()

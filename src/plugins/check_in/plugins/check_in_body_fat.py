@@ -17,9 +17,7 @@ __plugin_meta__ = PluginMetadata(
 记录体脂
 /体脂打卡
 /体脂打卡 20""",
-    supported_adapters=inherit_supported_adapters(
-        "nonebot_plugin_user", "nonebot_plugin_alconna"
-    ),
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_user", "nonebot_plugin_alconna"),
 )
 
 target_body_fat_cmd = on_alconna(
@@ -48,14 +46,10 @@ async def handle_first_message(
         target_body_fat_cmd.set_path_arg("target", target.result)
     else:
         target_body_fat = (
-            await session.scalars(
-                select(UserInfo.target_body_fat).where(UserInfo.user_id == user.user_id)
-            )
+            await session.scalars(select(UserInfo.target_body_fat).where(UserInfo.user_id == user.user_id))
         ).one_or_none()
         if target_body_fat:
-            await target_body_fat_cmd.finish(
-                f"你的目标体脂是 {target_body_fat}%，继续努力哦～", at_sender=True
-            )
+            await target_body_fat_cmd.finish(f"你的目标体脂是 {target_body_fat}%，继续努力哦～", at_sender=True)
 
 
 @target_body_fat_cmd.got_path("target", prompt="请输入你的目标体脂哦～")
@@ -64,22 +58,16 @@ async def _(session: AsyncSession, user: UserSession, target: str):
     try:
         body_fat = float(target)
     except ValueError:
-        await target_body_fat_cmd.reject(
-            "目标体脂只能输入数字哦，请重新输入", at_sender=True
-        )
+        await target_body_fat_cmd.reject("目标体脂只能输入数字哦，请重新输入", at_sender=True)
 
     if body_fat < 0 or body_fat > 100:
-        await target_body_fat_cmd.reject(
-            "目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True
-        )
+        await target_body_fat_cmd.reject("目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True)
 
     user_info = await get_or_create_user_info(user, session)
     user_info.target_body_fat = body_fat
     await session.commit()
 
-    await target_body_fat_cmd.finish(
-        "已成功设置，你真棒哦！祝你早日达成目标～", at_sender=True
-    )
+    await target_body_fat_cmd.finish("已成功设置，你真棒哦！祝你早日达成目标～", at_sender=True)
 
 
 body_fat_record_cmd = on_alconna(
@@ -110,18 +98,12 @@ async def _(session: AsyncSession, user: UserSession, content: str):
     try:
         body_fat = float(content)
     except ValueError:
-        await body_fat_record_cmd.reject(
-            "体脂只能输入数字哦，请重新输入", at_sender=True
-        )
+        await body_fat_record_cmd.reject("体脂只能输入数字哦，请重新输入", at_sender=True)
 
     if body_fat < 0 or body_fat > 100:
-        await target_body_fat_cmd.reject(
-            "目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True
-        )
+        await target_body_fat_cmd.reject("目标体脂只能在 0% ~ 100% 之间哦，请重新输入", at_sender=True)
 
     session.add(BodyFatRecord(user_id=user.user_id, body_fat=body_fat))
     await session.commit()
 
-    await body_fat_record_cmd.finish(
-        "已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True
-    )
+    await body_fat_record_cmd.finish("已成功记录，你真棒哦！祝你早日瘦成一道闪电～", at_sender=True)
