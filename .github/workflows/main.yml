@@ -106,6 +106,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: he0119/coolqbot
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=test,enable=${{ github.event_name == 'pull_request' }}
 
       - name: Build Docker image
         uses: docker/build-push-action@v6
@@ -136,7 +140,7 @@ jobs:
 
           # 启动容器
           echo "正在启动容器..."
-          docker run --name test-docker-container -d he0119/coolqbot > /dev/null
+          docker run --name test-docker-container -d he0119/coolqbot:test > /dev/null
 
           TIMEOUT=60
           ELAPSED=0
