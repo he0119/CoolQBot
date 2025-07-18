@@ -80,13 +80,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Docker meta
-        if: github.event_name != 'pull_request'
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: he0119/coolqbot
-
       - name: Cache buildkit
         uses: actions/cache@v4
         id: cache
@@ -108,27 +101,24 @@ jobs:
             }
           skip-extraction: ${{ steps.cache.outputs.cache-hit }}
 
-      - name: Build and push
-        if: github.event_name != 'pull_request'
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: he0119/coolqbot
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=test,enable=${{ github.event_name == 'pull_request' }}
+
+      - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            VERSION=${{ needs.test.outputs.version }}
-
-      - name: Build for test
-        if: github.event_name == 'pull_request'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: false
-          load: true
-          tags: he0119/coolqbot:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
