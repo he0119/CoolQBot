@@ -26,6 +26,7 @@ class BihuaService:
                 raise ValueError("相同的壁画已经存在")
 
             image_path = get_image_path(group_id, image_hash)
+            image_path.parent.mkdir(parents=True, exist_ok=True)
 
             # 保存图片到本地
             with open(image_path, "wb") as f:

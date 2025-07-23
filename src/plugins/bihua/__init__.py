@@ -19,12 +19,17 @@ require("nonebot_plugin_alconna")
 require("nonebot_plugin_localstore")
 from nonebot_plugin_alconna import (
     Alconna,
+    AlconnaMatch,
+    AlconnaMatcher,
     Args,
     CommandMeta,
     Image,
+    Match,
     UniMessage,
+    image_fetch,
     on_alconna,
 )
+from nonebot_plugin_alconna.builtins.extensions.reply import ReplyMergeExtension
 from nonebot_plugin_user import UserSession, get_user_by_id
 
 from src.utils.helpers import admin_permission
@@ -55,37 +60,35 @@ bihua_service = BihuaService()
 post_cmd = on_alconna(
     Alconna(
         "post",
-        Args["name", str]["image", Image],
+        Args["name#名称", str]["img?#图片", Image],
         meta=CommandMeta(
             description="收藏壁画",
-            example="发送图片和命令\n/post 我从来不说壁画 [图片]",
+            example="发送图片和命令\n回复图片并发送 /post 我从来不说壁画",
         ),
     ),
     use_cmd_start=True,
     block=True,
+    extensions=[ReplyMergeExtension()],
 )
 
 
 @post_cmd.handle()
-async def _(user: UserSession, name: str, image: Image):
-    if not image.url:
-        await post_cmd.finish("无法获取图片URL")
+async def _(
+    matcher: AlconnaMatcher,
+    img: Match[bytes] = AlconnaMatch("img", image_fetch),
+):
+    if img.available:
+        matcher.set_path_arg("img", img.result)
 
+
+@post_cmd.got_path("img", "请发送需要收藏的壁画", image_fetch)
+async def handle_save_bihua(user: UserSession, name: str, img: bytes):
     try:
-        # 下载图片数据
-        import httpx
-
-        async with httpx.AsyncClient() as client:
-            response = await client.get(image.url)
-            image_data = response.content
-
         # 保存壁画
-        await bihua_service.add_bihua(uid=user.user_id, group_id=user.session_id, name=name, image_data=image_data)
+        await bihua_service.add_bihua(uid=user.user_id, group_id=user.session_id, name=name, image_data=img)
         await post_cmd.finish(f"壁画 '{name}' 收藏成功！")
 
     except ValueError as e:
-        await post_cmd.finish(f"收藏失败：{e}")
-    except Exception as e:
         await post_cmd.finish(f"收藏失败：{e}")
 
 
@@ -106,7 +109,7 @@ bihua_cmd = on_alconna(
 
 @bihua_cmd.handle()
 async def _(user: UserSession, name: str):
-    bihua = await bihua_service.get_bihua_by_name(name, user.group_session_id)
+    bihua = await bihua_service.get_bihua_by_name(name, user.session_id)
     if not bihua:
         await bihua_cmd.finish(f"未找到壁画 '{name}'")
 
@@ -148,7 +151,7 @@ search_cmd = on_alconna(
 
 @search_cmd.handle()
 async def _(user: UserSession, keyword: str):
-    bihua_list = await bihua_service.search_bihua(keyword, user.group_session_id)
+    bihua_list = await bihua_service.search_bihua(keyword, user.session_id)
 
     if not bihua_list:
         await search_cmd.finish(f"未找到包含 '{keyword}' 的壁画")
@@ -178,7 +181,7 @@ list_cmd = on_alconna(
 
 @list_cmd.handle()
 async def _(user: UserSession):
-    bihua_list = await bihua_service.get_all_bihua(user.group_session_id)
+    bihua_list = await bihua_service.get_all_bihua(user.session_id)
 
     if not bihua_list:
         await list_cmd.finish("当前群组还没有收藏任何壁画")
@@ -234,7 +237,7 @@ count_cmd = on_alconna(
 
 @count_cmd.handle()
 async def _(user: UserSession):
-    count_data = await bihua_service.get_user_bihua_count(user.group_session_id)
+    count_data = await bihua_service.get_user_bihua_count(user.session_id)
 
     if not count_data:
         await count_cmd.finish("当前群组还没有收藏任何壁画")
