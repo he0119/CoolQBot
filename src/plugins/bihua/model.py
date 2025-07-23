@@ -1,7 +1,10 @@
 from datetime import datetime
+from pathlib import Path
 
 from nonebot_plugin_orm import Model
 from sqlalchemy.orm import Mapped, mapped_column
+
+from .utils import get_image_path
 
 
 class Bihua(Model):
@@ -12,6 +15,8 @@ class Bihua(Model):
     group_id: Mapped[str]  # 群组ID
     name: Mapped[str]  # 壁画名称
     image_hash: Mapped[str]  # 图片hash值，用于去重
-    image_url: Mapped[str | None]  # 图片URL（如果有）
-    image_data: Mapped[bytes | None]  # 图片数据（如果需要本地存储）
     created_at: Mapped[datetime] = mapped_column(default=datetime.now)  # 创建时间
+
+    def image_path(self) -> Path:
+        """获取壁画图片的本地存储路径"""
+        return get_image_path(self.group_id, self.image_hash)

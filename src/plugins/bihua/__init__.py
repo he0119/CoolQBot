@@ -16,6 +16,7 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
 require("nonebot_plugin_alconna")
+require("nonebot_plugin_localstore")
 from nonebot_plugin_alconna import (
     Alconna,
     Args,
@@ -79,9 +80,7 @@ async def _(user: UserSession, name: str, image: Image):
             image_data = response.content
 
         # 保存壁画
-        await bihua_service.add_bihua(
-            user_id=user.user.id, group_id=user.group_session_id, name=name, image_data=image_data, image_url=image.url
-        )
+        await bihua_service.add_bihua(uid=user.user_id, group_id=user.session_id, name=name, image_data=image_data)
         await post_cmd.finish(f"壁画 '{name}' 收藏成功！")
 
     except ValueError as e:
@@ -121,11 +120,13 @@ async def _(user: UserSession, name: str):
     msg += f"收藏时间：{bihua.created_at:%Y-%m-%d %H:%M}\n"
 
     # 发送图片
-    if bihua.image_url:
-        msg += Image(url=bihua.image_url)
-    elif bihua.image_data:
-        # 如果有本地数据，直接发送
-        msg += Image(raw=bihua.image_data)
+    image_path = bihua.image_path()
+    if image_path.exists():
+        with open(image_path, "rb") as f:
+            image_data = f.read()
+        msg += Image(raw=image_data)
+    else:
+        msg += "图片文件不存在"
 
     await bihua_cmd.finish(msg)
 
@@ -197,10 +198,11 @@ delete_cmd = on_alconna(
         "bihua_delete",
         Args["name", str],
         meta=CommandMeta(
-            description="删除壁画（只能删除自己收藏的）",
+            description="删除壁画（仅管理员）",
             example="删除壁画\n/bihua_delete 我从来不说壁画",
         ),
     ),
+    permission=admin_permission(),
     use_cmd_start=True,
     block=True,
 )
@@ -209,7 +211,7 @@ delete_cmd = on_alconna(
 @delete_cmd.handle()
 async def _(user: UserSession, name: str):
     try:
-        await bihua_service.delete_bihua(name, user.group_session_id, user.user.id)
+        await bihua_service.delete_bihua(name, user.session_id)
         await delete_cmd.finish(f"壁画 '{name}' 删除成功！")
     except ValueError as e:
         await delete_cmd.finish(f"删除失败：{e}")

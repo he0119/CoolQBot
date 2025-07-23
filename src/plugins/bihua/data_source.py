@@ -5,14 +5,13 @@ from nonebot_plugin_orm import get_session
 from sqlalchemy import func, select
 
 from .model import Bihua
+from .utils import get_image_path
 
 
 class BihuaService:
     """壁画服务类"""
 
-    async def add_bihua(
-        self, user_id: int, group_id: str, name: str, image_data: bytes, image_url: str | None = None
-    ) -> None:
+    async def add_bihua(self, uid: int, group_id: str, name: str, image_data: bytes) -> None:
         """添加壁画"""
         # 计算图片hash值
         image_hash = hashlib.md5(image_data).hexdigest()
@@ -26,13 +25,17 @@ class BihuaService:
             if existing_bihua is not None:
                 raise ValueError("相同的壁画已经存在")
 
+            image_path = get_image_path(group_id, image_hash)
+
+            # 保存图片到本地
+            with open(image_path, "wb") as f:
+                f.write(image_data)
+
             bihua = Bihua(
-                user_id=user_id,
+                user_id=uid,
                 group_id=group_id,
                 name=name,
                 image_hash=image_hash,
-                image_url=image_url,
-                image_data=image_data,
             )
             session.add(bihua)
             await session.commit()
@@ -58,15 +61,20 @@ class BihuaService:
             results = await session.scalars(statement)
             return results.all()
 
-    async def delete_bihua(self, name: str, group_id: str, user_id: int) -> None:
-        """删除壁画（只能删除自己收藏的）"""
+    async def delete_bihua(self, name: str, group_id: str) -> None:
+        """删除壁画"""
         async with get_session() as session:
-            statement = select(Bihua).where(Bihua.name == name, Bihua.group_id == group_id, Bihua.user_id == user_id)
+            statement = select(Bihua).where(Bihua.name == name, Bihua.group_id == group_id)
             results = await session.scalars(statement)
             bihua = results.first()
 
             if bihua is None:
-                raise ValueError("壁画不存在或不是你收藏的")
+                raise ValueError("壁画不存在")
+
+            # 删除本地文件
+            image_path = bihua.image_path()
+            if image_path.exists():
+                image_path.unlink()
 
             await session.delete(bihua)
             await session.commit()
