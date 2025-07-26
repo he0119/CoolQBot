@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 @pytest.fixture
 async def app(app: App, tmp_path: Path, mocker: MockerFixture):
     """清理壁画数据"""
-    mocker.patch("src.plugins.bihua.utils.DATA_DIR", return_value=tmp_path / "data" / "bihua")
+    mocker.patch("src.plugins.bihua.utils.DATA_DIR", tmp_path / "data" / "bihua")
 
     yield app
 

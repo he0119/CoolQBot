@@ -1,5 +1,5 @@
 from nonebot import get_adapter
-from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Message, MessageSegment
 from nonebug import App
 
 from tests.fake import fake_group_message_event_v11
@@ -19,7 +19,7 @@ async def test_bihua(app: App):
 
         event = fake_group_message_event_v11(message=Message("/壁画 名字"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "未找到壁画 '不存在的壁画'", True)
+        ctx.should_call_send(event, Message(MessageSegment.image(FAKE_IMAGE)))
         ctx.should_finished(bihua_cmd)
 
 
