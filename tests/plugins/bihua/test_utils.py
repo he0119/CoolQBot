@@ -14,7 +14,7 @@ async def test_get_image_path(app: App):
 
     assert isinstance(path, Path)
     assert path.name == "abc123"
-    assert "test_group" in str(path)
+    assert path.parent.name == "test_group"
 
 
 async def test_get_image_path_with_different_params(app: App):
