@@ -1,0 +1,211 @@
+"""壁画插件
+
+支持收藏和查看壁画
+还支持搜索壁画
+
+收藏时应该通过回复图片来收藏 比如 /post 我从来不说壁画
+查看壁画时可以通过 /bihua 我从来不说壁画，这个时候会发送我之前收藏的对应图片
+搜索壁画时可以通过 /bihua_search 关键词 来搜索壁画，返回相关壁画的名称列表
+
+同时收藏壁画时，应该记录壁画的 hash 值，避免重复收藏同一张壁画。还应该记录谁收藏的壁画，还有创建时间，方便后续管理和查询
+"""
+
+from nonebot import require
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+
+require("nonebot_plugin_orm")
+require("nonebot_plugin_user")
+require("nonebot_plugin_alconna")
+require("nonebot_plugin_localstore")
+from nonebot_plugin_alconna import (
+    Alconna,
+    AlconnaMatch,
+    AlconnaMatcher,
+    Args,
+    CommandMeta,
+    Image,
+    Match,
+    Option,
+    UniMessage,
+    image_fetch,
+    on_alconna,
+    store_true,
+)
+from nonebot_plugin_alconna.builtins.extensions.reply import ReplyMergeExtension
+from nonebot_plugin_user import UserSession, get_user_by_id
+
+from src.utils.helpers import admin_permission
+
+from .data_source import BihuaService
+
+__plugin_meta__ = PluginMetadata(
+    name="壁画收藏",
+    description="收藏、查看和搜索壁画",
+    usage="""收藏壁画（回复图片）
+/收藏壁画 壁画名称
+查看壁画
+/壁画 壁画名称
+搜索壁画
+/搜索壁画 关键词
+删除壁画
+/删除壁画 壁画名称""",
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
+)
+
+bihua_service = BihuaService()
+
+# 收藏壁画命令
+post_cmd = on_alconna(
+    Alconna(
+        "收藏壁画",
+        Args["name#名称", str]["img?#图片", Image],
+        meta=CommandMeta(
+            description="收藏壁画",
+            example="发送图片和命令\n回复图片并发送 /收藏壁画 我从来不说壁画",
+        ),
+    ),
+    use_cmd_start=True,
+    block=True,
+    extensions=[ReplyMergeExtension()],
+    aliases={"post"},
+)
+
+
+@post_cmd.handle()
+async def _(
+    matcher: AlconnaMatcher,
+    img: Match[bytes] = AlconnaMatch("img", image_fetch),
+):
+    if img.available:
+        matcher.set_path_arg("img", img.result)
+
+
+@post_cmd.got_path("img", "请发送需要收藏的壁画", image_fetch)
+async def handle_save_bihua(user: UserSession, name: str, img: bytes):
+    try:
+        # 保存壁画
+        await bihua_service.add_bihua(user_id=user.user_id, session_id=user.session_id, name=name, image_data=img)
+        await post_cmd.finish(f"壁画 '{name}' 收藏成功！")
+
+    except ValueError as e:
+        await post_cmd.finish(f"收藏失败：{e}")
+
+
+# 查看壁画命令
+bihua_cmd = on_alconna(
+    Alconna(
+        "壁画",
+        Args["name", str],
+        Option(
+            "-v|--verbose",
+            default=False,
+            action=store_true,
+            help_text="显示壁画详细信息",
+        ),
+        Option(
+            "-e|--exact",
+            default=False,
+            action=store_true,
+            help_text="精确匹配壁画名称",
+        ),
+        meta=CommandMeta(
+            description="查看壁画",
+            example="查看壁画\n/壁画 我从来不说壁画",
+        ),
+    ),
+    use_cmd_start=True,
+    block=True,
+    aliases={"bihua"},
+)
+
+
+@bihua_cmd.handle()
+async def _(user: UserSession, name: str, verbose: bool = False, exact: bool = False):
+    """查看壁画"""
+    if exact:
+        bihua = await bihua_service.get_bihua_by_name(name, user.session_id)
+    else:
+        bihua_list = await bihua_service.search_bihua(name, user.session_id)
+        if not bihua_list:
+            await bihua_cmd.finish(f"未找到壁画 '{name}'")
+        # 取第一个匹配的壁画
+        bihua = bihua_list[0]
+
+    if not bihua:
+        await bihua_cmd.finish(f"未找到壁画 '{name}'")
+
+    # 构建响应消息
+    msg = UniMessage()
+    if verbose:
+        # 获取收藏者信息
+        collector = await get_user_by_id(bihua.user_id)
+        msg += f"壁画：{bihua.name}\n"
+        msg += f"收藏者：{collector.name}\n"
+        msg += f"收藏时间：{bihua.created_at:%Y-%m-%d %H:%M}\n"
+
+    # 发送图片
+    image_path = bihua.image_path()
+    if image_path.exists():
+        with open(image_path, "rb") as f:
+            image_data = f.read()
+        msg += Image(raw=image_data)
+    else:
+        msg += "图片文件不存在"
+
+    await bihua_cmd.finish(msg)
+
+
+# 搜索壁画命令
+search_bihua_cmd = on_alconna(
+    Alconna(
+        "搜索壁画",
+        Args["keyword", str],
+        meta=CommandMeta(
+            description="搜索壁画",
+            example="搜索壁画\n/搜索壁画 关键词",
+        ),
+    ),
+    use_cmd_start=True,
+    block=True,
+)
+
+
+@search_bihua_cmd.handle()
+async def _(user: UserSession, keyword: str):
+    bihua_list = await bihua_service.search_bihua(keyword, user.session_id)
+
+    if not bihua_list:
+        await search_bihua_cmd.finish(f"未找到包含 '{keyword}' 的壁画")
+
+    # 构建结果列表
+    result_lines = [f"搜索到 {len(bihua_list)} 个相关壁画："]
+    for bihua in bihua_list:
+        collector = await get_user_by_id(bihua.user_id)
+        result_lines.append(f"• {bihua.name} (收藏者: {collector.name})")
+
+    await search_bihua_cmd.finish("\n".join(result_lines))
+
+
+# 删除壁画命令
+delete_bihua_cmd = on_alconna(
+    Alconna(
+        "删除壁画",
+        Args["name", str],
+        meta=CommandMeta(
+            description="删除壁画（仅管理员）",
+            example="删除壁画\n/删除壁画 我从来不说壁画",
+        ),
+    ),
+    permission=admin_permission(),
+    use_cmd_start=True,
+    block=True,
+)
+
+
+@delete_bihua_cmd.handle()
+async def _(user: UserSession, name: str):
+    try:
+        await bihua_service.delete_bihua(name, user.session_id)
+        await delete_bihua_cmd.finish(f"壁画 '{name}' 删除成功！")
+    except ValueError as e:
+        await delete_bihua_cmd.finish(f"删除失败：{e}")
