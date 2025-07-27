@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加壁画插件
+
 ## [0.23.1] - 2025-06-06
 
 ### Fixed
