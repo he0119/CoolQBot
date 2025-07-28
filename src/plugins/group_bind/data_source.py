@@ -8,16 +8,21 @@ class GroupBindService:
     """群组绑定服务类"""
 
     async def bind_group(self, session_id: str, bind_id: str) -> None:
-        """将群组绑定到目标群组"""
+        """将群组绑定到目标群组，如果已绑定则更新绑定"""
         async with get_session() as session:
             # 检查该群组是否已经绑定到其他群组
             statement = select(GroupBind).where(GroupBind.session_id == session_id)
             existing = await session.scalars(statement)
-            if existing.first():
-                raise ValueError("该群组已经绑定到其他群组")
+            existing_bind = existing.first()
 
-            bind_entry = GroupBind(session_id=session_id, bind_id=bind_id)
-            session.add(bind_entry)
+            if existing_bind:
+                # 如果已经绑定，更新绑定的目标
+                existing_bind.bind_id = bind_id
+            else:
+                # 如果没有绑定，创建新的绑定
+                bind_entry = GroupBind(session_id=session_id, bind_id=bind_id)
+                session.add(bind_entry)
+
             await session.commit()
 
     async def unbind_group(self, session_id: str) -> None:

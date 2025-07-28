@@ -12,6 +12,7 @@
 
 from nonebot import require
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from nonebot.rule import Rule
 
 require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
@@ -34,7 +35,7 @@ from nonebot_plugin_alconna import (
 from nonebot_plugin_alconna.builtins.extensions.reply import ReplyMergeExtension
 from nonebot_plugin_user import UserSession, get_user_by_id
 
-from src.plugins.group_bind import SessionId
+from src.plugins.group_bind import SessionId, is_group
 from src.utils.helpers import admin_permission
 
 from .data_source import BihuaService
@@ -69,6 +70,7 @@ post_cmd = on_alconna(
     block=True,
     extensions=[ReplyMergeExtension()],
     aliases={"post"},
+    rule=Rule(is_group),
 )
 
 
@@ -117,6 +119,7 @@ bihua_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     aliases={"bihua"},
+    rule=Rule(is_group),
 )
 
 
@@ -168,6 +171,7 @@ search_bihua_cmd = on_alconna(
     ),
     use_cmd_start=True,
     block=True,
+    rule=Rule(is_group),
 )
 
 
@@ -200,6 +204,7 @@ delete_bihua_cmd = on_alconna(
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    rule=Rule(is_group),
 )
 
 

@@ -2,10 +2,12 @@
 
 from nonebot import require
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from nonebot.rule import Rule
 
 require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
 require("nonebot_plugin_alconna")
+require("nonebot_plugin_uninfo")
 
 from nonebot_plugin_alconna import (
     Alconna,
@@ -14,6 +16,7 @@ from nonebot_plugin_alconna import (
     CommandMeta,
     on_alconna,
 )
+from nonebot_plugin_uninfo import SceneType, Session, UniSession
 from nonebot_plugin_user import UserSession
 
 from src.utils.permission import SUPERUSER
@@ -26,8 +29,21 @@ __plugin_meta__ = PluginMetadata(
     description="将多个群组绑定在一起",
     usage="/绑定群组 <目标群组ID>\n/解绑群组\n/查看绑定",
     type="application",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_alconna",
+        "nonebot_plugin_user",
+        "nonebot_plugin_uninfo",
+    ),
 )
+
+
+async def is_group(session: Session = UniSession()) -> bool:
+    """确保在群组中使用"""
+    return session.scene.type in [
+        SceneType.GROUP,
+        SceneType.GUILD,
+        SceneType.CHANNEL_TEXT,
+    ]
 
 
 # 绑定群组命令
@@ -44,6 +60,7 @@ bind_group_cmd = on_alconna(
     permission=SUPERUSER,
     use_cmd_start=True,
     block=True,
+    rule=Rule(is_group),
 )
 
 
@@ -52,11 +69,19 @@ async def _(matcher: AlconnaMatcher, user: UserSession, target_group_id: str):
     """处理绑定群组命令"""
     current_session_id = user.session_id
 
-    try:
+    if current_session_id == target_group_id:
+        await matcher.finish("不能将当前群组绑定到自己！")
+
+    # 检查是否已经绑定
+    is_bound = await group_bind_service.is_group_bound(current_session_id)
+
+    if is_bound:
+        old_bind_id = await group_bind_service.get_bind_id(current_session_id)
         await group_bind_service.bind_group(current_session_id, target_group_id)
-        await matcher.finish(f"✅ 群组绑定成功！当前群组已绑定到群组 {target_group_id}")
-    except ValueError as e:
-        await matcher.finish(f"❌ 绑定失败：{e!s}")
+        await matcher.finish(f"群组绑定已更新！原绑定群组 {old_bind_id} → 新绑定群组 {target_group_id}")
+    else:
+        await group_bind_service.bind_group(current_session_id, target_group_id)
+        await matcher.finish(f"群组绑定成功！当前群组已绑定到群组 {target_group_id}")
 
 
 # 解绑群组命令
@@ -72,6 +97,7 @@ unbind_group_cmd = on_alconna(
     permission=SUPERUSER,
     use_cmd_start=True,
     block=True,
+    rule=Rule(is_group),
 )
 
 
@@ -82,9 +108,9 @@ async def _(matcher: AlconnaMatcher, user: UserSession):
 
     try:
         await group_bind_service.unbind_group(current_session_id)
-        await matcher.finish("✅ 群组解绑成功！当前群组已从绑定中移除")
+        await matcher.finish("群组解绑成功！当前群组已从绑定中移除")
     except ValueError as e:
-        await matcher.finish(f"❌ 解绑失败：{e!s}")
+        await matcher.finish(f"解绑失败：{e!s}")
 
 
 # 查看绑定状态命令
@@ -100,6 +126,7 @@ check_bind_cmd = on_alconna(
     permission=SUPERUSER,
     use_cmd_start=True,
     block=True,
+    rule=Rule(is_group),
 )
 
 
@@ -112,22 +139,9 @@ async def _(matcher: AlconnaMatcher, user: UserSession):
     is_bound = await group_bind_service.is_group_bound(current_session_id)
 
     if not is_bound:
-        await matcher.finish("📝 当前群组未绑定到任何群组")
+        await matcher.finish("当前群组未绑定到任何群组")
 
     # 获取绑定的目标群组ID
     bind_id = await group_bind_service.get_bind_id(current_session_id)
 
-    # 获取所有绑定到同一目标的群组
-    bound_session_ids = await group_bind_service.get_bound_session_ids(current_session_id)
-
-    if bind_id == current_session_id:
-        # 当前群组是目标群组
-        other_groups = [sid for sid in bound_session_ids if sid != current_session_id]
-        if other_groups:
-            groups_text = "\n".join(f"  - {group_id}" for group_id in other_groups)
-            await matcher.finish(f"📝 当前群组是绑定目标群组\n\n以下群组绑定到此群组：\n{groups_text}")
-        else:
-            await matcher.finish("📝 当前群组是绑定目标群组，但没有其他群组绑定到此群组")
-    else:
-        # 当前群组绑定到其他群组
-        await matcher.finish(f"📝 当前群组已绑定到群组: {bind_id}")
+    await matcher.finish(f"当前群组已绑定到群组: {bind_id}")
