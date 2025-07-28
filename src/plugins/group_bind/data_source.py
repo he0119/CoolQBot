@@ -80,3 +80,7 @@ class GroupBindService:
             statement = select(GroupBind).where(GroupBind.session_id == session_id)
             result = await session.scalars(statement)
             return result.first() is not None
+
+
+# 初始化群组绑定服务
+group_bind_service = GroupBindService()

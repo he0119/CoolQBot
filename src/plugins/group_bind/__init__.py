@@ -18,7 +18,8 @@ from nonebot_plugin_user import UserSession
 
 from src.utils.permission import SUPERUSER
 
-from .data_source import GroupBindService
+from .annotated import SessionId as SessionId
+from .data_source import group_bind_service
 
 __plugin_meta__ = PluginMetadata(
     name="群组绑定",
@@ -28,8 +29,6 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
-# 初始化群组绑定服务
-group_bind_service = GroupBindService()
 
 # 绑定群组命令
 bind_group_cmd = on_alconna(
