@@ -12,6 +12,7 @@
 
 from nonebot import require
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from nonebot.rule import Rule
 
 require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
@@ -34,6 +35,7 @@ from nonebot_plugin_alconna import (
 from nonebot_plugin_alconna.builtins.extensions.reply import ReplyMergeExtension
 from nonebot_plugin_user import UserSession, get_user_by_id
 
+from src.plugins.group_bind import SessionId, is_group
 from src.utils.helpers import admin_permission
 
 from .data_source import BihuaService
@@ -68,6 +70,7 @@ post_cmd = on_alconna(
     block=True,
     extensions=[ReplyMergeExtension()],
     aliases={"post"},
+    rule=Rule(is_group),
 )
 
 
@@ -81,10 +84,10 @@ async def _(
 
 
 @post_cmd.got_path("img", "请发送需要收藏的壁画", image_fetch)
-async def handle_save_bihua(user: UserSession, name: str, img: bytes):
+async def handle_save_bihua(user: UserSession, session_id: SessionId, name: str, img: bytes):
     try:
         # 保存壁画
-        await bihua_service.add_bihua(user_id=user.user_id, session_id=user.session_id, name=name, image_data=img)
+        await bihua_service.add_bihua(user_id=user.user_id, session_id=session_id, name=name, image_data=img)
         await post_cmd.finish(f"壁画 '{name}' 收藏成功！")
 
     except ValueError as e:
@@ -116,16 +119,17 @@ bihua_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     aliases={"bihua"},
+    rule=Rule(is_group),
 )
 
 
 @bihua_cmd.handle()
-async def _(user: UserSession, name: str, verbose: bool = False, exact: bool = False):
+async def _(session_id: SessionId, name: str, verbose: bool = False, exact: bool = False):
     """查看壁画"""
     if exact:
-        bihua = await bihua_service.get_bihua_by_name(name, user.session_id)
+        bihua = await bihua_service.get_bihua_by_name(name, session_id)
     else:
-        bihua_list = await bihua_service.search_bihua(name, user.session_id)
+        bihua_list = await bihua_service.search_bihua(name, session_id)
         if not bihua_list:
             await bihua_cmd.finish(f"未找到壁画 '{name}'")
         # 取第一个匹配的壁画
@@ -167,12 +171,13 @@ search_bihua_cmd = on_alconna(
     ),
     use_cmd_start=True,
     block=True,
+    rule=Rule(is_group),
 )
 
 
 @search_bihua_cmd.handle()
-async def _(user: UserSession, keyword: str):
-    bihua_list = await bihua_service.search_bihua(keyword, user.session_id)
+async def _(session_id: SessionId, keyword: str):
+    bihua_list = await bihua_service.search_bihua(keyword, session_id)
 
     if not bihua_list:
         await search_bihua_cmd.finish(f"未找到包含 '{keyword}' 的壁画")
@@ -199,13 +204,14 @@ delete_bihua_cmd = on_alconna(
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    rule=Rule(is_group),
 )
 
 
 @delete_bihua_cmd.handle()
-async def _(user: UserSession, name: str):
+async def _(session_id: SessionId, name: str):
     try:
-        await bihua_service.delete_bihua(name, user.session_id)
+        await bihua_service.delete_bihua(name, session_id)
         await delete_bihua_cmd.finish(f"壁画 '{name}' 删除成功！")
     except ValueError as e:
         await delete_bihua_cmd.finish(f"删除失败：{e}")
