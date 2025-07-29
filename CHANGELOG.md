@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.24.1] - 2025-07-29
+
+### Fixed
+
+- 将复读插件的配置项添加到 .env 中
+
 ## [0.24.0] - 2025-07-29
 
 ### Added
@@ -654,7 +660,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.24.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.24.1...HEAD
+[0.24.1]: https://github.com/he0119/CoolQBot/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/he0119/CoolQBot/compare/v0.23.1...v0.24.0
 [0.23.1]: https://github.com/he0119/CoolQBot/compare/v0.23.0...v0.23.1
 [0.23.0]: https://github.com/he0119/CoolQBot/compare/v0.22.1...v0.23.0
