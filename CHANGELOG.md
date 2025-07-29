@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Added
 
 - 添加壁画插件
+- 添加群组绑定插件
 - 复读插件支持排除指定用户
 
 ## [0.23.1] - 2025-06-06
