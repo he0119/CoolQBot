@@ -159,3 +159,8 @@ filename = "CHANGELOG.md"
 regex = true
 search = "\\[Unreleased\\]: (https://.+?)v{current_version}\\.\\.\\.HEAD"
 replace = "[Unreleased]: \\1v{new_version}...HEAD\n[{new_version}]: \\1v{current_version}...v{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "uv.lock"
+search = "name = \"coolqbot\"\nversion = \"{current_version}\""
+replace = "name = \"coolqbot\"\nversion = \"{new_version}\""
