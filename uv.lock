@@ -562,19 +562,19 @@ requires-dist = [
     { name = "nonebot-adapter-dodo", specifier = ">=0.2.1" },
     { name = "nonebot-adapter-kaiheila", specifier = ">=0.3.4" },
     { name = "nonebot-adapter-onebot", specifier = ">=2.4.6" },
-    { name = "nonebot-adapter-qq", specifier = ">=1.6.4" },
+    { name = "nonebot-adapter-qq", specifier = ">=1.6.5" },
     { name = "nonebot-adapter-red", specifier = ">=0.9.0" },
-    { name = "nonebot-adapter-satori", specifier = ">=0.13.6" },
+    { name = "nonebot-adapter-satori", specifier = ">=0.13.7" },
     { name = "nonebot-adapter-telegram", specifier = ">=0.1.0b20" },
     { name = "nonebot-bison", specifier = "==0.9.8" },
-    { name = "nonebot-plugin-alconna", specifier = ">=0.58.5" },
+    { name = "nonebot-plugin-alconna", specifier = ">=0.59.1" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-bawiki", specifier = "==0.11.3" },
     { name = "nonebot-plugin-datastore", specifier = ">=1.3.0" },
-    { name = "nonebot-plugin-deepseek", specifier = "==0.1.9" },
+    { name = "nonebot-plugin-deepseek", specifier = "==0.1.10" },
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4" },
     { name = "nonebot-plugin-memes", specifier = "==0.8.1" },
-    { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.8.1" },
+    { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.8.2" },
     { name = "nonebot-plugin-prometheus", specifier = "==0.3.16" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
     { name = "nonebot-plugin-sentry", specifier = ">=2.0.0" },
@@ -1395,7 +1395,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-adapter-qq"
-version = "1.6.4"
+version = "1.6.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
@@ -1404,9 +1404,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/85/76/8916c26e1145575c1d3bfcefbb69280c0003b107156930b0d35729d63a23/nonebot_adapter_qq-1.6.4.tar.gz", hash = "sha256:c089373a13f6b583f1f8ee5a5354d5982e1bfe080f34153aab6902abb02ecfac", size = 30818, upload-time = "2025-06-02T07:43:03.407Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/af/b7/0dffd52104ffbf3b5ba1ad3d7fe2b138330bb6d32d350e0812706b440784/nonebot_adapter_qq-1.6.5.tar.gz", hash = "sha256:4ac48d6a36c9c7c09237dc9e7de022bda6c04a0bf5f37a72ef4a993d6398c29a", size = 31945, upload-time = "2025-07-26T04:17:03.563Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b7/07/7b885c80263a7da5ff773402d730e6d75119435512333ca2ef8cfa4d7cec/nonebot_adapter_qq-1.6.4-py3-none-any.whl", hash = "sha256:6b7648bcfbac738c7512ed7bd7dc53137b9addd1f55abd87217ba0ef17c19af2", size = 35155, upload-time = "2025-06-02T07:43:01.862Z" },
+    { url = "https://files.pythonhosted.org/packages/04/ab/1cb85473a9aeeaa0dd554d044cda853bf6536a8fee19ac478c8109e199e7/nonebot_adapter_qq-1.6.5-py3-none-any.whl", hash = "sha256:169ff7f270deb02de7e14296ccd8e32409f502b17da4eabf5871fb2c272f2d6e", size = 36414, upload-time = "2025-07-26T04:17:01.824Z" },
 ]
 
 [[package]]
@@ -1424,14 +1424,14 @@ wheels = [
 
 [[package]]
 name = "nonebot-adapter-satori"
-version = "0.13.6"
+version = "0.13.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7a/14/5a4411ca99f47071589a0df3b9c7998818f9fce7ef9109ca5e7f9d996daa/nonebot_adapter_satori-0.13.6.tar.gz", hash = "sha256:8e0a6ca4b9499a8e54740f8e6c427ec4a619f50290c50e130ee45276b1b60036", size = 29937, upload-time = "2025-04-27T09:46:07.795Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/76/7b/6484a4aae9a3c5943071910553466780344f1d5d07c3fb882eb20a1a0a6c/nonebot_adapter_satori-0.13.7.tar.gz", hash = "sha256:f2745629866581b195a0f8773783ce30f7815da25c449b151870fc161c9785be", size = 29991, upload-time = "2025-07-25T13:24:06.193Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/35/01/d57c3c2559f74ae5da87c61ca393c201ce0a7ff6b4b92fac4b1bdd346a03/nonebot_adapter_satori-0.13.6-py3-none-any.whl", hash = "sha256:2c13aa10cd314a656fbad142c5171cb685491fe86a60689850b39c7624e7f096", size = 28655, upload-time = "2025-04-27T09:46:06.344Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/2e/2af8aadcd13f1f08dbd05cc4d50e855e76a98b7da6f24c930496a0f7993d/nonebot_adapter_satori-0.13.7-py3-none-any.whl", hash = "sha256:040ace10b6243ed32b5d075b21ab45cae00beeeaeb3525bef33d4e0fcf230d9f", size = 28733, upload-time = "2025-07-25T13:24:05.016Z" },
 ]
 
 [[package]]
@@ -1482,7 +1482,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-alconna"
-version = "0.58.5"
+version = "0.59.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "arclet-alconna" },
@@ -1493,9 +1493,9 @@ dependencies = [
     { name = "nonebot2" },
     { name = "tarina" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/30/07/079d7156c8a73568191db7e176e5c4c44f69a117ea2e093549d37be33a96/nonebot_plugin_alconna-0.58.5.tar.gz", hash = "sha256:dc43e1d626c6e5d63993858a62cc5ace7b74a6163f9877dab5fdb07d95bf3159", size = 152967, upload-time = "2025-06-19T09:19:35.758Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b8/60/c667dec37ecc3d5462ed41cca08d96ae76ac51cffbc02d041fa7b88adc77/nonebot_plugin_alconna-0.59.1.tar.gz", hash = "sha256:2f45d0fe5133d5484e6d575ae80d39d5e646d5b01c21b9a2e07093ad4c337e4a", size = 152458, upload-time = "2025-07-25T15:25:45.153Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ae/6d/443b4300e9daad5df61373045dbfb0846845fb196201b97690f2147098dd/nonebot_plugin_alconna-0.58.5-py3-none-any.whl", hash = "sha256:92a3718ab1e61de0a8ad8cd7fdca1b77acb35793da208091196e563822f3c148", size = 210926, upload-time = "2025-06-19T09:19:34.349Z" },
+    { url = "https://files.pythonhosted.org/packages/aa/aa/a2c254746e0a5302a86c15cd20c33f55b64e2cea1a59a5ed2dd3b4cda801/nonebot_plugin_alconna-0.59.1-py3-none-any.whl", hash = "sha256:08648607fc70b49fd4279fe006736f3de0a32f71ef21a166332c70c6a1080beb", size = 209818, upload-time = "2025-07-25T15:25:43.617Z" },
 ]
 
 [[package]]
@@ -1582,7 +1582,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-deepseek"
-version = "0.1.9"
+version = "0.1.10"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1592,9 +1592,9 @@ dependencies = [
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d6/ab/df8e418eaff7eaa802abb4002b7847babb5ef8a418ec17564363b28b33cc/nonebot_plugin_deepseek-0.1.9.tar.gz", hash = "sha256:62f6ca1342060d1f11bd1e59aca718f929d23637990110c1fc92cf7291696768", size = 29113, upload-time = "2025-02-22T14:58:17.541Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1b/81/1cbe1b8cbd1f8b3370607967ef508bf04a93800af6ae422ae27c4042d14c/nonebot_plugin_deepseek-0.1.10.tar.gz", hash = "sha256:8040a41925e46216561bee71bf853f19ad258c6ce39459ab9d6b0cce7bbf0932", size = 31379, upload-time = "2025-07-08T15:09:38.627Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8a/fc/ac6ac4af1ccee54d375f9e57e00d936eb128f3e64011fc604a6581eb8105/nonebot_plugin_deepseek-0.1.9-py3-none-any.whl", hash = "sha256:49071059696856dae256610ada42ab074d4036ed7ba4bd512ad4b23e6373269e", size = 32565, upload-time = "2025-02-22T14:58:16.572Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/b8/6319e4f4196280b5060561ff54209accf3c3b5f8b57ec49df63536efc6d1/nonebot_plugin_deepseek-0.1.10-py3-none-any.whl", hash = "sha256:a651e2f69c1753d519392a55206af3ca757075c813aa2375e5180249a15a0377", size = 35163, upload-time = "2025-07-08T15:09:37.511Z" },
 ]
 
 [[package]]
@@ -1666,7 +1666,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-orm"
-version = "0.8.1"
+version = "0.8.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "alembic" },
@@ -1676,9 +1676,9 @@ dependencies = [
     { name = "sqlalchemy" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1e/bd/dc2ba64d4b7462d6e749b06d944e3b3af93a7faaddc33446ff7e51e4f6ed/nonebot_plugin_orm-0.8.1.tar.gz", hash = "sha256:5c90c84ce7ebd8da5244b72ede85d3c4f08e94190526066c8955fd94bde6ffdf", size = 26179, upload-time = "2025-06-03T18:45:20.396Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d4/01/cd8d2928499d2a5a814d76865fd4a7f6236781e65d288de27ba86647c051/nonebot_plugin_orm-0.8.2.tar.gz", hash = "sha256:faa9c9d1e957518f93e513914846e9c69d501cf8b0fc3dcf9489aafd9a5c935a", size = 26309, upload-time = "2025-07-12T17:13:46.527Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/72/dd/4c731367ed0d91b62034cc634aced675ce0a59d8034434090e07c1cf3dec/nonebot_plugin_orm-0.8.1-py3-none-any.whl", hash = "sha256:ac10a48b8c8ef90d4506acd6f5f46c02cf9ab76935856532ba15ab9c00684cd7", size = 31547, upload-time = "2025-06-03T18:45:19.034Z" },
+    { url = "https://files.pythonhosted.org/packages/06/67/04baee1f96a158e1b4c9e40e666ab38891faa894c35c29008f75d246460e/nonebot_plugin_orm-0.8.2-py3-none-any.whl", hash = "sha256:be870742127714e7d54f1510f017027b82a5e0bf267e2cd239cac8fa471b1f5b", size = 31744, upload-time = "2025-07-12T17:13:44.522Z" },
 ]
 
 [package.optional-dependencies]
