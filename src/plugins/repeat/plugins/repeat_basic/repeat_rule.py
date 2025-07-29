@@ -5,14 +5,19 @@ from datetime import datetime, timedelta
 
 from nonebot.adapters import Event
 from nonebot.log import logger
+from nonebot_plugin_user import UserSession
 
 from src.plugins.repeat import plugin_config
 from src.plugins.repeat.recorder import Recorder
 from src.utils.annotated import GroupInfo
 
 
-async def need_repeat(event: Event, group_info: GroupInfo) -> bool:
+async def need_repeat(event: Event, group_info: GroupInfo, user: UserSession) -> bool:
     """是否复读这个消息"""
+    # 不复读配置中排除的用户
+    if user.user_name in plugin_config.repeat_excluded_users or user.user_id in plugin_config.repeat_excluded_users:
+        return False
+
     # 不复读对机器人说的，因为这个应该由闲聊插件处理
     if event.is_tome():
         return False

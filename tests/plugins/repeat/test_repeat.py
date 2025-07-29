@@ -118,3 +118,22 @@ async def test_repeat_disable_already_disabled(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已在本群关闭复读功能", None)
         ctx.should_finished(repeat_cmd)
+
+
+async def test_repeat_excluded_user(app: App, mocker: MockerFixture):
+    """测试排除用户不会被复读"""
+    from src.plugins.repeat import plugin_config
+    from src.plugins.repeat.plugins.repeat_basic import repeat_message
+
+    # Mock 配置，添加排除的用户名
+    mocker.patch.object(plugin_config, "repeat_excluded_users", ["nickname"])
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+
+        # 创建一个来自被排除用户的消息事件
+        event = fake_group_message_event_v11(message=Message("123"))
+        ctx.receive_event(bot, event)
+        # 不应该触发复读
+        ctx.should_not_pass_rule(repeat_message)

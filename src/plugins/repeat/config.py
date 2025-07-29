@@ -13,6 +13,12 @@ class Config(BaseModel):
     repeat_migration_group_id: int | None = None
     """ 旧数据迁移的群号 """
 
+    repeat_excluded_users: list[str | int] = []
+    """ 排除复读的用户列表
+
+    支持用户名或用户 ID
+    """
+
 
 global_config = get_driver().config
 plugin_config = get_plugin_config(Config)
