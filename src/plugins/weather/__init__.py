@@ -5,6 +5,8 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
 require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, MultiVar, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
 from .eorzean_api import eorzean_weather
 from .heweather_api import heweather
@@ -27,17 +29,18 @@ __plugin_meta__ = PluginMetadata(
 
 weather_cmd = on_alconna(
     Alconna(
-        "天气",
-        Args["location?#位置", MultiVar(str, flag="*")],
+        "weather",
+        Args["location?#位置", MultiVar(str, flag="+")],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"weather"},
     use_cmd_start=True,
     block=True,
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
+weather_cmd.shortcut("天气$", prefix=True)
 
 
 @weather_cmd.handle()

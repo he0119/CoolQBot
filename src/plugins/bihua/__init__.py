@@ -32,7 +32,9 @@ from nonebot_plugin_alconna import (
     on_alconna,
     store_true,
 )
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
 from nonebot_plugin_alconna.builtins.extensions.reply import ReplyMergeExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_user import UserSession, get_user_by_id
 
 from src.plugins.group_bind import SessionId, is_group
@@ -59,7 +61,7 @@ bihua_service = BihuaService()
 # 收藏壁画命令
 post_cmd = on_alconna(
     Alconna(
-        "收藏壁画",
+        "post",
         Args["name#名称", str]["img?#图片", Image],
         meta=CommandMeta(
             description="收藏壁画",
@@ -68,10 +70,11 @@ post_cmd = on_alconna(
     ),
     use_cmd_start=True,
     block=True,
-    extensions=[ReplyMergeExtension()],
-    aliases={"post"},
+    extensions=[ReplyMergeExtension(), TelegramSlashExtension(), DiscordSlashExtension()],
     rule=Rule(is_group),
 )
+post_cmd.shortcut("收藏壁画$", prefix=True)
+post_cmd.shortcut("壁画收藏$", prefix=True)
 
 
 @post_cmd.handle()
@@ -97,7 +100,7 @@ async def handle_save_bihua(user: UserSession, session_id: SessionId, name: str,
 # 查看壁画命令
 bihua_cmd = on_alconna(
     Alconna(
-        "壁画",
+        "bihua",
         Args["name", str],
         Option(
             "-v|--verbose",
@@ -118,8 +121,9 @@ bihua_cmd = on_alconna(
     ),
     use_cmd_start=True,
     block=True,
-    aliases={"bihua"},
+    aliases={"壁画"},
     rule=Rule(is_group),
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 
@@ -172,6 +176,7 @@ search_bihua_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 
@@ -205,6 +210,7 @@ delete_bihua_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 

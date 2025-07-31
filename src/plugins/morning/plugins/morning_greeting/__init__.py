@@ -5,6 +5,8 @@ from nonebot.log import logger
 from nonebot.params import Depends
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_orm import get_session
 from nonebot_plugin_saa import PlatformTarget, Text, get_target
@@ -75,6 +77,7 @@ morning_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     permission=admin_permission(),
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 

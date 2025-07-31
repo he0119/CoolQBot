@@ -2,6 +2,8 @@
 
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, CommandMeta, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
 from .data_source import get_latest_nuannuan
 
@@ -24,6 +26,7 @@ nuannuan_cmd = on_alconna(
     aliases={"nuannuan"},
     use_cmd_start=True,
     block=True,
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 

@@ -16,6 +16,8 @@ from nonebot_plugin_alconna import (
     CommandMeta,
     on_alconna,
 )
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_uninfo import SceneType, Session, UniSession
 from nonebot_plugin_user import UserSession
 
@@ -61,6 +63,7 @@ bind_group_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 
@@ -98,6 +101,7 @@ unbind_group_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 
@@ -127,6 +131,7 @@ check_bind_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 

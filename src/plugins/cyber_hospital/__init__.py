@@ -11,6 +11,8 @@ require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
 require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import Alconna, AlconnaMatcher, Args, At, CommandMeta, Text, UniMessage, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_user import User, UserSession, get_user, get_user_by_id
 
 from src.utils.helpers import admin_permission
@@ -52,6 +54,7 @@ rounds_cmd = on_alconna(
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 
@@ -132,6 +135,7 @@ admit_cmd = on_alconna(
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 
@@ -160,6 +164,7 @@ discharge_cmd = on_alconna(
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 
@@ -188,6 +193,7 @@ record_cmd = on_alconna(
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 
@@ -220,6 +226,7 @@ history_cmd = on_alconna(
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 

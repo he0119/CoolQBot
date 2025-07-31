@@ -1,5 +1,7 @@
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_user import UserSession
 from sqlalchemy import select
 
@@ -32,6 +34,7 @@ target_body_fat_cmd = on_alconna(
     aliases={"check_in.body_fat"},
     use_cmd_start=True,
     block=True,
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 
@@ -82,6 +85,7 @@ body_fat_record_cmd = on_alconna(
     aliases={"记录体脂", "check_in.body_record"},
     use_cmd_start=True,
     block=True,
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 

@@ -6,6 +6,8 @@ from nonebot.plugin import PluginMetadata
 
 require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
 from src.utils.helpers import render_expression
 
@@ -42,6 +44,7 @@ music_cmd = on_alconna(
     aliases={"music"},
     use_cmd_start=True,
     block=True,
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 

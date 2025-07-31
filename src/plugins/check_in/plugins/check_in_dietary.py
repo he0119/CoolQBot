@@ -1,5 +1,7 @@
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_user import UserSession
 
 from src.plugins.check_in.models import DietaryRecord
@@ -26,6 +28,7 @@ dietary_cmd = on_alconna(
     aliases={("check_in.dietary")},
     use_cmd_start=True,
     block=True,
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 
