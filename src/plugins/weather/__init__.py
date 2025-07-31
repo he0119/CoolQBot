@@ -36,11 +36,14 @@ weather_cmd = on_alconna(
             example=__plugin_meta__.usage,
         ),
     ),
+    aliases={"天气"},
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh_CN": "天气"}),
+    ],
 )
-weather_cmd.shortcut("天气$", prefix=True)
 
 
 @weather_cmd.handle()

@@ -30,17 +30,20 @@ __plugin_meta__ = PluginMetadata(
 
 history_cmd = on_alconna(
     Alconna(
-        "打卡历史",
+        "check_in_history",
         Args["type?#历史类型", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={("check_in.history")},
+    aliases={"打卡历史"},
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh_CN": "打卡历史"}),
+    ],
 )
 
 

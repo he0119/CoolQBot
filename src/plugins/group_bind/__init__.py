@@ -51,7 +51,7 @@ async def is_group(session: Session = UniSession()) -> bool:
 # 绑定群组命令
 bind_group_cmd = on_alconna(
     Alconna(
-        "绑定群组",
+        "bind_group",
         Args["target_group_id", str],
         meta=CommandMeta(
             description="将当前群组绑定到目标群组",
@@ -59,11 +59,15 @@ bind_group_cmd = on_alconna(
             example="/绑定群组 123456789",
         ),
     ),
+    aliases={"绑定群组"},
     permission=SUPERUSER,
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh_CN": "绑定群组"}),
+    ],
 )
 
 
@@ -90,18 +94,19 @@ async def _(matcher: AlconnaMatcher, user: UserSession, target_group_id: str):
 # 解绑群组命令
 unbind_group_cmd = on_alconna(
     Alconna(
-        "解绑群组",
+        "unbind-group",
         meta=CommandMeta(
             description="将当前群组从绑定中移除",
             usage="解绑群组",
             example="/解绑群组",
         ),
     ),
+    aliases={"解绑群组"},
     permission=SUPERUSER,
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension(name_localizations={"zh_CN": "解绑群组"})],
 )
 
 
@@ -120,18 +125,19 @@ async def _(matcher: AlconnaMatcher, user: UserSession):
 # 查看绑定状态命令
 check_bind_cmd = on_alconna(
     Alconna(
-        "查看绑定",
+        "check-bind",
         meta=CommandMeta(
             description="查看当前群组的绑定状态",
             usage="查看绑定",
             example="/查看绑定",
         ),
     ),
+    aliases={"查看绑定"},
     permission=SUPERUSER,
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension(name_localizations={"zh_CN": "查看绑定"})],
 )
 
 

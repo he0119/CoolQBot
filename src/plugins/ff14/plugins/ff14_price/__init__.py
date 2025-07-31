@@ -28,17 +28,20 @@ plugin_data = get_plugin_data()
 
 price_cmd = on_alconna(
     Alconna(
-        "查价",
+        "price",
         Args["argv", MultiVar(str, flag="*")],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"price"},
+    aliases={"查价"},
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh_CN": "查价"}),
+    ],
 )
 
 

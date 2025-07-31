@@ -6,8 +6,6 @@ from nonebot.plugin import PluginMetadata
 
 require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
-from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
-from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
 from src.utils.helpers import render_expression
 
@@ -34,17 +32,16 @@ EXPR_NOT_FOUND = (
 
 music_cmd = on_alconna(
     Alconna(
-        "点歌",
+        "music",
         Args["keywords?#音乐名称或信息", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"music"},
+    aliases={"点歌"},
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
 )
 
 

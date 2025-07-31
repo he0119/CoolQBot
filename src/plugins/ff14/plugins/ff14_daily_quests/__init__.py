@@ -26,17 +26,20 @@ plugin_data = get_plugin_data()
 
 daily_quests_cmd = on_alconna(
     Alconna(
-        "每日委托",
+        "daily_quests",
         Args["quests?#委托（用逗号分隔）", MultiVar(str, "+")] / (",", "，"),
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"daily_quests"},
+    aliases={"每日委托"},
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh_CN": "每日委托"}),
+    ],
 )
 
 

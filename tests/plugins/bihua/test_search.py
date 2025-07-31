@@ -7,7 +7,7 @@ from tests.fake import fake_group_message_event_v11
 
 async def test_bihua_search_empty(app: App):
     """测试搜索壁画"""
-    from src.plugins.bihua import search_bihua_cmd
+    from src.plugins.bihua import bihua_search_cmd
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -17,4 +17,4 @@ async def test_bihua_search_empty(app: App):
         event = fake_group_message_event_v11(message=Message("/搜索壁画 不存在的关键词"), user_id=10, group_id=10000)
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "未找到包含 '不存在的关键词' 的壁画", True)
-        ctx.should_finished(search_bihua_cmd)
+        ctx.should_finished(bihua_search_cmd)

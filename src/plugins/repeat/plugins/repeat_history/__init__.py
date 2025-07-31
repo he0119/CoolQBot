@@ -25,14 +25,14 @@ __plugin_meta__ = PluginMetadata(
 
 history_cmd = on_alconna(
     Alconna(
-        "复读历史",
+        "history",
         Args["arg?#日期", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"repeat.history", "history"},
+    aliases={"复读历史"},
     use_cmd_start=True,
     block=True,
 )

@@ -18,17 +18,20 @@ __plugin_meta__ = PluginMetadata(
 
 fitness_cmd = on_alconna(
     Alconna(
-        "健身打卡",
+        "fitness_checkin",
         Args["content?#健身内容", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={("check_in.fitness")},
+    aliases={"健身打卡"},
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh_CN": "健身打卡"}),
+    ],
 )
 
 

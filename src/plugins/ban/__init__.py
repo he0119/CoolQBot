@@ -66,7 +66,7 @@ def get_ban_type(bot_role: str, sender_role: str) -> BanType:
 
 ban_cmd = on_alconna(
     Alconna(
-        "禁言",
+        "ban",
         Args["duration?#时长（分钟）", int],
         Args["group_id?#群号", int],
         meta=CommandMeta(
@@ -74,7 +74,7 @@ ban_cmd = on_alconna(
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"ban"},
+    aliases={"禁言"},
     use_cmd_start=True,
     block=True,
 )

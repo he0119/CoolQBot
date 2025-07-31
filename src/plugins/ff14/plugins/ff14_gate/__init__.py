@@ -27,9 +27,13 @@ gate_cmd = on_alconna(
             example=__plugin_meta__.usage,
         ),
     ),
+    aliases={"藏宝选门", "选门"},
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh_CN": "藏宝选门"}),
+    ],
 )
 
 

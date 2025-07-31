@@ -35,14 +35,14 @@ async def repeat_message_handle(event: Event):
 
 repeat_cmd = on_alconna(
     Alconna(
-        "复读",
+        "repeat",
         Args["arg?#是否启用复读", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"repeat.basic", "repeat"},
+    aliases={"复读"},
     use_cmd_start=True,
     block=True,
 )

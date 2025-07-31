@@ -66,18 +66,21 @@ async def morning():
 
 morning_cmd = on_alconna(
     Alconna(
-        "早安",
+        "morning",
         Args["arg?#功能选项（on/off/update/today）", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"morning"},
+    aliases={"早安"},
     use_cmd_start=True,
     block=True,
     permission=admin_permission(),
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh_CN": "早安"}),
+    ],
 )
 
 

@@ -18,17 +18,20 @@ __plugin_meta__ = PluginMetadata(
 
 dietary_cmd = on_alconna(
     Alconna(
-        "饮食打卡",
+        "dietary_checkin",
         Args["content?#A：健康饮食少油少糖 B：我摆了偷吃了炸鸡奶茶", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={("check_in.dietary")},
+    aliases={"饮食打卡"},
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh_CN": "饮食打卡"}),
+    ],
 )
 
 

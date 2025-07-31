@@ -30,7 +30,10 @@ roll_cmd = on_alconna(
     ),
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(),
+    ],
 )
 
 

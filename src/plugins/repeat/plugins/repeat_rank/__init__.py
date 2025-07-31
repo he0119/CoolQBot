@@ -28,14 +28,14 @@ __plugin_meta__ = PluginMetadata(
 
 rank_cmd = on_alconna(
     Alconna(
-        "复读排行榜",
+        "rank",
         Args["arg?#排行榜参数", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"repeat.rank", "rank"},
+    aliases={"复读排行榜"},
     use_cmd_start=True,
     block=True,
 )

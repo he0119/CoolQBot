@@ -17,16 +17,19 @@ __plugin_meta__ = PluginMetadata(
 
 nuannuan_cmd = on_alconna(
     Alconna(
-        "时尚品鉴",
+        "nuannuan",
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"nuannuan"},
+    aliases={"时尚品鉴"},
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension()],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh_CN": "时尚品鉴"}),
+    ],
 )
 
 
