@@ -33,7 +33,7 @@ target_weight_cmd = on_alconna(
     aliases={"目标体重"},
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension(name_localizations={"zh_CN": "目标体重"})],
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension(name_localizations={"zh-CN": "目标体重"})],
 )
 
 
@@ -85,7 +85,7 @@ weight_record_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "体重打卡"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "体重打卡"}),
     ],
 )
 

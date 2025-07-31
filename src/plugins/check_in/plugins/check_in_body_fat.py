@@ -36,7 +36,7 @@ target_body_fat_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "目标体脂"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "目标体脂"}),
     ],
 )
 
@@ -90,7 +90,7 @@ body_fat_record_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "体脂打卡"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "体脂打卡"}),
     ],
 )
 

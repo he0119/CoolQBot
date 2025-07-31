@@ -79,7 +79,7 @@ morning_cmd = on_alconna(
     permission=admin_permission(),
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "早安"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "早安"}),
     ],
 )
 

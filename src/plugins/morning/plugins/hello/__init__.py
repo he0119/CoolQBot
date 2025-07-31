@@ -67,7 +67,7 @@ hello_cmd = on_alconna(
     permission=admin_permission(),
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "问候"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "问候"}),
     ],
 )
 

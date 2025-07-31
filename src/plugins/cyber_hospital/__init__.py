@@ -57,7 +57,7 @@ rounds_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "查房"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "查房"}),
     ],
 )
 
@@ -142,7 +142,7 @@ admit_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "入院"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "入院"}),
     ],
 )
 
@@ -175,7 +175,7 @@ discharge_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "出院"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "出院"}),
     ],
 )
 
@@ -208,7 +208,7 @@ record_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "病历"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "病历"}),
     ],
 )
 
@@ -245,7 +245,7 @@ history_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "入院记录"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "入院记录"}),
     ],
 )
 

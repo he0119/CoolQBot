@@ -41,7 +41,7 @@ weather_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "天气"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "天气"}),
     ],
 )
 

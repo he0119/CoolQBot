@@ -32,7 +32,7 @@ gate_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "藏宝选门"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "藏宝选门"}),
     ],
 )
 

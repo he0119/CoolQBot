@@ -40,7 +40,7 @@ price_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "查价"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "查价"}),
     ],
 )
 

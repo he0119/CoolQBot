@@ -66,7 +66,7 @@ bind_group_cmd = on_alconna(
     rule=Rule(is_group),
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "绑定群组"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "绑定群组"}),
     ],
 )
 
@@ -106,7 +106,7 @@ unbind_group_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension(name_localizations={"zh_CN": "解绑群组"})],
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension(name_localizations={"zh-CN": "解绑群组"})],
 )
 
 
@@ -137,7 +137,7 @@ check_bind_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension(name_localizations={"zh_CN": "查看绑定"})],
+    extensions=[TelegramSlashExtension(), DiscordSlashExtension(name_localizations={"zh-CN": "查看绑定"})],
 )
 
 

@@ -74,7 +74,7 @@ post_cmd = on_alconna(
     extensions=[
         ReplyMergeExtension(),
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "收藏壁画"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "收藏壁画"}),
     ],
     rule=Rule(is_group),
 )
@@ -128,7 +128,7 @@ bihua_cmd = on_alconna(
     rule=Rule(is_group),
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "壁画"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "壁画"}),
     ],
 )
 
@@ -185,7 +185,7 @@ bihua_search_cmd = on_alconna(
     rule=Rule(is_group),
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "搜索壁画"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "搜索壁画"}),
     ],
 )
 
@@ -223,7 +223,7 @@ bihua_delete_cmd = on_alconna(
     rule=Rule(is_group),
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "删除壁画"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "删除壁画"}),
     ],
 )
 

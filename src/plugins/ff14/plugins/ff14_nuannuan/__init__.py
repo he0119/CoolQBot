@@ -28,7 +28,7 @@ nuannuan_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "时尚品鉴"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "时尚品鉴"}),
     ],
 )
 

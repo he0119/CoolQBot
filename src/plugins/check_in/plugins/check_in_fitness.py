@@ -30,7 +30,7 @@ fitness_cmd = on_alconna(
     block=True,
     extensions=[
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh_CN": "健身打卡"}),
+        DiscordSlashExtension(name_localizations={"zh-CN": "健身打卡"}),
     ],
 )
 
