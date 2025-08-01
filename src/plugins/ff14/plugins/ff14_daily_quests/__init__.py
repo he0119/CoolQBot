@@ -2,6 +2,8 @@
 
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, MultiVar, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_user import UserSession
 
@@ -24,16 +26,20 @@ plugin_data = get_plugin_data()
 
 daily_quests_cmd = on_alconna(
     Alconna(
-        "每日委托",
+        "daily_quests",
         Args["quests?#委托（用逗号分隔）", MultiVar(str, "+")] / (",", "，"),
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"daily_quests"},
+    aliases={"每日委托"},
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "每日委托"}),
+    ],
 )
 
 

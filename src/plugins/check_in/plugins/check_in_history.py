@@ -5,6 +5,8 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Image, Match, Text, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_user import UserSession
 from sqlalchemy import func, select
 
@@ -28,16 +30,20 @@ __plugin_meta__ = PluginMetadata(
 
 history_cmd = on_alconna(
     Alconna(
-        "打卡历史",
+        "checkin_history",
         Args["type?#历史类型", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={("check_in.history")},
+    aliases={"打卡历史"},
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "打卡历史"}),
+    ],
 )
 
 

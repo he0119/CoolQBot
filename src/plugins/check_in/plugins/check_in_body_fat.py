@@ -1,5 +1,7 @@
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_user import UserSession
 from sqlalchemy import select
 
@@ -22,16 +24,20 @@ __plugin_meta__ = PluginMetadata(
 
 target_body_fat_cmd = on_alconna(
     Alconna(
-        "目标体脂",
+        "target_body_fat",
         Args["target?#目标体脂（百分比）", str],
         meta=CommandMeta(
             description="设置和查看目标体脂",
             example="查看目标体脂\n/目标体脂\n设置目标体脂\n/目标体脂 20",
         ),
     ),
-    aliases={"check_in.body_fat"},
+    aliases={"目标体脂"},
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "目标体脂"}),
+    ],
 )
 
 
@@ -72,16 +78,20 @@ async def _(session: AsyncSession, user: UserSession, target: str):
 
 body_fat_record_cmd = on_alconna(
     Alconna(
-        "体脂打卡",
+        "checkin_body_fat",
         Args["content?#体脂（百分比）", str],
         meta=CommandMeta(
             description="记录体脂",
             example="记录体脂\n/体脂打卡\n/体脂打卡 20",
         ),
     ),
-    aliases={"记录体脂", "check_in.body_record"},
+    aliases={"体脂打卡"},
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "体脂打卡"}),
+    ],
 )
 
 

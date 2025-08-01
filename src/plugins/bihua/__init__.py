@@ -32,7 +32,9 @@ from nonebot_plugin_alconna import (
     on_alconna,
     store_true,
 )
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
 from nonebot_plugin_alconna.builtins.extensions.reply import ReplyMergeExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_user import UserSession, get_user_by_id
 
 from src.plugins.group_bind import SessionId, is_group
@@ -59,17 +61,21 @@ bihua_service = BihuaService()
 # 收藏壁画命令
 post_cmd = on_alconna(
     Alconna(
-        "收藏壁画",
+        "post",
         Args["name#名称", str]["img?#图片", Image],
         meta=CommandMeta(
             description="收藏壁画",
             example="发送图片和命令\n回复图片并发送 /收藏壁画 我从来不说壁画",
         ),
     ),
+    aliases={"收藏壁画", "壁画收藏"},
     use_cmd_start=True,
     block=True,
-    extensions=[ReplyMergeExtension()],
-    aliases={"post"},
+    extensions=[
+        ReplyMergeExtension(),
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "收藏壁画"}),
+    ],
     rule=Rule(is_group),
 )
 
@@ -97,7 +103,7 @@ async def handle_save_bihua(user: UserSession, session_id: SessionId, name: str,
 # 查看壁画命令
 bihua_cmd = on_alconna(
     Alconna(
-        "壁画",
+        "bihua",
         Args["name", str],
         Option(
             "-v|--verbose",
@@ -118,8 +124,12 @@ bihua_cmd = on_alconna(
     ),
     use_cmd_start=True,
     block=True,
-    aliases={"bihua"},
+    aliases={"壁画"},
     rule=Rule(is_group),
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "壁画"}),
+    ],
 )
 
 
@@ -160,27 +170,32 @@ async def _(session_id: SessionId, name: str, verbose: bool = False, exact: bool
 
 
 # 搜索壁画命令
-search_bihua_cmd = on_alconna(
+bihua_search_cmd = on_alconna(
     Alconna(
-        "搜索壁画",
+        "bihua_search",
         Args["keyword", str],
         meta=CommandMeta(
             description="搜索壁画",
             example="搜索壁画\n/搜索壁画 关键词",
         ),
     ),
+    aliases={"壁画搜索", "搜索壁画"},
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "搜索壁画"}),
+    ],
 )
 
 
-@search_bihua_cmd.handle()
+@bihua_search_cmd.handle()
 async def _(session_id: SessionId, keyword: str):
     bihua_list = await bihua_service.search_bihua(keyword, session_id)
 
     if not bihua_list:
-        await search_bihua_cmd.finish(f"未找到包含 '{keyword}' 的壁画")
+        await bihua_search_cmd.finish(f"未找到包含 '{keyword}' 的壁画")
 
     # 构建结果列表
     result_lines = [f"搜索到 {len(bihua_list)} 个相关壁画："]
@@ -188,30 +203,35 @@ async def _(session_id: SessionId, keyword: str):
         collector = await get_user_by_id(bihua.user_id)
         result_lines.append(f"• {bihua.name} (收藏者: {collector.name})")
 
-    await search_bihua_cmd.finish("\n".join(result_lines))
+    await bihua_search_cmd.finish("\n".join(result_lines))
 
 
 # 删除壁画命令
-delete_bihua_cmd = on_alconna(
+bihua_delete_cmd = on_alconna(
     Alconna(
-        "删除壁画",
+        "bihua_delete",
         Args["name", str],
         meta=CommandMeta(
             description="删除壁画（仅管理员）",
             example="删除壁画\n/删除壁画 我从来不说壁画",
         ),
     ),
+    aliases={"删除壁画", "壁画删除"},
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "删除壁画"}),
+    ],
 )
 
 
-@delete_bihua_cmd.handle()
+@bihua_delete_cmd.handle()
 async def _(session_id: SessionId, name: str):
     try:
         await bihua_service.delete_bihua(name, session_id)
-        await delete_bihua_cmd.finish(f"壁画 '{name}' 删除成功！")
+        await bihua_delete_cmd.finish(f"壁画 '{name}' 删除成功！")
     except ValueError as e:
-        await delete_bihua_cmd.finish(f"删除失败：{e}")
+        await bihua_delete_cmd.finish(f"删除失败：{e}")

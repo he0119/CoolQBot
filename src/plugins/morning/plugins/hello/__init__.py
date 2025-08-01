@@ -7,6 +7,8 @@ from nonebot.log import logger
 from nonebot.params import Depends
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_saa import PlatformTarget, Text, get_target
 from sqlalchemy import select
 
@@ -52,17 +54,21 @@ async def hello_on_connect(bot: Bot, session: AsyncSession) -> None:
 
 hello_cmd = on_alconna(
     Alconna(
-        "问候",
+        "hello",
         Args["status?#是否开启启动问候（on/off）", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"hello"},
+    aliases={"问候"},
     use_cmd_start=True,
     block=True,
     permission=admin_permission(),
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "问候"}),
+    ],
 )
 
 

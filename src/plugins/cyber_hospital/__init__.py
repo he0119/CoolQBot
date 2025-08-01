@@ -11,6 +11,8 @@ require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
 require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import Alconna, AlconnaMatcher, Args, At, CommandMeta, Text, UniMessage, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_user import User, UserSession, get_user, get_user_by_id
 
 from src.utils.helpers import admin_permission
@@ -42,16 +44,21 @@ hospital_service = Hospital()
 
 rounds_cmd = on_alconna(
     Alconna(
-        "查房",
+        "rounds",
         Args["at?#@病人", At]["content?#症状", str],
         meta=CommandMeta(
             description="查房并记录病情",
             example="查看入院病人列表\n/查房\n查房并记录病情\n/查房 @病人\n直接记录病情\n/查房 @病人 症状",
         ),
     ),
+    aliases={"查房"},
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "查房"}),
+    ],
 )
 
 
@@ -122,16 +129,21 @@ async def _(at_uid: int, at_pid: str, content: str = ArgPlainText()):
 
 admit_cmd = on_alconna(
     Alconna(
-        "入院",
+        "admit",
         Args["at?#@病人", At],
         meta=CommandMeta(
             description="病人入院",
             example="病人入院\n/入院 @病人",
         ),
     ),
+    aliases={"入院"},
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "入院"}),
+    ],
 )
 
 
@@ -150,16 +162,21 @@ async def _(user: UserSession, at: At | None = None):
 
 discharge_cmd = on_alconna(
     Alconna(
-        "出院",
+        "discharge",
         Args["at?#@病人", At],
         meta=CommandMeta(
             description="病人出院",
             example="病人出院\n/出院 @病人",
         ),
     ),
+    aliases={"出院"},
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "出院"}),
+    ],
 )
 
 
@@ -178,16 +195,21 @@ async def _(user: UserSession, at: At | None = None):
 
 record_cmd = on_alconna(
     Alconna(
-        "病历",
+        "record",
         Args["at?#@病人", At],
         meta=CommandMeta(
             description="查看病历",
             example="查看病历\n/病历 @病人",
         ),
     ),
+    aliases={"病历"},
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "病历"}),
+    ],
 )
 
 
@@ -210,16 +232,21 @@ async def _(user: UserSession, at: At | None = None):
 
 history_cmd = on_alconna(
     Alconna(
-        "入院记录",
+        "admission_history",
         Args["at?#@病人", At],
         meta=CommandMeta(
             description="查看所有人入院次数，或指定人出入院时间",
             example="查看所有人入院次数\n/入院记录\n查看指定人出入院时间\n/入院记录 @病人",
         ),
     ),
+    aliases={"入院记录"},
     permission=admin_permission(),
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "入院记录"}),
+    ],
 )
 
 

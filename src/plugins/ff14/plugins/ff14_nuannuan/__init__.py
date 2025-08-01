@@ -2,6 +2,8 @@
 
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, CommandMeta, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
 from .data_source import get_latest_nuannuan
 
@@ -15,15 +17,19 @@ __plugin_meta__ = PluginMetadata(
 
 nuannuan_cmd = on_alconna(
     Alconna(
-        "时尚品鉴",
+        "nuannuan",
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"nuannuan"},
+    aliases={"时尚品鉴"},
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "时尚品鉴"}),
+    ],
 )
 
 

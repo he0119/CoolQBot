@@ -1,5 +1,7 @@
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_user import UserSession
 
 from src.plugins.check_in.models import FitnessRecord
@@ -16,16 +18,20 @@ __plugin_meta__ = PluginMetadata(
 
 fitness_cmd = on_alconna(
     Alconna(
-        "健身打卡",
+        "checkin_fitness",
         Args["content?#健身内容", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={("check_in.fitness")},
+    aliases={"健身打卡"},
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "健身打卡"}),
+    ],
 )
 
 

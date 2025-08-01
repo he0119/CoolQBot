@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加 Telegram 和 Discord 命令扩展
+
 ## [0.24.1] - 2025-07-29
 
 ### Fixed

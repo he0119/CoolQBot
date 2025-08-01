@@ -32,14 +32,14 @@ EXPR_NOT_FOUND = (
 
 music_cmd = on_alconna(
     Alconna(
-        "点歌",
+        "music",
         Args["keywords?#音乐名称或信息", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"music"},
+    aliases={"点歌"},
     use_cmd_start=True,
     block=True,
 )

@@ -3,6 +3,8 @@
 import httpx
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, MultiVar, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_user import UserSession
 
@@ -26,16 +28,20 @@ plugin_data = get_plugin_data()
 
 price_cmd = on_alconna(
     Alconna(
-        "查价",
+        "price",
         Args["argv", MultiVar(str, flag="*")],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"price"},
+    aliases={"查价"},
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "查价"}),
+    ],
 )
 
 
