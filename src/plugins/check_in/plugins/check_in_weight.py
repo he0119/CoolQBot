@@ -23,7 +23,7 @@ __plugin_meta__ = PluginMetadata(
 
 target_weight_cmd = on_alconna(
     Alconna(
-        "target-weight",
+        "target_weight",
         Args["target?#目标体重", str],
         meta=CommandMeta(
             description="设置和查看目标体重",
@@ -33,7 +33,10 @@ target_weight_cmd = on_alconna(
     aliases={"目标体重"},
     use_cmd_start=True,
     block=True,
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension(name_localizations={"zh-CN": "目标体重"})],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "目标体重"}),
+    ],
 )
 
 
@@ -73,7 +76,7 @@ async def _(session: AsyncSession, user: UserSession, target: str):
 
 weight_record_cmd = on_alconna(
     Alconna(
-        "weight_checkin",
+        "checkin_weight",
         Args["content?#体重（kg）", str],
         meta=CommandMeta(
             description="记录体重",

@@ -94,7 +94,7 @@ async def _(matcher: AlconnaMatcher, user: UserSession, target_group_id: str):
 # 解绑群组命令
 unbind_group_cmd = on_alconna(
     Alconna(
-        "unbind-group",
+        "unbind_group",
         meta=CommandMeta(
             description="将当前群组从绑定中移除",
             usage="解绑群组",
@@ -106,7 +106,10 @@ unbind_group_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension(name_localizations={"zh-CN": "解绑群组"})],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "解绑群组"}),
+    ],
 )
 
 
@@ -125,7 +128,7 @@ async def _(matcher: AlconnaMatcher, user: UserSession):
 # 查看绑定状态命令
 check_bind_cmd = on_alconna(
     Alconna(
-        "check-bind",
+        "check_bind",
         meta=CommandMeta(
             description="查看当前群组的绑定状态",
             usage="查看绑定",
@@ -137,7 +140,10 @@ check_bind_cmd = on_alconna(
     use_cmd_start=True,
     block=True,
     rule=Rule(is_group),
-    extensions=[TelegramSlashExtension(), DiscordSlashExtension(name_localizations={"zh-CN": "查看绑定"})],
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "查看绑定"}),
+    ],
 )
 
 

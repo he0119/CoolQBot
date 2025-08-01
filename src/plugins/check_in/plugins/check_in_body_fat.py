@@ -78,14 +78,14 @@ async def _(session: AsyncSession, user: UserSession, target: str):
 
 body_fat_record_cmd = on_alconna(
     Alconna(
-        "body_fat_checkin",
+        "checkin_body_fat",
         Args["content?#体脂（百分比）", str],
         meta=CommandMeta(
             description="记录体脂",
             example="记录体脂\n/体脂打卡\n/体脂打卡 20",
         ),
     ),
-    aliases={"体脂打卡", "记录体脂"},
+    aliases={"体脂打卡"},
     use_cmd_start=True,
     block=True,
     extensions=[

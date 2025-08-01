@@ -18,7 +18,7 @@ __plugin_meta__ = PluginMetadata(
 
 fitness_cmd = on_alconna(
     Alconna(
-        "fitness_checkin",
+        "checkin_fitness",
         Args["content?#健身内容", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,

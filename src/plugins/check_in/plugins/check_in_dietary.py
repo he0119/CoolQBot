@@ -18,7 +18,7 @@ __plugin_meta__ = PluginMetadata(
 
 dietary_cmd = on_alconna(
     Alconna(
-        "dietary_checkin",
+        "checkin_dietary",
         Args["content?#A：健康饮食少油少糖 B：我摆了偷吃了炸鸡奶茶", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,

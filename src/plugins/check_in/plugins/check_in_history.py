@@ -30,7 +30,7 @@ __plugin_meta__ = PluginMetadata(
 
 history_cmd = on_alconna(
     Alconna(
-        "check_in_history",
+        "checkin_history",
         Args["type?#历史类型", str],
         meta=CommandMeta(
             description=__plugin_meta__.description,
