@@ -187,7 +187,7 @@ jobs:
           tags: tag:ci
 
       - name: Deploy to server
-        run: tailscale ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} ${{ secrets.DEPLOY_SCRIPT }}
+        run: tailscale ssh github@${{ secrets.SSH_HOST }} ${{ secrets.DEPLOY_SCRIPT }}
 
   deploy_prod:
     name: Deploy Prod
@@ -204,7 +204,7 @@ jobs:
           tags: tag:ci
 
       - name: Deploy to server
-        run: tailscale ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} ${{ secrets.DEPLOY_SCRIPT }}
+        run: tailscale ssh github@${{ secrets.SSH_HOST }} ${{ secrets.DEPLOY_SCRIPT }}
 
   sentry_release:
     name: Sentry Release
