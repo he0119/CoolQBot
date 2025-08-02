@@ -1,14 +1,4 @@
-"""壁画插件
-
-支持收藏和查看壁画
-还支持搜索壁画
-
-收藏时应该通过回复图片来收藏 比如 /post 我从来不说壁画
-查看壁画时可以通过 /bihua 我从来不说壁画，这个时候会发送我之前收藏的对应图片
-搜索壁画时可以通过 /bihua_search 关键词 来搜索壁画，返回相关壁画的名称列表
-
-同时收藏壁画时，应该记录壁画的 hash 值，避免重复收藏同一张壁画。还应该记录谁收藏的壁画，还有创建时间，方便后续管理和查询
-"""
+"""壁画插件"""
 
 from nonebot import require
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
