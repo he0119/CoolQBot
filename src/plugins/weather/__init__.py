@@ -1,7 +1,9 @@
 """天气插件"""
 
 from nonebot import require
+from nonebot.adapters import Bot, Event
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from nonebot.typing import T_State
 
 require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, MultiVar, on_alconna
@@ -46,21 +48,20 @@ weather_cmd = on_alconna(
 )
 
 
+async def parse_location(event: Event, bot: Bot, state: T_State, location: str, **kwargs) -> tuple[str, ...] | None:
+    return tuple(location.strip().split()) if location else None
+
+
 @weather_cmd.handle()
 async def weather_handle_first_receive(location: Match[tuple[str, ...]]):
     if location.available:
-        # 如果用户提供了参数，直接处理
-        weather_report = await get_weather_of_location(*location.result[:2])
-        await weather_cmd.finish(weather_report)
+        weather_cmd.set_path_arg("location", location.result)
 
 
-# 如果没有提供参数，通过 got_path 获取
-@weather_cmd.got_path("location", prompt="你想查询哪个城市的天气呢？")
-async def weather_handle(location: str):
+@weather_cmd.got_path("location", prompt="你想查询哪个城市的天气呢？", middleware=parse_location)
+async def weather_handle(location: tuple[str, ...]):
     """查询天气"""
-    # 将用户输入的字符串分割为元组
-    location_parts = tuple(location.strip().split())
-    weather_report = await get_weather_of_location(*location_parts[:2])
+    weather_report = await get_weather_of_location(*location[:2])
     await weather_cmd.finish(weather_report)
 
 
