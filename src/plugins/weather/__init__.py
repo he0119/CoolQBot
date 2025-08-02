@@ -49,13 +49,18 @@ weather_cmd = on_alconna(
 @weather_cmd.handle()
 async def weather_handle_first_receive(location: Match[tuple[str, ...]]):
     if location.available:
-        weather_cmd.set_path_arg("location", location.result)
+        # 如果用户提供了参数，直接处理
+        weather_report = await get_weather_of_location(*location.result[:2])
+        await weather_cmd.finish(weather_report)
 
 
+# 如果没有提供参数，通过 got_path 获取
 @weather_cmd.got_path("location", prompt="你想查询哪个城市的天气呢？")
-async def weather_handle(location: tuple[str, ...]):
+async def weather_handle(location: str):
     """查询天气"""
-    weather_report = await get_weather_of_location(*location[:2])
+    # 将用户输入的字符串分割为元组
+    location_parts = tuple(location.strip().split())
+    weather_report = await get_weather_of_location(*location_parts[:2])
     await weather_cmd.finish(weather_report)
 
 

@@ -168,3 +168,45 @@ async def test_heweather_lookup_failed(app: App, mocker: MockerFixture, caplog: 
 
     # 如果没有查询到城市，不应该有和风天气 API 请求失败的日志
     assert "和风天气 API 请求失败" not in caplog.text
+
+
+async def test_heweather_got_path(app: App, mocker: MockerFixture):
+    """测试和风天气，测试 got_path 交互功能"""
+    from src.plugins.weather import weather_cmd
+    from src.plugins.weather.heweather_api import plugin_config
+
+    mocker.patch.object(plugin_config, "heweather_key", "1234567890")
+
+    get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+
+        # 首先发送不带参数的命令，应该触发 got_path 提示
+        event = fake_group_message_event_v11(message=Message("/天气"))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "你想查询哪个城市的天气呢？",
+            "result",
+        )
+        ctx.should_rejected(weather_cmd)
+
+        # 然后用户输入城市名，应该返回天气信息
+        event = fake_group_message_event_v11(message=Message("成都"))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "中国 四川省 成都\n当前温度：9℃ 湿度：86%(体感温度：9℃)\n2022-01-08 阴转多云 温度：9~6℃ 峨眉月\n2022-01-09 多云转小雨 温度：10~7℃ 峨眉月\n2022-01-10 多云 温度：13~3℃ 上弦月",
+            True,
+        )
+        ctx.should_finished(weather_cmd)
+
+    get.assert_has_calls(
+        [
+            mocker.call("https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&key=1234567890"),
+            mocker.call("https://devapi.qweather.com/v7/weather/now?location=101270101&key=1234567890"),
+            mocker.call("https://devapi.qweather.com/v7/weather/3d?location=101270101&key=1234567890"),
+        ]  # type: ignore
+    )

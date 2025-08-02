@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 添加 Telegram 和 Discord 命令扩展
 
+### Fixed
+
+- 修复天气插件主动获取参数时未响应的问题
+
 ## [0.24.1] - 2025-07-29
 
 ### Fixed
