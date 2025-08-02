@@ -49,6 +49,7 @@ uv run nb orm upgrade     # 数据库迁移
 - 使用 `nonebug` 框架进行插件测试
 - 测试文件位于 `tests/plugins/{plugin_name}/`
 - 使用 `fake_group_message_event_v11` 等工具函数模拟事件
+- 普通用户测试：`user_id=10000` 对应配置中的 `nickname10000` 普通用户
 - 超级用户测试：`user_id=10` 对应配置中的 `nickname` 超级用户
 
 ### 配置约定
@@ -62,21 +63,46 @@ uv run nb orm upgrade     # 数据库迁移
 ### Session ID 处理
 
 ```python
-# 群组绑定等功能使用 session_id 标识不同平台的群组
-# 格式通常为 "QQClient_群组ID"
-current_session_id = event.get_session_id()
+# 使用 nonebot_plugin_user 处理用户和群组信息
+from nonebot_plugin_user import UserSession
+
+async def _(user: UserSession):
+    """处理用户会话"""
+    # 获取用户的 session_id
+    current_session_id = user.session_id
+
+# 获取绑定后的群组信息，应该使用 group_bind 插件，此时的 session_id 是绑定后的群组 ID
+from src.plugins.group_bind import SessionId
+async def _(session_id: SessionId):
+    """处理绑定群组命令"""
+    pass
 ```
 
 ### 事件处理器模式
 
 ```python
-# 插件使用 Alconna 或传统 on_command 定义命令
-from nonebot_plugin_alconna import on_alconna
-from nonebot import on_command
+# 插件使用 Alconna 命令
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, MultiVar, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
-# 统一的消息发送使用 SAA (Send Anything Anywhere)
-from nonebot_plugin_send_anything_anywhere import Text
-await Text("消息内容").send()
+weather_cmd = on_alconna(
+    Alconna(
+        "weather",
+        Args["location?#位置", MultiVar(str, flag="+")],
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
+    aliases={"天气"},
+    use_cmd_start=True,
+    block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "天气"}),
+    ],
+)
 ```
 
 ### 服务类模式
