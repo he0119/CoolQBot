@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 revision: str = "443969e6764c"
 down_revision: str | Sequence[str] | None = "6894055fff61"
 branch_labels: str | Sequence[str] | None = None
-depends_on: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = "d6e05e49f79f"  # 适配的 user 0.5.0 支持 uninfo 的版本
 
 MAPPING = {
     "console": "Console",
