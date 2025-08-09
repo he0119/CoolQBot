@@ -8,8 +8,8 @@ from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from nonebot_plugin_user import UserSession
 
-from src.utils.annotated import GroupInfo
 from src.utils.helpers import parse_bool, parse_int
 
 from .data_source import get_rank
@@ -83,7 +83,7 @@ async def rank_handle_first_receive(state: T_State, arg: Match[str]):
 )
 async def rank_handle_group_message(
     bot: V11Bot | V12Bot,
-    group_info: GroupInfo,
+    user: UserSession,
     display_number: int = Arg(),
     minimal_msg_number: int = Arg(),
     display_total_number: bool = Arg(),
@@ -93,6 +93,6 @@ async def rank_handle_group_message(
         display_number=display_number,
         minimal_msg_number=minimal_msg_number,
         display_total_number=display_total_number,
-        group_info=group_info,
+        session_id=user.session_id,
     )
     await rank_cmd.finish(res)

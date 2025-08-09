@@ -5,11 +5,10 @@ from collections.abc import Sequence
 from operator import itemgetter
 
 from nonebot.adapters import Bot
+from nonebot_plugin_user import get_user_by_id
 
 from src.plugins.repeat.models import MessageRecord
 from src.plugins.repeat.recorder import Recorder
-from src.utils.annotated import GroupInfo
-from src.utils.helpers import get_nickname
 
 
 async def get_rank(
@@ -17,10 +16,10 @@ async def get_rank(
     display_number: int,
     minimal_msg_number: int,
     display_total_number: bool,
-    group_info: GroupInfo,
+    session_id: str,
 ) -> str:
     """获取排行榜"""
-    recorder = Recorder(group_info)
+    recorder = Recorder(session_id)
 
     if not await recorder.is_enabled():
         return "该群未开启复读功能，无法获取排行榜。"
@@ -33,7 +32,7 @@ async def get_rank(
         display_number,
         minimal_msg_number,
         display_total_number,
-        group_info,
+        session_id,
     )
     str_data = await ranking.ranking()
 
@@ -53,14 +52,14 @@ class Ranking:
         display_number: int,
         minimal_msg_number: int,
         display_total_number: bool,
-        group_info: GroupInfo,
+        session_id: str,
     ):
         self.bot = bot
         self.records = records
         self.display_number = display_number
         self.minimal_msg_number = minimal_msg_number
         self.display_total_number = display_total_number
-        self.group_info = group_info
+        self.session_id = session_id
         self._nickname_cache = {}
 
     async def ranking(self):
@@ -121,11 +120,12 @@ class Ranking:
         repeat_rate = {k: v / msg_number_list[k] for k, v in repeat_list.items()}
         return repeat_rate
 
-    async def nikcname(self, user_id):
+    async def nikcname(self, user_id: int):
         """输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称"""
         if user_id in self._nickname_cache:
             return self._nickname_cache[user_id]
         else:
-            name = await get_nickname(self.bot, user_id, **self.group_info.model_dump(exclude={"platform"}))
-            self._nickname_cache[user_id] = name
-            return name
+            # name = await get_nickname(self.bot, user_id, **self.session_id.model_dump(exclude={"platform"}))
+            user = await get_user_by_id(user_id)
+            self._nickname_cache[user_id] = user.name
+            return user.name

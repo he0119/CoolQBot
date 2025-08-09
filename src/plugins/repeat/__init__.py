@@ -8,7 +8,7 @@ from pathlib import Path
 
 import nonebot
 from nonebot import get_driver, get_plugin_config, require
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
 require("nonebot_plugin_datastore")
 require("nonebot_plugin_orm")
@@ -21,7 +21,7 @@ __plugin_meta__ = PluginMetadata(
     name="复读",
     description="与复读有关的功能",
     usage="与复读有关的功能",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
 _sub_plugins = set()

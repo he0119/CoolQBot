@@ -7,12 +7,11 @@ from nonebot.adapters import Bot
 
 from src.plugins.repeat.plugins.repeat_rank.data_source import Ranking
 from src.plugins.repeat.recorder import Recorder
-from src.utils.annotated import GroupInfo
 
 
-async def get_history(bot: Bot, year: int, month: int, day: int, group_info: GroupInfo) -> str:
+async def get_history(bot: Bot, year: int, month: int, day: int, session_id: str) -> str:
     """获取历史数据"""
-    recorder = Recorder(group_info)
+    recorder = Recorder(session_id)
     if not await recorder.is_enabled():
         return "该群未开启复读功能，无法获取历史排行榜。"
 
@@ -47,7 +46,7 @@ async def get_history(bot: Bot, year: int, month: int, day: int, group_info: Gro
         display_number,
         minimal_msg_number,
         display_total_number,
-        group_info,
+        session_id,
     )
     ranking_str = await ranking.ranking()
 
