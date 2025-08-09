@@ -7,12 +7,12 @@ from nonebot.adapters import Event
 from nonebot.log import logger
 from nonebot_plugin_user import UserSession
 
+from src.plugins.group_bind import SessionId
 from src.plugins.repeat import plugin_config
-from src.plugins.repeat.recorder import Recorder
-from src.utils.annotated import GroupInfo
+from src.plugins.repeat.recorder import get_recorder
 
 
-async def need_repeat(event: Event, group_info: GroupInfo, user: UserSession) -> bool:
+async def need_repeat(event: Event, user: UserSession, session_id: SessionId) -> bool:
     """是否复读这个消息"""
     # 不复读配置中排除的用户
     if user.user_name in plugin_config.repeat_excluded_users or user.user_id in plugin_config.repeat_excluded_users:
@@ -22,10 +22,8 @@ async def need_repeat(event: Event, group_info: GroupInfo, user: UserSession) ->
     if event.is_tome():
         return False
 
-    user_id = event.get_user_id()
-
     # 只复读指定群内消息
-    recorder = Recorder(group_info)
+    recorder = get_recorder(session_id)
     if not await recorder.is_enabled():
         return False
 
@@ -38,7 +36,7 @@ async def need_repeat(event: Event, group_info: GroupInfo, user: UserSession) ->
     recorder.add_msg_send_time(now)
 
     # 不要复读应用消息
-    if user_id == 1000000:
+    if user.platform == "QQClient" and user.platform_user.id == "1000000":
         return False
 
     # 不要复读签到，分享，小程序，转发，红包
@@ -67,10 +65,10 @@ async def need_repeat(event: Event, group_info: GroupInfo, user: UserSession) ->
     logger.info(f"repeat: {rand}")
     if rand > repeat_rate:
         # 只有判断过后的消息才会被记录
-        await recorder.add_msg_number_list(user_id)
+        await recorder.add_msg_number_list(user.user_id)
         return False
 
-    await recorder.add_repeat_list(user_id)
+    await recorder.add_repeat_list(user.user_id)
     # 记录复读时间
     recorder.reset_last_message_on()
 

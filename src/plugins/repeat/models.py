@@ -6,43 +6,19 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 
 class MessageRecord(Model):
-    __table_args__ = (
-        UniqueConstraint(
-            "date",
-            "platform",
-            "group_id",
-            "guild_id",
-            "channel_id",
-            "user_id",
-            name="unique_record",
-        ),
-    )
+    __table_args__ = (UniqueConstraint("date", "session_id", "uid", name="unique_record"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     date: Mapped[date]
-    platform: Mapped[str]
-    group_id: Mapped[str] = mapped_column(default="")
-    guild_id: Mapped[str] = mapped_column(default="")
-    channel_id: Mapped[str] = mapped_column(default="")
+    session_id: Mapped[str]
 
-    user_id: Mapped[str]
+    uid: Mapped[int]
     repeat_time: Mapped[int] = mapped_column(default=0)
     msg_number: Mapped[int] = mapped_column(default=0)
 
 
 class Enabled(Model):
-    __table_args__ = (
-        UniqueConstraint(
-            "platform",
-            "group_id",
-            "guild_id",
-            "channel_id",
-            name="unique_enabled",
-        ),
-    )
+    __table_args__ = (UniqueConstraint("session_id", name="unique_enabled"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    platform: Mapped[str]
-    group_id: Mapped[str] = mapped_column(default="")
-    guild_id: Mapped[str] = mapped_column(default="")
-    channel_id: Mapped[str] = mapped_column(default="")
+    session_id: Mapped[str]

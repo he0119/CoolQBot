@@ -2,14 +2,12 @@
 
 import re
 
-from nonebot.adapters.onebot.v11 import Bot as V11Bot
-from nonebot.adapters.onebot.v12 import Bot as V12Bot
 from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 
-from src.utils.annotated import GroupInfo
+from src.plugins.group_bind import SessionId
 from src.utils.helpers import parse_bool, parse_int
 
 from .data_source import get_rank
@@ -42,7 +40,7 @@ rank_cmd = on_alconna(
 
 
 @rank_cmd.handle()
-async def rank_handle_first_receive(state: T_State, arg: Match[str]):
+async def rank_handle_first_receive(state: T_State, arg: Match[str]) -> None:
     args = arg.result if arg.available else ""
     match = re.match(r"^(?:(\d+))?(?:n(\d+))?$", args)
     if match:
@@ -82,17 +80,15 @@ async def rank_handle_first_receive(state: T_State, arg: Match[str]):
     parameterless=[Depends(parse_bool("display_total_number"))],
 )
 async def rank_handle_group_message(
-    bot: V11Bot | V12Bot,
-    group_info: GroupInfo,
+    session_id: SessionId,
     display_number: int = Arg(),
     minimal_msg_number: int = Arg(),
     display_total_number: bool = Arg(),
 ):
     res = await get_rank(
-        bot,
         display_number=display_number,
         minimal_msg_number=minimal_msg_number,
         display_total_number=display_total_number,
-        group_info=group_info,
+        session_id=session_id,
     )
     await rank_cmd.finish(res)

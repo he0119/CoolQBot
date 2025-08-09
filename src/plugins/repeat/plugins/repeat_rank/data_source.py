@@ -3,24 +3,22 @@
 import collections
 from collections.abc import Sequence
 from operator import itemgetter
+from typing import Any
 
-from nonebot.adapters import Bot
+from nonebot_plugin_user import get_user_by_id
 
 from src.plugins.repeat.models import MessageRecord
-from src.plugins.repeat.recorder import Recorder
-from src.utils.annotated import GroupInfo
-from src.utils.helpers import get_nickname
+from src.plugins.repeat.recorder import get_recorder
 
 
 async def get_rank(
-    bot: Bot,
     display_number: int,
     minimal_msg_number: int,
     display_total_number: bool,
-    group_info: GroupInfo,
+    session_id: str,
 ) -> str:
     """获取排行榜"""
-    recorder = Recorder(group_info)
+    recorder = get_recorder(session_id)
 
     if not await recorder.is_enabled():
         return "该群未开启复读功能，无法获取排行榜。"
@@ -28,12 +26,11 @@ async def get_rank(
     records = await recorder.get_records()
 
     ranking = Ranking(
-        bot,
         records,
         display_number,
         minimal_msg_number,
         display_total_number,
-        group_info,
+        session_id,
     )
     str_data = await ranking.ranking()
 
@@ -48,25 +45,23 @@ class Ranking:
 
     def __init__(
         self,
-        bot: Bot,
         records: Sequence[MessageRecord],
         display_number: int,
         minimal_msg_number: int,
         display_total_number: bool,
-        group_info: GroupInfo,
+        session_id: str,
     ):
-        self.bot = bot
         self.records = records
         self.display_number = display_number
         self.minimal_msg_number = minimal_msg_number
         self.display_total_number = display_total_number
-        self.group_info = group_info
+        self.session_id = session_id
         self._nickname_cache = {}
 
-    async def ranking(self):
+    async def ranking(self) -> str | None:
         """合并两个排行榜"""
-        self.repeat_list = {record.user_id: record.repeat_time for record in self.records}
-        self.msg_number_list = {record.user_id: record.msg_number for record in self.records}
+        self.repeat_list = {record.uid: record.repeat_time for record in self.records}
+        self.msg_number_list = {record.uid: record.msg_number for record in self.records}
 
         repeat_rate_ranking = await self.repeat_rate_ranking()
         repeat_number_ranking = await self.repeat_number_ranking()
@@ -74,7 +69,7 @@ class Ranking:
         if repeat_rate_ranking and repeat_number_ranking:
             return repeat_rate_ranking + "\n\n" + repeat_number_ranking
 
-    async def repeat_number_ranking(self):
+    async def repeat_number_ranking(self) -> str | None:
         """获取次数排行榜"""
         od = collections.OrderedDict(sorted(self.repeat_list.items(), key=itemgetter(1), reverse=True))
 
@@ -85,7 +80,7 @@ class Ranking:
         else:
             return None
 
-    async def repeat_rate_ranking(self):
+    async def repeat_rate_ranking(self) -> str | None:
         """获取复读概率排行榜"""
         repeat_rate = self.get_repeat_rate(self.repeat_list, self.msg_number_list)
         od = collections.OrderedDict(sorted(repeat_rate.items(), key=itemgetter(1), reverse=True))
@@ -97,7 +92,7 @@ class Ranking:
         else:
             return None
 
-    async def ranking_str(self, sorted_list, list_type):
+    async def ranking_str(self, sorted_list: collections.OrderedDict[int, Any], list_type: str) -> str:
         """获取排行榜文字"""
         i = 0
         str_data = ""
@@ -116,16 +111,16 @@ class Ranking:
         return str_data
 
     @staticmethod
-    def get_repeat_rate(repeat_list, msg_number_list):
+    def get_repeat_rate(repeat_list: dict[int, int], msg_number_list: dict[int, int]) -> dict[int, float]:
         """获取复读概率表"""
         repeat_rate = {k: v / msg_number_list[k] for k, v in repeat_list.items()}
         return repeat_rate
 
-    async def nikcname(self, user_id):
-        """输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称"""
+    async def nikcname(self, user_id: int) -> str:
+        """输入 QQ 号，返回用户昵称"""
         if user_id in self._nickname_cache:
             return self._nickname_cache[user_id]
         else:
-            name = await get_nickname(self.bot, user_id, **self.group_info.model_dump(exclude={"platform"}))
-            self._nickname_cache[user_id] = name
-            return name
+            user = await get_user_by_id(user_id)
+            self._nickname_cache[user_id] = user.name
+            return user.name

@@ -4,9 +4,6 @@ from collections.abc import Sequence
 from datetime import timedelta
 
 from nonebot.adapters import Message
-from nonebot.adapters.onebot.v11 import Bot as OneBotV11Bot
-from nonebot.adapters.onebot.v12 import Bot as OneBotV12Bot
-from nonebot.exception import ActionFailed
 from nonebot.matcher import Matcher
 from nonebot.params import Arg
 from nonebot.typing import T_State
@@ -109,65 +106,6 @@ def timedelta_to_chinese(timedelta: timedelta) -> str:
     if seconds:
         time_str += f"{seconds}秒"
     return time_str
-
-
-async def get_nickname(
-    bot: OneBotV11Bot | OneBotV12Bot,
-    user_id: str,
-    group_id: str | None = None,
-    guild_id: str | None = None,
-    channel_id: str | None = None,
-) -> str | None:
-    """输入用户 ID，获取用户昵称
-
-    如果提供 group_id，优先获取群名片
-    如果提供 guild_id/channel_id，优先获取频道名片
-    """
-    if isinstance(bot, OneBotV11Bot):
-        if group_id:
-            try:
-                msg = await bot.get_group_member_info(group_id=int(group_id), user_id=int(user_id))
-                if msg["card"]:
-                    return msg["card"]
-                return msg["nickname"]
-            except ActionFailed:
-                pass
-        # 如果不在群里的话(因为有可能会退群)
-        msg = await bot.get_stranger_info(user_id=int(user_id))
-        return msg["nickname"]
-    else:
-        if group_id:
-            try:
-                msg = await bot.get_group_member_info(group_id=group_id, user_id=user_id)
-                if msg["user_displayname"]:
-                    return msg["user_displayname"]
-                return msg["user_name"]
-            except ActionFailed:
-                pass
-        elif channel_id and guild_id:
-            try:
-                msg = await bot.get_channel_member_info(guild_id=guild_id, channel_id=channel_id, user_id=user_id)
-                if msg["user_displayname"]:
-                    return msg["user_displayname"]
-                return msg["user_name"]
-            except ActionFailed:
-                pass
-        elif guild_id:
-            try:
-                msg = await bot.get_guild_member_info(guild_id=guild_id, user_id=user_id)
-                if msg["user_displayname"]:
-                    return msg["user_displayname"]
-                return msg["user_name"]
-            except ActionFailed:
-                pass
-
-        try:
-            user = await bot.get_user_info(user_id=user_id)
-            if user["user_displayname"]:
-                return user["user_displayname"]
-            return user["user_name"]
-        except ActionFailed:
-            pass
 
 
 def admin_permission():
