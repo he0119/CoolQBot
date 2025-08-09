@@ -4,9 +4,9 @@ from nonebot import on_message
 from nonebot.adapters import Event
 from nonebot.plugin import PluginMetadata
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
-from nonebot_plugin_user import UserSession
 from sqlalchemy import select
 
+from src.plugins.group_bind import SessionId
 from src.plugins.repeat.models import Enabled
 from src.utils.annotated import AsyncSession
 from src.utils.helpers import strtobool
@@ -50,13 +50,13 @@ repeat_cmd = on_alconna(
 
 
 @repeat_cmd.handle()
-async def repeat_handle(session: AsyncSession, arg: Match[str], user: UserSession):
-    group = (await session.scalars(select(Enabled).where(Enabled.session_id == user.session_id))).one_or_none()
+async def repeat_handle(session: AsyncSession, arg: Match[str], session_id: SessionId):
+    group = (await session.scalars(select(Enabled).where(Enabled.session_id == session_id))).one_or_none()
 
     if arg.available:
         if strtobool(arg.result):
             if not group:
-                session.add(Enabled(session_id=user.session_id))
+                session.add(Enabled(session_id=session_id))
                 await session.commit()
             await repeat_cmd.finish("已在本群开启复读功能")
         else:

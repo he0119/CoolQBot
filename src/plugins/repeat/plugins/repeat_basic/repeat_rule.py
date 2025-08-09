@@ -7,11 +7,12 @@ from nonebot.adapters import Event
 from nonebot.log import logger
 from nonebot_plugin_user import UserSession
 
+from src.plugins.group_bind import SessionId
 from src.plugins.repeat import plugin_config
 from src.plugins.repeat.recorder import get_recorder
 
 
-async def need_repeat(event: Event, user: UserSession) -> bool:
+async def need_repeat(event: Event, user: UserSession, session_id: SessionId) -> bool:
     """是否复读这个消息"""
     # 不复读配置中排除的用户
     if user.user_name in plugin_config.repeat_excluded_users or user.user_id in plugin_config.repeat_excluded_users:
@@ -22,7 +23,7 @@ async def need_repeat(event: Event, user: UserSession) -> bool:
         return False
 
     # 只复读指定群内消息
-    recorder = get_recorder(user.session_id)
+    recorder = get_recorder(session_id)
     if not await recorder.is_enabled():
         return False
 
