@@ -3,13 +3,11 @@
 from calendar import monthrange
 from datetime import datetime
 
-from nonebot.adapters import Bot
-
 from src.plugins.repeat.plugins.repeat_rank.data_source import Ranking
 from src.plugins.repeat.recorder import get_recorder
 
 
-async def get_history(bot: Bot, year: int, month: int, day: int, session_id: str) -> str:
+async def get_history(year: int, month: int, day: int, session_id: str) -> str:
     """获取历史数据"""
     recorder = get_recorder(session_id)
     if not await recorder.is_enabled():
@@ -41,7 +39,6 @@ async def get_history(bot: Bot, year: int, month: int, day: int, session_id: str
     display_total_number = True
 
     ranking = Ranking(
-        bot,
         records,
         display_number,
         minimal_msg_number,

@@ -2,7 +2,6 @@
 
 import re
 
-from nonebot.adapters import Bot
 from nonebot.params import Arg, Depends
 from nonebot.plugin import PluginMetadata
 from nonebot.typing import T_State
@@ -70,11 +69,10 @@ async def history_handle_first_receive(state: T_State, arg: Match[str]):
     parameterless=[Depends(parse_int("day"))],
 )
 async def history_handle_group_message(
-    bot: Bot,
     session_id: SessionId,
     year: int = Arg(),
     month: int = Arg(),
     day: int = Arg(),
 ):
-    res = await get_history(bot, year=year, month=month, day=day, session_id=session_id)
+    res = await get_history(year=year, month=month, day=day, session_id=session_id)
     await history_cmd.finish(res)

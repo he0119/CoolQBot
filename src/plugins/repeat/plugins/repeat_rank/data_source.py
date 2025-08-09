@@ -4,7 +4,6 @@ import collections
 from collections.abc import Sequence
 from operator import itemgetter
 
-from nonebot.adapters import Bot
 from nonebot_plugin_user import get_user_by_id
 
 from src.plugins.repeat.models import MessageRecord
@@ -12,7 +11,6 @@ from src.plugins.repeat.recorder import get_recorder
 
 
 async def get_rank(
-    bot: Bot,
     display_number: int,
     minimal_msg_number: int,
     display_total_number: bool,
@@ -27,7 +25,6 @@ async def get_rank(
     records = await recorder.get_records()
 
     ranking = Ranking(
-        bot,
         records,
         display_number,
         minimal_msg_number,
@@ -47,14 +44,12 @@ class Ranking:
 
     def __init__(
         self,
-        bot: Bot,
         records: Sequence[MessageRecord],
         display_number: int,
         minimal_msg_number: int,
         display_total_number: bool,
         session_id: str,
     ):
-        self.bot = bot
         self.records = records
         self.display_number = display_number
         self.minimal_msg_number = minimal_msg_number
@@ -121,11 +116,10 @@ class Ranking:
         return repeat_rate
 
     async def nikcname(self, user_id: int):
-        """输入 QQ 号，返回群昵称，如果群昵称为空则返回 QQ 昵称"""
+        """输入 QQ 号，返回用户昵称"""
         if user_id in self._nickname_cache:
             return self._nickname_cache[user_id]
         else:
-            # name = await get_nickname(self.bot, user_id, **self.session_id.model_dump(exclude={"platform"}))
             user = await get_user_by_id(user_id)
             self._nickname_cache[user_id] = user.name
             return user.name
