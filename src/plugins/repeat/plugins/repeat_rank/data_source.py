@@ -8,7 +8,7 @@ from nonebot.adapters import Bot
 from nonebot_plugin_user import get_user_by_id
 
 from src.plugins.repeat.models import MessageRecord
-from src.plugins.repeat.recorder import Recorder
+from src.plugins.repeat.recorder import get_recorder
 
 
 async def get_rank(
@@ -19,7 +19,7 @@ async def get_rank(
     session_id: str,
 ) -> str:
     """获取排行榜"""
-    recorder = Recorder(session_id)
+    recorder = get_recorder(session_id)
 
     if not await recorder.is_enabled():
         return "该群未开启复读功能，无法获取排行榜。"

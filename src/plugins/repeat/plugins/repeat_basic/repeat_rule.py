@@ -8,7 +8,7 @@ from nonebot.log import logger
 from nonebot_plugin_user import UserSession
 
 from src.plugins.repeat import plugin_config
-from src.plugins.repeat.recorder import Recorder
+from src.plugins.repeat.recorder import get_recorder
 
 
 async def need_repeat(event: Event, user: UserSession) -> bool:
@@ -24,7 +24,7 @@ async def need_repeat(event: Event, user: UserSession) -> bool:
     user_id = event.get_user_id()
 
     # 只复读指定群内消息
-    recorder = Recorder(user.session_id)
+    recorder = get_recorder(user.session_id)
     if not await recorder.is_enabled():
         return False
 

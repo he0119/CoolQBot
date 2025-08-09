@@ -5,7 +5,7 @@
 """
 
 from datetime import date, datetime, timedelta
-from typing import ClassVar
+from functools import cache
 
 from nonebot import get_driver
 from nonebot.log import logger
@@ -86,16 +86,13 @@ def update_old_2(data: dict, group_id: int):
     return new_data
 
 
-class Singleton(type):
-    _instances: ClassVar = {}
-
-    def __call__(cls, session_id: str):
-        if session_id not in cls._instances:
-            cls._instances[session_id] = super().__call__(session_id)
-        return cls._instances[session_id]
+@cache
+def get_recorder(session_id: str) -> "Recorder":
+    """获取 Recorder 实例的工厂函数，使用 cache 实现单例模式"""
+    return Recorder(session_id)
 
 
-class Recorder(metaclass=Singleton):
+class Recorder:
     def __init__(self, session_id: str):
         self._msg_send_time: list[datetime] = []
         self._last_message_on: datetime = datetime.now()
