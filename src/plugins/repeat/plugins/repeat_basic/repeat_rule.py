@@ -21,8 +21,6 @@ async def need_repeat(event: Event, user: UserSession) -> bool:
     if event.is_tome():
         return False
 
-    user_id = event.get_user_id()
-
     # 只复读指定群内消息
     recorder = get_recorder(user.session_id)
     if not await recorder.is_enabled():
@@ -37,7 +35,7 @@ async def need_repeat(event: Event, user: UserSession) -> bool:
     recorder.add_msg_send_time(now)
 
     # 不要复读应用消息
-    if user_id == 1000000:
+    if user.platform == "QQClient" and user.platform_user.id == "1000000":
         return False
 
     # 不要复读签到，分享，小程序，转发，红包
@@ -66,10 +64,10 @@ async def need_repeat(event: Event, user: UserSession) -> bool:
     logger.info(f"repeat: {rand}")
     if rand > repeat_rate:
         # 只有判断过后的消息才会被记录
-        await recorder.add_msg_number_list(user_id)
+        await recorder.add_msg_number_list(user.user_id)
         return False
 
-    await recorder.add_repeat_list(user_id)
+    await recorder.add_repeat_list(user.user_id)
     # 记录复读时间
     recorder.reset_last_message_on()
 

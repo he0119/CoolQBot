@@ -16,7 +16,7 @@ async def _records(app: App):
     from src.plugins.repeat.models import Enabled
 
     async with get_session() as session:
-        session.add(Enabled(platform="qq", group_id="10000"))
+        session.add(Enabled(session_id="QQClient_10000"))
         await session.commit()
 
 
@@ -42,7 +42,7 @@ async def test_repeat(app: App, mocker: MockerFixture):
 
         event = fake_group_message_event_v11(message=Message("123"))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, event.message, None)
+        ctx.should_call_send(event, event.message)
         ctx.should_finished(repeat_message)
 
     assert mocked_recorder_datetime.now.call_count == 3

@@ -8,10 +8,12 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from alembic import op
 from nonebot import logger
+from sqlalchemy import select
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 
@@ -37,8 +39,7 @@ MAPPING = {
 }
 
 
-def get_session_id(platform: str, group_id: str, guild_id: str, channel_id: str) -> str | None:
-    """生成会话 ID"""
+def to_uninfo_platform(platform: str, group_id: str) -> str:
     if platform == "qq":
         if group_id and group_id.isdigit():
             platform = "QQClient"
@@ -47,10 +48,44 @@ def get_session_id(platform: str, group_id: str, guild_id: str, channel_id: str)
     else:
         platform = MAPPING.get(platform, "Unknown")
 
+    return platform
+
+
+def get_session_id(platform: str, group_id: str, guild_id: str, channel_id: str) -> str | None:
+    """生成会话 ID"""
     if group_id:
         return f"{platform}_{group_id}"
     if guild_id and channel_id:
         return f"{platform}_{guild_id}_{channel_id}"
+
+
+def get_user_id(platform: str, user_id: str, session, User, Bind) -> int | None:
+    user = (
+        session.scalars(
+            select(User)
+            .where(Bind.platform_id == user_id)
+            .where(Bind.platform == platform)
+            .join(Bind, User.id == Bind.bind_id)
+        )
+    ).one_or_none()
+
+    if user:
+        return user.id
+
+    user = User(name=f"{platform}-{user_id}", created_at=datetime.now(UTC))
+    session.add(user)
+    session.commit()
+
+    bind = Bind(
+        platform_id=user_id,
+        platform=f"{platform}",
+        bind_id=user.id,
+        original_id=user.id,
+    )
+    session.add(bind)
+    session.commit()
+
+    return user.id
 
 
 def upgrade(name: str = "") -> None:
@@ -64,18 +99,34 @@ def upgrade(name: str = "") -> None:
     MessageRecord = Base.classes.repeat_messagerecord
     Enabled = Base.classes.repeat_enabled
 
+    User = Base.classes.nonebot_plugin_user_user
+    Bind = Base.classes.nonebot_plugin_user_bind
+
     # 写入数据
     logger.info("repeat: 开始迁移 session_id...")
     for message_record in session.query(MessageRecord).all():
+        uninfo_platform = to_uninfo_platform(message_record.platform, message_record.group_id)
         session_id = get_session_id(
-            message_record.platform, message_record.group_id, message_record.guild_id, message_record.channel_id
+            uninfo_platform, message_record.group_id, message_record.guild_id, message_record.channel_id
         )
-        if session_id:
+        uid = get_user_id(uninfo_platform, message_record.user_id, session, User, Bind)
+        if session_id and uid:
             message_record.session_id = session_id
+            message_record.uid = uid
+        else:
+            raise ValueError(
+                f"无法为 {message_record.platform} {message_record.group_id} {message_record.guild_id} {message_record.channel_id} "
+                f"生成 session_id 或 uid"
+            )
     for enabled in session.query(Enabled).all():
-        session_id = get_session_id(enabled.platform, enabled.group_id, enabled.guild_id, enabled.channel_id)
+        uninfo_platform = to_uninfo_platform(enabled.platform, enabled.group_id)
+        session_id = get_session_id(uninfo_platform, enabled.group_id, enabled.guild_id, enabled.channel_id)
         if session_id:
             enabled.session_id = session_id
+        else:
+            raise ValueError(
+                f"无法为 {enabled.platform} {enabled.group_id} {enabled.guild_id} {enabled.channel_id} 生成 session_id"
+            )
 
     session.commit()
     logger.info("repeat: 迁移完成")

@@ -10,9 +10,6 @@ class Config(BaseModel):
     repeat_interval: int = 1
     """ 复读间隔 """
 
-    repeat_migration_group_id: int | None = None
-    """ 旧数据迁移的群号 """
-
     repeat_excluded_users: list[str | int] = []
     """ 排除复读的用户列表
 

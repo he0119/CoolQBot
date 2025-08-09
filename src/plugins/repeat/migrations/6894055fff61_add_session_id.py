@@ -32,9 +32,10 @@ def upgrade(name: str = "") -> None:
         batch_op.create_unique_constraint("unique_enabled", ["session_id"])
 
     with op.batch_alter_table("repeat_messagerecord", schema=None) as batch_op:
+        batch_op.add_column(sa.Column("uid", sa.Integer(), nullable=True))
         batch_op.add_column(sa.Column("session_id", sa.String(), nullable=True))
         batch_op.drop_constraint(batch_op.f("unique_record"), type_="unique")
-        batch_op.create_unique_constraint("unique_record", ["date", "session_id", "user_id"])
+        batch_op.create_unique_constraint("unique_record", ["date", "session_id", "uid"])
 
     # ### end Alembic commands ###
 
@@ -48,6 +49,7 @@ def downgrade(name: str = "") -> None:
         batch_op.create_unique_constraint(
             batch_op.f("unique_record"), ["date", "platform", "group_id", "guild_id", "channel_id", "user_id"]
         )
+        batch_op.drop_column("uid")
         batch_op.drop_column("session_id")
 
     with op.batch_alter_table("repeat_enabled", schema=None) as batch_op:

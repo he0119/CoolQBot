@@ -64,8 +64,8 @@ class Ranking:
 
     async def ranking(self):
         """合并两个排行榜"""
-        self.repeat_list = {record.user_id: record.repeat_time for record in self.records}
-        self.msg_number_list = {record.user_id: record.msg_number for record in self.records}
+        self.repeat_list = {record.uid: record.repeat_time for record in self.records}
+        self.msg_number_list = {record.uid: record.msg_number for record in self.records}
 
         repeat_rate_ranking = await self.repeat_rate_ranking()
         repeat_number_ranking = await self.repeat_number_ranking()

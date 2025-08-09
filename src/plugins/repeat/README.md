@@ -48,9 +48,6 @@ REPEAT_INTERVAL=1
 
 # 排除复读的用户列表 (支持用户名或用户ID)
 REPEAT_EXCLUDED_USERS=["bot", "admin", 123456]
-
-# 旧数据迁移群号 (仅在升级时需要)
-REPEAT_MIGRATION_GROUP_ID=123456789
 ```
 
 ### 配置参数说明
@@ -58,4 +55,3 @@ REPEAT_MIGRATION_GROUP_ID=123456789
 - `REPEAT_RATE`: 复读概率，取值范围 1-100，默认为 10（即 10% 概率）
 - `REPEAT_INTERVAL`: 复读间隔，单位分钟，默认为 1 分钟
 - `REPEAT_EXCLUDED_USERS`: 排除复读的用户列表，可以是用户名或用户 ID
-- `REPEAT_MIGRATION_GROUP_ID`: 用于数据迁移的群号，仅在从旧版本升级时需要
