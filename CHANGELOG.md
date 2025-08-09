@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 复读插件支持多适配器
+
 ## [0.24.2] - 2025-08-03
 
 ### Added
