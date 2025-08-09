@@ -4,6 +4,7 @@
 如果遇到老版本数据，则自动升级
 """
 
+from collections.abc import Sequence
 from datetime import date, datetime, timedelta
 from functools import cache
 
@@ -23,13 +24,13 @@ def get_recorder(session_id: str) -> "Recorder":
 
 
 class Recorder:
-    def __init__(self, session_id: str):
+    def __init__(self, session_id: str) -> None:
         self._msg_send_time: list[datetime] = []
         self._last_message_on: datetime = datetime.now()
 
         self.session_id = session_id
 
-    def message_number(self, x: int):
+    def message_number(self, x: int) -> int:
         """返回指定群 x 分钟内的消息条数，并清除之前的消息记录"""
 
         now = datetime.now()
@@ -42,7 +43,7 @@ class Recorder:
         self._msg_send_time.clear()
         return 0
 
-    async def get_records(self, year: int | None = None, month: int | None = None):
+    async def get_records(self, year: int | None = None, month: int | None = None) -> Sequence[MessageRecord]:
         """获取指定月的复读记录
 
         没有参数则为当月数据
@@ -71,7 +72,7 @@ class Recorder:
             )
             return records.scalars().all()
 
-    async def get_records_by_day(self, year: int, month: int, day: int):
+    async def get_records_by_day(self, year: int, month: int, day: int) -> Sequence[MessageRecord]:
         """获取指定群某一天的复读记录
 
         只填写日为这个月第几日的数据
@@ -85,7 +86,7 @@ class Recorder:
             )
             return records.scalars().all()
 
-    async def add_repeat_list(self, user_id: int):
+    async def add_repeat_list(self, user_id: int) -> None:
         """该 QQ 号在指定群的复读记录，加一"""
         now_date = datetime.now().date()
         async with get_session() as session:
@@ -110,7 +111,7 @@ class Recorder:
                 session.add(record)
                 await session.commit()
 
-    async def add_msg_number_list(self, user_id: int):
+    async def add_msg_number_list(self, user_id: int) -> None:
         """该 QQ 号在指定群的消息数量记录，加一"""
         now_date = datetime.now().date()
         async with get_session() as session:
@@ -133,16 +134,16 @@ class Recorder:
                 session.add(record)
                 await session.commit()
 
-    def add_msg_send_time(self, time):
+    def add_msg_send_time(self, time: datetime) -> None:
         """将这个时间加入到指定群的消息发送时间列表中"""
         self._msg_send_time.append(time)
 
-    def last_message_on(self):
+    def last_message_on(self) -> datetime:
         return self._last_message_on
 
-    def reset_last_message_on(self):
+    def reset_last_message_on(self) -> None:
         self._last_message_on = datetime.now()
 
-    async def is_enabled(self):
+    async def is_enabled(self) -> Enabled | None:
         async with get_session() as session:
             return (await session.scalars(select(Enabled).where(Enabled.session_id == self.session_id))).one_or_none()

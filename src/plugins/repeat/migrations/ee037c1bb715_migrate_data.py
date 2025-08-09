@@ -27,7 +27,7 @@ branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
-def _migrate_old_data(ds_conn: Connection):
+def _migrate_old_data(ds_conn: Connection) -> None:
     insp = inspect(ds_conn)
     if "repeat_record" not in insp.get_table_names() or "repeat_alembic_version" not in insp.get_table_names():
         logger.info("repeat: 未发现来自 datastore 的数据")
@@ -86,7 +86,7 @@ def _migrate_old_data(ds_conn: Connection):
     logger.info("repeat: 迁移完成")
 
 
-async def data_migrate(conn: AsyncConnection):
+async def data_migrate(conn: AsyncConnection) -> None:
     from nonebot_plugin_datastore.db import get_engine
 
     async with get_engine().connect() as ds_conn:

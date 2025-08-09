@@ -38,7 +38,7 @@ history_cmd = on_alconna(
 
 
 @history_cmd.handle()
-async def history_handle_first_receive(state: T_State, arg: Match[str]):
+async def history_handle_first_receive(state: T_State, arg: Match[str]) -> None:
     args = arg.result if arg.available else ""
     match = re.match(r"^(\d+)(?:\-(\d+)(?:\-(\d+))?)?$", args)
     if match:

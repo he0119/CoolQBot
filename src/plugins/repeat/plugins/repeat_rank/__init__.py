@@ -40,7 +40,7 @@ rank_cmd = on_alconna(
 
 
 @rank_cmd.handle()
-async def rank_handle_first_receive(state: T_State, arg: Match[str]):
+async def rank_handle_first_receive(state: T_State, arg: Match[str]) -> None:
     args = arg.result if arg.available else ""
     match = re.match(r"^(?:(\d+))?(?:n(\d+))?$", args)
     if match:

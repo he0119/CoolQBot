@@ -3,6 +3,7 @@
 import collections
 from collections.abc import Sequence
 from operator import itemgetter
+from typing import Any
 
 from nonebot_plugin_user import get_user_by_id
 
@@ -57,7 +58,7 @@ class Ranking:
         self.session_id = session_id
         self._nickname_cache = {}
 
-    async def ranking(self):
+    async def ranking(self) -> str | None:
         """合并两个排行榜"""
         self.repeat_list = {record.uid: record.repeat_time for record in self.records}
         self.msg_number_list = {record.uid: record.msg_number for record in self.records}
@@ -68,7 +69,7 @@ class Ranking:
         if repeat_rate_ranking and repeat_number_ranking:
             return repeat_rate_ranking + "\n\n" + repeat_number_ranking
 
-    async def repeat_number_ranking(self):
+    async def repeat_number_ranking(self) -> str | None:
         """获取次数排行榜"""
         od = collections.OrderedDict(sorted(self.repeat_list.items(), key=itemgetter(1), reverse=True))
 
@@ -79,7 +80,7 @@ class Ranking:
         else:
             return None
 
-    async def repeat_rate_ranking(self):
+    async def repeat_rate_ranking(self) -> str | None:
         """获取复读概率排行榜"""
         repeat_rate = self.get_repeat_rate(self.repeat_list, self.msg_number_list)
         od = collections.OrderedDict(sorted(repeat_rate.items(), key=itemgetter(1), reverse=True))
@@ -91,7 +92,7 @@ class Ranking:
         else:
             return None
 
-    async def ranking_str(self, sorted_list, list_type):
+    async def ranking_str(self, sorted_list: collections.OrderedDict[int, Any], list_type: str) -> str:
         """获取排行榜文字"""
         i = 0
         str_data = ""
@@ -110,12 +111,12 @@ class Ranking:
         return str_data
 
     @staticmethod
-    def get_repeat_rate(repeat_list, msg_number_list):
+    def get_repeat_rate(repeat_list: dict[int, int], msg_number_list: dict[int, int]) -> dict[int, float]:
         """获取复读概率表"""
         repeat_rate = {k: v / msg_number_list[k] for k, v in repeat_list.items()}
         return repeat_rate
 
-    async def nikcname(self, user_id: int):
+    async def nikcname(self, user_id: int) -> str:
         """输入 QQ 号，返回用户昵称"""
         if user_id in self._nickname_cache:
             return self._nickname_cache[user_id]

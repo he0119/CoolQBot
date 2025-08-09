@@ -30,7 +30,7 @@ repeat_message = on_message(rule=need_repeat, priority=50, block=True)
 
 
 @repeat_message.handle()
-async def repeat_message_handle(event: Event):
+async def repeat_message_handle(event: Event) -> None:
     await repeat_message.finish(event.get_message())
 
 
@@ -50,7 +50,7 @@ repeat_cmd = on_alconna(
 
 
 @repeat_cmd.handle()
-async def repeat_handle(session: AsyncSession, arg: Match[str], session_id: SessionId):
+async def repeat_handle(session: AsyncSession, arg: Match[str], session_id: SessionId) -> None:
     group = (await session.scalars(select(Enabled).where(Enabled.session_id == session_id))).one_or_none()
 
     if arg.available:
