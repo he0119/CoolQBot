@@ -35,7 +35,7 @@ def upgrade(name: str = "") -> None:
 
     with op.batch_alter_table("repeat_messagerecord", schema=None) as batch_op:
         batch_op.alter_column("session_id", existing_type=sa.VARCHAR(), nullable=False)
-        batch_op.alter_column("user_id", existing_type=sa.Integer(), nullable=False)
+        batch_op.alter_column("uid", existing_type=sa.Integer(), nullable=False)
         batch_op.drop_column("channel_id")
         batch_op.drop_column("group_id")
         batch_op.drop_column("platform")
@@ -55,7 +55,7 @@ def downgrade(name: str = "") -> None:
         batch_op.add_column(sa.Column("platform", sa.VARCHAR(), nullable=False))
         batch_op.add_column(sa.Column("group_id", sa.VARCHAR(), nullable=False))
         batch_op.add_column(sa.Column("channel_id", sa.VARCHAR(), nullable=False))
-        batch_op.alter_column("user_id", existing_type=sa.Integer(), nullable=True)
+        batch_op.alter_column("uid", existing_type=sa.Integer(), nullable=True)
         batch_op.alter_column("session_id", existing_type=sa.VARCHAR(), nullable=True)
 
     with op.batch_alter_table("repeat_enabled", schema=None) as batch_op:
