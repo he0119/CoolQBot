@@ -63,6 +63,7 @@ dev-dependencies = [
     "beautifulsoup4>=4.13.4",
     "bump-my-version>=1.2.1",
     "poethepoet>=0.36.0",
+    "inline-snapshot>=0.27.1",
 ]
 override-dependencies = ["pillow>=10.0.0"]
 
