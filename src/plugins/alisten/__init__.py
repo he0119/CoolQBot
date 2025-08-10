@@ -2,7 +2,7 @@
 
 from nonebot import require
 from nonebot.adapters.onebot.v11 import Bot
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
 require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
@@ -19,7 +19,7 @@ __plugin_meta__ = PluginMetadata(
 如果仅凭歌曲名称无法获得正确歌曲时
 可以尝试在后面加上歌手名称或其他信息
 /music Sagitta luminis 梶浦由記""",
-    supported_adapters={"~onebot.v11"},
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
 )
 
 

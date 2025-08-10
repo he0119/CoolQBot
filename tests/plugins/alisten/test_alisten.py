@@ -36,7 +36,7 @@ async def test_music(app: App, mocker: MockerFixture):
     from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
     require("src.plugins.music")
-    from src.plugins.music import music_cmd
+    from src.plugins.alisten import music_cmd
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
@@ -61,7 +61,7 @@ async def test_music_get_arg(
     from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
     require("src.plugins.music")
-    from src.plugins.music import music_cmd
+    from src.plugins.alisten import music_cmd
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
 
