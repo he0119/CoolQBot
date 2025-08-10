@@ -158,7 +158,10 @@ async def music_handle_first_receive(
 ):
     # 首先检查是否有配置
     if not config:
-        await music_cmd.finish("当前群组未配置 alisten 服务\n请联系管理员使用 /alisten config set 命令进行配置")
+        await music_cmd.finish(
+            "当前群组未配置 alisten 服务\n请联系管理员使用 /alisten config set 命令进行配置",
+            at_sender=True,
+        )
 
     if keywords.available:
         music_cmd.set_path_arg("keywords", keywords.result)

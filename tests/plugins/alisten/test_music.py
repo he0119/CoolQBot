@@ -11,6 +11,26 @@ from nonebug import App
 from tests.fake import fake_group_message_event_v11
 
 
+async def test_music_no_config(app: App):
+    """测试没有配置的情况"""
+    from nonebot.adapters.onebot.v11 import Message
+
+    from src.plugins.alisten import music_cmd
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+
+        event = fake_group_message_event_v11(message=Message("/music test"))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event=event,
+            message="当前群组未配置 alisten 服务\n请联系管理员使用 /alisten config set 命令进行配置",
+            at_sender=True,
+        )
+        ctx.should_finished(music_cmd)
+
+
 @pytest.mark.usefixtures("_configs")
 @respx.mock(assert_all_called=True)
 async def test_music_success(app: App, respx_mock: respx.MockRouter):
