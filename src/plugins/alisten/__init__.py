@@ -16,7 +16,7 @@ from sqlalchemy import select
 from src.plugins.group_bind import SessionId
 from src.utils.permission import SUPERUSER
 
-from .alisten_api import api
+from .alisten_api import SuccessResponse, api
 from .models import AlistenConfig
 
 __plugin_meta__ = PluginMetadata(
@@ -190,17 +190,15 @@ async def music_handle(
 
     result = await api.pick_music(name=name, user_name=user.name, source=source, config=config)
 
-    if result.success:
+    if isinstance(result, SuccessResponse):
         msg = "点歌成功！歌曲已加入播放列表"
-        if result.name:
-            msg += f"\n歌曲：{result.name}"
-        if result.source:
-            source_name = {
-                "wy": "网易云音乐",
-                "qq": "QQ音乐",
-                "db": "Bilibili",
-            }.get(result.source, result.source)
-            msg += f"\n来源：{source_name}"
+        msg += f"\n歌曲：{result.data.name}"
+        source_name = {
+            "wy": "网易云音乐",
+            "qq": "QQ音乐",
+            "db": "Bilibili",
+        }.get(result.data.source, result.data.source)
+        msg += f"\n来源：{source_name}"
         await music_cmd.finish(msg, at_sender=True)
     else:
-        await music_cmd.finish(result.message, at_sender=True)
+        await music_cmd.finish(result.error, at_sender=True)

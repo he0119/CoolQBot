@@ -203,6 +203,15 @@ wheels = [
 ]
 
 [[package]]
+name = "asttokens"
+version = "3.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4a/e7/82da0a03e7ba5141f05cce0d302e6eed121ae055e0456ca228bf693984bc/asttokens-3.0.0.tar.gz", hash = "sha256:0dcd8baa8d62b0c1d118b399b2ddba3c4aff271d0d7a9e0d4c1681c79035bbc7", size = 61978, upload-time = "2024-11-30T04:30:14.439Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/25/8a/c46dcc25341b5bce5472c718902eb3d38600a903b14fa6aeecef3f21a46f/asttokens-3.0.0-py3-none-any.whl", hash = "sha256:e3078351a059199dd5138cb1c706e6430c05eff2ff136af5eb4790f9d28932e2", size = 26918, upload-time = "2024-11-30T04:30:10.946Z" },
+]
+
+[[package]]
 name = "async-asgi-testclient"
 version = "1.4.11"
 source = { registry = "https://pypi.org/simple" }
@@ -541,6 +550,7 @@ dev = [
     { name = "beautifulsoup4" },
     { name = "bump-my-version" },
     { name = "freezegun" },
+    { name = "inline-snapshot" },
     { name = "nonebug" },
     { name = "nonebug-saa" },
     { name = "poethepoet" },
@@ -595,6 +605,7 @@ dev = [
     { name = "beautifulsoup4", specifier = ">=4.13.4" },
     { name = "bump-my-version", specifier = ">=1.2.1" },
     { name = "freezegun", specifier = ">=1.5.4" },
+    { name = "inline-snapshot", specifier = ">=0.27.1" },
     { name = "nonebug", specifier = ">=0.4.3" },
     { name = "nonebug-saa", specifier = ">=0.5.0" },
     { name = "poethepoet", specifier = ">=0.36.0" },
@@ -724,6 +735,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/bb/ff/b4c0dc78fbe20c3e59c0c7334de0c27eb4001a2b2017999af398bf730817/execnet-2.1.1.tar.gz", hash = "sha256:5189b52c6121c24feae288166ab41b32549c7e2348652736540b9e6e7d4e72e3", size = 166524, upload-time = "2024-04-08T09:04:19.245Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/43/09/2aea36ff60d16dd8879bdb2f5b3ee0ba8d08cbbdcdfe870e695ce3784385/execnet-2.1.1-py3-none-any.whl", hash = "sha256:26dee51f1b80cebd6d0ca8e74dd8745419761d3bef34163928cbebbdc4749fdc", size = 40612, upload-time = "2024-04-08T09:04:17.414Z" },
+]
+
+[[package]]
+name = "executing"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/91/50/a9d80c47ff289c611ff12e63f7c5d13942c65d68125160cefd768c73e6e4/executing-2.2.0.tar.gz", hash = "sha256:5d108c028108fe2551d1a7b2e8b713341e2cb4fc0aa7dcf966fa4327a5226755", size = 978693, upload-time = "2025-01-22T15:41:29.403Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7b/8f/c4d9bafc34ad7ad5d8dc16dd1347ee0e507a52c3adb6bfa8887e1c6a26ba/executing-2.2.0-py2.py3-none-any.whl", hash = "sha256:11387150cad388d62750327a53d3339fad4888b39a6fe233c3afbb54ecffd3aa", size = 26702, upload-time = "2025-01-22T15:41:25.929Z" },
 ]
 
 [[package]]
@@ -1028,6 +1048,21 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f2/97/ebf4da567aa6827c909642694d71c9fcf53e5b504f2d96afea02718862f3/iniconfig-2.1.0.tar.gz", hash = "sha256:3abbd2e30b36733fee78f9c7f7308f2d0050e88f0087fd25c2645f63c773e1c7", size = 4793, upload-time = "2025-03-19T20:09:59.721Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2c/e1/e6716421ea10d38022b952c159d5161ca1193197fb744506875fbb87ea7b/iniconfig-2.1.0-py3-none-any.whl", hash = "sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760", size = 6050, upload-time = "2025-03-19T20:10:01.071Z" },
+]
+
+[[package]]
+name = "inline-snapshot"
+version = "0.27.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "asttokens" },
+    { name = "executing" },
+    { name = "pytest" },
+    { name = "rich" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/29/56/20b7a5e94db1596430e92a1249f22810931cc9f6de01fee44665fc5bc137/inline_snapshot-0.27.1.tar.gz", hash = "sha256:44fdc960431032df5d215d5c6489e2c3e4c86d7de1c8860d777e890980d15e01", size = 345865, upload-time = "2025-08-08T17:36:01.742Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3d/1e/fcbc7e748d699f246bc8e1f198d916a57db543a2da95e8c00250b373729c/inline_snapshot-0.27.1-py3-none-any.whl", hash = "sha256:e989fdcc10626ca89727c6d88c1c71456cb10df577bb8c131191eb17f2e81a1e", size = 66903, upload-time = "2025-08-08T17:36:00.114Z" },
 ]
 
 [[package]]

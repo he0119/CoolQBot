@@ -1,6 +1,9 @@
+import json
+
 import httpx
 import pytest
 import respx
+from inline_snapshot import snapshot
 from nonebot import get_adapter
 from nonebot.adapters.onebot.v11 import Adapter, Bot
 from nonebug import App
@@ -16,15 +19,17 @@ async def test_music_success(app: App, respx_mock: respx.MockRouter):
 
     from src.plugins.alisten import music_cmd
 
-    respx_mock.post("http://localhost:8080/music/pick").mock(
+    mocked_api = respx_mock.post("http://localhost:8080/music/pick").mock(
         return_value=httpx.Response(
             status_code=200,
             json={
-                "success": True,
+                "code": "20000",
                 "message": "点歌成功",
-                "name": "测试歌曲",
-                "source": "网易云音乐",
-                "id": "123456",
+                "data": {
+                    "name": "测试歌曲",
+                    "source": "wy",
+                    "id": "123456",
+                },
             },
         )
     )
@@ -43,6 +48,18 @@ async def test_music_success(app: App, respx_mock: respx.MockRouter):
         )
         ctx.should_finished(music_cmd)
 
+    last_request = mocked_api.calls.last.request
+    assert json.loads(last_request.content) == snapshot(
+        {
+            "houseId": "room123",
+            "housePwd": "password123",
+            "user": {"name": "nickname", "email": ""},
+            "id": "",
+            "name": "test",
+            "source": "wy",
+        }
+    )
+
 
 @pytest.mark.usefixtures("_configs")
 @respx.mock(assert_all_called=True)
@@ -52,12 +69,11 @@ async def test_music_failure(app: App, respx_mock: respx.MockRouter):
 
     from src.plugins.alisten import music_cmd
 
-    respx_mock.post("http://localhost:8080/music/pick").mock(
+    mocked_api = respx_mock.post("http://localhost:8080/music/pick").mock(
         return_value=httpx.Response(
-            status_code=200,
+            status_code=400,
             json={
-                "success": False,
-                "message": "点歌失败，无法获取音乐信息",
+                "error": "点歌失败，无法获取音乐信息",
             },
         )
     )
@@ -76,6 +92,18 @@ async def test_music_failure(app: App, respx_mock: respx.MockRouter):
         )
         ctx.should_finished(music_cmd)
 
+    last_request = mocked_api.calls.last.request
+    assert json.loads(last_request.content) == snapshot(
+        {
+            "houseId": "room123",
+            "housePwd": "password123",
+            "user": {"name": "nickname", "email": ""},
+            "id": "",
+            "name": "test",
+            "source": "wy",
+        }
+    )
+
 
 @pytest.mark.usefixtures("_configs")
 @respx.mock(assert_all_called=True)
@@ -85,15 +113,17 @@ async def test_music_bilibili(app: App, respx_mock: respx.MockRouter):
 
     from src.plugins.alisten import music_cmd
 
-    respx_mock.post("http://localhost:8080/music/pick").mock(
+    mocked_api = respx_mock.post("http://localhost:8080/music/pick").mock(
         return_value=httpx.Response(
             status_code=200,
             json={
-                "success": True,
+                "code": "20000",
                 "message": "点歌成功",
-                "name": "【测试】Bilibili视频",
-                "source": "db",
-                "id": "BV1Xx411c7md",
+                "data": {
+                    "name": "【测试】Bilibili视频",
+                    "source": "db",
+                    "id": "BV1Xx411c7md",
+                },
             },
         )
     )
@@ -112,6 +142,18 @@ async def test_music_bilibili(app: App, respx_mock: respx.MockRouter):
         )
         ctx.should_finished(music_cmd)
 
+    last_request = mocked_api.calls.last.request
+    assert json.loads(last_request.content) == snapshot(
+        {
+            "houseId": "room123",
+            "housePwd": "password123",
+            "user": {"name": "nickname", "email": ""},
+            "id": "",
+            "name": "BV1Xx411c7md",
+            "source": "db",
+        }
+    )
+
 
 @pytest.mark.usefixtures("_configs")
 @respx.mock(assert_all_called=True)
@@ -121,15 +163,17 @@ async def test_music_get_arg(app: App, respx_mock: respx.MockRouter):
 
     from src.plugins.alisten import music_cmd
 
-    respx_mock.post("http://localhost:8080/music/pick").mock(
+    mocked_api = respx_mock.post("http://localhost:8080/music/pick").mock(
         return_value=httpx.Response(
             status_code=200,
             json={
-                "success": True,
+                "code": "20000",
                 "message": "点歌成功",
-                "name": "测试歌曲",
-                "source": "网易云音乐",
-                "id": "123456",
+                "data": {
+                    "name": "测试歌曲",
+                    "source": "wy",
+                    "id": "123456",
+                },
             },
         )
     )
@@ -155,3 +199,15 @@ async def test_music_get_arg(app: App, respx_mock: respx.MockRouter):
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "点歌成功！歌曲已加入播放列表\n歌曲：测试歌曲\n来源：网易云音乐", at_sender=True)
         ctx.should_finished(music_cmd)
+
+    last_request = mocked_api.calls.last.request
+    assert json.loads(last_request.content) == snapshot(
+        {
+            "houseId": "room123",
+            "housePwd": "password123",
+            "user": {"name": "nickname", "email": ""},
+            "id": "",
+            "name": "test",
+            "source": "wy",
+        }
+    )

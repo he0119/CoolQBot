@@ -23,20 +23,34 @@ class PickMusicRequest(BaseModel):
     source: str = "wy"
 
 
-class PickMusicResult(BaseModel):
-    """点歌结果"""
+class MusicData(BaseModel):
+    """音乐数据"""
 
-    success: bool
+    name: str
+    source: str
+    id: str
+
+
+class SuccessResponse(BaseModel):
+    """成功响应"""
+
+    code: str
     message: str
-    name: str | None = None
-    source: str | None = None
-    id: str | None = None
+    data: MusicData
+
+
+class ErrorResponse(BaseModel):
+    """错误响应"""
+
+    error: str
 
 
 class AListenAPI:
     """alisten API 客户端"""
 
-    async def pick_music(self, name: str, source: str, user_name: str, config: AlistenConfig) -> PickMusicResult:
+    async def pick_music(
+        self, name: str, source: str, user_name: str, config: AlistenConfig
+    ) -> SuccessResponse | ErrorResponse:
         """点歌
 
         Args:
@@ -67,38 +81,30 @@ class AListenAPI:
                 )
 
                 if response.status_code == 200:
-                    return PickMusicResult.model_validate(response.json())
+                    # 尝试解析成功响应
+                    try:
+                        success_response = SuccessResponse.model_validate(response.json())
+                        return success_response
+                    except Exception as e:
+                        logger.error(f"解析成功响应失败: {e}")
+                        return ErrorResponse(error="响应数据格式错误")
                 else:
                     # 处理错误响应
                     try:
-                        error_data = response.json()
-                        error_message = error_data.get("error", f"服务器错误: {response.status_code}")
+                        error_response = ErrorResponse.model_validate(response.json())
+                        return error_response
                     except Exception:
-                        error_message = f"服务器错误: {response.status_code}"
-
-                    return PickMusicResult(
-                        success=False,
-                        message=error_message,
-                    )
+                        return ErrorResponse(error=f"服务器错误: {response.status_code}")
 
         except httpx.TimeoutException:
             logger.error("alisten API 请求超时")
-            return PickMusicResult(
-                success=False,
-                message="请求超时，请稍后重试",
-            )
+            return ErrorResponse(error="请求超时，请稍后重试")
         except httpx.RequestError as e:
             logger.error(f"alisten API 请求失败: {e}")
-            return PickMusicResult(
-                success=False,
-                message="网络连接失败，请检查 alisten 服务是否正常运行",
-            )
+            return ErrorResponse(error="网络连接失败，请检查 alisten 服务是否正常运行")
         except Exception as e:
             logger.error(f"alisten API 未知错误: {e}")
-            return PickMusicResult(
-                success=False,
-                message="点歌失败，请稍后重试",
-            )
+            return ErrorResponse(error="点歌失败，请稍后重试")
 
 
 # 全局 API 实例
