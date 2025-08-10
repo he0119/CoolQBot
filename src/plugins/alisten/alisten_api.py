@@ -58,7 +58,7 @@ class AListenAPI:
         url = f"{plugin_config.alisten_server_url}/music/pick"
 
         try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
+            async with httpx.AsyncClient(timeout=30.0, verify=False) as client:
                 response = await client.post(
                     url,
                     json=request_data.model_dump(),
