@@ -72,6 +72,7 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        id: setup-buildx
 
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
@@ -84,21 +85,14 @@ jobs:
         uses: actions/cache@v4
         id: cache
         with:
-          path: |
-            var-cache-apt
-            var-lib-apt
-            root-cache-uv
-          key: cache-${{ hashFiles('Dockerfile') }}
+          path: cache-mount
+          key: cache-mount-${{ hashFiles('Dockerfile') }}
 
       - name: Inject cache into docker
         uses: reproducible-containers/buildkit-cache-dance@v3.3.0
         with:
-          cache-map: |
-            {
-              "var-cache-apt": "/var/cache/apt",
-              "var-lib-apt": "/var/lib/apt",
-              "root-cache-uv": "/root/.cache/uv"
-            }
+          builder: ${{ steps.setup-buildx.outputs.name }}
+          cache-dir: cache-mount
           skip-extraction: ${{ steps.cache.outputs.cache-hit }}
 
       - name: Docker meta
@@ -115,12 +109,12 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ needs.test.outputs.version }}
 
