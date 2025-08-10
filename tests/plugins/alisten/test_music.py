@@ -1,3 +1,6 @@
+import httpx
+import pytest
+import respx
 from nonebot import get_adapter
 from nonebot.adapters.onebot.v11 import Adapter, Bot
 from nonebug import App
@@ -6,37 +9,44 @@ from pytest_mock import MockerFixture
 from tests.fake import fake_group_message_event_v11
 
 
-def mocked_pick_music_success(name: str, source: str, user_name: str):
-    """模拟成功的点歌响应"""
-    from src.plugins.alisten.alisten_api import PickMusicResult
+@pytest.fixture
+async def _configs(app: App, mocker: MockerFixture):
+    from nonebot_plugin_orm import get_session
 
-    return PickMusicResult(
-        success=True,
-        message="点歌成功",
-        name="测试歌曲",
-        source="wy",
-        id="123456",
-    )
+    from src.plugins.alisten.models import AlistenConfig
 
-
-def mocked_pick_music_failure(name: str, source: str, user_name: str):
-    """模拟失败的点歌响应"""
-    from src.plugins.alisten.alisten_api import PickMusicResult
-
-    return PickMusicResult(
-        success=False,
-        message="找不到匹配的歌曲",
-    )
+    async with get_session() as session:
+        session.add(
+            AlistenConfig(
+                session_id="QQClient_10000",
+                server_url="http://localhost:8080",
+                house_id="room123",
+                house_password="password123",
+            )
+        )
+        await session.commit()
 
 
-async def test_music_success(app: App, mocker: MockerFixture):
+@pytest.mark.usefixtures("_configs")
+@respx.mock(assert_all_called=True)
+async def test_music_success(app: App, respx_mock: respx.MockRouter):
     """测试音乐点歌成功"""
     from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.alisten import music_cmd
 
-    # Mock API call
-    mock_api = mocker.patch("src.plugins.alisten.api.pick_music", side_effect=mocked_pick_music_success)
+    respx_mock.post("http://localhost:8080/music/pick").mock(
+        return_value=httpx.Response(
+            status_code=200,
+            json={
+                "success": True,
+                "message": "点歌成功",
+                "name": "测试歌曲",
+                "source": "网易云音乐",
+                "id": "123456",
+            },
+        )
+    )
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -52,18 +62,24 @@ async def test_music_success(app: App, mocker: MockerFixture):
         )
         ctx.should_finished(music_cmd)
 
-    # 验证 API 调用
-    mock_api.assert_called_once_with(name="test", source="wy", user_name="nickname")
 
-
-async def test_music_failure(app: App, mocker: MockerFixture):
+@pytest.mark.usefixtures("_configs")
+@respx.mock(assert_all_called=True)
+async def test_music_failure(app: App, respx_mock: respx.MockRouter):
     """测试音乐点歌失败"""
     from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.alisten import music_cmd
 
-    # Mock API call
-    mock_api = mocker.patch("src.plugins.alisten.api.pick_music", side_effect=mocked_pick_music_failure)
+    respx_mock.post("http://localhost:8080/music/pick").mock(
+        return_value=httpx.Response(
+            status_code=200,
+            json={
+                "success": False,
+                "message": "点歌失败，无法获取音乐信息",
+            },
+        )
+    )
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -74,34 +90,32 @@ async def test_music_failure(app: App, mocker: MockerFixture):
 
         ctx.should_call_send(
             event=fake_group_message_event_v11(message=Message("/music test")),
-            message="点歌失败：找不到匹配的歌曲",
+            message="点歌失败，无法获取音乐信息",
             at_sender=True,
         )
         ctx.should_finished(music_cmd)
 
-    # 验证 API 调用
-    mock_api.assert_called_once_with(name="test", source="wy", user_name="nickname")
 
-
-async def test_music_bilibili(app: App, mocker: MockerFixture):
+@pytest.mark.usefixtures("_configs")
+@respx.mock(assert_all_called=True)
+async def test_music_bilibili(app: App, respx_mock: respx.MockRouter):
     """测试 Bilibili BV 号点歌"""
     from nonebot.adapters.onebot.v11 import Message
 
     from src.plugins.alisten import music_cmd
 
-    def mocked_pick_music_bilibili(name: str, source: str, user_name: str):
-        from src.plugins.alisten.alisten_api import PickMusicResult
-
-        return PickMusicResult(
-            success=True,
-            message="点歌成功",
-            name="【测试】Bilibili视频",
-            source="db",
-            id="BV1Xx411c7md",
+    respx_mock.post("http://localhost:8080/music/pick").mock(
+        return_value=httpx.Response(
+            status_code=200,
+            json={
+                "success": True,
+                "message": "点歌成功",
+                "name": "【测试】Bilibili视频",
+                "source": "db",
+                "id": "BV1Xx411c7md",
+            },
         )
-
-    # Mock API call
-    mock_api = mocker.patch("src.plugins.alisten.api.pick_music", side_effect=mocked_pick_music_bilibili)
+    )
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -117,18 +131,27 @@ async def test_music_bilibili(app: App, mocker: MockerFixture):
         )
         ctx.should_finished(music_cmd)
 
-    # 验证 API 调用
-    mock_api.assert_called_once()
 
-
-async def test_music_get_arg(app: App, mocker: MockerFixture):
+@pytest.mark.usefixtures("_configs")
+@respx.mock(assert_all_called=True)
+async def test_music_get_arg(app: App, respx_mock: respx.MockRouter):
     """测试交互式点歌"""
     from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
     from src.plugins.alisten import music_cmd
 
-    # Mock API call
-    mock_api = mocker.patch("src.plugins.alisten.api.pick_music", side_effect=mocked_pick_music_success)
+    respx_mock.post("http://localhost:8080/music/pick").mock(
+        return_value=httpx.Response(
+            status_code=200,
+            json={
+                "success": True,
+                "message": "点歌成功",
+                "name": "测试歌曲",
+                "source": "网易云音乐",
+                "id": "123456",
+            },
+        )
+    )
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -151,6 +174,3 @@ async def test_music_get_arg(app: App, mocker: MockerFixture):
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "点歌成功！歌曲已加入播放列表\n歌曲：测试歌曲\n来源：网易云音乐", at_sender=True)
         ctx.should_finished(music_cmd)
-
-    # 验证 API 调用
-    mock_api.assert_called_once_with(name="test", source="wy", user_name="nickname")

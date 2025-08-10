@@ -4,7 +4,7 @@ import httpx
 from nonebot.log import logger
 from pydantic import BaseModel
 
-from .config import plugin_config
+from .models import AlistenConfig
 
 
 class User(BaseModel):
@@ -36,26 +36,27 @@ class PickMusicResult(BaseModel):
 class AListenAPI:
     """alisten API 客户端"""
 
-    async def pick_music(self, name: str, source: str, user_name: str) -> PickMusicResult:
+    async def pick_music(self, name: str, source: str, user_name: str, config: AlistenConfig) -> PickMusicResult:
         """点歌
 
         Args:
             name: 音乐名称或搜索关键词
             user_name: 用户昵称
             source: 音乐源 (wy/qq/db)
+            config: alisten 配置
 
         Returns:
             点歌结果
         """
         request_data = PickMusicRequest(
-            houseId=plugin_config.alisten_house_id,
-            housePwd=plugin_config.alisten_house_password,
+            houseId=config.house_id,
+            housePwd=config.house_password,
             user=User(name=user_name, email=""),
             name=name,
             source=source,
         )
 
-        url = f"{plugin_config.alisten_server_url}/music/pick"
+        url = f"{config.server_url}/music/pick"
 
         try:
             async with httpx.AsyncClient(timeout=30.0, verify=False) as client:
@@ -66,20 +67,7 @@ class AListenAPI:
                 )
 
                 if response.status_code == 200:
-                    data = response.json()
-                    if "error" in data:
-                        return PickMusicResult(
-                            success=False,
-                            message=data["error"],
-                        )
-                    else:
-                        return PickMusicResult(
-                            success=True,
-                            message=data.get("message", "点歌成功"),
-                            name=data.get("data", {}).get("name"),
-                            source=data.get("data", {}).get("source"),
-                            id=data.get("data", {}).get("id"),
-                        )
+                    return PickMusicResult.model_validate(response.json())
                 else:
                     # 处理错误响应
                     try:
