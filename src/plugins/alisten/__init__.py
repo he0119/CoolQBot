@@ -10,7 +10,8 @@ if not plugin_config.alisten_server_url or not plugin_config.alisten_house_id:
 
 require("nonebot_plugin_alconna")
 require("nonebot_plugin_user")
-from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from arclet.alconna import AllParam
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, UniMessage, on_alconna
 from nonebot_plugin_user import User
 
 from src.utils.helpers import render_expression
@@ -53,7 +54,7 @@ EXPR_SUCCESS = (
 music_cmd = on_alconna(
     Alconna(
         "music",
-        Args["keywords?#音乐名称或信息", str],
+        Args["keywords?#音乐名称或信息", AllParam],
         meta=CommandMeta(
             description=__plugin_meta__.description,
             example=__plugin_meta__.usage,
@@ -66,15 +67,15 @@ music_cmd = on_alconna(
 
 
 @music_cmd.handle()
-async def music_handle_first_receive(keywords: Match[str]):
+async def music_handle_first_receive(keywords: Match[UniMessage]):
     if keywords.available:
         music_cmd.set_path_arg("keywords", keywords.result)
 
 
 @music_cmd.got_path("keywords", prompt="你想听哪首歌呢？")
-async def music_handle(keywords: str, user: User):
+async def music_handle(keywords: UniMessage, user: User):
     """处理点歌请求"""
-    name = keywords.strip()
+    name = keywords.extract_plain_text().strip()
     source = "wy"  # 默认音乐源
 
     # 解析特殊格式的输入
