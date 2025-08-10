@@ -97,6 +97,8 @@ async def handle_config_set(
         )
         db_session.add(new_config)
 
+    await db_session.commit()
+
     await alisten_config_cmd.finish(
         f"alisten 配置已设置:\n"
         f"服务器地址: {server_url}\n"
@@ -129,6 +131,7 @@ async def handle_config_delete(
         await alisten_config_cmd.finish("当前群组未配置 alisten 服务")
 
     await db_session.delete(config)
+    await db_session.commit()
 
     await alisten_config_cmd.finish("alisten 配置已删除")
 
