@@ -182,7 +182,7 @@ async def music_handle(
 
     # 解析特殊格式的输入
     if ":" in name:
-        # 格式如 "wy:song_id" 或 "qq:song_id"
+        # 格式如 "wy:song_name" 或 "qq:song_name"
         parts = name.split(":", 1)
         if len(parts) == 2 and parts[0] in ["wy", "qq", "db"]:
             source = parts[0]
