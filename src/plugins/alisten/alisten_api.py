@@ -1,4 +1,4 @@
-"""alisten 服务器 API 客户端"""
+"""Alisten 服务器 API 客户端"""
 
 import httpx
 from nonebot.log import logger
@@ -46,7 +46,7 @@ class ErrorResponse(BaseModel):
 
 
 class AListenAPI:
-    """alisten API 客户端"""
+    """Alisten API 客户端"""
 
     async def pick_music(
         self, name: str, source: str, user_name: str, config: AlistenConfig
@@ -57,7 +57,7 @@ class AListenAPI:
             name: 音乐名称或搜索关键词
             user_name: 用户昵称
             source: 音乐源 (wy/qq/db)
-            config: alisten 配置
+            config: Alisten 配置
 
         Returns:
             点歌结果
@@ -97,13 +97,13 @@ class AListenAPI:
                         return ErrorResponse(error=f"服务器错误: {response.status_code}")
 
         except httpx.TimeoutException:
-            logger.error("alisten API 请求超时")
+            logger.error("Alisten API 请求超时")
             return ErrorResponse(error="请求超时，请稍后重试")
         except httpx.RequestError as e:
-            logger.error(f"alisten API 请求失败: {e}")
-            return ErrorResponse(error="网络连接失败，请检查 alisten 服务是否正常运行")
+            logger.error(f"Alisten API 请求失败: {e}")
+            return ErrorResponse(error="网络连接失败，请检查 Alisten 服务是否正常运行")
         except Exception as e:
-            logger.error(f"alisten API 未知错误: {e}")
+            logger.error(f"Alisten API 未知错误: {e}")
             return ErrorResponse(error="点歌失败，请稍后重试")
 
 

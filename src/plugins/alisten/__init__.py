@@ -1,4 +1,4 @@
-"""音乐插件"""
+"""Alisten 插件"""
 
 from nonebot import require
 from nonebot.params import Depends
@@ -23,13 +23,13 @@ from .models import AlistenConfig
 
 __plugin_meta__ = PluginMetadata(
     name="音乐",
-    description="通过 alisten 服务点歌",
+    description="通过 Alisten 服务点歌",
     usage="""参数为歌曲相关信息
-/music Sagitta luminis               # 搜索并点歌
+/music Sagitta luminis               # 搜索并点歌（默认为网易云）
 /点歌 青花瓷                          # 中文别名
 /music BV1Xx411c7md                  # Bilibili BV号
-/music qq:song_id                    # QQ音乐（需要指定来源）
-/music wy:song_id                    # 网易云音乐（需要指定来源）
+/music qq:song_name                  # QQ音乐
+/music wy:song_name                  # 网易云音乐
 
 配置命令（仅限超级用户）：
 /alisten config set <server_url> <house_id> [house_password]  # 设置配置
@@ -37,16 +37,15 @@ __plugin_meta__ = PluginMetadata(
 /alisten config delete                                        # 删除配置
 
 支持的音乐源：
-- wy: 网易云音乐
-- qq: QQ音乐
-- db: Bilibili（支持BV号）
-""",
+• wy: 网易云音乐（默认）
+• qq: QQ音乐
+• db: Bilibili""",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
 
 async def get_config(session_id: SessionId, db_session: async_scoped_session) -> AlistenConfig | None:
-    """获取 alisten 配置"""
+    """获取 Alisten 配置"""
     stmt = select(AlistenConfig).where(AlistenConfig.session_id == session_id)
     result = await db_session.execute(stmt)
     return result.scalar_one_or_none()
@@ -61,15 +60,18 @@ alisten_config_cmd = on_alconna(
             Subcommand(
                 "set",
                 Args["server_url", str]["house_id", str]["house_password?", str],
-                help_text="设置 Alisten 配置",
+                help_text="设置 Alisten 服务器配置，包括服务器地址、房间ID和可选的房间密码",
             ),
-            Subcommand("show", help_text="显示当前配置"),
-            Subcommand("delete", help_text="删除配置"),
-            help_text="配置管理",
+            Subcommand("show", help_text="显示当前群组的 Alisten 配置信息"),
+            Subcommand("delete", help_text="删除当前群组的 Alisten 配置"),
+            help_text="管理 Alisten 音乐服务器的配置",
         ),
         meta=CommandMeta(
-            description="Alisten 配置管理",
-            example="配置示例:\n/alisten config set http://localhost:8080 room123 password123",
+            description="Alisten 音乐服务器配置管理（仅限超级用户）",
+            example="""/alisten config set http://localhost:8080 room123 password123  # 设置完整配置
+/alisten config set https://music.example.com myroom          # 设置配置（无密码）
+/alisten config show                                          # 查看当前配置
+/alisten config delete                                        # 删除配置""",
         ),
     ),
     permission=SUPERUSER,
@@ -93,7 +95,7 @@ async def handle_config_set(
     house_password: str = "",
     existing_config: AlistenConfig | None = Depends(get_config),
 ):
-    """设置 alisten 配置"""
+    """设置 Alisten 配置"""
     if existing_config:
         # 更新现有配置
         existing_config.server_url = server_url
@@ -112,7 +114,7 @@ async def handle_config_set(
     await db_session.commit()
 
     await alisten_config_cmd.finish(
-        f"alisten 配置已设置:\n"
+        f"Alisten 配置已设置:\n"
         f"服务器地址: {server_url}\n"
         f"房间ID: {house_id}\n"
         f"房间密码: {'已设置' if house_password else '未设置'}"
@@ -123,10 +125,10 @@ async def handle_config_set(
 async def handle_config_show(config: AlistenConfig | None = Depends(get_config)):
     """显示当前配置"""
     if not config:
-        await alisten_config_cmd.finish("当前群组未配置 alisten 服务")
+        await alisten_config_cmd.finish("当前群组未配置 Alisten 服务")
 
     await alisten_config_cmd.finish(
-        f"当前 alisten 配置:\n"
+        f"当前 Alisten 配置:\n"
         f"服务器地址: {config.server_url}\n"
         f"房间ID: {config.house_id}\n"
         f"房间密码: {'已设置' if config.house_password else '未设置'}"
@@ -140,12 +142,12 @@ async def handle_config_delete(
 ):
     """删除配置"""
     if not config:
-        await alisten_config_cmd.finish("当前群组未配置 alisten 服务")
+        await alisten_config_cmd.finish("当前群组未配置 Alisten 服务")
 
     await db_session.delete(config)
     await db_session.commit()
 
-    await alisten_config_cmd.finish("alisten 配置已删除")
+    await alisten_config_cmd.finish("Alisten 配置已删除")
 
 
 music_cmd = on_alconna(
@@ -153,8 +155,17 @@ music_cmd = on_alconna(
         "music",
         Args["keywords?#音乐名称或信息", AllParam],
         meta=CommandMeta(
-            description=__plugin_meta__.description,
-            example=__plugin_meta__.usage,
+            description="通过 Alisten 服务点歌，支持多种音乐平台",
+            example="""/music Sagitta luminis               # 搜索并点歌（默认网易云音乐）
+/点歌 青花瓷                          # 使用中文别名点歌
+/music wy:夜曲                       # 指定网易云音乐
+/music qq:稻香                       # 指定QQ音乐
+/music BV1Xx411c7md                  # 直接使用Bilibili BV号
+
+支持的音乐源：
+• wy: 网易云音乐（默认）
+• qq: QQ音乐
+• db: Bilibili""",
         ),
     ),
     aliases={"点歌"},
@@ -175,7 +186,7 @@ async def music_handle_first_receive(
     # 首先检查是否有配置
     if not config:
         await music_cmd.finish(
-            "当前群组未配置 alisten 服务\n请联系管理员使用 /alisten config set 命令进行配置",
+            "当前群组未配置 Alisten 服务\n请联系管理员使用 /alisten config set 命令进行配置",
             at_sender=True,
         )
 

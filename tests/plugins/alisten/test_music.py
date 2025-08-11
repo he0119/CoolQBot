@@ -25,7 +25,7 @@ async def test_music_no_config(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event=event,
-            message="当前群组未配置 alisten 服务\n请联系管理员使用 /alisten config set 命令进行配置",
+            message="当前群组未配置 Alisten 服务\n请联系管理员使用 /alisten config set 命令进行配置",
             at_sender=True,
         )
         ctx.should_finished(music_cmd)

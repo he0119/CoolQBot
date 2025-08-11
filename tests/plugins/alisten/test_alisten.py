@@ -21,7 +21,7 @@ async def test_config_set_new(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "alisten 配置已设置:\n服务器地址: http://example.com\n房间ID: room123\n房间密码: 已设置",
+            "Alisten 配置已设置:\n服务器地址: http://example.com\n房间ID: room123\n房间密码: 已设置",
         )
         ctx.should_finished(alisten_config_cmd)
 
@@ -33,7 +33,7 @@ async def test_config_set_new(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "当前 alisten 配置:\n服务器地址: http://example.com\n房间ID: room123\n房间密码: 已设置",
+            "当前 Alisten 配置:\n服务器地址: http://example.com\n房间ID: room123\n房间密码: 已设置",
         )
         ctx.should_finished(alisten_config_cmd)
 
@@ -54,7 +54,7 @@ async def test_config_set_update_existing(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "alisten 配置已设置:\n服务器地址: http://newserver.com\n房间ID: newroom\n房间密码: 未设置",
+            "Alisten 配置已设置:\n服务器地址: http://newserver.com\n房间ID: newroom\n房间密码: 未设置",
         )
         ctx.should_finished(alisten_config_cmd)
 
@@ -66,7 +66,7 @@ async def test_config_set_update_existing(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "当前 alisten 配置:\n服务器地址: http://newserver.com\n房间ID: newroom\n房间密码: 未设置",
+            "当前 Alisten 配置:\n服务器地址: http://newserver.com\n房间ID: newroom\n房间密码: 未设置",
         )
         ctx.should_finished(alisten_config_cmd)
 
@@ -87,7 +87,7 @@ async def test_config_show_with_config(app: App):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "当前 alisten 配置:\n服务器地址: http://localhost:8080\n房间ID: room123\n房间密码: 已设置",
+            "当前 Alisten 配置:\n服务器地址: http://localhost:8080\n房间ID: room123\n房间密码: 已设置",
         )
         ctx.should_finished(alisten_config_cmd)
 
@@ -105,7 +105,7 @@ async def test_config_show_no_config(app: App):
             sender_id=10,  # 超级用户
         )
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "当前群组未配置 alisten 服务")
+        ctx.should_call_send(event, "当前群组未配置 Alisten 服务")
         ctx.should_finished(alisten_config_cmd)
 
 
@@ -123,7 +123,7 @@ async def test_config_delete_with_config(app: App):
             sender_id=10,  # 超级用户
         )
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "alisten 配置已删除")
+        ctx.should_call_send(event, "Alisten 配置已删除")
         ctx.should_finished(alisten_config_cmd)
 
         # 检查是否删除成功
@@ -132,7 +132,7 @@ async def test_config_delete_with_config(app: App):
             sender_id=10,  # 超级用户
         )
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "当前群组未配置 alisten 服务")
+        ctx.should_call_send(event, "当前群组未配置 Alisten 服务")
         ctx.should_finished(alisten_config_cmd)
 
 
@@ -149,7 +149,7 @@ async def test_config_delete_no_config(app: App):
             sender_id=10,  # 超级用户
         )
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "当前群组未配置 alisten 服务")
+        ctx.should_call_send(event, "当前群组未配置 Alisten 服务")
         ctx.should_finished(alisten_config_cmd)
 
 
