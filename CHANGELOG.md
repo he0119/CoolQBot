@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 复读插件支持多适配器
 - 添加 AListen 点歌插件
 
+### Fixed
+
+- 修复 alconna 消息缓存问题
+
+### Removed
+
+- 移除 BAWiki 插件
+
 ## [0.24.2] - 2025-08-03
 
 ### Added
