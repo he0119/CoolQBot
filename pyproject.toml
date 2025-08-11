@@ -8,7 +8,7 @@ license = { file = "LICENSE" }
 requires-python = ">=3.13.6"
 dependencies = [
     "pydantic>=2.11.7",
-    "eorzeaenv",
+    "eorzeaenv>=2.2.11",
     "matplotlib>=3.10.5",
     "uvicorn[standard]>=0.35.0",
     "uvicorn-worker>=0.3.0",
@@ -64,13 +64,12 @@ dev-dependencies = [
     "poethepoet>=0.36.0",
     "inline-snapshot>=0.27.1",
 ]
-override-dependencies = ["pillow>=10.0.0"]
+
+# eorzeaenv 与 bison 的 rapidfuzz 依赖会冲突，经测试 eorzeaenv 也支持 3.x 的版本
+override-dependencies = ["rapidfuzz>=3.0.0,<4.0.0"]
 
 [tool.uv.pip]
 universal = true
-
-[tool.uv.sources]
-eorzeaenv = { git = "https://github.com/he0119/EorzeaEnv.git", rev = "coolqbot" }
 
 [tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
