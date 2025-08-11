@@ -3,9 +3,11 @@
 import re
 
 from nonebot.params import Arg, Depends
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
 from src.plugins.group_bind import SessionId
 from src.utils.helpers import parse_int
@@ -19,7 +21,7 @@ __plugin_meta__ = PluginMetadata(
 /history 2020-1
 显示2020年1月1日的数据
 /history 2020-1-1""",
-    supported_adapters={"~onebot.v11"},
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
 history_cmd = on_alconna(
@@ -34,6 +36,10 @@ history_cmd = on_alconna(
     aliases={"复读历史"},
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "复读历史"}),
+    ],
 )
 
 

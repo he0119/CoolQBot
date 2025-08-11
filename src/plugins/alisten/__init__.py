@@ -9,6 +9,8 @@ require("nonebot_plugin_user")
 require("nonebot_plugin_orm")
 from arclet.alconna import AllParam
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, Subcommand, UniMessage, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_orm import async_scoped_session
 from nonebot_plugin_user import User
 from sqlalchemy import select
@@ -56,18 +58,28 @@ alisten_config_cmd = on_alconna(
         "alisten",
         Subcommand(
             "config",
-            Subcommand("set", Args["server_url", str]["house_id", str]["house_password?", str]),
-            Subcommand("show"),
-            Subcommand("delete"),
+            Subcommand(
+                "set",
+                Args["server_url", str]["house_id", str]["house_password?", str],
+                help_text="设置 Alisten 配置",
+            ),
+            Subcommand("show", help_text="显示当前配置"),
+            Subcommand("delete", help_text="删除配置"),
+            help_text="配置管理",
         ),
         meta=CommandMeta(
-            description="alisten 配置管理",
+            description="Alisten 配置管理",
             example="配置示例:\n/alisten config set http://localhost:8080 room123 password123",
         ),
     ),
     permission=SUPERUSER,
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        # FIXME: 现在会报错，等等看什么情况。
+        # DiscordSlashExtension(),
+    ],
 )
 
 
@@ -148,6 +160,10 @@ music_cmd = on_alconna(
     aliases={"点歌"},
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "点歌"}),
+    ],
 )
 
 

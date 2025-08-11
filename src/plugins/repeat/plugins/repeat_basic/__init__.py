@@ -2,8 +2,10 @@
 
 from nonebot import on_message
 from nonebot.adapters import Event
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from sqlalchemy import select
 
 from src.plugins.group_bind import SessionId
@@ -22,7 +24,7 @@ __plugin_meta__ = PluginMetadata(
 /repeat on
 关闭复读功能
 /repeat off""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
 
@@ -46,6 +48,10 @@ repeat_cmd = on_alconna(
     aliases={"复读"},
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "复读"}),
+    ],
 )
 
 

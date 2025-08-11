@@ -3,9 +3,11 @@
 import re
 
 from nonebot.params import Arg, Depends
-from nonebot.plugin import PluginMetadata
+from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
 from src.plugins.group_bind import SessionId
 from src.utils.helpers import parse_bool, parse_int
@@ -21,7 +23,7 @@ __plugin_meta__ = PluginMetadata(
 /rank n30
 限制显示的人数
 /rank 3n30""",
-    supported_adapters={"~onebot.v11", "~onebot.v12"},
+    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
 rank_cmd = on_alconna(
@@ -36,6 +38,10 @@ rank_cmd = on_alconna(
     aliases={"复读排行榜"},
     use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "复读排行榜"}),
+    ],
 )
 
 
