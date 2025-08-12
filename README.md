@@ -47,8 +47,6 @@ uv run nb run
 
 完成配置之后在 `docker-compose.yml` 文件所在目录下运行 `sudo docker compose up -d`，便可启动机器人。
 
-推荐使用 `Docker` 部署，因为机器人的音乐插件依赖于 [netease_cloud_music_api](https://github.com/Binaryify/NeteaseCloudMusicApi)。
-
 ## 功能
 
 请完成部署之后，向机器人发送 `/help` 命令获取各种功能的介绍。

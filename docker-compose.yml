@@ -10,12 +10,6 @@ services:
     env_file:
       - ".env"
 
-  netease:
-    image: binaryify/netease_cloud_music_api
-    container_name: netease
-    restart: always
-    environment:
-      - HOST=0.0.0.0
   rsshub:
     image: diygod/rsshub
     container_name: rsshub

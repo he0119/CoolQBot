@@ -117,5 +117,4 @@ async def handle_group_command(session_id: SessionId):
 生产环境推荐使用 Docker 进行部署。
 
 - **配置文件**: `docker-compose.yml`
-- **依赖服务**: 音乐插件依赖于外部的 `netease_cloud_music_api` 服务，该服务已包含在 Docker Compose 配置中。
 - **启动**: `docker compose up -d`
