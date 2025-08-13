@@ -218,7 +218,13 @@ async def music_handle(
         # Bilibili BV号
         source = "db"
 
-    result = await api.pick_music(name=name, user_name=user.name, source=source, config=config)
+    result = await api.pick_music(
+        name=name,
+        source=source,
+        config=config,
+        user_name=user.name,
+        user_email=user.email,
+    )
 
     if isinstance(result, SuccessResponse):
         msg = "点歌成功！歌曲已加入播放列表"

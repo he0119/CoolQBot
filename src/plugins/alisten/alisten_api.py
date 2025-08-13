@@ -49,7 +49,12 @@ class AListenAPI:
     """Alisten API 客户端"""
 
     async def pick_music(
-        self, name: str, source: str, user_name: str, config: AlistenConfig
+        self,
+        name: str,
+        source: str,
+        config: AlistenConfig,
+        user_name: str,
+        user_email: str | None,
     ) -> SuccessResponse | ErrorResponse:
         """点歌
 
@@ -65,7 +70,7 @@ class AListenAPI:
         request_data = PickMusicRequest(
             houseId=config.house_id,
             housePwd=config.house_password,
-            user=User(name=user_name, email=""),
+            user=User(name=user_name, email=user_email or ""),
             name=name,
             source=source,
         )

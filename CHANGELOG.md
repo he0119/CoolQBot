@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- Alisten 插件支持传递用户邮箱
+
 ## [0.25.0] - 2025-08-11
 
 ### Added
