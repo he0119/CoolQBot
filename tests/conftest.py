@@ -85,10 +85,11 @@ async def _default_user(app: App):
     """设置默认用户名"""
 
     # 添加 user 缓存
-    from nonebot_plugin_user.utils import get_user, set_user_name
+    from nonebot_plugin_user.utils import get_user, set_user_email, set_user_name
 
     await get_user("QQClient", "10")
     await set_user_name("QQClient", "10", "nickname")
+    await set_user_email("QQClient", "10", "nickname@example.com")
     await get_user("QQClient", "10000")
     await set_user_name("QQClient", "10000", "nickname10000")
 
