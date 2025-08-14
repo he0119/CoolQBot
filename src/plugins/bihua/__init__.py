@@ -8,6 +8,7 @@ require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
 require("nonebot_plugin_alconna")
 require("nonebot_plugin_localstore")
+require("src.utils.group_bind")
 from nonebot_plugin_alconna import (
     Alconna,
     AlconnaMatch,
