@@ -11,7 +11,7 @@ async def app(app: App):
     from nonebot_plugin_orm import get_session
     from sqlalchemy import delete
 
-    from src.plugins.group_bind.model import GroupBind
+    from src.utils.group_bind.model import GroupBind
 
     async with get_session() as session, session.begin():
         await session.execute(delete(GroupBind))

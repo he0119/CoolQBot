@@ -4,7 +4,7 @@ from nonebug import App
 
 async def test_bind_group_service(app: App):
     """测试群组绑定服务"""
-    from src.plugins.group_bind.data_source import group_bind_service
+    from src.utils.group_bind.data_source import group_bind_service
 
     # 测试绑定群组
     await group_bind_service.bind_group("group1", "group2")
@@ -25,7 +25,7 @@ async def test_bind_group_service(app: App):
 
 async def test_unbind_group_service(app: App):
     """测试解绑群组服务"""
-    from src.plugins.group_bind.data_source import group_bind_service
+    from src.utils.group_bind.data_source import group_bind_service
 
     # 先绑定一个群组
     await group_bind_service.bind_group("group1", "group2")
@@ -44,7 +44,7 @@ async def test_unbind_group_service(app: App):
 
 async def test_unbind_nonexistent_group(app: App):
     """测试解绑不存在的群组"""
-    from src.plugins.group_bind.data_source import group_bind_service
+    from src.utils.group_bind.data_source import group_bind_service
 
     # 尝试解绑不存在的群组，应该抛出异常
     with pytest.raises(ValueError, match="该群组未绑定到任何群组"):
@@ -53,7 +53,7 @@ async def test_unbind_nonexistent_group(app: App):
 
 async def test_get_bind_id_unbound_group(app: App):
     """测试获取未绑定群组的ID（应该返回自身）"""
-    from src.plugins.group_bind.data_source import group_bind_service
+    from src.utils.group_bind.data_source import group_bind_service
 
     # 获取未绑定群组的ID，应该返回自身的session_id
     bind_id = await group_bind_service.get_bind_id("unbound_group")
@@ -62,7 +62,7 @@ async def test_get_bind_id_unbound_group(app: App):
 
 async def test_is_group_bound_false(app: App):
     """测试检查未绑定的群组"""
-    from src.plugins.group_bind.data_source import group_bind_service
+    from src.utils.group_bind.data_source import group_bind_service
 
     # 检查未绑定的群组
     is_bound = await group_bind_service.is_group_bound("unbound_group")
@@ -71,7 +71,7 @@ async def test_is_group_bound_false(app: App):
 
 async def test_get_bound_session_ids(app: App):
     """测试获取所有绑定的会话ID列表"""
-    from src.plugins.group_bind.data_source import group_bind_service
+    from src.utils.group_bind.data_source import group_bind_service
 
     # 创建多个绑定到同一目标的群组
     await group_bind_service.bind_group("group1", "target_group")

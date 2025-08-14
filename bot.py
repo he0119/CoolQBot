@@ -30,6 +30,11 @@ from src.utils.permission import patch_permission
 
 patch_permission()
 
+# 替换用户
+from src.utils.user import patch_user
+
+patch_user()
+
 # 加载插件
 nonebot.load_from_toml("pyproject.toml")
 

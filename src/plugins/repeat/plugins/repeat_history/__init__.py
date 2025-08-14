@@ -8,8 +8,8 @@ from nonebot.typing import T_State
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
 from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
+from nonebot_plugin_user import UserSession
 
-from src.plugins.group_bind import SessionId
 from src.utils.helpers import parse_int
 
 from .data_source import get_history
@@ -75,10 +75,10 @@ async def history_handle_first_receive(state: T_State, arg: Match[str]) -> None:
     parameterless=[Depends(parse_int("day"))],
 )
 async def history_handle_group_message(
-    session_id: SessionId,
+    user: UserSession,
     year: int = Arg(),
     month: int = Arg(),
     day: int = Arg(),
 ):
-    res = await get_history(year=year, month=month, day=day, session_id=session_id)
+    res = await get_history(year=year, month=month, day=day, session_id=user.session_id)
     await history_cmd.finish(res)

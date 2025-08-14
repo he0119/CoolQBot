@@ -7,7 +7,7 @@ from tests.fake import fake_group_message_event_v11
 
 async def test_bind_group_success(app: App):
     """测试成功绑定群组"""
-    from src.plugins.group_bind import bind_group_cmd
+    from src.utils.group_bind import bind_group_cmd
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -25,7 +25,7 @@ async def test_bind_group_success(app: App):
 
 async def test_bind_group_update_existing(app: App):
     """测试绑定群组（无论是首次绑定还是更新绑定）"""
-    from src.plugins.group_bind import bind_group_cmd
+    from src.utils.group_bind import bind_group_cmd
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -44,7 +44,7 @@ async def test_bind_group_update_existing(app: App):
 
 async def test_bind_group_to_self(app: App):
     """测试绑定群组到自己（应该失败）"""
-    from src.plugins.group_bind import bind_group_cmd
+    from src.utils.group_bind import bind_group_cmd
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -62,8 +62,8 @@ async def test_bind_group_to_self(app: App):
 
 async def test_unbind_group_success(app: App):
     """测试成功解绑群组"""
-    from src.plugins.group_bind import unbind_group_cmd
-    from src.plugins.group_bind.data_source import group_bind_service
+    from src.utils.group_bind import unbind_group_cmd
+    from src.utils.group_bind.data_source import group_bind_service
 
     # 先创建一个绑定
     await group_bind_service.bind_group("QQClient_10000", "QQClient_123456")
@@ -84,7 +84,7 @@ async def test_unbind_group_success(app: App):
 
 async def test_unbind_group_not_bound(app: App):
     """测试解绑未绑定的群组（应该失败）"""
-    from src.plugins.group_bind import unbind_group_cmd
+    from src.utils.group_bind import unbind_group_cmd
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -102,7 +102,7 @@ async def test_unbind_group_not_bound(app: App):
 
 async def test_check_bind_not_bound(app: App):
     """测试查看未绑定群组的状态"""
-    from src.plugins.group_bind import check_bind_cmd
+    from src.utils.group_bind import check_bind_cmd
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -120,8 +120,8 @@ async def test_check_bind_not_bound(app: App):
 
 async def test_check_bind_bound(app: App):
     """测试查看已绑定群组的状态"""
-    from src.plugins.group_bind import check_bind_cmd
-    from src.plugins.group_bind.data_source import group_bind_service
+    from src.utils.group_bind import check_bind_cmd
+    from src.utils.group_bind.data_source import group_bind_service
 
     # 先创建一个绑定
     await group_bind_service.bind_group("QQClient_10000", "QQClient_123456789")
