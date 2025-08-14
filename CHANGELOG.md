@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - Alisten 插件支持传递用户邮箱
 
+### Changed
+
+- 直接使用 nonebot-plugin-alisten 插件
+
 ## [0.25.0] - 2025-08-11
 
 ### Added
