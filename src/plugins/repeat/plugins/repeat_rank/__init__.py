@@ -8,8 +8,8 @@ from nonebot.typing import T_State
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
 from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
+from nonebot_plugin_user import UserSession
 
-from src.plugins.group_bind import SessionId
 from src.utils.helpers import parse_bool, parse_int
 
 from .data_source import get_rank
@@ -86,7 +86,7 @@ async def rank_handle_first_receive(state: T_State, arg: Match[str]) -> None:
     parameterless=[Depends(parse_bool("display_total_number"))],
 )
 async def rank_handle_group_message(
-    session_id: SessionId,
+    user: UserSession,
     display_number: int = Arg(),
     minimal_msg_number: int = Arg(),
     display_total_number: bool = Arg(),
@@ -95,6 +95,6 @@ async def rank_handle_group_message(
         display_number=display_number,
         minimal_msg_number=minimal_msg_number,
         display_total_number=display_total_number,
-        session_id=session_id,
+        session_id=user.session_id,
     )
     await rank_cmd.finish(res)

@@ -9,6 +9,7 @@ from nonebot.typing import T_State
 
 require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
+require("src.utils.group_bind")
 require("nonebot_plugin_alconna")
 from nonebot_plugin_alconna import Alconna, AlconnaMatcher, Args, At, CommandMeta, Text, UniMessage, on_alconna
 from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension

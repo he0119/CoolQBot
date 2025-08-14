@@ -101,15 +101,13 @@ weather_cmd = on_alconna(
 ### 会话与用户识别
 
 - **用户/群组信息**: 使用 `nonebot-plugin-user` 和 `nonebot-plugin-uninfo` 来获取和管理跨平台的用户和会话信息。
-- **群组绑定**: `src/plugins/group_bind` 插件提供了一个关键服务，用于将不同平台的群组会话映射到一个统一的内部 ID (`SessionId`)，这对于需要跨平台共享数据的功能至关重要。
 
 ```python
-# 获取绑定后的群组 ID
-from src.plugins.group_bind import SessionId
+# 获取群组 ID
+from nonebot_plugin_user import UserSession
 
-async def handle_group_command(session_id: SessionId):
-    # 这里的 session_id 是经过 group_bind 插件处理后的统一 ID
-    pass
+async def handle_group_command(user: UserSession):
+    session_id = user.session_id
 ```
 
 ### Docker 部署

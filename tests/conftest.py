@@ -53,6 +53,11 @@ async def after_nonebot_init(after_nonebot_init: None):
 
     patch_permission()
 
+    # 替换用户
+    from src.utils.user import patch_user
+
+    patch_user()
+
     # 加载插件
     nonebot.load_plugins(str(HOME_DIR / "src" / "plugins"))
 

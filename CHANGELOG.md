@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Added
 
 - Alisten 插件支持传递用户邮箱
+- 替换用户插件里的 session_id 为绑定后的 id
 
 ### Changed
 

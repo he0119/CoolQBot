@@ -10,6 +10,7 @@ require("nonebot_plugin_apscheduler")
 require("nonebot_plugin_datastore")
 require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
+require("src.utils.group_bind")
 require("nonebot_plugin_alconna")
 
 __plugin_meta__ = PluginMetadata(
