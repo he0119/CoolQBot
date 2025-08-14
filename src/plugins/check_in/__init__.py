@@ -8,6 +8,7 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
 require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
+require("src.utils.group_bind")
 require("nonebot_plugin_alconna")
 
 __plugin_meta__ = PluginMetadata(
