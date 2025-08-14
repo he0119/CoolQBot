@@ -595,7 +595,7 @@ requires-dist = [
     { name = "nonebot-plugin-alconna", specifier = ">=0.59.4" },
     { name = "nonebot-plugin-alisten", specifier = ">=0.2.1" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
-    { name = "nonebot-plugin-datastore", specifier = ">=1.3.0" },
+    { name = "nonebot-plugin-datastore", specifier = ">=1.3.1" },
     { name = "nonebot-plugin-deepseek", specifier = "==0.1.10" },
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4" },
     { name = "nonebot-plugin-memes", specifier = "==0.8.1" },
@@ -1672,7 +1672,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-datastore"
-version = "1.3.0"
+version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "alembic" },
@@ -1680,9 +1680,9 @@ dependencies = [
     { name = "nonebot2", extra = ["httpx"] },
     { name = "sqlalchemy", extra = ["aiosqlite"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0d/63/896c034e84f6ef0a1f3dc75690fcdfca635ebebc4b18eb5b52dea8f2424b/nonebot_plugin_datastore-1.3.0.tar.gz", hash = "sha256:0e5e54968daeb5a12287e0b509f0b991cd0cc081928cd5ce5bd6815b78305207", size = 22055, upload-time = "2024-06-20T07:53:25.492Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5c/21/e0d2d1a3b11962183bc86fc3a48d5f8b41b91761a488f01a5d8d4467d331/nonebot_plugin_datastore-1.3.1.tar.gz", hash = "sha256:099c65ee2edc6c4216f6b9b7dd67aac86d1d050bc9a2195c835eab709be9d1a8", size = 19498, upload-time = "2025-08-13T15:03:19.459Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d6/e1/a0e4b1214dfda937e6c2da90a077b388b37148559f2455a74d763653923e/nonebot_plugin_datastore-1.3.0-py3-none-any.whl", hash = "sha256:68c74686a71f3f3c48f2b5f9860282d3a4f31faf97a3252859be919975f0a385", size = 26130, upload-time = "2024-06-20T07:53:23.524Z" },
+    { url = "https://files.pythonhosted.org/packages/4a/3a/3742894d5c774ec9fcc786ef629a058e21760d22c0c7acdc9a7820b57e57/nonebot_plugin_datastore-1.3.1-py3-none-any.whl", hash = "sha256:3f6fa91e9fac8edd143b7213371307c40598faa3c2a5f20fbda1f3b686a4fa95", size = 26791, upload-time = "2025-08-13T15:03:18.244Z" },
 ]
 
 [[package]]
