@@ -537,6 +537,7 @@ dependencies = [
     { name = "nonebot-adapter-satori" },
     { name = "nonebot-adapter-telegram" },
     { name = "nonebot-bison" },
+    { name = "nonebot-plugin-abs" },
     { name = "nonebot-plugin-alconna" },
     { name = "nonebot-plugin-alisten" },
     { name = "nonebot-plugin-apscheduler" },
@@ -592,6 +593,7 @@ requires-dist = [
     { name = "nonebot-adapter-satori", specifier = ">=0.13.7" },
     { name = "nonebot-adapter-telegram", specifier = ">=0.1.0b20" },
     { name = "nonebot-bison", specifier = "==0.9.8" },
+    { name = "nonebot-plugin-abs", specifier = "==1.0.0" },
     { name = "nonebot-plugin-alconna", specifier = ">=0.59.4" },
     { name = "nonebot-plugin-alisten", specifier = ">=0.2.1" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
@@ -1595,6 +1597,21 @@ wheels = [
 ]
 
 [[package]]
+name = "nonebot-plugin-abs"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "jieba" },
+    { name = "nonebot-plugin-alconna" },
+    { name = "nonebot2" },
+    { name = "pinyin" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4a/3e/4f38c66cc5e5c7152de9d4fdce8dd6f32cd4fd76a1d50b5b91752156c975/nonebot_plugin_abs-1.0.0.tar.gz", hash = "sha256:21b07cd40740c352a6a8d587d43445a42eb55385f317c8dfdf003080e80b1c23", size = 22754, upload-time = "2025-08-16T01:04:12.983Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/05/27/761d76c5d53b1cd991bbd35bd121fba5e402375253a89c26abd721114c30/nonebot_plugin_abs-1.0.0-py3-none-any.whl", hash = "sha256:ef199e923fe37c649915f21f010ab94891e1df569e0f805db1d1da87d950d2f6", size = 22436, upload-time = "2025-08-16T01:04:11.543Z" },
+]
+
+[[package]]
 name = "nonebot-plugin-alconna"
 version = "0.59.4"
 source = { registry = "https://pypi.org/simple" }
@@ -2142,6 +2159,12 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/df/86/25dde85c06c89d7fc5db17940f07aae0a56ac69aa9ccb5eb0f09798862a8/pillow-11.0.0-cp313-cp313t-win_amd64.whl", hash = "sha256:5c39ed17edea3bc69c743a8dd3e9853b7509625c2462532e62baa0732163a904", size = 2572169, upload-time = "2024-10-15T14:23:37.33Z" },
     { url = "https://files.pythonhosted.org/packages/51/85/9c33f2517add612e17f3381aee7c4072779130c634921a756c97bc29fb49/pillow-11.0.0-cp313-cp313t-win_arm64.whl", hash = "sha256:75acbbeb05b86bc53cbe7b7e6fe00fbcf82ad7c684b3ad82e3d711da9ba287d3", size = 2256828, upload-time = "2024-10-15T14:23:39.826Z" },
 ]
+
+[[package]]
+name = "pinyin"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/32/95/d2969f1071b7bc0afff407d1d7b4b3f445e8e6b59df7921c9c09e35ee375/pinyin-0.4.0.tar.gz", hash = "sha256:8842ae53cb7a81c8c3ec03d1cd7dba9aedb20d8d6962aebc620fad74da0868f5", size = 3632130, upload-time = "2016-11-24T03:35:02.653Z" }
 
 [[package]]
 name = "platformdirs"
