@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加抽象插件
+
 ### Fixed
 
 - 修复新用户创建失败的问题
