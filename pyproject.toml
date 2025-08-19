@@ -1,6 +1,6 @@
 [project]
 name = "coolqbot"
-version = "0.26.0"
+version = "0.26.1"
 description = "基于 NoneBot2 的聊天机器人"
 authors = [{ name = "uy_sun", email = "hmy0119@gmail.com" }]
 readme = "README.md"
@@ -142,7 +142,7 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 
 [tool.bumpversion]
-current_version = "0.26.0"
+current_version = "0.26.1"
 commit = true
 message = "chore(release): {new_version} [skip ci]"
 
