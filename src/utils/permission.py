@@ -1,9 +1,12 @@
 from nonebot import get_driver, require
-from nonebot.adapters import Bot
+from nonebot.adapters import Bot, Event
 from nonebot.permission import Permission
 
+require("nonebot_plugin_uninfo")
 require("nonebot_plugin_user")
+from nonebot_plugin_uninfo import get_session
 from nonebot_plugin_user import User
+from nonebot_plugin_user.utils import get_user
 
 config = get_driver().config
 
@@ -21,7 +24,11 @@ class SuperUser:
     def __repr__(self) -> str:
         return "Superuser()"
 
-    async def __call__(self, bot: Bot, user: User) -> bool:
+    async def __call__(self, bot: Bot, event: Event) -> bool:
+        session = await get_session(bot, event)
+        if not session:
+            return False
+        user = await get_user(session.scope, session.user.id)
         return user.name in bot.config.superusers
 
 
