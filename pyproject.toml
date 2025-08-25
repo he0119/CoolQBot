@@ -61,10 +61,10 @@ dev-dependencies = [
     "pytest-loguru>=0.4.0",
     "respx>=0.22.0",
     "freezegun>=1.5.5",
-    "beautifulsoup4>=4.13.4",
+    "beautifulsoup4>=4.13.5",
     "bump-my-version>=1.2.1",
-    "poethepoet>=0.36.0",
-    "inline-snapshot>=0.27.1",
+    "poethepoet>=0.37.0",
+    "inline-snapshot>=0.28.0",
 ]
 
 # eorzeaenv 与 bison 的 rapidfuzz 依赖会冲突，经测试 eorzeaenv 也支持 3.x 的版本
