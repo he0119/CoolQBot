@@ -16,8 +16,10 @@ ENV LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
 
 # 启用字节码编译，加速机器人启动
 ENV UV_COMPILE_BYTECODE=1
-# 在不更新 uv.lock 文件的情况下运行
-ENV UV_FROZEN=1
+# 确保 uv.lock 保持不变
+ENV UV_LOCKED=1
+# 不安装开发依赖
+ENV UV_NO_DEV=1
 # 从缓存中复制而不是链接，因为缓存是挂载的
 ENV UV_LINK_MODE=copy
 
@@ -32,19 +34,12 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Python 依赖
 COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
-  uv sync --no-dev
+  uv sync
 
 # 安装浏览器
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
-  uv run --no-dev playwright install --with-deps chromium firefox
-
-# 缓存表情包制作插件字体
-RUN git clone --depth 1 https://github.com/MemeCrafters/meme-generator-rs.git \
-  && cp -r ./meme-generator-rs/resources/fonts /usr/share/fonts/meme-fonts \
-  && rm -rf ./meme-generator-rs \
-  && fc-cache -fv
-ENV MEME_HOME=./data/meme_generator
+  uv run playwright install --with-deps chromium firefox
 
 # Gunicorn 配置
 COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
@@ -63,4 +58,4 @@ COPY src /app/src/
 # 健康检查
 HEALTHCHECK --interval=5s --timeout=4s --start-period=180s --retries=5 CMD curl -f http://localhost:${PORT:-8080}/health || exit 1
 
-CMD ["uv", "run", "--no-dev", "/start.sh"]
+CMD ["uv", "run", "/start.sh"]
