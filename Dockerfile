@@ -16,8 +16,8 @@ ENV LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
 
 # 启用字节码编译，加速机器人启动
 ENV UV_COMPILE_BYTECODE=1
-# 在不更新 uv.lock 文件的情况下运行
-ENV UV_FROZEN=1
+# 确保 uv.lock 保持不变
+ENV UV_LOCKED=1
 # 从缓存中复制而不是链接，因为缓存是挂载的
 ENV UV_LINK_MODE=copy
 
