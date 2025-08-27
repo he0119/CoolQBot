@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 修复无法推送微博的问题
+
 ## [0.26.1] - 2025-08-19
 
 ### Added
