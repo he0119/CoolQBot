@@ -592,7 +592,7 @@ requires-dist = [
     { name = "nonebot-adapter-red", specifier = ">=0.9.0" },
     { name = "nonebot-adapter-satori", specifier = ">=0.13.7" },
     { name = "nonebot-adapter-telegram", specifier = ">=0.1.0b20" },
-    { name = "nonebot-bison", specifier = "==0.9.8" },
+    { name = "nonebot-bison", specifier = "==0.9.9" },
     { name = "nonebot-plugin-abs", specifier = "==1.0.0" },
     { name = "nonebot-plugin-alconna", specifier = ">=0.59.4" },
     { name = "nonebot-plugin-alisten", specifier = ">=0.4.0" },
@@ -1566,7 +1566,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-bison"
-version = "0.9.8"
+version = "0.9.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1591,9 +1591,9 @@ dependencies = [
     { name = "tinydb" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/99/c0/46c3ae6ac41034f6e65e57ed4cc04a0b423812fe8cf7cc523eefb8e2326f/nonebot_bison-0.9.8.tar.gz", hash = "sha256:313479e7c4db722f9c68072ffbe30842074fe0a5ac01f05f36bd5394b5a6b515", size = 3229907, upload-time = "2025-06-04T16:10:51.262Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/55/4f/8e614ef159381a85873ae5954added62d12a51c15b7c0aeabdbac660195f/nonebot_bison-0.9.9.tar.gz", hash = "sha256:f9d44f17fa15be9950bd9b57a634a2000673605871d69dba22fc15d83ced8fc9", size = 3230160, upload-time = "2025-08-27T04:41:05.054Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e2/7b/ffbe2d7e8f1edd458dd92b886fe0759302e03423c2c1d94c6667e9a4b4a7/nonebot_bison-0.9.8-py3-none-any.whl", hash = "sha256:e702a0e19f4e7df9cbc9709894b1265d289c11641a61736f01ec6bf2a9187edb", size = 2958961, upload-time = "2025-06-04T16:10:49.715Z" },
+    { url = "https://files.pythonhosted.org/packages/f0/f0/0ec9bde0cbc0cd93b8cefc2d87b0165420ecf3388cb05617add26e857102/nonebot_bison-0.9.9-py3-none-any.whl", hash = "sha256:30dbc16e9dbd6f9fb38e6f660589c1dec41aa942f92979b8db329220ce247b67", size = 2959102, upload-time = "2025-08-27T04:41:03.565Z" },
 ]
 
 [[package]]
