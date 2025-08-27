@@ -593,7 +593,7 @@ requires-dist = [
     { name = "nonebot-adapter-satori", specifier = ">=0.13.7" },
     { name = "nonebot-adapter-telegram", specifier = ">=0.1.0b20" },
     { name = "nonebot-bison", specifier = "==0.9.9" },
-    { name = "nonebot-plugin-abs", specifier = "==1.0.0" },
+    { name = "nonebot-plugin-abs", specifier = "==1.0.1" },
     { name = "nonebot-plugin-alconna", specifier = ">=0.59.4" },
     { name = "nonebot-plugin-alisten", specifier = ">=0.4.0" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
@@ -1598,7 +1598,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-abs"
-version = "1.0.0"
+version = "1.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jieba" },
@@ -1606,9 +1606,9 @@ dependencies = [
     { name = "nonebot2" },
     { name = "pinyin" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4a/3e/4f38c66cc5e5c7152de9d4fdce8dd6f32cd4fd76a1d50b5b91752156c975/nonebot_plugin_abs-1.0.0.tar.gz", hash = "sha256:21b07cd40740c352a6a8d587d43445a42eb55385f317c8dfdf003080e80b1c23", size = 22754, upload-time = "2025-08-16T01:04:12.983Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2a/1f/9c488e41ba61037d5c7a798bb885cb12ec4b165bbc44ee9d95f9312f0fb0/nonebot_plugin_abs-1.0.1.tar.gz", hash = "sha256:f9a631a56f155525394374ce42b99b5d930d75d43c1ed5dd3fee18574b84e2ee", size = 22552, upload-time = "2025-08-27T02:46:35.08Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/05/27/761d76c5d53b1cd991bbd35bd121fba5e402375253a89c26abd721114c30/nonebot_plugin_abs-1.0.0-py3-none-any.whl", hash = "sha256:ef199e923fe37c649915f21f010ab94891e1df569e0f805db1d1da87d950d2f6", size = 22436, upload-time = "2025-08-16T01:04:11.543Z" },
+    { url = "https://files.pythonhosted.org/packages/c8/3a/b195482ccdc5715c0c53ee5233d914ae7e40203ab8d6293ade4e27962fe9/nonebot_plugin_abs-1.0.1-py3-none-any.whl", hash = "sha256:4512a84e53229626c6e37c6f8ad2f0c641b1928825432655577903b0b6b42621", size = 22277, upload-time = "2025-08-27T02:46:33.656Z" },
 ]
 
 [[package]]
