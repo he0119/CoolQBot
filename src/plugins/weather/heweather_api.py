@@ -27,7 +27,7 @@ async def lookup_location(location: str, adm: str | None = None) -> tuple[str, s
 
     params = urlencode(params)
 
-    url = f"https://geoapi.qweather.com/v2/city/lookup?{params}"
+    url = f"https://{plugin_config.heweather_host}/geo/v2/city/lookup?{params}"
     rjson = await get(url)
     resp = LookupResp.model_validate(rjson)
 
@@ -52,7 +52,7 @@ async def now(location_id: str) -> str:
 
     当前温度：12℃ 湿度：52%(体感温度：7℃)
     """
-    url = f"https://devapi.qweather.com/v7/weather/now?location={location_id}"
+    url = f"https://{plugin_config.heweather_host}/v7/weather/now?location={location_id}"
     rjson = await get(url)
     resp = NowResp.model_validate(rjson)
 
@@ -67,7 +67,7 @@ async def daily(location_id: str) -> str:
     2020-11-22 小雨转阴 温度：10~6℃ 上弦月
     2020-11-23 阴转小雨 温度：10~6℃ 盈凸月
     """
-    url = f"https://devapi.qweather.com/v7/weather/3d?location={location_id}"
+    url = f"https://{plugin_config.heweather_host}/v7/weather/3d?location={location_id}"
     resp = DailyResp.model_validate(await get(url))
 
     daily = resp.daily
@@ -87,7 +87,7 @@ async def daily(location_id: str) -> str:
 
 async def heweather(location: str, adm: str | None = None) -> str | None:
     """和风天气 API"""
-    if not plugin_config.heweather_key:
+    if not plugin_config.heweather_key or not plugin_config.heweather_host:
         return
 
     try:
