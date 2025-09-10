@@ -9,8 +9,27 @@ services:
       - "8080:8080"
     env_file:
       - ".env"
+    depends_on:
+      playwright:
+        condition: service_healthy
 
   rsshub:
     image: diygod/rsshub
     container_name: rsshub
     restart: always
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.54.0-noble
+    container_name: playwright
+    entrypoint:
+      [
+        "/bin/sh",
+        "-c",
+        "npx -y playwright@1.54.0 run-server --port 3000 --host 0.0.0.0",
+      ]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
