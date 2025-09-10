@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 适配和风天气的 API Host
 
+### Changed
+
+- htmlrender 使用外部浏览器
+
 ## [0.26.2] - 2025-08-27
 
 ### Fixed
