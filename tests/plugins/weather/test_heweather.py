@@ -21,21 +21,21 @@ def mocked_get(url: str):
     test_dir = Path(__file__).parent
     match url:
         case (
-            "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&key=1234567890"
-            | "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&adm=%E5%9B%9B%E5%B7%9D&key=1234567890"
+            "https://test.re.qweatherapi.com/geo/v2/city/lookup?location=%E6%88%90%E9%83%BD&key=1234567890"
+            | "https://test.re.qweatherapi.com/geo/v2/city/lookup?location=%E6%88%90%E9%83%BD&adm=%E5%9B%9B%E5%B7%9D&key=1234567890"
         ):
             with open(test_dir / "lookup.json", encoding="utf-8") as f:
                 data = json.load(f)
             return MockResponse(data)
-        case "https://devapi.qweather.com/v7/weather/now?location=101270101&key=1234567890":
+        case "https://test.re.qweatherapi.com/v7/weather/now?location=101270101&key=1234567890":
             with open(test_dir / "now.json", encoding="utf-8") as f:
                 data = json.load(f)
             return MockResponse(data)
-        case "https://devapi.qweather.com/v7/weather/3d?location=101270101&key=1234567890":
+        case "https://test.re.qweatherapi.com/v7/weather/3d?location=101270101&key=1234567890":
             with open(test_dir / "3d.json", encoding="utf-8") as f:
                 data = json.load(f)
             return MockResponse(data)
-        case "https://geoapi.qweather.com/v2/city/lookup?location=fail&key=1234567890":
+        case "https://test.re.qweatherapi.com/geo/v2/city/lookup?location=fail&key=1234567890":
             return MockResponse({"code": "404"})
 
     return MockResponse({})
@@ -46,6 +46,7 @@ async def test_heweather(app: App, mocker: MockerFixture):
     from src.plugins.weather import weather_cmd
     from src.plugins.weather.heweather_api import plugin_config
 
+    mocker.patch.object(plugin_config, "heweather_host", "test.re.qweatherapi.com")
     mocker.patch.object(plugin_config, "heweather_key", "1234567890")
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
@@ -65,9 +66,11 @@ async def test_heweather(app: App, mocker: MockerFixture):
 
     get.assert_has_calls(
         [
-            mocker.call("https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&key=1234567890"),  # type: ignore
-            mocker.call("https://devapi.qweather.com/v7/weather/now?location=101270101&key=1234567890"),
-            mocker.call("https://devapi.qweather.com/v7/weather/3d?location=101270101&key=1234567890"),
+            mocker.call(
+                "https://test.re.qweatherapi.com/geo/v2/city/lookup?location=%E6%88%90%E9%83%BD&key=1234567890"
+            ),  # type: ignore
+            mocker.call("https://test.re.qweatherapi.com/v7/weather/now?location=101270101&key=1234567890"),
+            mocker.call("https://test.re.qweatherapi.com/v7/weather/3d?location=101270101&key=1234567890"),
         ]
     )
 
@@ -77,6 +80,7 @@ async def test_heweather_with_adm(app: App, mocker: MockerFixture):
     from src.plugins.weather import weather_cmd
     from src.plugins.weather.heweather_api import plugin_config
 
+    mocker.patch.object(plugin_config, "heweather_host", "test.re.qweatherapi.com")
     mocker.patch.object(plugin_config, "heweather_key", "1234567890")
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
@@ -97,10 +101,10 @@ async def test_heweather_with_adm(app: App, mocker: MockerFixture):
     get.assert_has_calls(
         [
             mocker.call(
-                "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&adm=%E5%9B%9B%E5%B7%9D&key=1234567890"
+                "https://test.re.qweatherapi.com/geo/v2/city/lookup?location=%E6%88%90%E9%83%BD&adm=%E5%9B%9B%E5%B7%9D&key=1234567890"
             ),  # type: ignore
-            mocker.call("https://devapi.qweather.com/v7/weather/now?location=101270101&key=1234567890"),
-            mocker.call("https://devapi.qweather.com/v7/weather/3d?location=101270101&key=1234567890"),
+            mocker.call("https://test.re.qweatherapi.com/v7/weather/now?location=101270101&key=1234567890"),
+            mocker.call("https://test.re.qweatherapi.com/v7/weather/3d?location=101270101&key=1234567890"),
         ]
     )
 
@@ -110,6 +114,7 @@ async def test_heweather_with_three_args(app: App, mocker: MockerFixture):
     from src.plugins.weather import weather_cmd
     from src.plugins.weather.heweather_api import plugin_config
 
+    mocker.patch.object(plugin_config, "heweather_host", "test.re.qweatherapi.com")
     mocker.patch.object(plugin_config, "heweather_key", "1234567890")
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
@@ -130,10 +135,10 @@ async def test_heweather_with_three_args(app: App, mocker: MockerFixture):
     get.assert_has_calls(
         [
             mocker.call(
-                "https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&adm=%E5%9B%9B%E5%B7%9D&key=1234567890"
+                "https://test.re.qweatherapi.com/geo/v2/city/lookup?location=%E6%88%90%E9%83%BD&adm=%E5%9B%9B%E5%B7%9D&key=1234567890"
             ),  # type: ignore
-            mocker.call("https://devapi.qweather.com/v7/weather/now?location=101270101&key=1234567890"),
-            mocker.call("https://devapi.qweather.com/v7/weather/3d?location=101270101&key=1234567890"),
+            mocker.call("https://test.re.qweatherapi.com/v7/weather/now?location=101270101&key=1234567890"),
+            mocker.call("https://test.re.qweatherapi.com/v7/weather/3d?location=101270101&key=1234567890"),
         ]
     )
 
@@ -143,6 +148,7 @@ async def test_heweather_lookup_failed(app: App, mocker: MockerFixture, caplog: 
     from src.plugins.weather import weather_cmd
     from src.plugins.weather.heweather_api import plugin_config
 
+    mocker.patch.object(plugin_config, "heweather_host", "test.re.qweatherapi.com")
     mocker.patch.object(plugin_config, "heweather_key", "1234567890")
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
@@ -162,7 +168,7 @@ async def test_heweather_lookup_failed(app: App, mocker: MockerFixture, caplog: 
 
     get.assert_has_calls(
         [
-            mocker.call("https://geoapi.qweather.com/v2/city/lookup?location=fail&key=1234567890"),  # type: ignore
+            mocker.call("https://test.re.qweatherapi.com/geo/v2/city/lookup?location=fail&key=1234567890"),  # type: ignore
         ]
     )
 
@@ -175,6 +181,7 @@ async def test_heweather_got_path(app: App, mocker: MockerFixture):
     from src.plugins.weather import weather_cmd
     from src.plugins.weather.heweather_api import plugin_config
 
+    mocker.patch.object(plugin_config, "heweather_host", "test.re.qweatherapi.com")
     mocker.patch.object(plugin_config, "heweather_key", "1234567890")
 
     get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
@@ -205,8 +212,10 @@ async def test_heweather_got_path(app: App, mocker: MockerFixture):
 
     get.assert_has_calls(
         [
-            mocker.call("https://geoapi.qweather.com/v2/city/lookup?location=%E6%88%90%E9%83%BD&key=1234567890"),
-            mocker.call("https://devapi.qweather.com/v7/weather/now?location=101270101&key=1234567890"),
-            mocker.call("https://devapi.qweather.com/v7/weather/3d?location=101270101&key=1234567890"),
+            mocker.call(
+                "https://test.re.qweatherapi.com/geo/v2/city/lookup?location=%E6%88%90%E9%83%BD&key=1234567890"
+            ),
+            mocker.call("https://test.re.qweatherapi.com/v7/weather/now?location=101270101&key=1234567890"),
+            mocker.call("https://test.re.qweatherapi.com/v7/weather/3d?location=101270101&key=1234567890"),
         ]  # type: ignore
     )
