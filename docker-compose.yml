@@ -21,3 +21,4 @@ services:
   playwright:
     image: jacoblincool/playwright:chromium-server-1.54.0
     container_name: playwright
+    restart: always
