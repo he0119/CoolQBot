@@ -9,8 +9,16 @@ services:
       - "8080:8080"
     env_file:
       - ".env"
+    depends_on:
+      playwright:
+        condition: service_healthy
 
   rsshub:
     image: diygod/rsshub
     container_name: rsshub
+    restart: always
+
+  playwright:
+    image: jacoblincool/playwright:chromium-server-1.54.0
+    container_name: playwright
     restart: always
