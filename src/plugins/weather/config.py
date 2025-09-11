@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 
 class Config(BaseModel):
+    heweather_host: str | None = None
     heweather_key: str | None = None
 
 

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 适配和风天气的 API Host
+
 ## [0.26.2] - 2025-08-27
 
 ### Fixed
