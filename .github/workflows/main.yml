@@ -65,7 +65,7 @@ jobs:
     needs: test
     services:
       playwright:
-        image: jacoblincool/playwright:chrome-server-1.54.0
+        image: jacoblincool/playwright:chromium-server-1.54.0
         ports:
           - 53333:53333
     steps:
