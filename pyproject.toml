@@ -45,6 +45,8 @@ dependencies = [
     "nonebot-plugin-zssm==0.3.7",
     "nonebot-plugin-abs==1.1.0",
     "nonebot-plugin-parser[htmlkit]==2.4.1",
+    "playwright==1.57.0",
+    "nonebot-plugin-htmlrender==0.7.0a1",
 ]
 
 [project.urls]
