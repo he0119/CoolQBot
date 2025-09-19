@@ -55,16 +55,16 @@ dev-dependencies = [
     "nonebug>=0.4.3",
     "nonebug-saa>=0.5.0",
     "pytest-cov>=7.0.0",
-    "pytest-mock>=3.14.1",
+    "pytest-mock>=3.15.1",
     "pytest-xdist>=3.8.0",
-    "pytest-asyncio>=1.1.0",
+    "pytest-asyncio>=1.2.0",
     "pytest-loguru>=0.4.0",
     "respx>=0.22.0",
     "freezegun>=1.5.5",
     "beautifulsoup4>=4.13.5",
-    "bump-my-version>=1.2.1",
+    "bump-my-version>=1.2.2",
     "poethepoet>=0.37.0",
-    "inline-snapshot>=0.28.0",
+    "inline-snapshot>=0.29.0",
 ]
 
 # eorzeaenv 与 bison 的 rapidfuzz 依赖会冲突，经测试 eorzeaenv 也支持 3.x 的版本
