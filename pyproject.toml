@@ -50,8 +50,8 @@ Repository = "https://github.com/he0119/CoolQBot.git"
 Issues = "https://github.com/he0119/CoolQBot/issues"
 Changelog = "https://github.com/he0119/CoolQBot/blob/main/CHANGELOG.md"
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "nonebug>=0.4.3",
     "nonebug-saa>=0.5.0",
     "pytest-cov>=7.0.0",
@@ -67,6 +67,7 @@ dev-dependencies = [
     "inline-snapshot>=0.29.0",
 ]
 
+[tool.uv]
 # eorzeaenv 与 bison 的 rapidfuzz 依赖会冲突，经测试 eorzeaenv 也支持 3.x 的版本
 override-dependencies = ["rapidfuzz>=3.0.0,<4.0.0"]
 
