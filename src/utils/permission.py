@@ -32,7 +32,7 @@ class SuperUser:
         return user.name in bot.config.superusers
 
 
-SUPERUSER: Permission = Permission(SuperUser())
+SUPERUSER: Permission = Permission(is_superuser)
 """匹配任意超级用户事件"""
 
 
