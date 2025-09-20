@@ -1,6 +1,7 @@
 import nonebot
 from nonebot.adapters.discord import Adapter as DiscordAdapter
 from nonebot.adapters.dodo import Adapter as DodoAdapter
+from nonebot.adapters.feishu import Adapter as FeishuAdapter
 from nonebot.adapters.kaiheila import Adapter as KaiheilaAdapter
 from nonebot.adapters.onebot.v11 import Adapter as OneBotV11Adapter
 from nonebot.adapters.onebot.v12 import Adapter as OneBotV12Adapter
@@ -17,6 +18,7 @@ app = nonebot.get_asgi()
 driver = nonebot.get_driver()
 driver.register_adapter(DiscordAdapter)
 driver.register_adapter(DodoAdapter)
+driver.register_adapter(FeishuAdapter)
 driver.register_adapter(KaiheilaAdapter)
 driver.register_adapter(OneBotV11Adapter)
 driver.register_adapter(OneBotV12Adapter)
