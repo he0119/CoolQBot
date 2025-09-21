@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.27.0] - 2025-09-21
+
 ### Added
 
 - 适配和风天气的 API Host
@@ -721,7 +723,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.26.2...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.0...HEAD
+[0.27.0]: https://github.com/he0119/CoolQBot/compare/v0.26.2...v0.27.0
 [0.26.2]: https://github.com/he0119/CoolQBot/compare/v0.26.1...v0.26.2
 [0.26.1]: https://github.com/he0119/CoolQBot/compare/v0.26.0...v0.26.1
 [0.26.0]: https://github.com/he0119/CoolQBot/compare/v0.25.0...v0.26.0
