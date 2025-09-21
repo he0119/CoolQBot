@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 适配和风天气的 API Host
 - 添加飞书适配器
 
+### Fixed
+
+- 使用依赖注入的 User 来判断权限
+
 ## [0.26.2] - 2025-08-27
 
 ### Fixed
