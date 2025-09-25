@@ -43,6 +43,8 @@ dependencies = [
     "nonebot-plugin-prometheus==0.4.1",
     "nonebot-plugin-zssm==0.3.7",
     "nonebot-plugin-abs==1.0.2",
+    "playwright==1.55.0",
+    "nonebot-plugin-htmlrender==0.7.0a1",
 ]
 
 [project.urls]
