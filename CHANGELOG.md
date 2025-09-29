@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加链接分享自动解析插件
+
 ## [0.27.0] - 2025-09-21
 
 ### Added
