@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.27.1] - 2025-09-29
+
 ### Added
 
 - 添加链接分享自动解析插件
@@ -727,7 +729,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.1...HEAD
+[0.27.1]: https://github.com/he0119/CoolQBot/compare/v0.27.0...v0.27.1
 [0.27.0]: https://github.com/he0119/CoolQBot/compare/v0.26.2...v0.27.0
 [0.26.2]: https://github.com/he0119/CoolQBot/compare/v0.26.1...v0.26.2
 [0.26.1]: https://github.com/he0119/CoolQBot/compare/v0.26.0...v0.26.1
