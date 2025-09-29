@@ -28,7 +28,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt-get update \
   && apt-get -y upgrade \
-  && apt-get install -y --no-install-recommends gcc git curl locales fontconfig fonts-noto-color-emoji python3-dev \
+  && apt-get install -y --no-install-recommends gcc git curl locales fontconfig fonts-noto-color-emoji python3-dev ffmpeg \
   && localedef -i zh_CN -c -f UTF-8 -A /usr/share/locale/locale.alias zh_CN.UTF-8
 
 # Python 依赖
