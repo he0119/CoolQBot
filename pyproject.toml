@@ -44,6 +44,7 @@ dependencies = [
     "nonebot-plugin-zssm==0.3.7",
     "nonebot-plugin-abs==1.0.2",
     "nonebot-plugin-resolver2==1.13.0",
+    "nonebot-plugin-parser",
 ]
 
 [project.urls]
@@ -82,6 +83,9 @@ override-dependencies = [
 [tool.uv.pip]
 universal = true
 
+[tool.uv.sources]
+nonebot-plugin-parser = { git = "https://github.com/fllesser/nonebot-plugin-parser.git" }
+
 [tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
 bump = "bump-my-version bump"
@@ -104,7 +108,7 @@ plugins = [
     "nonebot_plugin_inspect",
     "nonebot_plugin_zssm",
     "nonebot_plugin_abs",
-    "nonebot_plugin_resolver2",
+    "nonebot_plugin_parser",
 ]
 
 [tool.pyright]
