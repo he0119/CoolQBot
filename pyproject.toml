@@ -65,7 +65,7 @@ dev = [
     "respx>=0.22.0",
     "freezegun>=1.5.5",
     "beautifulsoup4>=4.13.5",
-    "bump-my-version>=1.2.2",
+    "bump-my-version>=1.2.4",
     "poethepoet>=0.37.0",
     "inline-snapshot>=0.29.0",
 ]
