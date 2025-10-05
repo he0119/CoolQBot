@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Changed
+
+- resolver2 更名为 parser 并支持 NGA
+
 ## [0.27.1] - 2025-09-29
 
 ### Added
@@ -198,7 +202,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ### Fixed
 
-- 修复插件订阅 B 站和最终幻想XIV 出错的问题
+- 修复插件订阅 B 站和最终幻想 XIV 出错的问题
 - 修复运行迁移脚本时加载插件报错
 - 修复未配置 QQ 机器人时的报错
 - 修复表情包插件字体缺失的问题

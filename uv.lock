@@ -574,7 +574,7 @@ dependencies = [
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot-plugin-memes" },
     { name = "nonebot-plugin-orm", extra = ["default"] },
-    { name = "nonebot-plugin-parser" },
+    { name = "nonebot-plugin-parser", extra = ["htmlkit"] },
     { name = "nonebot-plugin-prometheus" },
     { name = "nonebot-plugin-resolver2" },
     { name = "nonebot-plugin-send-anything-anywhere" },
@@ -633,7 +633,7 @@ requires-dist = [
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4" },
     { name = "nonebot-plugin-memes", specifier = "==0.8.1" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.8.2" },
-    { name = "nonebot-plugin-parser", git = "https://github.com/fllesser/nonebot-plugin-parser.git" },
+    { name = "nonebot-plugin-parser", extras = ["htmlkit"], specifier = "==2.0.0" },
     { name = "nonebot-plugin-prometheus", specifier = "==0.4.1" },
     { name = "nonebot-plugin-resolver2", specifier = "==1.13.0" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
@@ -1805,7 +1805,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-htmlkit"
-version = "0.1.0rc1"
+version = "0.1.0rc2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -1815,12 +1815,12 @@ dependencies = [
     { name = "pygments" },
     { name = "pymdown-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bf/a0/6c34e909ed78b085c51a5ae2a5072e6bbb66a67187a0ba55f1a3e95d2438/nonebot_plugin_htmlkit-0.1.0rc1.tar.gz", hash = "sha256:8cd6c1f84b69532c6a914fd2d2cdd3e245d448bb9b19a5f56f66faa5f67f672f", size = 45527, upload-time = "2025-10-01T13:12:41.582Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/14/17/407f84ec42a1fc550a365c7d449e30c7837c3c6162a9a5ab03392221c8b8/nonebot_plugin_htmlkit-0.1.0rc2.tar.gz", hash = "sha256:8186774697277a591299e5bed19369fffaae4eafe6a2af847003a28a93d0a5ab", size = 50960, upload-time = "2025-10-04T16:25:07.265Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/54/7d/1a1c93853417f9acc5b2384d9c287a9db422453c27bce86c949d95f7997b/nonebot_plugin_htmlkit-0.1.0rc1-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:6084bf859ba6f24c493d27d15d7dad52cbe34dc2fa867d65105c2adea23c065e", size = 4216753, upload-time = "2025-10-01T13:12:35.072Z" },
-    { url = "https://files.pythonhosted.org/packages/0e/b5/e595cd76419392d51ebd6046f714becf1641fdfe39878a4ca07635309578/nonebot_plugin_htmlkit-0.1.0rc1-cp310-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:40df2ed39b3d0899806f0fb39175fddd792df79d5eb7baf0b3cca03a2a4d51a4", size = 5340253, upload-time = "2025-10-01T13:12:36.839Z" },
-    { url = "https://files.pythonhosted.org/packages/51/f2/b3b938aa88a74b53759a9e8d574c59d30bfaef18928680e2d850cc095d5f/nonebot_plugin_htmlkit-0.1.0rc1-cp310-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:d1f69f7be0b81b4e97778080e14275d10713b0cff022493d7cd01af841a543d0", size = 5566616, upload-time = "2025-10-01T13:12:38.681Z" },
-    { url = "https://files.pythonhosted.org/packages/c4/48/9f43d5dc800afcbbcedd7ceb4dd2d52881c57e8d22a5d873295266b14ab1/nonebot_plugin_htmlkit-0.1.0rc1-cp310-abi3-win_amd64.whl", hash = "sha256:979af2d5e8cbe2fad3b9e952bb990b6106a7d326e26eada1640c0d82d0efaf22", size = 2972307, upload-time = "2025-10-01T13:12:40.357Z" },
+    { url = "https://files.pythonhosted.org/packages/05/98/34edcf8678c374c1ccea2d2ac8e6bce323048cb14923199bb8d07650ec16/nonebot_plugin_htmlkit-0.1.0rc2-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:a5dbea84edf8427eecfcd5468af33d9aea927126ddd693d103834fc830222f6f", size = 6971726, upload-time = "2025-10-04T16:25:00.068Z" },
+    { url = "https://files.pythonhosted.org/packages/a5/6d/34e1b7cbdbe24f27f0d91212af75f20d2b0c6412b99c0bf8af6f27d04b56/nonebot_plugin_htmlkit-0.1.0rc2-cp310-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:29ca908a7d1453d1de20413545868a8439a38b8df9166c369a60906522783a35", size = 8964162, upload-time = "2025-10-04T16:25:01.72Z" },
+    { url = "https://files.pythonhosted.org/packages/81/7f/0236df08b8afa1956fe2a6f29a9bf388e713a4da3f932d372dbf26d7f494/nonebot_plugin_htmlkit-0.1.0rc2-cp310-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:f468ceeef5e4108009f5ef5f9f26e1656245dd7d321bb06f1654428e0e00218f", size = 9324671, upload-time = "2025-10-04T16:25:03.462Z" },
+    { url = "https://files.pythonhosted.org/packages/af/eb/1065659aaefd54a9944948ccf0e10709e923cd5cf2d031e8df939dfb5e1e/nonebot_plugin_htmlkit-0.1.0rc2-cp310-abi3-win_amd64.whl", hash = "sha256:2214c704f3bc9dc80bbce04108bf7d052fe0de9198b887e6e976058210edf9c0", size = 7478882, upload-time = "2025-10-04T16:25:05.721Z" },
 ]
 
 [[package]]
@@ -1914,24 +1914,33 @@ default = [
 
 [[package]]
 name = "nonebot-plugin-parser"
-version = "1.13.0"
-source = { git = "https://github.com/fllesser/nonebot-plugin-parser.git#09b144f92b396b95006a07e4d81e45390369a196" }
+version = "2.0.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
     { name = "beautifulsoup4" },
     { name = "bilibili-api-python" },
     { name = "curl-cffi" },
     { name = "httpx" },
-    { name = "jinja2" },
     { name = "msgspec" },
     { name = "nonebot-plugin-alconna" },
     { name = "nonebot-plugin-apscheduler" },
-    { name = "nonebot-plugin-htmlkit" },
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot-plugin-uninfo" },
     { name = "nonebot2" },
+    { name = "pillow" },
     { name = "tqdm" },
     { name = "yt-dlp" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4e/1c/a5691c76e467131722d5b40916e48badc46f38829accecb923eac7f409f5/nonebot_plugin_parser-2.0.0.tar.gz", hash = "sha256:6d5ab76bbd3bf9ddfcdb55ce8fe9eff0af99d5b41ea5947b640e6cf5acc42c6b", size = 2291420, upload-time = "2025-10-05T12:44:16.034Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/60/05/43e2dfe14d9f7e29aef324d87e28d594e0f50901cd1aca72c7891ae53417/nonebot_plugin_parser-2.0.0-py3-none-any.whl", hash = "sha256:6412412bc48887c641b707cd294e427294a7bdb2237443a3b798a5ffb41483e4", size = 2309746, upload-time = "2025-10-05T12:44:13.823Z" },
+]
+
+[package.optional-dependencies]
+htmlkit = [
+    { name = "jinja2" },
+    { name = "nonebot-plugin-htmlkit" },
 ]
 
 [[package]]
