@@ -655,7 +655,7 @@ dev = [
     { name = "beautifulsoup4", specifier = ">=4.13.5" },
     { name = "bump-my-version", specifier = ">=1.2.2" },
     { name = "freezegun", specifier = ">=1.5.5" },
-    { name = "inline-snapshot", specifier = ">=0.29.0" },
+    { name = "inline-snapshot", specifier = ">=0.29.3" },
     { name = "nonebug", specifier = ">=0.4.3" },
     { name = "nonebug-saa", specifier = ">=0.5.0" },
     { name = "poethepoet", specifier = ">=0.37.0" },
@@ -1148,7 +1148,7 @@ wheels = [
 
 [[package]]
 name = "inline-snapshot"
-version = "0.29.0"
+version = "0.29.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asttokens" },
@@ -1156,9 +1156,9 @@ dependencies = [
     { name = "pytest" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1c/4d/8e3b89f00df7925942acb091809ca32395373dc579517abacec5e242e8bd/inline_snapshot-0.29.0.tar.gz", hash = "sha256:8bac016fc8ff4638a6cdebca96d7042fecde471f0574d360de11f552ba77d6b5", size = 349586, upload-time = "2025-09-15T07:03:05.455Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/31/6d/535a8baebb38fcdca95aa91b93e1b7a3e6aa8196f34b29b02a8ae50249fd/inline_snapshot-0.29.3.tar.gz", hash = "sha256:f11e309d3474ab5f517687288bf23092e1acadb392e1e38ddb3d5bb165a8723e", size = 2596900, upload-time = "2025-10-04T11:48:30.806Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2d/eb/5ab8628a3289fab7ab28ccd59ef6d3ef4b28706c3065388df9f975ed29b6/inline_snapshot-0.29.0-py3-none-any.whl", hash = "sha256:aaea04480f1b5ec741b9025da45c00cb166d8791f01bed0f5ea7eabd1f9784cd", size = 70235, upload-time = "2025-09-15T07:03:03.616Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/99/3dac7fbee50707bb658895ab1b01da64f7de4aa0a6fcd2dcf7ee1a64c043/inline_snapshot-0.29.3-py3-none-any.whl", hash = "sha256:2b2c2140d0d0709ba99c552e211907f87bf23ce685b7b90fb2bc77fd7ae045b1", size = 70917, upload-time = "2025-10-04T11:48:29.004Z" },
 ]
 
 [[package]]

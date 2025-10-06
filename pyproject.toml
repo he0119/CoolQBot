@@ -67,7 +67,7 @@ dev = [
     "beautifulsoup4>=4.13.5",
     "bump-my-version>=1.2.2",
     "poethepoet>=0.37.0",
-    "inline-snapshot>=0.29.0",
+    "inline-snapshot>=0.29.3",
 ]
 
 [tool.uv]
