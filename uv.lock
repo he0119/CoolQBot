@@ -236,15 +236,15 @@ wheels = [
 
 [[package]]
 name = "beautifulsoup4"
-version = "4.13.5"
+version = "4.14.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "soupsieve" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/85/2e/3e5079847e653b1f6dc647aa24549d68c6addb4c595cc0d902d1b19308ad/beautifulsoup4-4.13.5.tar.gz", hash = "sha256:5e70131382930e7c3de33450a2f54a63d5e4b19386eab43a5b34d594268f3695", size = 622954, upload-time = "2025-08-24T14:06:13.168Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/77/e9/df2358efd7659577435e2177bfa69cba6c33216681af51a707193dec162a/beautifulsoup4-4.14.2.tar.gz", hash = "sha256:2a98ab9f944a11acee9cc848508ec28d9228abfd522ef0fad6a02a72e0ded69e", size = 625822, upload-time = "2025-09-29T10:05:42.613Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/04/eb/f4151e0c7377a6e08a38108609ba5cede57986802757848688aeedd1b9e8/beautifulsoup4-4.13.5-py3-none-any.whl", hash = "sha256:642085eaa22233aceadff9c69651bc51e8bf3f874fb6d7104ece2beb24b47c4a", size = 105113, upload-time = "2025-08-24T14:06:14.884Z" },
+    { url = "https://files.pythonhosted.org/packages/94/fe/3aed5d0be4d404d12d36ab97e2f1791424d9ca39c2f754a6285d59a3b01d/beautifulsoup4-4.14.2-py3-none-any.whl", hash = "sha256:5ef6fa3a8cbece8488d66985560f97ed091e22bbc4e9c2338508a9d5de6d4515", size = 106392, upload-time = "2025-09-29T10:05:43.771Z" },
 ]
 
 [[package]]
@@ -258,7 +258,7 @@ wheels = [
 
 [[package]]
 name = "bilibili-api-python"
-version = "17.3.0"
+version = "17.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "apscheduler" },
@@ -274,9 +274,9 @@ dependencies = [
     { name = "qrcode-terminal" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/28/59/f4f238a7e3a73583b13f1de54f158cc75241a6a612be2e6cf8ee12c92813/bilibili_api_python-17.3.0.tar.gz", hash = "sha256:4659f3df0b34db7c79322c1a6c6478800447d1b75482e7288b120c46a8fe67ae", size = 1411556, upload-time = "2025-06-30T13:21:17.397Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/54/b3/ca6c715311d80604ad37437bc1422c4bec7159db6ab49a311478f38e45ed/bilibili_api_python-17.4.0.tar.gz", hash = "sha256:396310c1820fd931a46a10c6115233be250e8db315a266eea608c0f625cdf1ef", size = 1417870, upload-time = "2025-10-08T05:26:35.474Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b1/52/957fc90a5cd6bfb3564ec5f068f960e8674fb8bd596426af73554ed676de/bilibili_api_python-17.3.0-py3-none-any.whl", hash = "sha256:8a7af3883cf5ce53825a236a49719858331054ee35cd788538df2bde712feccc", size = 379456, upload-time = "2025-06-30T13:21:16.226Z" },
+    { url = "https://files.pythonhosted.org/packages/79/1d/71e2a56f25effbc4e2618a49e55015928748a1c47dda3271d9274cf1f206/bilibili_api_python-17.4.0-py3-none-any.whl", hash = "sha256:79881aa011c23d74c0562765aee707d5fc410a02649091ec6aecf83f990fbdc5", size = 385523, upload-time = "2025-10-08T05:26:33.753Z" },
 ]
 
 [[package]]
@@ -652,7 +652,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "beautifulsoup4", specifier = ">=4.13.5" },
+    { name = "beautifulsoup4", specifier = ">=4.14.2" },
     { name = "bump-my-version", specifier = ">=1.2.4" },
     { name = "freezegun", specifier = ">=1.5.5" },
     { name = "inline-snapshot", specifier = ">=0.29.3" },
