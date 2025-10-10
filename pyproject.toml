@@ -83,6 +83,9 @@ override-dependencies = [
 [tool.uv.pip]
 universal = true
 
+[tool.uv.sources]
+nonebot-bison = { git = "https://github.com/MountainDash/nonebot-bison.git" }
+
 [tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
 bump = "bump-my-version bump"
