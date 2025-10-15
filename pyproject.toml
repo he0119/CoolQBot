@@ -43,7 +43,6 @@ dependencies = [
     "nonebot-plugin-prometheus==0.4.1",
     "nonebot-plugin-zssm==0.3.7",
     "nonebot-plugin-abs==1.0.2",
-    "nonebot-plugin-resolver2==1.13.0",
     "nonebot-plugin-parser[htmlkit]==2.0.6",
 ]
 
