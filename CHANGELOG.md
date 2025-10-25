@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.27.3] - 2025-10-25
+
 ### Fixed
 
 - 修复解析插件的内存泄漏
@@ -739,7 +741,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.2...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.3...HEAD
+[0.27.3]: https://github.com/he0119/CoolQBot/compare/v0.27.2...v0.27.3
 [0.27.2]: https://github.com/he0119/CoolQBot/compare/v0.27.1...v0.27.2
 [0.27.1]: https://github.com/he0119/CoolQBot/compare/v0.27.0...v0.27.1
 [0.27.0]: https://github.com/he0119/CoolQBot/compare/v0.26.2...v0.27.0
