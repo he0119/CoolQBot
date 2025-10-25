@@ -28,11 +28,11 @@ wheels = [
 
 [[package]]
 name = "aiofiles"
-version = "24.1.0"
+version = "25.1.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/0b/03/a88171e277e8caa88a4c77808c20ebb04ba74cc4681bf1e9416c862de237/aiofiles-24.1.0.tar.gz", hash = "sha256:22a075c9e5a3810f0c2e48f3008c94d68c65d763b9b03857924c99e57355166c", size = 30247, upload-time = "2024-06-24T11:02:03.584Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/41/c3/534eac40372d8ee36ef40df62ec129bee4fdb5ad9706e58a29be53b2c970/aiofiles-25.1.0.tar.gz", hash = "sha256:a8d728f0a29de45dc521f18f07297428d56992a742f0cd2701ba86e44d23d5b2", size = 46354, upload-time = "2025-10-09T20:51:04.358Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/45/30bb92d442636f570cb5651bc661f52b610e2eec3f891a5dc3a4c3667db0/aiofiles-24.1.0-py3-none-any.whl", hash = "sha256:b4ec55f4195e3eb5d7abd1bf7e061763e864dd4954231fb8539a0ef8bb8260e5", size = 15896, upload-time = "2024-06-24T11:02:01.529Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/8a/340a1555ae33d7354dbca4faa54948d76d89a27ceef032c8c3bc661d003e/aiofiles-25.1.0-py3-none-any.whl", hash = "sha256:abe311e527c862958650f9438e859c1fa7568a141b22abcd015e120e86a85695", size = 14668, upload-time = "2025-10-09T20:51:03.174Z" },
 ]
 
 [[package]]
@@ -632,7 +632,7 @@ requires-dist = [
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4" },
     { name = "nonebot-plugin-memes", specifier = "==0.8.1" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.8.2" },
-    { name = "nonebot-plugin-parser", extras = ["htmlkit"], specifier = "==2.0.6" },
+    { name = "nonebot-plugin-parser", extras = ["htmlkit"], specifier = "==2.1.0" },
     { name = "nonebot-plugin-prometheus", specifier = "==0.4.1" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
     { name = "nonebot-plugin-sentry", specifier = ">=2.0.0" },
@@ -1799,7 +1799,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-htmlkit"
-version = "0.1.0rc2"
+version = "0.1.0rc3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -1809,12 +1809,12 @@ dependencies = [
     { name = "pygments" },
     { name = "pymdown-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/14/17/407f84ec42a1fc550a365c7d449e30c7837c3c6162a9a5ab03392221c8b8/nonebot_plugin_htmlkit-0.1.0rc2.tar.gz", hash = "sha256:8186774697277a591299e5bed19369fffaae4eafe6a2af847003a28a93d0a5ab", size = 50960, upload-time = "2025-10-04T16:25:07.265Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/03/8f/8b44c1398b9316b7399c3b0be513a3fff36c043dd7a4ac44d7abcb122f9c/nonebot_plugin_htmlkit-0.1.0rc3.tar.gz", hash = "sha256:9ab747edd3977204500e8e06c18733a9ddcb0c500de4761bad319e72bc05bffb", size = 50974, upload-time = "2025-10-07T21:56:15.322Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/05/98/34edcf8678c374c1ccea2d2ac8e6bce323048cb14923199bb8d07650ec16/nonebot_plugin_htmlkit-0.1.0rc2-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:a5dbea84edf8427eecfcd5468af33d9aea927126ddd693d103834fc830222f6f", size = 6971726, upload-time = "2025-10-04T16:25:00.068Z" },
-    { url = "https://files.pythonhosted.org/packages/a5/6d/34e1b7cbdbe24f27f0d91212af75f20d2b0c6412b99c0bf8af6f27d04b56/nonebot_plugin_htmlkit-0.1.0rc2-cp310-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:29ca908a7d1453d1de20413545868a8439a38b8df9166c369a60906522783a35", size = 8964162, upload-time = "2025-10-04T16:25:01.72Z" },
-    { url = "https://files.pythonhosted.org/packages/81/7f/0236df08b8afa1956fe2a6f29a9bf388e713a4da3f932d372dbf26d7f494/nonebot_plugin_htmlkit-0.1.0rc2-cp310-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:f468ceeef5e4108009f5ef5f9f26e1656245dd7d321bb06f1654428e0e00218f", size = 9324671, upload-time = "2025-10-04T16:25:03.462Z" },
-    { url = "https://files.pythonhosted.org/packages/af/eb/1065659aaefd54a9944948ccf0e10709e923cd5cf2d031e8df939dfb5e1e/nonebot_plugin_htmlkit-0.1.0rc2-cp310-abi3-win_amd64.whl", hash = "sha256:2214c704f3bc9dc80bbce04108bf7d052fe0de9198b887e6e976058210edf9c0", size = 7478882, upload-time = "2025-10-04T16:25:05.721Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/19/c8c7f2f48aaa614f67c2d6f0bf86269cd36e64be2aa508687f66f305cc48/nonebot_plugin_htmlkit-0.1.0rc3-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:5d7e44b155dc1d543eec0f39c51563d398d72bb54a95a268564fb4cd68da3db3", size = 6968814, upload-time = "2025-10-07T21:56:08.503Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/f7/8740d114995e71a13421ecbcae91384bb7ef49cd22b207b3e9361269a692/nonebot_plugin_htmlkit-0.1.0rc3-cp310-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:fceeaf9bf00692bc572cf7fe4f34590ed833ac798a8ef31293c81f384e4550db", size = 8961405, upload-time = "2025-10-07T21:56:10.222Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/1e/d02c39f3b14a2385462c91a310c6a883887f38bbe2bff4813fd5c672d951/nonebot_plugin_htmlkit-0.1.0rc3-cp310-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:2da2ad7d35ab323c7d2a31db3d4d602d797e973d0ba1121b2ec657c03c01efbd", size = 9321894, upload-time = "2025-10-07T21:56:12.322Z" },
+    { url = "https://files.pythonhosted.org/packages/46/d2/d65d39829d301313578fdd3e3de672bb3cb0dd8944a686e96df376924b23/nonebot_plugin_htmlkit-0.1.0rc3-cp310-abi3-win_amd64.whl", hash = "sha256:d66891d2ce892c26caa3b20dd54f498672bf4989817a1a2fb964e6717fa4ee61", size = 7476813, upload-time = "2025-10-07T21:56:14.214Z" },
 ]
 
 [[package]]
@@ -1910,7 +1910,7 @@ default = [
 
 [[package]]
 name = "nonebot-plugin-parser"
-version = "2.0.6"
+version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -1928,14 +1928,13 @@ dependencies = [
     { name = "tqdm" },
     { name = "yt-dlp" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/c1/6a4e430ef56a4edb8f6af69d02c6e459fadea243f68fd01647d203eb2ec0/nonebot_plugin_parser-2.0.6.tar.gz", hash = "sha256:f0bed4b82fed958460f143983764344d6c3b8039a6c799b96c69a15995704597", size = 2295765, upload-time = "2025-10-08T05:34:27.165Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b6/df/ed6507beff897b771be1b15076c531b38c17d211696cfb6578b6be55833c/nonebot_plugin_parser-2.1.0.tar.gz", hash = "sha256:d93889ffe2bd7de857eec770a9772c91f5b3aa8798611c2aff44e114e81ed79f", size = 2326547, upload-time = "2025-10-24T07:27:59.624Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ba/4b/db282edf2a9b0eebd1a9dbbd34d8871191aae4921437933ef4ed2aa6600c/nonebot_plugin_parser-2.0.6-py3-none-any.whl", hash = "sha256:201d4c31620540e08748e84f6e59a21fc3aa63c9329333eb3d65e20a7f24cd91", size = 2314389, upload-time = "2025-10-08T05:34:25.182Z" },
+    { url = "https://files.pythonhosted.org/packages/2a/93/943eab5fc7e12f20c1e9e9e93da735a370263ceae408dd2fa0c47bc7d993/nonebot_plugin_parser-2.1.0-py3-none-any.whl", hash = "sha256:f0deb7dbba28212bd882ef9ebd0b157cac4d392da4fd4be5b4f46e75a09ff731", size = 2348966, upload-time = "2025-10-24T07:27:57.837Z" },
 ]
 
 [package.optional-dependencies]
 htmlkit = [
-    { name = "jinja2" },
     { name = "nonebot-plugin-htmlkit" },
 ]
 
@@ -3475,11 +3474,11 @@ wheels = [
 
 [[package]]
 name = "yt-dlp"
-version = "2025.9.26"
+version = "2025.10.22"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/58/8f/0daea0feec1ab85e7df85b98ec7cc8c85d706362e80efc5375c7007dc3dc/yt_dlp-2025.9.26.tar.gz", hash = "sha256:c148ae8233ac4ce6c5fbf6f70fcc390f13a00f59da3776d373cf88c5370bda86", size = 3037475, upload-time = "2025-09-26T22:23:42.882Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/08/70/cf4bd6c837ab0a709040888caa70d166aa2dfbb5018d1d5c983bf0b50254/yt_dlp-2025.10.22.tar.gz", hash = "sha256:db2d48133222b1d9508c6de757859c24b5cefb9568cf68ccad85dac20b07f77b", size = 3046863, upload-time = "2025-10-22T19:53:19.301Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/35/94/18210c5e6a9d7e622a3b3f4a73dde205f7adf0c46b42b27d0da8c6e5c872/yt_dlp-2025.9.26-py3-none-any.whl", hash = "sha256:36f5fbc153600f759abd48d257231f0e0a547a115ac7ffb05d5b64e5c7fdf8a2", size = 3241906, upload-time = "2025-09-26T22:23:39.976Z" },
+    { url = "https://files.pythonhosted.org/packages/cc/2a/fd184bf97d570841aa86b4aeb84aee93e7957a34059dafd4982157c10bff/yt_dlp-2025.10.22-py3-none-any.whl", hash = "sha256:9c803a9598859f91d0d5bd3337f1506ecb40bbe97f6efbe93bc4461fed344fb2", size = 3248983, upload-time = "2025-10-22T19:53:16.483Z" },
 ]
 
 [[package]]

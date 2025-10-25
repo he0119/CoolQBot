@@ -43,7 +43,7 @@ dependencies = [
     "nonebot-plugin-prometheus==0.4.1",
     "nonebot-plugin-zssm==0.3.7",
     "nonebot-plugin-abs==1.0.2",
-    "nonebot-plugin-parser[htmlkit]==2.0.6",
+    "nonebot-plugin-parser[htmlkit]==2.1.0",
 ]
 
 [project.urls]
@@ -73,8 +73,8 @@ dev = [
 override-dependencies = [
     # eorzeaenv 与 bison 的 rapidfuzz 依赖会冲突，经测试 eorzeaenv 也支持 3.x 的版本
     "rapidfuzz>=3.14.1,<4.0.0",
-    # resolver2 和 bison 的依赖有冲突
-    # resolver2 需要的版本更高
+    # parser 和 bison 的依赖有冲突
+    # parser 需要的版本更高
     "pillow>=11.3.0,<12.0.0",
     "qrcode>=8.2,<9.0.0",
 ]
