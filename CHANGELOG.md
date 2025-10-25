@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 修复解析插件的内存泄漏
+
 ## [0.27.2] - 2025-10-06
 
 ### Changed
