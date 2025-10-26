@@ -86,7 +86,7 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
                     await fflogs_cmd.finish("当前没有缓存副本。")
                 await fflogs_cmd.finish("当前缓存的副本有：\n" + "\n".join(cache_boss))
             # 检查是否是超级用户
-            if not is_superuser(session.user):
+            if not await is_superuser(session.user):
                 await fflogs_cmd.finish("抱歉，你没有权限设置缓存。")
             if strtobool(str(argv[1])):
                 if not fflogs.is_cache_enabled:
@@ -98,7 +98,7 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
                 await fflogs_cmd.finish("已停止定时缓存。")
         if len(argv) == 3:
             # 检查是否是超级用户
-            if not is_superuser(session.user):
+            if not await is_superuser(session.user):
                 await fflogs_cmd.finish("抱歉，你没有权限设置缓存。")
             if argv[1] == "add":
                 cache_boss.append(str(argv[2]))
