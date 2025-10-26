@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 修复 SuperUserShortcutExtension 未使用依赖注入的问题
+
 ## [0.27.3] - 2025-10-25
 
 ### Fixed
