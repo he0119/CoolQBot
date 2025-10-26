@@ -11,7 +11,7 @@ from nonebot_plugin_user.utils import get_user
 config = get_driver().config
 
 
-def is_superuser(user: User) -> bool:
+async def is_superuser(user: User) -> bool:
     """检查当前用户是否属于超级管理员"""
     return user.name in config.superusers
 
