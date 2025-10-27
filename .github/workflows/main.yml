@@ -134,7 +134,7 @@ jobs:
 
           # 启动容器
           echo "正在启动容器..."
-          docker run --name test-docker-container -d he0119/coolqbot:test > /dev/null
+          docker run --env HTMLRENDER_CI_MODE=true --name test-docker-container -d he0119/coolqbot:test > /dev/null
 
           TIMEOUT=60
           ELAPSED=0
