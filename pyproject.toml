@@ -7,10 +7,10 @@ readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.13.7"
 dependencies = [
-    "pydantic>=2.12.0",
+    "pydantic>=2.12.3",
     "eorzeaenv>=2.2.11",
-    "matplotlib>=3.10.6",
-    "uvicorn[standard]>=0.37.0",
+    "matplotlib>=3.10.7",
+    "uvicorn[standard]>=0.38.0",
     "uvicorn-worker>=0.4.0",
     "gunicorn>=23.0.0",
     "nonebot2[aiohttp,fastapi,httpx,websockets]>=2.4.3",
