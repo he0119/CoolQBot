@@ -639,7 +639,7 @@ requires-dist = [
     { name = "nonebot-plugin-sentry", specifier = ">=2.0.0" },
     { name = "nonebot-plugin-status", specifier = "==0.9.0" },
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
-    { name = "nonebot-plugin-uninfo", git = "https://github.com/he0119/nonebot-plugin-uninfo.git?branch=fix%2Fuse-depends" },
+    { name = "nonebot-plugin-uninfo", git = "https://github.com/RF-Tar-Railt/nonebot-plugin-uninfo.git" },
     { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.5.3" },
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.9.0" },
     { name = "nonebot-plugin-zssm", specifier = "==0.3.7" },
@@ -2014,7 +2014,7 @@ wheels = [
 [[package]]
 name = "nonebot-plugin-uninfo"
 version = "0.10.0"
-source = { git = "https://github.com/he0119/nonebot-plugin-uninfo.git?branch=fix%2Fuse-depends#f6320d1406c9f8b8979d77432944895771c451c1" }
+source = { git = "https://github.com/RF-Tar-Railt/nonebot-plugin-uninfo.git#1a38ee4ce06799b0948897add7494257c412af58" }
 dependencies = [
     { name = "importlib-metadata" },
     { name = "nonebot2" },

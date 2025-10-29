@@ -85,7 +85,7 @@ universal = true
 
 [tool.uv.sources]
 nonebot-bison = { git = "https://github.com/MountainDash/nonebot-bison.git" }
-nonebot-plugin-uninfo = { git = "https://github.com/he0119/nonebot-plugin-uninfo.git", branch = "fix/use-depends" }
+nonebot-plugin-uninfo = { git = "https://github.com/RF-Tar-Railt/nonebot-plugin-uninfo.git" }
 
 [tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
