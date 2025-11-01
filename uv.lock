@@ -736,7 +736,7 @@ requires-dist = [
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.9.0" },
     { name = "nonebot-plugin-zssm", specifier = "==0.3.7" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
-    { name = "nonebot2", extras = ["aiohttp", "fastapi", "httpx", "websockets"], specifier = ">=2.4.3" },
+    { name = "nonebot2", extras = ["aiohttp", "fastapi", "httpx", "websockets"], specifier = ">=2.4.4" },
     { name = "pydantic", specifier = ">=2.12.3" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.38.0" },
     { name = "uvicorn-worker", specifier = ">=0.4.0" },
@@ -2379,7 +2379,7 @@ wheels = [
 
 [[package]]
 name = "nonebot2"
-version = "2.4.3"
+version = "2.4.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -2391,9 +2391,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b7/d8/12ec3a3c858e4ddb149712d42bca63c4a923eeb2360a59b33310bc58146a/nonebot2-2.4.3.tar.gz", hash = "sha256:39bf0dc4deb92dc2a3211db75224f00462df45ca7e633d3eaf3ad422ff95712f", size = 90080, upload-time = "2025-08-07T10:15:13.07Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/0a/85/d2201a11ec3c6e1ba4f663c61ff65a4da06becd3d66c3536c26694325361/nonebot2-2.4.4.tar.gz", hash = "sha256:b367c17f31ae0d548e374bb80b719ed12885620f29f3cbc305a5a88a6175f4e3", size = 90954, upload-time = "2025-10-29T04:02:55.577Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/54/7e/e584af8282e5ce4a9127736ff15dd209534ec02e4f4be80097f4fda17e9d/nonebot2-2.4.3-py3-none-any.whl", hash = "sha256:8d9dc2c59ccfbedae53226377bb83854de732e68e00ab30315d57b1969e6a3fd", size = 117519, upload-time = "2025-08-07T10:15:11.806Z" },
+    { url = "https://files.pythonhosted.org/packages/66/ef/fa4a179d56f372619ce3899890277760b138ff6d5b395420e6d01e4523fd/nonebot2-2.4.4-py3-none-any.whl", hash = "sha256:8885d02906f1def83c138f298a7aa99ca1975351f44d8d290ea0eeec5aec1f0b", size = 118319, upload-time = "2025-10-29T04:02:54.55Z" },
 ]
 
 [package.optional-dependencies]

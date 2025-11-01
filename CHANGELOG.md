@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 修复 SuperUserShortcutExtension 未使用依赖注入的问题
 - 修复飞书没有权限或者没有设置别名时的报错
 
+### Changed
+
+- 移除 .env 中多余的配置项
+
 ## [0.27.3] - 2025-10-25
 
 ### Fixed
