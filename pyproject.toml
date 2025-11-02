@@ -91,21 +91,26 @@ show-bump = "bump-my-version show-bump"
 
 [tool.nonebot]
 plugin_dirs = ["src/plugins"]
-plugins = [
-    "nonebot_plugin_sentry",
-    "nonebot_plugin_treehelp",
-    "nonebot_plugin_wordcloud",
-    "nonebot_plugin_alisten",
-    "nonebot_plugin_memes",
-    "nonebot_bison",
-    "nonebot_plugin_status",
-    "nonebot_plugin_deepseek",
-    "nonebot_plugin_prometheus",
-    "nonebot_plugin_inspect",
-    "nonebot_plugin_zssm",
-    "nonebot_plugin_abs",
-    "nonebot_plugin_parser",
-]
+builtin_plugins = []
+
+[tool.nonebot.plugins]
+"@local" = []
+nonebot-plugin-sentry = ["nonebot_plugin_sentry"]
+nonebot-plugin-treehelp = ["nonebot_plugin_treehelp"]
+nonebot-plugin-wordcloud = ["nonebot_plugin_wordcloud"]
+nonebot-plugin-alisten = ["nonebot_plugin_alisten"]
+nonebot_plugin_memes = ["nonebot_plugin_memes"]
+nonebot-bison = ["nonebot_bison"]
+nonebot-plugin-status = ["nonebot_plugin_status"]
+nonebot-plugin-deepseek = ["nonebot_plugin_deepseek"]
+nonebot-plugin-prometheus = ["nonebot_plugin_prometheus"]
+nonebot-plugin-inspect = ["nonebot_plugin_inspect"]
+nonebot-plugin-zssm = ["nonebot_plugin_zssm"]
+nonebot-plugin-abs = ["nonebot_plugin_abs"]
+nonebot-plugin-parser = ["nonebot_plugin_parser"]
+
+[tool.nonebot.adapters]
+"@local" = []
 
 [tool.pyright]
 pythonVersion = "3.13"
