@@ -7,7 +7,7 @@ readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.13.7"
 dependencies = [
-    "pydantic>=2.12.3",
+    "pydantic>=2.12.4",
     "eorzeaenv>=2.2.11",
     "matplotlib>=3.10.7",
     "uvicorn[standard]>=0.38.0",
@@ -44,7 +44,7 @@ dependencies = [
     "nonebot-plugin-prometheus==0.4.1",
     "nonebot-plugin-zssm==0.3.7",
     "nonebot-plugin-abs==1.0.2",
-    "nonebot-plugin-parser[htmlkit]==2.1.1",
+    "nonebot-plugin-parser[htmlkit]==2.1.2",
 ]
 
 [project.urls]
