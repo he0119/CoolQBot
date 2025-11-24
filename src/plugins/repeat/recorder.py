@@ -8,13 +8,13 @@ from __future__ import annotations
 
 import asyncio
 from collections import defaultdict
-from contextlib import suppress
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
-from nonebot import get_driver, get_plugin_config
+from nonebot import get_plugin_config
 from nonebot.log import logger
+from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_orm import get_session
 from sqlalchemy import select
 
@@ -29,9 +29,6 @@ if TYPE_CHECKING:
 plugin_config = get_plugin_config(Config)
 
 
-driver = get_driver()
-
-
 @dataclass
 class PendingStat:
     msg_number: int = 0
@@ -39,7 +36,6 @@ class PendingStat:
 
 
 _RECORDER_REGISTRY: dict[str, Recorder] = {}
-_FLUSH_TASK: asyncio.Task[Any] | None = None
 
 
 async def flush_all_recorders() -> None:
@@ -58,37 +54,14 @@ async def flush_all_recorders() -> None:
             logger.opt(exception=result).warning("Failed to flush repeat statistics")
 
 
-async def _flush_worker() -> None:
-    try:
-        while True:
-            await asyncio.sleep(max(plugin_config.repeat_flush_interval, 1))
-            await flush_all_recorders()
-    except asyncio.CancelledError:
-        raise
-
-
-@driver.on_startup
-async def _start_repeat_flush_task() -> None:
-    global _FLUSH_TASK
-
-    if plugin_config.repeat_flush_interval <= 0:
-        return
-
-    if _FLUSH_TASK is None or _FLUSH_TASK.done():
-        _FLUSH_TASK = asyncio.create_task(_flush_worker())
-
-
-@driver.on_shutdown
-async def _stop_repeat_flush_task() -> None:
-    global _FLUSH_TASK
-
-    if _FLUSH_TASK:
-        _FLUSH_TASK.cancel()
-        with suppress(asyncio.CancelledError):
-            await _FLUSH_TASK
-        _FLUSH_TASK = None
-
-    await flush_all_recorders()
+if plugin_config.repeat_flush_interval > 0:
+    # 使用 apscheduler 设置定时刷新任务
+    scheduler.add_job(
+        flush_all_recorders,
+        "interval",
+        seconds=max(plugin_config.repeat_flush_interval, 1),
+        id="repeat_flush",
+    )
 
 
 def get_recorder(session_id: str) -> Recorder:
