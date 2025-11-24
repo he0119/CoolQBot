@@ -11,7 +11,6 @@ from collections import defaultdict
 from contextlib import suppress
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
-from functools import cache
 from typing import TYPE_CHECKING, Any
 
 from nonebot import get_driver, get_plugin_config
@@ -92,27 +91,12 @@ async def _stop_repeat_flush_task() -> None:
     await flush_all_recorders()
 
 
-def _register_recorder(recorder: Recorder) -> None:
-    _RECORDER_REGISTRY[recorder.session_id] = recorder
-
-
-@cache
 def get_recorder(session_id: str) -> Recorder:
-    """获取 Recorder 实例的工厂函数，使用 cache 实现单例模式"""
-    recorder = Recorder(session_id)
-    _register_recorder(recorder)
-    return recorder
-
-
-_original_cache_clear = get_recorder.cache_clear
-
-
-def _cache_clear_wrapper() -> None:
-    _RECORDER_REGISTRY.clear()
-    _original_cache_clear()
-
-
-get_recorder.cache_clear = _cache_clear_wrapper  # type: ignore[attr-defined]
+    """获取 Recorder 实例的工厂函数,使用 registry 实现单例模式"""
+    if session_id not in _RECORDER_REGISTRY:
+        recorder = Recorder(session_id)
+        _RECORDER_REGISTRY[recorder.session_id] = recorder
+    return _RECORDER_REGISTRY[session_id]
 
 
 class Recorder:
