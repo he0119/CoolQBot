@@ -10,6 +10,7 @@ from nonebot_plugin_user import UserSession
 from sqlalchemy import select
 
 from src.plugins.repeat.models import Enabled
+from src.plugins.repeat.recorder import get_recorder
 from src.utils.annotated import AsyncSession
 from src.utils.helpers import strtobool
 
@@ -58,19 +59,23 @@ repeat_cmd = on_alconna(
 @repeat_cmd.handle()
 async def repeat_handle(session: AsyncSession, arg: Match[str], user: UserSession) -> None:
     group = (await session.scalars(select(Enabled).where(Enabled.session_id == user.session_id))).one_or_none()
+    recorder = get_recorder(user.session_id)
 
     if arg.available:
         if strtobool(arg.result):
             if not group:
                 session.add(Enabled(session_id=user.session_id))
                 await session.commit()
+            recorder.set_enabled_state(True)
             await repeat_cmd.finish("已在本群开启复读功能")
         else:
             if group:
                 await session.delete(group)
                 await session.commit()
+            recorder.set_enabled_state(False)
             await repeat_cmd.finish("已在本群关闭复读功能")
     else:
+        recorder.set_enabled_state(bool(group))
         if group:
             await repeat_cmd.finish("复读功能开启中")
         else:

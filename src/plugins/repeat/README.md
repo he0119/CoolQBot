@@ -48,6 +48,15 @@ REPEAT_INTERVAL=1
 
 # 排除复读的用户列表 (支持用户名或用户ID)
 REPEAT_EXCLUDED_USERS=["bot", "admin", 123456]
+
+# 复读数据刷写间隔 (秒)
+REPEAT_FLUSH_INTERVAL=2.0
+
+# 缓存触发刷写的累积条数
+REPEAT_FLUSH_BATCH_SIZE=50
+
+# 复读开关状态缓存时长 (秒)
+REPEAT_ENABLED_CACHE_TTL=300
 ```
 
 ### 配置参数说明
@@ -55,3 +64,6 @@ REPEAT_EXCLUDED_USERS=["bot", "admin", 123456]
 - `REPEAT_RATE`: 复读概率，取值范围 1-100，默认为 10（即 10% 概率）
 - `REPEAT_INTERVAL`: 复读间隔，单位分钟，默认为 1 分钟
 - `REPEAT_EXCLUDED_USERS`: 排除复读的用户列表，可以是用户名或用户 ID
+- `REPEAT_FLUSH_INTERVAL`: 将缓存中的统计数据写入数据库的定时间隔（秒），默认 2 秒，可根据数据库承压能力调整
+- `REPEAT_FLUSH_BATCH_SIZE`: 缓存累计多少条记录后立即触发一次写入，默认 50
+- `REPEAT_ENABLED_CACHE_TTL`: 复读开关状态在内存中的缓存时长（秒），减少频繁数据库读取，默认 300 秒

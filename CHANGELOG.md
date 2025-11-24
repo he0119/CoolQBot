@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 给复读插件添加缓存
+
 ### Fixed
 
 - 修复 SuperUserShortcutExtension 未使用依赖注入的问题
