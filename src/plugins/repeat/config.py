@@ -22,9 +22,6 @@ class Config(BaseModel):
     repeat_flush_batch_size: int = 50
     """ 缓存中累积多少条记录后触发立即写入 """
 
-    repeat_enabled_cache_ttl: int = 300
-    """ 复读开启状态的缓存有效期（秒） """
-
 
 global_config = get_driver().config
 plugin_config = get_plugin_config(Config)

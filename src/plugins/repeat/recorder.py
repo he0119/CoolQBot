@@ -25,6 +25,8 @@ from .models import Enabled, MessageRecord
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from src.utils.annotated import AsyncSession
+
 plugin_config = get_plugin_config(Config)
 
 
@@ -124,8 +126,38 @@ class Recorder:
         self._flush_lock = asyncio.Lock()
         self._pending_events = 0
         self._flush_task: asyncio.Task[Any] | None = None
-        self._enabled_cache: bool | None = None
-        self._enabled_cache_expires_at: datetime | None = None
+        self._enabled: bool | None = None
+
+    async def is_enabled(self) -> bool:
+        """该群是否开启复读功能"""
+        if self._enabled is not None:
+            return self._enabled
+
+        async with get_session() as session:
+            enabled = bool(
+                (await session.scalars(select(Enabled).where(Enabled.session_id == self.session_id))).one_or_none()
+            )
+
+        self._enabled = enabled
+        return enabled
+
+    async def enable(self, session: AsyncSession):
+        """开启复读功能"""
+        record = await session.scalars(select(Enabled).where(Enabled.session_id == self.session_id))
+        group = record.one_or_none()
+        if not group:
+            session.add(Enabled(session_id=self.session_id))
+            await session.commit()
+        self._enabled = True
+
+    async def disable(self, session: AsyncSession):
+        """关闭复读功能"""
+        record = await session.scalars(select(Enabled).where(Enabled.session_id == self.session_id))
+        enabled = record.one_or_none()
+        if enabled:
+            await session.delete(enabled)
+            await session.commit()
+        self._enabled = False
 
     def message_number(self, x: int) -> int:
         """返回指定群 x 分钟内的消息条数，并清除之前的消息记录"""
@@ -213,33 +245,6 @@ class Recorder:
         new_task = asyncio.create_task(self._execute_flush())
         self._attach_flush_task(new_task)
         await new_task
-
-    def set_enabled_state(self, enabled: bool) -> None:
-        self._update_enabled_cache(enabled)
-
-    def invalidate_enabled_cache(self) -> None:
-        self._enabled_cache = None
-        self._enabled_cache_expires_at = None
-
-    async def is_enabled(self) -> bool:
-        ttl = plugin_config.repeat_enabled_cache_ttl
-        now = datetime.now()
-
-        if (
-            ttl > 0
-            and self._enabled_cache is not None
-            and self._enabled_cache_expires_at
-            and now < self._enabled_cache_expires_at
-        ):
-            return self._enabled_cache
-
-        async with get_session() as session:
-            enabled = bool(
-                (await session.scalars(select(Enabled).where(Enabled.session_id == self.session_id))).one_or_none()
-            )
-
-        self._update_enabled_cache(enabled)
-        return enabled
 
     async def _record_stat(self, user_id: int, msg_delta: int, repeat_delta: int) -> None:
         if msg_delta == 0 and repeat_delta == 0:
@@ -335,12 +340,3 @@ class Recorder:
                         )
 
             await session.commit()
-
-    def _update_enabled_cache(self, enabled: bool) -> None:
-        ttl = plugin_config.repeat_enabled_cache_ttl
-        if ttl <= 0:
-            self.invalidate_enabled_cache()
-            return
-
-        self._enabled_cache = enabled
-        self._enabled_cache_expires_at = datetime.now() + timedelta(seconds=ttl)
