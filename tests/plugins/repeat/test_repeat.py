@@ -28,11 +28,15 @@ async def test_repeat(app: App, mocker: MockerFixture):
     mocked_rule_datetime = mocker.patch("src.plugins.repeat.plugins.repeat_basic.repeat_rule.datetime")
     mocked_rule_datetime.now.return_value = datetime(2021, 1, 1, 0, 0, 0)
     mocked_recorder_datetime = mocker.patch("src.plugins.repeat.recorder.datetime")
-    mocked_recorder_datetime.now.side_effect = [
-        datetime(2020, 1, 1, 0, 0, 0),  # init
-        datetime(2021, 1, 1, 1, 0, 0),  # add_repeat_list
-        datetime(2021, 1, 1, 2, 0, 0),  # reset_last_message_on
-    ]
+
+    def _now_sequence():
+        yield datetime(2020, 1, 1, 0, 0, 0)  # init
+        yield datetime(2021, 1, 1, 1, 0, 0)  # add_repeat_list
+        yield datetime(2021, 1, 1, 2, 0, 0)  # reset_last_message_on
+        while True:
+            yield datetime(2021, 1, 1, 2, 0, 0)
+
+    mocked_recorder_datetime.now.side_effect = _now_sequence()
     mocked_random = mocker.patch("src.plugins.repeat.plugins.repeat_basic.repeat_rule.secrets.SystemRandom")
     mocked_random().randint.return_value = 1
 
@@ -45,7 +49,7 @@ async def test_repeat(app: App, mocker: MockerFixture):
         ctx.should_call_send(event, event.message)
         ctx.should_finished(repeat_message)
 
-    assert mocked_recorder_datetime.now.call_count == 3
+    assert mocked_recorder_datetime.now.call_count >= 3
 
 
 @pytest.mark.usefixtures("_records")

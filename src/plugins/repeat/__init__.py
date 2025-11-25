@@ -10,6 +10,7 @@ import nonebot
 from nonebot import get_driver, get_plugin_config, require
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
+require("nonebot_plugin_apscheduler")
 require("nonebot_plugin_datastore")
 require("nonebot_plugin_orm")
 require("nonebot_plugin_user")

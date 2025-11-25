@@ -48,6 +48,9 @@ REPEAT_INTERVAL=1
 
 # 排除复读的用户列表 (支持用户名或用户ID)
 REPEAT_EXCLUDED_USERS=["bot", "admin", 123456]
+
+# 复读数据刷写间隔 (秒)
+REPEAT_FLUSH_INTERVAL=2.0
 ```
 
 ### 配置参数说明
@@ -55,3 +58,4 @@ REPEAT_EXCLUDED_USERS=["bot", "admin", 123456]
 - `REPEAT_RATE`: 复读概率，取值范围 1-100，默认为 10（即 10% 概率）
 - `REPEAT_INTERVAL`: 复读间隔，单位分钟，默认为 1 分钟
 - `REPEAT_EXCLUDED_USERS`: 排除复读的用户列表，可以是用户名或用户 ID
+- `REPEAT_FLUSH_INTERVAL`: 将缓存中的统计数据写入数据库的定时间隔（秒），默认 2 秒，可根据数据库承压能力调整

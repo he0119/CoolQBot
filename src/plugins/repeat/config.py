@@ -16,6 +16,9 @@ class Config(BaseModel):
     支持用户名或用户 ID
     """
 
+    repeat_flush_interval: float = 2.0
+    """ 缓存写入数据库的时间间隔（秒） """
+
 
 global_config = get_driver().config
 plugin_config = get_plugin_config(Config)

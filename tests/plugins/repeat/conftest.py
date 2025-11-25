@@ -11,10 +11,10 @@ async def app(app: App):
     from nonebot_plugin_orm import get_session
 
     from src.plugins.repeat.models import Enabled, MessageRecord
-    from src.plugins.repeat.recorder import get_recorder
+    from src.plugins.repeat.recorder import _RECORDER_REGISTRY
 
-    # 清除 lru_cache 缓存
-    get_recorder.cache_clear()
+    # 清除缓存
+    _RECORDER_REGISTRY.clear()
 
     async with get_session() as session, session.begin():
         await session.execute(delete(MessageRecord))
