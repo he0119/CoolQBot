@@ -247,8 +247,9 @@ class Recorder:
 
         只填写日为这个月第几日的数据
         """
-        time = date(year, month, day)
         await self.flush()
+
+        time = date(year, month, day)
         async with get_session() as session:
             records = await session.execute(
                 select(MessageRecord)
