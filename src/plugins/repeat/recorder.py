@@ -11,7 +11,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 
-from nonebot import get_plugin_config
 from nonebot.log import logger
 from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_orm import get_session
@@ -19,10 +18,8 @@ from sqlalchemy import select
 
 from src.utils.annotated import AsyncSession
 
-from .config import Config
+from .config import plugin_config
 from .models import Enabled, MessageRecord
-
-plugin_config = get_plugin_config(Config)
 
 
 @dataclass(slots=True)
