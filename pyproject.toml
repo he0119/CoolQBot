@@ -65,7 +65,7 @@ dev = [
     "respx>=0.22.0",
     "freezegun>=1.5.5",
     "beautifulsoup4>=4.14.2",
-    "poethepoet>=0.37.0",
+    "poethepoet>=0.38.0",
     "inline-snapshot>=0.31.1",
 ]
 
