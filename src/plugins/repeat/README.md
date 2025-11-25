@@ -51,9 +51,6 @@ REPEAT_EXCLUDED_USERS=["bot", "admin", 123456]
 
 # 复读数据刷写间隔 (秒)
 REPEAT_FLUSH_INTERVAL=2.0
-
-# 缓存触发刷写的累积条数
-REPEAT_FLUSH_BATCH_SIZE=50
 ```
 
 ### 配置参数说明
