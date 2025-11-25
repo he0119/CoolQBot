@@ -51,14 +51,13 @@ async def need_repeat(event: Event, user: UserSession) -> bool:
     if time is not None and now < time + timedelta(minutes=plugin_config.repeat_interval):
         return False
 
-    # 只有可能被复读的消息才会被记录
-    await recorder.add_msg_number_list(user.user_id)
-
     # 按照设定概率复读
     random = secrets.SystemRandom()
     rand = random.randint(1, 100)
     logger.info(f"repeat: {rand}")
     if rand > plugin_config.repeat_rate:
+        # 未复读时，仅记录消息数量
+        await recorder.add_msg_number_list(user.user_id)
         return False
 
     await recorder.add_repeat_list(user.user_id)
