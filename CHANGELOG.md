@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.27.4] - 2025-11-25
+
 ### Added
 
 - 给复读插件添加缓存
@@ -754,7 +756,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.3...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.4...HEAD
+[0.27.4]: https://github.com/he0119/CoolQBot/compare/v0.27.3...v0.27.4
 [0.27.3]: https://github.com/he0119/CoolQBot/compare/v0.27.2...v0.27.3
 [0.27.2]: https://github.com/he0119/CoolQBot/compare/v0.27.1...v0.27.2
 [0.27.1]: https://github.com/he0119/CoolQBot/compare/v0.27.0...v0.27.1
