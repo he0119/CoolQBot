@@ -4,13 +4,12 @@
 如果遇到老版本数据，则自动升级
 """
 
-from __future__ import annotations
-
 import asyncio
+import bisect
 from collections import defaultdict
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
-from typing import TYPE_CHECKING, Any
 
 from nonebot import get_plugin_config
 from nonebot.log import logger
@@ -18,40 +17,119 @@ from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_orm import get_session
 from sqlalchemy import select
 
+from src.utils.annotated import AsyncSession
+
 from .config import Config
 from .models import Enabled, MessageRecord
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from src.utils.annotated import AsyncSession
 
 plugin_config = get_plugin_config(Config)
 
 
-@dataclass
+@dataclass(slots=True)
 class PendingStat:
     msg_number: int = 0
     repeat_time: int = 0
 
 
-_RECORDER_REGISTRY: dict[str, Recorder] = {}
+_RECORDER_REGISTRY: dict[str, "Recorder"] = {}
+_GLOBAL_FLUSH_LOCK = asyncio.Lock()
+
+
+async def _collect_all_pending() -> dict[tuple[str, date, int], PendingStat]:
+    """从所有 Recorder 收集待写入数据"""
+    collected: dict[tuple[str, date, int], PendingStat] = {}
+
+    for recorder in _RECORDER_REGISTRY.values():
+        async with recorder._pending_lock:
+            for (record_date, uid), stat in recorder._pending_stats.items():
+                key = (recorder.session_id, record_date, uid)
+                if key in collected:
+                    collected[key].msg_number += stat.msg_number
+                    collected[key].repeat_time += stat.repeat_time
+                else:
+                    collected[key] = PendingStat(stat.msg_number, stat.repeat_time)
+            recorder._pending_stats.clear()
+
+    return collected
+
+
+async def _restore_pending(pending: dict[tuple[str, date, int], PendingStat]) -> None:
+    """写入失败时恢复数据到对应的 Recorder"""
+    # 按 session_id 分组
+    by_session: dict[str, dict[tuple[date, int], PendingStat]] = defaultdict(dict)
+    for (session_id, record_date, uid), stat in pending.items():
+        by_session[session_id][(record_date, uid)] = stat
+
+    for session_id, stats in by_session.items():
+        if session_id in _RECORDER_REGISTRY:
+            recorder = _RECORDER_REGISTRY[session_id]
+            async with recorder._pending_lock:
+                for key, delta in stats.items():
+                    existing = recorder._pending_stats.get(key)
+                    if existing:
+                        existing.msg_number += delta.msg_number
+                        existing.repeat_time += delta.repeat_time
+                    else:
+                        recorder._pending_stats[key] = PendingStat(delta.msg_number, delta.repeat_time)
+
+
+async def _batch_write_to_db(
+    pending: dict[tuple[str, date, int], PendingStat],
+) -> None:
+    """批量写入数据库（单次事务）"""
+    if not pending:
+        return
+
+    # 按 (session_id, date) 分组以优化查询
+    grouped: dict[tuple[str, date], dict[int, PendingStat]] = defaultdict(dict)
+    for (session_id, record_date, uid), stat in pending.items():
+        grouped[(session_id, record_date)][uid] = stat
+
+    async with get_session() as session:
+        for (session_id, record_date), user_stats in grouped.items():
+            stmt = (
+                select(MessageRecord)
+                .where(MessageRecord.session_id == session_id)
+                .where(MessageRecord.date == record_date)
+                .where(MessageRecord.uid.in_(list(user_stats.keys())))
+            )
+            records = await session.execute(stmt)
+            existing = {record.uid: record for record in records.scalars()}
+
+            for uid, delta in user_stats.items():
+                record = existing.get(uid)
+                if record:
+                    record.msg_number += delta.msg_number
+                    record.repeat_time += delta.repeat_time
+                else:
+                    session.add(
+                        MessageRecord(
+                            date=record_date,
+                            uid=uid,
+                            msg_number=delta.msg_number,
+                            repeat_time=delta.repeat_time,
+                            session_id=session_id,
+                        )
+                    )
+
+        await session.commit()
 
 
 async def flush_all_recorders() -> None:
-    """Flush buffered stats for every recorder instance."""
-
+    """批量收集并写入所有 Recorder 的缓存数据（单次数据库事务）"""
     if not _RECORDER_REGISTRY:
         return
 
-    results = await asyncio.gather(
-        *(recorder.flush() for recorder in _RECORDER_REGISTRY.values()),
-        return_exceptions=True,
-    )
-
-    for result in results:
-        if isinstance(result, Exception):
-            logger.opt(exception=result).warning("Failed to flush repeat statistics")
+    pending: dict[tuple[str, date, int], PendingStat] = {}
+    async with _GLOBAL_FLUSH_LOCK:
+        try:
+            pending = await _collect_all_pending()
+            await _batch_write_to_db(pending)
+        except Exception as e:
+            logger.opt(exception=e).warning("Failed to flush repeat statistics")
+            # 恢复数据
+            if pending:
+                await _restore_pending(pending)
 
 
 if plugin_config.repeat_flush_interval > 0:
@@ -64,7 +142,7 @@ if plugin_config.repeat_flush_interval > 0:
     )
 
 
-def get_recorder(session_id: str) -> Recorder:
+def get_recorder(session_id: str) -> "Recorder":
     """获取 Recorder 实例的工厂函数,使用 registry 实现单例模式"""
     if session_id not in _RECORDER_REGISTRY:
         recorder = Recorder(session_id)
@@ -80,9 +158,6 @@ class Recorder:
         self.session_id = session_id
         self._pending_stats: dict[tuple[date, int], PendingStat] = {}
         self._pending_lock = asyncio.Lock()
-        self._flush_lock = asyncio.Lock()
-        self._pending_events = 0
-        self._flush_task: asyncio.Task[Any] | None = None
         self._enabled: bool | None = None
 
     async def is_enabled(self) -> bool:
@@ -117,17 +192,27 @@ class Recorder:
         self._enabled = False
 
     def message_number(self, x: int) -> int:
-        """返回指定群 x 分钟内的消息条数，并清除之前的消息记录"""
+        """返回指定群 x 分钟内的消息条数，并清除之前的消息记录
 
-        now = datetime.now()
-        for i in range(len(self._msg_send_time)):
-            if self._msg_send_time[i] > now - timedelta(minutes=x):
-                self._msg_send_time = self._msg_send_time[i:]
-                return len(self._msg_send_time)
+        使用二分查找优化性能
+        """
+        if not self._msg_send_time:
+            return 0
 
-        # 如果没有满足条件的消息，则清除记录
-        self._msg_send_time.clear()
-        return 0
+        threshold = datetime.now() - timedelta(minutes=x)
+        # 使用二分查找找到第一个大于阈值的位置
+        idx = bisect.bisect_right(self._msg_send_time, threshold)
+
+        if idx >= len(self._msg_send_time):
+            # 所有消息都过期了
+            self._msg_send_time.clear()
+            return 0
+
+        # 只保留未过期的消息
+        if idx > 0:
+            del self._msg_send_time[:idx]
+
+        return len(self._msg_send_time)
 
     async def get_records(self, year: int | None = None, month: int | None = None) -> Sequence[MessageRecord]:
         """获取指定月的复读记录
@@ -194,21 +279,41 @@ class Recorder:
         self._last_message_on = datetime.now()
 
     async def flush(self) -> None:
-        task = self._flush_task
-        if task and not task.done():
-            await task
-            return
+        """刷新当前 Recorder 的缓存数据"""
+        # 先获取待写入数据（快速操作，减少锁持有时间）
+        async with self._pending_lock:
+            if not self._pending_stats:
+                return
+            pending = self._pending_stats
+            self._pending_stats = {}
 
-        new_task = asyncio.create_task(self._execute_flush())
-        self._attach_flush_task(new_task)
-        await new_task
+        # 转换为全局格式
+        global_pending: dict[tuple[str, date, int], PendingStat] = {}
+        for (record_date, uid), stat in pending.items():
+            global_pending[(self.session_id, record_date, uid)] = stat
+
+        # 写入数据库（使用全局锁避免并发写入冲突）
+        async with _GLOBAL_FLUSH_LOCK:
+            try:
+                await _batch_write_to_db(global_pending)
+            except Exception:
+                # 失败时恢复数据
+                async with self._pending_lock:
+                    for (_, record_date, uid), delta in global_pending.items():
+                        key = (record_date, uid)
+                        stat = self._pending_stats.get(key)
+                        if stat is None:
+                            self._pending_stats[key] = PendingStat(delta.msg_number, delta.repeat_time)
+                        else:
+                            stat.msg_number += delta.msg_number
+                            stat.repeat_time += delta.repeat_time
+                raise
 
     async def _record_stat(self, user_id: int, msg_delta: int, repeat_delta: int) -> None:
         if msg_delta == 0 and repeat_delta == 0:
             return
 
         key = (datetime.now().date(), user_id)
-        trigger_flush = False
 
         async with self._pending_lock:
             stat = self._pending_stats.get(key)
@@ -217,83 +322,3 @@ class Recorder:
                 self._pending_stats[key] = stat
             stat.msg_number += msg_delta
             stat.repeat_time += repeat_delta
-            self._pending_events += msg_delta + repeat_delta
-            trigger_flush = self._pending_events >= max(plugin_config.repeat_flush_batch_size, 1)
-
-        if trigger_flush:
-            self._schedule_flush()
-
-    def _schedule_flush(self) -> None:
-        if self._flush_task and not self._flush_task.done():
-            return
-
-        task = asyncio.create_task(self._execute_flush())
-        self._attach_flush_task(task)
-
-    def _attach_flush_task(self, task: asyncio.Task[Any]) -> None:
-        self._flush_task = task
-        task.add_done_callback(lambda _: setattr(self, "_flush_task", None))
-
-    async def _execute_flush(self) -> None:
-        async with self._flush_lock:
-            pending = await self._pop_pending()
-            if not pending:
-                return
-
-            try:
-                await self._write_pending(pending)
-            except Exception:
-                await self._restore_pending(pending)
-                raise
-
-    async def _pop_pending(self) -> dict[tuple[date, int], PendingStat]:
-        async with self._pending_lock:
-            pending = self._pending_stats
-            self._pending_stats = {}
-            self._pending_events = 0
-            return pending
-
-    async def _restore_pending(self, pending: dict[tuple[date, int], PendingStat]) -> None:
-        async with self._pending_lock:
-            for key, delta in pending.items():
-                stat = self._pending_stats.get(key)
-                if stat is None:
-                    self._pending_stats[key] = PendingStat(delta.msg_number, delta.repeat_time)
-                else:
-                    stat.msg_number += delta.msg_number
-                    stat.repeat_time += delta.repeat_time
-                self._pending_events += delta.msg_number + delta.repeat_time
-
-    async def _write_pending(self, pending: dict[tuple[date, int], PendingStat]) -> None:
-        grouped: dict[date, dict[int, PendingStat]] = defaultdict(dict)
-        for (record_date, uid), delta in pending.items():
-            grouped[record_date][uid] = delta
-
-        async with get_session() as session:
-            for record_date, user_stats in grouped.items():
-                stmt = (
-                    select(MessageRecord)
-                    .where(MessageRecord.session_id == self.session_id)
-                    .where(MessageRecord.date == record_date)
-                    .where(MessageRecord.uid.in_(list(user_stats.keys())))
-                )
-                records = await session.execute(stmt)
-                existing = {record.uid: record for record in records.scalars()}
-
-                for uid, delta in user_stats.items():
-                    record = existing.get(uid)
-                    if record:
-                        record.msg_number += delta.msg_number
-                        record.repeat_time += delta.repeat_time
-                    else:
-                        session.add(
-                            MessageRecord(
-                                date=record_date,
-                                uid=uid,
-                                msg_number=delta.msg_number,
-                                repeat_time=delta.repeat_time,
-                                session_id=self.session_id,
-                            )
-                        )
-
-            await session.commit()

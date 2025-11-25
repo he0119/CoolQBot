@@ -62,4 +62,3 @@ REPEAT_FLUSH_BATCH_SIZE=50
 - `REPEAT_INTERVAL`: 复读间隔，单位分钟，默认为 1 分钟
 - `REPEAT_EXCLUDED_USERS`: 排除复读的用户列表，可以是用户名或用户 ID
 - `REPEAT_FLUSH_INTERVAL`: 将缓存中的统计数据写入数据库的定时间隔（秒），默认 2 秒，可根据数据库承压能力调整
-- `REPEAT_FLUSH_BATCH_SIZE`: 缓存累计多少条记录后立即触发一次写入，默认 50

@@ -51,20 +51,14 @@ async def need_repeat(event: Event, user: UserSession) -> bool:
     if time is not None and now < time + timedelta(minutes=plugin_config.repeat_interval):
         return False
 
-    repeat_rate = plugin_config.repeat_rate
-    # 当10分钟内发送消息数量大于30条时，降低复读概率
-    # 因为排行榜需要固定概率来展示欧非，暂时取消
-    # if recorder.message_number(10) > 30:
-    #     logger.info('Repeat rate changed!')
-    #     repeat_rate = 5
+    # 只有可能被复读的消息才会被记录
+    await recorder.add_msg_number_list(user.user_id)
 
     # 按照设定概率复读
     random = secrets.SystemRandom()
     rand = random.randint(1, 100)
     logger.info(f"repeat: {rand}")
-    if rand > repeat_rate:
-        # 只有判断过后的消息才会被记录
-        await recorder.add_msg_number_list(user.user_id)
+    if rand > plugin_config.repeat_rate:
         return False
 
     await recorder.add_repeat_list(user.user_id)
