@@ -639,7 +639,7 @@ dev = [
     { name = "inline-snapshot", specifier = ">=0.31.1" },
     { name = "nonebug", specifier = ">=0.4.3" },
     { name = "nonebug-saa", specifier = ">=0.5.0" },
-    { name = "poethepoet", specifier = ">=0.38.0" },
+    { name = "poethepoet", specifier = ">=0.40.0" },
     { name = "pytest-asyncio", specifier = ">=1.3.0" },
     { name = "pytest-cov", specifier = ">=7.0.0" },
     { name = "pytest-loguru", specifier = ">=0.4.0" },
@@ -2392,15 +2392,15 @@ wheels = [
 
 [[package]]
 name = "poethepoet"
-version = "0.38.0"
+version = "0.40.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pastel" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4d/14/d1f795f314c4bf3ad6d64216e370bdfda73093ed76e979485778b655a7ac/poethepoet-0.38.0.tar.gz", hash = "sha256:aeeb2f0a2cf0d3afa833976eff3ac7b8f5e472ae64171824900d79d3c68163c7", size = 77339, upload-time = "2025-11-23T13:51:28.246Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/38/9d/054c8435b03324ed9abd5d5ab8c45065b1f42c23952cd23f13a5921d8465/poethepoet-0.40.0.tar.gz", hash = "sha256:91835f00d03d6c4f0e146f80fa510e298ad865e7edd27fe4cb9c94fdc090791b", size = 81114, upload-time = "2026-01-05T19:09:13.116Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/38/89/2bf7d43ef4b0d60f446933ae9d3649f95c2c45c47b6736d121b602c28361/poethepoet-0.38.0-py3-none-any.whl", hash = "sha256:214bd9fcb348ff3dfd1466579d67e0c02242451a7044aced1a79641adef9cad0", size = 101938, upload-time = "2025-11-23T13:51:26.518Z" },
+    { url = "https://files.pythonhosted.org/packages/fb/bc/73327d12b176abea7a3c6c7d760e1a953992f7b59d72c0354e39d7a353b5/poethepoet-0.40.0-py3-none-any.whl", hash = "sha256:afd276ae31d5c53573c0c14898118d4848ccee3709b6b0be6a1c6cbe522bbc8a", size = 106672, upload-time = "2026-01-05T19:09:11.536Z" },
 ]
 
 [[package]]
