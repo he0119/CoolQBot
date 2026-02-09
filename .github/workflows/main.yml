@@ -89,7 +89,7 @@ jobs:
           key: cache-mount-${{ hashFiles('Dockerfile') }}
 
       - name: Inject cache into docker
-        uses: reproducible-containers/buildkit-cache-dance@v3.3.0
+        uses: reproducible-containers/buildkit-cache-dance@v3.3.1
         with:
           builder: ${{ steps.setup-buildx.outputs.name }}
           cache-dir: cache-mount
