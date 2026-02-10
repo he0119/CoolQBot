@@ -37,8 +37,9 @@ jobs:
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/codecov-action@v5
         with:
+          report_type: test_results
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload coverage to Codecov
@@ -203,7 +204,7 @@ jobs:
   sentry_release:
     name: Sentry Release
     runs-on: ubuntu-latest
-    needs: deploy_dev
+    needs: [test, deploy_dev]
     if: github.event_name != 'pull_request'
     steps:
       - name: Checkout
@@ -217,4 +218,4 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
           environment: ${{ needs.test.outputs.environment }}
-          version: ${{ needs.test.outputs.version }}
+          release: ${{ needs.test.outputs.version }}
