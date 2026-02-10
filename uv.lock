@@ -605,7 +605,7 @@ requires-dist = [
     { name = "nonebot-adapter-red", specifier = ">=0.9.0" },
     { name = "nonebot-adapter-satori", specifier = ">=0.13.7" },
     { name = "nonebot-adapter-telegram", specifier = ">=0.1.0b20" },
-    { name = "nonebot-bison", git = "https://github.com/MountainDash/nonebot-bison.git" },
+    { name = "nonebot-bison", specifier = "==0.9.14" },
     { name = "nonebot-plugin-abs", specifier = "==1.1.0" },
     { name = "nonebot-plugin-alconna", specifier = ">=0.60.3" },
     { name = "nonebot-plugin-alisten", specifier = ">=0.4.3" },
@@ -621,7 +621,7 @@ requires-dist = [
     { name = "nonebot-plugin-sentry", specifier = ">=2.0.0" },
     { name = "nonebot-plugin-status", specifier = "==0.9.0" },
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
-    { name = "nonebot-plugin-uninfo", git = "https://github.com/RF-Tar-Railt/nonebot-plugin-uninfo.git" },
+    { name = "nonebot-plugin-uninfo", specifier = ">=0.10.1" },
     { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.5.3" },
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.9.0" },
     { name = "nonebot-plugin-zssm", specifier = "==0.3.7" },
@@ -1696,8 +1696,8 @@ wheels = [
 
 [[package]]
 name = "nonebot-bison"
-version = "0.9.13"
-source = { git = "https://github.com/MountainDash/nonebot-bison.git#8d13d108e5ec75b2ed04fb6ed8a85f1b62375285" }
+version = "0.9.14"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "expiringdictx" },
@@ -1720,6 +1720,10 @@ dependencies = [
     { name = "rapidfuzz" },
     { name = "tinydb" },
     { name = "yarl" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/51/36/5bf33312f261b44eee34f1e88470cd70dcea76a5d3cd418d2b7c6b1f0970/nonebot_bison-0.9.14.tar.gz", hash = "sha256:1e472a46e5acf76a2bd0c5f64ffe68ea542870407df21262c87f6c792ec93d13", size = 3235386, upload-time = "2026-01-11T09:22:19.302Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ec/a1/8a8f14714dff14bfde26f68ce20c4d25b9b1afdd151533b5356238d2439e/nonebot_bison-0.9.14-py3-none-any.whl", hash = "sha256:e0a3cb1684d5e398165009b0f49944db45c0650cd80286bd71dad89592dbda06", size = 2961608, upload-time = "2026-01-11T09:22:21.039Z" },
 ]
 
 [[package]]
@@ -2073,11 +2077,15 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-uninfo"
-version = "0.10.0"
-source = { git = "https://github.com/RF-Tar-Railt/nonebot-plugin-uninfo.git#1a38ee4ce06799b0948897add7494257c412af58" }
+version = "0.10.1"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "importlib-metadata" },
     { name = "nonebot2" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/16/94/369e10017c2ff134ce5b01f53b14a5c54a6c84ecf39f3d564a72251f2d6e/nonebot_plugin_uninfo-0.10.1.tar.gz", hash = "sha256:cdd6acbeb235d5617b5d5feb232160f5815fb5b5c74cff6d71cb5dfd415855ce", size = 41008, upload-time = "2025-11-25T14:45:19.783Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fc/e3/70bb2cafa4cbfb28d06acf3172e095f10c36572e39edffbc3f82281b6fa6/nonebot_plugin_uninfo-0.10.1-py3-none-any.whl", hash = "sha256:3e5952af14e46cbf8e72920d995ac43aa491d9e9048285bd69901c5bd28dea9f", size = 65720, upload-time = "2025-11-25T14:45:18.069Z" },
 ]
 
 [[package]]
