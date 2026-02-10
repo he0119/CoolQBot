@@ -64,7 +64,7 @@ dev = [
     "pytest-loguru>=0.4.0",
     "respx>=0.22.0",
     "freezegun>=1.5.5",
-    "beautifulsoup4>=4.14.2",
+    "beautifulsoup4>=4.14.3",
     "poethepoet>=0.41.0",
     "inline-snapshot>=0.31.1",
 ]
