@@ -10,9 +10,9 @@ dependencies = [
     "pydantic>=2.12.5",
     "eorzeaenv>=2.2.11",
     "matplotlib>=3.10.8",
-    "uvicorn[standard]>=0.40.0",
+    "uvicorn[standard]>=0.41.0",
     "uvicorn-worker>=0.4.0",
-    "gunicorn>=25.0.3",
+    "gunicorn>=25.1.0",
     "nonebot2[aiohttp,fastapi,httpx,websockets]>=2.4.4",
     "nb-cli>=1.7.0",
     "nonebot-adapter-discord>=0.1.8",
@@ -44,7 +44,7 @@ dependencies = [
     "nonebot-plugin-prometheus==0.4.1",
     "nonebot-plugin-zssm==0.3.7",
     "nonebot-plugin-abs==1.1.0",
-    "nonebot-plugin-parser[htmlkit]==2.4.0",
+    "nonebot-plugin-parser[htmlkit]==2.4.1",
 ]
 
 [project.urls]
