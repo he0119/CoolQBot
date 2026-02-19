@@ -9,6 +9,7 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, on_alconna
 from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
 from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
+from nonebot_plugin_orm import get_session
 from nonebot_plugin_saa import PlatformTarget, Text, get_target
 from sqlalchemy import select
 
@@ -36,20 +37,21 @@ driver = nonebot.get_driver()
 
 
 @driver.on_bot_connect
-async def hello_on_connect(bot: Bot, session: AsyncSession) -> None:
+async def hello_on_connect(bot: Bot) -> None:
     """启动时发送问候"""
-    groups = (await session.scalars(select(Hello).where(Hello.bot_id == bot.self_id))).all()
-    if not groups:
-        return
+    async with get_session() as session:
+        groups = (await session.scalars(select(Hello).where(Hello.bot_id == bot.self_id))).all()
+        if not groups:
+            return
 
-    hello_str = get_first_connect_message()
-    msg = Text(hello_str)
-    for group in groups:
-        try:
-            await msg.send_to(group.saa_target, bot=bot)
-        except ActionFailed as e:
-            logger.error(f"发送启动问候失败: {e}")
-    logger.info("发送首次启动的问候")
+        hello_str = get_first_connect_message()
+        msg = Text(hello_str)
+        for group in groups:
+            try:
+                await msg.send_to(group.saa_target, bot=bot)
+            except ActionFailed as e:
+                logger.error(f"发送启动问候失败: {e}")
+        logger.info("发送首次启动的问候")
 
 
 hello_cmd = on_alconna(
