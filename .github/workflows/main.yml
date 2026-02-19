@@ -67,8 +67,6 @@ jobs:
     services:
       playwright:
         image: jacoblincool/playwright:chromium-server-1.56.0
-        ports:
-          - 53333:53333
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -140,7 +138,7 @@ jobs:
 
           # 启动容器
           echo "正在启动容器..."
-          docker run --env HTMLRENDER_CONNECT=ws://localhost:53333/playwright --name test-docker-container -d he0119/coolqbot:test > /dev/null
+          docker run --env HTMLRENDER_CONNECT=ws://playwright:53333/playwright --network=${{ job.services.playwright.network }} --name test-docker-container -d he0119/coolqbot:test > /dev/null
 
           TIMEOUT=60
           ELAPSED=0
