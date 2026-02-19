@@ -19,7 +19,7 @@ services:
     restart: always
 
   playwright:
-    image: jacoblincool/playwright:chromium-server-1.56.0
+    image: jacoblincool/playwright:chromium-server-1.56.1
     container_name: playwright
     restart: always
     healthcheck:
