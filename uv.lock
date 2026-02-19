@@ -551,7 +551,7 @@ wheels = [
 
 [[package]]
 name = "coolqbot"
-version = "0.27.4"
+version = "0.27.5"
 source = { virtual = "." }
 dependencies = [
     { name = "eorzeaenv" },

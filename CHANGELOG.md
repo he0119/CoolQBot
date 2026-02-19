@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.27.5] - 2026-02-19
+
 ### Fixed
 
 - 修复 Bison 的内存泄漏问题
@@ -764,7 +766,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.4...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.5...HEAD
+[0.27.5]: https://github.com/he0119/CoolQBot/compare/v0.27.4...v0.27.5
 [0.27.4]: https://github.com/he0119/CoolQBot/compare/v0.27.3...v0.27.4
 [0.27.3]: https://github.com/he0119/CoolQBot/compare/v0.27.2...v0.27.3
 [0.27.2]: https://github.com/he0119/CoolQBot/compare/v0.27.1...v0.27.2
