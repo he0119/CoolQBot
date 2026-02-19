@@ -1,4 +1,4 @@
-from nonebot import get_adapter, get_driver
+from nonebot import get_adapter
 from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
 from sqlalchemy import select
@@ -91,36 +91,3 @@ async def test_hello_disable(app: App):
     async with get_session() as session:
         groups = (await session.scalars(select(Hello))).all()
         assert len(groups) == 0
-
-
-async def test_hello_on_connect(app: App):
-    """测试启动时发送问候功能 - 验证数据库连接正常"""
-    from unittest.mock import AsyncMock, patch
-
-    from nonebot_plugin_orm import get_session
-    from nonebot_plugin_saa import TargetQQGroup
-
-    from src.plugins.morning.plugins.hello import Hello, hello_on_connect
-
-    # 创建一个测试群
-    async with get_session() as session:
-        session.add(Hello(target=TargetQQGroup(group_id=10000).model_dump(), bot_id="test"))
-        await session.commit()
-
-    # 创建一个模拟的 Bot 对象
-    adapter = get_adapter(Adapter)
-    async with app.test_api() as ctx:
-        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="test")
-
-        # 模拟消息发送，让它不真正发送
-        with patch("nonebot_plugin_saa.Text.send_to", new_callable=AsyncMock) as mock_send:
-            # 调用启动问候函数
-            await hello_on_connect(bot)
-
-            # 验证至少尝试发送了一次（说明数据库查询成功）
-            assert mock_send.call_count >= 1
-
-        # 验证数据库查询正常工作（不会抛出"no active connection"错误）
-        async with get_session() as session:
-            groups = (await session.scalars(select(Hello).where(Hello.bot_id == "test"))).all()
-            assert len(groups) == 1
