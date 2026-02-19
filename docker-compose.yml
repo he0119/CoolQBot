@@ -9,8 +9,22 @@ services:
       - "8080:8080"
     env_file:
       - ".env"
+    depends_on:
+      playwright:
+        condition: service_healthy
 
   rsshub:
     image: diygod/rsshub
     container_name: rsshub
     restart: always
+
+  playwright:
+    image: jacoblincool/playwright:chromium-server-1.56.1
+    container_name: playwright
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:53333/playwright"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s

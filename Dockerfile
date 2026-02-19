@@ -36,11 +36,6 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
   uv sync
 
-# 安装浏览器
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-  --mount=type=cache,target=/var/lib/apt,sharing=locked \
-  uv run playwright install --with-deps chromium firefox
-
 # Gunicorn 配置
 COPY ./docker/gunicorn_conf.py /gunicorn_conf.py
 COPY ./docker/start.sh /start.sh

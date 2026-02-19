@@ -51,6 +51,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 使用依赖注入的 User 来判断权限
 
+### Changed
+
+- htmlrender 使用外部浏览器
+
 ## [0.26.2] - 2025-08-27
 
 ### Fixed

@@ -64,6 +64,9 @@ jobs:
     name: Docker
     runs-on: ubuntu-latest
     needs: test
+    services:
+      playwright:
+        image: jacoblincool/playwright:chromium-server-1.56.1
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -135,7 +138,7 @@ jobs:
 
           # 启动容器
           echo "正在启动容器..."
-          docker run --env HTMLRENDER_CI_MODE=true --name test-docker-container -d he0119/coolqbot:test > /dev/null
+          docker run --env HTMLRENDER_CONNECT=ws://playwright:53333/playwright --network=${{ job.services.playwright.network }} --name test-docker-container -d he0119/coolqbot:test > /dev/null
 
           TIMEOUT=60
           ELAPSED=0
