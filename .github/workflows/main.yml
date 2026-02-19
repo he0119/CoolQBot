@@ -68,11 +68,6 @@ jobs:
       playwright:
         image: jacoblincool/playwright:chromium-server-1.56.1
     steps:
-      - name: Debug Network
-        run: |
-          docker run --network ${{ job.services.playwright.network }} curlimages/curl:latest \
-          curl -v http://playwright:53333/playwright  # 看看是否能通，如果是 3000 或 53333
-
       - name: Checkout
         uses: actions/checkout@v6
 
