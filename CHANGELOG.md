@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Fixed
+
+- 修复 Bison 的内存泄漏问题
+
 ## [0.27.4] - 2025-11-25
 
 ### Added
