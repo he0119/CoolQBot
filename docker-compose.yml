@@ -22,3 +22,9 @@ services:
     image: jacoblincool/playwright:chromium-server-1.56.0
     container_name: playwright
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:53333/playwright"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
