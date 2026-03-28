@@ -665,7 +665,7 @@ requires-dist = [
 dev = [
     { name = "beautifulsoup4", specifier = ">=4.14.3" },
     { name = "freezegun", specifier = ">=1.5.5" },
-    { name = "inline-snapshot", specifier = ">=0.32.4" },
+    { name = "inline-snapshot", specifier = ">=0.32.5" },
     { name = "nonebug", specifier = ">=0.4.3" },
     { name = "nonebug-saa", specifier = ">=0.5.0" },
     { name = "poethepoet", specifier = ">=0.41.0" },
