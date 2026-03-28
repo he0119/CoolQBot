@@ -15,6 +15,7 @@
       // https://docs.renovatebot.com/modules/manager/pep621/
       matchManagers: ["pep621"],
       matchDepTypes: ["project.dependencies"],
+      excludePackageNames: ["playwright"],
       matchUpdateTypes: ["minor", "patch"],
       description: "Weekly update of Python dependencies",
     },
@@ -23,6 +24,7 @@
       // https://docs.renovatebot.com/modules/manager/pep621/
       matchManagers: ["pep621"],
       matchDepTypes: ["tool.uv.dev-dependencies"],
+      excludePackageNames: ["playwright"],
       matchUpdateTypes: ["minor", "patch"],
       description: "Weekly update of Python dev-dependencies",
     },
@@ -37,6 +39,7 @@
       // https://docs.renovatebot.com/modules/manager/dockerfile/
       // https://docs.renovatebot.com/modules/manager/docker-compose/
       matchManagers: ["dockerfile", "docker-compose"],
+      excludePackageNames: ["/playwright/"],
       description: "Weekly update of Docker dependencies",
     },
     {
