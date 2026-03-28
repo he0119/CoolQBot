@@ -43,6 +43,12 @@
       description: "Weekly update of Docker dependencies",
     },
     {
+      groupName: "Playwright dependencies",
+      matchManagers: ["docker-compose", "pep621"],
+      matchPackageNames: ["/playwright/"],
+      description: "Weekly update of Playwright dependencies",
+    },
+    {
       // 更新 Python 版本时，需要同时更新这几个文件
       groupName: "Python version",
       matchPackageNames: ["python"],
