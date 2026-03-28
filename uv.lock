@@ -179,7 +179,7 @@ wheels = [
 
 [[package]]
 name = "apilmoji"
-version = "0.3.0"
+version = "0.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -187,9 +187,9 @@ dependencies = [
     { name = "httpx" },
     { name = "pillow" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/23/e1/a905bb2b74cde2d22eec2c5c87fb06913590986e2ae1aacaa29f21e29cb4/apilmoji-0.3.0.tar.gz", hash = "sha256:87c0c9f90f5b8bb88ef3d9d5675e398d0dcbf1eb49e4b9dbb68653b4f9848110", size = 8694, upload-time = "2026-02-07T04:47:09.813Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2a/7f/b6aa1676273195ded802af383d07328d9e751419a33ea59666481ba606dc/apilmoji-0.3.1.tar.gz", hash = "sha256:1490d0076e0b47bfb1b14bef9733a4d23181f54d8ecb212604f5ec0e11127428", size = 8604, upload-time = "2026-02-26T05:15:50.928Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/97/61/12d5fb461691505c99b8d03dcf0e3aa1ccb7ae9f548eb06280fd8f770abc/apilmoji-0.3.0-py3-none-any.whl", hash = "sha256:3d847d6496a7d17042a80f5c8055fe3b4dc1d7861c39a0a56e7cff51111c90a7", size = 9271, upload-time = "2026-02-07T04:47:10.937Z" },
+    { url = "https://files.pythonhosted.org/packages/37/41/48460d135db4be801fbb4840f60f4671b41cc5043f6c1d48a6cbeb91f4b5/apilmoji-0.3.1-py3-none-any.whl", hash = "sha256:305ec445d19b1cd11f21e07cf1d2bd9f3ae5be9fc688a6589f823dd67428da15", size = 9175, upload-time = "2026-02-26T05:15:49.906Z" },
 ]
 
 [package.optional-dependencies]
@@ -620,21 +620,21 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "eorzeaenv", specifier = ">=2.2.11" },
-    { name = "gunicorn", specifier = ">=25.1.0" },
+    { name = "gunicorn", specifier = ">=25.3.0" },
     { name = "matplotlib", specifier = ">=3.10.8" },
-    { name = "nb-cli", specifier = ">=1.7.0" },
+    { name = "nb-cli", specifier = ">=1.7.2" },
     { name = "nonebot-adapter-discord", specifier = ">=0.1.8" },
     { name = "nonebot-adapter-dodo", specifier = ">=0.2.1" },
-    { name = "nonebot-adapter-feishu", specifier = ">=2.6.2" },
+    { name = "nonebot-adapter-feishu", specifier = ">=2.7.1" },
     { name = "nonebot-adapter-kaiheila", specifier = ">=0.3.4" },
     { name = "nonebot-adapter-onebot", specifier = ">=2.4.6" },
-    { name = "nonebot-adapter-qq", specifier = ">=1.6.6" },
+    { name = "nonebot-adapter-qq", specifier = ">=1.6.7" },
     { name = "nonebot-adapter-red", specifier = ">=0.9.0" },
     { name = "nonebot-adapter-satori", specifier = ">=0.13.8" },
     { name = "nonebot-adapter-telegram", specifier = ">=0.1.0b20" },
     { name = "nonebot-bison", specifier = "==0.9.14" },
     { name = "nonebot-plugin-abs", specifier = "==1.1.0" },
-    { name = "nonebot-plugin-alconna", specifier = ">=0.60.4" },
+    { name = "nonebot-plugin-alconna", specifier = ">=0.61.1" },
     { name = "nonebot-plugin-alisten", specifier = ">=0.4.3" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-datastore", specifier = ">=1.3.1" },
@@ -643,13 +643,13 @@ requires-dist = [
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4" },
     { name = "nonebot-plugin-memes", specifier = "==0.8.1" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.8.3" },
-    { name = "nonebot-plugin-parser", extras = ["htmlkit"], specifier = "==2.4.1" },
+    { name = "nonebot-plugin-parser", extras = ["htmlkit"], specifier = "==2.6.1" },
     { name = "nonebot-plugin-prometheus", specifier = "==0.4.1" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
     { name = "nonebot-plugin-sentry", specifier = ">=2.0.0" },
     { name = "nonebot-plugin-status", specifier = "==0.9.0" },
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
-    { name = "nonebot-plugin-uninfo", specifier = ">=0.10.1" },
+    { name = "nonebot-plugin-uninfo", specifier = ">=0.11.0" },
     { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.5.3" },
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.9.0" },
     { name = "nonebot-plugin-zssm", specifier = "==0.3.7" },
@@ -657,7 +657,7 @@ requires-dist = [
     { name = "nonebot2", extras = ["aiohttp", "fastapi", "httpx", "websockets"], specifier = ">=2.4.4" },
     { name = "playwright", specifier = "==1.56.0" },
     { name = "pydantic", specifier = ">=2.12.5" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.41.0" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.42.0" },
     { name = "uvicorn-worker", specifier = ">=0.4.0" },
 ]
 
@@ -1010,14 +1010,14 @@ wheels = [
 
 [[package]]
 name = "gunicorn"
-version = "25.1.0"
+version = "25.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "packaging" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/66/13/ef67f59f6a7896fdc2c1d62b5665c5219d6b0a9a1784938eb9a28e55e128/gunicorn-25.1.0.tar.gz", hash = "sha256:1426611d959fa77e7de89f8c0f32eed6aa03ee735f98c01efba3e281b1c47616", size = 594377, upload-time = "2026-02-13T11:09:58.989Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/f4/e78fa054248fab913e2eab0332c6c2cb07421fca1ce56d8fe43b6aef57a4/gunicorn-25.3.0.tar.gz", hash = "sha256:f74e1b2f9f76f6cd1ca01198968bd2dd65830edc24b6e8e4d78de8320e2fe889", size = 634883, upload-time = "2026-03-27T00:00:26.092Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/da/73/4ad5b1f6a2e21cf1e85afdaad2b7b1a933985e2f5d679147a1953aaa192c/gunicorn-25.1.0-py3-none-any.whl", hash = "sha256:d0b1236ccf27f72cfe14bce7caadf467186f19e865094ca84221424e839b8b8b", size = 197067, upload-time = "2026-02-13T11:09:57.146Z" },
+    { url = "https://files.pythonhosted.org/packages/43/c8/8aaf447698c4d59aa853fd318eed300b5c9e44459f242ab8ead6c9c09792/gunicorn-25.3.0-py3-none-any.whl", hash = "sha256:cacea387dab08cd6776501621c295a904fe8e3b7aae9a1a3cbb26f4e7ed54660", size = 208403, upload-time = "2026-03-27T00:00:27.386Z" },
 ]
 
 [[package]]
@@ -1564,7 +1564,7 @@ wheels = [
 
 [[package]]
 name = "nb-cli"
-version = "1.7.0"
+version = "1.7.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1586,9 +1586,9 @@ dependencies = [
     { name = "watchfiles" },
     { name = "wcwidth" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1e/01/b0f679397c07695a6bf46fe018b5527069c9c96279f2ab2c00ec25e5b8d8/nb_cli-1.7.0.tar.gz", hash = "sha256:7acd31530070042ea5910d8b789b616d867216db34720726cc8a1587e4ed2740", size = 68859, upload-time = "2026-01-24T14:39:08.367Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/04/ad48cb7e7723a2a2eaaa5e06c6095b90cc47f7c412a1c013488fa1b80051/nb_cli-1.7.2.tar.gz", hash = "sha256:5af51ec911ec10e4d1c31fe186e087b0e3a97c8f29b066bfd7c0f4ad4a87ba4f", size = 69891, upload-time = "2026-02-28T17:35:38.559Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4d/39/20fa99c7cf693cf64c63fe3efb26fed5cf6ec9b047588e543f7804d963e5/nb_cli-1.7.0-py3-none-any.whl", hash = "sha256:032605794f9ad3423db920963f0d957edfb1a47235f1e7dcc1eae7a547d1c35d", size = 97919, upload-time = "2026-01-24T14:39:07.39Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/fb/94240e23d7eb46f1fa3b18241278e65a6ef88eaad9abdcee1d69192dce38/nb_cli-1.7.2-py3-none-any.whl", hash = "sha256:ace337a603a423ee5434cc54947c3236c1e737964893482081706948d778bd30", size = 98459, upload-time = "2026-02-28T17:35:37.169Z" },
 ]
 
 [[package]]
@@ -1630,16 +1630,17 @@ wheels = [
 
 [[package]]
 name = "nonebot-adapter-feishu"
-version = "2.6.2"
+version = "2.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cashews" },
     { name = "nonebot2" },
+    { name = "protobuf" },
     { name = "pycryptodome" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/11/67/e27d60edd50260a46e27a8170851203a74f8aed05fa84b1cffcc2ce619ab/nonebot_adapter_feishu-2.6.2.tar.gz", hash = "sha256:1223ba0720bd1e0c1f85d5c1216fdbc91711196e351d1b870bcffeeeac41436d", size = 19151, upload-time = "2024-06-28T02:59:02.885Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8a/a9/42197ac7fb6b3c68649061926fb332785693ed2be9dbc7a82d78fca0f15f/nonebot_adapter_feishu-2.7.1.tar.gz", hash = "sha256:f58594d8b3bfc0eb8365a6ad133f887390e6f768cd35e0ed055c955f7a63152f", size = 22890, upload-time = "2026-03-01T10:34:16.767Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/25/0f/0aa5eb7538118b408181a88f2ed75e2a2b91eb98c0c522b5494b7cd128ff/nonebot_adapter_feishu-2.6.2-py3-none-any.whl", hash = "sha256:1f68dbfe353c0c7a29798cffaf72e174ef62e8b903c723c6a661d033237febcd", size = 21650, upload-time = "2024-06-28T02:59:00.929Z" },
+    { url = "https://files.pythonhosted.org/packages/ff/7e/464a81ba80c38aea839adf47ca22088dbed1235ee59304bd17f815074cb2/nonebot_adapter_feishu-2.7.1-py3-none-any.whl", hash = "sha256:aa9824a65d61107bda56714573d76a62589993baed5065fb7c519b669de3c060", size = 27982, upload-time = "2026-03-01T10:34:15.691Z" },
 ]
 
 [[package]]
@@ -1672,7 +1673,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-adapter-qq"
-version = "1.6.6"
+version = "1.6.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
@@ -1681,9 +1682,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/66/e2/9645b8d99151b44762c44e1103527b2b82e078e9069b9bcee243727cbb3f/nonebot_adapter_qq-1.6.6.tar.gz", hash = "sha256:536f98b3b3ce7a8e3f01e74a59aafa7f90136bc7a2e4f72a3ff1cf1187e57ade", size = 30955, upload-time = "2025-11-22T09:07:48.513Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/49/a4e06aaa55505dd0a8a8b81e58f0f963d45c54a84b2089fc68385540c252/nonebot_adapter_qq-1.6.7.tar.gz", hash = "sha256:1631a051ceda0a2b98567c2860819a6fcd0a56c6a36c50653a8014a8ccfc58f9", size = 31019, upload-time = "2026-03-07T07:16:22.617Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/65/91/0d8d65ca10aaa02e2f74f0589d2ab7013e84f1779fb8929b5b9c9eb0b957/nonebot_adapter_qq-1.6.6-py3-none-any.whl", hash = "sha256:9ec76b8f68a16f4e667fd2f2f7c39d8c38f235851732acda7928649764c0bb7c", size = 36177, upload-time = "2025-11-22T09:07:47.4Z" },
+    { url = "https://files.pythonhosted.org/packages/f6/08/a238832e3fe46f98a59cb48520468b800c25fa68ca2f84ff3440742bb914/nonebot_adapter_qq-1.6.7-py3-none-any.whl", hash = "sha256:40f9c847cbc1490ccb4f0db7dbad94f3f5841cb79db71d9a8f1ed5598349cf1a", size = 36214, upload-time = "2026-03-07T07:16:21.471Z" },
 ]
 
 [[package]]
@@ -1774,7 +1775,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-alconna"
-version = "0.60.4"
+version = "0.61.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "arclet-alconna" },
@@ -1785,9 +1786,9 @@ dependencies = [
     { name = "nonebot2" },
     { name = "tarina" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/70/4ac2a8d7a11ce59de141b0ad272cae2817517a965e7b952e73de523a08b6/nonebot_plugin_alconna-0.60.4.tar.gz", hash = "sha256:ca1c91d7c4f52e0158b5dc12484722b65f0f4fd339b140cb39d3f2460720772a", size = 158853, upload-time = "2026-01-09T08:56:02.558Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/89/d7/2a744b626597959ca4b75f26ac6fc4432208249ed0c2a32894ed39334d94/nonebot_plugin_alconna-0.61.1.tar.gz", hash = "sha256:188f7a2eb3d4d1a485755e519094b478f698ab6294c246985895af90f2417073", size = 161299, upload-time = "2026-03-26T08:42:38.775Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/0a/b92a30401bb9dc1976fbf728d920fc002ed294dfa45d362208f64c89a494/nonebot_plugin_alconna-0.60.4-py3-none-any.whl", hash = "sha256:6194cb4b8d44e5a0be5fa6fdca8ba3f1dfae8dd3021ed8ee39fa673bcaae22e9", size = 218404, upload-time = "2026-01-09T08:56:01.514Z" },
+    { url = "https://files.pythonhosted.org/packages/72/5e/5e2b9ac2e73031d19f0d57e079bee2e7f8d24a44dcc8158c2e6dc8ead595/nonebot_plugin_alconna-0.61.1-py3-none-any.whl", hash = "sha256:6b30008b1dd10f895f8af8206009ece2a7657cb9877913bbc92f86c507f78082", size = 222289, upload-time = "2026-03-26T08:42:37.68Z" },
 ]
 
 [[package]]
@@ -2007,7 +2008,7 @@ default = [
 
 [[package]]
 name = "nonebot-plugin-parser"
-version = "2.4.1"
+version = "2.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -2025,9 +2026,9 @@ dependencies = [
     { name = "pillow" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fc/f1/cb85d4464079f03a9de981151e1c18d7ee31a7a5e8397eddab59577cc7b0/nonebot_plugin_parser-2.4.1.tar.gz", hash = "sha256:c8ba8ff8fdf5566bddcc9afdd3451b7e8d2c9efb4ff0af3a3d72cead1a35825a", size = 2339205, upload-time = "2026-02-16T04:03:06.546Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/39/2a/1e933ff756fee1d102d78a1a1d6c85381f09478be02d8cca231366ff49a1/nonebot_plugin_parser-2.6.1.tar.gz", hash = "sha256:04493eab89b81100e7e8b9c0a75364046de6077aee0344ba3f4e5f08ef225696", size = 2883616, upload-time = "2026-03-28T01:56:24.925Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d5/cc/12f78d4958e2d8f559b13e7191346186102bc93936741a48cfac3db3224f/nonebot_plugin_parser-2.4.1-py3-none-any.whl", hash = "sha256:85d9033561d672b8cd658a142d8da67d9ea58c78ba77cbced2eb3ecc1608b8a8", size = 2363662, upload-time = "2026-02-16T04:03:04.746Z" },
+    { url = "https://files.pythonhosted.org/packages/64/00/3f145cde4dd5a89d64a4bc87b2ee0ad5f0558a4dd2eae8249105aa325fdd/nonebot_plugin_parser-2.6.1-py3-none-any.whl", hash = "sha256:cd72088e4c4ee27dd3d268a42fa0731abfa2ef01cad305b97394cc12afa0df4e", size = 2909017, upload-time = "2026-03-28T01:56:23.057Z" },
 ]
 
 [package.optional-dependencies]
@@ -2108,15 +2109,15 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-uninfo"
-version = "0.10.1"
+version = "0.11.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "importlib-metadata" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/16/94/369e10017c2ff134ce5b01f53b14a5c54a6c84ecf39f3d564a72251f2d6e/nonebot_plugin_uninfo-0.10.1.tar.gz", hash = "sha256:cdd6acbeb235d5617b5d5feb232160f5815fb5b5c74cff6d71cb5dfd415855ce", size = 41008, upload-time = "2025-11-25T14:45:19.783Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/51/99/bb5c2c8a5feaec786c03bbeddf79b07afab4936282ff1fd63d1467154810/nonebot_plugin_uninfo-0.11.0.tar.gz", hash = "sha256:3c1f35b72affa0eab0d27e578157e31c9b15706476fcf98e3437d958c4b573fe", size = 42439, upload-time = "2026-03-13T10:04:05.02Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fc/e3/70bb2cafa4cbfb28d06acf3172e095f10c36572e39edffbc3f82281b6fa6/nonebot_plugin_uninfo-0.10.1-py3-none-any.whl", hash = "sha256:3e5952af14e46cbf8e72920d995ac43aa491d9e9048285bd69901c5bd28dea9f", size = 65720, upload-time = "2025-11-25T14:45:18.069Z" },
+    { url = "https://files.pythonhosted.org/packages/d7/24/538c4681a5f1d1ede4e9094b07aaec52eb706668caa8235835a259d61c9c/nonebot_plugin_uninfo-0.11.0-py3-none-any.whl", hash = "sha256:6caaa73a4b8403143ab736ff647c5155439915e97997b1416ea6c1c5bd0d3702", size = 68177, upload-time = "2026-03-13T10:04:03.82Z" },
 ]
 
 [[package]]
@@ -2494,6 +2495,21 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/cb/ef/3c6ecf8b317aa982f309835e8f96987466123c6e596646d4e6a1dfcd080f/propcache-0.4.1-cp314-cp314t-win_amd64.whl", hash = "sha256:990f6b3e2a27d683cb7602ed6c86f15ee6b43b1194736f9baaeb93d0016633b1", size = 46259, upload-time = "2025-10-08T19:48:34.226Z" },
     { url = "https://files.pythonhosted.org/packages/c4/2d/346e946d4951f37eca1e4f55be0f0174c52cd70720f84029b02f296f4a38/propcache-0.4.1-cp314-cp314t-win_arm64.whl", hash = "sha256:ecef2343af4cc68e05131e45024ba34f6095821988a9d0a02aa7c73fcc448aa9", size = 40428, upload-time = "2025-10-08T19:48:35.441Z" },
     { url = "https://files.pythonhosted.org/packages/5b/5a/bc7b4a4ef808fa59a816c17b20c4bef6884daebbdf627ff2a161da67da19/propcache-0.4.1-py3-none-any.whl", hash = "sha256:af2a6052aeb6cf17d3e46ee169099044fd8224cbaf75c76a2ef596e8163e2237", size = 13305, upload-time = "2025-10-08T19:49:00.792Z" },
+]
+
+[[package]]
+name = "protobuf"
+version = "7.34.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6b/6b/a0e95cad1ad7cc3f2c6821fcab91671bd5b78bd42afb357bb4765f29bc41/protobuf-7.34.1.tar.gz", hash = "sha256:9ce42245e704cc5027be797c1db1eb93184d44d1cdd71811fb2d9b25ad541280", size = 454708, upload-time = "2026-03-20T17:34:47.036Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ec/11/3325d41e6ee15bf1125654301211247b042563bcc898784351252549a8ad/protobuf-7.34.1-cp310-abi3-macosx_10_9_universal2.whl", hash = "sha256:d8b2cc79c4d8f62b293ad9b11ec3aebce9af481fa73e64556969f7345ebf9fc7", size = 429247, upload-time = "2026-03-20T17:34:37.024Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/9d/aa69df2724ff63efa6f72307b483ce0827f4347cc6d6df24b59e26659fef/protobuf-7.34.1-cp310-abi3-manylinux2014_aarch64.whl", hash = "sha256:5185e0e948d07abe94bb76ec9b8416b604cfe5da6f871d67aad30cbf24c3110b", size = 325753, upload-time = "2026-03-20T17:34:38.751Z" },
+    { url = "https://files.pythonhosted.org/packages/92/e8/d174c91fd48e50101943f042b09af9029064810b734e4160bbe282fa1caa/protobuf-7.34.1-cp310-abi3-manylinux2014_s390x.whl", hash = "sha256:403b093a6e28a960372b44e5eb081775c9b056e816a8029c61231743d63f881a", size = 340198, upload-time = "2026-03-20T17:34:39.871Z" },
+    { url = "https://files.pythonhosted.org/packages/53/1b/3b431694a4dc6d37b9f653f0c64b0a0d9ec074ee810710c0c3da21d67ba7/protobuf-7.34.1-cp310-abi3-manylinux2014_x86_64.whl", hash = "sha256:8ff40ce8cd688f7265326b38d5a1bed9bfdf5e6723d49961432f83e21d5713e4", size = 324267, upload-time = "2026-03-20T17:34:41.1Z" },
+    { url = "https://files.pythonhosted.org/packages/85/29/64de04a0ac142fb685fd09999bc3d337943fb386f3a0ec57f92fd8203f97/protobuf-7.34.1-cp310-abi3-win32.whl", hash = "sha256:34b84ce27680df7cca9f231043ada0daa55d0c44a2ddfaa58ec1d0d89d8bf60a", size = 426628, upload-time = "2026-03-20T17:34:42.536Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/87/cb5e585192a22b8bd457df5a2c16a75ea0db9674c3a0a39fc9347d84e075/protobuf-7.34.1-cp310-abi3-win_amd64.whl", hash = "sha256:e97b55646e6ce5cbb0954a8c28cd39a5869b59090dfaa7df4598a7fba869468c", size = 437901, upload-time = "2026-03-20T17:34:44.112Z" },
+    { url = "https://files.pythonhosted.org/packages/88/95/608f665226bca68b736b79e457fded9a2a38c4f4379a4a7614303d9db3bc/protobuf-7.34.1-py3-none-any.whl", hash = "sha256:bb3812cd53aefea2b028ef42bd780f5b96407247f20c6ef7c679807e9d188f11", size = 170715, upload-time = "2026-03-20T17:34:45.384Z" },
 ]
 
 [[package]]
@@ -3273,15 +3289,15 @@ wheels = [
 
 [[package]]
 name = "uvicorn"
-version = "0.41.0"
+version = "0.42.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
     { name = "h11" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/32/ce/eeb58ae4ac36fe09e3842eb02e0eb676bf2c53ae062b98f1b2531673efdd/uvicorn-0.41.0.tar.gz", hash = "sha256:09d11cf7008da33113824ee5a1c6422d89fbc2ff476540d69a34c87fab8b571a", size = 82633, upload-time = "2026-02-16T23:07:24.1Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e3/ad/4a96c425be6fb67e0621e62d86c402b4a17ab2be7f7c055d9bd2f638b9e2/uvicorn-0.42.0.tar.gz", hash = "sha256:9b1f190ce15a2dd22e7758651d9b6d12df09a13d51ba5bf4fc33c383a48e1775", size = 85393, upload-time = "2026-03-16T06:19:50.077Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/83/e4/d04a086285c20886c0daad0e026f250869201013d18f81d9ff5eada73a88/uvicorn-0.41.0-py3-none-any.whl", hash = "sha256:29e35b1d2c36a04b9e180d4007ede3bcb32a85fbdfd6c6aeb3f26839de088187", size = 68783, upload-time = "2026-02-16T23:07:22.357Z" },
+    { url = "https://files.pythonhosted.org/packages/0a/89/f8827ccff89c1586027a105e5630ff6139a64da2515e24dafe860bd9ae4d/uvicorn-0.42.0-py3-none-any.whl", hash = "sha256:96c30f5c7abe6f74ae8900a70e92b85ad6613b745d4879eb9b16ccad15645359", size = 68830, upload-time = "2026-03-16T06:19:48.325Z" },
 ]
 
 [package.optional-dependencies]
