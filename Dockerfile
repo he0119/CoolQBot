@@ -1,4 +1,4 @@
-FROM python:3.14.3-slim-bookworm
+FROM python:3.14.4-slim-bookworm
 COPY --from=ghcr.io/astral-sh/uv:0.11.2 /uv /bin/uv
 
 # 编译参数
