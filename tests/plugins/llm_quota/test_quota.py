@@ -1,10 +1,12 @@
 """测试大模型额度查询命令"""
 
+import httpx
 import pytest
+import respx
 from nonebot import get_adapter
 from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
-from pytest_mock import MockerFixture
+from respx import MockRouter
 
 from tests.fake import fake_group_message_event_v11
 
@@ -28,8 +30,8 @@ async def test_quota_not_configured(app: App):
         ctx.should_finished(quota_cmd)
 
 
-@pytest.mark.asyncio
-async def test_quota_with_config(app: App, mocker: MockerFixture):
+@respx.mock(assert_all_called=True)
+async def test_quota_with_config(app: App, respx_mock: MockRouter):
     from src.plugins.llm_quota import quota_cmd
     from src.plugins.llm_quota.data_source import set_group_api_url
 
@@ -49,16 +51,9 @@ async def test_quota_with_config(app: App, mocker: MockerFixture):
         ]
     }
 
-    mock_response = mocker.MagicMock()
-    mock_response.json.return_value = mock_data
-    mock_response.raise_for_status = mocker.MagicMock()
-
-    mock_client = mocker.AsyncMock()
-    mock_client.get.return_value = mock_response
-    mock_client.__aenter__ = mocker.AsyncMock(return_value=mock_client)
-    mock_client.__aexit__ = mocker.AsyncMock(return_value=None)
-
-    mocker.patch("httpx.AsyncClient", return_value=mock_client)
+    quotas_mock = respx_mock.get("https://ai.example.com/api/quotas").mock(
+        return_value=httpx.Response(200, json=mock_data)
+    )
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -73,6 +68,8 @@ async def test_quota_with_config(app: App, mocker: MockerFixture):
             at_sender=True,
         )
         ctx.should_finished(quota_cmd)
+
+    assert quotas_mock.call_count == 1
 
 
 @pytest.mark.asyncio
