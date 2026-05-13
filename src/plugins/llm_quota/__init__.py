@@ -53,9 +53,9 @@ async def quota_set_handle(bot: Bot, event: Event, user: UserSession, api_url: s
 
     user_obj = await get_user(session.scope, session.user.id)
     if user_obj.name not in bot.config.superusers:
-        await quota_cmd.finish("仅管理员可使用此命令")
+        await quota_cmd.finish("仅管理员可使用此命令", at_sender=True)
     await set_group_api_url(user.session_id, api_url)
-    await quota_cmd.finish(f"已设置额度查询 API 地址：{api_url}")
+    await quota_cmd.finish(f"已设置额度查询 API 地址：{api_url}", at_sender=True)
 
 
 @quota_cmd.assign("remove")
@@ -67,18 +67,21 @@ async def quota_remove_handle(bot: Bot, event: Event, user: UserSession):
 
     user_obj = await get_user(session.scope, session.user.id)
     if user_obj.name not in bot.config.superusers:
-        await quota_cmd.finish("仅管理员可使用此命令")
+        await quota_cmd.finish("仅管理员可使用此命令", at_sender=True)
     removed = await remove_group_api_url(user.session_id)
     if removed:
-        await quota_cmd.finish("已删除额度查询 API 配置")
+        await quota_cmd.finish("已删除额度查询 API 配置", at_sender=True)
     else:
-        await quota_cmd.finish("当前群组未配置额度查询 API")
+        await quota_cmd.finish("当前群组未配置额度查询 API", at_sender=True)
 
 
 @quota_cmd.handle()
 async def quota_handle(user: UserSession):
     api_url = await get_group_api_url(user.session_id)
     if not api_url:
-        await quota_cmd.finish("当前群组未配置额度查询 API，请管理员使用 /quota set 命令配置")
+        await quota_cmd.finish(
+            "当前群组未配置额度查询 API，请管理员使用 /quota set 命令配置",
+            at_sender=True,
+        )
     result = await get_quotas(api_url)
-    await quota_cmd.finish(result)
+    await quota_cmd.finish(result, at_sender=True)
