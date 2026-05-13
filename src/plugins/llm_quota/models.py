@@ -1,29 +1,17 @@
 """大模型额度查询数据模型"""
 
-from pydantic import BaseModel
+from nonebot_plugin_orm import Model
+from sqlalchemy import UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column
 
 
-class Bucket(BaseModel):
-    """额度桶"""
+class GroupQuotaConfig(Model):
+    """群组额度查询配置"""
 
-    name: str
-    """桶名称"""
-    current: int
-    """当前剩余额度（单位：token）"""
-    capacity: int
-    """总容量（单位：token）"""
-    rate: str
-    """速率限制"""
-    models: list[str]
-    """关联的模型列表"""
-    paused: bool
-    """是否暂停"""
-    last_updated: str
-    """最后更新时间"""
+    __table_args__ = (UniqueConstraint("session_id", name="unique_group_quota_config"),)
 
-
-class QuotasResponse(BaseModel):
-    """额度查询响应"""
-
-    buckets: list[Bucket]
-    """额度桶列表"""
+    id: Mapped[int] = mapped_column(primary_key=True)
+    session_id: Mapped[str]
+    """群组会话 ID"""
+    api_url: Mapped[str]
+    """API 地址"""

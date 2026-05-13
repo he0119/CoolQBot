@@ -6,16 +6,29 @@
 
 仅支持 Tailscale Aperture 格式的 API。
 
-## 配置
-
-在 `.env` 或 `.env.prod` 中配置：
-
-```dotenv
-LLM_QUOTA_API_URL=https://your-api-url.com/api/quotas
-```
-
-默认值：`https://ai.long-antares.ts.net/api/quotas`
-
 ## 命令
 
-- `/quota` 或 `/额度`：查询剩余额度
+| 命令                   | 别名    | 说明              | 权限   |
+| ---------------------- | ------- | ----------------- | ------ |
+| `/quota`               | `/额度` | 查询剩余额度      | 所有人 |
+| `/quota set <api_url>` | -       | 设置群组 API 地址 | 管理员 |
+| `/quota remove`        | -       | 删除群组 API 配置 | 管理员 |
+
+## 使用说明
+
+1. 管理员使用 `/quota set` 命令设置群组的 API 地址
+2. 群组成员使用 `/quota` 命令查询剩余额度
+3. 如果群组未配置 API，查询时会提示管理员先配置
+
+## 示例
+
+```
+# 设置 API 地址（管理员）
+/quota set https://ai.long-antares.ts.net/api/quotas
+
+# 查询额度
+/quota
+
+# 删除配置（管理员）
+/quota remove
+```

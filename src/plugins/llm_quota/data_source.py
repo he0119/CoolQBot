@@ -4,16 +4,74 @@
 """
 
 import httpx
+from nonebot_plugin_orm import get_session
+from pydantic import BaseModel
+from sqlalchemy import delete, select
 
-from .config import plugin_config
-from .models import QuotasResponse
+from .models import GroupQuotaConfig
 
 
-async def get_quotas() -> str:
+class Bucket(BaseModel):
+    """额度桶"""
+
+    name: str
+    """桶名称"""
+    current: int
+    """当前剩余额度（单位：纳元，除以 1_000_000_000 为元）"""
+    capacity: int
+    """总容量（单位：纳元，除以 1_000_000_000 为元）"""
+    rate: str
+    """速率限制"""
+    models: list[str]
+    """关联的模型列表"""
+    paused: bool
+    """是否暂停"""
+    last_updated: str
+    """最后更新时间"""
+
+
+class QuotasResponse(BaseModel):
+    """额度查询响应"""
+
+    buckets: list[Bucket]
+    """额度桶列表"""
+
+
+async def get_group_api_url(session_id: str) -> str | None:
+    """获取群组配置的 API 地址"""
+    async with get_session() as session:
+        config = (
+            await session.scalars(select(GroupQuotaConfig).where(GroupQuotaConfig.session_id == session_id))
+        ).one_or_none()
+        return config.api_url if config else None
+
+
+async def set_group_api_url(session_id: str, api_url: str) -> None:
+    """设置群组的 API 地址"""
+    async with get_session() as session:
+        config = (
+            await session.scalars(select(GroupQuotaConfig).where(GroupQuotaConfig.session_id == session_id))
+        ).one_or_none()
+        if config:
+            config.api_url = api_url
+        else:
+            session.add(GroupQuotaConfig(session_id=session_id, api_url=api_url))
+        await session.commit()
+
+
+async def remove_group_api_url(session_id: str) -> bool:
+    """删除群组的 API 地址"""
+    async with get_session() as session:
+        result = await session.execute(delete(GroupQuotaConfig).where(GroupQuotaConfig.session_id == session_id))
+        await session.commit()
+        return result.rowcount > 0
+
+
+async def get_quotas(api_url: str) -> str:
     """获取大模型额度信息"""
     try:
         async with httpx.AsyncClient() as client:
-            resp = await client.get(plugin_config.llm_quota_api_url, timeout=10.0)
+            resp = await client.get(api_url, timeout=10.0)
             resp.raise_for_status()
             data = QuotasResponse.model_validate(resp.json())
     except httpx.HTTPError:
