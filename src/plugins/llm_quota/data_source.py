@@ -24,7 +24,7 @@ async def get_quotas() -> str:
 
     lines = ["大模型剩余额度："]
     for bucket in data.buckets:
-        remaining_yuan = (bucket.capacity - bucket.current) / 1_000_000_000
+        remaining_yuan = bucket.current / 1_000_000_000
         lines.append(f"  {bucket.name}: {remaining_yuan:.2f} 元")
 
     return "\n".join(lines)
