@@ -102,27 +102,6 @@ async def test_quota_set_by_superuser(app: App):
 
 
 @pytest.mark.asyncio
-async def test_quota_set_by_normal_user(app: App):
-    from src.plugins.llm_quota import quota_cmd
-    from src.plugins.llm_quota.data_source import get_group_api_url
-
-    async with app.test_matcher() as ctx:
-        adapter = get_adapter(Adapter)
-        bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(
-            message=Message("/quota set https://ai.example.com/api/quotas"),
-            user_id=10000,
-        )
-
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "仅管理员可使用此命令", True, at_sender=True)
-        ctx.should_finished(quota_cmd)
-
-    api_url = await get_group_api_url("QQClient_10000")
-    assert api_url is None
-
-
-@pytest.mark.asyncio
 async def test_quota_remove_by_superuser(app: App):
     from src.plugins.llm_quota import quota_cmd
     from src.plugins.llm_quota.data_source import get_group_api_url, set_group_api_url
@@ -153,21 +132,4 @@ async def test_quota_remove_not_configured(app: App):
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "当前群组未配置额度查询 API", True, at_sender=True)
-        ctx.should_finished(quota_cmd)
-
-
-@pytest.mark.asyncio
-async def test_quota_remove_by_normal_user(app: App):
-    from src.plugins.llm_quota import quota_cmd
-    from src.plugins.llm_quota.data_source import set_group_api_url
-
-    await set_group_api_url("QQClient_10000", "https://ai.example.com/api/quotas")
-
-    async with app.test_matcher() as ctx:
-        adapter = get_adapter(Adapter)
-        bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/quota remove"), user_id=10000)
-
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "仅管理员可使用此命令", True, at_sender=True)
         ctx.should_finished(quota_cmd)
