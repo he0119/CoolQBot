@@ -8,6 +8,7 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
 require("nonebot_plugin_alconna")
 require("nonebot_plugin_orm")
+require("nonebot_plugin_user")
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Subcommand, on_alconna
 from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
 from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
