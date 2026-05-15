@@ -11,12 +11,29 @@
   ignoreDeps: ["eorzeaenv"],
   packageRules: [
     {
+      groupName: "NoneBot adapters",
+      matchManagers: ["pep621"],
+      matchPackageNames: ["/^nonebot-adapter-/"],
+      description: "Weekly update of nonebot adapters",
+    },
+    {
+      groupName: "NoneBot plugins",
+      matchManagers: ["pep621"],
+      matchPackageNames: ["/^nonebot-plugin-/", "nonebot-bison"],
+      description: "Weekly update of nonebot plugins",
+    },
+    {
       groupName: "Python dependencies",
       matchManagers: ["pep621"],
       matchDepTypes: ["project.dependencies"],
       matchUpdateTypes: ["minor", "patch"],
       description: "Weekly update of Python dependencies",
-      matchPackageNames: ["!playwright"],
+      matchPackageNames: [
+        "!playwright",
+        "!/^nonebot-adapter-/",
+        "!/^nonebot-plugin-/",
+        "!nonebot-bison",
+      ],
     },
     {
       groupName: "Python dev-dependencies",
