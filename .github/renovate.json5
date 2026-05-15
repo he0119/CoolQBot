@@ -12,35 +12,30 @@
   packageRules: [
     {
       groupName: "Python dependencies",
-      // https://docs.renovatebot.com/modules/manager/pep621/
       matchManagers: ["pep621"],
       matchDepTypes: ["project.dependencies"],
-      excludePackageNames: ["playwright"],
       matchUpdateTypes: ["minor", "patch"],
       description: "Weekly update of Python dependencies",
+      matchPackageNames: ["!playwright"],
     },
     {
       groupName: "Python dev-dependencies",
-      // https://docs.renovatebot.com/modules/manager/pep621/
       matchManagers: ["pep621"],
       matchDepTypes: ["dependency-groups"],
-      excludePackageNames: ["playwright"],
       matchUpdateTypes: ["minor", "patch"],
       description: "Weekly update of Python dev-dependencies",
+      matchPackageNames: ["!playwright"],
     },
     {
       groupName: "GitHub actions dependencies",
-      // https://docs.renovatebot.com/modules/manager/github-actions/
       matchManagers: ["github-actions"],
       description: "Weekly update of GitHub actions dependencies",
     },
     {
       groupName: "Docker dependencies",
-      // https://docs.renovatebot.com/modules/manager/dockerfile/
-      // https://docs.renovatebot.com/modules/manager/docker-compose/
       matchManagers: ["dockerfile", "docker-compose"],
-      excludePackageNames: ["/playwright/"],
       description: "Weekly update of Docker dependencies",
+      matchPackageNames: ["!/playwright/"],
     },
     {
       groupName: "Playwright dependencies",
@@ -49,18 +44,13 @@
       description: "Weekly update of Playwright dependencies",
     },
     {
-      // 更新 Python 版本时，需要同时更新这几个文件
       groupName: "Python version",
       matchPackageNames: ["python"],
-      // https://docs.renovatebot.com/modules/manager/dockerfile/
-      // https://docs.renovatebot.com/modules/manager/pyenv/
-      // https://docs.renovatebot.com/modules/manager/pep621/
       matchManagers: ["dockerfile", "pyenv", "pep621"],
       description: "Weekly update of Python version",
     },
     {
       groupName: "pre-commit dependencies",
-      // https://docs.renovatebot.com/modules/manager/pre-commit/
       matchManagers: ["pre-commit"],
       description: "Weekly update of pre-commit dependencies",
     },
