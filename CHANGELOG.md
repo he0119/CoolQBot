@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加大模型额度查询插件 (llm_quota)
+
 ## [0.27.6] - 2026-03-30
 
 ### Added
