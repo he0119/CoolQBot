@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.27.7] - 2026-05-15
+
 ### Added
 
 - 添加大模型额度查询插件 (llm_quota)
@@ -777,7 +779,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.6...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.7...HEAD
+[0.27.7]: https://github.com/he0119/CoolQBot/compare/v0.27.6...v0.27.7
 [0.27.6]: https://github.com/he0119/CoolQBot/compare/v0.27.5...v0.27.6
 [0.27.5]: https://github.com/he0119/CoolQBot/compare/v0.27.4...v0.27.5
 [0.27.4]: https://github.com/he0119/CoolQBot/compare/v0.27.3...v0.27.4
