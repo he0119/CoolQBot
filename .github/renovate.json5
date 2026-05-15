@@ -1,100 +1,58 @@
 {
-  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
   dependencyDashboard: true,
   extends: [
-    'config:recommended',
-    'schedule:weekly',
-    ':semanticCommitTypeAll(chore)',
+    "config:recommended",
+    "schedule:weekly",
+    ":semanticCommitTypeAll(chore)",
   ],
-  labels: [
-    'dependencies',
-  ],
-  rangeStrategy: 'bump',
-  ignoreDeps: [
-    'eorzeaenv',
-  ],
+  labels: ["dependencies"],
+  rangeStrategy: "bump",
+  ignoreDeps: ["eorzeaenv"],
   packageRules: [
     {
-      groupName: 'Python dependencies',
-      matchManagers: [
-        'pep621',
-      ],
-      matchDepTypes: [
-        'project.dependencies',
-      ],
-      matchUpdateTypes: [
-        'minor',
-        'patch',
-      ],
-      description: 'Weekly update of Python dependencies',
-      matchPackageNames: [
-        '!playwright',
-      ],
+      groupName: "Python dependencies",
+      matchManagers: ["pep621"],
+      matchDepTypes: ["project.dependencies"],
+      matchUpdateTypes: ["minor", "patch"],
+      description: "Weekly update of Python dependencies",
+      matchPackageNames: ["!playwright"],
     },
     {
-      groupName: 'Python dev-dependencies',
-      matchManagers: [
-        'pep621',
-      ],
-      matchDepTypes: [
-        'dependency-groups',
-      ],
-      matchUpdateTypes: [
-        'minor',
-        'patch',
-      ],
-      description: 'Weekly update of Python dev-dependencies',
-      matchPackageNames: [
-        '!playwright',
-      ],
+      groupName: "Python dev-dependencies",
+      matchManagers: ["pep621"],
+      matchDepTypes: ["dependency-groups"],
+      matchUpdateTypes: ["minor", "patch"],
+      description: "Weekly update of Python dev-dependencies",
+      matchPackageNames: ["!playwright"],
     },
     {
-      groupName: 'GitHub actions dependencies',
-      matchManagers: [
-        'github-actions',
-      ],
-      description: 'Weekly update of GitHub actions dependencies',
+      groupName: "GitHub actions dependencies",
+      matchManagers: ["github-actions"],
+      description: "Weekly update of GitHub actions dependencies",
     },
     {
-      groupName: 'Docker dependencies',
-      matchManagers: [
-        'dockerfile',
-        'docker-compose',
-      ],
-      description: 'Weekly update of Docker dependencies',
-      matchPackageNames: [
-        '!/playwright/',
-      ],
+      groupName: "Docker dependencies",
+      matchManagers: ["dockerfile", "docker-compose"],
+      description: "Weekly update of Docker dependencies",
+      matchPackageNames: ["!/playwright/"],
     },
     {
-      groupName: 'Playwright dependencies',
-      matchManagers: [
-        'docker-compose',
-        'pep621',
-      ],
-      matchPackageNames: [
-        '/playwright/',
-      ],
-      description: 'Weekly update of Playwright dependencies',
+      groupName: "Playwright dependencies",
+      matchManagers: ["docker-compose", "pep621"],
+      matchPackageNames: ["/playwright/"],
+      description: "Weekly update of Playwright dependencies",
     },
     {
-      groupName: 'Python version',
-      matchPackageNames: [
-        'python',
-      ],
-      matchManagers: [
-        'dockerfile',
-        'pyenv',
-        'pep621',
-      ],
-      description: 'Weekly update of Python version',
+      groupName: "Python version",
+      matchPackageNames: ["python"],
+      matchManagers: ["dockerfile", "pyenv", "pep621"],
+      description: "Weekly update of Python version",
     },
     {
-      groupName: 'pre-commit dependencies',
-      matchManagers: [
-        'pre-commit',
-      ],
-      description: 'Weekly update of pre-commit dependencies',
+      groupName: "pre-commit dependencies",
+      matchManagers: ["pre-commit"],
+      description: "Weekly update of pre-commit dependencies",
     },
   ],
 }
