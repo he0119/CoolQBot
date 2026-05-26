@@ -82,6 +82,9 @@ override-dependencies = [
 [tool.uv.pip]
 universal = true
 
+[tool.uv.sources]
+nonebot-plugin-alconna = { git = "https://github.com/nonebot/plugin-alconna.git" }
+
 [tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
 bump = "bump-my-version bump"

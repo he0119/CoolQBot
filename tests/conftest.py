@@ -18,7 +18,7 @@ sys.path.insert(0, str(HOME_DIR))
 def pytest_configure(config: pytest.Config) -> None:
     config.stash[NONEBOT_INIT_KWARGS] = {
         "alembic_startup_check": False,
-        "superusers": ["nickname"],
+        "superusers": ["nickname", "nickname_qq"],
         "qq_bots": [
             {
                 "id": "123456",
@@ -92,11 +92,19 @@ async def _default_user(app: App):
     # 添加 user 缓存
     from nonebot_plugin_user.utils import get_user, set_user_email, set_user_name
 
+    # OneBot V11 适配器用户
     await get_user("QQClient", "10")
     await set_user_name("QQClient", "10", "nickname")
     await set_user_email("QQClient", "10", "nickname@example.com")
     await get_user("QQClient", "10000")
     await set_user_name("QQClient", "10000", "nickname10000")
+
+    # QQ 适配器用户
+    await get_user("QQAPI", "10")
+    await set_user_name("QQAPI", "10", "nickname_qq")
+    await set_user_email("QQAPI", "10", "nickname_qq@example.com")
+    await get_user("QQAPI", "10000")
+    await set_user_name("QQAPI", "10000", "nickname10000_qq")
 
     # 添加 uninfo 缓存
     from nonebot_plugin_uninfo import Member, Scene, SceneType, Session, User
@@ -120,6 +128,35 @@ async def _default_user(app: App):
         self_id="123456",
         adapter="OneBot V11",
         scope="QQClient",
+        scene=Scene(
+            id="10000",
+            type=SceneType.GROUP,
+        ),
+        user=User(id="10000", name="nickname10000"),
+        member=Member(
+            user=User(id="10000", name="nickname10000"),
+        ),
+    )
+
+    # QQ 适配器缓存
+    qq_uninfo_cache = INFO_FETCHER_MAPPING["QQ"].session_cache
+    qq_uninfo_cache["group_10000_10"] = Session(
+        self_id="123456",
+        adapter="QQ",
+        scope="QQAPI",
+        scene=Scene(
+            id="10000",
+            type=SceneType.GROUP,
+        ),
+        user=User(id="10", name="nickname"),
+        member=Member(
+            user=User(id="10", name="nickname"),
+        ),
+    )
+    qq_uninfo_cache["group_10000_10000"] = Session(
+        self_id="123456",
+        adapter="QQ",
+        scope="QQAPI",
         scene=Scene(
             id="10000",
             type=SceneType.GROUP,

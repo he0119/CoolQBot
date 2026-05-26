@@ -13,6 +13,9 @@ if TYPE_CHECKING:
     from nonebot.adapters.onebot.v12 import (
         PrivateMessageEvent as PrivateMessageEventV12,
     )
+    from nonebot.adapters.qq.event import (
+        GroupMessageCreateEvent as GroupMessageCreateEventQQ,
+    )
 
 
 def fake_group_message_event_v11(**field) -> "GroupMessageEventV11":
@@ -115,6 +118,40 @@ def fake_private_message_event_v12(**field) -> "PrivateMessageEventV12":
         to_me: bool = False
 
     return FakeEvent(**field)
+
+
+def fake_group_message_event_qq(**field) -> "GroupMessageCreateEventQQ":
+    from nonebot.adapters.qq.event import GroupMessageCreateEvent
+    from nonebot.adapters.qq.models import GroupMemberAuthor
+    from pydantic import create_model
+
+    # 处理 author__xxx 形式的嵌套字段
+    author_defaults: dict = {
+        "id": "10",
+        "bot": False,
+        "member_openid": "10",
+        "username": "test",
+    }
+    flat_fields: dict = {}
+    for key, value in field.items():
+        if key.startswith("author__"):
+            author_defaults[key.removeprefix("author__")] = value
+        else:
+            flat_fields[key] = value
+
+    _Fake = create_model("_Fake", __base__=GroupMessageCreateEvent)
+
+    class FakeEvent(_Fake):
+        id: str = "1"
+        __type__: Literal["GROUP_MESSAGE_CREATE"] = "GROUP_MESSAGE_CREATE"  # type: ignore[assignment]
+        to_me: bool = False
+        author: GroupMemberAuthor = GroupMemberAuthor(**author_defaults)
+        group_id: str = "10000"
+        group_openid: str = "10000"
+        content: str = "test"
+        timestamp: str = "1000000"
+
+    return FakeEvent(**flat_fields)
 
 
 def fake_channel_message_event_v12(**field) -> "ChannelMessageEventV12":
