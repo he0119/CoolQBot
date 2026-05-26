@@ -651,7 +651,7 @@ requires-dist = [
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-uninfo", specifier = ">=0.11.0" },
     { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.5.3" },
-    { name = "nonebot-plugin-wordcloud", specifier = ">=0.9.0" },
+    { name = "nonebot-plugin-wordcloud", specifier = ">=0.10.0" },
     { name = "nonebot-plugin-zssm", specifier = "==0.3.7" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
     { name = "nonebot2", extras = ["aiohttp", "fastapi", "httpx", "websockets"], specifier = ">=2.5.0" },
@@ -1849,20 +1849,6 @@ wheels = [
 ]
 
 [[package]]
-name = "nonebot-plugin-cesaa"
-version = "0.5.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "nonebot-plugin-chatrecorder" },
-    { name = "nonebot-plugin-send-anything-anywhere" },
-    { name = "nonebot2" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/8e/2c/f0f119835a8d0037c68293c82d83a46de2fed1c4c953856f49f4824fd884/nonebot_plugin_cesaa-0.5.0.tar.gz", hash = "sha256:f9489fdc26b32c48abba754e401f759a1b633aeeee8bcaaced28bc260d770019", size = 6902, upload-time = "2024-12-24T12:03:16.732Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/92/9c/1a60949be080bbb1d6cba5137b1a0aa3054fbc63569c30e7428bb34f2d3f/nonebot_plugin_cesaa-0.5.0-py3-none-any.whl", hash = "sha256:3b012631fc3779acfc75297f5ec8b3dca613a777fd47ced202d7d11e9e728a17", size = 6295, upload-time = "2024-12-24T12:03:14.307Z" },
-]
-
-[[package]]
 name = "nonebot-plugin-chatrecorder"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2183,24 +2169,24 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.9.0"
+version = "0.10.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "emoji" },
     { name = "jieba" },
     { name = "nonebot-plugin-alconna" },
     { name = "nonebot-plugin-apscheduler" },
-    { name = "nonebot-plugin-cesaa" },
+    { name = "nonebot-plugin-chatrecorder" },
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot-plugin-orm" },
     { name = "nonebot-plugin-uninfo" },
-    { name = "nonebot2", extra = ["fastapi"] },
+    { name = "nonebot2" },
     { name = "tzdata" },
     { name = "wordcloud" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/71/58/c0f485c03566f6e36e78dbf1f6655ced4c262598cc74ba646d1dc3d56443/nonebot_plugin_wordcloud-0.9.0.tar.gz", hash = "sha256:be1b955e62646fa4a21784d86130258593971e59f591fc41c1c3a43712cab75e", size = 7219955, upload-time = "2025-01-14T04:40:31.338Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d7/55/b69a1f24eb06f7884736d80727c936ac8a9095840132de3c53eaa9e53f21/nonebot_plugin_wordcloud-0.10.0.tar.gz", hash = "sha256:f6a6d3c7508e5f875b0ccf3113b78cafcc15457bfceef90a215beff84f6f7bb0", size = 7256936, upload-time = "2026-05-25T05:13:14.052Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e2/9a/6700f3abe006742d168f3c6ec93165ddb2a75021d6ae67e191df4eaeae07/nonebot_plugin_wordcloud-0.9.0-py3-none-any.whl", hash = "sha256:a83d5c79935b5f98891e39f1a2fd16209745a24cdb6a2a02813e6ad50d4f6676", size = 7225169, upload-time = "2025-01-14T04:40:27.932Z" },
+    { url = "https://files.pythonhosted.org/packages/8d/e5/9cf779078831077e3de5609855ccfdd3c29be9a5aab82f20befd74190a6d/nonebot_plugin_wordcloud-0.10.0-py3-none-any.whl", hash = "sha256:34e6d24dcf985a65e45f23176f5954ea00600e7469d6a4777f0120d12953183a", size = 7262015, upload-time = "2026-05-25T05:13:11.718Z" },
 ]
 
 [[package]]
