@@ -182,3 +182,7 @@ pyrightconfig.json
 
 .env.prod
 data/
+
+# Claude
+CLAUDE.md
+.claude/
