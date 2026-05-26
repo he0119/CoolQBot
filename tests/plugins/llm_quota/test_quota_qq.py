@@ -21,7 +21,7 @@ async def test_quota_not_configured_qq(app: App):
         bot = ctx.create_bot(
             base=Bot, adapter=adapter, self_id="123456", bot_info=BotInfo(id="123456", token="token", secret="secret")
         )
-        event = fake_group_message_event_qq(content="/quota", group_openid="10000", author__member_openid="10000")
+        event = fake_group_message_event_qq(content="/quota", group_openid="10000", author__member_openid="10")
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -38,7 +38,7 @@ async def test_quota_with_config_qq(app: App, respx_mock: MockRouter):
     from src.plugins.llm_quota import quota_cmd
     from src.plugins.llm_quota.data_source import set_group_api_url
 
-    await set_group_api_url("group_10000_10000", "https://ai.example.com/api/quotas")
+    await set_group_api_url("QQAPI_10000", "https://ai.example.com/api/quotas")
 
     mock_data = {
         "buckets": [
@@ -63,7 +63,7 @@ async def test_quota_with_config_qq(app: App, respx_mock: MockRouter):
         bot = ctx.create_bot(
             base=Bot, adapter=adapter, self_id="123456", bot_info=BotInfo(id="123456", token="token", secret="secret")
         )
-        event = fake_group_message_event_qq(content="/quota", group_openid="10000", author__member_openid="10000")
+        event = fake_group_message_event_qq(content="/quota", group_openid="10000", author__member_openid="10")
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -102,7 +102,7 @@ async def test_quota_set_by_superuser_qq(app: App):
         )
         ctx.should_finished(quota_cmd)
 
-    api_url = await get_group_api_url("group_10000_10")
+    api_url = await get_group_api_url("QQAPI_10000")
     assert api_url == "https://ai.example.com/api/quotas"
 
 
@@ -111,7 +111,7 @@ async def test_quota_remove_by_superuser_qq(app: App):
     from src.plugins.llm_quota import quota_cmd
     from src.plugins.llm_quota.data_source import get_group_api_url, set_group_api_url
 
-    await set_group_api_url("group_10000_10", "https://ai.example.com/api/quotas")
+    await set_group_api_url("QQAPI_10000", "https://ai.example.com/api/quotas")
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -128,7 +128,7 @@ async def test_quota_remove_by_superuser_qq(app: App):
         ctx.should_call_send(event, "已删除额度查询 API 配置", True, at_sender=True)
         ctx.should_finished(quota_cmd)
 
-    api_url = await get_group_api_url("group_10000_10")
+    api_url = await get_group_api_url("QQAPI_10000")
     assert api_url is None
 
 

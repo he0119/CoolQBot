@@ -18,7 +18,7 @@ sys.path.insert(0, str(HOME_DIR))
 def pytest_configure(config: pytest.Config) -> None:
     config.stash[NONEBOT_INIT_KWARGS] = {
         "alembic_startup_check": False,
-        "superusers": ["nickname"],
+        "superusers": ["nickname", "nickname_qq"],
         "qq_bots": [
             {
                 "id": "123456",
