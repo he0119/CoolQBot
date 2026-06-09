@@ -233,6 +233,15 @@ wheels = [
 ]
 
 [[package]]
+name = "arclet-cithun"
+version = "1.3.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/c1/11/313c94f4e8a62c786d1b9858744a4cb09ffa1f1838adfc565e9197ea01cd/arclet_cithun-1.3.3.tar.gz", hash = "sha256:99bb02a45a46920d2c3c6a1688bddef0269960183b356aeedd7436162e0bdb44", size = 36243, upload-time = "2026-06-09T02:24:23.598Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/03/fb/de4e25991588986c4d96d561b0adcdaf23a764ecfce35e6e44097c86e33f/arclet_cithun-1.3.3-py3-none-any.whl", hash = "sha256:15c0662ecc8791b81e3c32b5469083524c7f4893aecb2ceb0a9c95aa8b134db7", size = 37791, upload-time = "2026-06-09T02:24:22.22Z" },
+]
+
+[[package]]
 name = "arrow"
 version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -650,8 +659,8 @@ requires-dist = [
     { name = "nonebot-plugin-status", specifier = "==0.9.0" },
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-uninfo", specifier = ">=0.11.0" },
-    { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.5.3" },
-    { name = "nonebot-plugin-wordcloud", specifier = ">=0.10.0" },
+    { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.6.0" },
+    { name = "nonebot-plugin-wordcloud", specifier = ">=0.11.0" },
     { name = "nonebot-plugin-zssm", specifier = "==0.3.7" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
     { name = "nonebot2", extras = ["aiohttp", "fastapi", "httpx", "websockets"], specifier = ">=2.5.0" },
@@ -2047,6 +2056,22 @@ htmlkit = [
 ]
 
 [[package]]
+name = "nonebot-plugin-permission"
+version = "0.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "arclet-cithun" },
+    { name = "nonebot-plugin-alconna" },
+    { name = "nonebot-plugin-orm" },
+    { name = "nonebot-plugin-user" },
+    { name = "nonebot2" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/da/b3/3201a5021282a5fff80c3ec78637fd5da4b30b59608f0d5c0f1daaf23f7d/nonebot_plugin_permission-0.2.1.tar.gz", hash = "sha256:9c9a6f46ff58b4f1924841f144e864b8e6b8efa8122c86b12cc155e807db8265", size = 14387, upload-time = "2026-06-03T08:56:53.903Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6c/c3/58e517f6614407496ea9ff24a86a2a09fbb6fb77a03fad014b89a5b5f278/nonebot_plugin_permission-0.2.1-py3-none-any.whl", hash = "sha256:a43c5963ca2e2e6e4a382e20119419c65980786b2737e1a5fcd9d896f916afbd", size = 17667, upload-time = "2026-06-03T08:56:52.456Z" },
+]
+
+[[package]]
 name = "nonebot-plugin-prometheus"
 version = "0.4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2132,7 +2157,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-user"
-version = "0.5.3"
+version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "expiringdictx" },
@@ -2141,9 +2166,9 @@ dependencies = [
     { name = "nonebot-plugin-uninfo" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/32/ca/7951643c4862c004ed00026dc11e0495d45f0294654277d0ee07fe4d3245/nonebot_plugin_user-0.5.3.tar.gz", hash = "sha256:67288a0badd775af693d95eb2cbe6924925ad5f24b94b72afde6e0376c01506a", size = 11743, upload-time = "2025-08-13T13:02:25.619Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1a/5d/fa839f1e4b1081c70ea2f63195478ba7c7e8cee6a028d8c86a84511078cc/nonebot_plugin_user-0.6.0.tar.gz", hash = "sha256:1fb595dc2f1826aed216097a27b971b1d374ba42531a4bbe37e5ce9366c5d429", size = 11478, upload-time = "2026-06-02T10:26:53.828Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/66/81/dd9f976fe7175554aea2f36b51c5f1e6e34845d0a8899403a46f1e3ff1bd/nonebot_plugin_user-0.5.3-py3-none-any.whl", hash = "sha256:c41ff5c3bf3f9b1a5e9ffd73ef4df61876a2b0a32e52ecca5c60103cf4e23118", size = 15405, upload-time = "2025-08-13T13:02:24.287Z" },
+    { url = "https://files.pythonhosted.org/packages/91/28/10a308da3c32e816f8b52311d753b556dbc35f5e24a7d90558c75c6f2e60/nonebot_plugin_user-0.6.0-py3-none-any.whl", hash = "sha256:3768ab8b884e469e5460136d3f230cf0e4854a4954ffd02216c6f13134ef9b85", size = 15851, upload-time = "2026-06-02T10:26:52.725Z" },
 ]
 
 [package.optional-dependencies]
@@ -2165,7 +2190,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.10.0"
+version = "0.11.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "emoji" },
@@ -2175,14 +2200,15 @@ dependencies = [
     { name = "nonebot-plugin-chatrecorder" },
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot-plugin-orm" },
+    { name = "nonebot-plugin-permission" },
     { name = "nonebot-plugin-uninfo" },
     { name = "nonebot2" },
     { name = "tzdata" },
     { name = "wordcloud" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d7/55/b69a1f24eb06f7884736d80727c936ac8a9095840132de3c53eaa9e53f21/nonebot_plugin_wordcloud-0.10.0.tar.gz", hash = "sha256:f6a6d3c7508e5f875b0ccf3113b78cafcc15457bfceef90a215beff84f6f7bb0", size = 7256936, upload-time = "2026-05-25T05:13:14.052Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/07/79/6469e3877e1f5a61595177d3f45d26ba14497d8dc70b48ca89df0396e533/nonebot_plugin_wordcloud-0.11.0.tar.gz", hash = "sha256:987a7313b940d971a2e86ea63a35fbd2bb77286cbbe23e541d25ef904f89b915", size = 7259545, upload-time = "2026-06-09T14:27:40.675Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/e5/9cf779078831077e3de5609855ccfdd3c29be9a5aab82f20befd74190a6d/nonebot_plugin_wordcloud-0.10.0-py3-none-any.whl", hash = "sha256:34e6d24dcf985a65e45f23176f5954ea00600e7469d6a4777f0120d12953183a", size = 7262015, upload-time = "2026-05-25T05:13:11.718Z" },
+    { url = "https://files.pythonhosted.org/packages/9c/24/951d33ffb520a37cfef2667f056991783f99e4a72a3910db31df43c90cfc/nonebot_plugin_wordcloud-0.11.0-py3-none-any.whl", hash = "sha256:f8d4c77476621974f79e928667f0979bb415823b89bd367732d3fa6b5a5886ee", size = 7265779, upload-time = "2026-06-09T14:27:37.477Z" },
 ]
 
 [[package]]
