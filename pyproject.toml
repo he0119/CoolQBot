@@ -84,6 +84,7 @@ universal = true
 
 [tool.uv.sources]
 nonebot-plugin-alconna = { git = "https://github.com/nonebot/plugin-alconna.git" }
+nonebot-plugin-zssm = { git = "https://github.com/djkcyl/nonebot-plugin-zssm.git" }
 
 [tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"

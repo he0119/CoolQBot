@@ -661,7 +661,7 @@ requires-dist = [
     { name = "nonebot-plugin-uninfo", specifier = ">=0.11.0" },
     { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.6.0" },
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.11.0" },
-    { name = "nonebot-plugin-zssm", specifier = "==0.3.7" },
+    { name = "nonebot-plugin-zssm", git = "https://github.com/djkcyl/nonebot-plugin-zssm.git" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
     { name = "nonebot2", extras = ["aiohttp", "fastapi", "httpx", "websockets"], specifier = ">=2.5.0" },
     { name = "playwright", specifier = "==1.56.0" },
@@ -2214,7 +2214,7 @@ wheels = [
 [[package]]
 name = "nonebot-plugin-zssm"
 version = "0.3.7"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/djkcyl/nonebot-plugin-zssm.git#e5f95eb3acdce3c7aad2e0eafd6fe39b305d38ca" }
 dependencies = [
     { name = "httpx" },
     { name = "nonebot-plugin-alconna" },
@@ -2222,10 +2222,6 @@ dependencies = [
     { name = "pillow" },
     { name = "playwright" },
     { name = "pymupdf" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/68/60/5c738da5892363dc5001544e3b5c8b22091103fb926bfbe0e356d34c02c5/nonebot_plugin_zssm-0.3.7.tar.gz", hash = "sha256:18a92faca606851fc646bef778ead99ddbbadf425be84939f3d1902145a5868c", size = 16100, upload-time = "2025-06-03T14:47:55.215Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/51/2a/53011a3dda4a0953e5acb11834e57422cd5d0a8690ae1567134044a5cf7a/nonebot_plugin_zssm-0.3.7-py3-none-any.whl", hash = "sha256:c6cd13d05d97e6a9f31b004cf45912400ca7292e104f2a1178e3f7acbbda1921", size = 19660, upload-time = "2025-06-03T14:47:54.183Z" },
 ]
 
 [[package]]
