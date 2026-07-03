@@ -26,6 +26,13 @@ down_revision: str | Sequence[str] | None = "e2f882d2c91d"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
+DATASTORE_TABLES = (
+    "hello_alembic_version",
+    "hello_hello",
+)
+
+MIGRATION_TABLES = ("hello_hello",)
+
 
 def _migrate_old_data(ds_conn: Connection):
     insp = inspect(ds_conn)
@@ -34,7 +41,7 @@ def _migrate_old_data(ds_conn: Connection):
         return
 
     DsBase = automap_base()
-    DsBase.prepare(autoload_with=ds_conn)
+    DsBase.prepare(autoload_with=ds_conn, reflection_options={"only": DATASTORE_TABLES})
     ds_session = Session(ds_conn)
 
     AlembicVersion = DsBase.classes.hello_alembic_version
@@ -50,7 +57,7 @@ def _migrate_old_data(ds_conn: Connection):
     DsHello = DsBase.classes.hello_hello
 
     Base = automap_base()
-    Base.prepare(autoload_with=op.get_bind())
+    Base.prepare(autoload_with=op.get_bind(), reflection_options={"only": MIGRATION_TABLES})
     session = Session(op.get_bind())
 
     Hello = Base.classes.hello_hello

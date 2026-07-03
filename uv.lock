@@ -588,7 +588,7 @@ dependencies = [
     { name = "nonebot-plugin-apscheduler" },
     { name = "nonebot-plugin-datastore" },
     { name = "nonebot-plugin-deepseek" },
-    { name = "nonebot-plugin-htmlrender" },
+    { name = "nonebot-plugin-htmlrender", extra = ["filehost", "prometheus", "sentry"] },
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot-plugin-memes" },
     { name = "nonebot-plugin-orm", extra = ["default"] },
@@ -648,7 +648,7 @@ requires-dist = [
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-datastore", specifier = ">=1.3.1" },
     { name = "nonebot-plugin-deepseek", specifier = "==0.2.1" },
-    { name = "nonebot-plugin-htmlrender", specifier = ">=0.7.0a3" },
+    { name = "nonebot-plugin-htmlrender", extras = ["filehost", "prometheus", "sentry"], specifier = ">=0.7.1" },
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4" },
     { name = "nonebot-plugin-memes", specifier = "==0.8.1" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.8.3" },
@@ -660,11 +660,11 @@ requires-dist = [
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-uninfo", specifier = ">=0.11.0" },
     { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.6.0" },
-    { name = "nonebot-plugin-wordcloud", specifier = ">=0.11.0" },
+    { name = "nonebot-plugin-wordcloud", specifier = ">=0.11.1" },
     { name = "nonebot-plugin-zssm", git = "https://github.com/djkcyl/nonebot-plugin-zssm.git" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
     { name = "nonebot2", extras = ["aiohttp", "fastapi", "httpx", "websockets"], specifier = ">=2.5.0" },
-    { name = "playwright", specifier = "==1.56.0" },
+    { name = "playwright", specifier = "==1.61.0" },
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.49.0" },
     { name = "uvicorn-worker", specifier = ">=0.4.0" },
@@ -1908,6 +1908,19 @@ wheels = [
 ]
 
 [[package]]
+name = "nonebot-plugin-filehost"
+version = "1.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "nonebot2", extra = ["fastapi"] },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c6/92/9eec2789ca2b5fb4519acb476d056bd778a1bc4a3d7fc028ab719dc5d11e/nonebot_plugin_filehost-1.1.1.tar.gz", hash = "sha256:47d677a04321ccc57d4368cb447cc857b964d40b5e09fcdf4ec6a0ac7110b7c4", size = 6089, upload-time = "2024-03-01T02:58:03.619Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/65/d0/ebdf825493bfcf2ca3cc79521e536034424503684a33d98e6cbf84dd9e5c/nonebot_plugin_filehost-1.1.1-py3-none-any.whl", hash = "sha256:e77a1eb6de1b15aad1f4fa05566fbf05e07822ffcfe3def11a48a84cbb17e022", size = 7386, upload-time = "2024-03-01T02:58:01.74Z" },
+]
+
+[[package]]
 name = "nonebot-plugin-htmlkit"
 version = "0.1.0rc5"
 source = { registry = "https://pypi.org/simple" }
@@ -1943,10 +1956,11 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-htmlrender"
-version = "0.7.0a3"
+version = "0.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "aiofiles" },
+    { name = "anyio" },
+    { name = "exceptiongroup" },
     { name = "jinja2" },
     { name = "markdown" },
     { name = "nonebot-plugin-localstore" },
@@ -1956,10 +1970,23 @@ dependencies = [
     { name = "pymdown-extensions" },
     { name = "python-markdown-math" },
     { name = "tenacity" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/63/62/8b2a66d60f2f9963d8d0ccf49447da729688b27d05c50aecca2470b22715/nonebot_plugin_htmlrender-0.7.0a3.tar.gz", hash = "sha256:a50a764b1c2ab2ef6c5d4bd93e0609f1a813104c7a621fa4e872169e7fd55b28", size = 1438008, upload-time = "2025-10-22T15:08:00.429Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/36/94/7e94eaf6a2f03988c3873853a78bb6d9e8ac91633f8cbfc5c75f72c57638/nonebot_plugin_htmlrender-0.7.1.tar.gz", hash = "sha256:66b3fe3c420e163eed2c6f74ceeb8da4bfcc7aefd65a1b3730e9f1a862b0cc58", size = 1735677, upload-time = "2026-06-18T05:37:31.299Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/51/3f9de5760336340660eaf8c70b5eef210fd814cf4ae81cf9d942d5a6cfbc/nonebot_plugin_htmlrender-0.7.0a3-py3-none-any.whl", hash = "sha256:c80e1b0352c6a52bcd1c73194de020b74c6c46e55e200cea47d51d135ccb8bec", size = 1066377, upload-time = "2025-10-22T15:07:58.714Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/93/12729712493056443dcf0615230a65b57b333c891182fc2aedd94dfcb6ee/nonebot_plugin_htmlrender-0.7.1-py3-none-any.whl", hash = "sha256:4b7803f4233e292a72d2cbc80ce55ff63e8ce500ba3c83b9dbc54c402ed4dc6f", size = 1136184, upload-time = "2026-06-18T05:37:29.578Z" },
+]
+
+[package.optional-dependencies]
+filehost = [
+    { name = "nonebot-plugin-filehost" },
+    { name = "py-machineid" },
+]
+prometheus = [
+    { name = "nonebot-plugin-prometheus" },
+]
+sentry = [
+    { name = "nonebot-plugin-sentry" },
 ]
 
 [[package]]
@@ -2197,7 +2224,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.11.0"
+version = "0.11.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "emoji" },
@@ -2213,9 +2240,9 @@ dependencies = [
     { name = "tzdata" },
     { name = "wordcloud" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/07/79/6469e3877e1f5a61595177d3f45d26ba14497d8dc70b48ca89df0396e533/nonebot_plugin_wordcloud-0.11.0.tar.gz", hash = "sha256:987a7313b940d971a2e86ea63a35fbd2bb77286cbbe23e541d25ef904f89b915", size = 7259545, upload-time = "2026-06-09T14:27:40.675Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/22/6b/737c7f2062e382c963c5c54e27a90e116d1acf5ecdbf6d369f6c0c888e91/nonebot_plugin_wordcloud-0.11.1.tar.gz", hash = "sha256:e590b54f5a0ef333dd756bc57e50e95ce0cb598623693bf0b64071221736dd75", size = 7259656, upload-time = "2026-07-03T08:47:30.086Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9c/24/951d33ffb520a37cfef2667f056991783f99e4a72a3910db31df43c90cfc/nonebot_plugin_wordcloud-0.11.0-py3-none-any.whl", hash = "sha256:f8d4c77476621974f79e928667f0979bb415823b89bd367732d3fa6b5a5886ee", size = 7265779, upload-time = "2026-06-09T14:27:37.477Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/c9/47ad401d373c2689d2492e628beb8583a5ed40ccccd59b35815dba7c74de/nonebot_plugin_wordcloud-0.11.1-py3-none-any.whl", hash = "sha256:d52d6c5e121fd5c57e86a937bbe6ed1676ef3a761b3985779564948e46acfa7b", size = 7265967, upload-time = "2026-07-03T08:47:27.587Z" },
 ]
 
 [[package]]
@@ -2435,21 +2462,21 @@ wheels = [
 
 [[package]]
 name = "playwright"
-version = "1.56.0"
+version = "1.61.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "greenlet" },
     { name = "pyee" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6b/31/a5362cee43f844509f1f10d8a27c9cc0e2f7bdce5353d304d93b2151c1b1/playwright-1.56.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:b33eb89c516cbc6723f2e3523bada4a4eb0984a9c411325c02d7016a5d625e9c", size = 40611424, upload-time = "2025-11-11T18:39:10.175Z" },
-    { url = "https://files.pythonhosted.org/packages/ef/95/347eef596d8778fb53590dc326c344d427fa19ba3d42b646fce2a4572eb3/playwright-1.56.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:b228b3395212b9472a4ee5f1afe40d376eef9568eb039fcb3e563de8f4f4657b", size = 39400228, upload-time = "2025-11-11T18:39:13.915Z" },
-    { url = "https://files.pythonhosted.org/packages/b9/54/6ad97b08b2ca1dfcb4fbde4536c4f45c0d9d8b1857a2d20e7bbfdf43bf15/playwright-1.56.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:0ef7e6fd653267798a8a968ff7aa2dcac14398b7dd7440ef57524e01e0fbbd65", size = 40611424, upload-time = "2025-11-11T18:39:17.093Z" },
-    { url = "https://files.pythonhosted.org/packages/e4/76/6d409e37e82cdd5dda3df1ab958130ae32b46e42458bd4fc93d7eb8749cb/playwright-1.56.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:404be089b49d94bc4c1fe0dfb07664bda5ffe87789034a03bffb884489bdfb5c", size = 46263122, upload-time = "2025-11-11T18:39:20.619Z" },
-    { url = "https://files.pythonhosted.org/packages/4f/84/fb292cc5d45f3252e255ea39066cd1d2385c61c6c1596548dfbf59c88605/playwright-1.56.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:64cda7cf4e51c0d35dab55190841bfcdfb5871685ec22cb722cd0ad2df183e34", size = 46110645, upload-time = "2025-11-11T18:39:24.005Z" },
-    { url = "https://files.pythonhosted.org/packages/61/bd/8c02c3388ae14edc374ac9f22cbe4e14826c6a51b2d8eaf86e89fabee264/playwright-1.56.0-py3-none-win32.whl", hash = "sha256:d87b79bcb082092d916a332c27ec9732e0418c319755d235d93cc6be13bdd721", size = 35639837, upload-time = "2025-11-11T18:39:27.174Z" },
-    { url = "https://files.pythonhosted.org/packages/64/27/f13b538fbc6b7a00152f4379054a49f6abc0bf55ac86f677ae54bc49fb82/playwright-1.56.0-py3-none-win_amd64.whl", hash = "sha256:3c7fc49bb9e673489bf2622855f9486d41c5101bbed964638552b864c4591f94", size = 35639843, upload-time = "2025-11-11T18:39:30.851Z" },
-    { url = "https://files.pythonhosted.org/packages/f2/c7/3ee8b556107995846576b4fe42a08ed49b8677619421f2afacf6ee421138/playwright-1.56.0-py3-none-win_arm64.whl", hash = "sha256:2745490ae8dd58d27e5ea4d9aa28402e8e2991eb84fb4b2fd5fbde2106716f6f", size = 31248959, upload-time = "2025-11-11T18:39:33.998Z" },
+    { url = "https://files.pythonhosted.org/packages/44/ee/31e4e0db36588b817a10b299a0285082545fde7d36543c2abe498bb3d61a/playwright-1.61.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:ff138c3a604f69911e9d42fd036e55c2a171e5616edf04c1e7f60a2a285540b0", size = 43421877, upload-time = "2026-06-29T10:32:48.428Z" },
+    { url = "https://files.pythonhosted.org/packages/42/35/71395dd3ecc798965be4a3ef8c443217d4abca168e7cb34536304f9489e6/playwright-1.61.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:009588c2a7e499bc5a8b425b61fa65490968bbda9cd69e0cf2cff10f8304659a", size = 42205016, upload-time = "2026-06-29T10:32:52.104Z" },
+    { url = "https://files.pythonhosted.org/packages/f4/44/323164cf5cd1647bdefce76ffce27651aadb959d089b48f53ea40918276e/playwright-1.61.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:9f7de4536088d12037c13a52b7ea34b59270b78926bb56935070597ffac6b1af", size = 43421884, upload-time = "2026-06-29T10:32:55.773Z" },
+    { url = "https://files.pythonhosted.org/packages/ab/f8/a35bf179e4ba2522c1893635094a64e407572547bd61528820fc0abc87fe/playwright-1.61.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:54f3b39f6eab832e33458c1dd7da0b5682aedab3b09ae731b5c59fa12fd2024e", size = 47421381, upload-time = "2026-06-29T10:32:59.903Z" },
+    { url = "https://files.pythonhosted.org/packages/b7/eb/e3f922348ec17c315f98c463f72faa1181a1c3de0bfe31a8d2edf6561723/playwright-1.61.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:93454322ade8c11d5d6c211bfd91bdfb9ffb4810e3e026371bcbc4bec1b7ee4c", size = 47120545, upload-time = "2026-06-29T10:33:03.574Z" },
+    { url = "https://files.pythonhosted.org/packages/c2/a6/5be4e52b40a9c0c8a073e7c5b0785c05cf5a9ea8f8a7b5b260e32d970342/playwright-1.61.0-py3-none-win32.whl", hash = "sha256:372d55a6f1248fa1dd47599686980cb8fb5bbe6fcda59eab793eb657c11d8a9b", size = 37844841, upload-time = "2026-06-29T10:33:07.361Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/fd/2b78036e5fbe9d5f5645bbe08a1eac7160c51243c0093963edbcf67c35d9/playwright-1.61.0-py3-none-win_amd64.whl", hash = "sha256:35c6cc4589a5d00964a59d7b3e59641e0aac0c02f15479a7af77d20f6bc79597", size = 37844846, upload-time = "2026-06-29T10:33:10.637Z" },
+    { url = "https://files.pythonhosted.org/packages/27/0d/1b0f3c4ee4eb0514bc805b5c2f9a223e5b6de4f11a926f5235d51d0fc81b/playwright-1.61.0-py3-none-win_arm64.whl", hash = "sha256:e9fcbffcf557a8620fdedd92491eb59a32d18e23d6f3b4f6214b952be324fe51", size = 33955127, upload-time = "2026-06-29T10:33:14.008Z" },
 ]
 
 [[package]]
@@ -2566,6 +2593,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/47/da/99f4345d4ddf2845cb5b5bd0d93d554e84542d116934fde07a0c50bd4e9f/psutil-6.1.1-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:33431e84fee02bc84ea36d9e2c4a6d395d479c9dd9bba2376c1f6ee8f3a4e0b3", size = 289017, upload-time = "2024-12-19T18:21:57.875Z" },
     { url = "https://files.pythonhosted.org/packages/38/53/bd755c2896f4461fd4f36fa6a6dcb66a88a9e4b9fd4e5b66a77cf9d4a584/psutil-6.1.1-cp37-abi3-win32.whl", hash = "sha256:eaa912e0b11848c4d9279a93d7e2783df352b082f40111e078388701fd479e53", size = 250602, upload-time = "2024-12-19T18:22:08.808Z" },
     { url = "https://files.pythonhosted.org/packages/7b/d7/7831438e6c3ebbfa6e01a927127a6cb42ad3ab844247f3c5b96bea25d73d/psutil-6.1.1-cp37-abi3-win_amd64.whl", hash = "sha256:f35cfccb065fff93529d2afb4a2e89e363fe63ca1e4a5da22b603a85833c2649", size = 254444, upload-time = "2024-12-19T18:22:11.335Z" },
+]
+
+[[package]]
+name = "py-machineid"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "winregistry", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f4/b0/c7fa6de7298a8f4e544929b97fa028304c0e11a4bc9500eff8689821bdbb/py_machineid-1.0.0.tar.gz", hash = "sha256:8a902a00fae8c6d6433f463697c21dc4ce98c6e55a2e0535c0273319acb0047a", size = 4629, upload-time = "2025-12-02T16:12:54.286Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/be/76/1ed8375cb1212824c57eb706e1f09f3f2ca4ed12b8d56b28a160e2d53505/py_machineid-1.0.0-py3-none-any.whl", hash = "sha256:910df0d5f2663bcf6739d835c4949f4e9cc6bb090a58b3dd766e12e5f768e3b9", size = 4926, upload-time = "2025-12-02T16:12:20.584Z" },
 ]
 
 [[package]]
@@ -3508,6 +3547,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b3/8f/705086c9d734d3b663af0e9bb3d4de6578d08f46b1b101c2442fd9aecaa2/win32_setctime-1.2.0.tar.gz", hash = "sha256:ae1fdf948f5640aae05c511ade119313fb6a30d7eabe25fef9764dca5873c4c0", size = 4867, upload-time = "2024-12-07T15:28:28.314Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e1/07/c6fe3ad3e685340704d314d765b7912993bcb8dc198f0e7a89382d37974b/win32_setctime-1.2.0-py3-none-any.whl", hash = "sha256:95d644c4e708aba81dc3704a116d8cbc974d70b3bdb8be1d150e36be6e9d1390", size = 4083, upload-time = "2024-12-07T15:28:26.465Z" },
+]
+
+[[package]]
+name = "winregistry"
+version = "2.1.5"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/58/b4/57c8cd9c3a50b0b71ab924377a12326c528f822c35cc60d192dec423e3b0/winregistry-2.1.5.tar.gz", hash = "sha256:05525ecac026dbdd2d20428a532354138dc6711de8a8f8efdc40484131627ba8", size = 9862, upload-time = "2026-04-02T06:56:59.471Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/69/9b/5e05038bfe8e2109b83bfd7237668d5cd26f038380ed9cf4db4b441966d1/winregistry-2.1.5-py3-none-any.whl", hash = "sha256:84e597b8f06c985a6be397e8c75400c2d72797d24134eb740b7b2f3de13089c1", size = 8892, upload-time = "2026-04-02T06:56:58.401Z" },
 ]
 
 [[package]]

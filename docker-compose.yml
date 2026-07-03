@@ -19,9 +19,25 @@ services:
     restart: always
 
   playwright:
-    image: jacoblincool/playwright:chromium-server-1.56.1
+    image: jacoblincool/playwright:chromium-server-1.61.1
     container_name: playwright
     restart: always
+    ports:
+      - "53333:53333"
+    command:
+      - node
+      - -e
+      - |
+        const { chromium } = require("playwright-core");
+
+        (async () => {
+          const server = await chromium.launchServer({
+            host: "0.0.0.0",
+            port: Number(process.env.BROWSER_PORT || 53333),
+            wsPath: process.env.BROWSER_WS_ENDPOINT || "/playwright",
+          });
+          console.log(server.wsEndpoint());
+        })();
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:53333/playwright"]
       interval: 1m30s

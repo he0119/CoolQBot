@@ -26,6 +26,13 @@ down_revision: str | Sequence[str] | None = "65a94a4a643b"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
+DATASTORE_TABLES = (
+    "morning_greeting_alembic_version",
+    "morning_greeting_morninggreeting",
+)
+
+MIGRATION_TABLES = ("morning_greeting_morninggreeting",)
+
 
 def _migrate_old_data(ds_conn: Connection):
     insp = inspect(ds_conn)
@@ -37,7 +44,7 @@ def _migrate_old_data(ds_conn: Connection):
         return
 
     DsBase = automap_base()
-    DsBase.prepare(autoload_with=ds_conn)
+    DsBase.prepare(autoload_with=ds_conn, reflection_options={"only": DATASTORE_TABLES})
     ds_session = Session(ds_conn)
 
     AlembicVersion = DsBase.classes.morning_greeting_alembic_version
@@ -54,7 +61,7 @@ def _migrate_old_data(ds_conn: Connection):
     DsMorningGreeting = DsBase.classes.morning_greeting_morninggreeting
 
     Base = automap_base()
-    Base.prepare(autoload_with=op.get_bind())
+    Base.prepare(autoload_with=op.get_bind(), reflection_options={"only": MIGRATION_TABLES})
     session = Session(op.get_bind())
 
     MorningGreeting = Base.classes.morning_greeting_morninggreeting

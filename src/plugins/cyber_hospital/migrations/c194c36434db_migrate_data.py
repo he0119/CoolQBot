@@ -26,6 +26,17 @@ down_revision: str | Sequence[str] | None = "3c6992cc96cf"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
+DATASTORE_TABLES = (
+    "cyber_hospital_alembic_version",
+    "cyber_hospital_patient",
+    "cyber_hospital_record",
+)
+
+MIGRATION_TABLES = (
+    "cyber_hospital_patient",
+    "cyber_hospital_record",
+)
+
 
 def _migrate_old_data(ds_conn: Connection):
     insp = inspect(ds_conn)
@@ -37,7 +48,7 @@ def _migrate_old_data(ds_conn: Connection):
         return
 
     DsBase = automap_base()
-    DsBase.prepare(autoload_with=ds_conn)
+    DsBase.prepare(autoload_with=ds_conn, reflection_options={"only": DATASTORE_TABLES})
     ds_session = Session(ds_conn)
 
     AlembicVersion = DsBase.classes.cyber_hospital_alembic_version
@@ -55,7 +66,7 @@ def _migrate_old_data(ds_conn: Connection):
     DsRecord = DsBase.classes.cyber_hospital_record
 
     Base = automap_base()
-    Base.prepare(autoload_with=op.get_bind())
+    Base.prepare(autoload_with=op.get_bind(), reflection_options={"only": MIGRATION_TABLES})
     session = Session(op.get_bind())
 
     Patient = Base.classes.cyber_hospital_patient
