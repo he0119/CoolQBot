@@ -45,8 +45,8 @@ dependencies = [
     "nonebot-plugin-zssm==0.3.7",
     "nonebot-plugin-abs==1.1.0",
     "nonebot-plugin-parser[htmlkit]==2.6.5",
-    "nonebot-plugin-htmlrender>=0.7.0a3",
-    "playwright==1.56.0",
+    "nonebot-plugin-htmlrender[filehost,prometheus,sentry]>=0.7.1",
+    "playwright==1.61.0",
 ]
 
 [project.urls]
