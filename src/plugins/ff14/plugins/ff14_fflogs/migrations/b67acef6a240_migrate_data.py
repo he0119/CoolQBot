@@ -26,6 +26,13 @@ down_revision: str | Sequence[str] | None = "c3c52d7c9d07"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
+DATASTORE_TABLES = (
+    "ff14_fflogs_alembic_version",
+    "ff14_fflogs_user",
+)
+
+MIGRATION_TABLES = ("ff14_fflogs_user",)
+
 
 def _migrate_old_data(ds_conn: Connection):
     insp = inspect(ds_conn)
@@ -34,7 +41,7 @@ def _migrate_old_data(ds_conn: Connection):
         return
 
     DsBase = automap_base()
-    DsBase.prepare(autoload_with=ds_conn)
+    DsBase.prepare(autoload_with=ds_conn, reflection_options={"only": DATASTORE_TABLES})
     ds_session = Session(ds_conn)
 
     AlembicVersion = DsBase.classes.ff14_fflogs_alembic_version
@@ -51,7 +58,7 @@ def _migrate_old_data(ds_conn: Connection):
     DsUser = DsBase.classes.ff14_fflogs_user
 
     Base = automap_base()
-    Base.prepare(autoload_with=op.get_bind())
+    Base.prepare(autoload_with=op.get_bind(), reflection_options={"only": MIGRATION_TABLES})
     session = Session(op.get_bind())
 
     User = Base.classes.ff14_fflogs_user

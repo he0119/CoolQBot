@@ -26,6 +26,23 @@ down_revision: str | Sequence[str] | None = "41333e58f5eb"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
+DATASTORE_TABLES = (
+    "check_in_alembic_version",
+    "check_in_userinfo",
+    "check_in_fitnessrecord",
+    "check_in_dietaryrecord",
+    "check_in_weightrecord",
+    "check_in_bodyfatrecord",
+)
+
+MIGRATION_TABLES = (
+    "check_in_userinfo",
+    "check_in_fitnessrecord",
+    "check_in_dietaryrecord",
+    "check_in_weightrecord",
+    "check_in_bodyfatrecord",
+)
+
 
 def _migrate_old_data(ds_conn: Connection):
     insp = inspect(ds_conn)
@@ -34,7 +51,7 @@ def _migrate_old_data(ds_conn: Connection):
         return
 
     DsBase = automap_base()
-    DsBase.prepare(autoload_with=ds_conn)
+    DsBase.prepare(autoload_with=ds_conn, reflection_options={"only": DATASTORE_TABLES})
     ds_session = Session(ds_conn)
 
     AlembicVersion = DsBase.classes.check_in_alembic_version
@@ -54,7 +71,7 @@ def _migrate_old_data(ds_conn: Connection):
     DsBodyFatRecord = DsBase.classes.check_in_bodyfatrecord
 
     Base = automap_base()
-    Base.prepare(autoload_with=op.get_bind())
+    Base.prepare(autoload_with=op.get_bind(), reflection_options={"only": MIGRATION_TABLES})
     session = Session(op.get_bind())
 
     UserInfo = Base.classes.check_in_userinfo
