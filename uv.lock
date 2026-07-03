@@ -674,10 +674,10 @@ requires-dist = [
 dev = [
     { name = "beautifulsoup4", specifier = ">=4.15.0" },
     { name = "freezegun", specifier = ">=1.5.5" },
-    { name = "inline-snapshot", specifier = ">=0.34.1" },
+    { name = "inline-snapshot", specifier = ">=0.34.2" },
     { name = "nonebug", specifier = ">=0.4.4" },
     { name = "nonebug-saa", specifier = ">=0.5.0" },
-    { name = "poethepoet", specifier = ">=0.46.0" },
+    { name = "poethepoet", specifier = ">=0.47.1" },
     { name = "pytest-asyncio", specifier = ">=1.4.0" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
     { name = "pytest-loguru", specifier = ">=0.4.1" },
@@ -1205,7 +1205,7 @@ wheels = [
 
 [[package]]
 name = "inline-snapshot"
-version = "0.34.1"
+version = "0.34.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asttokens" },
@@ -1214,9 +1214,9 @@ dependencies = [
     { name = "rich" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b8/2e/00c99468c7788bdb4f7d861bcfbfb091a5fe1bc475f9dd031f667c422a73/inline_snapshot-0.34.1.tar.gz", hash = "sha256:f8af37876c42069b7c0ed73f64357ace482955c3225ebcd27f243197ecfbcb65", size = 2638769, upload-time = "2026-06-05T16:58:47.921Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/91/c3/b5c36ab59e355b8d7c59205b8903fa74458c6938c9691f7d7730404f94c9/inline_snapshot-0.34.2.tar.gz", hash = "sha256:d160cb6059e00916c2e846abc014ead6f01fb24479f13696fb8670d7a7937f67", size = 2641142, upload-time = "2026-06-19T21:17:27.338Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ba/83/21747d0ee2276e973a2889e960f2ec904fbbe83fac6fecd8a57995bb81df/inline_snapshot-0.34.1-py3-none-any.whl", hash = "sha256:4c043215866dfdbe6a3ead92d9d0a9294720c7deebddc346dc781654cb19daa9", size = 90039, upload-time = "2026-06-05T16:58:46.038Z" },
+    { url = "https://files.pythonhosted.org/packages/bb/2a/84fe7ef052ac666e95e7cabdf0905aa3f2c90b5a117419760b39b577602a/inline_snapshot-0.34.2-py3-none-any.whl", hash = "sha256:743a514a08ffd0d2d62878b0208d4def5041585affa7db6b89f0ca2e23552361", size = 90717, upload-time = "2026-06-19T21:17:25.629Z" },
 ]
 
 [[package]]
@@ -2491,15 +2491,15 @@ wheels = [
 
 [[package]]
 name = "poethepoet"
-version = "0.46.0"
+version = "0.47.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pastel" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3b/f5/d501fcb67e450fd3fae9db06050420c0c6043758cfa8c30ba40278211265/poethepoet-0.46.0.tar.gz", hash = "sha256:daf8469031879ef59ef0b34fdba83574d65e41eb9186e20cd0f7c89ce479b030", size = 117276, upload-time = "2026-05-15T15:52:02.548Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/08/8c/6e866f2dd70aa3339fd3cdcd16648612a11726ddf0b803f0602885e16bd1/poethepoet-0.47.1.tar.gz", hash = "sha256:bb27f9fbba161c5be11878ad0a6f64ff29b8a68851d1861e4bd30255b753da2a", size = 145618, upload-time = "2026-07-01T07:36:20.922Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/af/01/a9d6ea30351919298d3dc237172ae6a60ce0224ecaaee289b671ab979c13/poethepoet-0.46.0-py3-none-any.whl", hash = "sha256:dc6d770a14792d124abac9066c5a707876027d1878ac9ca26cf57e9b2a96dc89", size = 150581, upload-time = "2026-05-15T15:52:01.118Z" },
+    { url = "https://files.pythonhosted.org/packages/45/8f/6518a009dd017ff4c281cb62207bc6741638c93738f08fd27b3caaa1e725/poethepoet-0.47.1-py3-none-any.whl", hash = "sha256:1738b9f6f1dc2c5d61b3e620aa4a2e7b8c20bccef815c8bfb312ebf87464d671", size = 183474, upload-time = "2026-07-01T07:36:19.333Z" },
 ]
 
 [[package]]
