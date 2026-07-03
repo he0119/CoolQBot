@@ -660,7 +660,7 @@ requires-dist = [
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-uninfo", specifier = ">=0.11.0" },
     { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.6.0" },
-    { name = "nonebot-plugin-wordcloud", specifier = ">=0.11.0" },
+    { name = "nonebot-plugin-wordcloud", specifier = ">=0.11.1" },
     { name = "nonebot-plugin-zssm", git = "https://github.com/djkcyl/nonebot-plugin-zssm.git" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
     { name = "nonebot2", extras = ["aiohttp", "fastapi", "httpx", "websockets"], specifier = ">=2.5.0" },
@@ -2224,7 +2224,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-wordcloud"
-version = "0.11.0"
+version = "0.11.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "emoji" },
@@ -2240,9 +2240,9 @@ dependencies = [
     { name = "tzdata" },
     { name = "wordcloud" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/07/79/6469e3877e1f5a61595177d3f45d26ba14497d8dc70b48ca89df0396e533/nonebot_plugin_wordcloud-0.11.0.tar.gz", hash = "sha256:987a7313b940d971a2e86ea63a35fbd2bb77286cbbe23e541d25ef904f89b915", size = 7259545, upload-time = "2026-06-09T14:27:40.675Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/22/6b/737c7f2062e382c963c5c54e27a90e116d1acf5ecdbf6d369f6c0c888e91/nonebot_plugin_wordcloud-0.11.1.tar.gz", hash = "sha256:e590b54f5a0ef333dd756bc57e50e95ce0cb598623693bf0b64071221736dd75", size = 7259656, upload-time = "2026-07-03T08:47:30.086Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9c/24/951d33ffb520a37cfef2667f056991783f99e4a72a3910db31df43c90cfc/nonebot_plugin_wordcloud-0.11.0-py3-none-any.whl", hash = "sha256:f8d4c77476621974f79e928667f0979bb415823b89bd367732d3fa6b5a5886ee", size = 7265779, upload-time = "2026-06-09T14:27:37.477Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/c9/47ad401d373c2689d2492e628beb8583a5ed40ccccd59b35815dba7c74de/nonebot_plugin_wordcloud-0.11.1-py3-none-any.whl", hash = "sha256:d52d6c5e121fd5c57e86a937bbe6ed1676ef3a761b3985779564948e46acfa7b", size = 7265967, upload-time = "2026-07-03T08:47:27.587Z" },
 ]
 
 [[package]]
