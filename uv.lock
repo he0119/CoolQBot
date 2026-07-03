@@ -632,7 +632,7 @@ requires-dist = [
     { name = "gunicorn", specifier = ">=26.0.0" },
     { name = "matplotlib", specifier = ">=3.10.9" },
     { name = "nb-cli", specifier = ">=1.7.4" },
-    { name = "nonebot-adapter-discord", specifier = ">=1.1.8" },
+    { name = "nonebot-adapter-discord", specifier = ">=1.1.9" },
     { name = "nonebot-adapter-dodo", specifier = ">=0.2.1" },
     { name = "nonebot-adapter-feishu", specifier = ">=2.7.2" },
     { name = "nonebot-adapter-kaiheila", specifier = ">=0.3.4" },
@@ -1650,14 +1650,14 @@ wheels = [
 
 [[package]]
 name = "nonebot-adapter-discord"
-version = "1.1.8"
+version = "1.1.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/39/c8/50e47a273af67b04e0b566a782fa3b0208895a1b63a16accfaa51779b180/nonebot_adapter_discord-1.1.8.tar.gz", hash = "sha256:4faf9d6819dbb039a3c98ba58cd225bd01cac645b1fcae0dde67b9a55403bc6f", size = 113565, upload-time = "2026-06-04T13:50:53.864Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/05/cd/25052d488689060470d9069d8354dcd9219eeb69418643d06929a6124bba/nonebot_adapter_discord-1.1.9.tar.gz", hash = "sha256:2c3975b5683a816e6d677a2341c0c32e48babd9c811d8dfc9702125e3188670a", size = 113756, upload-time = "2026-06-18T06:57:10.804Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f2/36/5be7162230af2489f47eaeee1f552875b1d5ce3a909fa2e825a2187e6e9f/nonebot_adapter_discord-1.1.8-py3-none-any.whl", hash = "sha256:9f7694414f6b205de7afe0b401ddd9d2127ddb97009d5c78562ae047a142c490", size = 121117, upload-time = "2026-06-04T13:50:52.664Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/cc/5c87236d7a80589a1e3a6617d1ec23e439637cc387751941466f18ca6bf9/nonebot_adapter_discord-1.1.9-py3-none-any.whl", hash = "sha256:abca0842d448eb61b9fc8014a1654fd6ae8c1696b76846bf6a0b12eb925f38ae", size = 121281, upload-time = "2026-06-18T06:57:09.521Z" },
 ]
 
 [[package]]
