@@ -234,11 +234,11 @@ wheels = [
 
 [[package]]
 name = "arclet-cithun"
-version = "1.3.3"
+version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c1/11/313c94f4e8a62c786d1b9858744a4cb09ffa1f1838adfc565e9197ea01cd/arclet_cithun-1.3.3.tar.gz", hash = "sha256:99bb02a45a46920d2c3c6a1688bddef0269960183b356aeedd7436162e0bdb44", size = 36243, upload-time = "2026-06-09T02:24:23.598Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/d9/674135ecdd03a1ddf8638b0522be39a1ec973cd3d6aafeef251bccae99f6/arclet_cithun-1.4.0.tar.gz", hash = "sha256:8cafb4591c798f05906ce8827eaf19661bc3e2dae4d754db89c1351ab6fea275", size = 38540, upload-time = "2026-06-10T07:14:49.997Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/fb/de4e25991588986c4d96d561b0adcdaf23a764ecfce35e6e44097c86e33f/arclet_cithun-1.3.3-py3-none-any.whl", hash = "sha256:15c0662ecc8791b81e3c32b5469083524c7f4893aecb2ceb0a9c95aa8b134db7", size = 37791, upload-time = "2026-06-09T02:24:22.22Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/d2/be3839aa49dc4834cbbea1b194ce0563f98654f24faf3c6f024003f2143e/arclet_cithun-1.4.0-py3-none-any.whl", hash = "sha256:b555c804d7b067e63c4fab90ff744be8a1d471569a0f265c9c3b4d39df333db2", size = 38251, upload-time = "2026-06-10T07:14:48.515Z" },
 ]
 
 [[package]]
@@ -593,6 +593,7 @@ dependencies = [
     { name = "nonebot-plugin-memes" },
     { name = "nonebot-plugin-orm", extra = ["default"] },
     { name = "nonebot-plugin-parser", extra = ["htmlkit"] },
+    { name = "nonebot-plugin-permission" },
     { name = "nonebot-plugin-prometheus" },
     { name = "nonebot-plugin-send-anything-anywhere" },
     { name = "nonebot-plugin-sentry" },
@@ -653,6 +654,7 @@ requires-dist = [
     { name = "nonebot-plugin-memes", specifier = "==0.8.1" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.8.3" },
     { name = "nonebot-plugin-parser", extras = ["htmlkit"], specifier = "==2.6.6" },
+    { name = "nonebot-plugin-permission", git = "https://github.com/he0119/nonebot-plugin-permission.git?branch=fix%2Fcoolqbot" },
     { name = "nonebot-plugin-prometheus", specifier = "==0.4.1" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
     { name = "nonebot-plugin-sentry", specifier = ">=2.0.0" },
@@ -2091,18 +2093,14 @@ htmlkit = [
 
 [[package]]
 name = "nonebot-plugin-permission"
-version = "0.2.1"
-source = { registry = "https://pypi.org/simple" }
+version = "0.3.0"
+source = { git = "https://github.com/he0119/nonebot-plugin-permission.git?branch=fix%2Fcoolqbot#cfee3ac44dd5a800dc4b3d1c01dbda9a9d4fe184" }
 dependencies = [
     { name = "arclet-cithun" },
     { name = "nonebot-plugin-alconna" },
     { name = "nonebot-plugin-orm" },
     { name = "nonebot-plugin-user" },
     { name = "nonebot2" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/da/b3/3201a5021282a5fff80c3ec78637fd5da4b30b59608f0d5c0f1daaf23f7d/nonebot_plugin_permission-0.2.1.tar.gz", hash = "sha256:9c9a6f46ff58b4f1924841f144e864b8e6b8efa8122c86b12cc155e807db8265", size = 14387, upload-time = "2026-06-03T08:56:53.903Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/6c/c3/58e517f6614407496ea9ff24a86a2a09fbb6fb77a03fad014b89a5b5f278/nonebot_plugin_permission-0.2.1-py3-none-any.whl", hash = "sha256:a43c5963ca2e2e6e4a382e20119419c65980786b2737e1a5fcd9d896f916afbd", size = 17667, upload-time = "2026-06-03T08:56:52.456Z" },
 ]
 
 [[package]]
