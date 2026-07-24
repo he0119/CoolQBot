@@ -1,5 +1,5 @@
 {
-  "version": "7.05",
+  "version": "7.5",
   "boss": [
     {
       "name": "空中神域不获岛",
@@ -959,14 +959,22 @@
       "nicknames": ["巴哈姆特绝境战(4.x)"],
       "zone": 30,
       "encounter": 1047,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 3,
+      "version": "4.x",
+      "partition_end": null,
+      "partition_frozen": true
     },
     {
       "name": "究极神兵绝境战(4.x)",
       "nicknames": ["究极神兵绝境战(4.x)"],
       "zone": 30,
       "encounter": 1048,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 3,
+      "version": "4.x",
+      "partition_end": null,
+      "partition_frozen": true
     },
     {
       "name": "The Copied Factory 多关节型：司令机",
@@ -997,11 +1005,48 @@
       "difficulty": 100
     },
     {
-      "name": "亚历山大绝境战",
-      "nicknames": ["绝亚"],
+      "name": "亚历山大绝境战(5.1-5.2)",
+      "nicknames": ["亚历山大绝境战(5.1-5.2)"],
       "zone": 32,
       "encounter": 1050,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 3,
+      "version": "5.1-5.2",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(5.3)",
+      "nicknames": ["亚历山大绝境战(5.3)"],
+      "zone": 32,
+      "encounter": 1050,
+      "difficulty": 100,
+      "partition": 9,
+      "version": "5.3",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(5.4)",
+      "nicknames": ["亚历山大绝境战(5.4)"],
+      "zone": 32,
+      "encounter": 1050,
+      "difficulty": 100,
+      "partition": 15,
+      "version": "5.4",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(5.5)",
+      "nicknames": ["亚历山大绝境战(5.5)", "绝亚"],
+      "zone": 32,
+      "encounter": 1050,
+      "difficulty": 100,
+      "partition": 21,
+      "version": "5.5",
+      "partition_end": null,
+      "partition_frozen": true
     },
     {
       "name": "伊甸希望乐园 共鸣之章1",
@@ -1375,25 +1420,235 @@
       "difficulty": 100
     },
     {
+      "name": "巴哈姆特绝境战(6.0)",
+      "nicknames": ["巴哈姆特绝境战(6.0)"],
+      "zone": 43,
+      "encounter": 1060,
+      "difficulty": 100,
+      "partition": 3,
+      "version": "6.0",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "巴哈姆特绝境战(6.1)",
+      "nicknames": ["巴哈姆特绝境战(6.1)"],
+      "zone": 43,
+      "encounter": 1060,
+      "difficulty": 100,
+      "partition": 9,
+      "version": "6.1",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "巴哈姆特绝境战(6.2)",
+      "nicknames": ["巴哈姆特绝境战(6.2)"],
+      "zone": 43,
+      "encounter": 1060,
+      "difficulty": 100,
+      "partition": 15,
+      "version": "6.2",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "巴哈姆特绝境战(6.28)",
+      "nicknames": ["巴哈姆特绝境战(6.28)"],
+      "zone": 43,
+      "encounter": 1060,
+      "difficulty": 100,
+      "partition": 21,
+      "version": "6.28",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "巴哈姆特绝境战(6.3)",
+      "nicknames": ["巴哈姆特绝境战(6.3)"],
+      "zone": 43,
+      "encounter": 1060,
+      "difficulty": 100,
+      "partition": 27,
+      "version": "6.3",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "巴哈姆特绝境战(6.4)",
+      "nicknames": ["巴哈姆特绝境战(6.4)"],
+      "zone": 43,
+      "encounter": 1060,
+      "difficulty": 100,
+      "partition": 33,
+      "version": "6.4",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
       "name": "巴哈姆特绝境战(6.5)",
       "nicknames": ["巴哈姆特绝境战(6.5)"],
       "zone": 43,
       "encounter": 1060,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 39,
+      "version": "6.5",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(6.0)",
+      "nicknames": ["究极神兵绝境战(6.0)"],
+      "zone": 43,
+      "encounter": 1061,
+      "difficulty": 100,
+      "partition": 3,
+      "version": "6.0",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(6.1)",
+      "nicknames": ["究极神兵绝境战(6.1)"],
+      "zone": 43,
+      "encounter": 1061,
+      "difficulty": 100,
+      "partition": 9,
+      "version": "6.1",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(6.2)",
+      "nicknames": ["究极神兵绝境战(6.2)"],
+      "zone": 43,
+      "encounter": 1061,
+      "difficulty": 100,
+      "partition": 15,
+      "version": "6.2",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(6.28)",
+      "nicknames": ["究极神兵绝境战(6.28)"],
+      "zone": 43,
+      "encounter": 1061,
+      "difficulty": 100,
+      "partition": 21,
+      "version": "6.28",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(6.3)",
+      "nicknames": ["究极神兵绝境战(6.3)"],
+      "zone": 43,
+      "encounter": 1061,
+      "difficulty": 100,
+      "partition": 27,
+      "version": "6.3",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(6.4)",
+      "nicknames": ["究极神兵绝境战(6.4)"],
+      "zone": 43,
+      "encounter": 1061,
+      "difficulty": 100,
+      "partition": 33,
+      "version": "6.4",
+      "partition_end": null,
+      "partition_frozen": true
     },
     {
       "name": "究极神兵绝境战(6.5)",
       "nicknames": ["究极神兵绝境战(6.5)"],
       "zone": 43,
       "encounter": 1061,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 39,
+      "version": "6.5",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(6.0)",
+      "nicknames": ["亚历山大绝境战(6.0)"],
+      "zone": 43,
+      "encounter": 1062,
+      "difficulty": 100,
+      "partition": 3,
+      "version": "6.0",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(6.1)",
+      "nicknames": ["亚历山大绝境战(6.1)"],
+      "zone": 43,
+      "encounter": 1062,
+      "difficulty": 100,
+      "partition": 9,
+      "version": "6.1",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(6.2)",
+      "nicknames": ["亚历山大绝境战(6.2)"],
+      "zone": 43,
+      "encounter": 1062,
+      "difficulty": 100,
+      "partition": 15,
+      "version": "6.2",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(6.28)",
+      "nicknames": ["亚历山大绝境战(6.28)"],
+      "zone": 43,
+      "encounter": 1062,
+      "difficulty": 100,
+      "partition": 21,
+      "version": "6.28",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(6.3)",
+      "nicknames": ["亚历山大绝境战(6.3)"],
+      "zone": 43,
+      "encounter": 1062,
+      "difficulty": 100,
+      "partition": 27,
+      "version": "6.3",
+      "partition_end": null,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(6.4)",
+      "nicknames": ["亚历山大绝境战(6.4)"],
+      "zone": 43,
+      "encounter": 1062,
+      "difficulty": 100,
+      "partition": 33,
+      "version": "6.4",
+      "partition_end": null,
+      "partition_frozen": true
     },
     {
       "name": "亚历山大绝境战(6.5)",
       "nicknames": ["亚历山大绝境战(6.5)"],
       "zone": 43,
       "encounter": 1062,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 39,
+      "version": "6.5",
+      "partition_end": null,
+      "partition_frozen": true
     },
     {
       "name": "万魔殿 边境之狱1",
@@ -1809,6 +2064,34 @@
       "difficulty": 100
     },
     {
+      "name": "王城古迹永护塔底",
+      "nicknames": ["王城古迹永护塔底"],
+      "zone": 57,
+      "encounter": 4546,
+      "difficulty": 100
+    },
+    {
+      "name": "永久幽界中央终端",
+      "nicknames": ["永久幽界中央终端"],
+      "zone": 57,
+      "encounter": 4547,
+      "difficulty": 100
+    },
+    {
+      "name": "遗忘行路雾之迹",
+      "nicknames": ["遗忘行路雾之迹"],
+      "zone": 57,
+      "encounter": 4549,
+      "difficulty": 100
+    },
+    {
+      "name": "军工要地克吕提俄斯魔导工厂",
+      "nicknames": ["军工要地克吕提俄斯魔导工厂"],
+      "zone": 57,
+      "encounter": 4551,
+      "difficulty": 100
+    },
+    {
       "name": "艳翼蛇鸟歼殛战",
       "nicknames": ["极鸟", "武器神"],
       "zone": 58,
@@ -1834,35 +2117,388 @@
       "nicknames": ["巴哈姆特绝境战(7.0)"],
       "zone": 59,
       "encounter": 1073,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 3,
+      "version": "7.0",
+      "partition_end": 1727323200,
+      "partition_frozen": true
+    },
+    {
+      "name": "巴哈姆特绝境战(7.05)",
+      "nicknames": ["巴哈姆特绝境战(7.05)"],
+      "zone": 59,
+      "encounter": 1073,
+      "difficulty": 100,
+      "partition": 9,
+      "version": "7.05",
+      "partition_end": 1739854800,
+      "partition_frozen": true
+    },
+    {
+      "name": "巴哈姆特绝境战(7.1)",
+      "nicknames": ["巴哈姆特绝境战(7.1)"],
+      "zone": 59,
+      "encounter": 1073,
+      "difficulty": 100,
+      "partition": 15,
+      "version": "7.1",
+      "partition_end": 1750741200,
+      "partition_frozen": true
+    },
+    {
+      "name": "巴哈姆特绝境战(7.2)",
+      "nicknames": ["巴哈姆特绝境战(7.2)"],
+      "zone": 59,
+      "encounter": 1073,
+      "difficulty": 100,
+      "partition": 21,
+      "version": "7.2",
+      "partition_end": 1757998800,
+      "partition_frozen": true
+    },
+    {
+      "name": "巴哈姆特绝境战(7.3)",
+      "nicknames": ["巴哈姆特绝境战(7.3)"],
+      "zone": 59,
+      "encounter": 1073,
+      "difficulty": 100,
+      "partition": 27,
+      "version": "7.3",
+      "partition_end": 1765868400,
+      "partition_frozen": true
+    },
+    {
+      "name": "巴哈姆特绝境战(7.4)",
+      "nicknames": ["巴哈姆特绝境战(7.4)"],
+      "zone": 59,
+      "encounter": 1073,
+      "difficulty": 100,
+      "partition": 33,
+      "version": "7.4",
+      "partition_end": 1777359600,
+      "partition_frozen": true
+    },
+    {
+      "name": "巴哈姆特绝境战(7.5)",
+      "nicknames": ["巴哈姆特绝境战(7.5)"],
+      "zone": 59,
+      "encounter": 1073,
+      "difficulty": 100,
+      "partition": 39,
+      "version": "7.5",
+      "partition_end": null,
+      "partition_frozen": false
     },
     {
       "name": "究极神兵绝境战(7.0)",
       "nicknames": ["究极神兵绝境战(7.0)"],
       "zone": 59,
       "encounter": 1074,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 3,
+      "version": "7.0",
+      "partition_end": 1727323200,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(7.05)",
+      "nicknames": ["究极神兵绝境战(7.05)"],
+      "zone": 59,
+      "encounter": 1074,
+      "difficulty": 100,
+      "partition": 9,
+      "version": "7.05",
+      "partition_end": 1739854800,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(7.1)",
+      "nicknames": ["究极神兵绝境战(7.1)"],
+      "zone": 59,
+      "encounter": 1074,
+      "difficulty": 100,
+      "partition": 15,
+      "version": "7.1",
+      "partition_end": 1750741200,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(7.2)",
+      "nicknames": ["究极神兵绝境战(7.2)"],
+      "zone": 59,
+      "encounter": 1074,
+      "difficulty": 100,
+      "partition": 21,
+      "version": "7.2",
+      "partition_end": 1757998800,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(7.3)",
+      "nicknames": ["究极神兵绝境战(7.3)"],
+      "zone": 59,
+      "encounter": 1074,
+      "difficulty": 100,
+      "partition": 27,
+      "version": "7.3",
+      "partition_end": 1765868400,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(7.4)",
+      "nicknames": ["究极神兵绝境战(7.4)"],
+      "zone": 59,
+      "encounter": 1074,
+      "difficulty": 100,
+      "partition": 33,
+      "version": "7.4",
+      "partition_end": 1777359600,
+      "partition_frozen": true
+    },
+    {
+      "name": "究极神兵绝境战(7.5)",
+      "nicknames": ["究极神兵绝境战(7.5)"],
+      "zone": 59,
+      "encounter": 1074,
+      "difficulty": 100,
+      "partition": 39,
+      "version": "7.5",
+      "partition_end": null,
+      "partition_frozen": false
     },
     {
       "name": "亚历山大绝境战(7.0)",
       "nicknames": ["亚历山大绝境战(7.0)"],
       "zone": 59,
       "encounter": 1075,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 3,
+      "version": "7.0",
+      "partition_end": 1727323200,
+      "partition_frozen": true
     },
     {
-      "name": "Ultimates (Legacy) 幻想龙诗绝境战",
-      "nicknames": ["ultimates-(legacy)-幻想龙诗绝境战"],
+      "name": "亚历山大绝境战(7.05)",
+      "nicknames": ["亚历山大绝境战(7.05)"],
+      "zone": 59,
+      "encounter": 1075,
+      "difficulty": 100,
+      "partition": 9,
+      "version": "7.05",
+      "partition_end": 1739854800,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(7.1)",
+      "nicknames": ["亚历山大绝境战(7.1)"],
+      "zone": 59,
+      "encounter": 1075,
+      "difficulty": 100,
+      "partition": 15,
+      "version": "7.1",
+      "partition_end": 1750741200,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(7.2)",
+      "nicknames": ["亚历山大绝境战(7.2)"],
+      "zone": 59,
+      "encounter": 1075,
+      "difficulty": 100,
+      "partition": 21,
+      "version": "7.2",
+      "partition_end": 1757998800,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(7.3)",
+      "nicknames": ["亚历山大绝境战(7.3)"],
+      "zone": 59,
+      "encounter": 1075,
+      "difficulty": 100,
+      "partition": 27,
+      "version": "7.3",
+      "partition_end": 1765868400,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(7.4)",
+      "nicknames": ["亚历山大绝境战(7.4)"],
+      "zone": 59,
+      "encounter": 1075,
+      "difficulty": 100,
+      "partition": 33,
+      "version": "7.4",
+      "partition_end": 1777359600,
+      "partition_frozen": true
+    },
+    {
+      "name": "亚历山大绝境战(7.5)",
+      "nicknames": ["亚历山大绝境战(7.5)"],
+      "zone": 59,
+      "encounter": 1075,
+      "difficulty": 100,
+      "partition": 39,
+      "version": "7.5",
+      "partition_end": null,
+      "partition_frozen": false
+    },
+    {
+      "name": "幻想龙诗绝境战(7.0)",
+      "nicknames": ["幻想龙诗绝境战(7.0)"],
       "zone": 59,
       "encounter": 1076,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 3,
+      "version": "7.0",
+      "partition_end": 1727323200,
+      "partition_frozen": true
     },
     {
-      "name": "Ultimates (Legacy) 欧米茄绝境验证战",
-      "nicknames": ["ultimates-(legacy)-欧米茄绝境验证战"],
+      "name": "幻想龙诗绝境战(7.05)",
+      "nicknames": ["幻想龙诗绝境战(7.05)"],
+      "zone": 59,
+      "encounter": 1076,
+      "difficulty": 100,
+      "partition": 9,
+      "version": "7.05",
+      "partition_end": 1739854800,
+      "partition_frozen": true
+    },
+    {
+      "name": "幻想龙诗绝境战(7.1)",
+      "nicknames": ["幻想龙诗绝境战(7.1)"],
+      "zone": 59,
+      "encounter": 1076,
+      "difficulty": 100,
+      "partition": 15,
+      "version": "7.1",
+      "partition_end": 1750741200,
+      "partition_frozen": true
+    },
+    {
+      "name": "幻想龙诗绝境战(7.2)",
+      "nicknames": ["幻想龙诗绝境战(7.2)"],
+      "zone": 59,
+      "encounter": 1076,
+      "difficulty": 100,
+      "partition": 21,
+      "version": "7.2",
+      "partition_end": 1757998800,
+      "partition_frozen": true
+    },
+    {
+      "name": "幻想龙诗绝境战(7.3)",
+      "nicknames": ["幻想龙诗绝境战(7.3)"],
+      "zone": 59,
+      "encounter": 1076,
+      "difficulty": 100,
+      "partition": 27,
+      "version": "7.3",
+      "partition_end": 1765868400,
+      "partition_frozen": true
+    },
+    {
+      "name": "幻想龙诗绝境战(7.4)",
+      "nicknames": ["幻想龙诗绝境战(7.4)"],
+      "zone": 59,
+      "encounter": 1076,
+      "difficulty": 100,
+      "partition": 33,
+      "version": "7.4",
+      "partition_end": 1777359600,
+      "partition_frozen": true
+    },
+    {
+      "name": "幻想龙诗绝境战(7.5)",
+      "nicknames": ["ultimates-(legacy)-幻想龙诗绝境战", "幻想龙诗绝境战(7.5)"],
+      "zone": 59,
+      "encounter": 1076,
+      "difficulty": 100,
+      "partition": 39,
+      "version": "7.5",
+      "partition_end": null,
+      "partition_frozen": false
+    },
+    {
+      "name": "欧米茄绝境验证战(7.0)",
+      "nicknames": ["欧米茄绝境验证战(7.0)"],
       "zone": 59,
       "encounter": 1077,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 3,
+      "version": "7.0",
+      "partition_end": 1727323200,
+      "partition_frozen": true
+    },
+    {
+      "name": "欧米茄绝境验证战(7.05)",
+      "nicknames": ["欧米茄绝境验证战(7.05)"],
+      "zone": 59,
+      "encounter": 1077,
+      "difficulty": 100,
+      "partition": 9,
+      "version": "7.05",
+      "partition_end": 1739854800,
+      "partition_frozen": true
+    },
+    {
+      "name": "欧米茄绝境验证战(7.1)",
+      "nicknames": ["欧米茄绝境验证战(7.1)"],
+      "zone": 59,
+      "encounter": 1077,
+      "difficulty": 100,
+      "partition": 15,
+      "version": "7.1",
+      "partition_end": 1750741200,
+      "partition_frozen": true
+    },
+    {
+      "name": "欧米茄绝境验证战(7.2)",
+      "nicknames": ["欧米茄绝境验证战(7.2)"],
+      "zone": 59,
+      "encounter": 1077,
+      "difficulty": 100,
+      "partition": 21,
+      "version": "7.2",
+      "partition_end": 1757998800,
+      "partition_frozen": true
+    },
+    {
+      "name": "欧米茄绝境验证战(7.3)",
+      "nicknames": ["欧米茄绝境验证战(7.3)"],
+      "zone": 59,
+      "encounter": 1077,
+      "difficulty": 100,
+      "partition": 27,
+      "version": "7.3",
+      "partition_end": 1765868400,
+      "partition_frozen": true
+    },
+    {
+      "name": "欧米茄绝境验证战(7.4)",
+      "nicknames": ["欧米茄绝境验证战(7.4)"],
+      "zone": 59,
+      "encounter": 1077,
+      "difficulty": 100,
+      "partition": 33,
+      "version": "7.4",
+      "partition_end": 1777359600,
+      "partition_frozen": true
+    },
+    {
+      "name": "欧米茄绝境验证战(7.5)",
+      "nicknames": [
+        "ultimates-(legacy)-欧米茄绝境验证战",
+        "欧米茄绝境验证战(7.5)"
+      ],
+      "zone": 59,
+      "encounter": 1077,
+      "difficulty": 100,
+      "partition": 39,
+      "version": "7.5",
+      "partition_end": null,
+      "partition_frozen": false
     },
     {
       "name": "Delubrum Reginae 求道之三位一体",
@@ -1942,6 +2578,13 @@
       "difficulty": 101
     },
     {
+      "name": "AAC Light-Heavyweight 野蛮爆弹狂人",
+      "nicknames": ["aac-light-heavyweight-野蛮爆弹狂人"],
+      "zone": 62,
+      "encounter": 95,
+      "difficulty": 100
+    },
+    {
       "name": "阿卡狄亚登天斗技场 轻量级3",
       "nicknames": ["m3"],
       "zone": 62,
@@ -1968,6 +2611,286 @@
       "zone": 62,
       "encounter": 96,
       "difficulty": 101
+    },
+    {
+      "name": "Jeuno: The First Walk 遥远的咒缚 普利修",
+      "nicknames": ["jeuno:-the-first-walk-遥远的咒缚-普利修"],
+      "zone": 63,
+      "encounter": 2057,
+      "difficulty": 100
+    },
+    {
+      "name": "Jeuno: The First Walk 法芙尼尔",
+      "nicknames": ["jeuno:-the-first-walk-法芙尼尔"],
+      "zone": 63,
+      "encounter": 2058,
+      "difficulty": 100
+    },
+    {
+      "name": "Jeuno: The First Walk 方舟天使",
+      "nicknames": ["jeuno:-the-first-walk-方舟天使"],
+      "zone": 63,
+      "encounter": 2059,
+      "difficulty": 100
+    },
+    {
+      "name": "Jeuno: The First Walk 暗之王",
+      "nicknames": ["jeuno:-the-first-walk-暗之王"],
+      "zone": 63,
+      "encounter": 2060,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Unreal) 白虎",
+      "nicknames": ["trials-(unreal)-白虎"],
+      "zone": 64,
+      "encounter": 3009,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Unreal) 朱雀",
+      "nicknames": ["trials-(unreal)-朱雀"],
+      "zone": 64,
+      "encounter": 3010,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Unreal) 青龙",
+      "nicknames": ["trials-(unreal)-青龙"],
+      "zone": 64,
+      "encounter": 3011,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Unreal) 月读",
+      "nicknames": ["trials-(unreal)-月读"],
+      "zone": 64,
+      "encounter": 3012,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials (Unreal) 神龙",
+      "nicknames": ["trials-(unreal)-神龙"],
+      "zone": 64,
+      "encounter": 3013,
+      "difficulty": 100
+    },
+    {
+      "name": "Futures Rewritten 光暗未来绝境战",
+      "nicknames": ["futures-rewritten-光暗未来绝境战"],
+      "zone": 65,
+      "encounter": 1079,
+      "difficulty": 100
+    },
+    {
+      "name": "Alliance Raids (Chaotic) 暗黑之云",
+      "nicknames": ["alliance-raids-(chaotic)-暗黑之云"],
+      "zone": 66,
+      "encounter": 2061,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials II (Extreme) 泽莲尼娅",
+      "nicknames": ["trials-ii-(extreme)-泽莲尼娅"],
+      "zone": 67,
+      "encounter": 1080,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials II (Extreme) 永远之暗",
+      "nicknames": ["trials-ii-(extreme)-永远之暗"],
+      "zone": 67,
+      "encounter": 1081,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials II (Extreme) 护锁刃龙",
+      "nicknames": ["trials-ii-(extreme)-护锁刃龙"],
+      "zone": 67,
+      "encounter": 1082,
+      "difficulty": 100
+    },
+    {
+      "name": "AAC Cruiserweight 热舞绿光",
+      "nicknames": ["aac-cruiserweight-热舞绿光"],
+      "zone": 68,
+      "encounter": 97,
+      "difficulty": 100
+    },
+    {
+      "name": "AAC Cruiserweight 狂热糖潮",
+      "nicknames": ["aac-cruiserweight-狂热糖潮"],
+      "zone": 68,
+      "encounter": 98,
+      "difficulty": 100
+    },
+    {
+      "name": "AAC Cruiserweight 野蛮恨心",
+      "nicknames": ["aac-cruiserweight-野蛮恨心"],
+      "zone": 68,
+      "encounter": 99,
+      "difficulty": 100
+    },
+    {
+      "name": "AAC Cruiserweight 剑嚎",
+      "nicknames": ["aac-cruiserweight-剑嚎"],
+      "zone": 68,
+      "encounter": 100,
+      "difficulty": 100
+    },
+    {
+      "name": "The Forked Tower: Blood 恶魔板",
+      "nicknames": ["the-forked-tower:-blood-恶魔板"],
+      "zone": 69,
+      "encounter": 2062,
+      "difficulty": 100
+    },
+    {
+      "name": "The Forked Tower: Blood 星头三兄弟",
+      "nicknames": ["the-forked-tower:-blood-星头三兄弟"],
+      "zone": 69,
+      "encounter": 2063,
+      "difficulty": 100
+    },
+    {
+      "name": "The Forked Tower: Blood 大理石龙",
+      "nicknames": ["the-forked-tower:-blood-大理石龙"],
+      "zone": 69,
+      "encounter": 2065,
+      "difficulty": 100
+    },
+    {
+      "name": "The Forked Tower: Blood 魔陶洛斯",
+      "nicknames": ["the-forked-tower:-blood-魔陶洛斯"],
+      "zone": 69,
+      "encounter": 2066,
+      "difficulty": 100
+    },
+    {
+      "name": "San d'Oria: The Second Walk 信仰之麒麟",
+      "nicknames": ["san-d'oria:-the-second-walk-信仰之麒麟"],
+      "zone": 70,
+      "encounter": 2067,
+      "difficulty": 100
+    },
+    {
+      "name": "San d'Oria: The Second Walk 阿尔蒂玛与欧米茄",
+      "nicknames": ["san-d'oria:-the-second-walk-阿尔蒂玛与欧米茄"],
+      "zone": 70,
+      "encounter": 2068,
+      "difficulty": 100
+    },
+    {
+      "name": "San d'Oria: The Second Walk 卡姆拉纳特",
+      "nicknames": ["san-d'oria:-the-second-walk-卡姆拉纳特"],
+      "zone": 70,
+      "encounter": 2069,
+      "difficulty": 100
+    },
+    {
+      "name": "San d'Oria: The Second Walk 埃尔德纳修",
+      "nicknames": ["san-d'oria:-the-second-walk-埃尔德纳修"],
+      "zone": 70,
+      "encounter": 2070,
+      "difficulty": 100
+    },
+    {
+      "name": "Deep Dungeons 卓异的悲寂",
+      "nicknames": ["deep-dungeons-卓异的悲寂"],
+      "zone": 71,
+      "encounter": 4548,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials III (Extreme) 格莱杨拉波尔",
+      "nicknames": ["trials-iii-(extreme)-格莱杨拉波尔"],
+      "zone": 72,
+      "encounter": 1083,
+      "difficulty": 100
+    },
+    {
+      "name": "Trials III (Extreme) 恩欧",
+      "nicknames": ["trials-iii-(extreme)-恩欧"],
+      "zone": 72,
+      "encounter": 1084,
+      "difficulty": 100
+    },
+    {
+      "name": "AAC Heavyweight 致命美人",
+      "nicknames": ["aac-heavyweight-致命美人"],
+      "zone": 73,
+      "encounter": 101,
+      "difficulty": 100
+    },
+    {
+      "name": "AAC Heavyweight 极限兄弟",
+      "nicknames": ["aac-heavyweight-极限兄弟"],
+      "zone": 73,
+      "encounter": 102,
+      "difficulty": 100
+    },
+    {
+      "name": "AAC Heavyweight 霸王",
+      "nicknames": ["aac-heavyweight-霸王"],
+      "zone": 73,
+      "encounter": 103,
+      "difficulty": 100
+    },
+    {
+      "name": "AAC Heavyweight 林德布鲁姆",
+      "nicknames": ["aac-heavyweight-林德布鲁姆"],
+      "zone": 73,
+      "encounter": 104,
+      "difficulty": 100
+    },
+    {
+      "name": "AAC Heavyweight 林德布鲁姆 II",
+      "nicknames": ["aac-heavyweight-林德布鲁姆-ii"],
+      "zone": 73,
+      "encounter": 105,
+      "difficulty": 100
+    },
+    {
+      "name": "异闻商客奇谭",
+      "nicknames": ["异闻商客奇谭"],
+      "zone": 74,
+      "encounter": 4550,
+      "difficulty": 100
+    },
+    {
+      "name": "Windurst: The Third Walk 恶魔香托托",
+      "nicknames": ["windurst:-the-third-walk-恶魔香托托"],
+      "zone": 75,
+      "encounter": 2071,
+      "difficulty": 100
+    },
+    {
+      "name": "Windurst: The Third Walk 巨神重现 亚历山大",
+      "nicknames": ["windurst:-the-third-walk-巨神重现-亚历山大"],
+      "zone": 75,
+      "encounter": 2072,
+      "difficulty": 100
+    },
+    {
+      "name": "Windurst: The Third Walk 普罗玛西亚",
+      "nicknames": ["windurst:-the-third-walk-普罗玛西亚"],
+      "zone": 75,
+      "encounter": 2073,
+      "difficulty": 100
+    },
+    {
+      "name": "Windurst: The Third Walk 虚无之王",
+      "nicknames": ["windurst:-the-third-walk-虚无之王"],
+      "zone": 75,
+      "encounter": 2074,
+      "difficulty": 100
+    },
+    {
+      "name": "Dancing Mad 妖星乱舞绝境战",
+      "nicknames": ["dancing-mad-妖星乱舞绝境战"],
+      "zone": 76,
+      "encounter": 1085,
+      "difficulty": 100
     }
   ],
   "job": [

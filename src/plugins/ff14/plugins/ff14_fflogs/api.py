@@ -140,10 +140,18 @@ class FFLogs:
             # 抛出上面任何异常，说明调用失败
             return None
 
-    async def _get_one_day_ranking(self, boss: int, difficulty: int, job: int, date: datetime) -> list[Ranking]:
+    async def _get_one_day_ranking(
+        self,
+        boss: int,
+        difficulty: int,
+        job: int,
+        date: datetime,
+        partition: int | None = None,
+    ) -> list[Ranking]:
         """获取指定 boss，指定职业，指定一天中的排名数据"""
         # 查看是否有缓存
-        cache_name = f"{boss}_{difficulty}_{job}_{date.strftime('%Y%m%d')}.pkl"
+        partition_key = f"_partition_{partition}" if partition is not None else ""
+        cache_name = f"{boss}_{difficulty}_{job}{partition_key}_{date.strftime('%Y%m%d')}.pkl"
         if plugin_data.exists(cache_name, cache=True):
             data = plugin_data.load_pkl(cache_name, cache=True)
             # 为了兼容以前的数据，以前的数据是字典格式
@@ -164,16 +172,16 @@ class FFLogs:
         while hasMorePages and page < 51:
             rankings_url = f"{self.base_url}/rankings/encounter/{boss}"
 
-            res = await self._http(
-                rankings_url,
-                params={
-                    "metric": "rdps",
-                    "difficulty": difficulty,
-                    "spec": job,
-                    "page": page,
-                    "filter": f"date.{start_timestamp}.{end_timestamp}",
-                },
-            )
+            params = {
+                "metric": "rdps",
+                "difficulty": difficulty,
+                "spec": job,
+                "page": page,
+                "filter": f"date.{start_timestamp}.{end_timestamp}",
+            }
+            if partition is not None:
+                params["partition"] = partition
+            res = await self._http(rankings_url, params=params)
             try:
                 ranking = FFLogsRanking.model_validate(res)
             except ValidationError:
@@ -191,6 +199,51 @@ class FFLogs:
 
         return rankings
 
+    async def _get_partition_ranking(
+        self,
+        boss: int,
+        difficulty: int,
+        job: int,
+        partition: int,
+    ) -> list[Ranking]:
+        """获取冻结分区的排名数据。
+
+        一些旧绝本分区不再返回起止时间，无法按日期切片，只能查询整个分区。
+        """
+        cache_name = f"{boss}_{difficulty}_{job}_partition_{partition}_all.pkl"
+        if plugin_data.exists(cache_name, cache=True):
+            data = plugin_data.load_pkl(cache_name, cache=True)
+            if len(data) > 0 and isinstance(data[0], dict):
+                return TypeAdapter(list[Ranking]).validate_python(data)
+            return data
+
+        page = 1
+        has_more_pages = True
+        rankings: list[Ranking] = []
+        rankings_url = f"{self.base_url}/rankings/encounter/{boss}"
+        while has_more_pages and page < 51:
+            res = await self._http(
+                rankings_url,
+                params={
+                    "metric": "rdps",
+                    "difficulty": difficulty,
+                    "spec": job,
+                    "page": page,
+                    "partition": partition,
+                },
+            )
+            try:
+                ranking = FFLogsRanking.model_validate(res)
+            except ValidationError:
+                raise DataException("服务器没有正确返回数据")
+
+            has_more_pages = ranking.hasMorePages
+            rankings += ranking.rankings
+            page += 1
+
+        plugin_data.dump_pkl(rankings, cache_name, cache=True)
+        return rankings
+
     async def _get_whole_ranking(
         self,
         boss: int,
@@ -198,13 +251,18 @@ class FFLogs:
         job: int,
         dps_type: Literal["rdps", "adps", "pdps", "ndps"],
         date: datetime,
+        partition: int | None = None,
+        whole_partition: bool = False,
     ) -> list[float]:
         date = datetime(year=date.year, month=date.month, day=date.day)
 
-        rankings: list[Ranking] = []
-        for _ in range(plugin_config.fflogs_range):
-            rankings += await self._get_one_day_ranking(boss, difficulty, job, date)
-            date -= timedelta(days=1)
+        if whole_partition and partition is not None:
+            rankings = await self._get_partition_ranking(boss, difficulty, job, partition)
+        else:
+            rankings = []
+            for _ in range(plugin_config.fflogs_range):
+                rankings += await self._get_one_day_ranking(boss, difficulty, job, date, partition)
+                date -= timedelta(days=1)
 
         # 根据 DPS 类型进行排序，并提取数据
         dps_rankings = []
@@ -237,6 +295,7 @@ class FFLogs:
         encounter: int,
         difficulty: int,
         metric: Literal["rdps", "adps", "pdps", "ndps"],
+        partition: int | None = None,
     ):
         """查询指定角色的 DPS
 
@@ -244,14 +303,14 @@ class FFLogs:
         """
         url = f"https://cn.fflogs.com/v1/rankings/character/{characterName}/{serverName}/CN"
 
-        res = await self._http(
-            url,
-            params={
-                "zone": zone,
-                "encounter": encounter,
-                "metric": metric,
-            },
-        )
+        params = {
+            "zone": zone,
+            "encounter": encounter,
+            "metric": metric,
+        }
+        if partition is not None:
+            params["partition"] = partition
+        res = await self._http(url, params=params)
 
         if not res and isinstance(res, list):
             raise DataException("网站里没有数据")
@@ -311,10 +370,21 @@ class FFLogs:
         if dps_type not in ["adps", "rdps", "pdps", "ndps"]:
             return f"找不到类型为 {dps_type} 的数据，只支持 adps rdps pdps ndps"
 
-        # 排名从前一天开始排，因为今天的数据并不全
+        # 当前分区从前一天开始排，因为今天的数据并不全；历史分区从结束前一天开始排。
         date = datetime.now() - timedelta(days=1)
+        if boss.partition_end is not None:
+            date = datetime.fromtimestamp(boss.partition_end) - timedelta(days=1)
+        whole_partition = boss.partition_frozen and boss.partition_end is None
         try:
-            rankings = await self._get_whole_ranking(boss.encounter, boss.difficulty, job.spec, dps_type, date)
+            rankings = await self._get_whole_ranking(
+                boss.encounter,
+                boss.difficulty,
+                job.spec,
+                dps_type,
+                date,
+                boss.partition,
+                whole_partition,
+            )
         except DataException as e:
             return f"{e}，请稍后再试"
 
@@ -358,6 +428,7 @@ class FFLogs:
                 boss.encounter,
                 boss.difficulty,
                 dps_type,
+                boss.partition,
             )
         except DataException as e:
             return f"{e}，请稍后再试"

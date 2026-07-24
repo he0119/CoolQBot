@@ -42,7 +42,7 @@ async def fflogs_data(app: App) -> dict[str, Any]:
 
 
 @pytest.fixture
-async def fflogs_character_rankings(app: App) -> dict[str, Any]:
+async def fflogs_character_rankings(app: App) -> list[dict[str, Any]]:
     path = Path(__file__).parent / "fflogs_character_rankings.json"
     with path.open("r", encoding="utf-8") as f:
         data = json.load(f)
@@ -105,9 +105,11 @@ async def test_dps_help(app: App, mocker: MockerFixture):
         ctx.should_finished(fflogs_cmd)
 
 
-async def test_dps_missing_token(app: App):
+async def test_dps_missing_token(app: App, mocker: MockerFixture):
     """测试 FFLOGS，缺少 Token 的情况"""
-    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_config
+
+    mocker.patch.object(plugin_config, "fflogs_token", None)
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -279,7 +281,7 @@ async def test_dps_character_rankings(
     mocker: MockerFixture,
     respx_mock: MockRouter,
     fflogs_data: dict[str, Any],
-    fflogs_character_rankings: dict[str, Any],
+    fflogs_character_rankings: list[dict[str, Any]],
 ):
     """测试角色排行榜"""
     from src.plugins.ff14.plugins.ff14_fflogs import fflogs, fflogs_cmd, plugin_config
@@ -338,6 +340,51 @@ async def test_dps_character_rankings(
 
     assert fflogs_data_mock.call_count == 1
     assert user_dps_mock.call_count == 3
+
+
+@respx.mock(assert_all_called=True)
+async def test_dps_character_rankings_with_partition(
+    app: App,
+    mocker: MockerFixture,
+    respx_mock: MockRouter,
+    fflogs_data: dict[str, Any],
+    fflogs_character_rankings: list[dict[str, Any]],
+):
+    """测试查询指定版本的绝本角色排行榜。"""
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_config
+
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
+    fflogs_character_rankings[0].update(
+        {
+            "encounterID": 1050,
+            "encounterName": "亚历山大绝境战",
+            "difficulty": 100,
+            "ilvlKeyOrPatch": 5.5,
+        }
+    )
+
+    fflogs_data_mock = respx_mock.get("https://bot-docs.hehome.xyz/fflogs_data.json").mock(
+        return_value=httpx.Response(200, json=fflogs_data)
+    )
+    user_dps_mock = respx_mock.get(
+        "https://cn.fflogs.com/v1/rankings/character/name/server/CN?zone=32&encounter=1050&metric=rdps&partition=21&api_key=test"
+    ).mock(return_value=httpx.Response(200, json=fflogs_character_rankings))
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/dps 绝亚 name server"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "亚历山大绝境战(5.5) name-server 的排名(rdps)\n白魔法师(17624/24314) 27.51% 4790.83",
+            True,
+        )
+        ctx.should_finished(fflogs_cmd)
+
+    assert fflogs_data_mock.call_count == 1
+    assert user_dps_mock.call_count == 1
 
 
 async def test_dps_character_rankings_not_bind(app: App, mocker: MockerFixture):
@@ -532,3 +579,96 @@ async def test_dps_job_rankings(
             mocker.call(year=2023, month=4, day=15),
         ]  # type: ignore
     )
+
+
+@respx.mock(assert_all_called=True)
+async def test_dps_job_rankings_with_frozen_partition(
+    app: App,
+    mocker: MockerFixture,
+    respx_mock: MockRouter,
+    fflogs_data: dict[str, Any],
+    fflogs_job_rankings: dict[str, Any],
+):
+    """没有结束时间的冻结绝本分区应查询整个分区。"""
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_config
+
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
+
+    fflogs_data_mock = respx_mock.get("https://bot-docs.hehome.xyz/fflogs_data.json").mock(
+        return_value=httpx.Response(200, json=fflogs_data)
+    )
+    rankings_mock = respx_mock.get(
+        "https://cn.fflogs.com/v1/rankings/encounter/1050?metric=rdps&difficulty=100&spec=13&page=1&partition=21&api_key=test"
+    ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings))
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/dps 绝亚 白魔"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "亚历山大绝境战(5.5) 白魔法师 的数据(rdps)\n数据总数：86 条\n100% : 6603.57\n99% : 6603.57\n95% : 6306.06\n75% : 5523.09\n50% : 5214.54\n25% : 4892.16\n10% : 4414.67",
+            True,
+        )
+        ctx.should_finished(fflogs_cmd)
+
+    assert fflogs_data_mock.call_count == 1
+    assert rankings_mock.call_count == 1
+
+
+@respx.mock(assert_all_called=True)
+async def test_dps_job_rankings_with_partition_end(
+    app: App,
+    mocker: MockerFixture,
+    respx_mock: MockRouter,
+    fflogs_data: dict[str, Any],
+    fflogs_job_rankings: dict[str, Any],
+    fflogs_job_rankings_empty: dict[str, Any],
+):
+    """有结束时间的历史分区应查询结束前的指定天数。"""
+    from src.plugins.ff14.plugins.ff14_fflogs import fflogs_cmd, plugin_config
+
+    mocker.patch.object(plugin_config, "fflogs_range", 2)
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
+    fflogs_data["boss"].append(
+        {
+            "name": "巴哈姆特绝境战(7.4)",
+            "nicknames": ["绝巴7.4"],
+            "zone": 59,
+            "encounter": 1073,
+            "difficulty": 100,
+            "partition": 33,
+            "version": "7.4",
+            "partition_end": 1681574400,
+            "partition_frozen": True,
+        }
+    )
+
+    fflogs_data_mock = respx_mock.get("https://bot-docs.hehome.xyz/fflogs_data.json").mock(
+        return_value=httpx.Response(200, json=fflogs_data)
+    )
+    rankings_15_mock = respx_mock.get(
+        "https://cn.fflogs.com/v1/rankings/encounter/1073?metric=rdps&difficulty=100&spec=13&page=1&filter=date.1681488000000.1681574400000&partition=33&api_key=test"
+    ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings))
+    rankings_14_mock = respx_mock.get(
+        "https://cn.fflogs.com/v1/rankings/encounter/1073?metric=rdps&difficulty=100&spec=13&page=1&filter=date.1681401600000.1681488000000&partition=33&api_key=test"
+    ).mock(return_value=httpx.Response(200, json=fflogs_job_rankings_empty))
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/dps 绝巴7.4 白魔"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "巴哈姆特绝境战(7.4) 白魔法师 的数据(rdps)\n数据总数：86 条\n100% : 6603.57\n99% : 6603.57\n95% : 6306.06\n75% : 5523.09\n50% : 5214.54\n25% : 4892.16\n10% : 4414.67",
+            True,
+        )
+        ctx.should_finished(fflogs_cmd)
+
+    assert fflogs_data_mock.call_count == 1
+    assert rankings_15_mock.call_count == 1
+    assert rankings_14_mock.call_count == 1

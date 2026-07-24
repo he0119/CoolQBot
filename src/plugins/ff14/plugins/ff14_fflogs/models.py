@@ -18,14 +18,18 @@ class BossInfo(BaseModel):
     zone: int
     encounter: int
     difficulty: int
-    """副本难度难度
+    """副本难度
 
-    绝本的难度是 101
+    绝本的难度是 100
 
-    零式副本的难度是 101，普通的则是 100
-
-    极神也是 100
+    零式副本的难度是 101，普通和极神是 100
     """
+    partition: int | None = None
+    """FFLogs 排行榜分区，绝本使用该字段区分不同版本。"""
+    version: str | None = None
+    partition_end: int | None = None
+    """分区结束时间，Unix 时间戳（秒）。"""
+    partition_frozen: bool = False
 
 
 class JobInfo(BaseModel):
@@ -55,11 +59,17 @@ class Brackets(BaseModel):
 
 
 class Partition(BaseModel):
+    id: int | None = None
     name: str
     compact: str
     area: int | None = None
     default: bool | None = None
     filtered_name: str | None = None
+    patch: str | None = None
+    partition_type: str | None = Field(default=None, alias="partitionType")
+    start_time: int | None = Field(default=None, alias="startTime")
+    end_time: int | None = Field(default=None, alias="endTime")
+    frozen: bool | None = None
 
 
 class Zones(BaseModel):
@@ -100,7 +110,7 @@ class Ranking(BaseModel):
     rDPS: float
     nDPS: float
     pDPS: float
-    rank: int
+    rank: int | None = None
 
 
 class FFLogsRanking(BaseModel):
@@ -124,7 +134,7 @@ class CharacterRanking(BaseModel):
     difficulty: int
     """副本难度难度
 
-    绝本的难度是 101
+    绝本的难度是 100
 
     零式副本的难度是 101，普通的则是 100
 

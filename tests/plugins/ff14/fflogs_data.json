@@ -339,11 +339,14 @@
       "difficulty": 101
     },
     {
-      "name": "亚历山大绝境战",
+      "name": "亚历山大绝境战(5.5)",
       "nicknames": ["绝亚"],
       "zone": 32,
       "encounter": 1050,
-      "difficulty": 101
+      "difficulty": 100,
+      "partition": 21,
+      "version": "5.5",
+      "partition_frozen": true
     },
     {
       "name": "伊甸希望乐园 共鸣之章1",
