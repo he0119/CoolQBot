@@ -1,5 +1,5 @@
 FROM python:3.14.6-slim-bookworm
-COPY --from=ghcr.io/astral-sh/uv:0.11.26 /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.11.32 /uv /bin/uv
 
 # 编译参数
 ARG VERSION
