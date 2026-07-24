@@ -20,13 +20,13 @@ jobs:
       version: ${{ steps.setVersion.outputs.version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set timezone
         run: sudo timedatectl set-timezone 'Asia/Shanghai'
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v8.3.2
+        uses: astral-sh/setup-uv@v9.0.0
         with:
           enable-cache: true
 
@@ -69,7 +69,7 @@ jobs:
         image: jacoblincool/playwright:chromium-server-1.61.1
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
@@ -86,7 +86,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Cache buildkit
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         id: cache
         with:
           path: cache-mount
@@ -211,7 +211,7 @@ jobs:
     if: github.event_name != 'pull_request'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Create Sentry release
         uses: getsentry/action-release@v3
