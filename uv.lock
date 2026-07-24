@@ -675,7 +675,7 @@ requires-dist = [
     { name = "nonebot-plugin-alisten", specifier = ">=0.4.3" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-datastore", specifier = ">=1.3.1" },
-    { name = "nonebot-plugin-deepseek", specifier = "==0.2.1" },
+    { name = "nonebot-plugin-deepseek", specifier = "==0.3.0" },
     { name = "nonebot-plugin-htmlrender", extras = ["filehost", "prometheus", "sentry"], specifier = ">=0.7.2" },
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4" },
     { name = "nonebot-plugin-memes", specifier = "==0.8.1" },
@@ -1949,7 +1949,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-deepseek"
-version = "0.2.1"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1959,9 +1959,9 @@ dependencies = [
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8c/14/5fd4d74053c9c858114a123bea2f325a8b6137210bc53ca3b756d73de18e/nonebot_plugin_deepseek-0.2.1.tar.gz", hash = "sha256:2f348276507174a7f4df108368b75f1286c61a6b8d44a342880fc343c3773a08", size = 27379, upload-time = "2026-05-04T08:45:13.502Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/05/2d/7367695ba0cd8c7e563fa2e1d6f0a21ab2260093d477837306b7e80ada59/nonebot_plugin_deepseek-0.3.0.tar.gz", hash = "sha256:dd57c67660d6c6ea870add7c24c3cd2756142fbe5dcdcf0f56bfe06095c185be", size = 27799, upload-time = "2026-07-24T04:46:20.339Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/94/a8/b07f673f8cbfc5571f69c6355644bd52e12de7675bcaa8e4c93310579fc0/nonebot_plugin_deepseek-0.2.1-py3-none-any.whl", hash = "sha256:3f184c0fe3cd8170d1ddbf04eecec7ca7e8f6b6df35f1788784b44edeed466bb", size = 37196, upload-time = "2026-05-04T08:45:12.228Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/b4/2397f9d94ec4e46406a66e162c98f95d922a234d4a192e46cce3a90f9289/nonebot_plugin_deepseek-0.3.0-py3-none-any.whl", hash = "sha256:bbcf51935cd12049fe9b2fb6ee5029fee843f253f556e4bdd76029a7b7e08c19", size = 37532, upload-time = "2026-07-24T04:46:19.354Z" },
 ]
 
 [[package]]
