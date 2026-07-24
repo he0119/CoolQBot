@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 插件适配 QQ 适配器
+
 ## [0.27.7] - 2026-05-15
 
 ### Added
