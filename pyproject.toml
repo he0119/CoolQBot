@@ -26,15 +26,16 @@ dependencies = [
     "nonebot-adapter-feishu>=2.7.2",
     "nonebot-plugin-wordcloud>=0.11.1",
     "nonebot-plugin-treehelp>=0.5.0",
-    "nonebot-plugin-user[inspect]>=0.6.0",
+    "nonebot-plugin-user[inspect]>=0.6.1",
     "nonebot-plugin-alisten>=0.4.3",
     "nonebot-plugin-orm[default]>=0.8.3",
     "nonebot-plugin-apscheduler>=0.5.0",
     "nonebot-plugin-send-anything-anywhere>=0.7.1",
     "nonebot-plugin-uninfo>=0.11.1",
-    "nonebot-plugin-alconna>=0.62.0",
+    "nonebot-plugin-alconna>=0.62.1",
     "nonebot-plugin-datastore>=1.3.1",
     "nonebot-plugin-localstore>=0.7.4",
+    "nonebot-plugin-permission>=0.3.1",
     "nonebot-session-to-uninfo>=0.0.2",
     "nonebot-plugin-sentry>=2.0.0",
     "nonebot-plugin-memes==0.8.1",
@@ -45,9 +46,8 @@ dependencies = [
     "nonebot-plugin-zssm==0.3.7",
     "nonebot-plugin-abs==1.1.0",
     "nonebot-plugin-parser[htmlkit]==2.6.6",
-    "nonebot-plugin-htmlrender[filehost,prometheus,sentry]>=0.7.1",
+    "nonebot-plugin-htmlrender[filehost,prometheus,sentry]>=0.7.2",
     "playwright==1.61.0",
-    "nonebot-plugin-permission",
 ]
 
 [project.urls]
@@ -84,9 +84,7 @@ override-dependencies = [
 universal = true
 
 [tool.uv.sources]
-nonebot-plugin-alconna = { git = "https://github.com/nonebot/plugin-alconna.git" }
 nonebot-plugin-zssm = { git = "https://github.com/djkcyl/nonebot-plugin-zssm.git" }
-nonebot-plugin-permission = { git = "https://github.com/he0119/nonebot-plugin-permission.git", branch = "fix/coolqbot" }
 
 [tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
