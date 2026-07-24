@@ -688,7 +688,7 @@ requires-dist = [
     { name = "nonebot-plugin-status", specifier = "==0.9.0" },
     { name = "nonebot-plugin-treehelp", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-uninfo", specifier = ">=0.11.1" },
-    { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.6.0" },
+    { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.6.1" },
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.11.1" },
     { name = "nonebot-plugin-zssm", git = "https://github.com/djkcyl/nonebot-plugin-zssm.git" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
@@ -2249,7 +2249,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-user"
-version = "0.6.0"
+version = "0.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "expiringdictx" },
@@ -2258,9 +2258,9 @@ dependencies = [
     { name = "nonebot-plugin-uninfo" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1a/5d/fa839f1e4b1081c70ea2f63195478ba7c7e8cee6a028d8c86a84511078cc/nonebot_plugin_user-0.6.0.tar.gz", hash = "sha256:1fb595dc2f1826aed216097a27b971b1d374ba42531a4bbe37e5ce9366c5d429", size = 11478, upload-time = "2026-06-02T10:26:53.828Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/63/76/bc28a7e1a4f14dac66f2d5a4da6923b0c4f8f46e79b9b1e21029a56971db/nonebot_plugin_user-0.6.1.tar.gz", hash = "sha256:e50d78b6f1a33c9fa9a47c5cdad1b3cee1bc04565de8d3058d3fde794ad376e0", size = 11498, upload-time = "2026-07-24T04:39:40.772Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/91/28/10a308da3c32e816f8b52311d753b556dbc35f5e24a7d90558c75c6f2e60/nonebot_plugin_user-0.6.0-py3-none-any.whl", hash = "sha256:3768ab8b884e469e5460136d3f230cf0e4854a4954ffd02216c6f13134ef9b85", size = 15851, upload-time = "2026-06-02T10:26:52.725Z" },
+    { url = "https://files.pythonhosted.org/packages/bb/61/5f6d375f7ffb619be23ba1e06f10179fbfa61c0b569ca0a683a51b8c1b52/nonebot_plugin_user-0.6.1-py3-none-any.whl", hash = "sha256:57e322e62a3930e42ffddfdce1921c18d5470571096e7967f5bd41f43a8abe15", size = 15833, upload-time = "2026-07-24T04:39:39.487Z" },
 ]
 
 [package.optional-dependencies]
