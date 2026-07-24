@@ -67,8 +67,15 @@
     {
       groupName: "Python version",
       matchPackageNames: ["python"],
-      matchManagers: ["dockerfile", "pyenv", "pep621"],
+      matchManagers: ["dockerfile", "pyenv"],
       description: "Weekly update of Python version",
+    },
+    {
+      groupName: "Project Python version",
+      matchPackageNames: ["python"],
+      matchManagers: ["pep621"],
+      matchUpdateTypes: ["major", "minor"],
+      description: "Weekly update of project Python version",
     },
     {
       groupName: "pre-commit dependencies",
