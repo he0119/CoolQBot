@@ -69,7 +69,7 @@ dev = [
     "freezegun>=1.5.5",
     "beautifulsoup4>=4.15.0",
     "poethepoet>=0.48.0",
-    "inline-snapshot>=0.34.2",
+    "inline-snapshot>=0.35.2",
 ]
 
 [tool.uv]
