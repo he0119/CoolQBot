@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-07-24
+
 ### Added
 
 - 插件适配 QQ 适配器
@@ -783,7 +785,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.27.7...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.28.0...HEAD
+[0.28.0]: https://github.com/he0119/CoolQBot/compare/v0.27.7...v0.28.0
 [0.27.7]: https://github.com/he0119/CoolQBot/compare/v0.27.6...v0.27.7
 [0.27.6]: https://github.com/he0119/CoolQBot/compare/v0.27.5...v0.27.6
 [0.27.5]: https://github.com/he0119/CoolQBot/compare/v0.27.4...v0.27.5
