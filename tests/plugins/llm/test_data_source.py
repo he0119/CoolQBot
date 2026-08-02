@@ -75,31 +75,44 @@ async def test_set_and_get_tts_model(app: App, mocker):
 
 
 def test_model_config_defaults(app: App):
-    """模型配置的默认值：model 跟随 name，base_url 按格式选取"""
-    from src.plugins.llm.config import ModelConfig
+    """模型配置的默认值：model 跟随 name，解析时按格式选取 base_url"""
+    from src.plugins.llm.config import ModelConfig, ScopedConfig
 
     chat = ModelConfig(name="deepseek-chat")
     assert chat.model == "deepseek-chat"
-    assert chat.base_url == "https://api.deepseek.com"
 
     anthropic = ModelConfig(name="claude", provider="anthropic", model="claude-opus-5")
     assert anthropic.model == "claude-opus-5"
-    assert anthropic.base_url == "https://api.anthropic.com"
+
+    config = ScopedConfig(models=[chat, anthropic])
+    assert config.resolve("deepseek-chat").base_url == "https://api.deepseek.com"
+    assert config.resolve("claude").base_url == "https://api.anthropic.com"
 
 
 def test_resolve_falls_back_to_global(app: App, mocker):
-    """模型未单独配置时回退到全局密钥与人设"""
+    """模型未单独配置时回退到全局服务地址、密钥与人设"""
     from src.plugins.llm.config import ModelConfig, plugin_config
 
-    mocker.patch.object(plugin_config, "models", [ModelConfig(name="a"), ModelConfig(name="b", api_key="sk-own")])
+    mocker.patch.object(
+        plugin_config,
+        "models",
+        [
+            ModelConfig(name="a"),
+            ModelConfig(name="b", base_url="https://model.example.com", api_key="sk-own"),
+        ],
+    )
+    mocker.patch.object(plugin_config, "base_url", "https://global.example.com")
     mocker.patch.object(plugin_config, "api_key", "sk-global")
     mocker.patch.object(plugin_config, "prompt", "你是助手")
 
+    assert plugin_config.resolve("a").base_url == "https://global.example.com"
     assert plugin_config.resolve("a").api_key == "sk-global"
     assert plugin_config.resolve("a").prompt == "你是助手"
-    # 已单独配置的密钥不被覆盖
+    # 已单独配置的服务地址与密钥不被覆盖
+    assert plugin_config.resolve("b").base_url == "https://model.example.com"
     assert plugin_config.resolve("b").api_key == "sk-own"
     # resolve 返回副本，不污染原配置
+    assert plugin_config.get_model("a").base_url == ""
     assert plugin_config.get_model("a").api_key == ""
 
 

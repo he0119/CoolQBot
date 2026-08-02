@@ -3,8 +3,9 @@
 环境变量以 `LLM__` 前缀嵌套配置，例如：
 
 ```env
+LLM__BASE_URL=https://api.example.com
 LLM__API_KEY=sk-xxx
-LLM__MODELS='[{"name":"claude","provider":"anthropic","model":"claude-opus-5","base_url":"https://api.anthropic.com","api_key":"sk-ant-xxx"}]'
+LLM__MODELS='[{"name":"model-a","provider":"chat"}]'
 ```
 """
 
@@ -34,7 +35,7 @@ class ModelConfig(BaseModel):
     provider: ProviderName = "chat"
     """API 格式"""
     base_url: str = ""
-    """服务地址，留空时按格式取默认值"""
+    """服务地址，留空时回退到全局 base_url 或按格式取默认值"""
     api_key: str = ""
     """密钥，留空时回退到全局 api_key"""
     prompt: str = ""
@@ -56,14 +57,14 @@ class ModelConfig(BaseModel):
     def fill_defaults(self) -> "ModelConfig":
         if not self.model:
             self.model = self.name
-        if not self.base_url:
-            self.base_url = DEFAULT_BASE_URLS[self.provider]
         return self
 
 
 class ScopedConfig(BaseModel):
     """大模型插件配置"""
 
+    base_url: str = ""
+    """全局服务地址，未单独配置服务地址的模型都使用它"""
     api_key: str = ""
     """全局密钥，未单独配置密钥的模型都使用它"""
     models: list[ModelConfig] = Field(default_factory=list)
@@ -106,6 +107,8 @@ class ScopedConfig(BaseModel):
         返回副本，避免污染原始配置。
         """
         model = self.get_model(name).model_copy()
+        if not model.base_url:
+            model.base_url = self.base_url or DEFAULT_BASE_URLS[model.provider]
         if not model.api_key:
             model.api_key = self.api_key
         if not model.prompt:
