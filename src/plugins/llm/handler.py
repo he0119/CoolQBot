@@ -10,6 +10,7 @@ import asyncio
 import re
 from time import perf_counter
 from typing import TYPE_CHECKING
+from uuid import uuid4
 
 from nonebot.log import logger
 from nonebot_plugin_alconna import UniMessage
@@ -30,10 +31,10 @@ THINKING_SEPARATOR = "\n\n--------------------\n\n"
 """推理内容与正文之间的分隔线"""
 
 
-async def chat(model_name: str, messages: list[Message]) -> Completion:
+async def chat(model_name: str, messages: list[Message], *, session_affinity: str = "") -> Completion:
     """发起一次对话请求"""
     model = plugin_config.resolve(model_name)
-    provider = get_provider(model.provider)(model)
+    provider = get_provider(model.provider)(model, session_affinity=session_affinity)
     tools = registry.to_params()
     return await provider.chat(messages, tools or None)
 
@@ -91,10 +92,12 @@ class LLMHandler:
         self,
         model_name: str,
         *,
+        session_affinity: str | None = None,
         send_md_pic: bool = False,
         tts_model: str = "",
     ) -> None:
         self.model_name = model_name
+        self.session_affinity = session_affinity or uuid4().hex
         self.send_md_pic = send_md_pic
         self.tts_model = tts_model
         self.context: list[Message] = []
@@ -112,7 +115,7 @@ class LLMHandler:
         self.context.append(Message.user(content, images))
 
         started_at = perf_counter()
-        completion = await chat(self.model_name, self.context)
+        completion = await chat(self.model_name, self.context, session_affinity=self.session_affinity)
         total_usage = completion.usage
         actual_model = completion.model
         for _ in range(plugin_config.max_tool_rounds):
@@ -120,7 +123,7 @@ class LLMHandler:
                 break
             self.context.append(completion.message)
             await execute_tool_calls(completion.tool_calls, self.context)
-            completion = await chat(self.model_name, self.context)
+            completion = await chat(self.model_name, self.context, session_affinity=self.session_affinity)
             total_usage = total_usage + completion.usage
             actual_model = completion.model or actual_model
 

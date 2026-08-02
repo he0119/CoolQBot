@@ -1,12 +1,18 @@
 """测试三种 API 格式的请求构造与响应解析"""
 
 import json
+import tomllib
+from pathlib import Path
 
 import httpx
 import pytest
 import respx
 from nonebug import App
 from respx import MockRouter
+
+PROJECT_VERSION = tomllib.loads((Path(__file__).parents[3] / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+    "version"
+]
 
 
 def make_config(provider: str, **kwargs):
@@ -64,6 +70,8 @@ async def test_chat_request_and_response(app: App, respx_mock: MockRouter):
     request = route.calls[0].request
     payload = json.loads(request.content)
     assert request.headers["authorization"] == "Bearer sk-test"
+    assert request.headers["user-agent"] == f"CoolQBot/{PROJECT_VERSION}"
+    assert "x-session-affinity" not in request.headers
     # system 作为普通消息留在 messages 里
     assert payload["messages"][0] == {"role": "system", "content": "你是一个助手"}
     assert payload["messages"][1] == {"role": "user", "content": "你好"}
@@ -135,13 +143,16 @@ async def test_chat_stream(app: App, respx_mock: MockRouter):
         'data: {"model":"test-model","choices":[],"usage":{"prompt_tokens":3,"completion_tokens":2}}\n\n',
         "data: [DONE]\n\n",
     ]
-    respx_mock.post("https://api.example.com/chat/completions").mock(
+    route = respx_mock.post("https://api.example.com/chat/completions").mock(
         return_value=httpx.Response(200, text="".join(chunks))
     )
 
-    provider = ChatProvider(make_config("chat", stream=True))
+    provider = ChatProvider(make_config("chat", stream=True), session_affinity="test-affinity")
     completion = await provider.chat(make_messages())
 
+    request = route.calls[0].request
+    assert request.headers["user-agent"] == f"CoolQBot/{PROJECT_VERSION}"
+    assert request.headers["x-session-affinity"] == "test-affinity"
     assert completion.content == "你好"
     assert completion.reasoning == "想"
     assert completion.finish_reason == "stop"

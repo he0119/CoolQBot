@@ -1,6 +1,7 @@
 """测试 /llm 命令"""
 
 import json
+from uuid import UUID
 
 import httpx
 import pytest
@@ -27,6 +28,18 @@ def mock_models(mocker):
     mocker.patch.object(plugin_config, "models", [config])
     mocker.patch("src.plugins.llm.handler.perf_counter", side_effect=[10.0, 15.1])
     return config
+
+
+def test_session_affinity_is_per_conversation(app: App, mock_models):
+    """每个 LLM 对话上下文使用独立的随机亲和键"""
+    from src.plugins.llm.handler import LLMHandler
+
+    first = LLMHandler("test-model")
+    second = LLMHandler("test-model")
+
+    assert UUID(first.session_affinity).version == 4
+    assert UUID(second.session_affinity).version == 4
+    assert first.session_affinity != second.session_affinity
 
 
 @pytest.mark.asyncio
@@ -56,7 +69,7 @@ async def test_llm_not_configured(app: App):
 async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
     """发送 /llm 你好 得到模型回复"""
 
-    respx_mock.post("https://api.example.com/chat/completions").mock(
+    route = respx_mock.post("https://api.example.com/chat/completions").mock(
         return_value=httpx.Response(
             200,
             json={
@@ -82,6 +95,9 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
             Message("你好呀\n\n--- 5.1s  deepseek-v4-flash  I:1967 O:410 A:2377 C:1152"),
             True,
         )
+
+    request = route.calls[0].request
+    assert UUID(request.headers["x-session-affinity"]).version == 4
 
 
 @respx.mock(assert_all_called=True)
@@ -206,6 +222,9 @@ async def test_llm_with_tool(app: App, respx_mock: MockRouter, mock_models):
     assert payload["messages"][-1]["role"] == "tool"
     assert payload["messages"][-1]["tool_call_id"] == "call_1"
     assert payload["messages"][-1]["content"] == "晴，25 度"
+    affinities = {call.request.headers["x-session-affinity"] for call in respx_mock.calls}
+    assert len(affinities) == 1
+    assert UUID(affinities.pop()).version == 4
 
 
 @respx.mock(assert_all_called=True)

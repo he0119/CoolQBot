@@ -24,6 +24,13 @@
 - Markdown 转图片
 - TTS 语音回复（GPT-SoVITS）
 
+## 请求标识
+
+大模型请求会发送以下标识头：
+
+- `User-Agent: CoolQBot/<当前版本>`：版本读取自 `pyproject.toml` 的 `[project].version`。
+- `X-Session-Affinity: <随机会话 ID>`：每次创建 LLM 对话上下文时生成；同一轮工具调用和多轮对话保持一致，新的 `/llm` 调用会重新生成。不会发送群号或用户 ID。
+
 ## 命令
 
 | 命令                           | 别名  | 说明                  | 权限   |

@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import tomllib
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import httpx
@@ -13,6 +15,20 @@ if TYPE_CHECKING:
 
     from ..config import ModelConfig
     from ..schemas import Completion, Message, ToolParam
+
+
+def _get_bot_version() -> str:
+    """从项目 pyproject.toml 获取机器人版本"""
+    pyproject = Path(__file__).resolve().parents[4] / "pyproject.toml"
+    try:
+        with pyproject.open("rb") as file:
+            return str(tomllib.load(file)["project"]["version"])
+    except (KeyError, OSError, tomllib.TOMLDecodeError):
+        return "unknown"
+
+
+USER_AGENT = f"CoolQBot/{_get_bot_version()}"
+"""标识当前机器人版本的 User-Agent"""
 
 
 class ProviderError(Exception):
@@ -62,8 +78,9 @@ class Provider(ABC):
     子类只需实现请求体构造与响应解析，HTTP 交互由基类统一处理。
     """
 
-    def __init__(self, config: ModelConfig) -> None:
+    def __init__(self, config: ModelConfig, *, session_affinity: str = "") -> None:
         self.config = config
+        self.session_affinity = session_affinity
 
     @property
     @abstractmethod
@@ -96,6 +113,9 @@ class Provider(ABC):
         stream = bool(self.config.stream)
         payload = self.build_payload(messages, tools, stream=stream)
         headers = self.build_headers()
+        headers["User-Agent"] = USER_AGENT
+        if self.session_affinity:
+            headers["X-Session-Affinity"] = self.session_affinity
 
         try:
             if stream:
