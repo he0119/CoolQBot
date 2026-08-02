@@ -100,6 +100,20 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
     assert UUID(request.headers["x-session-affinity"]).version == 4
 
 
+async def test_llm_rejects_unknown_model(app: App, mock_models):
+    """单次指定未启用模型时给出明确提示"""
+    from src.plugins.llm import llm_cmd
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/llm 你好 --model missing"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "未启用的模型：missing，可用：test-model", True, at_sender=True)
+        ctx.should_finished(llm_cmd)
+
+
 @respx.mock(assert_all_called=True)
 async def test_llm_with_thinking(app: App, respx_mock: MockRouter, mock_models, mocker):
     """开启推理内容展示时附带思考过程"""

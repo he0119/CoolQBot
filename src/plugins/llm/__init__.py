@@ -175,12 +175,21 @@ async def llm_handle(
         await llm_cmd.finish("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
 
     # 未指定模型时使用群组默认模型
+    model_names = plugin_config.get_model_names()
     name = model_name.result if model_name.available else await get_model_name(user.session_id)
+    if name not in model_names:
+        await llm_cmd.finish(f"未启用的模型：{name}，可用：{'、'.join(model_names)}", at_sender=True)
+
     tts_model = await get_tts_model(user.session_id) if use_tts.result else ""
     if use_tts.result and not tts_model:
         await llm_cmd.finish("未设置 TTS 模型，请先使用 /llm tts --set 设置", at_sender=True)
 
-    images = [ImageContent(data=img.result)] if img.available else None
+    images: list[ImageContent] | None = None
+    if img.available:
+        try:
+            images = [ImageContent.from_bytes(img.result)]
+        except ValueError as e:
+            await llm_cmd.finish(str(e), at_sender=True)
     text = " ".join(content.result) if content.available else ""
 
     handler = LLMHandler(

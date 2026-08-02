@@ -572,6 +572,30 @@ async def test_anthropic_stream(app: App, respx_mock: MockRouter):
 # ------------------------------------------------------------------ 其他
 
 
+@pytest.mark.parametrize(
+    ("data", "mimetype"),
+    [
+        (b"\x89PNG\r\n\x1a\nrest", "image/png"),
+        (b"\xff\xd8\xffrest", "image/jpeg"),
+        (b"GIF89arest", "image/gif"),
+        (b"RIFF\x04\x00\x00\x00WEBPrest", "image/webp"),
+    ],
+)
+def test_image_content_detects_mimetype(app: App, data: bytes, mimetype: str):
+    """命令入口取得原始字节后应按文件签名识别媒体类型"""
+    from src.plugins.llm.schemas import ImageContent
+
+    assert ImageContent.from_bytes(data).mimetype == mimetype
+
+
+def test_image_content_rejects_unknown_format(app: App):
+    """不支持的附件不能伪装成 PNG 发送给供应商"""
+    from src.plugins.llm.schemas import ImageContent
+
+    with pytest.raises(ValueError, match="不支持的图片格式"):
+        ImageContent.from_bytes(b"not-an-image")
+
+
 @respx.mock(assert_all_called=True)
 async def test_stream_request_keeps_timeout(app: App, respx_mock: MockRouter, mocker):
     """流式请求使用读取空闲超时，而不是关闭全部超时"""

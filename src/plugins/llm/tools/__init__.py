@@ -24,7 +24,7 @@ from __future__ import annotations
 import inspect
 import json
 import re
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, get_type_hints
 
 from ..schemas import ToolParam
 
@@ -65,12 +65,16 @@ class ToolRegistry:
 
         def decorator(func: Callable) -> Callable:
             signature = inspect.signature(func)
+            try:
+                annotations = get_type_hints(func)
+            except (NameError, TypeError):
+                annotations = {}
             param_docs = _parse_param_docs(func.__doc__ or "")
             properties: dict[str, Any] = {}
             required: list[str] = []
 
             for param_name, param in signature.parameters.items():
-                annotation = param.annotation
+                annotation = annotations.get(param_name, param.annotation)
                 properties[param_name] = {
                     "type": _TYPE_TO_SCHEMA.get(annotation, "string"),
                     "description": param_docs.get(param_name, ""),

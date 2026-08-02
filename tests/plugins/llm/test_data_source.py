@@ -143,6 +143,21 @@ async def test_tool_registry(app: App):
     assert result == "3"
 
 
+def test_tool_registry_resolves_postponed_annotations(app: App):
+    """future annotations 仍应生成正确的 JSON Schema 类型"""
+    from src.plugins.llm.tools import ToolRegistry
+
+    def configure(count: "int", enabled: "bool") -> str:
+        return f"{count}:{enabled}"
+
+    registry = ToolRegistry()
+    registry.register("configure", "修改配置")(configure)
+
+    properties = registry.to_params()[0].parameters["properties"]
+    assert properties["count"]["type"] == "integer"
+    assert properties["enabled"]["type"] == "boolean"
+
+
 async def test_tool_registry_errors(app: App):
     """未注册工具与缺少参数时返回错误描述而非抛出异常"""
     from src.plugins.llm.schemas import ToolCall

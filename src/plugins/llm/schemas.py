@@ -23,6 +23,21 @@ class ImageContent:
     mimetype: str = "image/png"
     """图片类型"""
 
+    @classmethod
+    def from_bytes(cls, data: bytes) -> ImageContent:
+        """根据文件签名构造图片内容"""
+        if data.startswith(b"\x89PNG\r\n\x1a\n"):
+            mimetype = "image/png"
+        elif data.startswith(b"\xff\xd8\xff"):
+            mimetype = "image/jpeg"
+        elif data.startswith((b"GIF87a", b"GIF89a")):
+            mimetype = "image/gif"
+        elif len(data) >= 12 and data.startswith(b"RIFF") and data[8:12] == b"WEBP":
+            mimetype = "image/webp"
+        else:
+            raise ValueError("不支持的图片格式，仅支持 PNG、JPEG、GIF 和 WebP")
+        return cls(data=data, mimetype=mimetype)
+
     def to_base64(self) -> str:
         """转换为 base64 字符串（不含 data URI 前缀）"""
         return base64.b64encode(self.data).decode()
