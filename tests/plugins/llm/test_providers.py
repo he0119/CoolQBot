@@ -484,9 +484,7 @@ def test_anthropic_thinking_blocks_round_trip(app: App):
         }
     )
 
-    payload = provider.build_payload(
-        [Message.user("天气"), completion.message, Message.tool("toolu_1", "晴")]
-    )
+    payload = provider.build_payload([Message.user("天气"), completion.message, Message.tool("toolu_1", "晴")])
 
     assert payload["messages"][1] == {"role": "assistant", "content": content}
 
@@ -654,10 +652,7 @@ async def test_responses_failed_event_raises(app: App, respx_mock: MockRouter):
     """Responses 的 response.failed 事件应转换为 ProviderError"""
     from src.plugins.llm.providers import ProviderError, ResponsesProvider
 
-    chunks = [
-        'event: response.failed\ndata: {"response":{"status":"failed",'
-        '"error":{"message":"响应生成失败"}}}\n\n'
-    ]
+    chunks = ['event: response.failed\ndata: {"response":{"status":"failed","error":{"message":"响应生成失败"}}}\n\n']
     respx_mock.post("https://api.example.com/responses").mock(return_value=httpx.Response(200, text="".join(chunks)))
 
     provider = ResponsesProvider(make_config("responses", stream=True))
