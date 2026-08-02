@@ -272,7 +272,7 @@ async def test_llm_send_md_pic_fallback(app: App, respx_mock: MockRouter, mock_m
     """Markdown 渲染失败时退回文字回复"""
 
     # 直接让渲染函数失败，模拟 htmlrender 不可用
-    mocker.patch("src.plugins.llm.handler.render_markdown", return_value=None)
+    mocker.patch("src.plugins.llm.handler.try_render_markdown", return_value=None)
 
     respx_mock.post("https://api.example.com/chat/completions").mock(
         return_value=httpx.Response(

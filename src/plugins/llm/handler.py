@@ -137,22 +137,22 @@ class LLMHandler:
                 return
 
         if self.send_md_pic:
-            if image := await render_markdown(text):
+            if image := await try_render_markdown(text):
                 await UniMessage.image(raw=image).send()
                 return
 
         await UniMessage.text(text).send()
 
 
-async def render_markdown(text: str) -> bytes | None:
+async def try_render_markdown(text: str) -> bytes | None:
     """把 Markdown 渲染成图片，失败时返回 None 以便退回文字
 
     htmlrender 依赖浏览器环境，导入与渲染都可能失败，因此一并兜底。
     """
     try:
-        from nonebot_plugin_htmlrender import md_to_pic
+        from nonebot_plugin_htmlrender import render_markdown
 
-        return await md_to_pic(text)
+        return await render_markdown(text)
     except Exception as e:
         logger.opt(exception=e).warning("Markdown 渲染图片失败，改用文字回复")
         return None
