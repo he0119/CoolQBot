@@ -3,7 +3,7 @@
 通过 `@registry.register(name, description)` 装饰器注册工具，运行时根据模型
 请求的参数自动转换并执行，执行结果作为下一轮对话的上下文交回模型。
 
-本插件默认不注册任何工具，需要时在自己的模块中注册即可：
+业务插件按需向注册表登记工具。当前内置天气与节假日查询，也可以继续在自己的模块中注册：
 
 ```python
 from src.plugins.llm.tools import registry

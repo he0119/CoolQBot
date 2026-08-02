@@ -143,6 +143,13 @@ LLM__TTS_MODEL=default
 | `timeout`     | 非流式请求超时时间（秒）                                |
 | `extra_body`  | 附加到请求体的额外字段，用于传各服务商特有参数          |
 
+## 内置工具
+
+| 工具                   | 说明                                          |
+| ---------------------- | --------------------------------------------- |
+| `query_weather`        | 查询现实城市或最终幻想 XIV 艾欧泽亚地区的天气 |
+| `query_holiday_status` | 查询今天、周末、最近节假日以及调休安排        |
+
 ## 注册工具
 
 在自己的模块中向注册表登记工具，模型即可按需调用：
@@ -151,14 +158,14 @@ LLM__TTS_MODEL=default
 from src.plugins.llm.tools import registry
 
 
-@registry.register("get_weather", "查询指定城市的天气")
-async def get_weather(city: str) -> str:
-    """查询天气
+@registry.register("query_example", "查询示例数据")
+async def query_example(name: str) -> str:
+    """查询示例数据
 
     Args:
-        city: 城市名称
+        name: 查询名称
     """
-    return "晴，25 度"
+    return f"{name} 的查询结果"
 ```
 
 参数 schema 由函数签名与 docstring 的 `Args` 小节自动生成，无默认值的参数为必填。
