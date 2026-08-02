@@ -10,6 +10,8 @@ from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, MultiVar, 
 from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
 from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
+from src.plugins.llm.tools import registry
+
 from .eorzean_api import eorzean_weather
 from .heweather_api import heweather
 
@@ -65,8 +67,14 @@ async def weather_handle(location: tuple[str, ...]):
     await weather_cmd.finish(weather_report)
 
 
+@registry.register("query_weather", "查询现实城市或最终幻想 XIV 艾欧泽亚地区的天气")
 async def get_weather_of_location(location: str, adm: str | None = None) -> str:
-    """根据城市名与城市所属行政区划获取天气数据"""
+    """根据城市名与城市所属行政区划获取天气数据
+
+    Args:
+        location: 城市、地区或艾欧泽亚地点名称
+        adm: 同名城市所属的上级行政区，不确定或无需区分时省略
+    """
     # 艾欧泽亚的天气
     str_data = eorzean_weather(location)
     if not str_data:
