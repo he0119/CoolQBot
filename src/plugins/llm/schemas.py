@@ -141,6 +141,8 @@ class Completion:
     """实际使用的模型名"""
     finish_reason: str = ""
     """结束原因，已归一化为 stop / length / tool_calls / content_filter"""
+    elapsed_seconds: float = 0.0
+    """完成本次提问的耗时（秒）"""
 
     @property
     def content(self) -> str:

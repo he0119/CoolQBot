@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import re
+from time import perf_counter
 from typing import TYPE_CHECKING
 
 from nonebot.log import logger
@@ -53,12 +54,28 @@ def split_content(completion: Completion) -> tuple[str, str]:
     return THINK_PATTERN.sub("", content).strip(), reasoning
 
 
-def format_output(completion: Completion, *, with_thinking: bool) -> str:
+def format_statistics(completion: Completion) -> str:
+    """把本次提问的耗时、模型及 token 用量格式化为紧凑尾注"""
+    usage = completion.usage
+    model = completion.model or "unknown"
+    return (
+        f"--- {completion.elapsed_seconds:.1f}s  "
+        f"{model}  I:{usage.input_tokens} O:{usage.output_tokens} "
+        f"A:{usage.total_tokens} C:{usage.cache_read_tokens}"
+    )
+
+
+def format_output(completion: Completion, *, with_thinking: bool, with_statistics: bool = True) -> str:
     """把模型回复格式化为最终文本"""
     content, reasoning = split_content(completion)
     if with_thinking and reasoning:
-        return f"{reasoning}{THINKING_SEPARATOR}{content}" if content else reasoning
-    return content
+        text = f"{reasoning}{THINKING_SEPARATOR}{content}" if content else reasoning
+    else:
+        text = content
+
+    if text and with_statistics:
+        return f"{text}\n\n{format_statistics(completion)}"
+    return text
 
 
 async def execute_tool_calls(calls: list[ToolCall], context: list[Message]) -> None:
@@ -94,14 +111,22 @@ class LLMHandler:
         """
         self.context.append(Message.user(content, images))
 
+        started_at = perf_counter()
         completion = await chat(self.model_name, self.context)
+        total_usage = completion.usage
+        actual_model = completion.model
         for _ in range(plugin_config.max_tool_rounds):
             if not completion.tool_calls:
                 break
             self.context.append(completion.message)
             await execute_tool_calls(completion.tool_calls, self.context)
             completion = await chat(self.model_name, self.context)
+            total_usage = total_usage + completion.usage
+            actual_model = completion.model or actual_model
 
+        completion.usage = total_usage
+        completion.model = actual_model or plugin_config.resolve(self.model_name).model
+        completion.elapsed_seconds = perf_counter() - started_at
         self.context.append(completion.message)
         return completion
 
@@ -126,7 +151,7 @@ class LLMHandler:
 
         if self.tts_model:
             # 语音回复不朗读推理内容
-            spoken = format_output(completion, with_thinking=False) or text
+            spoken = format_output(completion, with_thinking=False, with_statistics=False) or text
             try:
                 audio = await text_to_speech(spoken, self.tts_model)
             except TTSError as e:
@@ -134,6 +159,7 @@ class LLMHandler:
                 await UniMessage.text(f"语音合成失败（{e}），以下是文字回复：").send()
             else:
                 await UniMessage.audio(raw=audio).send()
+                await UniMessage.text(format_statistics(completion)).send()
                 return
 
         if self.send_md_pic:

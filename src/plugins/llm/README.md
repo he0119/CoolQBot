@@ -20,7 +20,7 @@
 - 推理内容展示（DeepSeek 的 `reasoning_content`、Anthropic 的 `thinking`、Responses 的推理摘要）
 - 工具调用（function calling），三种格式自动适配
 - 图片输入（多模态）
-- 统一的 token 用量统计，含缓存命中与推理 token
+- 在回复末尾显示整轮耗时、实际模型和 token 用量，工具调用产生的多次请求会累计统计
 - Markdown 转图片
 - TTS 语音回复（GPT-SoVITS）
 

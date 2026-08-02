@@ -25,6 +25,7 @@ def mock_models(mocker):
         api_key="sk-test",
     )
     mocker.patch.object(plugin_config, "models", [config])
+    mocker.patch("src.plugins.llm.handler.perf_counter", side_effect=[10.0, 15.1])
     return config
 
 
@@ -59,8 +60,13 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
         return_value=httpx.Response(
             200,
             json={
-                "model": "test-model",
+                "model": "deepseek-v4-flash",
                 "choices": [{"finish_reason": "stop", "message": {"role": "assistant", "content": "你好呀"}}],
+                "usage": {
+                    "prompt_tokens": 1967,
+                    "completion_tokens": 410,
+                    "prompt_tokens_details": {"cached_tokens": 1152},
+                },
             },
         )
     )
@@ -71,7 +77,11 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
         event = fake_group_message_event_v11(message=Message("/llm 你好"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, Message("你好呀"), True)
+        ctx.should_call_send(
+            event,
+            Message("你好呀\n\n--- 5.1s  deepseek-v4-flash  I:1967 O:410 A:2377 C:1152"),
+            True,
+        )
 
 
 @respx.mock(assert_all_called=True)
@@ -103,7 +113,11 @@ async def test_llm_with_thinking(app: App, respx_mock: MockRouter, mock_models, 
         event = fake_group_message_event_v11(message=Message("/llm 你好"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, Message(f"在想{THINKING_SEPARATOR}你好呀"), True)
+        ctx.should_call_send(
+            event,
+            Message(f"在想{THINKING_SEPARATOR}你好呀\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0"),
+            True,
+        )
 
 
 @respx.mock(assert_all_called=True)
@@ -146,6 +160,11 @@ async def test_llm_with_tool(app: App, respx_mock: MockRouter, mock_models):
                             },
                         }
                     ],
+                    "usage": {
+                        "prompt_tokens": 10,
+                        "completion_tokens": 1,
+                        "prompt_tokens_details": {"cached_tokens": 3},
+                    },
                 },
             ),
             httpx.Response(
@@ -155,6 +174,11 @@ async def test_llm_with_tool(app: App, respx_mock: MockRouter, mock_models):
                     "choices": [
                         {"finish_reason": "stop", "message": {"role": "assistant", "content": "成都晴，25 度"}}
                     ],
+                    "usage": {
+                        "prompt_tokens": 20,
+                        "completion_tokens": 5,
+                        "prompt_tokens_details": {"cached_tokens": 2},
+                    },
                 },
             ),
         ]
@@ -167,7 +191,11 @@ async def test_llm_with_tool(app: App, respx_mock: MockRouter, mock_models):
             event = fake_group_message_event_v11(message=Message("/llm 成都天气"))
 
             ctx.receive_event(bot, event)
-            ctx.should_call_send(event, Message("成都晴，25 度"), True)
+            ctx.should_call_send(
+                event,
+                Message("成都晴，25 度\n\n--- 5.1s  test-model  I:30 O:6 A:36 C:5"),
+                True,
+            )
     finally:
         # 清理注册的工具，避免影响其他测试
         registry._registry.pop("get_weather", None)
@@ -291,4 +319,8 @@ async def test_llm_send_md_pic_fallback(app: App, respx_mock: MockRouter, mock_m
         event = fake_group_message_event_v11(message=Message("/llm -r 你好"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, Message("**加粗**"), True)
+        ctx.should_call_send(
+            event,
+            Message("**加粗**\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0"),
+            True,
+        )
