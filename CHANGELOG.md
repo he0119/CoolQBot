@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加大模型对话插件 (llm)，支持 Chat Completions、Responses 与 Anthropic Messages 三种 API 格式
+
 ## [0.28.0] - 2026-07-24
 
 ### Added
