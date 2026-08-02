@@ -64,6 +64,8 @@ class Message:
     """模型请求的工具调用，仅 assistant 消息有效"""
     tool_call_id: str = ""
     """所回复的工具调用 ID，仅 tool 消息有效"""
+    provider_data: dict[str, Any] = field(default_factory=dict)
+    """供应商协议的原始数据，仅用于后续请求无损回放"""
 
     @classmethod
     def user(cls, content: str, images: list[ImageContent] | None = None) -> Message:
@@ -71,9 +73,21 @@ class Message:
         return cls(role="user", content=content, images=images or [])
 
     @classmethod
-    def assistant(cls, content: str = "", reasoning: str = "", tool_calls: list[ToolCall] | None = None) -> Message:
+    def assistant(
+        cls,
+        content: str = "",
+        reasoning: str = "",
+        tool_calls: list[ToolCall] | None = None,
+        provider_data: dict[str, Any] | None = None,
+    ) -> Message:
         """构造助手消息"""
-        return cls(role="assistant", content=content, reasoning=reasoning, tool_calls=tool_calls or [])
+        return cls(
+            role="assistant",
+            content=content,
+            reasoning=reasoning,
+            tool_calls=tool_calls or [],
+            provider_data=provider_data or {},
+        )
 
     @classmethod
     def tool(cls, tool_call_id: str, content: str) -> Message:

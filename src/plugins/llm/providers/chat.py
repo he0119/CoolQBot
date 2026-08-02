@@ -95,6 +95,8 @@ class ChatProvider(Provider):
                 }
                 for call in message.tool_calls
             ]
+        if message.role == "assistant" and message.reasoning:
+            data["reasoning_content"] = message.reasoning
         return data
 
     def parse_response(self, data: dict[str, Any]) -> Completion:

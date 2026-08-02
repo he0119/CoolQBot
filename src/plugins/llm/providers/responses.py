@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 from typing import TYPE_CHECKING, Any
 
@@ -54,7 +55,7 @@ class ResponsesProvider(Provider):
                 if message.content:
                     system_parts.append(message.content)
                 continue
-            input_items.append(self._dump_item(message))
+            input_items.extend(self._dump_items(message))
         if system_parts:
             payload["instructions"] = "\n".join(system_parts)
         if input_items:
@@ -72,14 +73,23 @@ class ResponsesProvider(Provider):
         payload.update(self.config.extra_body)
         return payload
 
-    def _dump_item(self, message: Message) -> dict[str, Any]:
+    def _dump_items(self, message: Message) -> list[dict[str, Any]]:
         if message.role == "tool":
-            return {"type": "function_call_output", "call_id": message.tool_call_id, "output": message.content}
+            return [{"type": "function_call_output", "call_id": message.tool_call_id, "output": message.content}]
 
         if message.role == "assistant":
+            if raw_output := message.provider_data.get("responses_output"):
+                return copy.deepcopy(raw_output)
+
             output: list[dict[str, Any]] = []
             if message.content:
-                output.append({"type": "output_text", "text": message.content})
+                output.append(
+                    {
+                        "type": "message",
+                        "role": "assistant",
+                        "content": [{"type": "output_text", "text": message.content}],
+                    }
+                )
             for call in message.tool_calls:
                 output.append(
                     {
@@ -89,14 +99,14 @@ class ResponsesProvider(Provider):
                         "arguments": call.arguments_json(),
                     }
                 )
-            return {"type": "message", "role": "assistant", "content": output}
+            return output
 
         # user 消息
         content: list[dict[str, Any]] = []
         if message.content:
             content.append({"type": "input_text", "text": message.content})
         content.extend({"type": "input_image", "image_url": i.to_data_uri()} for i in message.images)
-        return {"type": "message", "role": "user", "content": content}
+        return [{"type": "message", "role": "user", "content": content}]
 
     def parse_response(self, data: dict[str, Any]) -> Completion:
         output_items = data.get("output") or []
@@ -117,6 +127,7 @@ class ResponsesProvider(Provider):
         call_ids: dict[str, str] = {}
         arguments: dict[str, str] = {}
         order: list[str] = []
+        raw_output: dict[int, dict[str, Any]] = {}
         usage = Usage()
         model = ""
 
@@ -132,14 +143,20 @@ class ResponsesProvider(Provider):
                 content.append(data.get("delta") or "")
             elif event in ("response.reasoning_summary_text.delta", "response.reasoning_text.delta"):
                 reasoning.append(data.get("delta") or "")
-            elif event == "response.output_item.added":
-                item = data.get("item") or {}
+            elif event in ("response.output_item.added", "response.output_item.done"):
+                item = copy.deepcopy(data.get("item") or {})
+                output_index = data.get("output_index")
+                if not isinstance(output_index, int):
+                    output_index = len(raw_output)
+                raw_output[output_index] = item
                 if item.get("type") == "function_call":
                     item_id = item.get("id") or item.get("call_id") or ""
                     if item_id not in order:
                         order.append(item_id)
                     names[item_id] = item.get("name") or ""
                     call_ids[item_id] = item.get("call_id") or item_id
+                    if item.get("arguments") is not None:
+                        arguments[item_id] = item["arguments"]
             elif event == "response.function_call_arguments.delta":
                 item_id = data.get("item_id") or ""
                 if item_id not in order:
@@ -167,6 +184,7 @@ class ResponsesProvider(Provider):
                 content="".join(content),
                 reasoning="".join(reasoning),
                 tool_calls=tool_calls,
+                provider_data={"responses_output": [item for _, item in sorted(raw_output.items())]},
             ),
             usage=usage,
             model=model,
@@ -196,7 +214,12 @@ class ResponsesProvider(Provider):
                     )
                 )
 
-        return Message.assistant(content="".join(text), reasoning="\n".join(reasoning), tool_calls=tool_calls)
+        return Message.assistant(
+            content="".join(text),
+            reasoning="\n".join(reasoning),
+            tool_calls=tool_calls,
+            provider_data={"responses_output": copy.deepcopy(output_items)},
+        )
 
     def _parse_usage(self, raw: dict[str, Any] | None) -> Usage:
         if not raw:

@@ -131,6 +131,41 @@ async def test_chat_tools_and_images(app: App, respx_mock: MockRouter):
     assert completion.tool_calls[0].arguments == {"city": "成都"}
 
 
+def test_chat_reasoning_content_round_trip(app: App):
+    """DeepSeek 工具回合需要原样回传 reasoning_content"""
+    from src.plugins.llm.providers import ChatProvider
+    from src.plugins.llm.schemas import Message
+
+    provider = ChatProvider(make_config("chat"))
+    completion = provider.parse_response(
+        {
+            "model": "test-model",
+            "choices": [
+                {
+                    "finish_reason": "tool_calls",
+                    "message": {
+                        "role": "assistant",
+                        "content": None,
+                        "reasoning_content": "需要查询天气",
+                        "tool_calls": [
+                            {
+                                "id": "call_1",
+                                "type": "function",
+                                "function": {"name": "get_weather", "arguments": '{"city":"成都"}'},
+                            }
+                        ],
+                    },
+                }
+            ],
+        }
+    )
+
+    payload = provider.build_payload([Message.user("天气"), completion.message, Message.tool("call_1", "晴")])
+
+    assert payload["messages"][1]["reasoning_content"] == "需要查询天气"
+    assert payload["messages"][1]["tool_calls"][0]["id"] == "call_1"
+
+
 @respx.mock(assert_all_called=True)
 async def test_chat_stream(app: App, respx_mock: MockRouter):
     """chat 格式：流式分片按 index 拼接，[DONE] 结束"""
@@ -252,21 +287,66 @@ async def test_responses_tool_call_and_result(app: App, respx_mock: MockRouter):
     assert completion.finish_reason == "tool_calls"
 
 
+def test_responses_output_items_round_trip(app: App):
+    """Responses 工具回合应把原始 output items 作为顶层 input items 回传"""
+    from src.plugins.llm.providers import ResponsesProvider
+    from src.plugins.llm.schemas import Message
+
+    output = [
+        {
+            "id": "rs_1",
+            "type": "reasoning",
+            "summary": [{"type": "summary_text", "text": "需要查询天气"}],
+        },
+        {
+            "id": "fc_1",
+            "type": "function_call",
+            "call_id": "call_1",
+            "name": "get_weather",
+            "arguments": '{"city":"成都"}',
+        },
+    ]
+    provider = ResponsesProvider(make_config("responses"))
+    completion = provider.parse_response({"model": "test-model", "status": "completed", "output": output})
+
+    payload = provider.build_payload([Message.user("天气"), completion.message, Message.tool("call_1", "晴")])
+
+    assert payload["input"] == [
+        {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "天气"}]},
+        *output,
+        {"type": "function_call_output", "call_id": "call_1", "output": "晴"},
+    ]
+
+
 @respx.mock(assert_all_called=True)
 async def test_responses_stream(app: App, respx_mock: MockRouter):
     """responses 格式：按事件名分发，工具参数分片累积"""
     from src.plugins.llm.providers import ResponsesProvider
+    from src.plugins.llm.schemas import Message
 
     chunks = [
         'event: response.created\ndata: {"response":{"model":"test-model"}}\n\n',
+        'event: response.output_item.added\ndata: {"output_index":0,'
+        '"item":{"id":"rs_1","type":"reasoning","summary":[]}}\n\n',
         'event: response.reasoning_summary_text.delta\ndata: {"delta":"想"}\n\n',
+        'event: response.output_item.done\ndata: {"output_index":0,'
+        '"item":{"id":"rs_1","type":"reasoning","summary":[{"type":"summary_text","text":"想"}],'
+        '"encrypted_content":"encrypted"}}\n\n',
+        'event: response.output_item.added\ndata: {"output_index":1,'
+        '"item":{"id":"msg_1","type":"message","role":"assistant","content":[]}}\n\n',
         'event: response.output_text.delta\ndata: {"delta":"你"}\n\n',
         'event: response.output_text.delta\ndata: {"delta":"好"}\n\n',
-        'event: response.output_item.added\ndata: {"item":{"type":"function_call","id":"fc_1",'
+        'event: response.output_item.done\ndata: {"output_index":1,'
+        '"item":{"id":"msg_1","type":"message","role":"assistant",'
+        '"content":[{"type":"output_text","text":"你好"}]}}\n\n',
+        'event: response.output_item.added\ndata: {"output_index":2,"item":{"type":"function_call","id":"fc_1",'
         '"call_id":"call_1","name":"get_weather"}}\n\n',
         'event: response.function_call_arguments.delta\ndata: {"item_id":"fc_1","delta":"{\\"city\\":"}\n\n',
         'event: response.function_call_arguments.done\ndata: {"item_id":"fc_1",'
         '"arguments":"{\\"city\\": \\"成都\\"}"}\n\n',
+        'event: response.output_item.done\ndata: {"output_index":2,"item":{"type":"function_call",'
+        '"id":"fc_1","call_id":"call_1","name":"get_weather",'
+        '"arguments":"{\\"city\\": \\"成都\\"}"}}\n\n',
         'event: response.completed\ndata: {"response":{"model":"test-model",'
         '"usage":{"input_tokens":3,"output_tokens":2}}}\n\n',
     ]
@@ -281,6 +361,17 @@ async def test_responses_stream(app: App, respx_mock: MockRouter):
     assert completion.tool_calls[0].name == "get_weather"
     assert completion.tool_calls[0].arguments == {"city": "成都"}
     assert completion.usage.output_tokens == 2
+
+    payload = provider.build_payload([Message.user("天气"), completion.message, Message.tool("call_1", "晴")])
+    assert [item["type"] for item in payload["input"]] == [
+        "message",
+        "reasoning",
+        "message",
+        "function_call",
+        "function_call_output",
+    ]
+    assert payload["input"][1]["encrypted_content"] == "encrypted"
+    assert payload["input"][3]["arguments"] == '{"city": "成都"}'
 
 
 # ----------------------------------------------------------- anthropic 格式
@@ -374,6 +465,32 @@ async def test_anthropic_tool_result_folds_into_user(app: App, respx_mock: MockR
     assert completion.finish_reason == "tool_calls"
 
 
+def test_anthropic_thinking_blocks_round_trip(app: App):
+    """Anthropic 工具回合应原样回传 thinking、signature 与 redacted_thinking"""
+    from src.plugins.llm.providers import AnthropicProvider
+    from src.plugins.llm.schemas import Message
+
+    content = [
+        {"type": "thinking", "thinking": "需要查询天气", "signature": "sig_1"},
+        {"type": "redacted_thinking", "data": "encrypted"},
+        {"type": "tool_use", "id": "toolu_1", "name": "get_weather", "input": {"city": "成都"}},
+    ]
+    provider = AnthropicProvider(make_config("anthropic"))
+    completion = provider.parse_response(
+        {
+            "model": "claude-opus-5",
+            "stop_reason": "tool_use",
+            "content": content,
+        }
+    )
+
+    payload = provider.build_payload(
+        [Message.user("天气"), completion.message, Message.tool("toolu_1", "晴")]
+    )
+
+    assert payload["messages"][1] == {"role": "assistant", "content": content}
+
+
 @respx.mock(assert_all_called=True)
 async def test_anthropic_image_uses_base64_source(app: App, respx_mock: MockRouter):
     """anthropic 格式：图片用 source.base64，不带 data URI 前缀"""
@@ -402,6 +519,7 @@ async def test_anthropic_image_uses_base64_source(app: App, respx_mock: MockRout
 async def test_anthropic_stream(app: App, respx_mock: MockRouter):
     """anthropic 格式：内容块按 index 累积，工具入参是 partial_json 分片"""
     from src.plugins.llm.providers import AnthropicProvider
+    from src.plugins.llm.schemas import Message
 
     chunks = [
         'event: message_start\ndata: {"type":"message_start","message":{"model":"claude-opus-5",'
@@ -410,14 +528,24 @@ async def test_anthropic_stream(app: App, respx_mock: MockRouter):
         '"content_block":{"type":"thinking"}}\n\n',
         'event: content_block_delta\ndata: {"type":"content_block_delta","index":0,'
         '"delta":{"type":"thinking_delta","thinking":"想"}}\n\n',
-        'event: content_block_delta\ndata: {"type":"content_block_delta","index":1,'
-        '"delta":{"type":"text_delta","text":"你好"}}\n\n',
+        'event: content_block_delta\ndata: {"type":"content_block_delta","index":0,'
+        '"delta":{"type":"signature_delta","signature":"sig_1"}}\n\n',
+        'event: content_block_stop\ndata: {"type":"content_block_stop","index":0}\n\n',
+        'event: content_block_start\ndata: {"type":"content_block_start","index":1,'
+        '"content_block":{"type":"redacted_thinking","data":"encrypted"}}\n\n',
+        'event: content_block_stop\ndata: {"type":"content_block_stop","index":1}\n\n',
         'event: content_block_start\ndata: {"type":"content_block_start","index":2,'
+        '"content_block":{"type":"text","text":""}}\n\n',
+        'event: content_block_delta\ndata: {"type":"content_block_delta","index":2,'
+        '"delta":{"type":"text_delta","text":"你好"}}\n\n',
+        'event: content_block_stop\ndata: {"type":"content_block_stop","index":2}\n\n',
+        'event: content_block_start\ndata: {"type":"content_block_start","index":3,'
         '"content_block":{"type":"tool_use","id":"toolu_1","name":"get_weather"}}\n\n',
-        'event: content_block_delta\ndata: {"type":"content_block_delta","index":2,'
+        'event: content_block_delta\ndata: {"type":"content_block_delta","index":3,'
         '"delta":{"type":"input_json_delta","partial_json":"{\\"city\\":"}}\n\n',
-        'event: content_block_delta\ndata: {"type":"content_block_delta","index":2,'
+        'event: content_block_delta\ndata: {"type":"content_block_delta","index":3,'
         '"delta":{"type":"input_json_delta","partial_json":" \\"成都\\"}"}}\n\n',
+        'event: content_block_stop\ndata: {"type":"content_block_stop","index":3}\n\n',
         'event: message_delta\ndata: {"type":"message_delta","delta":{"stop_reason":"tool_use"},'
         '"usage":{"output_tokens":7}}\n\n',
         'event: message_stop\ndata: {"type":"message_stop"}\n\n',
@@ -434,6 +562,11 @@ async def test_anthropic_stream(app: App, respx_mock: MockRouter):
     assert completion.finish_reason == "tool_calls"
     assert completion.usage.input_tokens == 10
     assert completion.usage.output_tokens == 7
+
+    payload = provider.build_payload([Message.user("天气"), completion.message, Message.tool("toolu_1", "晴")])
+    assistant_content = payload["messages"][1]["content"]
+    assert assistant_content[0] == {"type": "thinking", "thinking": "想", "signature": "sig_1"}
+    assert assistant_content[1] == {"type": "redacted_thinking", "data": "encrypted"}
 
 
 # ------------------------------------------------------------------ 其他

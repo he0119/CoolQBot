@@ -12,6 +12,7 @@
 
 from __future__ import annotations
 
+import copy
 from typing import TYPE_CHECKING, Any
 
 from ..schemas import Completion, Message, ToolCall, Usage
@@ -107,17 +108,20 @@ class AnthropicProvider(Provider):
                 if message.content:
                     content.append({"type": "text", "text": message.content})
             else:
-                if message.content:
-                    content.append({"type": "text", "text": message.content})
-                content.extend(
-                    {
-                        "type": "tool_use",
-                        "id": call.id,
-                        "name": call.name,
-                        "input": call.arguments,
-                    }
-                    for call in message.tool_calls
-                )
+                if raw_content := message.provider_data.get("anthropic_content"):
+                    content = copy.deepcopy(raw_content)
+                else:
+                    if message.content:
+                        content.append({"type": "text", "text": message.content})
+                    content.extend(
+                        {
+                            "type": "tool_use",
+                            "id": call.id,
+                            "name": call.name,
+                            "input": call.arguments,
+                        }
+                        for call in message.tool_calls
+                    )
 
             if content:
                 dumped.append({"role": message.role, "content": content})
@@ -129,7 +133,8 @@ class AnthropicProvider(Provider):
         thinking: list[str] = []
         tool_calls: list[ToolCall] = []
 
-        for block in data.get("content") or []:
+        raw_content = data.get("content") or []
+        for block in raw_content:
             block_type = block.get("type")
             if block_type == "text":
                 text.append(block.get("text") or "")
@@ -149,6 +154,7 @@ class AnthropicProvider(Provider):
                 content="".join(text),
                 reasoning="".join(thinking),
                 tool_calls=tool_calls,
+                provider_data={"anthropic_content": copy.deepcopy(raw_content)},
             ),
             usage=self._parse_usage(data.get("usage")),
             model=data.get("model", ""),
@@ -160,6 +166,7 @@ class AnthropicProvider(Provider):
         thinking: list[str] = []
         # 内容块按 index 到达，tool_use 的入参以 JSON 字符串分片累积
         blocks: dict[int, dict[str, Any]] = {}
+        partial_json: dict[int, str] = {}
         usage = Usage()
         model = ""
         stop_reason = ""
@@ -175,23 +182,34 @@ class AnthropicProvider(Provider):
                 model = message.get("model") or model
                 usage = self._parse_usage(message.get("usage"))
             elif event == "content_block_start":
-                block = data.get("content_block") or {}
+                index = data.get("index", 0)
+                block = copy.deepcopy(data.get("content_block") or {})
+                blocks[index] = block
                 if block.get("type") == "tool_use":
-                    blocks[data.get("index", 0)] = {
-                        "id": block.get("id") or "",
-                        "name": block.get("name") or "",
-                        "partial": "",
-                    }
+                    partial_json[index] = ""
             elif event == "content_block_delta":
+                index = data.get("index", 0)
                 delta = data.get("delta") or {}
                 delta_type = delta.get("type")
                 if delta_type == "text_delta":
-                    text.append(delta.get("text") or "")
+                    chunk = delta.get("text") or ""
+                    text.append(chunk)
+                    block = blocks.setdefault(index, {"type": "text", "text": ""})
+                    block["text"] = (block.get("text") or "") + chunk
                 elif delta_type == "thinking_delta":
-                    thinking.append(delta.get("thinking") or "")
+                    chunk = delta.get("thinking") or ""
+                    thinking.append(chunk)
+                    block = blocks.setdefault(index, {"type": "thinking", "thinking": ""})
+                    block["thinking"] = (block.get("thinking") or "") + chunk
+                elif delta_type == "signature_delta":
+                    block = blocks.setdefault(index, {"type": "thinking", "thinking": ""})
+                    block["signature"] = (block.get("signature") or "") + (delta.get("signature") or "")
                 elif delta_type == "input_json_delta":
-                    if block := blocks.get(data.get("index", 0)):
-                        block["partial"] += delta.get("partial_json") or ""
+                    partial_json[index] = partial_json.get(index, "") + (delta.get("partial_json") or "")
+            elif event == "content_block_stop":
+                index = data.get("index", 0)
+                if index in partial_json and (block := blocks.get(index)) is not None:
+                    block["input"] = _loads(partial_json[index])
             elif event == "message_delta":
                 stop_reason = (data.get("delta") or {}).get("stop_reason") or stop_reason
                 # message_delta 只带增量的 output_tokens，需要并入已有用量
@@ -200,16 +218,26 @@ class AnthropicProvider(Provider):
                     usage.output_tokens = delta_usage.output_tokens or usage.output_tokens
                     usage.input_tokens = delta_usage.input_tokens or usage.input_tokens
 
+        for index, raw in partial_json.items():
+            if (block := blocks.get(index)) is not None:
+                block["input"] = _loads(raw)
+
+        raw_content = [block for _, block in sorted(blocks.items())]
         tool_calls = [
-            ToolCall(id=block["id"], name=block["name"], arguments=_loads(block["partial"]))
-            for _, block in sorted(blocks.items())
-            if block["name"]
+            ToolCall(
+                id=block.get("id") or "",
+                name=block.get("name") or "",
+                arguments=block.get("input") or {},
+            )
+            for block in raw_content
+            if block.get("type") == "tool_use" and block.get("name")
         ]
         return Completion(
             message=Message.assistant(
                 content="".join(text),
                 reasoning="".join(thinking),
                 tool_calls=tool_calls,
+                provider_data={"anthropic_content": raw_content},
             ),
             usage=usage,
             model=model,
