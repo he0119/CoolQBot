@@ -227,6 +227,33 @@ async def test_llm_with_tool(app: App, respx_mock: MockRouter, mock_models):
     assert UUID(affinities.pop()).version == 4
 
 
+async def test_tool_round_limit_rolls_back_current_question(app: App, mock_models, mocker):
+    """工具调用超过轮数上限时不保留不完整的上下文"""
+    from src.plugins.llm.config import plugin_config
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.providers import ProviderError
+    from src.plugins.llm.schemas import Completion, Message, ToolCall
+
+    tool_completion = Completion(
+        message=Message.assistant(tool_calls=[ToolCall(id="call_1", name="get_weather", arguments={})]),
+        finish_reason="tool_calls",
+    )
+    mocker.patch.object(plugin_config, "max_tool_rounds", 1)
+    mocker.patch("src.plugins.llm.handler.chat", side_effect=[tool_completion, tool_completion])
+
+    async def execute(calls, context):
+        context.append(Message.tool(calls[0].id, "晴"))
+
+    mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
+    handler = LLMHandler("test-model")
+    original_context = list(handler.context)
+
+    with pytest.raises(ProviderError, match="工具调用超过上限"):
+        await handler.ask("天气")
+
+    assert handler.context == original_context
+
+
 @respx.mock(assert_all_called=True)
 async def test_llm_error_raises(app: App, respx_mock: MockRouter, mock_models):
     """API 返回错误时提示用户"""

@@ -67,9 +67,8 @@ async def iter_sse(response: httpx.Response) -> AsyncIterator[tuple[str, Any]]:
                 return
             try:
                 yield event, json.loads(value)
-            except json.JSONDecodeError:
-                # 单个数据块解析失败不应中断整个流
-                continue
+            except json.JSONDecodeError as e:
+                raise ProviderError("流式响应包含无效 JSON") from e
 
 
 class Provider(ABC):
@@ -139,8 +138,8 @@ class Provider(ABC):
         return self.parse_response(data)
 
     async def _request_stream(self, payload: dict[str, Any], headers: dict[str, str]) -> Completion:
-        # 流式请求不设总超时，避免长回复被中途掐断
-        async with httpx.AsyncClient(proxy=self.config.proxy, timeout=None) as client:
+        # HTTPX 的 read timeout 限制网络静默时间，不会截断持续输出的长回复
+        async with httpx.AsyncClient(proxy=self.config.proxy, timeout=self.config.timeout) as client:
             async with client.stream("POST", self.endpoint, headers=headers, json=payload) as response:
                 if response.status_code != 200:
                     await response.aread()

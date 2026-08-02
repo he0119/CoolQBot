@@ -14,7 +14,7 @@ import json
 from typing import TYPE_CHECKING, Any
 
 from ..schemas import Completion, Message, ToolCall, Usage
-from .base import Provider, iter_sse
+from .base import Provider, ProviderError, iter_sse
 
 if TYPE_CHECKING:
     import httpx
@@ -130,13 +130,23 @@ class ResponsesProvider(Provider):
         raw_output: dict[int, dict[str, Any]] = {}
         usage = Usage()
         model = ""
+        finish_reason = ""
 
         async for event, data in iter_sse(response):
+            if event == "error" or data.get("type") == "error":
+                self.raise_for_error(data, 500)
+            if event == "response.failed":
+                response_data = data.get("response") or {}
+                error = response_data.get("error") or data.get("error")
+                if error:
+                    self.raise_for_error({"error": error})
+                raise ProviderError("响应生成失败")
             self.raise_for_error(data)
 
-            if event in ("response.created", "response.completed"):
+            if event in ("response.created", "response.completed", "response.incomplete"):
                 response_data = data.get("response") or {}
                 model = response_data.get("model") or model
+                finish_reason = _finish_reason(response_data) or finish_reason
                 if raw_usage := response_data.get("usage"):
                     usage = self._parse_usage(raw_usage)
             elif event == "response.output_text.delta":
@@ -188,6 +198,7 @@ class ResponsesProvider(Provider):
             ),
             usage=usage,
             model=model,
+            finish_reason="tool_calls" if tool_calls else finish_reason,
         )
 
     def _extract_message(self, output_items: list[dict[str, Any]]) -> Message:

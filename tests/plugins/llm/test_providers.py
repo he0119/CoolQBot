@@ -573,6 +573,94 @@ async def test_anthropic_stream(app: App, respx_mock: MockRouter):
 
 
 @respx.mock(assert_all_called=True)
+async def test_stream_request_keeps_timeout(app: App, respx_mock: MockRouter, mocker):
+    """流式请求使用读取空闲超时，而不是关闭全部超时"""
+    from src.plugins.llm.providers import ChatProvider
+    from src.plugins.llm.providers import base as base_module
+
+    seen: list[object] = []
+    real_client = httpx.AsyncClient
+
+    class RecordingClient(real_client):
+        def __init__(self, *args, **kwargs):
+            seen.append(kwargs.get("timeout"))
+            super().__init__(*args, **kwargs)
+
+    mocker.patch.object(base_module.httpx, "AsyncClient", RecordingClient)
+    respx_mock.post("https://api.example.com/chat/completions").mock(
+        return_value=httpx.Response(200, text='data: {"choices":[]}\n\ndata: [DONE]\n\n')
+    )
+
+    provider = ChatProvider(make_config("chat", stream=True, timeout=7))
+    await provider.chat(make_messages())
+
+    assert seen == [7]
+
+
+async def test_invalid_sse_json_raises(app: App):
+    """损坏的 SSE 数据不能被静默当成成功响应"""
+    from src.plugins.llm.providers import ProviderError
+    from src.plugins.llm.providers.base import iter_sse
+
+    response = httpx.Response(200, text="data: not-json\n\n")
+
+    with pytest.raises(ProviderError, match="无效 JSON"):
+        async for _ in iter_sse(response):
+            pass
+
+
+@respx.mock(assert_all_called=True)
+async def test_responses_stream_error_raises(app: App, respx_mock: MockRouter):
+    """Responses 流中 error 事件不能返回此前累积的部分文本"""
+    from src.plugins.llm.providers import ProviderError, ResponsesProvider
+
+    chunks = [
+        'event: response.output_text.delta\ndata: {"delta":"部分内容"}\n\n',
+        'event: error\ndata: {"type":"error","message":"上游流失败"}\n\n',
+    ]
+    respx_mock.post("https://api.example.com/responses").mock(return_value=httpx.Response(200, text="".join(chunks)))
+
+    provider = ResponsesProvider(make_config("responses", stream=True))
+    with pytest.raises(ProviderError, match="上游流失败"):
+        await provider.chat(make_messages())
+
+
+@respx.mock(assert_all_called=True)
+async def test_responses_failed_event_raises(app: App, respx_mock: MockRouter):
+    """Responses 的 response.failed 事件应转换为 ProviderError"""
+    from src.plugins.llm.providers import ProviderError, ResponsesProvider
+
+    chunks = [
+        'event: response.failed\ndata: {"response":{"status":"failed",'
+        '"error":{"message":"响应生成失败"}}}\n\n'
+    ]
+    respx_mock.post("https://api.example.com/responses").mock(return_value=httpx.Response(200, text="".join(chunks)))
+
+    provider = ResponsesProvider(make_config("responses", stream=True))
+    with pytest.raises(ProviderError, match="响应生成失败"):
+        await provider.chat(make_messages())
+
+
+@respx.mock(assert_all_called=True)
+async def test_responses_incomplete_event_marks_length(app: App, respx_mock: MockRouter):
+    """Responses 因输出 token 上限中止时应保留文本并标记 length"""
+    from src.plugins.llm.providers import ResponsesProvider
+
+    chunks = [
+        'event: response.output_text.delta\ndata: {"delta":"部分内容"}\n\n',
+        'event: response.incomplete\ndata: {"response":{"status":"incomplete",'
+        '"incomplete_details":{"reason":"max_output_tokens"}}}\n\n',
+    ]
+    respx_mock.post("https://api.example.com/responses").mock(return_value=httpx.Response(200, text="".join(chunks)))
+
+    provider = ResponsesProvider(make_config("responses", stream=True))
+    completion = await provider.chat(make_messages())
+
+    assert completion.content == "部分内容"
+    assert completion.finish_reason == "length"
+
+
+@respx.mock(assert_all_called=True)
 async def test_error_response_raises(app: App, respx_mock: MockRouter):
     """错误响应转换成 ProviderError"""
     from src.plugins.llm.providers import ChatProvider, ProviderError

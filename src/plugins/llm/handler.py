@@ -16,7 +16,7 @@ from nonebot.log import logger
 from nonebot_plugin_alconna import UniMessage
 
 from .config import plugin_config
-from .providers import get_provider
+from .providers import ProviderError, get_provider
 from .schemas import Completion, ImageContent, Message
 from .tools import registry
 from .tts import TTSError, text_to_speech
@@ -112,6 +112,7 @@ class LLMHandler:
         模型请求工具调用时自动执行并继续请求，直到给出最终回复
         或达到 `max_tool_rounds` 轮数上限。
         """
+        context_start = len(self.context)
         self.context.append(Message.user(content, images))
 
         started_at = perf_counter()
@@ -126,6 +127,10 @@ class LLMHandler:
             completion = await chat(self.model_name, self.context, session_affinity=self.session_affinity)
             total_usage = total_usage + completion.usage
             actual_model = completion.model or actual_model
+
+        if completion.tool_calls:
+            del self.context[context_start:]
+            raise ProviderError(f"工具调用超过上限（{plugin_config.max_tool_rounds} 轮）")
 
         completion.usage = total_usage
         completion.model = actual_model or plugin_config.resolve(self.model_name).model
