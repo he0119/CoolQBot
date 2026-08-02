@@ -4,11 +4,11 @@
 
 ## 支持的 API 格式
 
-| 格式         | 请求地址                      | 认证方式                | 适用服务                             |
-| ------------ | ----------------------------- | ----------------------- | ------------------------------------ |
-| `chat`       | `{base_url}/chat/completions` | `Authorization: Bearer` | DeepSeek、OpenAI 兼容接口、硅基流动等 |
-| `responses`  | `{base_url}/responses`        | `Authorization: Bearer` | OpenAI Responses API                 |
-| `anthropic`  | `{base_url}/v1/messages`      | `x-api-key`             | Anthropic Claude                     |
+| 格式        | 请求地址                      | 认证方式                | 适用服务                              |
+| ----------- | ----------------------------- | ----------------------- | ------------------------------------- |
+| `chat`      | `{base_url}/chat/completions` | `Authorization: Bearer` | DeepSeek、OpenAI 兼容接口、硅基流动等 |
+| `responses` | `{base_url}/responses`        | `Authorization: Bearer` | OpenAI Responses API                  |
+| `anthropic` | `{base_url}/v1/messages`      | `x-api-key`             | Anthropic Claude                      |
 
 三种格式在请求结构上差异较大（system 提示词的位置、工具定义的嵌套层级、图片编码方式、
 用量字段名各不相同），插件内部统一归一化，命令与配置的使用方式完全一致。
@@ -26,17 +26,17 @@
 
 ## 命令
 
-| 命令                          | 别名 | 说明                     | 权限 |
-| ----------------------------- | ---- | ------------------------ | ---- |
-| `/llm <内容>`                 | `/ai` | 与模型对话               | 所有人 |
-| `/llm <内容> --model <模型名>` | -    | 本次使用指定模型         | 所有人 |
-| `/llm <内容> -c`              | -    | 启用多轮对话             | 所有人 |
-| `/llm <内容> -r`              | -    | 把回复渲染成图片         | 所有人 |
-| `/llm <内容> -t`              | -    | 使用语音回复             | 所有人 |
-| `/llm model --list`           | -    | 查看可用模型列表         | 所有人 |
-| `/llm model --set <模型名>`    | -    | 设置群组默认模型         | 所有人 |
-| `/llm tts --list`             | -    | 查看可用 TTS 模型列表    | 所有人 |
-| `/llm tts --set <模型名>`      | -    | 设置群组默认 TTS 模型    | 所有人 |
+| 命令                           | 别名  | 说明                  | 权限   |
+| ------------------------------ | ----- | --------------------- | ------ |
+| `/llm <内容>`                  | `/ai` | 与模型对话            | 所有人 |
+| `/llm <内容> --model <模型名>` | -     | 本次使用指定模型      | 所有人 |
+| `/llm <内容> -c`               | -     | 启用多轮对话          | 所有人 |
+| `/llm <内容> -r`               | -     | 把回复渲染成图片      | 所有人 |
+| `/llm <内容> -t`               | -     | 使用语音回复          | 所有人 |
+| `/llm model --list`            | -     | 查看可用模型列表      | 所有人 |
+| `/llm model --set <模型名>`    | -     | 设置群组默认模型      | 所有人 |
+| `/llm tts --list`              | -     | 查看可用 TTS 模型列表 | 所有人 |
+| `/llm tts --set <模型名>`      | -     | 设置群组默认 TTS 模型 | 所有人 |
 
 ## 使用方法
 
@@ -127,20 +127,20 @@ LLM__TTS_MODEL=default
 
 ### 单个模型的可配置项
 
-| 字段          | 说明                                           |
-| ------------- | ---------------------------------------------- |
-| `name`        | 模型标识，命令中用此名称选择模型               |
-| `model`       | 传给 API 的模型名，留空时与 `name` 相同        |
-| `provider`    | API 格式，`chat` / `responses` / `anthropic`   |
-| `base_url`    | 服务地址，留空时按格式取默认值                 |
-| `api_key`     | 密钥，留空时回退到 `LLM__API_KEY`              |
-| `prompt`      | 人设，留空时回退到 `LLM__PROMPT`               |
-| `proxy`       | 代理地址                                       |
-| `stream`      | 是否流式请求，留空时回退到 `LLM__STREAM`       |
+| 字段          | 说明                                             |
+| ------------- | ------------------------------------------------ |
+| `name`        | 模型标识，命令中用此名称选择模型                 |
+| `model`       | 传给 API 的模型名，留空时与 `name` 相同          |
+| `provider`    | API 格式，`chat` / `responses` / `anthropic`     |
+| `base_url`    | 服务地址，留空时按格式取默认值                   |
+| `api_key`     | 密钥，留空时回退到 `LLM__API_KEY`                |
+| `prompt`      | 人设，留空时回退到 `LLM__PROMPT`                 |
+| `proxy`       | 代理地址                                         |
+| `stream`      | 是否流式请求，留空时回退到 `LLM__STREAM`         |
 | `max_tokens`  | 最大输出 token 数（`anthropic` 必填，默认 4096） |
-| `temperature` | 采样温度                                       |
-| `timeout`     | 非流式请求超时时间（秒）                       |
-| `extra_body`  | 附加到请求体的额外字段，用于传各服务商特有参数 |
+| `temperature` | 采样温度                                         |
+| `timeout`     | 非流式请求超时时间（秒）                         |
+| `extra_body`  | 附加到请求体的额外字段，用于传各服务商特有参数   |
 
 ## 注册工具
 
