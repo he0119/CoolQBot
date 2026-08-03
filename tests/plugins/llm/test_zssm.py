@@ -18,7 +18,7 @@ from tests.fake import fake_group_message_event_v11
 
 
 @pytest.fixture
-def zssm_model(mocker):
+async def zssm_model(app: App, mocker):
     """配置解释模式测试模型。"""
     from src.plugins.llm.config import ModelConfig, plugin_config
 
@@ -29,7 +29,9 @@ def zssm_model(mocker):
         api_key="sk-test",
     )
     mocker.patch.object(plugin_config, "models", [model])
-    mocker.patch.object(plugin_config, "zssm_model", "")
+    from src.plugins.llm.data_source import set_available_model_names
+
+    await set_available_model_names("QQClient_10000", ["test-model"])
     mocker.patch("src.plugins.llm.handler.perf_counter", side_effect=[10.0, 15.1])
     reaction = mocker.patch("src.plugins.llm.plugins.zssm.send_reaction")
     return model, reaction
@@ -68,6 +70,27 @@ async def test_zssm_not_configured(app: App, mocker):
         ctx.should_finished(zssm_cmd)
 
 
+async def test_zssm_denies_group_without_available_models(app: App, mocker):
+    """全局存在模型时，未开放模型的群仍不能使用解释模式。"""
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.plugins.zssm import zssm_cmd
+
+    mocker.patch.object(plugin_config, "models", [ModelConfig(name="test-model")])
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("zssm Python GIL"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            Message(MessageSegment.reply(1)) + "本群未开放任何模型，请联系超级管理员配置",
+            True,
+        )
+        ctx.should_finished(zssm_cmd)
+
+
 @respx.mock(assert_all_called=True)
 async def test_zssm_uses_temporary_model(app: App, respx_mock: MockRouter, zssm_model, mocker):
     """--model 仅为本次解释覆盖专用模型。"""
@@ -81,7 +104,9 @@ async def test_zssm_uses_temporary_model(app: App, respx_mock: MockRouter, zssm_
         api_key="sk-temporary",
     )
     mocker.patch.object(plugin_config, "models", [default_model, temporary_model])
-    mocker.patch.object(plugin_config, "zssm_model", "test-model")
+    from src.plugins.llm.data_source import set_available_model_names
+
+    await set_available_model_names("QQClient_10000", ["test-model", "temporary"])
     route = respx_mock.post("https://temporary.example.com/chat/completions").mock(
         return_value=httpx.Response(
             200,
@@ -129,20 +154,34 @@ async def test_zssm_rejects_unknown_temporary_model(app: App, zssm_model):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message(MessageSegment.reply(1)) + "解释模型未启用：missing，可用：test-model",
+            Message(MessageSegment.reply(1)) + "本群未启用解释模型：missing，可用：test-model",
             True,
         )
         ctx.should_finished(zssm_cmd)
 
 
 @respx.mock(assert_all_called=True)
-async def test_zssm_explains_text_without_tools(app: App, respx_mock: MockRouter, zssm_model):
-    """直接输入文本时使用专用提示词、关闭工具并格式化输出。"""
+async def test_zssm_explains_text_with_group_model(app: App, respx_mock: MockRouter, zssm_model, mocker):
+    """直接输入文本时使用本群解释模型、专用提示词并关闭工具。"""
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names, set_zssm_model_name
+
+    default_model, _ = zssm_model
+    explain_model = ModelConfig(
+        name="explain",
+        model="explain-upstream",
+        provider="chat",
+        base_url="https://api.example.com",
+        api_key="sk-test",
+    )
+    mocker.patch.object(plugin_config, "models", [default_model, explain_model])
+    await set_available_model_names("QQClient_10000", ["test-model", "explain"])
+    await set_zssm_model_name("QQClient_10000", "explain")
     route = respx_mock.post("https://api.example.com/chat/completions").mock(
         return_value=httpx.Response(
             200,
             json={
-                "model": "test-model",
+                "model": "explain-upstream",
                 "choices": [
                     {
                         "finish_reason": "stop",
@@ -176,12 +215,13 @@ async def test_zssm_explains_text_without_tools(app: App, respx_mock: MockRouter
             Message(MessageSegment.reply(1))
             + (
                 "关键词：Python | GIL\n\nGIL 是 CPython 用来协调字节码执行的一把全局锁。"
-                "\n\n--- 5.1s  test-model  I:10 O:5 A:15 C:0"
+                "\n\n--- 5.1s  explain-upstream  I:10 O:5 A:15 C:0"
             ),
             True,
         )
 
     payload = json.loads(route.calls[0].request.content)
+    assert payload["model"] == "explain-upstream"
     assert "tools" not in payload
     assert payload["messages"][0]["role"] == "system"
     assert "不可信数据" in payload["messages"][0]["content"]
@@ -342,15 +382,12 @@ def test_model_capability_selects_single_or_two_stage_vision(app: App, mocker):
     text = ModelConfig(name="text")
     vision = ModelConfig(name="vision", capabilities={"vision"})
     mocker.patch.object(plugin_config, "models", [multimodal, text, vision])
-    mocker.patch.object(plugin_config, "zssm_vision_model", "vision")
+    assert resolve_vision_fallback("multimodal", "vision", has_images=True) == ""
+    assert resolve_vision_fallback("text", "vision", has_images=True) == "vision"
+    assert resolve_vision_fallback("text", "vision", has_images=False) == ""
 
-    assert resolve_vision_fallback("multimodal", has_images=True) == ""
-    assert resolve_vision_fallback("text", has_images=True) == "vision"
-    assert resolve_vision_fallback("text", has_images=False) == ""
-
-    mocker.patch.object(plugin_config, "zssm_vision_model", "")
-    with pytest.raises(ValueError, match="LLM__ZSSM_VISION_MODEL"):
-        resolve_vision_fallback("text", has_images=True)
+    with pytest.raises(ValueError, match=r"/llm model --set-vision"):
+        resolve_vision_fallback("text", "", has_images=True)
 
 
 async def test_private_resource_url_is_rejected(app: App):

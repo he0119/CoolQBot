@@ -178,6 +178,9 @@ async def test_llm_quota_command_uses_selected_model(
             ),
         ],
     )
+    from src.plugins.llm.data_source import set_available_model_names
+
+    await set_available_model_names("QQClient_10000", ["without-quota", "deepseek"])
     mocker.patch.object(plugin_config, "base_url", "https://api.deepseek.com")
     respx_mock.get("https://api.deepseek.com/user/balance").mock(
         return_value=httpx.Response(
@@ -215,13 +218,14 @@ async def test_llm_quota_command_defaults_to_current_model(app: App, mocker):
     """/llm quota 默认查询群组当前模型"""
     from src.plugins.llm import llm_cmd
     from src.plugins.llm.config import ModelConfig, plugin_config
-    from src.plugins.llm.data_source import set_model_name
+    from src.plugins.llm.data_source import set_available_model_names, set_model_name
 
     mocker.patch.object(
         plugin_config,
         "models",
         [ModelConfig(name="first"), ModelConfig(name="current")],
     )
+    await set_available_model_names("QQClient_10000", ["first", "current"])
     await set_model_name("QQClient_10000", "current")
 
     async with app.test_matcher() as ctx:

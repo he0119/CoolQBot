@@ -172,10 +172,6 @@ class ScopedConfig(BaseModel):
         validation_alias=AliasChoices("web_fetch_fake_ip_ranges", "zssm_resource_fake_ip_ranges"),
     )
     """web_fetch 与解释模式允许的代理 fake-ip 网段；不放宽 URL 中直接填写的 IP"""
-    zssm_model: str = ""
-    """解释模式使用的模型；留空时使用当前群组模型"""
-    zssm_vision_model: str = ""
-    """解释模型不支持图片时使用的视觉模型；必须声明 vision 能力"""
     zssm_max_images: int = 2
     """解释模式单次允许的最大图片数量"""
     zssm_max_image_bytes: int = 10 * 1024 * 1024

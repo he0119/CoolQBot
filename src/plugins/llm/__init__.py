@@ -42,9 +42,24 @@ from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExt
 from nonebot_plugin_user import UserSession
 
 from src.utils.helpers import admin_permission
+from src.utils.permission import SUPERUSER
 
 from .config import plugin_config
-from .data_source import get_model_name, get_tts_model, set_model_name, set_tts_model
+from .data_source import (
+    clear_available_model_names,
+    clear_zssm_model_name,
+    clear_zssm_vision_model_name,
+    get_available_model_names,
+    get_model_name,
+    get_tts_model,
+    get_zssm_model_name,
+    get_zssm_vision_model_name,
+    set_available_model_names,
+    set_model_name,
+    set_tts_model,
+    set_zssm_model_name,
+    set_zssm_vision_model_name,
+)
 from .handler import LLMHandler, send_reaction
 from .providers import ProviderError
 from .quota import QuotaError, get_quota
@@ -70,6 +85,16 @@ llm_cmd = on_alconna(
             "model",
             Option("-l|--list", help_text="查看模型列表"),
             Option("--set", Args["model#模型名称", str], help_text="设置群组默认模型"),
+            Option(
+                "--set-available",
+                Args["models#模型名称", MultiVar(str, flag="+")],
+                help_text="设置本群可用模型（仅超级管理员）",
+            ),
+            Option("--clear-available", action=store_true, help_text="清空本群可用模型（仅超级管理员）"),
+            Option("--set-zssm", Args["model#模型名称", str], help_text="设置本群解释模型"),
+            Option("--clear-zssm", action=store_true, help_text="使本群解释模型跟随默认模型"),
+            Option("--set-vision", Args["model#模型名称", str], help_text="设置本群解释视觉模型"),
+            Option("--clear-vision", action=store_true, help_text="清除本群解释视觉模型"),
             help_text="模型相关设置",
         ),
         Subcommand(
@@ -128,14 +153,16 @@ async def _create_handler(
     use_tts: bool = False,
 ) -> LLMHandler:
     """按当前会话设置创建处理器。"""
-    model_names = plugin_config.get_model_names()
-    if not model_names:
+    if not plugin_config.get_model_names():
         raise LLMSetupError("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
+    model_names = await get_available_model_names(user.session_id)
+    if not model_names:
+        raise LLMSetupError("本群未开放任何模型，请联系超级管理员配置", at_sender=True)
 
     name = selected_model or await get_model_name(user.session_id)
     if name not in model_names:
         raise LLMSetupError(
-            f"未启用的模型：{name}，可用：{'、'.join(model_names)}",
+            f"本群未启用的模型：{name}，可用：{'、'.join(model_names)}",
             at_sender=True,
         )
 
@@ -154,17 +181,41 @@ async def _create_handler(
 
 
 @llm_cmd.assign("model.list")
-async def llm_model_list_handle(user: UserSession):
-    names = plugin_config.get_model_names()
-    if not names:
+async def llm_model_list_handle(bot: Bot, event: Event, user: UserSession):
+    all_names = plugin_config.get_model_names()
+    if not all_names:
         await llm_cmd.finish("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
+    available_names = await get_available_model_names(user.session_id)
+    is_superuser = await SUPERUSER(bot, event)
+    if not available_names and not is_superuser:
+        await llm_cmd.finish("本群未开放任何模型，请联系超级管理员配置")
 
-    current = await get_model_name(user.session_id)
-    model_list = "\n".join(f"- {name}（当前）" if name == current else f"- {name}" for name in names)
+    current = await get_model_name(user.session_id) if available_names else ""
+    zssm_model = await get_zssm_model_name(user.session_id) if available_names else ""
+    vision_model = await get_zssm_vision_model_name(user.session_id)
+    available = set(available_names)
+
+    def format_model(name: str) -> str:
+        labels: list[str] = []
+        if is_superuser:
+            labels.append("已开放" if name in available else "未开放")
+        if name == current:
+            labels.append("当前")
+        if name == zssm_model:
+            labels.append("解释")
+        if name == vision_model:
+            labels.append("视觉")
+        suffix = f"（{'，'.join(labels)}）" if labels else ""
+        return f"- {name}{suffix}"
+
+    names = all_names if is_superuser else available_names
+    model_list = "\n".join(format_model(name) for name in names)
+    title = "全部模型列表" if is_superuser else "支持的模型列表"
+    access_hint = "\n输入 /llm model --set-available [模型名...] 设置本群开放模型" if is_superuser else ""
     await llm_cmd.finish(
-        f"支持的模型列表：\n{model_list}\n"
+        f"{title}：\n{model_list}\n"
         "输入 /llm --model [模型名] [内容] 单次指定模型\n"
-        "输入 /llm model --set [模型名] 设置群组默认模型"
+        f"输入 /llm model --set [模型名] 设置群组默认模型{access_hint}"
     )
 
 
@@ -179,12 +230,84 @@ async def llm_model_set_handle(
     if not await admin_permission()(bot, event):
         await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
 
-    names = plugin_config.get_model_names()
+    names = await get_available_model_names(user.session_id)
     if model.result not in names:
-        await llm_cmd.finish(f"未启用的模型：{model.result}，可用：{'、'.join(names)}", at_sender=True)
+        await llm_cmd.finish(f"本群未启用的模型：{model.result}，可用：{'、'.join(names)}", at_sender=True)
 
     await set_model_name(user.session_id, model.result)
     await llm_cmd.finish(f"已设置群组默认模型为：{model.result}", at_sender=True)
+
+
+@llm_cmd.assign("model.set-available")
+async def llm_model_set_available_handle(
+    bot: Bot,
+    event: Event,
+    user: UserSession,
+    models: Query[tuple[str, ...]] = Query("model.set-available.models"),
+):
+    if not await SUPERUSER(bot, event):
+        await llm_cmd.finish("该指令仅超级管理员可用", at_sender=True)
+    try:
+        available = await set_available_model_names(user.session_id, list(models.result))
+    except ValueError as e:
+        await llm_cmd.finish(str(e), at_sender=True)
+    await llm_cmd.finish(f"已设置本群可用模型：{'、'.join(available)}", at_sender=True)
+
+
+@llm_cmd.assign("model.clear-available")
+async def llm_model_clear_available_handle(bot: Bot, event: Event, user: UserSession):
+    if not await SUPERUSER(bot, event):
+        await llm_cmd.finish("该指令仅超级管理员可用", at_sender=True)
+    await clear_available_model_names(user.session_id)
+    await llm_cmd.finish("已清空本群可用模型", at_sender=True)
+
+
+@llm_cmd.assign("model.set-zssm")
+async def llm_model_set_zssm_handle(
+    bot: Bot,
+    event: Event,
+    user: UserSession,
+    model: Query[str] = Query("model.set-zssm.model"),
+):
+    if not await admin_permission()(bot, event):
+        await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
+    try:
+        await set_zssm_model_name(user.session_id, model.result)
+    except ValueError as e:
+        await llm_cmd.finish(str(e), at_sender=True)
+    await llm_cmd.finish(f"已设置本群解释模型为：{model.result}", at_sender=True)
+
+
+@llm_cmd.assign("model.clear-zssm")
+async def llm_model_clear_zssm_handle(bot: Bot, event: Event, user: UserSession):
+    if not await admin_permission()(bot, event):
+        await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
+    await clear_zssm_model_name(user.session_id)
+    await llm_cmd.finish("本群解释模型已改为跟随默认模型", at_sender=True)
+
+
+@llm_cmd.assign("model.set-vision")
+async def llm_model_set_vision_handle(
+    bot: Bot,
+    event: Event,
+    user: UserSession,
+    model: Query[str] = Query("model.set-vision.model"),
+):
+    if not await admin_permission()(bot, event):
+        await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
+    try:
+        await set_zssm_vision_model_name(user.session_id, model.result)
+    except ValueError as e:
+        await llm_cmd.finish(str(e), at_sender=True)
+    await llm_cmd.finish(f"已设置本群解释视觉模型为：{model.result}", at_sender=True)
+
+
+@llm_cmd.assign("model.clear-vision")
+async def llm_model_clear_vision_handle(bot: Bot, event: Event, user: UserSession):
+    if not await admin_permission()(bot, event):
+        await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
+    await clear_zssm_vision_model_name(user.session_id)
+    await llm_cmd.finish("已清除本群解释视觉模型", at_sender=True)
 
 
 @llm_cmd.assign("tts.list")
@@ -227,13 +350,15 @@ async def llm_tts_set_handle(
 
 @llm_cmd.assign("quota")
 async def llm_quota_handle(user: UserSession, model: Query[str] = Query("quota.model")):
-    names = plugin_config.get_model_names()
-    if not names:
+    if not plugin_config.get_model_names():
         await llm_cmd.finish("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
+    names = await get_available_model_names(user.session_id)
+    if not names:
+        await llm_cmd.finish("本群未开放任何模型，请联系超级管理员配置", at_sender=True)
 
     name = model.result if model.available else await get_model_name(user.session_id)
     if name not in names:
-        await llm_cmd.finish(f"未启用的模型：{name}，可用：{'、'.join(names)}", at_sender=True)
+        await llm_cmd.finish(f"本群未启用的模型：{name}，可用：{'、'.join(names)}", at_sender=True)
 
     try:
         result = await get_quota(plugin_config.resolve(name))
