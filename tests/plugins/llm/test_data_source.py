@@ -94,8 +94,8 @@ def test_model_config_defaults(app: App):
     assert anthropic.capabilities == {"vision"}
 
     config = ScopedConfig(models=[chat, anthropic])
-    assert config.tool_notice_delay == 2.0
-    assert config.tool_notice_interval == 30.0
+    assert config.tool_notice_delay == 10.0
+    assert config.tool_notice_interval == 60.0
     assert config.resolve("deepseek-chat").base_url == "https://api.deepseek.com"
     assert config.resolve("claude").base_url == "https://api.anthropic.com"
 
