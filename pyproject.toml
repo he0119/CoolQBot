@@ -44,7 +44,7 @@ dependencies = [
     "nonebot-plugin-prometheus==0.4.1",
     "nonebot-plugin-abs==1.1.0",
     "nonebot-plugin-parser[htmlkit]==2.6.7",
-    "nonebot-plugin-htmlrender[filehost,prometheus,sentry]>=0.7.2,<0.8.0",
+    "nonebot-plugin-htmlrender[filehost,prometheus,sentry]>=0.8.1,<0.8.2",
     "nonebot-plugin-waiter>=0.8.1",
     "playwright==1.61.0",
     "pymupdf>=1.25.5",

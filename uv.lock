@@ -663,7 +663,7 @@ requires-dist = [
     { name = "nonebot-plugin-alisten", specifier = ">=0.4.3" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.5.0" },
     { name = "nonebot-plugin-datastore", specifier = ">=1.3.1" },
-    { name = "nonebot-plugin-htmlrender", extras = ["filehost", "prometheus", "sentry"], specifier = ">=0.7.2,<0.8.0" },
+    { name = "nonebot-plugin-htmlrender", extras = ["filehost", "prometheus", "sentry"], specifier = ">=0.8.1,<0.8.2" },
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4" },
     { name = "nonebot-plugin-memes", specifier = "==0.8.1" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.8.3" },
@@ -1976,19 +1976,6 @@ wheels = [
 ]
 
 [[package]]
-name = "nonebot-plugin-filehost"
-version = "1.1.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "anyio" },
-    { name = "nonebot2", extra = ["fastapi"] },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/92/9eec2789ca2b5fb4519acb476d056bd778a1bc4a3d7fc028ab719dc5d11e/nonebot_plugin_filehost-1.1.1.tar.gz", hash = "sha256:47d677a04321ccc57d4368cb447cc857b964d40b5e09fcdf4ec6a0ac7110b7c4", size = 6089, upload-time = "2024-03-01T02:58:03.619Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/65/d0/ebdf825493bfcf2ca3cc79521e536034424503684a33d98e6cbf84dd9e5c/nonebot_plugin_filehost-1.1.1-py3-none-any.whl", hash = "sha256:e77a1eb6de1b15aad1f4fa05566fbf05e07822ffcfe3def11a48a84cbb17e022", size = 7386, upload-time = "2024-03-01T02:58:01.74Z" },
-]
-
-[[package]]
 name = "nonebot-plugin-htmlkit"
 version = "0.1.0rc5"
 source = { registry = "https://pypi.org/simple" }
@@ -2024,7 +2011,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-htmlrender"
-version = "0.7.2"
+version = "0.8.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -2033,21 +2020,18 @@ dependencies = [
     { name = "markdown" },
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot2" },
-    { name = "playwright" },
     { name = "pygments" },
     { name = "pymdown-extensions" },
     { name = "python-markdown-math" },
-    { name = "tenacity" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/14/c8/460fc35084839a2d0abb58b8600015889c520725564b053e5c2970d9fadc/nonebot_plugin_htmlrender-0.7.2.tar.gz", hash = "sha256:ad85bc734f25cd91582b3ff1315031aed61a8c16d53ab5e0013140262e4a8820", size = 1737758, upload-time = "2026-07-14T04:32:45.431Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b0/50/23c063924aba438cc426fffb443d8079060a38c5707435eb75d088069972/nonebot_plugin_htmlrender-0.8.1.tar.gz", hash = "sha256:314c75357d8843573d337e0cf698f747eef551b4ffcdc624588eaf13ac22b3a5", size = 2960961, upload-time = "2026-07-30T05:03:29.782Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a1/14/15b9483afc5b9a6a1de51f0ebd35f4d49cc04d84ac36086c42713acb01c5/nonebot_plugin_htmlrender-0.7.2-py3-none-any.whl", hash = "sha256:353479bec15e235244ed47e7a74f997140d719ac70c7ad401def3edcb3b42dfc", size = 1136330, upload-time = "2026-07-14T04:32:43.808Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/e4/050e5ea0ffbc05667d0cd5e0afc93d80571723d1da842a10aeb46a53b363/nonebot_plugin_htmlrender-0.8.1-py3-none-any.whl", hash = "sha256:ebf503834c9b0c6e397a1c0a172c4b71dbce2b4e8dad7c8b893b92c04b9193e8", size = 1261799, upload-time = "2026-07-30T05:03:27.794Z" },
 ]
 
 [package.optional-dependencies]
 filehost = [
-    { name = "nonebot-plugin-filehost" },
     { name = "py-machineid" },
 ]
 prometheus = [
@@ -3398,15 +3382,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/66/5e/656d52aa389f9e9c97385e3073860b2c177aae3261ff607a7b0d1113b19e/tarina-0.7.5-cp314-cp314-win_amd64.whl", hash = "sha256:fa4344d0172c217ce11fa3318829faa90e09e28a38e3838705e085e200ae2116", size = 99797, upload-time = "2026-05-18T09:14:09.131Z" },
     { url = "https://files.pythonhosted.org/packages/f4/25/6ef0affe179e09358ca685e2616bdfebf2ca88f5bef1f9e2ca6786eff2bd/tarina-0.7.5-cp314-cp314-win_arm64.whl", hash = "sha256:714d16892d6258cb7e1dddf19ffe954f62e899e9857bfc1a2a4016c24c7eafbe", size = 92417, upload-time = "2026-05-18T09:14:10.15Z" },
     { url = "https://files.pythonhosted.org/packages/e5/31/8de99c767e77174c2e32ebce81110b2daff5949943835a956c1fc8f36bcd/tarina-0.7.5-py3-none-any.whl", hash = "sha256:f8d25cd4953f5613fac478cd9b5af5d598542033f385a45fe5e88e8ddf566af0", size = 48582, upload-time = "2026-05-18T09:14:32.075Z" },
-]
-
-[[package]]
-name = "tenacity"
-version = "9.1.4"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/47/c6/ee486fd809e357697ee8a44d3d69222b344920433d3b6666ccd9b374630c/tenacity-9.1.4.tar.gz", hash = "sha256:adb31d4c263f2bd041081ab33b498309a57c77f9acf2db65aadf0898179cf93a", size = 49413, upload-time = "2026-02-07T10:45:33.841Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d7/c1/eb8f9debc45d3b7918a32ab756658a0904732f75e555402972246b0b8e71/tenacity-9.1.4-py3-none-any.whl", hash = "sha256:6095a360c919085f28c6527de529e76a06ad89b23659fa881ae0649b867a9d55", size = 28926, upload-time = "2026-02-07T10:45:32.24Z" },
 ]
 
 [[package]]
