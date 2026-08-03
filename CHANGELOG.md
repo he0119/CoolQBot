@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Added
 
 - 添加大模型对话插件 (llm)，支持 Chat Completions、Responses 与 Anthropic Messages 三种 API 格式、全局和模型级服务地址配置、响应耗时与 token 用量尾注、会话亲和请求头、Aperture 与 DeepSeek 模型额度查询，以及天气和节假日工具调用
+- 为 `/llm quota` 添加 `/quota` 与 `/额度` 快捷命令
+
+### Removed
+
+- 移除已由 llm 替代的 deepseek 与 llm_quota 插件
 
 ## [0.28.0] - 2026-07-24
 

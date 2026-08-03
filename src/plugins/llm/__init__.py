@@ -92,6 +92,9 @@ llm_cmd = on_alconna(
     ],
 )
 
+llm_cmd.shortcut("quota", command="llm quota", prefix=True, fuzzy=True, humanized="quota [模型名]")
+llm_cmd.shortcut("额度", command="llm quota", prefix=True, fuzzy=True, humanized="额度 [模型名]")
+
 
 @llm_cmd.assign("model.list")
 async def llm_model_list_handle(user: UserSession):
