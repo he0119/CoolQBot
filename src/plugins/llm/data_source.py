@@ -36,6 +36,18 @@ def _available_names(config: GroupLLMConfig | None) -> list[str]:
     return [name for name in names if name in allowed]
 
 
+def _resolve_zssm_vision_model_name(config: GroupLLMConfig | None, names: list[str]) -> str:
+    """优先使用群组显式设置，否则选择首个已开放的视觉模型。"""
+    if config and config.zssm_vision_model in names:
+        configured = config.zssm_vision_model
+        if configured and "vision" in plugin_config.get_model(configured).capabilities:
+            return configured
+    return next(
+        (name for name in names if "vision" in plugin_config.get_model(name).capabilities),
+        "",
+    )
+
+
 async def get_available_model_names(session_id: str) -> list[str]:
     """获取本群可用模型；未配置准入列表时默认拒绝。"""
     return _available_names(await _get_config(session_id))
@@ -50,7 +62,7 @@ async def get_model_overview(session_id: str) -> GroupModelOverview:
 
     model_name = config.model_name if config and config.model_name in names else names[0]
     zssm_model_name = config.zssm_model if config and config.zssm_model in names else model_name
-    zssm_vision_model_name = config.zssm_vision_model if config and config.zssm_vision_model in names else ""
+    zssm_vision_model_name = _resolve_zssm_vision_model_name(config, names)
     return GroupModelOverview(names, model_name, zssm_model_name, zssm_vision_model_name)
 
 
@@ -177,12 +189,10 @@ async def clear_zssm_model_name(session_id: str) -> None:
 
 
 async def get_zssm_vision_model_name(session_id: str) -> str:
-    """获取本群解释模式使用的独立视觉模型。"""
+    """获取本群解释模式使用的独立视觉模型；未设置时自动选择。"""
     config = await _get_config(session_id)
     names = _available_names(config)
-    if config and config.zssm_vision_model in names:
-        return config.zssm_vision_model or ""
-    return ""
+    return _resolve_zssm_vision_model_name(config, names)
 
 
 async def set_zssm_vision_model_name(session_id: str, model_name: str) -> None:
@@ -201,7 +211,7 @@ async def set_zssm_vision_model_name(session_id: str, model_name: str) -> None:
 
 
 async def clear_zssm_vision_model_name(session_id: str) -> None:
-    """清除本群解释模式使用的独立视觉模型。"""
+    """清除本群解释模式的显式视觉模型，使其恢复自动选择。"""
     async with get_session() as session:
         config = (
             await session.scalars(select(GroupLLMConfig).where(GroupLLMConfig.session_id == session_id))
@@ -209,7 +219,7 @@ async def clear_zssm_vision_model_name(session_id: str) -> None:
         if config:
             config.zssm_vision_model = None
             await session.commit()
-    logger.info("LLM 群组视觉模型已清除")
+    logger.info("LLM 群组视觉模型已恢复自动选择")
 
 
 async def get_tts_model(session_id: str) -> str:

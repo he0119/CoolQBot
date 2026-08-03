@@ -62,6 +62,7 @@ from .data_source import (
 from .handler import LLMHandler, send_reaction
 from .providers import ProviderError
 from .quota import QuotaError, get_quota
+from .rules import is_non_private
 from .schemas import ImageContent
 from .tts import TTSError, get_tts_models
 
@@ -83,6 +84,8 @@ llm_cmd = on_alconna(
         Subcommand(
             "model",
             Option("-l|--list", help_text="查看模型列表"),
+            Option("-a|--all", default=False, action=store_true, help_text="查看全部模型（仅超级管理员）"),
+            Option("-c|--capabilities", default=False, action=store_true, help_text="在模型列表中显示能力"),
             Option("--set", Args["model#模型名称", str], help_text="设置群组默认模型"),
             Option(
                 "--set-available",
@@ -93,7 +96,7 @@ llm_cmd = on_alconna(
             Option("--set-zssm", Args["model#模型名称", str], help_text="设置本群解释模型"),
             Option("--clear-zssm", action=store_true, help_text="使本群解释模型跟随默认模型"),
             Option("--set-vision", Args["model#模型名称", str], help_text="设置本群解释视觉模型"),
-            Option("--clear-vision", action=store_true, help_text="清除本群解释视觉模型"),
+            Option("--clear-vision", action=store_true, help_text="使本群解释视觉模型恢复自动选择"),
             help_text="模型相关设置",
         ),
         Subcommand(
@@ -114,6 +117,7 @@ llm_cmd = on_alconna(
     ),
     use_cmd_start=True,
     block=True,
+    rule=Rule(is_non_private),
     extensions=[
         ReplyMergeExtension(),
         TelegramSlashExtension(),
@@ -133,7 +137,11 @@ async def _should_handle_mention(event: Event) -> bool:
     return not any(prefix and text.startswith(prefix) for prefix in nonebot.get_driver().config.command_start)
 
 
-llm_mention = on_message(rule=to_me() & Rule(_should_handle_mention), priority=15, block=True)
+llm_mention = on_message(
+    rule=Rule(is_non_private) & to_me() & Rule(_should_handle_mention),
+    priority=15,
+    block=True,
+)
 
 
 class LLMSetupError(ValueError):
@@ -181,14 +189,22 @@ async def _create_handler(
 
 
 @llm_cmd.assign("model.list")
-async def llm_model_list_handle(bot: Bot, event: Event, user: UserSession):
+async def llm_model_list_handle(
+    bot: Bot,
+    event: Event,
+    user: UserSession,
+    show_all: Query[bool] = Query("model.all.value", False),
+    show_capabilities: Query[bool] = Query("model.capabilities.value", False),
+):
     all_names = plugin_config.get_model_names()
     if not all_names:
         await llm_cmd.finish("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
     overview = await get_model_overview(user.session_id)
     available_names = overview.available_model_names
     is_superuser = await SUPERUSER(bot, event)
-    if not available_names and not is_superuser:
+    if show_all.result and not is_superuser:
+        await llm_cmd.finish("该参数仅超级管理员可用", at_sender=True)
+    if not available_names and not show_all.result:
         await llm_cmd.finish("本群未开放任何模型，请联系超级管理员配置")
 
     current = overview.model_name
@@ -198,21 +214,25 @@ async def llm_model_list_handle(bot: Bot, event: Event, user: UserSession):
 
     def format_model(name: str) -> str:
         labels: list[str] = []
-        if is_superuser:
+        if show_all.result:
             labels.append("已开放" if name in available else "未开放")
         if name == current:
             labels.append("当前")
         if name == zssm_model:
-            labels.append("解释")
+            labels.append("zssm")
         if name == vision_model:
-            labels.append("视觉")
+            labels.append("zssm 视觉")
+        if show_capabilities.result:
+            capabilities = plugin_config.get_model(name).capabilities
+            capability_text = "、".join("视觉" if item == "vision" else item for item in sorted(capabilities))
+            labels.append(f"能力：{capability_text or '无'}")
         suffix = f"（{'，'.join(labels)}）" if labels else ""
         return f"- {name}{suffix}"
 
-    names = all_names if is_superuser else available_names
+    names = all_names if show_all.result else available_names
     model_list = "\n".join(format_model(name) for name in names)
-    title = "全部模型列表" if is_superuser else "支持的模型列表"
-    access_hint = "\n输入 /llm model --set-available [模型名...] 设置本群开放模型" if is_superuser else ""
+    title = "全部模型列表" if show_all.result else "支持的模型列表"
+    access_hint = "\n输入 /llm model --set-available [模型名...] 设置本群开放模型" if show_all.result else ""
     await llm_cmd.finish(
         f"{title}：\n{model_list}\n"
         "输入 /llm --model [模型名] [内容] 单次指定模型\n"
@@ -308,7 +328,7 @@ async def llm_model_clear_vision_handle(bot: Bot, event: Event, user: UserSessio
     if not await admin_permission()(bot, event):
         await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
     await clear_zssm_vision_model_name(user.session_id)
-    await llm_cmd.finish("已清除本群解释视觉模型", at_sender=True)
+    await llm_cmd.finish("本群解释视觉模型已恢复自动选择", at_sender=True)
 
 
 @llm_cmd.assign("tts.list")
