@@ -44,6 +44,49 @@ def test_session_affinity_is_per_conversation(app: App, mock_models):
     assert first.session_affinity != second.session_affinity
 
 
+def test_extract_context_reply_keeps_message_id(app: App, mocker):
+    """续聊消息在 waiter 的事件上下文中保存消息 ID"""
+    from src.plugins.llm import _extract_reply
+
+    event = fake_group_message_event_v11(message=Message("继续聊"), message_id=42)
+    get_message_id = mocker.patch("src.plugins.llm.get_message_id", return_value="42")
+
+    message, message_id = _extract_reply(event)
+
+    assert message == event.get_message()
+    assert message_id == "42"
+    get_message_id.assert_called_once_with(event)
+
+
+async def test_context_reply_reacts_to_current_message(app: App, mocker):
+    """多轮续聊把当前消息 ID 传给模型响应流程"""
+    from src.plugins.llm import _handle_with_context
+
+    class StopConversation(Exception):
+        pass
+
+    handler = mocker.Mock()
+    handler.send = mocker.AsyncMock()
+    first_completion = object()
+    ask = mocker.patch(
+        "src.plugins.llm._ask",
+        side_effect=[first_completion, StopConversation],
+    )
+    mocker.patch(
+        "nonebot_plugin_waiter.prompt",
+        return_value=(Message("继续聊"), "42"),
+    )
+
+    with pytest.raises(StopConversation):
+        await _handle_with_context(handler, "开始", None)
+
+    assert ask.await_args_list == [
+        call(handler, "开始", None),
+        call(handler, "继续聊", None, message_id="42"),
+    ]
+    handler.send.assert_awaited_once_with(first_completion)
+
+
 @pytest.mark.asyncio
 async def test_llm_not_configured(app: App):
     """未配置任何模型时的提示"""

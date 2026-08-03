@@ -249,20 +249,14 @@ async def _handle_with_context(
     await handler.send(completion)
 
     while True:
-        reply_message_id: str | None = None
-
-        def receive_reply(reply_event: Event):
-            nonlocal reply_message_id
-            reply_message_id = get_message_id(reply_event)
-            return reply_event.get_message()
-
-        reply = await prompt(
+        received = await prompt(
             "继续对话吧（发送「结束」结束对话，「回滚」撤销上一轮）",
-            handler=receive_reply,
+            handler=_extract_reply,
             timeout=plugin_config.context_timeout,
         )
-        if reply is None:
+        if received is None:
             await UniMessage.text("等待超时，已结束对话").finish()
+        reply, reply_message_id = received
 
         message = reply.extract_plain_text().strip()
         if message in ("结束", "取消"):
@@ -278,6 +272,11 @@ async def _handle_with_context(
 
         completion = await _ask(handler, message, None, message_id=reply_message_id)
         await handler.send(completion)
+
+
+def _extract_reply(reply_event: Event):
+    """提取续聊消息，并在 waiter 事件上下文中保存其消息 ID"""
+    return reply_event.get_message(), get_message_id(reply_event)
 
 
 async def _ask(
