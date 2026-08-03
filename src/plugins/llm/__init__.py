@@ -93,7 +93,7 @@ llm_cmd = on_alconna(
             Option("--set-zssm", Args["model#模型名称", str], help_text="设置本群解释模型"),
             Option("--clear-zssm", action=store_true, help_text="使本群解释模型跟随默认模型"),
             Option("--set-vision", Args["model#模型名称", str], help_text="设置本群解释视觉模型"),
-            Option("--clear-vision", action=store_true, help_text="清除本群解释视觉模型"),
+            Option("--clear-vision", action=store_true, help_text="使本群解释视觉模型恢复自动选择"),
             help_text="模型相关设置",
         ),
         Subcommand(
@@ -204,8 +204,10 @@ async def llm_model_list_handle(bot: Bot, event: Event, user: UserSession):
             labels.append("当前")
         if name == zssm_model:
             labels.append("解释")
+        if "vision" in plugin_config.get_model(name).capabilities:
+            labels.append("👁️")
         if name == vision_model:
-            labels.append("视觉")
+            labels.append("解释视觉")
         suffix = f"（{'，'.join(labels)}）" if labels else ""
         return f"- {name}{suffix}"
 
@@ -308,7 +310,7 @@ async def llm_model_clear_vision_handle(bot: Bot, event: Event, user: UserSessio
     if not await admin_permission()(bot, event):
         await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
     await clear_zssm_vision_model_name(user.session_id)
-    await llm_cmd.finish("已清除本群解释视觉模型", at_sender=True)
+    await llm_cmd.finish("本群解释视觉模型已恢复自动选择", at_sender=True)
 
 
 @llm_cmd.assign("tts.list")

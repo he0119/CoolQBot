@@ -386,7 +386,7 @@ def test_model_capability_selects_single_or_two_stage_vision(app: App, mocker):
     assert resolve_vision_fallback("text", "vision", has_images=True) == "vision"
     assert resolve_vision_fallback("text", "vision", has_images=False) == ""
 
-    with pytest.raises(ValueError, match=r"/llm model --set-vision"):
+    with pytest.raises(ValueError, match="本群没有已开放并声明 vision 能力的模型"):
         resolve_vision_fallback("text", "", has_images=True)
 
 

@@ -964,7 +964,7 @@ async def test_group_model_management_reports_validation_errors(app: App, mocker
 
 
 async def test_admin_clears_group_zssm_models(app: App, mocker):
-    """管理员可以恢复解释模型跟随默认值并清除视觉模型。"""
+    """管理员可以恢复解释模型跟随默认值与视觉模型自动选择。"""
     from src.plugins.llm import llm_cmd
     from src.plugins.llm.config import ModelConfig, plugin_config
     from src.plugins.llm.data_source import (
@@ -1003,11 +1003,11 @@ async def test_admin_clears_group_zssm_models(app: App, mocker):
         event = fake_group_message_event_v11(message=Message("/llm model --clear-vision"), user_id=10)
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "已清除本群解释视觉模型", True, at_sender=True)
+        ctx.should_call_send(event, "本群解释视觉模型已恢复自动选择", True, at_sender=True)
         ctx.should_finished(llm_cmd)
 
     assert await get_zssm_model_name("QQClient_10000") == "default"
-    assert await get_zssm_vision_model_name("QQClient_10000") == ""
+    assert await get_zssm_vision_model_name("QQClient_10000") == "vision"
 
 
 async def test_superuser_sets_available_models_with_provider_paths(app: App, mocker):
@@ -1098,7 +1098,7 @@ async def test_admin_sets_group_zssm_models(app: App, respx_mock: MockRouter, mo
             "全部模型列表：\n"
             "- test-model（已开放，当前）\n"
             "- explain（已开放，解释）\n"
-            "- vision（已开放，视觉）\n"
+            "- vision（已开放，👁️，解释视觉）\n"
             "输入 /llm --model [模型名] [内容] 单次指定模型\n"
             "输入 /llm model --set [模型名] 设置群组默认模型\n"
             "输入 /llm model --set-available [模型名...] 设置本群开放模型",

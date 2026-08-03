@@ -142,7 +142,7 @@ async def test_model_overview_reads_group_config_once(app: App, mocker):
 
 
 async def test_group_zssm_models_are_independent(app: App, mocker):
-    """解释模型与视觉模型按群保存，并且只能从本群开放模型中选择。"""
+    """解释模型与视觉模型按群保存，视觉模型清除后恢复自动选择。"""
     from src.plugins.llm.config import ModelConfig, plugin_config
     from src.plugins.llm.data_source import (
         clear_zssm_model_name,
@@ -184,11 +184,40 @@ async def test_group_zssm_models_are_independent(app: App, mocker):
     assert await get_zssm_model_name("QQClient_10000") == "explain"
 
     await clear_zssm_vision_model_name("QQClient_10000")
-    assert await get_zssm_vision_model_name("QQClient_10000") == ""
+    assert await get_zssm_vision_model_name("QQClient_10000") == "vision"
     await set_zssm_vision_model_name("QQClient_10000", "vision")
 
     await set_available_model_names("QQClient_10000", ["explain"])
     assert await get_zssm_vision_model_name("QQClient_10000") == ""
+
+
+async def test_zssm_vision_model_prefers_explicit_selection_over_automatic_fallback(app: App, mocker):
+    """未设置时按开放顺序自动选视觉模型，显式选择仍有更高优先级。"""
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import (
+        clear_zssm_vision_model_name,
+        get_zssm_vision_model_name,
+        set_available_model_names,
+        set_zssm_vision_model_name,
+    )
+
+    mocker.patch.object(
+        plugin_config,
+        "models",
+        [
+            ModelConfig(name="text"),
+            ModelConfig(name="automatic", capabilities={"vision"}),
+            ModelConfig(name="explicit", capabilities={"vision"}),
+        ],
+    )
+    await set_available_model_names("QQClient_10000", ["text", "automatic", "explicit"])
+
+    assert await get_zssm_vision_model_name("QQClient_10000") == "automatic"
+    await set_zssm_vision_model_name("QQClient_10000", "explicit")
+    assert await get_zssm_vision_model_name("QQClient_10000") == "explicit"
+
+    await clear_zssm_vision_model_name("QQClient_10000")
+    assert await get_zssm_vision_model_name("QQClient_10000") == "automatic"
 
 
 async def test_set_and_get_tts_model(app: App, mocker):
