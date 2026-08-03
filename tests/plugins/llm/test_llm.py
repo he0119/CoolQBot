@@ -1,6 +1,7 @@
 """测试 /llm 命令"""
 
 import json
+from unittest.mock import call
 from uuid import UUID
 
 import httpx
@@ -27,7 +28,8 @@ def mock_models(mocker):
     )
     mocker.patch.object(plugin_config, "models", [config])
     mocker.patch("src.plugins.llm.handler.perf_counter", side_effect=[10.0, 15.1])
-    return config
+    reaction = mocker.patch("src.plugins.llm.send_reaction")
+    return config, reaction
 
 
 def test_session_affinity_is_per_conversation(app: App, mock_models):
@@ -40,6 +42,49 @@ def test_session_affinity_is_per_conversation(app: App, mock_models):
     assert UUID(first.session_affinity).version == 4
     assert UUID(second.session_affinity).version == 4
     assert first.session_affinity != second.session_affinity
+
+
+def test_extract_context_reply_keeps_message_id(app: App, mocker):
+    """续聊消息在 waiter 的事件上下文中保存消息 ID"""
+    from src.plugins.llm import _extract_reply
+
+    event = fake_group_message_event_v11(message=Message("继续聊"), message_id=42)
+    get_message_id = mocker.patch("src.plugins.llm.get_message_id", return_value="42")
+
+    message, message_id = _extract_reply(event)
+
+    assert message == event.get_message()
+    assert message_id == "42"
+    get_message_id.assert_called_once_with(event)
+
+
+async def test_context_reply_reacts_to_current_message(app: App, mocker):
+    """多轮续聊把当前消息 ID 传给模型响应流程"""
+    from src.plugins.llm import _handle_with_context
+
+    class StopConversation(Exception):
+        pass
+
+    handler = mocker.Mock()
+    handler.send = mocker.AsyncMock()
+    first_completion = object()
+    ask = mocker.patch(
+        "src.plugins.llm._ask",
+        side_effect=[first_completion, StopConversation],
+    )
+    mocker.patch(
+        "nonebot_plugin_waiter.prompt",
+        return_value=(Message("继续聊"), "42"),
+    )
+
+    with pytest.raises(StopConversation):
+        await _handle_with_context(handler, "开始", None)
+
+    assert ask.await_args_list == [
+        call(handler, "开始", None),
+        call(handler, "继续聊", None, message_id="42"),
+    ]
+    handler.send.assert_awaited_once_with(first_completion)
 
 
 @pytest.mark.asyncio
@@ -96,6 +141,12 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
             True,
         )
 
+    _, reaction = mock_models
+    assert reaction.await_args_list == [
+        call("thinking", message_id=None),
+        call("done", message_id=None),
+    ]
+
     request = route.calls[0].request
     assert UUID(request.headers["x-session-affinity"]).version == 4
 
@@ -118,7 +169,6 @@ async def test_llm_rejects_unknown_model(app: App, mock_models):
 async def test_llm_with_thinking(app: App, respx_mock: MockRouter, mock_models, mocker):
     """开启推理内容展示时附带思考过程"""
     from src.plugins.llm.config import plugin_config
-    from src.plugins.llm.handler import THINKING_SEPARATOR
 
     mocker.patch.object(plugin_config, "send_thinking", True)
 
@@ -145,7 +195,7 @@ async def test_llm_with_thinking(app: App, respx_mock: MockRouter, mock_models, 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message(f"在想{THINKING_SEPARATOR}你好呀\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0"),
+            Message("> 在想\n\n你好呀\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0"),
             True,
         )
 
@@ -285,6 +335,12 @@ async def test_llm_error_raises(app: App, respx_mock: MockRouter, mock_models):
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "调用失败：无效的密钥", True, at_sender=True)
         ctx.should_finished(llm_cmd)
+
+    _, reaction = mock_models
+    assert reaction.await_args_list == [
+        call("thinking", message_id=None),
+        call("fail", message_id=None),
+    ]
 
 
 @respx.mock(assert_all_called=True)

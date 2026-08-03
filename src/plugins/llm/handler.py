@@ -9,11 +9,11 @@ from __future__ import annotations
 import asyncio
 import re
 from time import perf_counter
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 from uuid import uuid4
 
 from nonebot.log import logger
-from nonebot_plugin_alconna import UniMessage
+from nonebot_plugin_alconna import SupportAdapter, UniMessage, get_target, message_reaction
 
 from .config import plugin_config
 from .providers import ProviderError, get_provider
@@ -27,8 +27,13 @@ if TYPE_CHECKING:
 THINK_PATTERN = re.compile(r"<think>(.*?)</think>", re.DOTALL)
 """部分服务商把推理内容混在正文的 think 标签里"""
 
-THINKING_SEPARATOR = "\n\n--------------------\n\n"
-"""推理内容与正文之间的分隔线"""
+ReactionStatus = Literal["fail", "thinking", "done"]
+REACTION_EMOJIS: dict[ReactionStatus, tuple[str, str]] = {
+    "fail": ("10060", "❌"),
+    "thinking": ("424", "👀"),
+    "done": ("144", "🎉"),
+}
+"""QQ emoji ID 与其他平台 Unicode emoji 的对应关系"""
 
 
 async def chat(model_name: str, messages: list[Message], *, session_affinity: str = "") -> Completion:
@@ -66,17 +71,41 @@ def format_statistics(completion: Completion) -> str:
     )
 
 
+def format_thinking(reasoning: str) -> str:
+    """把推理内容格式化为 Markdown 引用块"""
+    return "\n".join(f"> {line}" if line else ">" for line in reasoning.splitlines())
+
+
 def format_output(completion: Completion, *, with_thinking: bool, with_statistics: bool = True) -> str:
     """把模型回复格式化为最终文本"""
     content, reasoning = split_content(completion)
     if with_thinking and reasoning:
-        text = f"{reasoning}{THINKING_SEPARATOR}{content}" if content else reasoning
+        thinking = format_thinking(reasoning)
+        text = f"{thinking}\n\n{content}" if content else thinking
     else:
         text = content
 
     if text and with_statistics:
         return f"{text}\n\n{format_statistics(completion)}"
     return text
+
+
+async def send_reaction(
+    status: ReactionStatus,
+    *,
+    message_id: str | None = None,
+) -> None:
+    """给触发消息添加响应状态；平台不支持或调用失败时静默跳过"""
+    try:
+        target = get_target()
+        is_qq = target.adapter in (SupportAdapter.onebot11, SupportAdapter.qq)
+        if is_qq and target.private:
+            return
+
+        emoji = REACTION_EMOJIS[status][0 if is_qq else 1]
+        await message_reaction(emoji, message_id=message_id)
+    except Exception as e:
+        logger.opt(exception=e).debug("添加大模型响应状态失败，已忽略")
 
 
 async def execute_tool_calls(calls: list[ToolCall], context: list[Message]) -> None:

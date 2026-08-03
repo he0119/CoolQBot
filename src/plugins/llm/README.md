@@ -17,7 +17,8 @@
 
 - 单轮与多轮对话，多轮支持「结束」「回滚」指令
 - 流式与非流式请求
-- 推理内容展示（DeepSeek 的 `reasoning_content`、Anthropic 的 `thinking`、Responses 的推理摘要）
+- 推理内容以引用块展示（DeepSeek 的 `reasoning_content`、Anthropic 的 `thinking`、Responses 的推理摘要）
+- 使用 emoji reaction 反馈响应状态（思考中、已完成、失败；不支持的平台自动跳过）
 - 工具调用（function calling），三种格式自动适配
 - 图片输入（多模态）
 - 在回复末尾显示整轮耗时、实际模型和 token 用量，工具调用产生的多次请求会累计统计

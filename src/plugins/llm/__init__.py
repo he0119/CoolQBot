@@ -27,6 +27,7 @@ from nonebot_plugin_alconna import (
     Query,
     Subcommand,
     UniMessage,
+    get_message_id,
     image_fetch,
     on_alconna,
 )
@@ -39,7 +40,7 @@ from src.utils.helpers import admin_permission
 
 from .config import plugin_config
 from .data_source import get_model_name, get_tts_model, set_model_name, set_tts_model
-from .handler import LLMHandler
+from .handler import LLMHandler, send_reaction
 from .providers import ProviderError
 from .quota import QuotaError, get_quota
 from .schemas import ImageContent
@@ -248,12 +249,14 @@ async def _handle_with_context(
     await handler.send(completion)
 
     while True:
-        reply = await prompt(
+        received = await prompt(
             "继续对话吧（发送「结束」结束对话，「回滚」撤销上一轮）",
+            handler=_extract_reply,
             timeout=plugin_config.context_timeout,
         )
-        if reply is None:
+        if received is None:
             await UniMessage.text("等待超时，已结束对话").finish()
+        reply, reply_message_id = received
 
         message = reply.extract_plain_text().strip()
         if message in ("结束", "取消"):
@@ -267,18 +270,36 @@ async def _handle_with_context(
         if not message:
             continue
 
-        completion = await _ask(handler, message, None)
+        completion = await _ask(handler, message, None, message_id=reply_message_id)
         await handler.send(completion)
 
 
-async def _ask(handler: LLMHandler, text: str, images: list[ImageContent] | None):
+def _extract_reply(reply_event: Event):
+    """提取续聊消息，并在 waiter 事件上下文中保存其消息 ID"""
+    return reply_event.get_message(), get_message_id(reply_event)
+
+
+async def _ask(
+    handler: LLMHandler,
+    text: str,
+    images: list[ImageContent] | None,
+    *,
+    message_id: str | None = None,
+):
     """请求模型，失败时结束当前会话并提示原因"""
+    await send_reaction("thinking", message_id=message_id)
     try:
-        return await handler.ask(text, images)
+        completion = await handler.ask(text, images)
     except ProviderError as e:
+        await send_reaction("fail", message_id=message_id)
         await llm_cmd.finish(f"调用失败：{e}", at_sender=True)
     except ValueError as e:
+        await send_reaction("fail", message_id=message_id)
         await llm_cmd.finish(str(e), at_sender=True)
     except Exception as e:
         logger.opt(exception=e).error("大模型调用出现未预期的错误")
+        await send_reaction("fail", message_id=message_id)
         await llm_cmd.finish("调用失败，请稍后重试", at_sender=True)
+
+    await send_reaction("done", message_id=message_id)
+    return completion
