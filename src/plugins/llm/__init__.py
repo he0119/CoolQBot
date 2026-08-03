@@ -1,7 +1,7 @@
 """大模型对话插件
 
 支持 OpenAI Chat Completions / OpenAI Responses / Anthropic Messages 三种
-API 格式，提供多轮对话、推理内容展示、Markdown 转图片与 TTS 语音回复。
+API 格式，提供多轮对话、推理内容展示、原生 Markdown、Markdown 转图片与 TTS 语音回复。
 额度查询按模型选择独立 provider，目前支持 Aperture 与 DeepSeek。
 """
 
@@ -174,6 +174,7 @@ async def _create_handler(
 
     return LLMHandler(
         name,
+        send_markdown=plugin_config.prefer_markdown and not render,
         send_md_pic=render or plugin_config.md_to_pic,
         tts_model=tts_model,
     )

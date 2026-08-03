@@ -26,6 +26,7 @@
 - 超级管理员可按群开放模型，群管理员可分别设置默认对话、`zssm` 解释和视觉模型
 - 内置“这是什么”解释模式，可解释被回复的文字、图片、网页与 PDF
 - 在回复末尾显示整轮耗时、实际模型和 token 用量，工具调用产生的多次请求会累计统计
+- QQ 平台可优先发送原生 Markdown，其他平台或发送失败时自动回退
 - Markdown 转图片
 - TTS 语音回复（GPT-SoVITS）
 - 按模型查询剩余额度，支持 Tailscale Aperture 与 DeepSeek 官方余额接口
@@ -154,6 +155,8 @@ LLM__API_KEY=sk-xxx
 LLM__PROMPT=你是一个乐于助人的助手
 # 是否展示推理内容
 LLM__SEND_THINKING=true
+# 是否在 QQ 平台优先发送原生 Markdown；显式使用 /llm -r 时仍发送图片
+LLM__PREFER_MARKDOWN=false
 # 是否默认把回复渲染成图片
 LLM__MD_TO_PIC=false
 # 是否响应群聊 @ 等被适配器判定为发给机器人的消息

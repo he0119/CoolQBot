@@ -1,7 +1,7 @@
 """大模型对话处理
 
 负责组装上下文、驱动多轮对话、执行工具调用，并按配置决定回复形式
-（文本 / Markdown 图片 / TTS 语音）。
+（文本 / 原生 Markdown / Markdown 图片 / TTS 语音）。
 """
 
 from __future__ import annotations
@@ -145,6 +145,7 @@ class LLMHandler:
         model_name: str,
         *,
         session_affinity: str | None = None,
+        send_markdown: bool = False,
         send_md_pic: bool = False,
         tts_model: str = "",
         system_prompt: str | None = None,
@@ -153,6 +154,7 @@ class LLMHandler:
     ) -> None:
         self.model_name = model_name
         self.session_affinity = session_affinity or uuid4().hex
+        self.send_markdown = send_markdown
         self.send_md_pic = send_md_pic
         self.tts_model = tts_model
         self.enable_tools = enable_tools
@@ -372,6 +374,10 @@ class LLMHandler:
                 await UniMessage.text(format_statistics(completion)).send(reply_to=reply_to)
                 return
 
+        if self.send_markdown and await try_send_markdown(text, reply_to=reply_to):
+            logger.info("LLM 会话发送回复（会话={}，方式=原生 Markdown，字符={}）", self.log_id, len(text))
+            return
+
         if self.send_md_pic:
             if image := await try_render_markdown(text):
                 logger.info(
@@ -384,6 +390,25 @@ class LLMHandler:
 
         logger.info("LLM 会话发送回复（会话={}，方式=文本，字符={}）", self.log_id, len(text))
         await UniMessage.text(text).send(reply_to=reply_to)
+
+
+async def try_send_markdown(text: str, *, reply_to: str | bool = False) -> bool:
+    """在支持的平台发送原生 Markdown，无法发送时返回 False 以便继续回退。"""
+    try:
+        adapter = get_target().adapter
+    except Exception as e:
+        logger.opt(exception=e).debug("无法判断当前平台的 Markdown 支持情况，继续使用回退格式")
+        return False
+
+    if adapter != SupportAdapter.qq:
+        return False
+
+    try:
+        await UniMessage.style(text, "markdown").send(reply_to=reply_to)
+    except Exception as e:
+        logger.opt(exception=e).warning("原生 Markdown 回复发送失败，继续使用回退格式")
+        return False
+    return True
 
 
 async def try_render_markdown(text: str) -> bytes | None:

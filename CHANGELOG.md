@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 集成 `zssm` 解释模式，支持文本、关注点、图片、网页和 PDF，并可通过 `--model` 临时指定模型
 - 支持超级管理员按群开放模型（默认不开放），并为每个群独立设置默认对话、`zssm` 解释及视觉模型
 - 添加天气、节假日、`web_search` 与 `web_fetch` 内置工具，支持搜索并安全读取网页、文本、JSON 和 PDF，并在长时间调用时定期提示用户
+- 支持在 QQ 平台优先使用原生 Markdown 回复，并在发送失败时回退到图片或文本
 
 ### Fixed
 

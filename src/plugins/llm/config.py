@@ -116,6 +116,8 @@ class ScopedConfig(BaseModel):
     """是否流式请求"""
     send_thinking: bool = False
     """是否附带推理内容"""
+    prefer_markdown: bool = False
+    """是否在 QQ 平台优先使用原生 Markdown 回复"""
     md_to_pic: bool = False
     """是否把回复渲染成图片"""
     respond_to_mention: bool = True

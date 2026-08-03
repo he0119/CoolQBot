@@ -222,11 +222,14 @@ def test_model_config_defaults(app: App):
     assert anthropic.capabilities == {"vision"}
 
     config = ScopedConfig(models=[chat, anthropic])
+    assert config.prefer_markdown is False
     assert config.max_tool_rounds == 10
     assert config.tool_notice_delay == 10.0
     assert config.tool_notice_interval == 60.0
     assert config.resolve("deepseek-chat").base_url == "https://api.deepseek.com"
     assert config.resolve("claude").base_url == "https://api.anthropic.com"
+
+    assert ScopedConfig.model_validate({"prefer_markdown": True}).prefer_markdown is True
 
 
 def test_legacy_zssm_resource_config_aliases(app: App):

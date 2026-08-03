@@ -198,6 +198,24 @@ async def test_llm_group_mention_uses_default_chat_flow(app: App, mock_models, m
     handler.send.assert_awaited_once_with(completion, reply_to="42")
 
 
+async def test_create_handler_prefers_markdown_unless_render_is_explicit(app: App, mock_models, mocker):
+    """全局 Markdown 偏好生效，但显式 -r 仍强制渲染图片。"""
+    from src.plugins.llm import _create_handler
+    from src.plugins.llm.config import plugin_config
+
+    mocker.patch.object(plugin_config, "prefer_markdown", True)
+    mocker.patch.object(plugin_config, "md_to_pic", False)
+    user = mocker.Mock(session_id="QQClient_10000")
+
+    handler = await _create_handler(user)
+    assert handler.send_markdown is True
+    assert handler.send_md_pic is False
+
+    rendered_handler = await _create_handler(user, render=True)
+    assert rendered_handler.send_markdown is False
+    assert rendered_handler.send_md_pic is True
+
+
 async def test_llm_mention_requires_to_me_message(app: App, mock_models):
     """普通消息不会触发快捷对话。"""
     from src.plugins.llm import llm_mention
@@ -1165,3 +1183,54 @@ async def test_llm_send_md_pic_fallback(app: App, respx_mock: MockRouter, mock_m
             Message("**加粗**\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0"),
             True,
         )
+
+
+async def test_try_send_markdown_uses_native_style_on_supported_adapter(app: App, mocker):
+    """支持的平台使用 UniSeg 的原生 Markdown 样式发送。"""
+    from nonebot_plugin_alconna import SupportAdapter, UniMessage
+
+    from src.plugins.llm.handler import try_send_markdown
+
+    mocker.patch(
+        "src.plugins.llm.handler.get_target",
+        return_value=mocker.Mock(adapter=SupportAdapter.qq),
+    )
+    send = mocker.patch.object(UniMessage, "send", autospec=True)
+
+    assert await try_send_markdown("**加粗**", reply_to="42") is True
+
+    message = send.await_args.args[0]
+    assert message[0].text == "**加粗**"
+    assert message[0].extract_most_style() == "markdown"
+    assert send.await_args.kwargs == {"reply_to": "42"}
+
+
+async def test_try_send_markdown_skips_unsupported_adapter(app: App, mocker):
+    """非 QQ 平台不尝试发送原生 Markdown，以便继续图片或文本回退。"""
+    from nonebot_plugin_alconna import SupportAdapter, UniMessage
+
+    from src.plugins.llm.handler import try_send_markdown
+
+    mocker.patch(
+        "src.plugins.llm.handler.get_target",
+        return_value=mocker.Mock(adapter=SupportAdapter.discord),
+    )
+    send = mocker.patch.object(UniMessage, "send", autospec=True)
+
+    assert await try_send_markdown("**加粗**") is False
+    send.assert_not_awaited()
+
+
+async def test_try_send_markdown_falls_back_after_send_error(app: App, mocker):
+    """平台拒绝原生 Markdown 时返回失败，让调用方继续回退。"""
+    from nonebot_plugin_alconna import SupportAdapter, UniMessage
+
+    from src.plugins.llm.handler import try_send_markdown
+
+    mocker.patch(
+        "src.plugins.llm.handler.get_target",
+        return_value=mocker.Mock(adapter=SupportAdapter.qq),
+    )
+    mocker.patch.object(UniMessage, "send", autospec=True, side_effect=RuntimeError("send failed"))
+
+    assert await try_send_markdown("**加粗**") is False
