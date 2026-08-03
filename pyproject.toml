@@ -41,7 +41,6 @@ dependencies = [
     "nonebot-plugin-memes==0.8.1",
     "nonebot-bison==0.9.14",
     "nonebot-plugin-status==0.9.0",
-    "nonebot-plugin-deepseek[image]==0.3.0",
     "nonebot-plugin-prometheus==0.4.1",
     "nonebot-plugin-zssm==0.3.7",
     "nonebot-plugin-abs==1.1.0",
@@ -107,7 +106,6 @@ nonebot-plugin-alisten = ["nonebot_plugin_alisten"]
 nonebot_plugin_memes = ["nonebot_plugin_memes"]
 nonebot-bison = ["nonebot_bison"]
 nonebot-plugin-status = ["nonebot_plugin_status"]
-nonebot-plugin-deepseek = ["nonebot_plugin_deepseek"]
 nonebot-plugin-prometheus = ["nonebot_plugin_prometheus"]
 nonebot-plugin-inspect = ["nonebot_plugin_inspect"]
 nonebot-plugin-zssm = ["nonebot_plugin_zssm"]

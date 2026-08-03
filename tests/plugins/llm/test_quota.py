@@ -148,9 +148,15 @@ async def test_quota_not_configured(app: App):
         await get_quota(ModelConfig(name="test-model"))
 
 
+@pytest.mark.parametrize("message", ["/llm quota deepseek", "/quota deepseek", "/额度 deepseek"])
 @respx.mock(assert_all_called=True)
-async def test_llm_quota_command_uses_selected_model(app: App, respx_mock: MockRouter, mocker):
-    """/llm quota 可指定模型，并调用该模型自己的额度 provider"""
+async def test_llm_quota_command_uses_selected_model(
+    app: App,
+    respx_mock: MockRouter,
+    mocker,
+    message: str,
+):
+    """完整命令和快捷命令均可指定模型，并调用该模型自己的额度 provider"""
     from src.plugins.llm import llm_cmd
     from src.plugins.llm.config import ModelConfig, plugin_config
 
@@ -187,7 +193,7 @@ async def test_llm_quota_command_uses_selected_model(app: App, respx_mock: MockR
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm quota deepseek"))
+        event = fake_group_message_event_v11(message=Message(message))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
