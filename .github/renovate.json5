@@ -9,6 +9,17 @@
   labels: ["dependencies"],
   rangeStrategy: "bump",
   ignoreDeps: ["eorzeaenv"],
+  customManagers: [
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^pyproject\\.toml$/"],
+      matchStrings: ['pythonVersion\\s*=\\s*"(?<currentValue>\\d+\\.\\d+)"'],
+      depNameTemplate: "python",
+      datasourceTemplate: "python-version",
+      versioningTemplate: "python",
+      extractVersionTemplate: "^(?<version>\\d+\\.\\d+)",
+    },
+  ],
   packageRules: [
     {
       groupName: "NoneBot adapters",
@@ -73,7 +84,7 @@
     {
       groupName: "Project Python version",
       matchPackageNames: ["python"],
-      matchManagers: ["pep621"],
+      matchManagers: ["pep621", "custom.regex"],
       matchUpdateTypes: ["major", "minor"],
       description: "Weekly update of project Python version",
     },
