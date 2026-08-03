@@ -116,7 +116,7 @@ nonebot-plugin-parser = ["nonebot_plugin_parser"]
 "@local" = []
 
 [tool.pyright]
-pythonVersion = "3.13"
+pythonVersion = "3.14"
 pythonPlatform = "All"
 typeCheckingMode = "standard"
 
