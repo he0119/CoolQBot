@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 添加大模型对话插件 (llm)，支持 Chat Completions、Responses 与 Anthropic Messages 三种 API 格式、全局和模型级服务地址配置、响应耗时与 token 用量尾注、会话亲和请求头、Aperture 与 DeepSeek 模型额度查询，以及天气和节假日工具调用
 - 为 `/llm quota` 添加 `/quota` 与 `/额度` 快捷命令
 - 支持在模型配置的 `capabilities` 中声明 `vision` 图片输入能力
-- 为 llm 添加内置 `zssm` 解释模式，支持回复文本、关注点、图片以及受限读取网页和 PDF
+- 为 llm 添加内置 `zssm` 解释模式，支持回复文本、关注点、图片以及受限读取网页和 PDF，并记录简洁的资源读取与模型调用日志
 
 ### Changed
 
@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Fixed
 
 - 修正 llm 对话选项位置与 TTS 模型设置命令的使用说明
+- 允许外部资源域名解析到配置的代理 fake-ip 网段，同时继续拒绝直接填写的非公网 IP
 
 ### Removed
 

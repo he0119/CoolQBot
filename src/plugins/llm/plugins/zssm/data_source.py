@@ -15,6 +15,7 @@ from urllib.parse import urljoin, urlsplit
 
 import httpx
 import pymupdf
+from nonebot.log import logger
 from nonebot_plugin_alconna import image_fetch
 
 from ...config import plugin_config
@@ -192,6 +193,8 @@ async def fetch_images(
     if len(images) > plugin_config.zssm_max_images:
         raise ValueError(f"图片数量超过限制，最多 {plugin_config.zssm_max_images} 张")
 
+    if images:
+        logger.info("开始读取 {} 张图片", len(images))
     contents: list[ImageContent] = []
     for image in images:
         data = await image_fetch(event, bot, state, image)
@@ -201,6 +204,8 @@ async def fetch_images(
             limit = plugin_config.zssm_max_image_bytes / 1024 / 1024
             raise ValueError(f"图片超过 {limit:g} MiB 限制")
         contents.append(ImageContent.from_bytes(data))
+    if contents:
+        logger.info("已读取 {} 张图片，共 {} 字节", len(contents), sum(len(item.data) for item in contents))
     return contents
 
 
@@ -208,6 +213,7 @@ async def describe_images(model_name: str, images: list[ImageContent]) -> tuple[
     """使用统一 LLM Provider 调用专用视觉模型描述图片。"""
     if "vision" not in plugin_config.get_model(model_name).capabilities:
         raise ValueError(f"视觉模型 {model_name} 未声明 vision 能力")
+    logger.info("调用视觉模型 {} 描述 {} 张图片", model_name, len(images))
     handler = LLMHandler(
         model_name,
         system_prompt=VISION_PROMPT,
@@ -218,6 +224,7 @@ async def describe_images(model_name: str, images: list[ImageContent]) -> tuple[
     description, _ = split_content(completion)
     if not description:
         raise ValueError("视觉模型没有返回图片描述")
+    logger.info("视觉模型 {} 已返回图片描述", completion.model)
     return description, completion
 
 
@@ -227,13 +234,35 @@ async def load_resources(*texts: str) -> list[ResourceContent]:
     if not urls:
         return []
 
-    async def load(url: str) -> ResourceContent:
-        try:
-            return await read_resource(url)
-        except ResourceError as e:
-            return ResourceContent(url=url, kind="error", content=f"读取失败：{e}")
+    total = len(urls)
 
-    return list(await asyncio.gather(*(load(url) for url in urls)))
+    async def load(index: int, url: str) -> ResourceContent:
+        target = _resource_log_target(url)
+        logger.info("开始读取外部资源 {}/{}（{}）", index, total, target)
+        try:
+            resource = await read_resource(url)
+        except ResourceError as e:
+            logger.warning("读取外部资源失败 {}/{}（{}）：{}", index, total, target, e)
+            return ResourceContent(url=url, kind="error", content=f"读取失败：{e}")
+        logger.info(
+            "外部资源读取完成 {}/{}（{}，{}，{} 字符）",
+            index,
+            total,
+            _resource_log_target(resource.url),
+            resource.kind,
+            len(resource.content),
+        )
+        return resource
+
+    return list(await asyncio.gather(*(load(index, url) for index, url in enumerate(urls, start=1))))
+
+
+def _resource_log_target(url: str) -> str:
+    """只保留资源主机名用于日志，避免记录路径和查询参数。"""
+    try:
+        return urlsplit(url).hostname or "无效地址"
+    except ValueError:
+        return "无效地址"
 
 
 async def read_resource(url: str) -> ResourceContent:
@@ -308,7 +337,7 @@ async def _download_resource(url: str) -> tuple[bytes, str, str]:
 
 
 async def _ensure_public_url(url: str) -> None:
-    """拒绝非 HTTP(S)、带凭据和解析到非公网地址的 URL。"""
+    """拒绝非 HTTP(S)、带凭据和非公网目标，兼容域名解析得到的 fake-ip。"""
     try:
         parsed = urlsplit(url)
         port = parsed.port
@@ -321,21 +350,51 @@ async def _ensure_public_url(url: str) -> None:
 
     host = parsed.hostname
     try:
-        addresses = {ipaddress.ip_address(host)}
+        literal_address = ipaddress.ip_address(host)
     except ValueError:
-        loop = asyncio.get_running_loop()
-        try:
-            records = await loop.getaddrinfo(
-                host,
-                port or (443 if parsed.scheme == "https" else 80),
-                type=socket.SOCK_STREAM,
-            )
-        except OSError as e:
-            raise ResourceError("域名解析失败") from e
-        addresses = {ipaddress.ip_address(record[4][0]) for record in records}
+        addresses = await _resolve_host_addresses(
+            host,
+            port or (443 if parsed.scheme == "https" else 80),
+        )
+        if not addresses:
+            raise ResourceError("域名没有解析到地址")
+        fake_ip_networks = _get_fake_ip_networks()
+        if any(not address.is_global and not _address_in_networks(address, fake_ip_networks) for address in addresses):
+            raise ResourceError("不允许访问本机、内网或非公网地址")
+        return
 
-    if not addresses or any(not address.is_global for address in addresses):
+    # URL 中直接填写 IP 时不应用 fake-ip 例外，避免把保留地址当作用户目标。
+    if not literal_address.is_global:
         raise ResourceError("不允许访问本机、内网或非公网地址")
+
+
+async def _resolve_host_addresses(
+    host: str,
+    port: int,
+) -> set[ipaddress.IPv4Address | ipaddress.IPv6Address]:
+    loop = asyncio.get_running_loop()
+    try:
+        records = await loop.getaddrinfo(host, port, type=socket.SOCK_STREAM)
+    except OSError as e:
+        raise ResourceError("域名解析失败") from e
+    return {ipaddress.ip_address(record[4][0]) for record in records}
+
+
+def _get_fake_ip_networks() -> list[ipaddress.IPv4Network | ipaddress.IPv6Network]:
+    networks: list[ipaddress.IPv4Network | ipaddress.IPv6Network] = []
+    for value in plugin_config.zssm_resource_fake_ip_ranges:
+        try:
+            networks.append(ipaddress.ip_network(value, strict=False))
+        except ValueError as e:
+            raise ResourceError(f"fake-ip 网段配置无效：{value}") from e
+    return networks
+
+
+def _address_in_networks(
+    address: ipaddress.IPv4Address | ipaddress.IPv6Address,
+    networks: list[ipaddress.IPv4Network | ipaddress.IPv6Network],
+) -> bool:
+    return any(address.version == network.version and address in network for network in networks)
 
 
 def _extract_pdf_text(data: bytes) -> str:

@@ -142,6 +142,8 @@ class ScopedConfig(BaseModel):
     """解释模式下载网页或 PDF 的超时时间（秒）"""
     zssm_resource_proxy: str | None = None
     """解释模式下载网页或 PDF 使用的代理"""
+    zssm_resource_fake_ip_ranges: list[str] = Field(default_factory=lambda: ["198.18.0.0/15"])
+    """域名解析时允许的代理 fake-ip 网段；不放宽 URL 中直接填写的 IP"""
     tts_base_url: str = ""
     """GPT-SoVITS 服务地址，留空则禁用语音功能"""
     tts_access_token: str = ""

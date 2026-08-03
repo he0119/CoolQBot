@@ -109,7 +109,14 @@ async def zssm_handle(
             enable_tools=False,
             show_thinking=False,
         )
+        logger.info(
+            "调用解释模型 {}（直传图片 {} 张，外部资源 {} 个）",
+            model_name,
+            len(final_images or []),
+            len(resources),
+        )
         completion = await handler.ask(user_prompt, final_images)
+        logger.info("解释模型 {} 已完成", completion.model)
         if vision_completion:
             completion.usage = vision_completion.usage + completion.usage
             completion.elapsed_seconds += vision_completion.elapsed_seconds

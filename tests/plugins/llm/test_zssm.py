@@ -202,11 +202,13 @@ async def test_fetch_images_uses_multimodal_input(app: App, mocker):
 
     png = b"\x89PNG\r\n\x1a\n" + b"test"
     event = mocker.Mock()
+    log_info = mocker.patch("src.plugins.llm.plugins.zssm.data_source.logger.info")
     contents = await fetch_images([Image(raw=png)], event, mocker.Mock(), {})
 
     assert len(contents) == 1
     assert contents[0].data == png
     assert contents[0].mimetype == "image/png"
+    assert log_info.call_count == 2
 
     mocker.patch.object(plugin_config, "zssm_max_images", 1)
     with pytest.raises(ValueError, match="最多 1 张"):
@@ -279,6 +281,60 @@ async def test_private_resource_url_is_rejected(app: App):
         await _ensure_public_url("http://127.0.0.1/admin")
     with pytest.raises(ResourceError, match="非公网地址"):
         await _ensure_public_url("http://[::1]/admin")
+
+
+async def test_domain_fake_ip_is_allowed_without_allowing_ip_literal(app: App, mocker):
+    """域名解析可使用代理 fake-ip，但用户直接填写保留地址仍会被拒绝。"""
+    import ipaddress
+
+    from src.plugins.llm.plugins.zssm.data_source import ResourceError, _ensure_public_url
+
+    resolve = mocker.patch(
+        "src.plugins.llm.plugins.zssm.data_source._resolve_host_addresses",
+        return_value={ipaddress.ip_address("198.18.1.2")},
+    )
+
+    await _ensure_public_url("https://example.com/article")
+    resolve.assert_awaited_once_with("example.com", 443)
+
+    with pytest.raises(ResourceError, match="非公网地址"):
+        await _ensure_public_url("https://198.18.1.2/article")
+
+
+async def test_domain_private_ip_outside_fake_range_is_rejected(app: App, mocker):
+    """普通域名解析到真实私网时仍阻止访问。"""
+    import ipaddress
+
+    from src.plugins.llm.plugins.zssm.data_source import ResourceError, _ensure_public_url
+
+    mocker.patch(
+        "src.plugins.llm.plugins.zssm.data_source._resolve_host_addresses",
+        return_value={ipaddress.ip_address("192.168.1.10")},
+    )
+
+    with pytest.raises(ResourceError, match="非公网地址"):
+        await _ensure_public_url("https://internal.example.com/admin")
+
+
+async def test_resource_operations_are_logged_without_url_details(app: App, mocker):
+    """资源读取记录主机、结果和长度，但不把路径或查询参数写入日志。"""
+    from src.plugins.llm.plugins.zssm.data_source import ResourceContent, load_resources
+
+    read_resource = mocker.patch(
+        "src.plugins.llm.plugins.zssm.data_source.read_resource",
+        return_value=ResourceContent("https://cdn.example.com/final", "web_page", "正文"),
+    )
+    log_info = mocker.patch("src.plugins.llm.plugins.zssm.data_source.logger.info")
+
+    result = await load_resources("https://example.com/private/path?token=secret")
+
+    assert result == [ResourceContent("https://cdn.example.com/final", "web_page", "正文")]
+    read_resource.assert_awaited_once_with("https://example.com/private/path?token=secret")
+    log_text = " ".join(str(item) for item in log_info.call_args_list)
+    assert "example.com" in log_text
+    assert "cdn.example.com" in log_text
+    assert "private/path" not in log_text
+    assert "token=secret" not in log_text
 
 
 @respx.mock(assert_all_called=True)
