@@ -88,14 +88,13 @@ def format_explain_response(content: str) -> str:
     return output.strip()
 
 
-def resolve_vision_fallback(model_name: str, *, has_images: bool) -> str:
+def resolve_vision_fallback(model_name: str, vision_model_name: str, *, has_images: bool) -> str:
     """按模型能力决定是否需要独立视觉模型。"""
     if not has_images or "vision" in plugin_config.get_model(model_name).capabilities:
         return ""
 
-    vision_model_name = plugin_config.zssm_vision_model
     if not vision_model_name:
-        raise ValueError("解释模型未声明 vision 能力，请配置支持视觉输入的模型，或设置 LLM__ZSSM_VISION_MODEL")
+        raise ValueError("解释模型未声明 vision 能力，请使用 /llm model --set-vision 设置本群视觉模型")
     try:
         vision_model = plugin_config.get_model(vision_model_name)
     except ValueError as e:

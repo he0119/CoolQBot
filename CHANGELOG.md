@@ -11,7 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 添加大模型对话插件 (llm)，支持 Chat Completions、Responses 与 Anthropic Messages 三种 API 格式、命令及群聊 @ 对话、全局和模型级配置、图片输入、响应统计、会话亲和及模型额度查询
 - 集成 `zssm` 解释模式，支持文本、关注点、图片、网页和 PDF，并可通过 `--model` 临时指定模型
+- 支持超级管理员按群开放模型（默认不开放），并为每个群独立设置默认对话、`zssm` 解释及视觉模型
 - 添加天气、节假日、`web_search` 与 `web_fetch` 内置工具，支持搜索并安全读取网页、文本、JSON 和 PDF，并在长时间调用时定期提示用户
+
+### Fixed
+
+- 修复 SQLite 单连接池导致并发会话互相回滚、群级 LLM 配置写入误报成功的问题
 
 ### Removed
 

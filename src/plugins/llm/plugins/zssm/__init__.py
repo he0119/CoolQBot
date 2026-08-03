@@ -13,7 +13,11 @@ from nonebot_plugin_alconna.uniseg import Image
 from nonebot_plugin_user import UserSession
 
 from ...config import plugin_config
-from ...data_source import get_model_name
+from ...data_source import (
+    get_available_model_names,
+    get_zssm_model_name,
+    get_zssm_vision_model_name,
+)
 from ...handler import LLMHandler, send_reaction, split_content
 from ...providers import ProviderError
 from .data_source import (
@@ -82,19 +86,21 @@ async def zssm_handle(
     if not target and not focus and not images:
         await UniMessage.text("请回复或输入需要解释的内容").finish(reply_to=msg_id)
 
-    names = plugin_config.get_model_names()
-    if not names:
+    if not plugin_config.get_model_names():
         await UniMessage.text("未配置任何模型，请先在 .env 中配置 LLM__MODELS").finish(reply_to=msg_id)
-    model_name = (
-        selected_model.result
-        if selected_model.available
-        else plugin_config.zssm_model or await get_model_name(user.session_id)
-    )
+    names = await get_available_model_names(user.session_id)
+    if not names:
+        await UniMessage.text("本群未开放任何模型，请联系超级管理员配置").finish(reply_to=msg_id)
+    model_name = selected_model.result if selected_model.available else await get_zssm_model_name(user.session_id)
     if model_name not in names:
-        await UniMessage.text(f"解释模型未启用：{model_name}，可用：{'、'.join(names)}").finish(reply_to=msg_id)
+        await UniMessage.text(f"本群未启用解释模型：{model_name}，可用：{'、'.join(names)}").finish(reply_to=msg_id)
     vision_model = ""
     try:
-        vision_model = resolve_vision_fallback(model_name, has_images=bool(images))
+        vision_model = resolve_vision_fallback(
+            model_name,
+            await get_zssm_vision_model_name(user.session_id),
+            has_images=bool(images),
+        )
     except ValueError as e:
         await UniMessage.text(str(e)).finish(reply_to=msg_id)
 

@@ -10,9 +10,8 @@ from nonebot.adapters.red import Adapter as RedAdapter
 from nonebot.adapters.satori import Adapter as SatoriAdapter
 from nonebot.adapters.telegram import Adapter as TelegramAdapter
 from nonebot.log import logger
-from sqlalchemy import StaticPool
 
-nonebot.init(sqlalchemy_engine_options={"poolclass": StaticPool})
+nonebot.init()
 app = nonebot.get_asgi()
 
 driver = nonebot.get_driver()
