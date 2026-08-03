@@ -1,11 +1,23 @@
 """群组大模型配置的读写"""
 
+from dataclasses import dataclass
+
 from nonebot.log import logger
 from nonebot_plugin_orm import get_session
 from sqlalchemy import select, update
 
 from .config import plugin_config
 from .models import GroupLLMConfig
+
+
+@dataclass(frozen=True)
+class GroupModelOverview:
+    """模型列表展示所需的群组配置快照。"""
+
+    available_model_names: list[str]
+    model_name: str
+    zssm_model_name: str
+    zssm_vision_model_name: str
 
 
 async def _get_config(session_id: str) -> GroupLLMConfig | None:
@@ -27,6 +39,19 @@ def _available_names(config: GroupLLMConfig | None) -> list[str]:
 async def get_available_model_names(session_id: str) -> list[str]:
     """获取本群可用模型；未配置准入列表时默认拒绝。"""
     return _available_names(await _get_config(session_id))
+
+
+async def get_model_overview(session_id: str) -> GroupModelOverview:
+    """一次查询获取模型列表展示所需的群组设置。"""
+    config = await _get_config(session_id)
+    names = _available_names(config)
+    if not names:
+        return GroupModelOverview([], "", "", "")
+
+    model_name = config.model_name if config and config.model_name in names else names[0]
+    zssm_model_name = config.zssm_model if config and config.zssm_model in names else model_name
+    zssm_vision_model_name = config.zssm_vision_model if config and config.zssm_vision_model in names else ""
+    return GroupModelOverview(names, model_name, zssm_model_name, zssm_vision_model_name)
 
 
 async def get_model_name(session_id: str) -> str:
@@ -73,39 +98,33 @@ async def set_available_model_names(session_id: str, model_names: list[str]) -> 
     if not available:
         raise ValueError("至少需要为本群开放一个模型")
 
-    for attempt in range(2):
-        async with get_session() as session:
-            config = (
-                await session.scalars(select(GroupLLMConfig).where(GroupLLMConfig.session_id == session_id))
-            ).one_or_none()
-            if config:
-                await session.execute(
-                    update(GroupLLMConfig)
-                    .where(GroupLLMConfig.session_id == session_id)
-                    .values(
-                        available_models=available,
-                        model_name=config.model_name if config.model_name in available else available[0],
-                        zssm_model=config.zssm_model if config.zssm_model in available else None,
-                        zssm_vision_model=(config.zssm_vision_model if config.zssm_vision_model in available else None),
-                    )
+    async with get_session() as session:
+        config = (
+            await session.scalars(select(GroupLLMConfig).where(GroupLLMConfig.session_id == session_id))
+        ).one_or_none()
+        if config:
+            await session.execute(
+                update(GroupLLMConfig)
+                .where(GroupLLMConfig.session_id == session_id)
+                .values(
+                    available_models=available,
+                    model_name=config.model_name if config.model_name in available else available[0],
+                    zssm_model=config.zssm_model if config.zssm_model in available else None,
+                    zssm_vision_model=(config.zssm_vision_model if config.zssm_vision_model in available else None),
                 )
-            else:
-                session.add(
-                    GroupLLMConfig(
-                        session_id=session_id,
-                        available_models=available,
-                        model_name=available[0],
-                    )
+            )
+        else:
+            session.add(
+                GroupLLMConfig(
+                    session_id=session_id,
+                    available_models=available,
+                    model_name=available[0],
                 )
-            await session.commit()
+            )
+        await session.commit()
 
-        persisted = await get_available_model_names(session_id)
-        if persisted == available:
-            logger.info("LLM 群组可用模型已更新（数量={}）", len(available))
-            return persisted
-        logger.warning("LLM 群组可用模型回读不一致（重试={}）", attempt == 0)
-
-    raise ValueError("群组可用模型保存失败，请重试；若持续失败，请重启机器人并确认数据库迁移已应用")
+    logger.info("LLM 群组可用模型已更新（数量={}）", len(available))
+    return available
 
 
 async def clear_available_model_names(session_id: str) -> None:

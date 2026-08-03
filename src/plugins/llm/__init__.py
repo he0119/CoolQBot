@@ -51,9 +51,8 @@ from .data_source import (
     clear_zssm_vision_model_name,
     get_available_model_names,
     get_model_name,
+    get_model_overview,
     get_tts_model,
-    get_zssm_model_name,
-    get_zssm_vision_model_name,
     set_available_model_names,
     set_model_name,
     set_tts_model,
@@ -185,14 +184,15 @@ async def llm_model_list_handle(bot: Bot, event: Event, user: UserSession):
     all_names = plugin_config.get_model_names()
     if not all_names:
         await llm_cmd.finish("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
-    available_names = await get_available_model_names(user.session_id)
+    overview = await get_model_overview(user.session_id)
+    available_names = overview.available_model_names
     is_superuser = await SUPERUSER(bot, event)
     if not available_names and not is_superuser:
         await llm_cmd.finish("本群未开放任何模型，请联系超级管理员配置")
 
-    current = await get_model_name(user.session_id) if available_names else ""
-    zssm_model = await get_zssm_model_name(user.session_id) if available_names else ""
-    vision_model = await get_zssm_vision_model_name(user.session_id)
+    current = overview.model_name
+    zssm_model = overview.zssm_model_name
+    vision_model = overview.zssm_vision_model_name
     available = set(available_names)
 
     def format_model(name: str) -> str:

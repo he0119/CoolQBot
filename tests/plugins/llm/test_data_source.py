@@ -97,19 +97,35 @@ async def test_available_models_are_scoped_by_group(app: App, mocker):
     assert await get_available_model_names("QQClient_10000") == []
 
 
-async def test_available_models_retry_after_inconsistent_readback(app: App, mocker):
-    """保存后首次回读为空时自动重试，不返回空的成功结果。"""
+async def test_model_overview_reads_group_config_once(app: App, mocker):
+    """模型列表所需设置通过一次群配置查询完成。"""
+    from src.plugins.llm import data_source
     from src.plugins.llm.config import ModelConfig, plugin_config
-    from src.plugins.llm.data_source import set_available_model_names
 
-    mocker.patch.object(plugin_config, "models", [ModelConfig(name="first")])
-    readback = mocker.patch(
-        "src.plugins.llm.data_source.get_available_model_names",
-        side_effect=[[], ["first"]],
+    mocker.patch.object(
+        plugin_config,
+        "models",
+        [
+            ModelConfig(name="default"),
+            ModelConfig(name="explain"),
+            ModelConfig(name="vision", capabilities={"vision"}),
+        ],
     )
+    await data_source.set_available_model_names("QQClient_10000", ["default", "explain", "vision"])
+    await data_source.set_model_name("QQClient_10000", "explain")
+    await data_source.set_zssm_model_name("QQClient_10000", "default")
+    await data_source.set_zssm_vision_model_name("QQClient_10000", "vision")
+    get_config = mocker.spy(data_source, "_get_config")
 
-    assert await set_available_model_names("QQClient_10000", ["first"]) == ["first"]
-    assert readback.await_count == 2
+    overview = await data_source.get_model_overview("QQClient_10000")
+
+    assert overview == data_source.GroupModelOverview(
+        available_model_names=["default", "explain", "vision"],
+        model_name="explain",
+        zssm_model_name="default",
+        zssm_vision_model_name="vision",
+    )
+    get_config.assert_awaited_once_with("QQClient_10000")
 
 
 async def test_group_zssm_models_are_independent(app: App, mocker):
