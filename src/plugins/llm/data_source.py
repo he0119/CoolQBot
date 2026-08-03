@@ -153,16 +153,13 @@ async def get_zssm_model_name(session_id: str) -> str:
 
 async def set_zssm_model_name(session_id: str, model_name: str) -> None:
     """设置本群解释模型。"""
-    if model_name not in await get_available_model_names(session_id):
-        raise ValueError(f"本群未启用的模型：{model_name}")
     async with get_session() as session:
         config = (
             await session.scalars(select(GroupLLMConfig).where(GroupLLMConfig.session_id == session_id))
         ).one_or_none()
-        if config:
-            config.zssm_model = model_name
-        else:
-            session.add(GroupLLMConfig(session_id=session_id, zssm_model=model_name))
+        if not config or model_name not in _available_names(config):
+            raise ValueError(f"本群未启用的模型：{model_name}")
+        config.zssm_model = model_name
         await session.commit()
     logger.info("LLM 群组解释模型已更新（模型={}）", model_name)
 
@@ -190,18 +187,15 @@ async def get_zssm_vision_model_name(session_id: str) -> str:
 
 async def set_zssm_vision_model_name(session_id: str, model_name: str) -> None:
     """设置本群解释模式使用的独立视觉模型。"""
-    if model_name not in await get_available_model_names(session_id):
-        raise ValueError(f"本群未启用的模型：{model_name}")
-    if "vision" not in plugin_config.get_model(model_name).capabilities:
-        raise ValueError(f"视觉模型 {model_name} 未声明 vision 能力")
     async with get_session() as session:
         config = (
             await session.scalars(select(GroupLLMConfig).where(GroupLLMConfig.session_id == session_id))
         ).one_or_none()
-        if config:
-            config.zssm_vision_model = model_name
-        else:
-            session.add(GroupLLMConfig(session_id=session_id, zssm_vision_model=model_name))
+        if not config or model_name not in _available_names(config):
+            raise ValueError(f"本群未启用的模型：{model_name}")
+        if "vision" not in plugin_config.get_model(model_name).capabilities:
+            raise ValueError(f"视觉模型 {model_name} 未声明 vision 能力")
+        config.zssm_vision_model = model_name
         await session.commit()
     logger.info("LLM 群组视觉模型已更新（模型={}）", model_name)
 

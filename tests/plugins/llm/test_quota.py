@@ -236,3 +236,43 @@ async def test_llm_quota_command_defaults_to_current_model(app: App, mocker):
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "模型 current 未配置额度查询", True, at_sender=True)
         ctx.should_finished(llm_cmd)
+
+
+async def test_llm_quota_denies_group_without_available_models(app: App, mocker):
+    """未配置群组准入列表时不允许查询额度。"""
+    from src.plugins.llm import llm_cmd
+    from src.plugins.llm.config import ModelConfig, plugin_config
+
+    mocker.patch.object(plugin_config, "models", [ModelConfig(name="first")])
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/llm quota"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "本群未开放任何模型，请联系超级管理员配置", True, at_sender=True)
+        ctx.should_finished(llm_cmd)
+
+
+async def test_llm_quota_rejects_unavailable_model(app: App, mocker):
+    """额度查询不能绕过群组模型准入列表。"""
+    from src.plugins.llm import llm_cmd
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names
+
+    mocker.patch.object(
+        plugin_config,
+        "models",
+        [ModelConfig(name="first"), ModelConfig(name="hidden")],
+    )
+    await set_available_model_names("QQClient_10000", ["first"])
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/llm quota hidden"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "本群未启用的模型：hidden，可用：first", True, at_sender=True)
+        ctx.should_finished(llm_cmd)

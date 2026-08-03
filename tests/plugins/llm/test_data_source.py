@@ -97,6 +97,19 @@ async def test_available_models_are_scoped_by_group(app: App, mocker):
     assert await get_available_model_names("QQClient_10000") == []
 
 
+async def test_set_available_models_rejects_unknown_and_empty_lists(app: App, mocker):
+    """群组准入列表拒绝未配置模型和空列表。"""
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names
+
+    mocker.patch.object(plugin_config, "models", [ModelConfig(name="first")])
+
+    with pytest.raises(ValueError, match="未配置的模型：missing"):
+        await set_available_model_names("QQClient_10000", ["missing", "missing"])
+    with pytest.raises(ValueError, match="至少需要为本群开放一个模型"):
+        await set_available_model_names("QQClient_10000", [])
+
+
 async def test_model_overview_reads_group_config_once(app: App, mocker):
     """模型列表所需设置通过一次群配置查询完成。"""
     from src.plugins.llm import data_source
@@ -133,6 +146,7 @@ async def test_group_zssm_models_are_independent(app: App, mocker):
     from src.plugins.llm.config import ModelConfig, plugin_config
     from src.plugins.llm.data_source import (
         clear_zssm_model_name,
+        clear_zssm_vision_model_name,
         get_zssm_model_name,
         get_zssm_vision_model_name,
         set_available_model_names,
@@ -162,10 +176,16 @@ async def test_group_zssm_models_are_independent(app: App, mocker):
     with pytest.raises(ValueError, match="未声明 vision 能力"):
         await set_zssm_vision_model_name("QQClient_10000", "explain")
     with pytest.raises(ValueError, match="本群未启用的模型：default"):
+        await set_zssm_vision_model_name("QQClient_10000", "default")
+    with pytest.raises(ValueError, match="本群未启用的模型：default"):
         await set_zssm_model_name("QQClient_10000", "default")
 
     await clear_zssm_model_name("QQClient_10000")
     assert await get_zssm_model_name("QQClient_10000") == "explain"
+
+    await clear_zssm_vision_model_name("QQClient_10000")
+    assert await get_zssm_vision_model_name("QQClient_10000") == ""
+    await set_zssm_vision_model_name("QQClient_10000", "vision")
 
     await set_available_model_names("QQClient_10000", ["explain"])
     assert await get_zssm_vision_model_name("QQClient_10000") == ""
