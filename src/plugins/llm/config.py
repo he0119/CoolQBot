@@ -124,9 +124,9 @@ class ScopedConfig(BaseModel):
     """多轮对话中等待用户输入的超时时间（秒）"""
     max_tool_rounds: int = 5
     """单次提问中允许的最大工具调用轮数，防止模型陷入循环"""
-    tool_notice_delay: float = Field(default=2.0, ge=0)
+    tool_notice_delay: float = Field(default=10.0, ge=0)
     """发现工具调用后首次发送等待提示前的秒数"""
-    tool_notice_interval: float = Field(default=30.0, gt=0)
+    tool_notice_interval: float = Field(default=60.0, gt=0)
     """工具阶段仍未完成时重复发送等待提示的间隔秒数"""
     web_search_max_results: int = Field(default=5, ge=1, le=10)
     """网页搜索单次允许返回的最大结果数"""
