@@ -39,7 +39,7 @@ async def text_to_speech(text: str, model: str) -> bytes:
     if not plugin_config.tts_enabled:
         raise TTSError("当前未启用 TTS 功能")
     if not model:
-        raise TTSError("未设置 TTS 模型，请先使用 /llm tts set 设置")
+        raise TTSError("未设置 TTS 模型，请先使用 /llm tts --set 设置")
 
     base_url = plugin_config.tts_base_url.rstrip("/")
     payload = {

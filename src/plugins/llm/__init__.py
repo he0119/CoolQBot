@@ -106,7 +106,7 @@ async def llm_model_list_handle(user: UserSession):
     model_list = "\n".join(f"- {name}（当前）" if name == current else f"- {name}" for name in names)
     await llm_cmd.finish(
         f"支持的模型列表：\n{model_list}\n"
-        "输入 /llm [内容] --model [模型名] 单次指定模型\n"
+        "输入 /llm --model [模型名] [内容] 单次指定模型\n"
         "输入 /llm model --set [模型名] 设置群组默认模型"
     )
 

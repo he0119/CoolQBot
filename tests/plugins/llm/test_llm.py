@@ -107,7 +107,7 @@ async def test_llm_rejects_unknown_model(app: App, mock_models):
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm 你好 --model missing"))
+        event = fake_group_message_event_v11(message=Message("/llm --model missing 你好"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "未启用的模型：missing，可用：test-model", True, at_sender=True)
@@ -301,7 +301,7 @@ async def test_llm_model_list_and_set(app: App, respx_mock: MockRouter, mock_mod
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "支持的模型列表：\n- test-model（当前）\n输入 /llm [内容] --model [模型名] 单次指定模型\n"
+            "支持的模型列表：\n- test-model（当前）\n输入 /llm --model [模型名] [内容] 单次指定模型\n"
             "输入 /llm model --set [模型名] 设置群组默认模型",
             True,
         )
