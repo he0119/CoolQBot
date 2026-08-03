@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 为 `/llm quota` 添加 `/quota` 与 `/额度` 快捷命令
 - 支持在模型配置的 `capabilities` 中声明 `vision` 图片输入能力
 - 为 llm 添加内置 `zssm` 解释模式，支持回复文本、关注点、图片以及受限读取网页和 PDF，并记录简洁的资源读取与模型调用日志
+- 支持通过 `zssm --model <模型名>` 临时指定本次解释使用的模型
 
 ### Changed
 

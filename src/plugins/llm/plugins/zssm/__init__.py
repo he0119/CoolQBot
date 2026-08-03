@@ -7,7 +7,7 @@ from nonebot.adapters import Bot, Event
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
-from nonebot_plugin_alconna import Alconna, Args, Match, MsgId, UniMessage, on_alconna
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, MsgId, Option, Query, UniMessage, on_alconna
 from nonebot_plugin_alconna.builtins.extensions.reply import ReplyRecordExtension
 from nonebot_plugin_alconna.uniseg import Image
 from nonebot_plugin_user import UserSession
@@ -28,14 +28,22 @@ from .data_source import (
 __plugin_meta__ = PluginMetadata(
     name="这是什么",
     description="使用大模型解释回复或输入的文字、图片、网页与 PDF",
-    usage="回复一条消息并发送 zssm，可在后面补充关注点",
+    usage="回复一条消息并发送 zssm，可用 --model 临时指定模型，并在后面补充关注点",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
 SYSTEM_PROMPT = Path(__file__).with_name("prompt.txt").read_text(encoding="utf-8")
 
 zssm_cmd = on_alconna(
-    Alconna("zssm", Args["content?", AllParam]),
+    Alconna(
+        "zssm",
+        Args["content?", AllParam],
+        Option("--model", Args["model#模型名称", str], help_text="本次使用指定模型"),
+        meta=CommandMeta(
+            description=__plugin_meta__.description,
+            example=__plugin_meta__.usage,
+        ),
+    ),
     block=True,
     extensions=[ReplyRecordExtension()],
 )
@@ -50,6 +58,7 @@ async def zssm_handle(
     state: T_State,
     user: UserSession,
     content: Match[UniMessage],
+    selected_model: Query[str] = Query("model.model"),
 ) -> None:
     """收集被回复消息与关注点，并交给解释模式处理。"""
     current_message = content.result if content.available else UniMessage()
@@ -76,7 +85,11 @@ async def zssm_handle(
     names = plugin_config.get_model_names()
     if not names:
         await UniMessage.text("未配置任何模型，请先在 .env 中配置 LLM__MODELS").finish(reply_to=msg_id)
-    model_name = plugin_config.zssm_model or await get_model_name(user.session_id)
+    model_name = (
+        selected_model.result
+        if selected_model.available
+        else plugin_config.zssm_model or await get_model_name(user.session_id)
+    )
     if model_name not in names:
         await UniMessage.text(f"解释模型未启用：{model_name}，可用：{'、'.join(names)}").finish(reply_to=msg_id)
     vision_model = ""

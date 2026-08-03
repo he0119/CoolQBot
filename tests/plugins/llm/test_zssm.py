@@ -35,6 +35,18 @@ def zssm_model(mocker):
     return model, reaction
 
 
+def test_zssm_has_help_metadata(app: App):
+    """帮助信息使用插件描述，不显示 Alconna 的 Unknown 占位符。"""
+    from src.plugins.llm.plugins.zssm import zssm_cmd
+
+    command = zssm_cmd.command()
+    assert command.meta.description == "使用大模型解释回复或输入的文字、图片、网页与 PDF"
+    assert command.meta.example == "回复一条消息并发送 zssm，可用 --model 临时指定模型，并在后面补充关注点"
+    help_text = command.get_help()
+    assert command.meta.description in help_text
+    assert "Unknown" not in help_text
+
+
 async def test_zssm_not_configured(app: App, mocker):
     """未配置模型时在读取群组默认值前给出明确提示。"""
     from src.plugins.llm.config import plugin_config
@@ -51,6 +63,73 @@ async def test_zssm_not_configured(app: App, mocker):
         ctx.should_call_send(
             event,
             Message(MessageSegment.reply(1)) + "未配置任何模型，请先在 .env 中配置 LLM__MODELS",
+            True,
+        )
+        ctx.should_finished(zssm_cmd)
+
+
+@respx.mock(assert_all_called=True)
+async def test_zssm_uses_temporary_model(app: App, respx_mock: MockRouter, zssm_model, mocker):
+    """--model 仅为本次解释覆盖专用模型。"""
+    from src.plugins.llm.config import ModelConfig, plugin_config
+
+    default_model, _ = zssm_model
+    temporary_model = ModelConfig(
+        name="temporary",
+        provider="chat",
+        base_url="https://temporary.example.com",
+        api_key="sk-temporary",
+    )
+    mocker.patch.object(plugin_config, "models", [default_model, temporary_model])
+    mocker.patch.object(plugin_config, "zssm_model", "test-model")
+    route = respx_mock.post("https://temporary.example.com/chat/completions").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "model": "temporary",
+                "choices": [
+                    {
+                        "finish_reason": "stop",
+                        "message": {
+                            "role": "assistant",
+                            "content": '{"output":"临时模型解释","keywords":[],"blocked":false}',
+                        },
+                    }
+                ],
+            },
+        )
+    )
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("zssm --model temporary Python GIL"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            Message(MessageSegment.reply(1)) + "临时模型解释\n\n--- 5.1s  temporary  I:0 O:0 A:0 C:0",
+            True,
+        )
+
+    payload = json.loads(route.calls[0].request.content)
+    user_data = json.loads(payload["messages"][1]["content"])
+    assert user_data["target"] == "Python GIL"
+
+
+async def test_zssm_rejects_unknown_temporary_model(app: App, zssm_model):
+    """临时指定未启用模型时在调用前给出明确提示。"""
+    from src.plugins.llm.plugins.zssm import zssm_cmd
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("zssm --model missing Python GIL"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            Message(MessageSegment.reply(1)) + "解释模型未启用：missing，可用：test-model",
             True,
         )
         ctx.should_finished(zssm_cmd)
