@@ -6,9 +6,11 @@ import json
 import tomllib
 from abc import ABC, abstractmethod
 from pathlib import Path
+from time import perf_counter
 from typing import TYPE_CHECKING, Any
 
 import httpx
+from nonebot.log import logger
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -110,6 +112,17 @@ class Provider(ABC):
     async def chat(self, messages: list[Message], tools: list[ToolParam] | None = None) -> Completion:
         """发起一次对话请求"""
         stream = bool(self.config.stream)
+        log_id = self.session_affinity[:8] or "-"
+        started_at = perf_counter()
+        logger.debug(
+            "LLM Provider 开始请求（会话={}，模型={}，协议={}，流式={}，消息={}，工具={}）",
+            log_id,
+            self.config.name,
+            self.config.provider,
+            stream,
+            len(messages),
+            len(tools or []),
+        )
         payload = self.build_payload(messages, tools, stream=stream)
         headers = self.build_headers()
         headers["User-Agent"] = USER_AGENT
@@ -118,12 +131,49 @@ class Provider(ABC):
 
         try:
             if stream:
-                return await self._request_stream(payload, headers)
-            return await self._request(payload, headers)
+                completion = await self._request_stream(payload, headers)
+            else:
+                completion = await self._request(payload, headers)
+        except ProviderError:
+            logger.warning(
+                "LLM Provider 返回错误（会话={}，模型={}，协议={}，耗时={:.3f}s）",
+                log_id,
+                self.config.name,
+                self.config.provider,
+                perf_counter() - started_at,
+            )
+            raise
         except httpx.TimeoutException as e:
+            logger.warning(
+                "LLM Provider 请求超时（会话={}，模型={}，协议={}，耗时={:.3f}s）",
+                log_id,
+                self.config.name,
+                self.config.provider,
+                perf_counter() - started_at,
+            )
             raise ProviderError("请求超时，请稍后重试") from e
         except httpx.HTTPError as e:
+            logger.warning(
+                "LLM Provider 网络请求失败（会话={}，模型={}，协议={}，错误类型={}，耗时={:.3f}s）",
+                log_id,
+                self.config.name,
+                self.config.provider,
+                type(e).__name__,
+                perf_counter() - started_at,
+            )
             raise ProviderError(f"网络请求失败：{e}") from e
+        logger.debug(
+            "LLM Provider 请求完成（会话={}，配置模型={}，实际模型={}，结束原因={}，工具调用={}，I={}，O={}，耗时={:.3f}s）",
+            log_id,
+            self.config.name,
+            completion.model or "unknown",
+            completion.finish_reason,
+            len(completion.tool_calls),
+            completion.usage.input_tokens,
+            completion.usage.output_tokens,
+            perf_counter() - started_at,
+        )
+        return completion
 
     async def _request(self, payload: dict[str, Any], headers: dict[str, str]) -> Completion:
         async with httpx.AsyncClient(proxy=self.config.proxy) as client:

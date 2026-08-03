@@ -355,7 +355,7 @@ def test_model_capability_selects_single_or_two_stage_vision(app: App, mocker):
 
 async def test_private_resource_url_is_rejected(app: App):
     """外部资料读取不能访问本机和内网地址。"""
-    from src.plugins.llm.plugins.zssm.data_source import ResourceError, _ensure_public_url
+    from src.plugins.llm.tools.web import ResourceError, _ensure_public_url
 
     with pytest.raises(ResourceError, match="非公网地址"):
         await _ensure_public_url("http://127.0.0.1/admin")
@@ -367,10 +367,10 @@ async def test_domain_fake_ip_is_allowed_without_allowing_ip_literal(app: App, m
     """域名解析可使用代理 fake-ip，但用户直接填写保留地址仍会被拒绝。"""
     import ipaddress
 
-    from src.plugins.llm.plugins.zssm.data_source import ResourceError, _ensure_public_url
+    from src.plugins.llm.tools.web import ResourceError, _ensure_public_url
 
     resolve = mocker.patch(
-        "src.plugins.llm.plugins.zssm.data_source._resolve_host_addresses",
+        "src.plugins.llm.tools.web._resolve_host_addresses",
         return_value={ipaddress.ip_address("198.18.1.2")},
     )
 
@@ -385,10 +385,10 @@ async def test_domain_private_ip_outside_fake_range_is_rejected(app: App, mocker
     """普通域名解析到真实私网时仍阻止访问。"""
     import ipaddress
 
-    from src.plugins.llm.plugins.zssm.data_source import ResourceError, _ensure_public_url
+    from src.plugins.llm.tools.web import ResourceError, _ensure_public_url
 
     mocker.patch(
-        "src.plugins.llm.plugins.zssm.data_source._resolve_host_addresses",
+        "src.plugins.llm.tools.web._resolve_host_addresses",
         return_value={ipaddress.ip_address("192.168.1.10")},
     )
 
@@ -398,7 +398,8 @@ async def test_domain_private_ip_outside_fake_range_is_rejected(app: App, mocker
 
 async def test_resource_operations_are_logged_without_url_details(app: App, mocker):
     """资源读取记录主机、结果和长度，但不把路径或查询参数写入日志。"""
-    from src.plugins.llm.plugins.zssm.data_source import ResourceContent, load_resources
+    from src.plugins.llm.plugins.zssm.data_source import load_resources
+    from src.plugins.llm.tools.web import ResourceContent
 
     read_resource = mocker.patch(
         "src.plugins.llm.plugins.zssm.data_source.read_resource",
@@ -420,9 +421,9 @@ async def test_resource_operations_are_logged_without_url_details(app: App, mock
 @respx.mock(assert_all_called=True)
 async def test_read_web_resource_extracts_visible_text(app: App, respx_mock: MockRouter, mocker):
     """网页读取不执行脚本，只把可见文本交给模型。"""
-    from src.plugins.llm.plugins.zssm.data_source import read_resource
+    from src.plugins.llm.tools.web import read_resource
 
-    mocker.patch("src.plugins.llm.plugins.zssm.data_source._ensure_public_url")
+    mocker.patch("src.plugins.llm.tools.web._ensure_public_url")
     respx_mock.get("https://example.com/article").mock(
         return_value=httpx.Response(
             200,
@@ -441,10 +442,10 @@ async def test_read_web_resource_extracts_visible_text(app: App, respx_mock: Moc
 @respx.mock(assert_all_called=True)
 async def test_resource_redirect_target_is_revalidated(app: App, respx_mock: MockRouter, mocker):
     """公开链接不能通过重定向绕过内网地址检查。"""
-    from src.plugins.llm.plugins.zssm.data_source import ResourceError, read_resource
+    from src.plugins.llm.tools.web import ResourceError, read_resource
 
     validate = mocker.patch(
-        "src.plugins.llm.plugins.zssm.data_source._ensure_public_url",
+        "src.plugins.llm.tools.web._ensure_public_url",
         side_effect=[None, ResourceError("不允许访问本机、内网或非公网地址")],
     )
     respx_mock.get("https://example.com/redirect").mock(
@@ -462,7 +463,7 @@ async def test_resource_redirect_target_is_revalidated(app: App, respx_mock: Moc
 
 def test_pdf_resource_text_extraction(app: App):
     """PDF 在内存中解析并提取文本。"""
-    from src.plugins.llm.plugins.zssm.data_source import _extract_pdf_text
+    from src.plugins.llm.tools.web import _extract_pdf_text
 
     document = pymupdf.open()
     page = document.new_page()

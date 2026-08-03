@@ -151,6 +151,32 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
     assert UUID(request.headers["x-session-affinity"]).version == 4
 
 
+async def test_llm_handler_logs_metadata_without_content(app: App, mock_models, mocker):
+    """会话日志使用随机关联 ID 和长度，不记录输入输出正文。"""
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.schemas import Completion, Message
+
+    mocker.patch(
+        "src.plugins.llm.handler.chat",
+        return_value=Completion(
+            message=Message.assistant(content="private-output"),
+            model="actual-model",
+            finish_reason="stop",
+        ),
+    )
+    logger_info = mocker.patch("src.plugins.llm.handler.logger.info")
+    handler = LLMHandler("test-model", session_affinity="abcdef1234567890")
+
+    await handler.ask("private-input")
+
+    log_text = " ".join(str(item) for item in logger_info.call_args_list)
+    assert "abcdef12" in log_text
+    assert "test-model" in log_text
+    assert "actual-model" in log_text
+    assert "private-input" not in log_text
+    assert "private-output" not in log_text
+
+
 async def test_llm_rejects_unknown_model(app: App, mock_models):
     """单次指定未启用模型时给出明确提示"""
     from src.plugins.llm import llm_cmd

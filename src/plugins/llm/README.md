@@ -20,6 +20,7 @@
 - 推理内容以引用块展示（DeepSeek 的 `reasoning_content`、Anthropic 的 `thinking`、Responses 的推理摘要）
 - 使用 emoji reaction 反馈响应状态（思考中、已完成、失败；不支持的平台自动跳过）
 - 工具调用（function calling），三种格式自动适配
+- 内置网页搜索与网页/PDF 正文读取工具，返回来源 URL 并标记不可信外部内容
 - 图片输入（多模态），需要模型在 `capabilities` 中声明 `vision`
 - 内置“这是什么”解释模式，可解释被回复的文字、图片、网页与 PDF
 - 在回复末尾显示整轮耗时、实际模型和 token 用量，工具调用产生的多次请求会累计统计
@@ -107,14 +108,22 @@
 消息中实际出现的网页或 PDF 链接会在调用模型前读取，读取器有以下限制：
 
 - 只允许 HTTP(S)，拒绝带登录凭据的 URL，以及指向本机、内网和其他非公网地址的目标；每次重定向都会重新校验。
-- 域名解析到 `LLM__ZSSM_RESOURCE_FAKE_IP_RANGES` 配置的网段时放行，用于兼容透明代理的 fake-ip；直接在 URL 里填写这些 IP 仍会拒绝。
+- 域名解析到 `LLM__WEB_FETCH_FAKE_IP_RANGES` 配置的网段时放行，用于兼容透明代理的 fake-ip；直接在 URL 里填写这些 IP 仍会拒绝。
 - 限制资源数量、单个资源的下载字节数、PDF 页数与提取文本长度，超长内容会截断。
-- 配置 `LLM__ZSSM_RESOURCE_PROXY` 后，域名由代理解析，上述地址校验只在本地生效，实际能访问到哪些网络取决于代理。
+- 配置 `LLM__WEB_PROXY` 后，域名由代理解析，上述地址校验只在本地生效，实际能访问到哪些网络取决于代理。
 - 校验和建立连接是两次独立的域名解析，理论上存在 DNS rebinding 的时间差，不适合用在能访问敏感内网的环境里。
 
 所有不可信内容（被解释的文字、关注点、图片描述、网页正文）都以 JSON 数据传给模型，提示词要求模型只把它们当作待解释的数据，不执行其中的指令。
 
-图片读取、外部资源读取以及视觉/解释模型调用会输出简洁日志；资源日志只记录主机名和处理结果，不记录 URL 路径、查询参数或正文。
+## 日志
+
+每个 `LLMHandler` 使用随机会话亲和 ID 的前 8 位关联同一轮或多轮对话日志，不包含用户或群组标识。
+
+- `INFO`：记录会话开始/完成、工具名与参数名、Web 搜索/抓取、额度、TTS、回复方式、数量、结果规模和耗时。
+- `DEBUG`：记录每轮 Provider 的协议、流式模式、消息/工具数量、结束原因和 token 用量。
+- `WARNING`：记录失败阶段与异常类型；上游错误正文不会写入日志。
+
+日志不会记录提示词、用户/模型正文、工具参数值、搜索词、API key、TTS 令牌、群号、用户 ID、URL 路径或查询参数。Web 资源只记录主机名。
 
 ## 配置说明
 
@@ -135,6 +144,21 @@ LLM__MD_TO_PIC=false
 LLM__STREAM=false
 # 单次提问允许的最大工具调用轮数
 LLM__MAX_TOOL_ROUNDS=5
+# 网页搜索配置；结果数量还会受模型传入的 max_results 限制
+LLM__WEB_SEARCH_MAX_RESULTS=5
+LLM__WEB_SEARCH_TIMEOUT=10
+LLM__WEB_SEARCH_REGION=wt-wt
+LLM__WEB_SEARCH_SAFESEARCH=moderate
+LLM__WEB_SEARCH_BACKEND=auto
+# 网页/PDF 读取限制，同时用于 zssm 自动读取外部资料
+LLM__WEB_FETCH_MAX_BYTES=10485760
+LLM__WEB_FETCH_MAX_CHARS=30000
+LLM__WEB_FETCH_MAX_PDF_PAGES=50
+LLM__WEB_FETCH_TIMEOUT=30
+# 可选，网页搜索以及下载网页与 PDF 时使用的代理
+LLM__WEB_PROXY=
+# 域名经透明代理解析到 fake-ip 时允许的网段
+LLM__WEB_FETCH_FAKE_IP_RANGES='["198.18.0.0/15"]'
 # 多轮对话等待用户输入的超时时间（秒）
 LLM__CONTEXT_TIMEOUT=120
 
@@ -142,18 +166,10 @@ LLM__CONTEXT_TIMEOUT=120
 LLM__ZSSM_MODEL=deepseek
 # 可选；解释模型不支持图片时，用该模型先生成图片描述
 LLM__ZSSM_VISION_MODEL=gpt
-# 输入与外部资源限制
+# 输入与自动读取外部资源数量限制
 LLM__ZSSM_MAX_IMAGES=2
 LLM__ZSSM_MAX_IMAGE_BYTES=10485760
 LLM__ZSSM_MAX_RESOURCES=2
-LLM__ZSSM_MAX_RESOURCE_BYTES=10485760
-LLM__ZSSM_MAX_RESOURCE_CHARS=30000
-LLM__ZSSM_MAX_PDF_PAGES=50
-LLM__ZSSM_RESOURCE_TIMEOUT=30
-# 可选，下载网页与 PDF 时使用的代理
-LLM__ZSSM_RESOURCE_PROXY=
-# 域名经透明代理解析到 fake-ip 时允许的网段
-LLM__ZSSM_RESOURCE_FAKE_IP_RANGES='["198.18.0.0/15"]'
 
 # 模型列表
 LLM__MODELS='
@@ -241,6 +257,16 @@ DeepSeek 字段与鉴权方式以[官方余额接口文档](https://api-docs.dee
 | ---------------------- | --------------------------------------------- |
 | `query_weather`        | 查询现实城市或最终幻想 XIV 艾欧泽亚地区的天气 |
 | `query_holiday_status` | 查询今天、周末、最近节假日以及调休安排        |
+| `web_search`           | 搜索互联网，返回标题、URL 与摘要              |
+| `web_fetch`            | 安全读取网页、文本、JSON 或 PDF 正文          |
+
+`web_search` 使用 `ddgs` 搜索并限制单次结果数；模型需要详细内容时，可继续调用 `web_fetch` 读取搜索结果。
+`web_fetch` 只接受 HTTP(S) URL，会校验每次重定向并拒绝本机、内网和其他非公网地址，同时限制下载大小、
+PDF 页数和提取字符数。两项工具返回的内容都带有“不可信外部数据”标记，来源 URL 会一并交给模型。
+
+旧版 `LLM__ZSSM_MAX_RESOURCE_BYTES`、`LLM__ZSSM_MAX_RESOURCE_CHARS`、`LLM__ZSSM_MAX_PDF_PAGES`、
+`LLM__ZSSM_RESOURCE_TIMEOUT`、`LLM__ZSSM_RESOURCE_PROXY` 与 `LLM__ZSSM_RESOURCE_FAKE_IP_RANGES`
+仍作为上述通用 Web 配置的兼容别名，无需立即修改已有部署。
 
 ## 注册工具
 

@@ -5,9 +5,11 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from decimal import Decimal
+from time import perf_counter
 from typing import TYPE_CHECKING, Literal
 
 import httpx
+from nonebot.log import logger
 from pydantic import BaseModel, ValidationError
 
 from .config import DEEPSEEK_QUOTA_API_URL, plugin_config
@@ -219,4 +221,24 @@ async def get_quota(model: ModelConfig) -> str:
     if model.quota is None:
         raise QuotaError(f"模型 {model.name} 未配置额度查询")
     provider = QUOTA_PROVIDERS[model.quota.provider](model.quota, model)
-    return format_quota(model.name, await provider.query())
+    started_at = perf_counter()
+    logger.info("LLM 额度查询开始（模型={}，provider={}）", model.name, model.quota.provider)
+    try:
+        result = await provider.query()
+    except QuotaError:
+        logger.warning(
+            "LLM 额度查询失败（模型={}，provider={}，耗时={:.3f}s）",
+            model.name,
+            model.quota.provider,
+            perf_counter() - started_at,
+        )
+        raise
+    logger.info(
+        "LLM 额度查询完成（模型={}，provider={}，项目={}，可用={}，耗时={:.3f}s）",
+        model.name,
+        model.quota.provider,
+        len(result.items),
+        result.available,
+        perf_counter() - started_at,
+    )
+    return format_quota(model.name, result)

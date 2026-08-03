@@ -24,7 +24,10 @@ from __future__ import annotations
 import inspect
 import json
 import re
+from time import perf_counter
 from typing import TYPE_CHECKING, Any, get_type_hints
+
+from nonebot.log import logger
 
 from ..schemas import ToolParam
 
@@ -114,8 +117,16 @@ class ToolRegistry:
         """
         info = self._registry.get(call.name)
         if not info:
+            logger.warning("LLM 请求了未注册的工具")
             return f"错误：未注册的工具 {call.name}"
 
+        started_at = perf_counter()
+        argument_names = [name for name in info["properties"] if name in call.arguments]
+        logger.info(
+            "LLM 工具开始执行（工具={}，参数={}）",
+            call.name,
+            "、".join(argument_names) or "无",
+        )
         try:
             arguments = {
                 param_name: _convert_value(call.arguments[param_name], properties["type"])
@@ -124,15 +135,34 @@ class ToolRegistry:
             }
             missing = [name for name in info["required"] if name not in arguments]
             if missing:
+                logger.warning(
+                    "LLM 工具缺少必填参数（工具={}，缺少={}，耗时={:.3f}s）",
+                    call.name,
+                    "、".join(missing),
+                    perf_counter() - started_at,
+                )
                 return f"错误：缺少必填参数 {'、'.join(missing)}"
 
             result = info["func"](**arguments)
             if inspect.isawaitable(result):
                 result = await result
         except Exception as e:
+            logger.warning(
+                "LLM 工具执行失败（工具={}，错误类型={}，耗时={:.3f}s）",
+                call.name,
+                type(e).__name__,
+                perf_counter() - started_at,
+            )
             return f"错误：工具 {call.name} 执行失败：{e}"
 
-        return result if isinstance(result, str) else json.dumps(result, ensure_ascii=False)
+        output = result if isinstance(result, str) else json.dumps(result, ensure_ascii=False)
+        logger.info(
+            "LLM 工具执行完成（工具={}，结果字符={}，耗时={:.3f}s）",
+            call.name,
+            len(output),
+            perf_counter() - started_at,
+        )
+        return output
 
 
 def _parse_param_docs(docstring: str) -> dict[str, str]:
@@ -172,3 +202,6 @@ def _convert_value(value: Any, schema_type: str) -> Any:
 
 registry = ToolRegistry()
 """全局工具注册表"""
+
+# 内置工具在注册表创建后导入，避免模块初始化时的循环依赖。
+from . import web as web

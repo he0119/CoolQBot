@@ -146,6 +146,11 @@ class LLMHandler:
         if prompt:
             self.context.append(Message(role="system", content=prompt))
 
+    @property
+    def log_id(self) -> str:
+        """用于关联日志的随机短 ID，不包含用户或群组信息。"""
+        return self.session_affinity[:8]
+
     async def ask(self, content: str, images: list[ImageContent] | None = None) -> Completion:
         """追加一轮用户输入并请求模型
 
@@ -159,6 +164,15 @@ class LLMHandler:
         self.context.append(Message.user(content, images))
 
         started_at = perf_counter()
+        logger.info(
+            "LLM 会话开始请求（会话={}，模型={}，上下文消息={}，输入字符={}，图片={}，工具={}）",
+            self.log_id,
+            self.model_name,
+            context_start,
+            len(content),
+            len(images or []),
+            "启用" if self.enable_tools else "禁用",
+        )
         completion = await chat(
             self.model_name,
             self.context,
@@ -167,12 +181,25 @@ class LLMHandler:
         )
         if completion.tool_calls and not self.enable_tools:
             del self.context[context_start:]
+            logger.warning(
+                "LLM 会话拒绝工具调用（会话={}，调用数量={}）",
+                self.log_id,
+                len(completion.tool_calls),
+            )
             raise ProviderError("当前模式不允许工具调用")
         total_usage = completion.usage
         actual_model = completion.model
-        for _ in range(plugin_config.max_tool_rounds):
+        tool_rounds = 0
+        for tool_round in range(1, plugin_config.max_tool_rounds + 1):
             if not completion.tool_calls:
                 break
+            tool_rounds = tool_round
+            logger.info(
+                "LLM 会话执行工具回合（会话={}，轮次={}，调用数量={}）",
+                self.log_id,
+                tool_round,
+                len(completion.tool_calls),
+            )
             self.context.append(completion.message)
             await execute_tool_calls(completion.tool_calls, self.context)
             completion = await chat(
@@ -186,25 +213,44 @@ class LLMHandler:
 
         if completion.tool_calls:
             del self.context[context_start:]
+            logger.warning(
+                "LLM 会话工具调用超过上限（会话={}，上限={}，待执行调用={}）",
+                self.log_id,
+                plugin_config.max_tool_rounds,
+                len(completion.tool_calls),
+            )
             raise ProviderError(f"工具调用超过上限（{plugin_config.max_tool_rounds} 轮）")
 
         completion.usage = total_usage
         completion.model = actual_model or plugin_config.resolve(self.model_name).model
         completion.elapsed_seconds = perf_counter() - started_at
         self.context.append(completion.message)
+        logger.info(
+            "LLM 会话请求完成（会话={}，模型={}，结束原因={}，工具轮次={}，I={}，O={}，C={}，耗时={:.3f}s）",
+            self.log_id,
+            completion.model,
+            completion.finish_reason,
+            tool_rounds,
+            completion.usage.input_tokens,
+            completion.usage.output_tokens,
+            completion.usage.cache_read_tokens,
+            completion.elapsed_seconds,
+        )
         return completion
 
     def rollback(self) -> bool:
         """回滚最近一轮对话，成功时返回 True"""
         # 一轮 = 一条用户输入 + 一条模型回复，工具消息也一并回滚
-        removed = False
+        removed_count = 0
         while self.context and self.context[-1].role != "user":
             self.context.pop()
-            removed = True
+            removed_count += 1
         if self.context and self.context[-1].role == "user":
             self.context.pop()
-            removed = True
-        return removed
+            removed_count += 1
+        if removed_count:
+            logger.info("LLM 会话已回滚（会话={}，移除消息={}）", self.log_id, removed_count)
+        return bool(removed_count)
 
     async def send(
         self,
@@ -215,6 +261,7 @@ class LLMHandler:
         """按配置发送模型回复"""
         text = format_output(completion, with_thinking=self.show_thinking)
         if not text:
+            logger.warning("LLM 会话没有可发送内容（会话={}）", self.log_id)
             await UniMessage.text("模型没有返回任何内容").send(reply_to=reply_to)
             return
 
@@ -224,18 +271,29 @@ class LLMHandler:
             try:
                 audio = await text_to_speech(spoken, self.tts_model)
             except TTSError as e:
-                logger.opt(exception=e).warning("语音合成失败，改用文字回复")
+                logger.warning("LLM 会话语音合成失败，改用文字回复（会话={}）", self.log_id)
                 await UniMessage.text(f"语音合成失败（{e}），以下是文字回复：").send(reply_to=reply_to)
             else:
+                logger.info(
+                    "LLM 会话发送回复（会话={}，方式=语音，音频字节={}）",
+                    self.log_id,
+                    len(audio),
+                )
                 await UniMessage.audio(raw=audio).send(reply_to=reply_to)
                 await UniMessage.text(format_statistics(completion)).send(reply_to=reply_to)
                 return
 
         if self.send_md_pic:
             if image := await try_render_markdown(text):
+                logger.info(
+                    "LLM 会话发送回复（会话={}，方式=Markdown 图片，图片字节={}）",
+                    self.log_id,
+                    len(image),
+                )
                 await UniMessage.image(raw=image).send(reply_to=reply_to)
                 return
 
+        logger.info("LLM 会话发送回复（会话={}，方式=文本，字符={}）", self.log_id, len(text))
         await UniMessage.text(text).send(reply_to=reply_to)
 
 

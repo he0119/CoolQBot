@@ -1,5 +1,6 @@
 """群组大模型配置的读写"""
 
+from nonebot.log import logger
 from nonebot_plugin_orm import get_session
 from sqlalchemy import select
 
@@ -40,6 +41,7 @@ async def set_model_name(session_id: str, model_name: str) -> None:
         else:
             session.add(GroupLLMConfig(session_id=session_id, model_name=model_name))
         await session.commit()
+    logger.info("LLM 群组默认模型已更新（模型={}）", model_name)
 
 
 async def get_tts_model(session_id: str) -> str:
@@ -61,3 +63,4 @@ async def set_tts_model(session_id: str, tts_model: str) -> None:
         else:
             session.add(GroupLLMConfig(session_id=session_id, tts_model=tts_model))
         await session.commit()
+    logger.info("LLM 群组默认 TTS 模型已更新（模型={}）", tts_model)

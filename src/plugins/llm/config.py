@@ -12,7 +12,7 @@ LLM__MODELS='[{"name":"model-a","provider":"chat"}]'
 from typing import Annotated, Any, Literal
 
 from nonebot import get_plugin_config
-from pydantic import BaseModel, Field, model_validator
+from pydantic import AliasChoices, BaseModel, Field, model_validator
 
 ProviderName = Literal["chat", "responses", "anthropic"]
 """支持的 API 格式"""
@@ -122,6 +122,50 @@ class ScopedConfig(BaseModel):
     """多轮对话中等待用户输入的超时时间（秒）"""
     max_tool_rounds: int = 5
     """单次提问中允许的最大工具调用轮数，防止模型陷入循环"""
+    web_search_max_results: int = Field(default=5, ge=1, le=10)
+    """网页搜索单次允许返回的最大结果数"""
+    web_search_timeout: int = Field(default=10, gt=0)
+    """网页搜索超时时间（秒）"""
+    web_search_region: str = "wt-wt"
+    """网页搜索区域代码，wt-wt 表示不限定区域"""
+    web_search_safesearch: Literal["on", "moderate", "off"] = "moderate"
+    """网页搜索安全过滤级别"""
+    web_search_backend: str = "auto"
+    """网页搜索后端，默认由 ddgs 自动选择"""
+    web_fetch_max_bytes: int = Field(
+        default=10 * 1024 * 1024,
+        gt=0,
+        validation_alias=AliasChoices("web_fetch_max_bytes", "zssm_max_resource_bytes"),
+    )
+    """web_fetch 与解释模式单个网页或 PDF 的最大下载字节数"""
+    web_fetch_max_chars: int = Field(
+        default=30_000,
+        gt=0,
+        validation_alias=AliasChoices("web_fetch_max_chars", "zssm_max_resource_chars"),
+    )
+    """web_fetch 与解释模式单个网页或 PDF 提取后的最大字符数"""
+    web_fetch_max_pdf_pages: int = Field(
+        default=50,
+        gt=0,
+        validation_alias=AliasChoices("web_fetch_max_pdf_pages", "zssm_max_pdf_pages"),
+    )
+    """web_fetch 与解释模式读取 PDF 的最大页数"""
+    web_fetch_timeout: int = Field(
+        default=30,
+        gt=0,
+        validation_alias=AliasChoices("web_fetch_timeout", "zssm_resource_timeout"),
+    )
+    """web_fetch 与解释模式下载网页或 PDF 的超时时间（秒）"""
+    web_proxy: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("web_proxy", "zssm_resource_proxy"),
+    )
+    """网页搜索、web_fetch 与解释模式下载网页或 PDF 使用的代理"""
+    web_fetch_fake_ip_ranges: list[str] = Field(
+        default_factory=lambda: ["198.18.0.0/15"],
+        validation_alias=AliasChoices("web_fetch_fake_ip_ranges", "zssm_resource_fake_ip_ranges"),
+    )
+    """web_fetch 与解释模式允许的代理 fake-ip 网段；不放宽 URL 中直接填写的 IP"""
     zssm_model: str = ""
     """解释模式使用的模型；留空时使用当前群组模型"""
     zssm_vision_model: str = ""
@@ -132,18 +176,6 @@ class ScopedConfig(BaseModel):
     """解释模式单张图片的最大字节数"""
     zssm_max_resources: int = 2
     """解释模式单次读取的最大网页或 PDF 数量"""
-    zssm_max_resource_bytes: int = 10 * 1024 * 1024
-    """解释模式单个网页或 PDF 的最大下载字节数"""
-    zssm_max_resource_chars: int = 30_000
-    """解释模式单个网页或 PDF 提取后的最大字符数"""
-    zssm_max_pdf_pages: int = 50
-    """解释模式读取 PDF 的最大页数"""
-    zssm_resource_timeout: int = 30
-    """解释模式下载网页或 PDF 的超时时间（秒）"""
-    zssm_resource_proxy: str | None = None
-    """解释模式下载网页或 PDF 使用的代理"""
-    zssm_resource_fake_ip_ranges: list[str] = Field(default_factory=lambda: ["198.18.0.0/15"])
-    """域名解析时允许的代理 fake-ip 网段；不放宽 URL 中直接填写的 IP"""
     tts_base_url: str = ""
     """GPT-SoVITS 服务地址，留空则禁用语音功能"""
     tts_access_token: str = ""

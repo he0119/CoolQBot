@@ -98,6 +98,14 @@ async def zssm_handle(
     except ValueError as e:
         await UniMessage.text(str(e)).finish(reply_to=msg_id)
 
+    logger.info(
+        "解释模式开始（模型={}，视觉模型={}，目标字符={}，关注字符={}，图片={}）",
+        model_name,
+        vision_model or "无需",
+        len(target),
+        len(focus),
+        len(images),
+    )
     await send_reaction("thinking", message_id=msg_id)
     try:
         image_contents = await fetch_images(images, event, bot, state)
@@ -123,13 +131,14 @@ async def zssm_handle(
             show_thinking=False,
         )
         logger.info(
-            "调用解释模型 {}（直传图片 {} 张，外部资源 {} 个）",
+            "解释模式调用模型（会话={}，模型={}，直传图片={}，外部资源={}）",
+            handler.log_id,
             model_name,
             len(final_images or []),
             len(resources),
         )
         completion = await handler.ask(user_prompt, final_images)
-        logger.info("解释模型 {} 已完成", completion.model)
+        logger.info("解释模式模型调用完成（会话={}，模型={}）", handler.log_id, completion.model)
         if vision_completion:
             completion.usage = vision_completion.usage + completion.usage
             completion.elapsed_seconds += vision_completion.elapsed_seconds
@@ -137,6 +146,7 @@ async def zssm_handle(
         content_text, _ = split_content(completion)
         completion.message.content = format_explain_response(content_text)
     except (ProviderError, ValueError) as e:
+        logger.warning("解释模式失败（模型={}，错误类型={}）", model_name, type(e).__name__)
         await send_reaction("fail", message_id=msg_id)
         await UniMessage.text(f"解释失败：{e}").finish(reply_to=msg_id)
     except Exception as e:

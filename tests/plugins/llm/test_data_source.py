@@ -98,6 +98,29 @@ def test_model_config_defaults(app: App):
     assert config.resolve("claude").base_url == "https://api.anthropic.com"
 
 
+def test_legacy_zssm_resource_config_aliases(app: App):
+    """旧版 zssm 外部资源配置继续映射到通用 Web 配置。"""
+    from src.plugins.llm.config import ScopedConfig
+
+    config = ScopedConfig.model_validate(
+        {
+            "zssm_max_resource_bytes": 1024,
+            "zssm_max_resource_chars": 2048,
+            "zssm_max_pdf_pages": 3,
+            "zssm_resource_timeout": 4,
+            "zssm_resource_proxy": "http://proxy.example.com",
+            "zssm_resource_fake_ip_ranges": ["198.18.0.0/15", "198.51.100.0/24"],
+        }
+    )
+
+    assert config.web_fetch_max_bytes == 1024
+    assert config.web_fetch_max_chars == 2048
+    assert config.web_fetch_max_pdf_pages == 3
+    assert config.web_fetch_timeout == 4
+    assert config.web_proxy == "http://proxy.example.com"
+    assert config.web_fetch_fake_ip_ranges == ["198.18.0.0/15", "198.51.100.0/24"]
+
+
 def test_resolve_falls_back_to_global(app: App, mocker):
     """模型未单独配置时回退到全局服务地址、密钥与人设"""
     from src.plugins.llm.config import ModelConfig, plugin_config
@@ -185,6 +208,36 @@ async def test_tool_registry_errors(app: App):
 
     assert "未注册的工具" in await registry.execute(ToolCall(id="1", name="unknown", arguments={}))
     assert "缺少必填参数" in await registry.execute(ToolCall(id="2", name="greet", arguments={}))
+
+
+async def test_tool_registry_logs_metadata_without_values(app: App, mocker):
+    """工具日志只记录工具名、参数名和结果规模，不记录参数值或结果正文。"""
+    from src.plugins.llm.schemas import ToolCall
+    from src.plugins.llm.tools import ToolRegistry
+
+    logger_info = mocker.patch("src.plugins.llm.tools.logger.info")
+    registry = ToolRegistry()
+
+    @registry.register("lookup", "查询数据")
+    def lookup(query: str, api_key: str) -> str:
+        return "private-result"
+
+    result = await registry.execute(
+        ToolCall(
+            id="1",
+            name="lookup",
+            arguments={"query": "private-query", "api_key": "secret-key"},
+        )
+    )
+
+    assert result == "private-result"
+    log_text = " ".join(str(item) for item in logger_info.call_args_list)
+    assert "lookup" in log_text
+    assert "query" in log_text
+    assert "api_key" in log_text
+    assert "private-query" not in log_text
+    assert "secret-key" not in log_text
+    assert "private-result" not in log_text
 
 
 def test_usage_normalizes_across_formats(app: App):

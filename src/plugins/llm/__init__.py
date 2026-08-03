@@ -294,9 +294,11 @@ async def _ask(
     try:
         completion = await handler.ask(text, images)
     except ProviderError as e:
+        logger.warning("LLM 调用失败（会话={}，错误类型=ProviderError）", handler.log_id)
         await send_reaction("fail", message_id=message_id)
         await llm_cmd.finish(f"调用失败：{e}", at_sender=True)
     except ValueError as e:
+        logger.warning("LLM 调用失败（会话={}，错误类型=ValueError）", handler.log_id)
         await send_reaction("fail", message_id=message_id)
         await llm_cmd.finish(str(e), at_sender=True)
     except Exception as e:

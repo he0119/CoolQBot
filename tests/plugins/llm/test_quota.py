@@ -99,6 +99,7 @@ async def test_deepseek_quota(app: App, respx_mock: MockRouter, mocker):
         quota={"provider": "deepseek"},
     )
     mocker.patch.object(plugin_config, "base_url", "")
+    logger_info = mocker.patch("src.plugins.llm.quota.logger.info")
 
     result = await get_quota(model)
 
@@ -108,6 +109,9 @@ async def test_deepseek_quota(app: App, respx_mock: MockRouter, mocker):
         "  USD: $15.25（赠金 $1.25，充值 $14.00）"
     )
     assert route.calls[0].request.headers["Authorization"] == "Bearer sk-model"
+    log_text = " ".join(str(item) for item in logger_info.call_args_list)
+    assert "deepseek" in log_text
+    assert "sk-model" not in log_text
 
 
 async def test_deepseek_quota_without_api_key(app: App):
@@ -122,11 +126,12 @@ async def test_deepseek_quota_without_api_key(app: App):
 
 
 @respx.mock(assert_all_called=True)
-async def test_quota_http_error(app: App, respx_mock: MockRouter):
+async def test_quota_http_error(app: App, respx_mock: MockRouter, mocker):
     """额度 API 出错时不向聊天消息泄露响应内容"""
     from src.plugins.llm.config import ModelConfig
     from src.plugins.llm.quota import QuotaError, get_quota
 
+    logger_warning = mocker.patch("src.plugins.llm.quota.logger.warning")
     respx_mock.get("https://ai.example.com/api/quotas").mock(
         return_value=httpx.Response(401, json={"error": "secret detail"})
     )
@@ -137,6 +142,7 @@ async def test_quota_http_error(app: App, respx_mock: MockRouter):
 
     with pytest.raises(QuotaError, match="获取额度信息失败，请稍后再试"):
         await get_quota(model)
+    assert "secret detail" not in " ".join(str(item) for item in logger_warning.call_args_list)
 
 
 async def test_quota_not_configured(app: App):

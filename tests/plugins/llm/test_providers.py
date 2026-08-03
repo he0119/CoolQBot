@@ -85,6 +85,38 @@ async def test_chat_request_and_response(app: App, respx_mock: MockRouter):
 
 
 @respx.mock(assert_all_called=True)
+async def test_provider_logs_metadata_without_payload(app: App, respx_mock: MockRouter, mocker):
+    """Provider 日志只记录请求元数据，不记录提示词或密钥。"""
+    from src.plugins.llm.providers import ChatProvider
+    from src.plugins.llm.schemas import Message
+
+    logger_debug = mocker.patch("src.plugins.llm.providers.base.logger.debug")
+    respx_mock.post("https://api.example.com/chat/completions").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "model": "actual-model",
+                "choices": [{"finish_reason": "stop", "message": {"role": "assistant", "content": "private-output"}}],
+            },
+        )
+    )
+
+    provider = ChatProvider(
+        make_config("chat", api_key="secret-key"),
+        session_affinity="abcdef1234567890",
+    )
+    await provider.chat([Message.user("private-prompt")])
+
+    log_text = " ".join(str(item) for item in logger_debug.call_args_list)
+    assert "abcdef12" in log_text
+    assert "test-model" in log_text
+    assert "actual-model" in log_text
+    assert "private-prompt" not in log_text
+    assert "private-output" not in log_text
+    assert "secret-key" not in log_text
+
+
+@respx.mock(assert_all_called=True)
 async def test_chat_tools_and_images(app: App, respx_mock: MockRouter):
     """chat 格式：工具嵌套在 function 下，图片用 image_url + data URI"""
     from src.plugins.llm.providers import ChatProvider

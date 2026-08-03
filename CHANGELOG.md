@@ -14,10 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 支持在模型配置的 `capabilities` 中声明 `vision` 图片输入能力
 - 为 llm 添加内置 `zssm` 解释模式，支持回复文本、关注点、图片以及受限读取网页和 PDF，并记录简洁的资源读取与模型调用日志
 - 支持通过 `zssm --model <模型名>` 临时指定本次解释使用的模型
+- 为 llm 添加 `web_search` 与 `web_fetch` 内置工具，支持搜索网页以及安全读取网页、文本、JSON 和 PDF
 
 ### Changed
 
 - 优化 llm 回复显示：推理内容改用引用块，并通过 emoji reaction 反馈响应状态
+- 完善 llm 调用链日志，覆盖会话、Provider、工具、Web、额度与 TTS，同时避免记录正文、凭据和用户/群组标识
 - 将外部 zssm 插件迁移到 llm，共用模型配置、请求协议与响应统计
 - 图片输入改为必须由模型在 `capabilities` 中显式声明 `vision`；原本能接收图片的模型需要补上该声明，否则发送图片会提示未声明 vision 能力
 
