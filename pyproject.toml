@@ -42,12 +42,12 @@ dependencies = [
     "nonebot-bison==0.9.14",
     "nonebot-plugin-status==0.9.0",
     "nonebot-plugin-prometheus==0.4.1",
-    "nonebot-plugin-zssm==0.3.7",
     "nonebot-plugin-abs==1.1.0",
     "nonebot-plugin-parser[htmlkit]==2.6.6",
     "nonebot-plugin-htmlrender[filehost,prometheus,sentry]>=0.7.2",
     "nonebot-plugin-waiter>=0.8.1",
     "playwright==1.61.0",
+    "pymupdf>=1.25.5",
 ]
 
 [project.urls]
@@ -83,9 +83,6 @@ override-dependencies = [
 [tool.uv.pip]
 universal = true
 
-[tool.uv.sources]
-nonebot-plugin-zssm = { git = "https://github.com/djkcyl/nonebot-plugin-zssm.git" }
-
 [tool.poe.tasks]
 test = "pytest --cov=src --cov-report xml --junitxml=./junit.xml -n auto"
 bump = "bump-my-version bump"
@@ -108,7 +105,6 @@ nonebot-bison = ["nonebot_bison"]
 nonebot-plugin-status = ["nonebot_plugin_status"]
 nonebot-plugin-prometheus = ["nonebot_plugin_prometheus"]
 nonebot-plugin-inspect = ["nonebot_plugin_inspect"]
-nonebot-plugin-zssm = ["nonebot_plugin_zssm"]
 nonebot-plugin-abs = ["nonebot_plugin_abs"]
 nonebot-plugin-parser = ["nonebot_plugin_parser"]
 

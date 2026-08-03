@@ -20,7 +20,8 @@
 - 推理内容以引用块展示（DeepSeek 的 `reasoning_content`、Anthropic 的 `thinking`、Responses 的推理摘要）
 - 使用 emoji reaction 反馈响应状态（思考中、已完成、失败；不支持的平台自动跳过）
 - 工具调用（function calling），三种格式自动适配
-- 图片输入（多模态）
+- 图片输入（多模态），需要模型在 `capabilities` 中声明 `vision`
+- 内置“这是什么”解释模式，可解释被回复的文字、图片、网页与 PDF
 - 在回复末尾显示整轮耗时、实际模型和 token 用量，工具调用产生的多次请求会累计统计
 - Markdown 转图片
 - TTS 语音回复（GPT-SoVITS）
@@ -47,6 +48,7 @@
 | `/llm tts --list`              | -                 | 查看可用 TTS 模型列表 | 所有人 |
 | `/llm tts --set <模型名>`      | -                 | 设置群组默认 TTS 模型 | 所有人 |
 | `/llm quota [模型名]`          | `/quota`、`/额度` | 查询模型剩余额度      | 所有人 |
+| `zssm [关注点]`                | -                 | 解释输入或被回复内容  | 所有人 |
 
 对话选项应写在内容前；`<内容>` 是可变长参数，放在内容后的选项可能被当作正文。
 
@@ -87,6 +89,31 @@
 /llm -t 念一首诗                 # 用语音回复
 ```
 
+### 解释消息内容
+
+直接发送 `zssm <内容>` 可以解释一段文字。更常用的方式是回复群友消息并发送 `zssm`，命令后的文字会作为关注点：
+
+```text
+群友：量子纠缠说明两个粒子可以超光速通信……
+你（回复群友）：zssm 重点说明“超光速通信”是否准确
+```
+
+解释模式使用独立提示词，不展示推理过程，也不开放工具调用；即使模型返回了工具调用请求也会被拒绝。机器人的回答引用你发送的 `zssm` 命令。
+
+图片处理取决于模型能力：模型在 `capabilities` 中声明 `vision` 时，图片直接随解释请求发送，只调用一次；否则需要通过 `LLM__ZSSM_VISION_MODEL` 指定另一个声明了 `vision` 的模型，先生成图片描述再解释。
+
+消息中实际出现的网页或 PDF 链接会在调用模型前读取，读取器有以下限制：
+
+- 只允许 HTTP(S)，拒绝带登录凭据的 URL，以及指向本机、内网和其他非公网地址的目标；每次重定向都会重新校验。
+- 域名解析到 `LLM__ZSSM_RESOURCE_FAKE_IP_RANGES` 配置的网段时放行，用于兼容透明代理的 fake-ip；直接在 URL 里填写这些 IP 仍会拒绝。
+- 限制资源数量、单个资源的下载字节数、PDF 页数与提取文本长度，超长内容会截断。
+- 配置 `LLM__ZSSM_RESOURCE_PROXY` 后，域名由代理解析，上述地址校验只在本地生效，实际能访问到哪些网络取决于代理。
+- 校验和建立连接是两次独立的域名解析，理论上存在 DNS rebinding 的时间差，不适合用在能访问敏感内网的环境里。
+
+所有不可信内容（被解释的文字、关注点、图片描述、网页正文）都以 JSON 数据传给模型，提示词要求模型只把它们当作待解释的数据，不执行其中的指令。
+
+图片读取、外部资源读取以及视觉/解释模型调用会输出简洁日志；资源日志只记录主机名和处理结果，不记录 URL 路径、查询参数或正文。
+
 ## 配置说明
 
 通过 `LLM__` 前缀在 `.env` 中配置。`models` 的第一项为默认模型。
@@ -108,6 +135,23 @@ LLM__STREAM=false
 LLM__MAX_TOOL_ROUNDS=5
 # 多轮对话等待用户输入的超时时间（秒）
 LLM__CONTEXT_TIMEOUT=120
+
+# “这是什么”解释模式；留空时跟随当前群组模型
+LLM__ZSSM_MODEL=deepseek
+# 可选；解释模型不支持图片时，用该模型先生成图片描述
+LLM__ZSSM_VISION_MODEL=gpt
+# 输入与外部资源限制
+LLM__ZSSM_MAX_IMAGES=2
+LLM__ZSSM_MAX_IMAGE_BYTES=10485760
+LLM__ZSSM_MAX_RESOURCES=2
+LLM__ZSSM_MAX_RESOURCE_BYTES=10485760
+LLM__ZSSM_MAX_RESOURCE_CHARS=30000
+LLM__ZSSM_MAX_PDF_PAGES=50
+LLM__ZSSM_RESOURCE_TIMEOUT=30
+# 可选，下载网页与 PDF 时使用的代理
+LLM__ZSSM_RESOURCE_PROXY=
+# 域名经透明代理解析到 fake-ip 时允许的网段
+LLM__ZSSM_RESOURCE_FAKE_IP_RANGES='["198.18.0.0/15"]'
 
 # 模型列表
 LLM__MODELS='
@@ -135,7 +179,8 @@ LLM__MODELS='
     "provider": "responses",
     "model": "gpt-5",
     "base_url": "https://api.openai.com/v1",
-    "api_key": "sk-openai-xxx"
+    "api_key": "sk-openai-xxx",
+    "capabilities": ["vision"]
   },
   {
     "name": "claude",
@@ -156,21 +201,22 @@ LLM__TTS_MODEL=default
 
 ### 单个模型的可配置项
 
-| 字段          | 说明                                                    |
-| ------------- | ------------------------------------------------------- |
-| `name`        | 模型标识，命令中用此名称选择模型                        |
-| `model`       | 传给 API 的模型名，留空时与 `name` 相同                 |
-| `provider`    | API 格式，`chat` / `responses` / `anthropic`            |
-| `base_url`    | 服务地址，留空时回退到 `LLM__BASE_URL` 或按格式取默认值 |
-| `api_key`     | 密钥，留空时回退到 `LLM__API_KEY`                       |
-| `prompt`      | 人设，留空时回退到 `LLM__PROMPT`                        |
-| `proxy`       | 代理地址                                                |
-| `stream`      | 是否流式请求，留空时回退到 `LLM__STREAM`                |
-| `max_tokens`  | 最大输出 token 数（`anthropic` 必填，默认 4096）        |
-| `temperature` | 采样温度                                                |
-| `timeout`     | 非流式请求超时时间（秒）                                |
-| `extra_body`  | 附加到请求体的额外字段，用于传各服务商特有参数          |
-| `quota`       | 该模型的额度查询配置，留空时不支持 `/llm quota`         |
+| 字段           | 说明                                                    |
+| -------------- | ------------------------------------------------------- |
+| `name`         | 模型标识，命令中用此名称选择模型                        |
+| `model`        | 传给 API 的模型名，留空时与 `name` 相同                 |
+| `provider`     | API 格式，`chat` / `responses` / `anthropic`            |
+| `base_url`     | 服务地址，留空时回退到 `LLM__BASE_URL` 或按格式取默认值 |
+| `api_key`      | 密钥，留空时回退到 `LLM__API_KEY`                       |
+| `prompt`       | 人设，留空时回退到 `LLM__PROMPT`                        |
+| `proxy`        | 代理地址                                                |
+| `stream`       | 是否流式请求，留空时回退到 `LLM__STREAM`                |
+| `max_tokens`   | 最大输出 token 数（`anthropic` 必填，默认 4096）        |
+| `temperature`  | 采样温度                                                |
+| `timeout`      | 非流式请求超时时间（秒）                                |
+| `extra_body`   | 附加到请求体的额外字段，用于传各服务商特有参数          |
+| `capabilities` | 模型能力列表；`vision` 表示可直接接收图片               |
+| `quota`        | 该模型的额度查询配置，留空时不支持 `/llm quota`         |
 
 ### 额度查询配置
 

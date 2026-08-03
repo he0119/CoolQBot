@@ -5,6 +5,9 @@ API 格式，提供多轮对话、推理内容展示、Markdown 转图片与 TTS
 额度查询按模型选择独立 provider，目前支持 Aperture 与 DeepSeek。
 """
 
+from pathlib import Path
+
+import nonebot
 from nonebot import require
 from nonebot.adapters import Bot, Event
 from nonebot.log import logger
@@ -303,3 +306,6 @@ async def _ask(
 
     await send_reaction("done", message_id=message_id)
     return completion
+
+
+_sub_plugins = nonebot.load_plugins(str((Path(__file__).parent / "plugins").resolve()))

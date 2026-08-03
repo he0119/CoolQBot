@@ -36,11 +36,17 @@ REACTION_EMOJIS: dict[ReactionStatus, tuple[str, str]] = {
 """QQ emoji ID 与其他平台 Unicode emoji 的对应关系"""
 
 
-async def chat(model_name: str, messages: list[Message], *, session_affinity: str = "") -> Completion:
+async def chat(
+    model_name: str,
+    messages: list[Message],
+    *,
+    session_affinity: str = "",
+    enable_tools: bool = True,
+) -> Completion:
     """发起一次对话请求"""
     model = plugin_config.resolve(model_name)
     provider = get_provider(model.provider)(model, session_affinity=session_affinity)
-    tools = registry.to_params()
+    tools = registry.to_params() if enable_tools else []
     return await provider.chat(messages, tools or None)
 
 
@@ -124,14 +130,19 @@ class LLMHandler:
         session_affinity: str | None = None,
         send_md_pic: bool = False,
         tts_model: str = "",
+        system_prompt: str | None = None,
+        enable_tools: bool = True,
+        show_thinking: bool | None = None,
     ) -> None:
         self.model_name = model_name
         self.session_affinity = session_affinity or uuid4().hex
         self.send_md_pic = send_md_pic
         self.tts_model = tts_model
+        self.enable_tools = enable_tools
+        self.show_thinking = plugin_config.send_thinking if show_thinking is None else show_thinking
         self.context: list[Message] = []
 
-        prompt = plugin_config.resolve(model_name).prompt
+        prompt = plugin_config.resolve(model_name).prompt if system_prompt is None else system_prompt
         if prompt:
             self.context.append(Message(role="system", content=prompt))
 
@@ -141,11 +152,22 @@ class LLMHandler:
         模型请求工具调用时自动执行并继续请求，直到给出最终回复
         或达到 `max_tool_rounds` 轮数上限。
         """
+        if images and "vision" not in plugin_config.get_model(self.model_name).capabilities:
+            raise ValueError(f"模型 {self.model_name} 未声明 vision 能力，不能接收图片")
+
         context_start = len(self.context)
         self.context.append(Message.user(content, images))
 
         started_at = perf_counter()
-        completion = await chat(self.model_name, self.context, session_affinity=self.session_affinity)
+        completion = await chat(
+            self.model_name,
+            self.context,
+            session_affinity=self.session_affinity,
+            enable_tools=self.enable_tools,
+        )
+        if completion.tool_calls and not self.enable_tools:
+            del self.context[context_start:]
+            raise ProviderError("当前模式不允许工具调用")
         total_usage = completion.usage
         actual_model = completion.model
         for _ in range(plugin_config.max_tool_rounds):
@@ -153,7 +175,12 @@ class LLMHandler:
                 break
             self.context.append(completion.message)
             await execute_tool_calls(completion.tool_calls, self.context)
-            completion = await chat(self.model_name, self.context, session_affinity=self.session_affinity)
+            completion = await chat(
+                self.model_name,
+                self.context,
+                session_affinity=self.session_affinity,
+                enable_tools=self.enable_tools,
+            )
             total_usage = total_usage + completion.usage
             actual_model = completion.model or actual_model
 
@@ -179,11 +206,16 @@ class LLMHandler:
             removed = True
         return removed
 
-    async def send(self, completion: Completion) -> None:
+    async def send(
+        self,
+        completion: Completion,
+        *,
+        reply_to: str | bool = False,
+    ) -> None:
         """按配置发送模型回复"""
-        text = format_output(completion, with_thinking=plugin_config.send_thinking)
+        text = format_output(completion, with_thinking=self.show_thinking)
         if not text:
-            await UniMessage.text("模型没有返回任何内容").send()
+            await UniMessage.text("模型没有返回任何内容").send(reply_to=reply_to)
             return
 
         if self.tts_model:
@@ -193,18 +225,18 @@ class LLMHandler:
                 audio = await text_to_speech(spoken, self.tts_model)
             except TTSError as e:
                 logger.opt(exception=e).warning("语音合成失败，改用文字回复")
-                await UniMessage.text(f"语音合成失败（{e}），以下是文字回复：").send()
+                await UniMessage.text(f"语音合成失败（{e}），以下是文字回复：").send(reply_to=reply_to)
             else:
-                await UniMessage.audio(raw=audio).send()
-                await UniMessage.text(format_statistics(completion)).send()
+                await UniMessage.audio(raw=audio).send(reply_to=reply_to)
+                await UniMessage.text(format_statistics(completion)).send(reply_to=reply_to)
                 return
 
         if self.send_md_pic:
             if image := await try_render_markdown(text):
-                await UniMessage.image(raw=image).send()
+                await UniMessage.image(raw=image).send(reply_to=reply_to)
                 return
 
-        await UniMessage.text(text).send()
+        await UniMessage.text(text).send(reply_to=reply_to)
 
 
 async def try_render_markdown(text: str) -> bytes | None:
