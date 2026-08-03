@@ -8,6 +8,9 @@ from __future__ import annotations
 
 import asyncio
 import re
+from collections.abc import Awaitable, Callable
+from contextlib import suppress
+from dataclasses import dataclass
 from time import perf_counter
 from typing import TYPE_CHECKING, Literal
 from uuid import uuid4
@@ -28,12 +31,21 @@ THINK_PATTERN = re.compile(r"<think>(.*?)</think>", re.DOTALL)
 """部分服务商把推理内容混在正文的 think 标签里"""
 
 ReactionStatus = Literal["fail", "thinking", "done"]
+ToolWaitNotifier = Callable[[int, int, int], Awaitable[None]]
 REACTION_EMOJIS: dict[ReactionStatus, tuple[str, str]] = {
     "fail": ("10060", "❌"),
     "thinking": ("424", "👀"),
     "done": ("144", "🎉"),
 }
 """QQ emoji ID 与其他平台 Unicode emoji 的对应关系"""
+
+
+@dataclass
+class _ToolWaitProgress:
+    """等待提示使用的非敏感工具调用进度。"""
+
+    request_count: int = 1
+    tool_call_count: int = 0
 
 
 async def chat(
@@ -151,7 +163,13 @@ class LLMHandler:
         """用于关联日志的随机短 ID，不包含用户或群组信息。"""
         return self.session_affinity[:8]
 
-    async def ask(self, content: str, images: list[ImageContent] | None = None) -> Completion:
+    async def ask(
+        self,
+        content: str,
+        images: list[ImageContent] | None = None,
+        *,
+        on_tool_wait: ToolWaitNotifier | None = None,
+    ) -> Completion:
         """追加一轮用户输入并请求模型
 
         模型请求工具调用时自动执行并继续请求，直到给出最终回复
@@ -190,26 +208,38 @@ class LLMHandler:
         total_usage = completion.usage
         actual_model = completion.model
         tool_rounds = 0
-        for tool_round in range(1, plugin_config.max_tool_rounds + 1):
-            if not completion.tool_calls:
-                break
-            tool_rounds = tool_round
-            logger.info(
-                "LLM 会话执行工具回合（会话={}，轮次={}，调用数量={}）",
-                self.log_id,
-                tool_round,
-                len(completion.tool_calls),
-            )
-            self.context.append(completion.message)
-            await execute_tool_calls(completion.tool_calls, self.context)
-            completion = await chat(
-                self.model_name,
-                self.context,
-                session_affinity=self.session_affinity,
-                enable_tools=self.enable_tools,
-            )
-            total_usage = total_usage + completion.usage
-            actual_model = completion.model or actual_model
+        notice_task: asyncio.Task[None] | None = None
+        tool_progress = _ToolWaitProgress()
+        try:
+            for tool_round in range(1, plugin_config.max_tool_rounds + 1):
+                if not completion.tool_calls:
+                    break
+                tool_progress.tool_call_count += len(completion.tool_calls)
+                if on_tool_wait and notice_task is None:
+                    notice_task = asyncio.create_task(self._send_tool_wait_notices(on_tool_wait, tool_progress))
+                tool_rounds = tool_round
+                logger.info(
+                    "LLM 会话执行工具回合（会话={}，轮次={}，调用数量={}）",
+                    self.log_id,
+                    tool_round,
+                    len(completion.tool_calls),
+                )
+                self.context.append(completion.message)
+                await execute_tool_calls(completion.tool_calls, self.context)
+                tool_progress.request_count += 1
+                completion = await chat(
+                    self.model_name,
+                    self.context,
+                    session_affinity=self.session_affinity,
+                    enable_tools=self.enable_tools,
+                )
+                total_usage = total_usage + completion.usage
+                actual_model = completion.model or actual_model
+        finally:
+            if notice_task:
+                notice_task.cancel()
+                with suppress(asyncio.CancelledError):
+                    await notice_task
 
         if completion.tool_calls:
             del self.context[context_start:]
@@ -237,6 +267,33 @@ class LLMHandler:
             completion.elapsed_seconds,
         )
         return completion
+
+    async def _send_tool_wait_notices(self, notify: ToolWaitNotifier, progress: _ToolWaitProgress) -> None:
+        """工具阶段未完成时按配置周期发送等待提示。"""
+        delay = plugin_config.tool_notice_delay
+        count = 0
+        while True:
+            await asyncio.sleep(delay)
+            count += 1
+            try:
+                await notify(count, progress.request_count, progress.tool_call_count)
+            except Exception as e:
+                logger.opt(exception=e).debug(
+                    "LLM 工具等待提示发送失败，已忽略（会话={}，次数={}，模型请求={}，工具调用={}）",
+                    self.log_id,
+                    count,
+                    progress.request_count,
+                    progress.tool_call_count,
+                )
+            else:
+                logger.info(
+                    "LLM 会话发送工具等待提示（会话={}，次数={}，模型请求={}，工具调用={}）",
+                    self.log_id,
+                    count,
+                    progress.request_count,
+                    progress.tool_call_count,
+                )
+            delay = plugin_config.tool_notice_interval
 
     def rollback(self) -> bool:
         """回滚最近一轮对话，成功时返回 True"""

@@ -282,6 +282,19 @@ def _extract_reply(reply_event: Event):
     return reply_event.get_message(), get_message_id(reply_event)
 
 
+async def _send_tool_wait_notice(
+    count: int,
+    request_count: int,
+    tool_call_count: int,
+    *,
+    message_id: str | None = None,
+) -> None:
+    """提示用户工具调用仍在进行；首次与后续心跳使用不同文案。"""
+    progress = f"模型请求 {request_count} 次，工具调用 {tool_call_count} 个"
+    text = f"🔍 正在查询资料（{progress}），请稍候……" if count == 1 else f"⏳ 查询仍在进行（{progress}），请再稍候……"
+    await UniMessage.text(text).send(reply_to=message_id or True)
+
+
 async def _ask(
     handler: LLMHandler,
     text: str,
@@ -291,8 +304,12 @@ async def _ask(
 ):
     """请求模型，失败时结束当前会话并提示原因"""
     await send_reaction("thinking", message_id=message_id)
+
+    async def notify_tool_wait(count: int, request_count: int, tool_call_count: int) -> None:
+        await _send_tool_wait_notice(count, request_count, tool_call_count, message_id=message_id)
+
     try:
-        completion = await handler.ask(text, images)
+        completion = await handler.ask(text, images, on_tool_wait=notify_tool_wait)
     except ProviderError as e:
         logger.warning("LLM 调用失败（会话={}，错误类型=ProviderError）", handler.log_id)
         await send_reaction("fail", message_id=message_id)

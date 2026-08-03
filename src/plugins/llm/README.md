@@ -19,7 +19,7 @@
 - 流式与非流式请求
 - 推理内容以引用块展示（DeepSeek 的 `reasoning_content`、Anthropic 的 `thinking`、Responses 的推理摘要）
 - 使用 emoji reaction 反馈响应状态（思考中、已完成、失败；不支持的平台自动跳过）
-- 工具调用（function calling），三种格式自动适配
+- 工具调用（function calling），三种格式自动适配；耗时较长时定期提示模型请求与工具调用进度
 - 内置网页搜索与网页/PDF 正文读取工具，返回来源 URL 并标记不可信外部内容
 - 图片输入（多模态），需要模型在 `capabilities` 中声明 `vision`
 - 内置“这是什么”解释模式，可解释被回复的文字、图片、网页与 PDF
@@ -144,6 +144,9 @@ LLM__MD_TO_PIC=false
 LLM__STREAM=false
 # 单次提问允许的最大工具调用轮数
 LLM__MAX_TOOL_ROUNDS=5
+# 工具调用开始后首次提示与后续重复提示的间隔（秒）
+LLM__TOOL_NOTICE_DELAY=2
+LLM__TOOL_NOTICE_INTERVAL=30
 # 网页搜索配置；结果数量还会受模型传入的 max_results 限制
 LLM__WEB_SEARCH_MAX_RESULTS=5
 LLM__WEB_SEARCH_TIMEOUT=10

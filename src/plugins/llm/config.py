@@ -122,6 +122,10 @@ class ScopedConfig(BaseModel):
     """多轮对话中等待用户输入的超时时间（秒）"""
     max_tool_rounds: int = 5
     """单次提问中允许的最大工具调用轮数，防止模型陷入循环"""
+    tool_notice_delay: float = Field(default=2.0, ge=0)
+    """发现工具调用后首次发送等待提示前的秒数"""
+    tool_notice_interval: float = Field(default=30.0, gt=0)
+    """工具阶段仍未完成时重复发送等待提示的间隔秒数"""
     web_search_max_results: int = Field(default=5, ge=1, le=10)
     """网页搜索单次允许返回的最大结果数"""
     web_search_timeout: int = Field(default=10, gt=0)
@@ -162,7 +166,7 @@ class ScopedConfig(BaseModel):
     )
     """网页搜索、web_fetch 与解释模式下载网页或 PDF 使用的代理"""
     web_fetch_fake_ip_ranges: list[str] = Field(
-        default_factory=lambda: ["198.18.0.0/15"],
+        default_factory=list,
         validation_alias=AliasChoices("web_fetch_fake_ip_ranges", "zssm_resource_fake_ip_ranges"),
     )
     """web_fetch 与解释模式允许的代理 fake-ip 网段；不放宽 URL 中直接填写的 IP"""

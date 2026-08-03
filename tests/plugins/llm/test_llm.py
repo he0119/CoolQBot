@@ -1,5 +1,6 @@
 """测试 /llm 命令"""
 
+import asyncio
 import json
 from unittest.mock import call
 from uuid import UUID
@@ -315,6 +316,87 @@ async def test_llm_with_tool(app: App, respx_mock: MockRouter, mock_models):
     affinities = {call.request.headers["x-session-affinity"] for call in respx_mock.calls}
     assert len(affinities) == 1
     assert UUID(affinities.pop()).version == 4
+
+
+@pytest.mark.parametrize(
+    ("count", "request_count", "tool_call_count", "message_id", "expected", "expected_reply"),
+    [
+        (1, 1, 2, None, "🔍 正在查询资料（模型请求 1 次，工具调用 2 个），请稍候……", True),
+        (2, 3, 4, "42", "⏳ 查询仍在进行（模型请求 3 次，工具调用 4 个），请再稍候……", "42"),
+    ],
+)
+async def test_tool_wait_notice_replies_to_trigger_message(
+    app: App,
+    mocker,
+    count: int,
+    request_count: int,
+    tool_call_count: int,
+    message_id: str | None,
+    expected: str,
+    expected_reply: str | bool,
+):
+    """工具等待提示回复触发消息，并区分首次与后续心跳。"""
+    from src.plugins.llm import _send_tool_wait_notice
+
+    message = mocker.Mock()
+    message.send = mocker.AsyncMock()
+    text = mocker.patch("src.plugins.llm.UniMessage.text", return_value=message)
+
+    await _send_tool_wait_notice(count, request_count, tool_call_count, message_id=message_id)
+
+    text.assert_called_once_with(expected)
+    message.send.assert_awaited_once_with(reply_to=expected_reply)
+
+
+async def test_tool_wait_notice_repeats_until_final_completion(app: App, mock_models, mocker):
+    """首次工具调用启动一个心跳，并持续到工具后的最终模型回复完成。"""
+    from src.plugins.llm.config import plugin_config
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.schemas import Completion, Message, ToolCall
+
+    tool_completion = Completion(
+        message=Message.assistant(tool_calls=[ToolCall(id="call_1", name="web_search", arguments={})]),
+        finish_reason="tool_calls",
+    )
+    final_completion = Completion(message=Message.assistant(content="结果"), finish_reason="stop")
+    first_notice_sent = asyncio.Event()
+    second_request_started = asyncio.Event()
+    second_notice_sent = asyncio.Event()
+    keep_second_notice_pending = asyncio.Event()
+    notices: list[tuple[int, int, int]] = []
+    chat_count = 0
+
+    async def fake_chat(*args, **kwargs):
+        nonlocal chat_count
+        chat_count += 1
+        if chat_count == 1:
+            return tool_completion
+        second_request_started.set()
+        await second_notice_sent.wait()
+        return final_completion
+
+    async def execute(calls, context):
+        await first_notice_sent.wait()
+        context.append(Message.tool(calls[0].id, "搜索结果"))
+
+    async def notify(count: int, request_count: int, tool_call_count: int) -> None:
+        notices.append((count, request_count, tool_call_count))
+        if count == 1:
+            first_notice_sent.set()
+            await second_request_started.wait()
+        else:
+            second_notice_sent.set()
+            await keep_second_notice_pending.wait()
+
+    mocker.patch.object(plugin_config, "tool_notice_delay", 0)
+    mocker.patch.object(plugin_config, "tool_notice_interval", 0.001)
+    mocker.patch("src.plugins.llm.handler.chat", side_effect=fake_chat)
+    mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
+
+    completion = await LLMHandler("test-model").ask("查资料", on_tool_wait=notify)
+
+    assert completion.content == "结果"
+    assert notices == [(1, 1, 1), (2, 2, 1)]
 
 
 async def test_tool_round_limit_rolls_back_current_question(app: App, mock_models, mocker):
