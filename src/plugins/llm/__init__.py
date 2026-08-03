@@ -88,13 +88,12 @@ llm_cmd = on_alconna(
             example=__plugin_meta__.usage,
         ),
     ),
-    aliases={"ai"},
     use_cmd_start=True,
     block=True,
     extensions=[
         ReplyMergeExtension(),
         TelegramSlashExtension(),
-        DiscordSlashExtension(name_localizations={"zh-CN": "ai"}),
+        DiscordSlashExtension(),
     ],
 )
 
