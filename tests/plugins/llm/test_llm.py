@@ -528,8 +528,64 @@ async def test_tool_wait_notice_repeats_until_final_completion(app: App, mock_mo
     assert notices == [(1, 1, 1), (2, 2, 1)]
 
 
-async def test_tool_round_limit_rolls_back_current_question(app: App, mock_models, mocker):
-    """工具调用超过轮数上限时不保留不完整的上下文"""
+async def test_tool_round_limit_generates_final_response_without_tools(app: App, mock_models, mocker):
+    """达到工具轮数上限后基于已有结果生成无工具收尾回复。"""
+    from src.plugins.llm.config import plugin_config
+    from src.plugins.llm.handler import TOOL_ROUND_LIMIT_PROMPT, LLMHandler
+    from src.plugins.llm.schemas import Completion, Message, ToolCall, Usage
+
+    first_tool_completion = Completion(
+        message=Message.assistant(tool_calls=[ToolCall(id="call_1", name="get_weather", arguments={})]),
+        finish_reason="tool_calls",
+        usage=Usage(input_tokens=1, output_tokens=2),
+        model="first-model",
+    )
+    pending_tool_completion = Completion(
+        message=Message.assistant(tool_calls=[ToolCall(id="call_2", name="web_search", arguments={})]),
+        finish_reason="tool_calls",
+        usage=Usage(input_tokens=3, output_tokens=4),
+        model="second-model",
+    )
+    final_completion = Completion(
+        message=Message.assistant(content="根据已有天气信息：晴。"),
+        finish_reason="stop",
+        usage=Usage(input_tokens=5, output_tokens=6),
+        model="final-model",
+    )
+    mocker.patch.object(plugin_config, "max_tool_rounds", 1)
+    chat = mocker.patch(
+        "src.plugins.llm.handler.chat",
+        side_effect=[first_tool_completion, pending_tool_completion, final_completion],
+    )
+
+    async def execute(calls, context):
+        context.append(Message.tool(calls[0].id, "晴"))
+
+    execute_calls = mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
+    handler = LLMHandler("test-model", system_prompt="测试人设")
+
+    completion = await handler.ask("天气")
+
+    assert completion.content == "根据已有天气信息：晴。"
+    assert completion.usage == Usage(input_tokens=9, output_tokens=12)
+    assert completion.model == "final-model"
+    assert [message.role for message in handler.context] == ["system", "user", "assistant", "tool", "assistant"]
+    assert handler.context[-1] is completion.message
+    execute_calls.assert_awaited_once()
+    assert execute_calls.await_args.args[0] == first_tool_completion.tool_calls
+    assert execute_calls.await_args.args[1] is handler.context
+    assert chat.await_count == 3
+    final_call = chat.await_args_list[-1]
+    assert final_call.kwargs == {"session_affinity": handler.session_affinity, "enable_tools": False}
+    assert final_call.args[1][:2] == [
+        Message(role="system", content="测试人设"),
+        Message(role="system", content=TOOL_ROUND_LIMIT_PROMPT),
+    ]
+    assert final_call.args[1][2:] == handler.context[1:-1]
+
+
+async def test_tool_round_limit_rolls_back_when_final_response_still_calls_tools(app: App, mock_models, mocker):
+    """无工具收尾仍返回工具调用时不保留不完整的上下文。"""
     from src.plugins.llm.config import plugin_config
     from src.plugins.llm.handler import LLMHandler
     from src.plugins.llm.providers import ProviderError
@@ -540,7 +596,10 @@ async def test_tool_round_limit_rolls_back_current_question(app: App, mock_model
         finish_reason="tool_calls",
     )
     mocker.patch.object(plugin_config, "max_tool_rounds", 1)
-    mocker.patch("src.plugins.llm.handler.chat", side_effect=[tool_completion, tool_completion])
+    chat = mocker.patch(
+        "src.plugins.llm.handler.chat",
+        side_effect=[tool_completion, tool_completion, tool_completion],
+    )
 
     async def execute(calls, context):
         context.append(Message.tool(calls[0].id, "晴"))
@@ -549,7 +608,38 @@ async def test_tool_round_limit_rolls_back_current_question(app: App, mock_model
     handler = LLMHandler("test-model")
     original_context = list(handler.context)
 
-    with pytest.raises(ProviderError, match="工具调用超过上限"):
+    with pytest.raises(ProviderError, match="达到上限后仍未生成最终回复"):
+        await handler.ask("天气")
+
+    assert handler.context == original_context
+    assert chat.await_args_list[-1].kwargs["enable_tools"] is False
+
+
+async def test_tool_round_limit_rolls_back_when_final_request_fails(app: App, mock_models, mocker):
+    """无工具收尾请求失败时回滚当前问题。"""
+    from src.plugins.llm.config import plugin_config
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.providers import ProviderError
+    from src.plugins.llm.schemas import Completion, Message, ToolCall
+
+    tool_completion = Completion(
+        message=Message.assistant(tool_calls=[ToolCall(id="call_1", name="get_weather", arguments={})]),
+        finish_reason="tool_calls",
+    )
+    mocker.patch.object(plugin_config, "max_tool_rounds", 1)
+    mocker.patch(
+        "src.plugins.llm.handler.chat",
+        side_effect=[tool_completion, tool_completion, ProviderError("收尾请求失败")],
+    )
+
+    async def execute(calls, context):
+        context.append(Message.tool(calls[0].id, "晴"))
+
+    mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
+    handler = LLMHandler("test-model")
+    original_context = list(handler.context)
+
+    with pytest.raises(ProviderError, match="收尾请求失败"):
         await handler.ask("天气")
 
     assert handler.context == original_context

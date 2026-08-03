@@ -160,8 +160,8 @@ LLM__MD_TO_PIC=false
 LLM__RESPOND_TO_MENTION=true
 # 是否流式请求
 LLM__STREAM=false
-# 单次提问允许的最大工具调用轮数
-LLM__MAX_TOOL_ROUNDS=5
+# 单次提问允许的最大工具调用轮数，达到上限后会禁用工具并基于已有结果收尾
+LLM__MAX_TOOL_ROUNDS=10
 # 工具调用开始后首次提示与后续重复提示的间隔（秒）
 LLM__TOOL_NOTICE_DELAY=2
 LLM__TOOL_NOTICE_INTERVAL=30
