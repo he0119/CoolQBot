@@ -9,28 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ### Added
 
-- 添加大模型对话插件 (llm)，支持 Chat Completions、Responses 与 Anthropic Messages 三种 API 格式、全局和模型级服务地址配置、响应耗时与 token 用量尾注、会话亲和请求头、Aperture 与 DeepSeek 模型额度查询，以及天气和节假日工具调用
-- 为 `/llm quota` 添加 `/quota` 与 `/额度` 快捷命令
-- 支持在模型配置的 `capabilities` 中声明 `vision` 图片输入能力
-- 为 llm 添加内置 `zssm` 解释模式，支持回复文本、关注点、图片以及受限读取网页和 PDF，并记录简洁的资源读取与模型调用日志
-- 支持通过 `zssm --model <模型名>` 临时指定本次解释使用的模型
-- 为 llm 添加 `web_search` 与 `web_fetch` 内置工具，支持搜索网页以及安全读取网页、文本、JSON 和 PDF
-
-### Changed
-
-- 优化 llm 回复显示：推理内容改用引用块，并通过 emoji reaction 反馈响应状态
-- 完善 llm 调用链日志，覆盖会话、Provider、工具、Web、额度与 TTS，同时避免记录正文、凭据和用户/群组标识
-- 将外部 zssm 插件迁移到 llm，共用模型配置、请求协议与响应统计
-- 图片输入改为必须由模型在 `capabilities` 中显式声明 `vision`；原本能接收图片的模型需要补上该声明，否则发送图片会提示未声明 vision 能力
-
-### Fixed
-
-- 修正 llm 对话选项位置与 TTS 模型设置命令的使用说明
-- 允许外部资源域名解析到配置的代理 fake-ip 网段，同时继续拒绝直接填写的非公网 IP
+- 添加大模型对话插件 (llm)，支持 Chat Completions、Responses 与 Anthropic Messages 三种 API 格式、全局和模型级配置、图片输入、响应统计、会话亲和及模型额度查询
+- 集成 `zssm` 解释模式，支持文本、关注点、图片、网页和 PDF，并可通过 `--model` 临时指定模型
+- 添加天气、节假日、`web_search` 与 `web_fetch` 内置工具，支持搜索并安全读取网页、文本、JSON 和 PDF
 
 ### Removed
 
-- 移除已由 llm 替代的 deepseek 与 llm_quota 插件
+- 移除已由 llm 集成替代的 deepseek、llm_quota 与外部 zssm 插件
 
 ## [0.28.0] - 2026-07-24
 
