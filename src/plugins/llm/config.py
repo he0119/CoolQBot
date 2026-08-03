@@ -118,6 +118,8 @@ class ScopedConfig(BaseModel):
     """是否附带推理内容"""
     md_to_pic: bool = False
     """是否把回复渲染成图片"""
+    respond_to_mention: bool = True
+    """是否响应被适配器判定为发给机器人的消息（如群聊 @）"""
     context_timeout: int = 120
     """多轮对话中等待用户输入的超时时间（秒）"""
     max_tool_rounds: int = 5

@@ -8,10 +8,12 @@ API 格式，提供多轮对话、推理内容展示、Markdown 转图片与 TTS
 from pathlib import Path
 
 import nonebot
-from nonebot import require
+from nonebot import on_message, require
 from nonebot.adapters import Bot, Event
 from nonebot.log import logger
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
+from nonebot.rule import Rule, to_me
+from nonebot.typing import T_State
 
 require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
@@ -52,7 +54,7 @@ from .tts import TTSError, get_tts_models
 __plugin_meta__ = PluginMetadata(
     name="大模型对话",
     description="接入多种大模型 API，提供智能对话与问答功能",
-    usage="/llm 你好",
+    usage="/llm 你好，或在群聊中 @机器人 你好",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
@@ -98,6 +100,58 @@ llm_cmd = on_alconna(
 
 llm_cmd.shortcut("quota", command="llm quota", prefix=True, fuzzy=True, humanized="quota [模型名]")
 llm_cmd.shortcut("额度", command="llm quota", prefix=True, fuzzy=True, humanized="额度 [模型名]")
+
+
+async def _should_handle_mention(event: Event) -> bool:
+    """按配置启用快捷对话，并避免带非空前缀的命令被重复处理。"""
+    if not plugin_config.respond_to_mention:
+        return False
+    text = event.get_plaintext().lstrip()
+    return not any(prefix and text.startswith(prefix) for prefix in nonebot.get_driver().config.command_start)
+
+
+llm_mention = on_message(rule=to_me() & Rule(_should_handle_mention), priority=15, block=True)
+
+
+class LLMSetupError(ValueError):
+    """模型或输出配置不能用于当前请求。"""
+
+    def __init__(self, message: str, *, at_sender: bool = False) -> None:
+        super().__init__(message)
+        self.at_sender = at_sender
+
+
+async def _create_handler(
+    user: UserSession,
+    *,
+    selected_model: str = "",
+    render: bool = False,
+    use_tts: bool = False,
+) -> LLMHandler:
+    """按当前会话设置创建处理器。"""
+    model_names = plugin_config.get_model_names()
+    if not model_names:
+        raise LLMSetupError("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
+
+    name = selected_model or await get_model_name(user.session_id)
+    if name not in model_names:
+        raise LLMSetupError(
+            f"未启用的模型：{name}，可用：{'、'.join(model_names)}",
+            at_sender=True,
+        )
+
+    tts_model = await get_tts_model(user.session_id) if use_tts else ""
+    if use_tts and not tts_model:
+        raise LLMSetupError(
+            "未设置 TTS 模型，请先使用 /llm tts --set 设置",
+            at_sender=True,
+        )
+
+    return LLMHandler(
+        name,
+        send_md_pic=render or plugin_config.md_to_pic,
+        tts_model=tts_model,
+    )
 
 
 @llm_cmd.assign("model.list")
@@ -202,19 +256,6 @@ async def llm_handle(
     if not content.available and not img.available:
         await llm_cmd.finish("你想问什么呢？输入 /llm -h 查看用法", at_sender=True)
 
-    if not plugin_config.get_model_names():
-        await llm_cmd.finish("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
-
-    # 未指定模型时使用群组默认模型
-    model_names = plugin_config.get_model_names()
-    name = model_name.result if model_name.available else await get_model_name(user.session_id)
-    if name not in model_names:
-        await llm_cmd.finish(f"未启用的模型：{name}，可用：{'、'.join(model_names)}", at_sender=True)
-
-    tts_model = await get_tts_model(user.session_id) if use_tts.result else ""
-    if use_tts.result and not tts_model:
-        await llm_cmd.finish("未设置 TTS 模型，请先使用 /llm tts --set 设置", at_sender=True)
-
     images: list[ImageContent] | None = None
     if img.available:
         try:
@@ -223,11 +264,17 @@ async def llm_handle(
             await llm_cmd.finish(str(e), at_sender=True)
     text = " ".join(content.result) if content.available else ""
 
-    handler = LLMHandler(
-        name,
-        send_md_pic=render.result or plugin_config.md_to_pic,
-        tts_model=tts_model,
-    )
+    try:
+        handler = await _create_handler(
+            user,
+            selected_model=model_name.result if model_name.available else "",
+            render=render.result,
+            use_tts=use_tts.result,
+        )
+    except LLMSetupError as e:
+        if e.at_sender:
+            await llm_cmd.finish(str(e), at_sender=True)
+        await llm_cmd.finish(str(e))
 
     if use_context.result:
         await _handle_with_context(handler, text, images)
@@ -235,6 +282,38 @@ async def llm_handle(
 
     completion = await _ask(handler, text, images)
     await handler.send(completion)
+
+
+@llm_mention.handle()
+async def llm_mention_handle(
+    bot: Bot,
+    event: Event,
+    state: T_State,
+    user: UserSession,
+) -> None:
+    """把群聊中 @ 机器人的内容直接交给默认模型。"""
+    message_id = get_message_id(event)
+    message = UniMessage.of(event.get_message(), bot=bot)
+    text = message.extract_plain_text().strip()
+    images: list[ImageContent] = []
+    try:
+        for image in message.get(Image):
+            data = await image_fetch(event, bot, state, image)
+            if not data:
+                raise ValueError("图片读取失败")
+            images.append(ImageContent.from_bytes(data))
+    except ValueError as e:
+        await UniMessage.text(str(e)).finish(reply_to=message_id)
+
+    if not text and not images:
+        await UniMessage.text("你想问什么呢？").finish(reply_to=message_id)
+
+    try:
+        handler = await _create_handler(user)
+    except LLMSetupError as e:
+        await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=message_id)
+    completion = await _ask(handler, text, images or None, message_id=message_id)
+    await handler.send(completion, reply_to=message_id)
 
 
 async def _handle_with_context(

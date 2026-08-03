@@ -152,6 +152,116 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
     assert UUID(request.headers["x-session-affinity"]).version == 4
 
 
+async def test_llm_group_mention_uses_default_chat_flow(app: App, mock_models, mocker):
+    """群聊明确 @ 机器人时复用默认模型与标准问答流程。"""
+    from src.plugins.llm import llm_mention
+
+    handler = mocker.Mock()
+    handler.send = mocker.AsyncMock()
+    completion = object()
+    create_handler = mocker.patch("src.plugins.llm._create_handler", return_value=handler)
+    ask = mocker.patch("src.plugins.llm._ask", return_value=completion)
+    async with app.test_matcher(llm_mention) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message_id=42,
+            message=Message("你好"),
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+
+    create_handler.assert_awaited_once()
+    assert create_handler.await_args.kwargs == {}
+    ask.assert_awaited_once_with(handler, "你好", None, message_id="42")
+    handler.send.assert_awaited_once_with(completion, reply_to="42")
+
+
+async def test_llm_mention_requires_to_me_message(app: App, mock_models):
+    """普通消息不会触发快捷对话。"""
+    from src.plugins.llm import llm_mention
+
+    async with app.test_matcher(llm_mention) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message=Message("你好"),
+            to_me=False,
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_not_pass_rule(llm_mention)
+
+
+async def test_llm_mention_ignores_commands(app: App, mock_models, mocker):
+    """@机器人执行带非空前缀的命令时不再同时触发 LLM 对话。"""
+    import nonebot
+
+    from src.plugins.llm import llm_mention
+
+    mocker.patch.object(nonebot.get_driver().config, "command_start", {"/", ""})
+    async with app.test_matcher(llm_mention) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message=Message("/llm -h"),
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_not_pass_rule(llm_mention)
+
+
+async def test_llm_mention_allows_plain_text_with_empty_command_start(app: App, mock_models, mocker):
+    """空命令前缀不应导致所有快捷对话都被过滤。"""
+    import nonebot
+
+    from src.plugins.llm import llm_mention
+
+    mocker.patch.object(nonebot.get_driver().config, "command_start", {"/", ""})
+    handler = mocker.Mock()
+    handler.send = mocker.AsyncMock()
+    create_handler = mocker.patch("src.plugins.llm._create_handler", return_value=handler)
+    ask = mocker.patch("src.plugins.llm._ask", return_value=object())
+    async with app.test_matcher(llm_mention) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message=Message("你好"),
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+
+    create_handler.assert_awaited_once()
+    ask.assert_awaited_once()
+    handler.send.assert_awaited_once()
+
+
+async def test_llm_mention_can_be_disabled(app: App, mock_models, mocker):
+    """关闭配置后不响应 @ 机器人消息。"""
+    from src.plugins.llm import llm_mention
+    from src.plugins.llm.config import plugin_config
+
+    mocker.patch.object(plugin_config, "respond_to_mention", False)
+    async with app.test_matcher(llm_mention) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message=Message("你好"),
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_not_pass_rule(llm_mention)
+
+
 async def test_llm_handler_logs_metadata_without_content(app: App, mock_models, mocker):
     """会话日志使用随机关联 ID 和长度，不记录输入输出正文。"""
     from src.plugins.llm.handler import LLMHandler
