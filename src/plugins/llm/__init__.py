@@ -2,6 +2,7 @@
 
 支持 OpenAI Chat Completions / OpenAI Responses / Anthropic Messages 三种
 API 格式，提供多轮对话、推理内容展示、Markdown 转图片与 TTS 语音回复。
+额度查询按模型选择独立 provider，目前支持 Aperture 与 DeepSeek。
 """
 
 from nonebot import require
@@ -40,6 +41,7 @@ from .config import plugin_config
 from .data_source import get_model_name, get_tts_model, set_model_name, set_tts_model
 from .handler import LLMHandler
 from .providers import ProviderError
+from .quota import QuotaError, get_quota
 from .schemas import ImageContent
 from .tts import TTSError, get_tts_models
 
@@ -69,6 +71,11 @@ llm_cmd = on_alconna(
             Option("-l|--list", help_text="查看 TTS 模型列表"),
             Option("--set", Args["model#模型名称", str], help_text="设置群组默认 TTS 模型"),
             help_text="TTS 模型相关设置",
+        ),
+        Subcommand(
+            "quota",
+            Args["model?#模型名称", str],
+            help_text="查询大模型剩余额度",
         ),
         meta=CommandMeta(
             description=__plugin_meta__.description,
@@ -156,6 +163,23 @@ async def llm_tts_set_handle(
 
     await set_tts_model(user.session_id, model.result)
     await llm_cmd.finish(f"已设置群组默认 TTS 模型为：{model.result}", at_sender=True)
+
+
+@llm_cmd.assign("quota")
+async def llm_quota_handle(user: UserSession, model: Query[str] = Query("quota.model")):
+    names = plugin_config.get_model_names()
+    if not names:
+        await llm_cmd.finish("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
+
+    name = model.result if model.available else await get_model_name(user.session_id)
+    if name not in names:
+        await llm_cmd.finish(f"未启用的模型：{name}，可用：{'、'.join(names)}", at_sender=True)
+
+    try:
+        result = await get_quota(plugin_config.resolve(name))
+    except QuotaError as e:
+        await llm_cmd.finish(str(e), at_sender=True)
+    await llm_cmd.finish(result, at_sender=True)
 
 
 @llm_cmd.handle()

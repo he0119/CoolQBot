@@ -23,6 +23,7 @@
 - 在回复末尾显示整轮耗时、实际模型和 token 用量，工具调用产生的多次请求会累计统计
 - Markdown 转图片
 - TTS 语音回复（GPT-SoVITS）
+- 按模型查询剩余额度，支持 Tailscale Aperture 与 DeepSeek 官方余额接口
 
 ## 请求标识
 
@@ -44,6 +45,7 @@
 | `/llm model --set <模型名>`    | -     | 设置群组默认模型      | 所有人 |
 | `/llm tts --list`              | -     | 查看可用 TTS 模型列表 | 所有人 |
 | `/llm tts --set <模型名>`      | -     | 设置群组默认 TTS 模型 | 所有人 |
+| `/llm quota [模型名]`          | -     | 查询模型剩余额度      | 所有人 |
 
 ## 使用方法
 
@@ -61,6 +63,8 @@
 /llm model --list                # 查看有哪些模型
 /llm 讲个笑话 --model claude     # 本次使用 claude
 /llm model --set claude          # 之后本群默认使用 claude
+/llm quota                       # 查询本群当前模型的剩余额度
+/llm quota deepseek              # 查询指定模型的剩余额度
 ```
 
 ### 多轮对话
@@ -107,7 +111,21 @@ LLM__MODELS='
   {
     "name": "deepseek",
     "provider": "chat",
-    "model": "deepseek-chat"
+    "model": "deepseek-chat",
+    "quota": {
+      "provider": "deepseek"
+    }
+  },
+  {
+    "name": "deepseek-aperture",
+    "provider": "chat",
+    "model": "deepseek-chat",
+    "base_url": "https://ai.example.com/v1",
+    "quota": {
+      "provider": "aperture",
+      "api_url": "https://ai.example.com/api/quotas",
+      "bucket": "deepseek"
+    }
   },
   {
     "name": "gpt",
@@ -149,6 +167,21 @@ LLM__TTS_MODEL=default
 | `temperature` | 采样温度                                                |
 | `timeout`     | 非流式请求超时时间（秒）                                |
 | `extra_body`  | 附加到请求体的额外字段，用于传各服务商特有参数          |
+| `quota`       | 该模型的额度查询配置，留空时不支持 `/llm quota`         |
+
+### 额度查询配置
+
+`quota.provider` 决定额度接口的请求和响应格式，目前支持：
+
+DeepSeek 字段与鉴权方式以[官方余额接口文档](https://api-docs.deepseek.com/zh-cn/api/get-user-balance)为准。
+
+| Provider   | 必填配置  | 说明                                                                |
+| ---------- | --------- | ------------------------------------------------------------------- |
+| `deepseek` | 无        | 请求 DeepSeek 官方 `/user/balance`；默认复用模型 `api_key`          |
+| `aperture` | `api_url` | 请求 Tailscale Aperture `/api/quotas`；可用 `bucket` 筛选单个额度桶 |
+
+两种 provider 都可单独设置 `api_key`、`proxy` 与 `timeout`。DeepSeek 的 `api_url` 也可以覆盖，
+用于兼容代理或后续不同的服务地址。
 
 ## 内置工具
 
