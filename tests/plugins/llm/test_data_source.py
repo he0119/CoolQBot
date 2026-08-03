@@ -1,5 +1,7 @@
 """测试群组配置与工具注册表"""
 
+from types import SimpleNamespace
+
 import pytest
 from nonebug import App
 
@@ -202,3 +204,62 @@ def test_split_content_extracts_think_tags(app: App):
 
     assert content == "你好"
     assert reasoning == "在想"
+
+
+def test_format_output_quotes_multiline_thinking(app: App):
+    """推理内容使用 Markdown 引用块，并保留段落结构"""
+    from src.plugins.llm.handler import format_output
+    from src.plugins.llm.schemas import Completion, Message
+
+    completion = Completion(message=Message.assistant(content="回答", reasoning="第一段\n\n第二段"))
+
+    assert format_output(completion, with_thinking=True, with_statistics=False) == "> 第一段\n>\n> 第二段\n\n回答"
+
+
+@pytest.mark.parametrize(
+    ("adapter", "status", "expected"),
+    [
+        ("OneBot V11", "thinking", "424"),
+        ("Discord", "done", "🎉"),
+    ],
+)
+async def test_send_reaction_uses_adapter_emoji(app: App, mocker, adapter, status, expected):
+    """QQ 使用 emoji ID，其他平台使用 Unicode emoji"""
+    from src.plugins.llm.handler import send_reaction
+
+    get_target = mocker.patch(
+        "src.plugins.llm.handler.get_target",
+        return_value=SimpleNamespace(adapter=adapter, private=False),
+    )
+    reaction = mocker.patch("src.plugins.llm.handler.message_reaction")
+
+    await send_reaction(status, message_id="42")
+
+    get_target.assert_called_once_with()
+    reaction.assert_awaited_once_with(expected, message_id="42")
+
+
+async def test_send_reaction_skips_qq_private_message(app: App, mocker):
+    """QQ 私聊不支持消息 reaction，直接跳过"""
+    from nonebot_plugin_alconna import SupportAdapter
+
+    from src.plugins.llm.handler import send_reaction
+
+    mocker.patch(
+        "src.plugins.llm.handler.get_target",
+        return_value=SimpleNamespace(adapter=SupportAdapter.onebot11, private=True),
+    )
+    reaction = mocker.patch("src.plugins.llm.handler.message_reaction")
+
+    await send_reaction("thinking")
+
+    reaction.assert_not_awaited()
+
+
+async def test_send_reaction_failure_does_not_interrupt_response(app: App, mocker):
+    """reaction 不可用时不影响后续模型请求"""
+    from src.plugins.llm.handler import send_reaction
+
+    mocker.patch("src.plugins.llm.handler.get_target", side_effect=RuntimeError("unsupported"))
+
+    await send_reaction("thinking")
