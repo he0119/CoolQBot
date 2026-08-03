@@ -2,29 +2,20 @@
 
 https://universalis.app/docs/index.html?urls.primaryName=Universalis%20v2
 
-https://github.com/thewakingsands/cafemaker/wiki
+https://api.ffxivteamcraft.com/search
 """
 
 from datetime import datetime
 
 import httpx
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.plugins.llm.tools import registry
 
 
-class XIVAPIResultsItem(BaseModel):
-    ID: int
-    Icon: str
-    Name: str
-    Url: str
-    UrlType: str
-    _: str
-    _Score: float
-
-
-class XIVAPISearch(BaseModel):
-    Results: list[XIVAPIResultsItem]
+class TeamcraftSearchItem(BaseModel):
+    item_id: int = Field(alias="itemId")
+    name: str = Field(alias="zh")
 
 
 class UniversalisListingItem(BaseModel):
@@ -42,21 +33,20 @@ class UniversalisCurrentlyShown(BaseModel):
     listings: list[UniversalisListingItem]
 
 
-async def search_item_id_by_name(name: str) -> XIVAPIResultsItem | None:
+async def search_item_id_by_name(name: str) -> TeamcraftSearchItem | None:
     """通过物品名称获取物品 ID"""
     async with httpx.AsyncClient() as client:
-        r = await client.get(f"https://cafemaker.wakingsands.com/search?string={name}")
-        rjson = r.json()
-        search = XIVAPISearch.model_validate(rjson)
+        r = await client.get(
+            "https://api.ffxivteamcraft.com/search",
+            params={"query": name, "type": "Item", "sort": "desc", "lang": "zh"},
+        )
+        r.raise_for_status()
+        search = [TeamcraftSearchItem.model_validate(item) for item in r.json()]
 
-        first_item = None
-        for item in search.Results:
-            if item.UrlType == "Item":
-                if item.Name == name:
-                    return item
-                if first_item is None:
-                    first_item = item
-        return first_item if first_item else None
+        for item in search:
+            if item.name == name:
+                return item
+        return search[0] if search else None
 
 
 async def get_item_price(name: str, world_or_dc: str) -> str:
@@ -70,7 +60,7 @@ async def get_item_price(name: str, world_or_dc: str) -> str:
         return f"抱歉，没有找到 {name}，请检查物品名称是否正确。"
 
     async with httpx.AsyncClient() as client:
-        r = await client.get(f"https://universalis.app/api/v2/{world_or_dc}/{item.ID}?listings=6")
+        r = await client.get(f"https://universalis.app/api/v2/{world_or_dc}/{item.item_id}?listings=6")
         rjson = r.json()
 
         if "itemID" not in rjson:
@@ -84,11 +74,11 @@ async def get_item_price(name: str, world_or_dc: str) -> str:
                 f"{listitem.pricePerUnit}*{listitem.quantity} {'HQ' if listitem.hq else ''} 服务器: {listitem.worldName if listitem.worldName is not None else world_or_dc}"
             )
         if items_info:
-            items_info.insert(0, f"{item.Name} 在市场的价格是:")
+            items_info.insert(0, f"{item.name} 在市场的价格是:")
             # 使用本地时区
             items_info.append(f"数据更新时间: {data.lastUploadTime.astimezone().strftime('%Y年%m月%d日 %H时%M分')}")
             return "\n".join(items_info)
-        return f"抱歉，没有找到 {item.Name} 的价格。"
+        return f"抱歉，没有找到 {item.name} 的价格。"
 
 
 @registry.register(

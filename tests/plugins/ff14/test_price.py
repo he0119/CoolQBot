@@ -8,24 +8,40 @@ from pytest_mock import MockerFixture
 
 from tests.fake import fake_group_message_event_v11
 
+TEAMCRAFT_SEARCH_PARAMS = {"type": "Item", "sort": "desc", "lang": "zh"}
 
-def mocked_get(url: str):
+
+def mocked_get(url: str, params: dict[str, str] | None = None):
     class MockResponse:
-        def __init__(self, json: dict):
+        def __init__(self, json: object):
             self._json = json
 
         def json(self):
             return self._json
 
+        def raise_for_status(self):
+            return None
+
     test_dir = Path(__file__).parent
-    if url == "https://cafemaker.wakingsands.com/search?string=萨维奈舞裙":
+    if url == "https://api.ffxivteamcraft.com/search" and params == {
+        "query": "萨维奈舞裙",
+        **TEAMCRAFT_SEARCH_PARAMS,
+    }:
         with open(test_dir / "price_search.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
-    if url == "https://cafemaker.wakingsands.com/search?string=未命名":
+    if url == "https://api.ffxivteamcraft.com/search" and params == {
+        "query": "未命名",
+        **TEAMCRAFT_SEARCH_PARAMS,
+    }:
         with open(test_dir / "price_search_not_found.json", encoding="utf-8") as f:
             data = json.load(f)
         return MockResponse(data)
+    if url == "https://api.ffxivteamcraft.com/search" and params == {
+        "query": "食果花鼠",
+        **TEAMCRAFT_SEARCH_PARAMS,
+    }:
+        return MockResponse([{"zh": "食果花鼠", "itemId": 8202}])
     if url == "https://universalis.app/api/v2/猫小胖/10393?listings=6":
         with open(test_dir / "price_10393.json", encoding="utf-8") as f:
             data = json.load(f)
@@ -59,7 +75,10 @@ async def test_price(app: App, mocker: MockerFixture):
 
     get.assert_has_calls(
         [
-            mocker.call("https://cafemaker.wakingsands.com/search?string=萨维奈舞裙"),
+            mocker.call(
+                "https://api.ffxivteamcraft.com/search",
+                params={"query": "萨维奈舞裙", **TEAMCRAFT_SEARCH_PARAMS},
+            ),
             mocker.call("https://universalis.app/api/v2/猫小胖/10393?listings=6"),
         ]  # type: ignore
     )
@@ -113,7 +132,10 @@ async def test_price_default(app: App, mocker: MockerFixture):
 
     get.assert_has_calls(
         [
-            mocker.call("https://cafemaker.wakingsands.com/search?string=萨维奈舞裙"),
+            mocker.call(
+                "https://api.ffxivteamcraft.com/search",
+                params={"query": "萨维奈舞裙", **TEAMCRAFT_SEARCH_PARAMS},
+            ),
             mocker.call("https://universalis.app/api/v2/猫小胖/10393?listings=6"),
         ]  # type: ignore
     )
@@ -138,7 +160,10 @@ async def test_price_item_not_found(app: App, mocker: MockerFixture):
         )
         ctx.should_finished(price_cmd)
 
-    get.assert_called_once_with("https://cafemaker.wakingsands.com/search?string=未命名")
+    get.assert_called_once_with(
+        "https://api.ffxivteamcraft.com/search",
+        params={"query": "未命名", **TEAMCRAFT_SEARCH_PARAMS},
+    )
 
 
 async def test_price_world_not_found(app: App, mocker: MockerFixture):
@@ -162,9 +187,29 @@ async def test_price_world_not_found(app: App, mocker: MockerFixture):
 
     get.assert_has_calls(
         [
-            mocker.call("https://cafemaker.wakingsands.com/search?string=萨维奈舞裙"),
+            mocker.call(
+                "https://api.ffxivteamcraft.com/search",
+                params={"query": "萨维奈舞裙", **TEAMCRAFT_SEARCH_PARAMS},
+            ),
             mocker.call("https://universalis.app/api/v2/静语/10393?listings=6"),
         ]  # type: ignore
+    )
+
+
+async def test_search_item_id_by_name_uses_teamcraft(app: App, mocker: MockerFixture):
+    """Teamcraft 搜索结果提供物品 ID 与中文名称。"""
+    from src.plugins.ff14.plugins.ff14_price.data_source import search_item_id_by_name
+
+    get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
+
+    item = await search_item_id_by_name("食果花鼠")
+
+    assert item is not None
+    assert item.item_id == 8202
+    assert item.name == "食果花鼠"
+    get.assert_awaited_once_with(
+        "https://api.ffxivteamcraft.com/search",
+        params={"query": "食果花鼠", **TEAMCRAFT_SEARCH_PARAMS},
     )
 
 
