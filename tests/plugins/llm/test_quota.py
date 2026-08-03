@@ -37,16 +37,16 @@ async def test_aperture_quota(app: App, respx_mock: MockRouter):
         },
     )
 
-    result = await get_quota(model, "https://global.example.com")
+    result = await get_quota(model)
 
     assert result == "deepseek-aperture 剩余额度：\n  deepseek: 4.82 元"
     assert route.calls[0].request.headers["User-Agent"].startswith("CoolQBot/")
 
 
 @respx.mock(assert_all_called=True)
-async def test_quota_api_url_falls_back_to_global_base_url(app: App, respx_mock: MockRouter):
+async def test_quota_api_url_falls_back_to_global_base_url(app: App, respx_mock: MockRouter, mocker):
     """未配置 api_url 时优先使用全局 LLM 服务地址并追加 provider 路径"""
-    from src.plugins.llm.config import ModelConfig
+    from src.plugins.llm.config import ModelConfig, plugin_config
     from src.plugins.llm.quota import get_quota
 
     route = respx_mock.get("https://global.example.com/api/quotas").mock(
@@ -57,17 +57,18 @@ async def test_quota_api_url_falls_back_to_global_base_url(app: App, respx_mock:
         base_url="https://model.example.com",
         quota={"provider": "aperture"},
     )
+    mocker.patch.object(plugin_config, "base_url", "https://global.example.com/")
 
-    result = await get_quota(model, "https://global.example.com/")
+    result = await get_quota(model)
 
     assert result == "aperture 剩余额度：\n  shared: 1.00 元"
     assert route.call_count == 1
 
 
 @respx.mock(assert_all_called=True)
-async def test_deepseek_quota(app: App, respx_mock: MockRouter):
+async def test_deepseek_quota(app: App, respx_mock: MockRouter, mocker):
     """DeepSeek provider 复用模型密钥并显示充值与赠金余额"""
-    from src.plugins.llm.config import DEEPSEEK_QUOTA_API_URL, ModelConfig
+    from src.plugins.llm.config import DEEPSEEK_QUOTA_API_URL, ModelConfig, plugin_config
     from src.plugins.llm.quota import get_quota
 
     route = respx_mock.get(DEEPSEEK_QUOTA_API_URL).mock(
@@ -97,6 +98,7 @@ async def test_deepseek_quota(app: App, respx_mock: MockRouter):
         api_key="sk-model",
         quota={"provider": "deepseek"},
     )
+    mocker.patch.object(plugin_config, "base_url", "")
 
     result = await get_quota(model)
 

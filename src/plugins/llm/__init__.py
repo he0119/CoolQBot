@@ -176,7 +176,7 @@ async def llm_quota_handle(user: UserSession, model: Query[str] = Query("quota.m
         await llm_cmd.finish(f"未启用的模型：{name}，可用：{'、'.join(names)}", at_sender=True)
 
     try:
-        result = await get_quota(plugin_config.resolve(name), plugin_config.base_url)
+        result = await get_quota(plugin_config.resolve(name))
     except QuotaError as e:
         await llm_cmd.finish(str(e), at_sender=True)
     await llm_cmd.finish(result, at_sender=True)

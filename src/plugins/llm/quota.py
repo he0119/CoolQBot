@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Literal
 import httpx
 from pydantic import BaseModel, ValidationError
 
-from .config import DEEPSEEK_QUOTA_API_URL
+from .config import DEEPSEEK_QUOTA_API_URL, plugin_config
 from .providers.base import USER_AGENT
 
 if TYPE_CHECKING:
@@ -76,17 +76,16 @@ class QuotaProvider(ABC):
     default_api_url: str = ""
     """服务地址也为空时使用的最终默认地址"""
 
-    def __init__(self, config: BaseQuotaConfig, model: ModelConfig, default_base_url: str = "") -> None:
+    def __init__(self, config: BaseQuotaConfig, model: ModelConfig) -> None:
         self.config = config
         self.model = model
-        self.default_base_url = default_base_url
 
     @property
     def api_url(self) -> str:
         """完整的额度查询地址"""
         if self.config.api_url:
             return self.config.api_url
-        base_url = self.default_base_url or self.model.base_url
+        base_url = plugin_config.base_url or self.model.base_url
         if base_url:
             return f"{base_url.rstrip('/')}{self.endpoint_path}"
         if self.default_api_url:
@@ -215,9 +214,9 @@ def format_quota(model_name: str, result: QuotaResult) -> str:
     return "\n".join(lines)
 
 
-async def get_quota(model: ModelConfig, default_base_url: str = "") -> str:
+async def get_quota(model: ModelConfig) -> str:
     """根据模型配置选择 provider 并查询额度"""
     if model.quota is None:
         raise QuotaError(f"模型 {model.name} 未配置额度查询")
-    provider = QUOTA_PROVIDERS[model.quota.provider](model.quota, model, default_base_url)
+    provider = QUOTA_PROVIDERS[model.quota.provider](model.quota, model)
     return format_quota(model.name, await provider.query())
