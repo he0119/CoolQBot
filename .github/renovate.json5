@@ -12,9 +12,11 @@
   customManagers: [
     {
       customType: "regex",
+      description: "Update Pyright Python version",
       managerFilePatterns: ["/^pyproject\\.toml$/"],
       matchStrings: ['pythonVersion\\s*=\\s*"(?<currentValue>\\d+\\.\\d+)"'],
       depNameTemplate: "python",
+      depTypeTemplate: "tool.pyright",
       datasourceTemplate: "python-version",
       versioningTemplate: "python",
       extractVersionTemplate: "^(?<version>\\d+\\.\\d+)",
@@ -85,6 +87,7 @@
       groupName: "Project Python version",
       matchPackageNames: ["python"],
       matchManagers: ["pep621", "custom.regex"],
+      matchDepTypes: ["requires-python", "tool.pyright"],
       matchUpdateTypes: ["major", "minor"],
       description: "Weekly update of project Python version",
     },
