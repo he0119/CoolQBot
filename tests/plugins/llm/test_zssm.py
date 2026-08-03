@@ -14,7 +14,7 @@ from nonebot.adapters.onebot.v11.event import Sender
 from nonebug import App
 from respx import MockRouter
 
-from tests.fake import fake_group_message_event_v11
+from tests.fake import fake_group_message_event_v11, fake_private_message_event_v11
 
 
 @pytest.fixture
@@ -47,6 +47,23 @@ def test_zssm_has_help_metadata(app: App):
     help_text = command.get_help()
     assert command.meta.description in help_text
     assert "Unknown" not in help_text
+
+
+async def test_zssm_ignores_private_messages(app: App):
+    """解释模式与主 LLM 入口一样不允许在私聊中使用。"""
+    from src.plugins.llm.plugins.zssm import zssm_cmd
+
+    async with app.test_matcher(zssm_cmd) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_private_message_event_v11(
+            self_id=123456,
+            message=Message("zssm Python GIL"),
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_not_pass_rule(zssm_cmd)
 
 
 async def test_zssm_not_configured(app: App, mocker):

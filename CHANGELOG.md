@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 修复 SQLite 单连接池导致并发会话互相回滚、群级 LLM 配置写入误报成功的问题
 - 修复大模型工具调用达到轮数上限后直接失败的问题，改为基于已有结果生成收尾回复
 - 修复模型列表未显示视觉能力、`zssm` 未自动选择本群视觉模型的问题
+- 禁止私聊消息触发大模型命令、快捷对话和 `zssm`，避免使用群级会话配置处理私聊
 
 ### Removed
 

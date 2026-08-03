@@ -13,7 +13,7 @@ from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
 from respx import MockRouter
 
-from tests.fake import fake_group_message_event_v11
+from tests.fake import fake_group_message_event_v11, fake_private_message_event_v11
 
 
 @pytest.fixture
@@ -231,6 +231,61 @@ async def test_llm_mention_requires_to_me_message(app: App, mock_models):
 
         ctx.receive_event(bot, event)
         ctx.should_not_pass_rule(llm_mention)
+
+
+async def test_llm_command_ignores_private_messages(app: App, mock_models):
+    """所有 /llm 子命令共享同一条非私聊规则。"""
+    from src.plugins.llm import llm_cmd
+
+    async with app.test_matcher(llm_cmd) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_private_message_event_v11(
+            self_id=123456,
+            message=Message("/llm model --list"),
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_not_pass_rule(llm_cmd)
+
+
+async def test_llm_mention_ignores_private_messages(app: App, mock_models):
+    """私聊默认具有 to_me 状态时也不能触发快捷对话。"""
+    from src.plugins.llm import llm_mention
+
+    async with app.test_matcher(llm_mention) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_private_message_event_v11(
+            self_id=123456,
+            message=Message("你好"),
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_not_pass_rule(llm_mention)
+
+
+@pytest.mark.parametrize(
+    ("scene_type", "expected"),
+    [
+        ("PRIVATE", False),
+        ("GROUP", True),
+        ("GUILD", True),
+        ("CHANNEL_TEXT", True),
+    ],
+)
+async def test_llm_rule_rejects_only_private_scenes(app: App, mocker, scene_type: str, expected: bool):
+    """私聊不能复用群级配置，群聊、频道和子频道保持可用。"""
+    from nonebot_plugin_uninfo import Scene, SceneType
+
+    from src.plugins.llm.rules import is_non_private
+
+    user = mocker.Mock()
+    user.session.scene = Scene(id="scene", type=SceneType[scene_type])
+
+    assert await is_non_private(user) is expected
 
 
 async def test_llm_mention_ignores_commands(app: App, mock_models, mocker):

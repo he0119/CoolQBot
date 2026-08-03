@@ -62,6 +62,7 @@ from .data_source import (
 from .handler import LLMHandler, send_reaction
 from .providers import ProviderError
 from .quota import QuotaError, get_quota
+from .rules import is_non_private
 from .schemas import ImageContent
 from .tts import TTSError, get_tts_models
 
@@ -114,6 +115,7 @@ llm_cmd = on_alconna(
     ),
     use_cmd_start=True,
     block=True,
+    rule=Rule(is_non_private),
     extensions=[
         ReplyMergeExtension(),
         TelegramSlashExtension(),
@@ -133,7 +135,11 @@ async def _should_handle_mention(event: Event) -> bool:
     return not any(prefix and text.startswith(prefix) for prefix in nonebot.get_driver().config.command_start)
 
 
-llm_mention = on_message(rule=to_me() & Rule(_should_handle_mention), priority=15, block=True)
+llm_mention = on_message(
+    rule=Rule(is_non_private) & to_me() & Rule(_should_handle_mention),
+    priority=15,
+    block=True,
+)
 
 
 class LLMSetupError(ValueError):
