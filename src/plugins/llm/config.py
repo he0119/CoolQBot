@@ -9,7 +9,7 @@ LLM__MODELS='[{"name":"model-a","provider":"chat"}]'
 ```
 """
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from nonebot import get_plugin_config
 from pydantic import BaseModel, Field, model_validator
@@ -23,6 +23,40 @@ DEFAULT_BASE_URLS: dict[str, str] = {
     "anthropic": "https://api.anthropic.com",
 }
 """各格式的默认服务地址"""
+
+DEEPSEEK_QUOTA_API_URL = "https://api.deepseek.com/user/balance"
+"""DeepSeek 官方余额查询地址"""
+
+
+class BaseQuotaConfig(BaseModel):
+    """额度查询的共用配置"""
+
+    api_url: str = ""
+    """完整的额度接口地址；留空时回退到全局 LLM 服务地址"""
+    api_key: str = ""
+    """额度接口密钥；留空时由具体 provider 决定是否复用模型密钥"""
+    proxy: str | None = None
+    """额度查询代理地址；留空时复用模型代理"""
+    timeout: int = 10
+    """额度查询超时时间（秒）"""
+
+
+class ApertureQuotaConfig(BaseQuotaConfig):
+    """Tailscale Aperture 额度接口配置"""
+
+    provider: Literal["aperture"]
+    bucket: str = ""
+    """仅显示指定额度桶；留空时显示接口返回的全部额度桶"""
+
+
+class DeepSeekQuotaConfig(BaseQuotaConfig):
+    """DeepSeek 官方余额接口配置"""
+
+    provider: Literal["deepseek"]
+
+
+QuotaConfig = Annotated[ApertureQuotaConfig | DeepSeekQuotaConfig, Field(discriminator="provider")]
+"""单个模型的额度查询配置"""
 
 
 class ModelConfig(BaseModel):
@@ -52,6 +86,8 @@ class ModelConfig(BaseModel):
     """非流式请求的超时时间（秒）"""
     extra_body: dict[str, Any] = Field(default_factory=dict)
     """附加到请求体的额外字段，用于传递各服务商的特有参数"""
+    quota: QuotaConfig | None = None
+    """该模型的额度查询配置，留空时不支持额度查询"""
 
     @model_validator(mode="after")
     def fill_defaults(self) -> "ModelConfig":
