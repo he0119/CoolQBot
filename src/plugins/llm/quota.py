@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Literal
 import httpx
 from pydantic import BaseModel, ValidationError
 
+from .config import DEEPSEEK_QUOTA_API_URL
 from .providers.base import USER_AGENT
 
 if TYPE_CHECKING:
@@ -70,14 +71,27 @@ class DeepSeekResponse(BaseModel):
 class QuotaProvider(ABC):
     """额度查询 provider 基类"""
 
-    def __init__(self, config: BaseQuotaConfig, model: ModelConfig) -> None:
+    endpoint_path: str
+    """未显式配置 API 地址时追加到服务地址的路径"""
+    default_api_url: str = ""
+    """服务地址也为空时使用的最终默认地址"""
+
+    def __init__(self, config: BaseQuotaConfig, model: ModelConfig, default_base_url: str = "") -> None:
         self.config = config
         self.model = model
+        self.default_base_url = default_base_url
 
     @property
-    @abstractmethod
     def api_url(self) -> str:
         """完整的额度查询地址"""
+        if self.config.api_url:
+            return self.config.api_url
+        base_url = self.default_base_url or self.model.base_url
+        if base_url:
+            return f"{base_url.rstrip('/')}{self.endpoint_path}"
+        if self.default_api_url:
+            return self.default_api_url
+        raise QuotaError("额度查询未配置 API 地址或 LLM__BASE_URL")
 
     def build_headers(self) -> dict[str, str]:
         """构造请求头"""
@@ -109,10 +123,7 @@ class ApertureQuotaProvider(QuotaProvider):
     """Tailscale Aperture 额度查询"""
 
     config: ApertureQuotaConfig
-
-    @property
-    def api_url(self) -> str:
-        return self.config.api_url
+    endpoint_path = "/api/quotas"
 
     def build_headers(self) -> dict[str, str]:
         headers = super().build_headers()
@@ -141,10 +152,8 @@ class DeepSeekQuotaProvider(QuotaProvider):
     """DeepSeek 官方余额查询"""
 
     config: DeepSeekQuotaConfig
-
-    @property
-    def api_url(self) -> str:
-        return self.config.api_url
+    endpoint_path = "/user/balance"
+    default_api_url = DEEPSEEK_QUOTA_API_URL
 
     def build_headers(self) -> dict[str, str]:
         api_key = self.config.api_key or self.model.api_key
@@ -206,9 +215,9 @@ def format_quota(model_name: str, result: QuotaResult) -> str:
     return "\n".join(lines)
 
 
-async def get_quota(model: ModelConfig) -> str:
+async def get_quota(model: ModelConfig, default_base_url: str = "") -> str:
     """根据模型配置选择 provider 并查询额度"""
     if model.quota is None:
         raise QuotaError(f"模型 {model.name} 未配置额度查询")
-    provider = QUOTA_PROVIDERS[model.quota.provider](model.quota, model)
+    provider = QUOTA_PROVIDERS[model.quota.provider](model.quota, model, default_base_url)
     return format_quota(model.name, await provider.query())

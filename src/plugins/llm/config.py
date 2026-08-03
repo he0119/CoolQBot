@@ -31,6 +31,8 @@ DEEPSEEK_QUOTA_API_URL = "https://api.deepseek.com/user/balance"
 class BaseQuotaConfig(BaseModel):
     """额度查询的共用配置"""
 
+    api_url: str = ""
+    """完整的额度接口地址；留空时回退到全局 LLM 服务地址"""
     api_key: str = ""
     """额度接口密钥；留空时由具体 provider 决定是否复用模型密钥"""
     proxy: str | None = None
@@ -43,8 +45,6 @@ class ApertureQuotaConfig(BaseQuotaConfig):
     """Tailscale Aperture 额度接口配置"""
 
     provider: Literal["aperture"]
-    api_url: str
-    """完整的 Aperture `/api/quotas` 地址"""
     bucket: str = ""
     """仅显示指定额度桶；留空时显示接口返回的全部额度桶"""
 
@@ -53,8 +53,6 @@ class DeepSeekQuotaConfig(BaseQuotaConfig):
     """DeepSeek 官方余额接口配置"""
 
     provider: Literal["deepseek"]
-    api_url: str = DEEPSEEK_QUOTA_API_URL
-    """完整的余额查询地址"""
 
 
 QuotaConfig = Annotated[ApertureQuotaConfig | DeepSeekQuotaConfig, Field(discriminator="provider")]

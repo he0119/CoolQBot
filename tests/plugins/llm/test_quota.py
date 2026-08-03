@@ -37,10 +37,31 @@ async def test_aperture_quota(app: App, respx_mock: MockRouter):
         },
     )
 
-    result = await get_quota(model)
+    result = await get_quota(model, "https://global.example.com")
 
     assert result == "deepseek-aperture 剩余额度：\n  deepseek: 4.82 元"
     assert route.calls[0].request.headers["User-Agent"].startswith("CoolQBot/")
+
+
+@respx.mock(assert_all_called=True)
+async def test_quota_api_url_falls_back_to_global_base_url(app: App, respx_mock: MockRouter):
+    """未配置 api_url 时优先使用全局 LLM 服务地址并追加 provider 路径"""
+    from src.plugins.llm.config import ModelConfig
+    from src.plugins.llm.quota import get_quota
+
+    route = respx_mock.get("https://global.example.com/api/quotas").mock(
+        return_value=httpx.Response(200, json={"buckets": [{"name": "shared", "current": 1000000000}]})
+    )
+    model = ModelConfig(
+        name="aperture",
+        base_url="https://model.example.com",
+        quota={"provider": "aperture"},
+    )
+
+    result = await get_quota(model, "https://global.example.com/")
+
+    assert result == "aperture 剩余额度：\n  shared: 1.00 元"
+    assert route.call_count == 1
 
 
 @respx.mock(assert_all_called=True)
@@ -143,6 +164,7 @@ async def test_llm_quota_command_uses_selected_model(app: App, respx_mock: MockR
             ),
         ],
     )
+    mocker.patch.object(plugin_config, "base_url", "https://api.deepseek.com")
     respx_mock.get("https://api.deepseek.com/user/balance").mock(
         return_value=httpx.Response(
             200,

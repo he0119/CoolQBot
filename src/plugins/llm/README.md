@@ -123,7 +123,6 @@ LLM__MODELS='
     "base_url": "https://ai.example.com/v1",
     "quota": {
       "provider": "aperture",
-      "api_url": "https://ai.example.com/api/quotas",
       "bucket": "deepseek"
     }
   },
@@ -175,13 +174,14 @@ LLM__TTS_MODEL=default
 
 DeepSeek 字段与鉴权方式以[官方余额接口文档](https://api-docs.deepseek.com/zh-cn/api/get-user-balance)为准。
 
-| Provider   | 必填配置  | 说明                                                                |
-| ---------- | --------- | ------------------------------------------------------------------- |
-| `deepseek` | 无        | 请求 DeepSeek 官方 `/user/balance`；默认复用模型 `api_key`          |
-| `aperture` | `api_url` | 请求 Tailscale Aperture `/api/quotas`；可用 `bucket` 筛选单个额度桶 |
+| Provider   | 追加路径        | 说明                                                           |
+| ---------- | --------------- | -------------------------------------------------------------- |
+| `deepseek` | `/user/balance` | 请求 DeepSeek 官方余额接口；默认复用模型 `api_key`             |
+| `aperture` | `/api/quotas`   | 请求 Tailscale Aperture 额度接口；可用 `bucket` 筛选单个额度桶 |
 
-两种 provider 都可单独设置 `api_key`、`proxy` 与 `timeout`。DeepSeek 的 `api_url` 也可以覆盖，
-用于兼容代理或后续不同的服务地址。
+未设置 `quota.api_url` 时，插件优先使用 `LLM__BASE_URL` 并追加上表路径；全局地址也为空时，
+再使用模型解析后的服务地址。`quota.api_url` 可填写完整地址以覆盖这一行为。两种 provider 还可单独设置
+`api_key`、`proxy` 与 `timeout`。
 
 ## 内置工具
 
