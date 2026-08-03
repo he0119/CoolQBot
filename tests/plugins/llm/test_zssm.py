@@ -94,7 +94,8 @@ async def test_zssm_explains_text_without_tools(app: App, respx_mock: MockRouter
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message(
+            Message(MessageSegment.reply(1))
+            + (
                 "关键词：Python | GIL\n\nGIL 是 CPython 用来协调字节码执行的一把全局锁。"
                 "\n\n--- 5.1s  test-model  I:10 O:5 A:15 C:0"
             ),
@@ -161,7 +162,7 @@ async def test_zssm_separates_reply_and_focus(app: App, respx_mock: MockRouter, 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message(MessageSegment.reply(99)) + "解释结果\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0",
+            Message(MessageSegment.reply(1)) + "解释结果\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0",
             True,
         )
 

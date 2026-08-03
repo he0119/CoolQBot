@@ -22,8 +22,6 @@ from .tools import registry
 from .tts import TTSError, text_to_speech
 
 if TYPE_CHECKING:
-    from nonebot_plugin_alconna.uniseg import Reply
-
     from .schemas import ToolCall
 
 THINK_PATTERN = re.compile(r"<think>(.*?)</think>", re.DOTALL)
@@ -212,7 +210,7 @@ class LLMHandler:
         self,
         completion: Completion,
         *,
-        reply_to: str | bool | Reply | None = False,
+        reply_to: str | bool = False,
     ) -> None:
         """按配置发送模型回复"""
         text = format_output(completion, with_thinking=self.show_thinking)

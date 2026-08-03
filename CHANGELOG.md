@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 优化 llm 回复显示：推理内容改用引用块，并通过 emoji reaction 反馈响应状态
 - 将外部 zssm 插件迁移到 llm，共用模型配置、请求协议与响应统计
+- 图片输入改为必须由模型在 `capabilities` 中显式声明 `vision`；原本能接收图片的模型需要补上该声明，否则发送图片会提示未声明 vision 能力
 
 ### Fixed
 

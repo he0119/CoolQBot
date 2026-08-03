@@ -9,7 +9,7 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 from nonebot_plugin_alconna import Alconna, Args, Match, MsgId, UniMessage, on_alconna
 from nonebot_plugin_alconna.builtins.extensions.reply import ReplyRecordExtension
-from nonebot_plugin_alconna.uniseg import Image, Reply
+from nonebot_plugin_alconna.uniseg import Image
 from nonebot_plugin_user import UserSession
 
 from ...config import plugin_config
@@ -57,7 +57,7 @@ async def zssm_handle(
 
     if reply:
         if not reply.msg:
-            await UniMessage.text("上一条消息内容为空").finish(reply_to=Reply(msg_id))
+            await UniMessage.text("上一条消息内容为空").finish(reply_to=msg_id)
         reply_message = reply.msg
         if isinstance(reply_message, str):
             reply_message = event.get_message().__class__(reply_message)
@@ -71,19 +71,19 @@ async def zssm_handle(
     focus = focus_message.extract_plain_text().strip()
     images = [*target_message.get(Image), *focus_message.get(Image)]
     if not target and not focus and not images:
-        await UniMessage.text("请回复或输入需要解释的内容").finish(reply_to=Reply(msg_id))
+        await UniMessage.text("请回复或输入需要解释的内容").finish(reply_to=msg_id)
 
     names = plugin_config.get_model_names()
     if not names:
-        await UniMessage.text("未配置任何模型，请先在 .env 中配置 LLM__MODELS").finish(reply_to=Reply(msg_id))
+        await UniMessage.text("未配置任何模型，请先在 .env 中配置 LLM__MODELS").finish(reply_to=msg_id)
     model_name = plugin_config.zssm_model or await get_model_name(user.session_id)
     if model_name not in names:
-        await UniMessage.text(f"解释模型未启用：{model_name}，可用：{'、'.join(names)}").finish(reply_to=Reply(msg_id))
+        await UniMessage.text(f"解释模型未启用：{model_name}，可用：{'、'.join(names)}").finish(reply_to=msg_id)
     vision_model = ""
     try:
         vision_model = resolve_vision_fallback(model_name, has_images=bool(images))
     except ValueError as e:
-        await UniMessage.text(str(e)).finish(reply_to=Reply(msg_id))
+        await UniMessage.text(str(e)).finish(reply_to=msg_id)
 
     await send_reaction("thinking", message_id=msg_id)
     try:
@@ -125,11 +125,11 @@ async def zssm_handle(
         completion.message.content = format_explain_response(content_text)
     except (ProviderError, ValueError) as e:
         await send_reaction("fail", message_id=msg_id)
-        await UniMessage.text(f"解释失败：{e}").finish(reply_to=Reply(msg_id))
+        await UniMessage.text(f"解释失败：{e}").finish(reply_to=msg_id)
     except Exception as e:
         logger.opt(exception=e).error("解释模式出现未预期的错误")
         await send_reaction("fail", message_id=msg_id)
-        await UniMessage.text("解释失败，请稍后重试").finish(reply_to=Reply(msg_id))
+        await UniMessage.text("解释失败，请稍后重试").finish(reply_to=msg_id)
     else:
         await send_reaction("done", message_id=msg_id)
-        await handler.send(completion, reply_to=reply)
+        await handler.send(completion, reply_to=msg_id)
