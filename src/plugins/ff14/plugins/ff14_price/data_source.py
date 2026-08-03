@@ -10,6 +10,8 @@ from datetime import datetime
 import httpx
 from pydantic import BaseModel
 
+from src.plugins.llm.tools import registry
+
 
 class XIVAPIResultsItem(BaseModel):
     ID: int
@@ -87,3 +89,20 @@ async def get_item_price(name: str, world_or_dc: str) -> str:
             items_info.append(f"数据更新时间: {data.lastUploadTime.astimezone().strftime('%Y年%m月%d日 %H时%M分')}")
             return "\n".join(items_info)
         return f"抱歉，没有找到 {item.Name} 的价格。"
+
+
+@registry.register(
+    "query_ff14_item_price",
+    "查询最终幻想 XIV 国服指定物品在服务器或大区中的当前市场最低价",
+)
+async def query_ff14_item_price(item_name: str, world_or_dc: str = "猫小胖") -> str:
+    """查询最终幻想 XIV 国服市场价格
+
+    Args:
+        item_name: 物品中文名称
+        world_or_dc: 国服服务器或大区名称，省略时查询猫小胖大区
+    """
+    try:
+        return await get_item_price(item_name, world_or_dc)
+    except httpx.HTTPError:
+        return "抱歉，网络出错，无法获取物品价格，请稍后再试。"

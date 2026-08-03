@@ -32,7 +32,7 @@ from nonebot.log import logger
 from ..schemas import ToolParam
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Collection
 
     from ..schemas import ToolCall
 
@@ -59,11 +59,17 @@ class ToolRegistry:
     def __len__(self) -> int:
         return len(self._registry)
 
-    def register(self, name: str, description: str) -> Callable[[Callable], Callable]:
+    def register(
+        self,
+        name: str,
+        description: str,
+        *,
+        group: str | None = None,
+    ) -> Callable[[Callable], Callable]:
         """注册工具
 
         参数 schema 由函数签名与 docstring 中的 Args 小节生成，
-        无默认值的参数被视为必填。
+        无默认值的参数被视为必填。设置 group 后，工具只在显式启用该分组时可用。
         """
 
         def decorator(func: Callable) -> Callable:
@@ -90,13 +96,15 @@ class ToolRegistry:
                 "func": func,
                 "properties": properties,
                 "required": required,
+                "group": group,
             }
             return func
 
         return decorator
 
-    def to_params(self) -> list[ToolParam]:
+    def to_params(self, *, enabled_groups: Collection[str] = ()) -> list[ToolParam]:
         """转换为与格式无关的工具定义列表"""
+        groups = set(enabled_groups)
         return [
             ToolParam(
                 name=name,
@@ -108,9 +116,10 @@ class ToolRegistry:
                 },
             )
             for name, info in self._registry.items()
+            if info["group"] is None or info["group"] in groups
         ]
 
-    async def execute(self, call: ToolCall) -> str:
+    async def execute(self, call: ToolCall, *, enabled_groups: Collection[str] = ()) -> str:
         """执行一次工具调用，返回交回模型的结果
 
         执行失败时返回错误描述而非抛出异常，让模型有机会自行调整。
@@ -119,6 +128,9 @@ class ToolRegistry:
         if not info:
             logger.warning("LLM 请求了未注册的工具")
             return f"错误：未注册的工具 {call.name}"
+        if info["group"] is not None and info["group"] not in enabled_groups:
+            logger.warning("LLM 请求了未启用的工具（工具={}，分组={}）", call.name, info["group"])
+            return f"错误：当前未启用工具 {call.name}"
 
         started_at = perf_counter()
         argument_names = [name for name in info["properties"] if name in call.arguments]

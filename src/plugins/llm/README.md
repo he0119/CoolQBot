@@ -22,6 +22,7 @@
 - 使用 emoji reaction 反馈响应状态（思考中、已完成、失败；不支持的平台自动跳过）
 - 工具调用（function calling），三种格式自动适配；耗时较长时定期提示模型请求与工具调用进度
 - 可通过 `-s` 按次启用网页搜索；网页/PDF 正文读取工具默认可用，均返回来源 URL 并标记不可信外部内容
+- 默认提供最终幻想 XIV 国服物价、时尚品鉴和 FFLogs 角色排名查询工具
 - 图片输入（多模态），需要模型在 `capabilities` 中声明 `vision`
 - 超级管理员可按群开放模型，群管理员可分别设置默认对话、`zssm` 解释和视觉模型；未指定视觉模型时自动选择首个已开放且支持视觉的模型
 - 内置“这是什么”解释模式，可解释被回复的文字、图片、网页与 PDF
@@ -107,6 +108,7 @@
 ```bash
 /llm -r 用表格对比 Python 和 Go  # 回复渲染成图片
 /llm -s 查询 Python 3.14 新特性   # 本次允许模型搜索网页
+/llm 查一下静语庄园的萨维奈舞裙价格 # 模型可直接调用 FF14 物价工具
 /llm tts --set 派蒙              # 设置语音模型
 /llm -t 念一首诗                 # 用语音回复
 ```
@@ -279,18 +281,24 @@ DeepSeek 字段与鉴权方式以[官方余额接口文档](https://api-docs.dee
 
 ## 内置工具
 
-| 工具                   | 说明                                          |
-| ---------------------- | --------------------------------------------- |
-| `query_weather`        | 查询现实城市或最终幻想 XIV 艾欧泽亚地区的天气 |
-| `query_holiday_status` | 查询今天、周末、最近节假日以及调休安排        |
-| `web_search`           | 搜索互联网，返回标题、URL 与摘要              |
-| `web_fetch`            | 安全读取网页、文本、JSON 或 PDF 正文          |
+| 工具                             | 说明                                          |
+| -------------------------------- | --------------------------------------------- |
+| `query_weather`                  | 查询现实城市或最终幻想 XIV 艾欧泽亚地区的天气 |
+| `query_holiday_status`           | 查询今天、周末、最近节假日以及调休安排        |
+| `web_search`                     | 搜索互联网，返回标题、URL 与摘要              |
+| `web_fetch`                      | 安全读取网页、文本、JSON 或 PDF 正文          |
+| `query_ff14_item_price`          | 查询国服服务器或大区的物品市场价格            |
+| `query_ff14_fashion_report`      | 查询本周时尚品鉴满分攻略                      |
+| `query_fflogs_character_ranking` | 查询国服角色的 FFLogs 副本排名                |
 
 `web_search` 默认不随请求发送，仅在使用 `/llm -s <内容>`（或 `--search`）时启用；多轮对话会在本次会话中保持启用。
 `web_fetch` 默认可用，因此模型仍可读取用户直接提供的 URL。`web_search` 使用 `ddgs` 搜索并限制单次结果数；
 模型需要详细内容时，可继续调用 `web_fetch` 读取搜索结果。
 `web_fetch` 只接受 HTTP(S) URL，会校验每次重定向并拒绝本机、内网和其他非公网地址，同时限制下载大小、
 PDF 页数和提取字符数。两项工具返回的内容都带有“不可信外部数据”标记，来源 URL 会一并交给模型。
+
+三个最终幻想 XIV 工具默认随普通对话提供：物价查询默认使用猫小胖大区，也可以显式指定国服服务器或大区；
+时尚品鉴返回当前攻略及来源链接；FFLogs 角色排名需要配置 `FFLOGS_TOKEN`，并显式提供副本、角色名和服务器名。
 
 旧版 `LLM__ZSSM_MAX_RESOURCE_BYTES`、`LLM__ZSSM_MAX_RESOURCE_CHARS`、`LLM__ZSSM_MAX_PDF_PAGES`、
 `LLM__ZSSM_RESOURCE_TIMEOUT`、`LLM__ZSSM_RESOURCE_PROXY` 与 `LLM__ZSSM_RESOURCE_FAKE_IP_RANGES`

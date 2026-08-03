@@ -64,10 +64,17 @@ async def chat(
     """发起一次对话请求"""
     model = plugin_config.resolve(model_name)
     provider = get_provider(model.provider)(model, session_affinity=session_affinity)
-    tools = registry.to_params() if enable_tools else []
-    if not enable_web_search:
-        tools = [tool for tool in tools if tool.name != "web_search"]
+    enabled_groups = _get_enabled_tool_groups(enable_web_search)
+    tools = registry.to_params(enabled_groups=enabled_groups) if enable_tools else []
     return await provider.chat(messages, tools or None)
+
+
+def _get_enabled_tool_groups(enable_web_search: bool) -> frozenset[str]:
+    """把用户入口选项转换为工具注册表分组。"""
+    groups: set[str] = set()
+    if enable_web_search:
+        groups.add("search")
+    return frozenset(groups)
 
 
 def split_content(completion: Completion) -> tuple[str, str]:
@@ -134,9 +141,14 @@ async def send_reaction(
         logger.opt(exception=e).debug("添加大模型响应状态失败，已忽略")
 
 
-async def execute_tool_calls(calls: list[ToolCall], context: list[Message]) -> None:
+async def execute_tool_calls(
+    calls: list[ToolCall],
+    context: list[Message],
+    *,
+    enabled_groups: frozenset[str] = frozenset(),
+) -> None:
     """并行执行模型请求的工具调用，并按原顺序把结果加入上下文"""
-    results = await asyncio.gather(*(registry.execute(call) for call in calls))
+    results = await asyncio.gather(*(registry.execute(call, enabled_groups=enabled_groups) for call in calls))
     context.extend(Message.tool(call.id, result) for call, result in zip(calls, results, strict=True))
 
 
@@ -239,7 +251,8 @@ class LLMHandler:
                     len(completion.tool_calls),
                 )
                 self.context.append(completion.message)
-                await execute_tool_calls(completion.tool_calls, self.context)
+                enabled_groups = _get_enabled_tool_groups(self.enable_web_search)
+                await execute_tool_calls(completion.tool_calls, self.context, enabled_groups=enabled_groups)
                 tool_progress.request_count += 1
                 completion = await chat(
                     self.model_name,

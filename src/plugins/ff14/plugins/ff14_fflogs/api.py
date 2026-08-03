@@ -21,6 +21,8 @@ from nonebot_plugin_orm import get_session
 from pydantic import TypeAdapter, ValidationError
 from sqlalchemy import select
 
+from src.plugins.llm.tools import registry
+
 from .config import plugin_config
 from .data import FFLOGS_DATA, FFlogsDataModel, get_boss_info_by_nickname, get_job_info_by_nickname
 from .models import CharacterRanking, Class, FFLogsRanking, Ranking, User, Zones
@@ -371,4 +373,37 @@ class FFLogs:
 
 
 fflogs = FFLogs()
+
+
+@registry.register(
+    "query_fflogs_character_ranking",
+    "查询最终幻想 XIV 国服角色在指定副本中的 FFLogs 排名、百分位和输出",
+)
+async def query_fflogs_character_ranking(
+    boss: str,
+    character_name: str,
+    server_name: str,
+    dps_type: str = "rdps",
+) -> str:
+    """查询角色 FFLogs 排名
+
+    Args:
+        boss: 副本或首领名称，支持常用简称
+        character_name: 角色名称
+        server_name: 国服服务器名称
+        dps_type: 输出统计类型，支持 rdps、adps、pdps，默认 rdps
+    """
+    if not plugin_config.fflogs_token:
+        return "FFLogs API Token 未配置，无法查询角色排名。"
+    metric = dps_type.lower()
+    if metric not in ("rdps", "adps", "pdps"):
+        return f"不支持的 DPS 类型：{dps_type}，只支持 rdps、adps、pdps。"
+    return await fflogs.character_dps(
+        boss,
+        character_name,
+        server_name,
+        cast("Literal['rdps', 'adps', 'pdps']", metric),
+    )
+
+
 get_driver().on_startup(fflogs.init)

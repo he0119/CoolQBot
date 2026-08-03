@@ -373,6 +373,36 @@ async def test_tool_registry_errors(app: App):
     assert "缺少必填参数" in await registry.execute(ToolCall(id="2", name="greet", arguments={}))
 
 
+async def test_tool_registry_requires_explicit_group(app: App):
+    """分组工具未显式启用时既不暴露也不执行。"""
+    from src.plugins.llm.schemas import ToolCall
+    from src.plugins.llm.tools import ToolRegistry
+
+    registry = ToolRegistry()
+    called = False
+
+    @registry.register("search", "查询资料", group="search")
+    def search(query: str) -> str:
+        nonlocal called
+        called = True
+        return query
+
+    assert registry.to_params() == []
+    assert [param.name for param in registry.to_params(enabled_groups={"search"})] == ["search"]
+    assert await registry.execute(ToolCall(id="1", name="search", arguments={"query": "资料"})) == (
+        "错误：当前未启用工具 search"
+    )
+    assert called is False
+    assert (
+        await registry.execute(
+            ToolCall(id="2", name="search", arguments={"query": "资料"}),
+            enabled_groups={"search"},
+        )
+        == "资料"
+    )
+    assert called is True
+
+
 async def test_tool_registry_logs_metadata_without_values(app: App, mocker):
     """工具日志只记录工具名、参数名和结果规模，不记录参数值或结果正文。"""
     from src.plugins.llm.schemas import ToolCall

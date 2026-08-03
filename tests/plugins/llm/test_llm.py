@@ -172,6 +172,11 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
     tool_names = {tool["function"]["name"] for tool in json.loads(request.content)["tools"]}
     assert "web_fetch" in tool_names
     assert "web_search" not in tool_names
+    assert {
+        "query_ff14_item_price",
+        "query_ff14_fashion_report",
+        "query_fflogs_character_ranking",
+    } <= tool_names
 
 
 @respx.mock(assert_all_called=True)
@@ -202,6 +207,11 @@ async def test_llm_search_option_enables_web_search(app: App, respx_mock: MockRo
     payload = json.loads(route.calls[0].request.content)
     tool_names = {tool["function"]["name"] for tool in payload["tools"]}
     assert {"web_search", "web_fetch"} <= tool_names
+    assert {
+        "query_ff14_item_price",
+        "query_ff14_fashion_report",
+        "query_fflogs_character_ranking",
+    } <= tool_names
 
 
 async def test_llm_group_mention_uses_default_chat_flow(app: App, mock_models, mocker):
@@ -613,7 +623,7 @@ async def test_tool_wait_notice_repeats_until_final_completion(app: App, mock_mo
         await second_notice_sent.wait()
         return final_completion
 
-    async def execute(calls, context):
+    async def execute(calls, context, **kwargs):
         await first_notice_sent.wait()
         context.append(Message.tool(calls[0].id, "搜索结果"))
 
@@ -667,7 +677,7 @@ async def test_tool_round_limit_generates_final_response_without_tools(app: App,
         side_effect=[first_tool_completion, pending_tool_completion, final_completion],
     )
 
-    async def execute(calls, context):
+    async def execute(calls, context, **kwargs):
         context.append(Message.tool(calls[0].id, "晴"))
 
     execute_calls = mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
@@ -710,7 +720,7 @@ async def test_tool_round_limit_rolls_back_when_final_response_still_calls_tools
         side_effect=[tool_completion, tool_completion, tool_completion],
     )
 
-    async def execute(calls, context):
+    async def execute(calls, context, **kwargs):
         context.append(Message.tool(calls[0].id, "晴"))
 
     mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
@@ -741,7 +751,7 @@ async def test_tool_round_limit_rolls_back_when_final_request_fails(app: App, mo
         side_effect=[tool_completion, tool_completion, ProviderError("收尾请求失败")],
     )
 
-    async def execute(calls, context):
+    async def execute(calls, context, **kwargs):
         context.append(Message.tool(calls[0].id, "晴"))
 
     mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
