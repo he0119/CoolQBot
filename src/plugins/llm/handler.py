@@ -59,11 +59,14 @@ async def chat(
     *,
     session_affinity: str = "",
     enable_tools: bool = True,
+    enable_web_search: bool = False,
 ) -> Completion:
     """发起一次对话请求"""
     model = plugin_config.resolve(model_name)
     provider = get_provider(model.provider)(model, session_affinity=session_affinity)
     tools = registry.to_params() if enable_tools else []
+    if not enable_web_search:
+        tools = [tool for tool in tools if tool.name != "web_search"]
     return await provider.chat(messages, tools or None)
 
 
@@ -150,6 +153,7 @@ class LLMHandler:
         tts_model: str = "",
         system_prompt: str | None = None,
         enable_tools: bool = True,
+        enable_web_search: bool = False,
         show_thinking: bool | None = None,
     ) -> None:
         self.model_name = model_name
@@ -158,6 +162,7 @@ class LLMHandler:
         self.send_md_pic = send_md_pic
         self.tts_model = tts_model
         self.enable_tools = enable_tools
+        self.enable_web_search = enable_web_search
         self.show_thinking = plugin_config.send_thinking if show_thinking is None else show_thinking
         self.context: list[Message] = []
 
@@ -190,19 +195,21 @@ class LLMHandler:
 
         started_at = perf_counter()
         logger.info(
-            "LLM 会话开始请求（会话={}，模型={}，上下文消息={}，输入字符={}，图片={}，工具={}）",
+            "LLM 会话开始请求（会话={}，模型={}，上下文消息={}，输入字符={}，图片={}，工具={}，网页搜索={}）",
             self.log_id,
             self.model_name,
             context_start,
             len(content),
             len(images or []),
             "启用" if self.enable_tools else "禁用",
+            "启用" if self.enable_web_search else "禁用",
         )
         completion = await chat(
             self.model_name,
             self.context,
             session_affinity=self.session_affinity,
             enable_tools=self.enable_tools,
+            enable_web_search=self.enable_web_search,
         )
         if completion.tool_calls and not self.enable_tools:
             del self.context[context_start:]
@@ -239,6 +246,7 @@ class LLMHandler:
                     self.context,
                     session_affinity=self.session_affinity,
                     enable_tools=self.enable_tools,
+                    enable_web_search=self.enable_web_search,
                 )
                 total_usage = total_usage + completion.usage
                 actual_model = completion.model or actual_model

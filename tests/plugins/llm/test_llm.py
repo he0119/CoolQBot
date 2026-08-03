@@ -169,6 +169,39 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
 
     request = route.calls[0].request
     assert UUID(request.headers["x-session-affinity"]).version == 4
+    tool_names = {tool["function"]["name"] for tool in json.loads(request.content)["tools"]}
+    assert "web_fetch" in tool_names
+    assert "web_search" not in tool_names
+
+
+@respx.mock(assert_all_called=True)
+async def test_llm_search_option_enables_web_search(app: App, respx_mock: MockRouter, mock_models):
+    """-s 按次启用网页搜索，同时保留默认可用的网页读取工具。"""
+    route = respx_mock.post("https://api.example.com/chat/completions").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "model": "test-model",
+                "choices": [{"finish_reason": "stop", "message": {"role": "assistant", "content": "搜索结果"}}],
+            },
+        )
+    )
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/llm -s 查询新消息"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            Message("搜索结果\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0"),
+            True,
+        )
+
+    payload = json.loads(route.calls[0].request.content)
+    tool_names = {tool["function"]["name"] for tool in payload["tools"]}
+    assert {"web_search", "web_fetch"} <= tool_names
 
 
 async def test_llm_group_mention_uses_default_chat_flow(app: App, mock_models, mocker):
@@ -214,6 +247,9 @@ async def test_create_handler_prefers_markdown_unless_render_is_explicit(app: Ap
     rendered_handler = await _create_handler(user, render=True)
     assert rendered_handler.send_markdown is False
     assert rendered_handler.send_md_pic is True
+
+    search_handler = await _create_handler(user, search=True)
+    assert search_handler.enable_web_search is True
 
 
 async def test_llm_mention_requires_to_me_message(app: App, mock_models):
@@ -743,6 +779,7 @@ async def test_disabled_tools_are_not_executed(app: App, mock_models, mocker):
     assert chat.await_args.kwargs == {
         "session_affinity": handler.session_affinity,
         "enable_tools": False,
+        "enable_web_search": False,
     }
 
 

@@ -80,6 +80,7 @@ llm_cmd = on_alconna(
         Option("--model", Args["model#模型名称", str], help_text="本次使用指定模型"),
         Option("-c|--context", default=False, action=store_true, help_text="启用多轮对话"),
         Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
+        Option("-s|--search", default=False, action=store_true, help_text="启用网页搜索"),
         Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
         Subcommand(
             "model",
@@ -157,6 +158,7 @@ async def _create_handler(
     *,
     selected_model: str = "",
     render: bool = False,
+    search: bool = False,
     use_tts: bool = False,
 ) -> LLMHandler:
     """按当前会话设置创建处理器。"""
@@ -185,6 +187,7 @@ async def _create_handler(
         send_markdown=plugin_config.prefer_markdown and not render,
         send_md_pic=render or plugin_config.md_to_pic,
         tts_model=tts_model,
+        enable_web_search=search,
     )
 
 
@@ -396,6 +399,7 @@ async def llm_handle(
     model_name: Query[str] = Query("model.model"),
     use_context: Query[bool] = Query("context.value", False),
     render: Query[bool] = Query("render.value", False),
+    search: Query[bool] = Query("search.value", False),
     use_tts: Query[bool] = Query("tts.value", False),
 ):
     if not content.available and not img.available:
@@ -414,6 +418,7 @@ async def llm_handle(
             user,
             selected_model=model_name.result if model_name.available else "",
             render=render.result,
+            search=search.result,
             use_tts=use_tts.result,
         )
     except LLMSetupError as e:
