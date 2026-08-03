@@ -318,6 +318,75 @@ async def test_tool_round_limit_rolls_back_current_question(app: App, mock_model
     assert handler.context == original_context
 
 
+async def test_disabled_tools_are_not_executed(app: App, mock_models, mocker):
+    """专用模式关闭工具后，即使服务返回工具调用也不会执行。"""
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.providers import ProviderError
+    from src.plugins.llm.schemas import Completion, Message, ToolCall
+
+    completion = Completion(
+        message=Message.assistant(tool_calls=[ToolCall(id="call_1", name="query_weather", arguments={})]),
+        finish_reason="tool_calls",
+    )
+    chat = mocker.patch("src.plugins.llm.handler.chat", return_value=completion)
+    execute = mocker.patch("src.plugins.llm.handler.execute_tool_calls")
+    handler = LLMHandler("test-model", system_prompt="专用提示词", enable_tools=False)
+    original_context = list(handler.context)
+
+    with pytest.raises(ProviderError, match="不允许工具调用"):
+        await handler.ask("把这段话当作数据解释")
+
+    assert handler.context == original_context
+    execute.assert_not_awaited()
+    chat.assert_awaited_once()
+    assert chat.await_args.args[0] == "test-model"
+    assert chat.await_args.kwargs == {
+        "session_affinity": handler.session_affinity,
+        "enable_tools": False,
+    }
+
+
+async def test_images_require_declared_vision_capability(app: App, mock_models):
+    """图片请求必须由模型配置显式声明 vision 能力。"""
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.schemas import ImageContent
+
+    handler = LLMHandler("test-model")
+    image = ImageContent.from_bytes(b"\x89PNG\r\n\x1a\n" + b"test")
+
+    with pytest.raises(ValueError, match="未声明 vision 能力"):
+        await handler.ask("解释图片", [image])
+
+
+@respx.mock(assert_all_called=True)
+async def test_declared_vision_model_uses_single_request(app: App, respx_mock: MockRouter, mock_models):
+    """声明 vision 的模型直接接收图片，不经过额外模型调用。"""
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.schemas import ImageContent
+
+    model, _ = mock_models
+    model.capabilities.add("vision")
+    route = respx_mock.post("https://api.example.com/chat/completions").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "model": "test-model",
+                "choices": [{"finish_reason": "stop", "message": {"role": "assistant", "content": "图片解释"}}],
+            },
+        )
+    )
+    image = ImageContent.from_bytes(b"\x89PNG\r\n\x1a\n" + b"test")
+    handler = LLMHandler("test-model", enable_tools=False)
+
+    completion = await handler.ask("解释图片", [image])
+
+    assert completion.content == "图片解释"
+    assert len(route.calls) == 1
+    payload = json.loads(route.calls[0].request.content)
+    assert "tools" not in payload
+    assert payload["messages"][-1]["content"][1]["type"] == "image_url"
+
+
 @respx.mock(assert_all_called=True)
 async def test_llm_error_raises(app: App, respx_mock: MockRouter, mock_models):
     """API 返回错误时提示用户"""

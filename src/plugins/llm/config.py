@@ -17,6 +17,9 @@ from pydantic import BaseModel, Field, model_validator
 ProviderName = Literal["chat", "responses", "anthropic"]
 """支持的 API 格式"""
 
+ModelCapability = Literal["vision"]
+"""可由模型配置显式声明的能力"""
+
 DEFAULT_BASE_URLS: dict[str, str] = {
     "chat": "https://api.deepseek.com",
     "responses": "https://api.openai.com/v1",
@@ -86,6 +89,8 @@ class ModelConfig(BaseModel):
     """非流式请求的超时时间（秒）"""
     extra_body: dict[str, Any] = Field(default_factory=dict)
     """附加到请求体的额外字段，用于传递各服务商的特有参数"""
+    capabilities: set[ModelCapability] = Field(default_factory=set)
+    """模型能力；vision 表示可直接接收图片"""
     quota: QuotaConfig | None = None
     """该模型的额度查询配置，留空时不支持额度查询"""
 
@@ -117,6 +122,26 @@ class ScopedConfig(BaseModel):
     """多轮对话中等待用户输入的超时时间（秒）"""
     max_tool_rounds: int = 5
     """单次提问中允许的最大工具调用轮数，防止模型陷入循环"""
+    zssm_model: str = ""
+    """解释模式使用的模型；留空时使用当前群组模型"""
+    zssm_vision_model: str = ""
+    """解释模型不支持图片时使用的视觉模型；必须声明 vision 能力"""
+    zssm_max_images: int = 2
+    """解释模式单次允许的最大图片数量"""
+    zssm_max_image_bytes: int = 10 * 1024 * 1024
+    """解释模式单张图片的最大字节数"""
+    zssm_max_resources: int = 2
+    """解释模式单次读取的最大网页或 PDF 数量"""
+    zssm_max_resource_bytes: int = 10 * 1024 * 1024
+    """解释模式单个网页或 PDF 的最大下载字节数"""
+    zssm_max_resource_chars: int = 30_000
+    """解释模式单个网页或 PDF 提取后的最大字符数"""
+    zssm_max_pdf_pages: int = 50
+    """解释模式读取 PDF 的最大页数"""
+    zssm_resource_timeout: int = 30
+    """解释模式下载网页或 PDF 的超时时间（秒）"""
+    zssm_resource_proxy: str | None = None
+    """解释模式下载网页或 PDF 使用的代理"""
     tts_base_url: str = ""
     """GPT-SoVITS 服务地址，留空则禁用语音功能"""
     tts_access_token: str = ""

@@ -615,11 +615,11 @@ dependencies = [
     { name = "nonebot-plugin-user", extra = ["inspect"] },
     { name = "nonebot-plugin-waiter" },
     { name = "nonebot-plugin-wordcloud" },
-    { name = "nonebot-plugin-zssm" },
     { name = "nonebot-session-to-uninfo" },
     { name = "nonebot2", extra = ["aiohttp", "fastapi", "httpx", "websockets"] },
     { name = "playwright" },
     { name = "pydantic" },
+    { name = "pymupdf" },
     { name = "uvicorn", extra = ["standard"] },
     { name = "uvicorn-worker" },
 ]
@@ -676,11 +676,11 @@ requires-dist = [
     { name = "nonebot-plugin-user", extras = ["inspect"], specifier = ">=0.6.1" },
     { name = "nonebot-plugin-waiter", specifier = ">=0.8.1" },
     { name = "nonebot-plugin-wordcloud", specifier = ">=0.11.1" },
-    { name = "nonebot-plugin-zssm", git = "https://github.com/djkcyl/nonebot-plugin-zssm.git" },
     { name = "nonebot-session-to-uninfo", specifier = ">=0.0.2" },
     { name = "nonebot2", extras = ["aiohttp", "fastapi", "httpx", "websockets"], specifier = ">=2.5.0" },
     { name = "playwright", specifier = "==1.61.0" },
     { name = "pydantic", specifier = ">=2.13.4" },
+    { name = "pymupdf", specifier = ">=1.25.5" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.52.1" },
     { name = "uvicorn-worker", specifier = ">=0.4.0" },
 ]
@@ -2270,19 +2270,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/22/6b/737c7f2062e382c963c5c54e27a90e116d1acf5ecdbf6d369f6c0c888e91/nonebot_plugin_wordcloud-0.11.1.tar.gz", hash = "sha256:e590b54f5a0ef333dd756bc57e50e95ce0cb598623693bf0b64071221736dd75", size = 7259656, upload-time = "2026-07-03T08:47:30.086Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8e/c9/47ad401d373c2689d2492e628beb8583a5ed40ccccd59b35815dba7c74de/nonebot_plugin_wordcloud-0.11.1-py3-none-any.whl", hash = "sha256:d52d6c5e121fd5c57e86a937bbe6ed1676ef3a761b3985779564948e46acfa7b", size = 7265967, upload-time = "2026-07-03T08:47:27.587Z" },
-]
-
-[[package]]
-name = "nonebot-plugin-zssm"
-version = "0.3.7"
-source = { git = "https://github.com/djkcyl/nonebot-plugin-zssm.git#e5f95eb3acdce3c7aad2e0eafd6fe39b305d38ca" }
-dependencies = [
-    { name = "httpx" },
-    { name = "nonebot-plugin-alconna" },
-    { name = "nonebot2", extra = ["fastapi", "websockets"] },
-    { name = "pillow" },
-    { name = "playwright" },
-    { name = "pymupdf" },
 ]
 
 [[package]]

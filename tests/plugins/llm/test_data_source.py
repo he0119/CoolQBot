@@ -82,9 +82,16 @@ def test_model_config_defaults(app: App):
 
     chat = ModelConfig(name="deepseek-chat")
     assert chat.model == "deepseek-chat"
+    assert chat.capabilities == set()
 
-    anthropic = ModelConfig(name="claude", provider="anthropic", model="claude-opus-5")
+    anthropic = ModelConfig(
+        name="claude",
+        provider="anthropic",
+        model="claude-opus-5",
+        capabilities={"vision"},
+    )
     assert anthropic.model == "claude-opus-5"
+    assert anthropic.capabilities == {"vision"}
 
     config = ScopedConfig(models=[chat, anthropic])
     assert config.resolve("deepseek-chat").base_url == "https://api.deepseek.com"
