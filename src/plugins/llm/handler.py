@@ -30,6 +30,11 @@ if TYPE_CHECKING:
 THINK_PATTERN = re.compile(r"<think>(.*?)</think>", re.DOTALL)
 """部分服务商把推理内容混在正文的 think 标签里"""
 
+TOOL_ROUND_LIMIT_PROMPT = (
+    "工具调用轮数已达到上限。请停止调用工具，仅根据已经获取的信息直接回答用户；如果信息不足，请明确说明尚未完成的部分。"
+)
+"""工具调用达到上限后用于强制生成收尾回复的临时提示词。"""
+
 ReactionStatus = Literal["fail", "thinking", "done"]
 ToolWaitNotifier = Callable[[int, int, int], Awaitable[None]]
 REACTION_EMOJIS: dict[ReactionStatus, tuple[str, str]] = {
@@ -172,8 +177,8 @@ class LLMHandler:
     ) -> Completion:
         """追加一轮用户输入并请求模型
 
-        模型请求工具调用时自动执行并继续请求，直到给出最终回复
-        或达到 `max_tool_rounds` 轮数上限。
+        模型请求工具调用时自动执行并继续请求，直到给出最终回复；
+        达到 `max_tool_rounds` 轮数上限后禁用工具生成收尾回复。
         """
         if images and "vision" not in plugin_config.get_model(self.model_name).capabilities:
             raise ValueError(f"模型 {self.model_name} 未声明 vision 能力，不能接收图片")
@@ -235,6 +240,33 @@ class LLMHandler:
                 )
                 total_usage = total_usage + completion.usage
                 actual_model = completion.model or actual_model
+
+            if completion.tool_calls:
+                logger.warning(
+                    "LLM 会话工具调用达到上限，转为无工具收尾（会话={}，上限={}，未执行调用={}）",
+                    self.log_id,
+                    plugin_config.max_tool_rounds,
+                    len(completion.tool_calls),
+                )
+                final_context = list(self.context)
+                first_non_system = next(
+                    (index for index, message in enumerate(final_context) if message.role != "system"),
+                    len(final_context),
+                )
+                final_context.insert(first_non_system, Message(role="system", content=TOOL_ROUND_LIMIT_PROMPT))
+                tool_progress.request_count += 1
+                try:
+                    completion = await chat(
+                        self.model_name,
+                        final_context,
+                        session_affinity=self.session_affinity,
+                        enable_tools=False,
+                    )
+                except Exception:
+                    del self.context[context_start:]
+                    raise
+                total_usage = total_usage + completion.usage
+                actual_model = completion.model or actual_model
         finally:
             if notice_task:
                 notice_task.cancel()
@@ -244,12 +276,12 @@ class LLMHandler:
         if completion.tool_calls:
             del self.context[context_start:]
             logger.warning(
-                "LLM 会话工具调用超过上限（会话={}，上限={}，待执行调用={}）",
+                "LLM 会话无工具收尾仍返回工具调用（会话={}，上限={}，调用数量={}）",
                 self.log_id,
                 plugin_config.max_tool_rounds,
                 len(completion.tool_calls),
             )
-            raise ProviderError(f"工具调用超过上限（{plugin_config.max_tool_rounds} 轮）")
+            raise ProviderError(f"工具调用达到上限后仍未生成最终回复（{plugin_config.max_tool_rounds} 轮）")
 
         completion.usage = total_usage
         completion.model = actual_model or plugin_config.resolve(self.model_name).model

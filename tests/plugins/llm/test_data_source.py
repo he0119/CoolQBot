@@ -205,7 +205,7 @@ async def test_set_and_get_tts_model(app: App, mocker):
 
 
 def test_model_config_defaults(app: App):
-    """模型配置的默认值：model 跟随 name，解析时按格式选取 base_url"""
+    """模型配置的默认值：模型名、服务地址和工具轮数。"""
     from src.plugins.llm.config import ModelConfig, ScopedConfig
 
     chat = ModelConfig(name="deepseek-chat")
@@ -222,6 +222,7 @@ def test_model_config_defaults(app: App):
     assert anthropic.capabilities == {"vision"}
 
     config = ScopedConfig(models=[chat, anthropic])
+    assert config.max_tool_rounds == 10
     assert config.tool_notice_delay == 10.0
     assert config.tool_notice_interval == 60.0
     assert config.resolve("deepseek-chat").base_url == "https://api.deepseek.com"

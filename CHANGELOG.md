@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Fixed
 
 - 修复 SQLite 单连接池导致并发会话互相回滚、群级 LLM 配置写入误报成功的问题
+- 修复大模型工具调用达到轮数上限后直接失败的问题，改为基于已有结果生成收尾回复
 
 ### Removed
 
