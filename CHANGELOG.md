@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-08-04
+
 ### Added
 
 - 添加大模型对话插件 (llm)，支持 Chat Completions、Responses 与 Anthropic Messages 三种 API 格式、命令及群聊 @ 对话、全局和模型级配置、图片输入、响应统计、会话亲和及模型额度查询
@@ -804,7 +806,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.28.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.0...HEAD
+[0.29.0]: https://github.com/he0119/CoolQBot/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/he0119/CoolQBot/compare/v0.27.7...v0.28.0
 [0.27.7]: https://github.com/he0119/CoolQBot/compare/v0.27.6...v0.27.7
 [0.27.6]: https://github.com/he0119/CoolQBot/compare/v0.27.5...v0.27.6
