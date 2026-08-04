@@ -12,7 +12,7 @@ def test_builtin_tool_schemas(app: App):
     """内置工具向模型暴露清晰且最小的参数 schema。"""
     from src.plugins.llm.tools import registry
 
-    params = {param.name: param for param in registry.to_params(enabled_groups={"search"})}
+    params = {param.name: param for param in registry.to_params()}
 
     weather = params["query_weather"].parameters
     assert weather["required"] == ["location"]
@@ -87,20 +87,17 @@ def test_builtin_tool_schemas(app: App):
     }
 
 
-def test_search_tool_is_opt_in_but_ff14_tools_are_default(app: App):
-    """网页搜索按需开放，FF14 只读工具随普通请求提供。"""
+def test_all_builtin_tools_are_registered(app: App):
+    """Agent 使用的完整工具列表包含搜索与业务工具。"""
     from src.plugins.llm.tools import registry
 
-    default_names = {param.name for param in registry.to_params()}
-    assert "web_search" not in default_names
+    names = {param.name for param in registry.to_params()}
+    assert {"web_search", "web_fetch"} <= names
     assert {
         "query_ff14_item_price",
         "query_ff14_fashion_report",
         "query_fflogs_character_ranking",
-    } <= default_names
-
-    search_names = {param.name for param in registry.to_params(enabled_groups={"search"})}
-    assert "web_search" in search_names
+    } <= names
 
 
 async def test_query_weather_tool(app: App, mocker: MockerFixture):
@@ -182,7 +179,6 @@ async def test_web_search_tool_limits_and_normalizes_results(app: App, mocker: M
                 name="web_search",
                 arguments={"query": "Python 3.14", "max_results": 99},
             ),
-            enabled_groups={"search"},
         )
     )
 
@@ -271,7 +267,6 @@ async def test_web_search_tool_hides_backend_error(app: App, mocker: MockerFixtu
             name="web_search",
             arguments={"query": "测试搜索"},
         ),
-        enabled_groups={"search"},
     )
 
     assert result == "错误：工具 web_search 执行失败：网页搜索超时"

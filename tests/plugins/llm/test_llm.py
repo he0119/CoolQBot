@@ -46,18 +46,16 @@ def test_dialogue_commands_are_separate_from_management(app: App):
     assert not llm_cmd.command().parse("/llm 你好").matched
 
 
-async def test_chat_rejects_removed_search_flag(app: App):
-    """纯对话提示改用默认支持搜索的工具增强命令。"""
-    from src.plugins.llm import chat_cmd
+@pytest.mark.parametrize("flag", ["-s", "--search"])
+def test_removed_search_flags_are_plain_dialogue_content(app: App, flag: str):
+    """已移除的搜索参数不再保留特殊语义。"""
+    from src.plugins.llm import _parse_mention_text, chat_command
 
-    async with app.test_matcher() as ctx:
-        adapter = get_adapter(Adapter)
-        bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/chat -s 查询"))
+    result = chat_command.parse(f"/chat {flag} 查询")
 
-        ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "纯对话不支持网页搜索，请使用 /agent", True, at_sender=True)
-        ctx.should_finished(chat_cmd)
+    assert result.matched
+    assert result.query("content") == (flag, "查询")
+    assert _parse_mention_text(f"{flag} 查询").text == f"{flag} 查询"
 
 
 def test_session_affinity_is_per_conversation(app: App, mock_models):
@@ -306,7 +304,6 @@ async def test_create_handler_prefers_markdown_unless_render_is_explicit(app: Ap
     assert handler.send_markdown is True
     assert handler.send_md_pic is False
     assert handler.enable_tools is False
-    assert handler.enable_web_search is False
 
     rendered_handler = await _create_handler(user, render=True)
     assert rendered_handler.send_markdown is False
@@ -314,7 +311,6 @@ async def test_create_handler_prefers_markdown_unless_render_is_explicit(app: Ap
 
     agent_handler = await _create_handler(user, enable_tools=True)
     assert agent_handler.enable_tools is True
-    assert agent_handler.enable_web_search is True
 
 
 async def test_llm_mention_requires_to_me_message(app: App, mock_models):
@@ -482,6 +478,8 @@ async def test_llm_handler_logs_metadata_without_content(app: App, mock_models, 
     assert "abcdef12" in log_text
     assert "test-model" in log_text
     assert "actual-model" in log_text
+    assert "工具" in log_text
+    assert "网页搜索" not in log_text
     assert "private-input" not in log_text
     assert "private-output" not in log_text
 
@@ -629,8 +627,8 @@ async def test_llm_with_tool(app: App, respx_mock: MockRouter, mock_models):
 @pytest.mark.parametrize(
     ("count", "request_count", "tool_call_count", "message_id", "expected", "expected_reply"),
     [
-        (1, 1, 2, None, "🔍 正在查询资料（模型请求 1 次，工具调用 2 个），请稍候……", True),
-        (2, 3, 4, "42", "⏳ 查询仍在进行（模型请求 3 次，工具调用 4 个），请再稍候……", "42"),
+        (1, 1, 2, None, "🔍 正在查询资料（模型请求 1/10 次，工具调用 2 次），请稍候……", True),
+        (2, 3, 4, "42", "⏳ 查询仍在进行（模型请求 3/10 次，工具调用 4 次），请再稍候……", "42"),
     ],
 )
 async def test_tool_wait_notice_replies_to_trigger_message(
@@ -645,7 +643,9 @@ async def test_tool_wait_notice_replies_to_trigger_message(
 ):
     """工具等待提示回复触发消息，并区分首次与后续心跳。"""
     from src.plugins.llm import _send_tool_wait_notice
+    from src.plugins.llm.config import plugin_config
 
+    mocker.patch.object(plugin_config, "max_requests", 10)
     message = mocker.Mock()
     message.send = mocker.AsyncMock()
     text = mocker.patch("src.plugins.llm.UniMessage.text", return_value=message)
@@ -707,10 +707,10 @@ async def test_tool_wait_notice_repeats_until_final_completion(app: App, mock_mo
     assert notices == [(1, 1, 1), (2, 2, 1)]
 
 
-async def test_tool_round_limit_generates_final_response_without_tools(app: App, mock_models, mocker):
-    """达到工具轮数上限后基于已有结果生成无工具收尾回复。"""
+async def test_request_limit_generates_final_response_without_tools(app: App, mock_models, mocker):
+    """最后一次模型请求基于已有工具结果生成无工具收尾回复。"""
     from src.plugins.llm.config import plugin_config
-    from src.plugins.llm.handler import TOOL_ROUND_LIMIT_PROMPT, LLMHandler
+    from src.plugins.llm.handler import REQUEST_LIMIT_PROMPT, LLMHandler
     from src.plugins.llm.schemas import Completion, Message, ToolCall, Usage
 
     first_tool_completion = Completion(
@@ -719,22 +719,16 @@ async def test_tool_round_limit_generates_final_response_without_tools(app: App,
         usage=Usage(input_tokens=1, output_tokens=2),
         model="first-model",
     )
-    pending_tool_completion = Completion(
-        message=Message.assistant(tool_calls=[ToolCall(id="call_2", name="web_search", arguments={})]),
-        finish_reason="tool_calls",
-        usage=Usage(input_tokens=3, output_tokens=4),
-        model="second-model",
-    )
     final_completion = Completion(
         message=Message.assistant(content="根据已有天气信息：晴。"),
         finish_reason="stop",
         usage=Usage(input_tokens=5, output_tokens=6),
         model="final-model",
     )
-    mocker.patch.object(plugin_config, "max_tool_rounds", 1)
+    mocker.patch.object(plugin_config, "max_requests", 2)
     chat = mocker.patch(
         "src.plugins.llm.handler.chat",
-        side_effect=[first_tool_completion, pending_tool_completion, final_completion],
+        side_effect=[first_tool_completion, final_completion],
     )
 
     async def execute(calls, context, **kwargs):
@@ -746,24 +740,24 @@ async def test_tool_round_limit_generates_final_response_without_tools(app: App,
     completion = await handler.ask("天气")
 
     assert completion.content == "根据已有天气信息：晴。"
-    assert completion.usage == Usage(input_tokens=9, output_tokens=12)
+    assert completion.usage == Usage(input_tokens=6, output_tokens=8)
     assert completion.model == "final-model"
     assert [message.role for message in handler.context] == ["system", "user", "assistant", "tool", "assistant"]
     assert handler.context[-1] is completion.message
     execute_calls.assert_awaited_once()
     assert execute_calls.await_args.args[0] == first_tool_completion.tool_calls
     assert execute_calls.await_args.args[1] is handler.context
-    assert chat.await_count == 3
+    assert chat.await_count == 2
     final_call = chat.await_args_list[-1]
     assert final_call.kwargs == {"session_affinity": handler.session_affinity, "enable_tools": False}
     assert final_call.args[1][:2] == [
         Message(role="system", content="测试人设"),
-        Message(role="system", content=TOOL_ROUND_LIMIT_PROMPT),
+        Message(role="system", content=REQUEST_LIMIT_PROMPT),
     ]
     assert final_call.args[1][2:] == handler.context[1:-1]
 
 
-async def test_tool_round_limit_rolls_back_when_final_response_still_calls_tools(app: App, mock_models, mocker):
+async def test_request_limit_rolls_back_when_final_response_still_calls_tools(app: App, mock_models, mocker):
     """无工具收尾仍返回工具调用时不保留不完整的上下文。"""
     from src.plugins.llm.config import plugin_config
     from src.plugins.llm.handler import LLMHandler
@@ -774,10 +768,10 @@ async def test_tool_round_limit_rolls_back_when_final_response_still_calls_tools
         message=Message.assistant(tool_calls=[ToolCall(id="call_1", name="get_weather", arguments={})]),
         finish_reason="tool_calls",
     )
-    mocker.patch.object(plugin_config, "max_tool_rounds", 1)
+    mocker.patch.object(plugin_config, "max_requests", 2)
     chat = mocker.patch(
         "src.plugins.llm.handler.chat",
-        side_effect=[tool_completion, tool_completion, tool_completion],
+        side_effect=[tool_completion, tool_completion],
     )
 
     async def execute(calls, context, **kwargs):
@@ -794,7 +788,7 @@ async def test_tool_round_limit_rolls_back_when_final_response_still_calls_tools
     assert chat.await_args_list[-1].kwargs["enable_tools"] is False
 
 
-async def test_tool_round_limit_rolls_back_when_final_request_fails(app: App, mock_models, mocker):
+async def test_request_limit_rolls_back_when_final_request_fails(app: App, mock_models, mocker):
     """无工具收尾请求失败时回滚当前问题。"""
     from src.plugins.llm.config import plugin_config
     from src.plugins.llm.handler import LLMHandler
@@ -805,10 +799,10 @@ async def test_tool_round_limit_rolls_back_when_final_request_fails(app: App, mo
         message=Message.assistant(tool_calls=[ToolCall(id="call_1", name="get_weather", arguments={})]),
         finish_reason="tool_calls",
     )
-    mocker.patch.object(plugin_config, "max_tool_rounds", 1)
+    mocker.patch.object(plugin_config, "max_requests", 2)
     mocker.patch(
         "src.plugins.llm.handler.chat",
-        side_effect=[tool_completion, tool_completion, ProviderError("收尾请求失败")],
+        side_effect=[tool_completion, ProviderError("收尾请求失败")],
     )
 
     async def execute(calls, context, **kwargs):
@@ -849,7 +843,6 @@ async def test_disabled_tools_are_not_executed(app: App, mock_models, mocker):
     assert chat.await_args.kwargs == {
         "session_affinity": handler.session_affinity,
         "enable_tools": False,
-        "enable_web_search": False,
     }
 
 

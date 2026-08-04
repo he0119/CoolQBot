@@ -23,7 +23,7 @@
 - 流式与非流式请求
 - 推理内容以引用块展示（DeepSeek 的 `reasoning_content`、Anthropic 的 `thinking`、Responses 的推理摘要）
 - 使用 emoji reaction 反馈响应状态（思考中、已完成、失败；不支持的平台自动跳过）
-- `/chat` 提供不发送工具定义的纯对话，`/agent` 默认开放包括网页搜索在内的全部工具
+- `/chat` 提供不发送工具定义的纯对话，`/agent` 默认开放全部已注册工具
 - 工具调用（function calling）适配三种 API 格式；耗时较长时定期提示模型请求与工具调用进度
 - 默认提供最终幻想 XIV 国服物价、时尚品鉴和 FFLogs 角色排名查询工具
 - 模型默认声明 `text` 能力；图片输入需要额外声明 `vision`，也可将模型配置为仅视觉能力
@@ -181,8 +181,8 @@ LLM__MD_TO_PIC=false
 LLM__RESPOND_TO_MENTION=true
 # 是否流式请求
 LLM__STREAM=false
-# 单次提问允许的最大工具调用轮数，达到上限后会禁用工具并基于已有结果收尾
-LLM__MAX_TOOL_ROUNDS=10
+# 单次提问允许的最大模型请求次数，最后一次请求会禁用工具并基于已有结果收尾
+LLM__MAX_REQUESTS=10
 # 工具调用开始后首次提示与后续重复提示的间隔（秒）
 LLM__TOOL_NOTICE_DELAY=2
 LLM__TOOL_NOTICE_INTERVAL=30
@@ -303,7 +303,7 @@ DeepSeek 字段与鉴权方式以[官方余额接口文档](https://api-docs.dee
 | `query_ff14_fashion_report`      | 查询本周时尚品鉴满分攻略                      |
 | `query_fflogs_character_ranking` | 查询国服角色的 FFLogs 副本排名                |
 
-`/chat` 和 @ 对话不会发送任何工具定义；`/agent` 默认发送全部已注册工具，包括 `web_search` 与 `web_fetch`。
+`/chat` 和普通 @ 对话不会发送任何工具定义；`/agent` 及带 `-a|--agent` 的 @ 对话默认发送全部已注册工具。
 `web_search` 使用 `ddgs` 搜索并限制单次结果数；
 模型需要详细内容时，可继续调用 `web_fetch` 读取搜索结果。
 `web_fetch` 只接受 HTTP(S) URL，会校验每次重定向并拒绝本机、内网和其他非公网地址，同时限制下载大小、

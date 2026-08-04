@@ -137,8 +137,8 @@ class ScopedConfig(BaseModel):
     """是否响应被适配器判定为发给机器人的消息（如群聊 @）"""
     context_timeout: int = 120
     """多轮对话中等待用户输入的超时时间（秒）"""
-    max_tool_rounds: int = 10
-    """单次提问中允许的最大工具调用轮数，达到上限后禁用工具生成收尾回复"""
+    max_requests: int = Field(default=10, ge=2)
+    """单次提问允许的最大模型请求次数，最后一次请求禁用工具并生成收尾回复"""
     tool_notice_delay: float = Field(default=10.0, ge=0)
     """发现工具调用后首次发送等待提示前的秒数"""
     tool_notice_interval: float = Field(default=60.0, gt=0)

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 移除模型与 DeepSeek 额度接口的内置地址，未单独配置时仅回退到 `LLM__BASE_URL`
 - 将模型 Provider 配置改为枚举，并使用 `openai_chat_completions`、`openai_responses` 与 `anthropic_messages` 完整协议名；当前版本仍兼容旧名称并输出弃用警告，旧名称将在下个版本移除
 - 将纯对话与工具调用分别独立为 `/chat` 和 `/agent`，使 `/llm` 专用于 `model`、`tts` 与 `quota`，并将 TTS 管理统一为 `list` / `set` 子命令；@ 对话复用通用选项并支持 `-a|--agent` 按次启用工具，同时规范模型列表帮助与 `--all` 参数校验
+- 将 Agent 上限统一为包含首次与收尾在内的模型请求次数，最后一次请求自动禁用工具；移除旧搜索参数的残留处理与独立网页搜索开关，Agent 统一启用全部工具
 
 ### Fixed
 

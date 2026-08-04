@@ -324,7 +324,7 @@ async def test_set_and_get_tts_model(app: App, mocker):
 
 
 def test_model_config_defaults(app: App):
-    """模型配置的默认值：模型名、服务地址和工具轮数。"""
+    """模型配置的默认值：模型名、服务地址和请求上限。"""
     from src.plugins.llm.config import ModelCapability, ModelConfig, ScopedConfig
 
     chat = ModelConfig(name="deepseek-chat")
@@ -345,7 +345,7 @@ def test_model_config_defaults(app: App):
 
     config = ScopedConfig(base_url="https://global.example.com", models=[chat, anthropic])
     assert config.prefer_markdown is False
-    assert config.max_tool_rounds == 10
+    assert config.max_requests == 10
     assert config.tool_notice_delay == 10.0
     assert config.tool_notice_interval == 60.0
     assert config.resolve("deepseek-chat").base_url == "https://global.example.com"
@@ -466,36 +466,6 @@ async def test_tool_registry_errors(app: App):
 
     assert "未注册的工具" in await registry.execute(ToolCall(id="1", name="unknown", arguments={}))
     assert "缺少必填参数" in await registry.execute(ToolCall(id="2", name="greet", arguments={}))
-
-
-async def test_tool_registry_requires_explicit_group(app: App):
-    """分组工具未显式启用时既不暴露也不执行。"""
-    from src.plugins.llm.schemas import ToolCall
-    from src.plugins.llm.tools import ToolRegistry
-
-    registry = ToolRegistry()
-    called = False
-
-    @registry.register("search", "查询资料", group="search")
-    def search(query: str) -> str:
-        nonlocal called
-        called = True
-        return query
-
-    assert registry.to_params() == []
-    assert [param.name for param in registry.to_params(enabled_groups={"search"})] == ["search"]
-    assert await registry.execute(ToolCall(id="1", name="search", arguments={"query": "资料"})) == (
-        "错误：当前未启用工具 search"
-    )
-    assert called is False
-    assert (
-        await registry.execute(
-            ToolCall(id="2", name="search", arguments={"query": "资料"}),
-            enabled_groups={"search"},
-        )
-        == "资料"
-    )
-    assert called is True
 
 
 async def test_tool_registry_logs_metadata_without_values(app: App, mocker):

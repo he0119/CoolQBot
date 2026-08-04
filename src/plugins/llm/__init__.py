@@ -174,7 +174,7 @@ chat_cmd = on_alconna(
 
 agent_command = _build_dialogue_command(
     "agent",
-    description="允许模型调用包括网页搜索在内的工具完成查询与问答",
+    description="允许模型调用工具完成查询与问答",
     example="/agent 查询成都天气",
 )
 
@@ -241,8 +241,6 @@ def _parse_mention_text(text: str) -> ChatRequest:
     if not result.matched:
         raise LLMSetupError("对话参数有误，请输入 /chat -h 查看用法", at_sender=True)
     content: tuple[str, ...] = result.query("content", ())
-    if content and content[0] in {"-s", "--search"}:
-        raise LLMSetupError("纯对话不支持网页搜索，请使用 /agent", at_sender=True)
     return ChatRequest(
         text=" ".join(content),
         model_name=result.query("model.model", ""),
@@ -292,7 +290,6 @@ async def _create_handler(
         send_md_pic=render or plugin_config.md_to_pic,
         tts_model=tts_model,
         enable_tools=enable_tools,
-        enable_web_search=enable_tools,
     )
 
 
@@ -563,8 +560,6 @@ async def _handle_dialogue_command(
     if not content.available and not img.available:
         command_name = "agent" if enable_tools else "chat"
         await matcher.finish(f"你想问什么呢？输入 /{command_name} -h 查看用法", at_sender=True)
-    if not enable_tools and content.available and content.result[0] in {"-s", "--search"}:
-        await matcher.finish("纯对话不支持网页搜索，请使用 /agent", at_sender=True)
 
     images: list[ImageContent] | None = None
     if img.available:
@@ -753,7 +748,7 @@ async def _send_tool_wait_notice(
     message_id: str | None = None,
 ) -> None:
     """提示用户工具调用仍在进行；首次与后续心跳使用不同文案。"""
-    progress = f"模型请求 {request_count} 次，工具调用 {tool_call_count} 个"
+    progress = f"模型请求 {request_count}/{plugin_config.max_requests} 次，工具调用 {tool_call_count} 次"
     text = f"🔍 正在查询资料（{progress}），请稍候……" if count == 1 else f"⏳ 查询仍在进行（{progress}），请再稍候……"
     await UniMessage.text(text).send(reply_to=message_id or True)
 

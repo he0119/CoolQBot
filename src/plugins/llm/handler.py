@@ -30,10 +30,10 @@ if TYPE_CHECKING:
 THINK_PATTERN = re.compile(r"<think>(.*?)</think>", re.DOTALL)
 """部分服务商把推理内容混在正文的 think 标签里"""
 
-TOOL_ROUND_LIMIT_PROMPT = (
-    "工具调用轮数已达到上限。请停止调用工具，仅根据已经获取的信息直接回答用户；如果信息不足，请明确说明尚未完成的部分。"
+REQUEST_LIMIT_PROMPT = (
+    "模型请求次数已达到上限。请停止调用工具，仅根据已经获取的信息直接回答用户；如果信息不足，请明确说明尚未完成的部分。"
 )
-"""工具调用达到上限后用于强制生成收尾回复的临时提示词。"""
+"""最后一次模型请求用于强制生成收尾回复的临时提示词。"""
 
 ReactionStatus = Literal["fail", "thinking", "done"]
 ToolWaitNotifier = Callable[[int, int, int], Awaitable[None]]
@@ -59,24 +59,14 @@ async def chat(
     *,
     session_affinity: str = "",
     enable_tools: bool = True,
-    enable_web_search: bool = False,
 ) -> Completion:
     """发起一次对话请求"""
     model = plugin_config.resolve(model_name)
     if not model.base_url:
         raise ValueError(f"模型 {model_name} 未配置 base_url，且未设置 LLM__BASE_URL")
     provider = get_provider(model.provider)(model, session_affinity=session_affinity)
-    enabled_groups = _get_enabled_tool_groups(enable_web_search)
-    tools = registry.to_params(enabled_groups=enabled_groups) if enable_tools else []
+    tools = registry.to_params() if enable_tools else []
     return await provider.chat(messages, tools or None)
-
-
-def _get_enabled_tool_groups(enable_web_search: bool) -> frozenset[str]:
-    """把用户入口选项转换为工具注册表分组。"""
-    groups: set[str] = set()
-    if enable_web_search:
-        groups.add("search")
-    return frozenset(groups)
 
 
 def split_content(completion: Completion) -> tuple[str, str]:
@@ -146,11 +136,9 @@ async def send_reaction(
 async def execute_tool_calls(
     calls: list[ToolCall],
     context: list[Message],
-    *,
-    enabled_groups: frozenset[str] = frozenset(),
 ) -> None:
     """并行执行模型请求的工具调用，并按原顺序把结果加入上下文"""
-    results = await asyncio.gather(*(registry.execute(call, enabled_groups=enabled_groups) for call in calls))
+    results = await asyncio.gather(*(registry.execute(call) for call in calls))
     context.extend(Message.tool(call.id, result) for call, result in zip(calls, results, strict=True))
 
 
@@ -167,7 +155,6 @@ class LLMHandler:
         tts_model: str = "",
         system_prompt: str | None = None,
         enable_tools: bool = True,
-        enable_web_search: bool = False,
         show_thinking: bool | None = None,
     ) -> None:
         self.model_name = model_name
@@ -176,7 +163,6 @@ class LLMHandler:
         self.send_md_pic = send_md_pic
         self.tts_model = tts_model
         self.enable_tools = enable_tools
-        self.enable_web_search = enable_web_search
         self.show_thinking = plugin_config.send_thinking if show_thinking is None else show_thinking
         self.context: list[Message] = []
 
@@ -199,7 +185,7 @@ class LLMHandler:
         """追加一轮用户输入并请求模型
 
         模型请求工具调用时自动执行并继续请求，直到给出最终回复；
-        达到 `max_tool_rounds` 轮数上限后禁用工具生成收尾回复。
+        最后一次模型请求禁用工具并生成收尾回复。
         """
         if images and ModelCapability.VISION not in plugin_config.get_model(self.model_name).capabilities:
             raise ValueError(f"模型 {self.model_name} 未声明 vision 能力，不能接收图片")
@@ -209,21 +195,19 @@ class LLMHandler:
 
         started_at = perf_counter()
         logger.info(
-            "LLM 会话开始请求（会话={}，模型={}，上下文消息={}，输入字符={}，图片={}，工具={}，网页搜索={}）",
+            "LLM 会话开始请求（会话={}，模型={}，上下文消息={}，输入字符={}，图片={}，工具={}）",
             self.log_id,
             self.model_name,
             context_start,
             len(content),
             len(images or []),
             "启用" if self.enable_tools else "禁用",
-            "启用" if self.enable_web_search else "禁用",
         )
         completion = await chat(
             self.model_name,
             self.context,
             session_affinity=self.session_affinity,
             enable_tools=self.enable_tools,
-            enable_web_search=self.enable_web_search,
         )
         if completion.tool_calls and not self.enable_tools:
             del self.context[context_start:]
@@ -235,63 +219,52 @@ class LLMHandler:
             raise ProviderError("当前模式不允许工具调用")
         total_usage = completion.usage
         actual_model = completion.model
-        tool_rounds = 0
         notice_task: asyncio.Task[None] | None = None
         tool_progress = _ToolWaitProgress()
         try:
-            for tool_round in range(1, plugin_config.max_tool_rounds + 1):
-                if not completion.tool_calls:
-                    break
+            while completion.tool_calls:
                 tool_progress.tool_call_count += len(completion.tool_calls)
                 if on_tool_wait and notice_task is None:
                     notice_task = asyncio.create_task(self._send_tool_wait_notices(on_tool_wait, tool_progress))
-                tool_rounds = tool_round
                 logger.info(
-                    "LLM 会话执行工具回合（会话={}，轮次={}，调用数量={}）",
+                    "LLM 会话执行工具（会话={}，模型请求={}，调用数量={}）",
                     self.log_id,
-                    tool_round,
+                    tool_progress.request_count,
                     len(completion.tool_calls),
                 )
                 self.context.append(completion.message)
-                enabled_groups = _get_enabled_tool_groups(self.enable_web_search)
-                await execute_tool_calls(completion.tool_calls, self.context, enabled_groups=enabled_groups)
+                await execute_tool_calls(completion.tool_calls, self.context)
                 tool_progress.request_count += 1
-                completion = await chat(
-                    self.model_name,
-                    self.context,
-                    session_affinity=self.session_affinity,
-                    enable_tools=self.enable_tools,
-                    enable_web_search=self.enable_web_search,
-                )
-                total_usage = total_usage + completion.usage
-                actual_model = completion.model or actual_model
-
-            if completion.tool_calls:
-                logger.warning(
-                    "LLM 会话工具调用达到上限，转为无工具收尾（会话={}，上限={}，未执行调用={}）",
-                    self.log_id,
-                    plugin_config.max_tool_rounds,
-                    len(completion.tool_calls),
-                )
-                final_context = list(self.context)
-                first_non_system = next(
-                    (index for index, message in enumerate(final_context) if message.role != "system"),
-                    len(final_context),
-                )
-                final_context.insert(first_non_system, Message(role="system", content=TOOL_ROUND_LIMIT_PROMPT))
-                tool_progress.request_count += 1
+                is_final_request = tool_progress.request_count == plugin_config.max_requests
+                request_context = self.context
+                if is_final_request:
+                    logger.warning(
+                        "LLM 会话模型请求达到上限，转为无工具收尾（会话={}，上限={}，工具调用={}）",
+                        self.log_id,
+                        plugin_config.max_requests,
+                        tool_progress.tool_call_count,
+                    )
+                    request_context = list(self.context)
+                    first_non_system = next(
+                        (index for index, message in enumerate(request_context) if message.role != "system"),
+                        len(request_context),
+                    )
+                    request_context.insert(first_non_system, Message(role="system", content=REQUEST_LIMIT_PROMPT))
                 try:
                     completion = await chat(
                         self.model_name,
-                        final_context,
+                        request_context,
                         session_affinity=self.session_affinity,
-                        enable_tools=False,
+                        enable_tools=self.enable_tools and not is_final_request,
                     )
                 except Exception:
-                    del self.context[context_start:]
+                    if is_final_request:
+                        del self.context[context_start:]
                     raise
                 total_usage = total_usage + completion.usage
                 actual_model = completion.model or actual_model
+                if is_final_request:
+                    break
         finally:
             if notice_task:
                 notice_task.cancel()
@@ -301,23 +274,24 @@ class LLMHandler:
         if completion.tool_calls:
             del self.context[context_start:]
             logger.warning(
-                "LLM 会话无工具收尾仍返回工具调用（会话={}，上限={}，调用数量={}）",
+                "LLM 会话达到模型请求上限后仍返回工具调用（会话={}，上限={}，调用数量={}）",
                 self.log_id,
-                plugin_config.max_tool_rounds,
+                plugin_config.max_requests,
                 len(completion.tool_calls),
             )
-            raise ProviderError(f"工具调用达到上限后仍未生成最终回复（{plugin_config.max_tool_rounds} 轮）")
+            raise ProviderError(f"模型请求达到上限后仍未生成最终回复（{plugin_config.max_requests} 次）")
 
         completion.usage = total_usage
         completion.model = actual_model or plugin_config.resolve(self.model_name).model
         completion.elapsed_seconds = perf_counter() - started_at
         self.context.append(completion.message)
         logger.info(
-            "LLM 会话请求完成（会话={}，模型={}，结束原因={}，工具轮次={}，I={}，O={}，C={}，耗时={:.3f}s）",
+            "LLM 会话请求完成（会话={}，模型={}，结束原因={}，模型请求={}，工具调用={}，I={}，O={}，C={}，耗时={:.3f}s）",
             self.log_id,
             completion.model,
             completion.finish_reason,
-            tool_rounds,
+            tool_progress.request_count,
+            tool_progress.tool_call_count,
             completion.usage.input_tokens,
             completion.usage.output_tokens,
             completion.usage.cache_read_tokens,
