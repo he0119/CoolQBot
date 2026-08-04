@@ -775,15 +775,19 @@ async def _ask(
     try:
         completion = await handler.ask(text, images, on_tool_wait=notify_tool_wait)
     except ProviderError as e:
-        logger.warning("LLM 调用失败（会话={}，错误类型=ProviderError）", handler.log_id)
+        logger.warning("LLM 调用失败（会话={}，错误类型=ProviderError，错误={}）", handler.log_id, e)
         await send_reaction("fail", message_id=message_id)
         await finish_matcher.finish(f"调用失败：{e}", at_sender=True)
     except ValueError as e:
-        logger.warning("LLM 调用失败（会话={}，错误类型=ValueError）", handler.log_id)
+        logger.warning("LLM 调用失败（会话={}，错误类型=ValueError，错误={}）", handler.log_id, e)
         await send_reaction("fail", message_id=message_id)
         await finish_matcher.finish(str(e), at_sender=True)
     except Exception as e:
-        logger.opt(exception=e).error("大模型调用出现未预期的错误")
+        logger.opt(exception=e).error(
+            "大模型调用出现未预期的错误（会话={}，错误类型={}）",
+            handler.log_id,
+            type(e).__name__,
+        )
         await send_reaction("fail", message_id=message_id)
         await finish_matcher.finish("调用失败，请稍后重试", at_sender=True)
 

@@ -283,6 +283,75 @@ async def test_zssm_explains_text_with_group_model(app: App, respx_mock: MockRou
     ]
 
 
+async def test_zssm_logs_provider_failure_as_warning(app: App, zssm_model, mocker):
+    """可预期的上游协议错误记录阶段和详情，但不输出异常堆栈。"""
+    from src.plugins.llm.plugins.zssm import zssm_cmd
+    from src.plugins.llm.providers import ProviderError
+
+    error = ProviderError("服务返回无效 JSON（HTTP 502，Content-Type=text/html，响应 0 字节）")
+    handler = mocker.Mock(log_id="abcd1234")
+    handler.ask = mocker.AsyncMock(side_effect=error)
+    mocker.patch("src.plugins.llm.plugins.zssm.LLMHandler", return_value=handler)
+    zssm_logger = mocker.patch("src.plugins.llm.plugins.zssm.logger")
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("zssm Python GIL"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            Message(MessageSegment.reply(1)) + f"解释失败：{error}",
+            True,
+        )
+        ctx.should_finished(zssm_cmd)
+
+    zssm_logger.warning.assert_called_once_with(
+        "解释模式失败（会话={}，模型={}，阶段={}，错误类型={}，错误={}）",
+        "abcd1234",
+        "test-model",
+        "解释模型请求",
+        "ProviderError",
+        error,
+    )
+    zssm_logger.opt.assert_not_called()
+
+
+async def test_zssm_logs_unexpected_failure_as_error(app: App, zssm_model, mocker):
+    """未预期的程序异常以 ERROR 记录上下文和堆栈。"""
+    from src.plugins.llm.plugins.zssm import zssm_cmd
+
+    error = RuntimeError("unexpected")
+    handler = mocker.Mock(log_id="abcd1234")
+    handler.ask = mocker.AsyncMock(side_effect=error)
+    mocker.patch("src.plugins.llm.plugins.zssm.LLMHandler", return_value=handler)
+    zssm_logger = mocker.patch("src.plugins.llm.plugins.zssm.logger")
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("zssm Python GIL"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            Message(MessageSegment.reply(1)) + "解释失败，请稍后重试",
+            True,
+        )
+        ctx.should_finished(zssm_cmd)
+
+    zssm_logger.warning.assert_not_called()
+    zssm_logger.opt.assert_called_once_with(exception=error)
+    zssm_logger.opt.return_value.error.assert_called_once_with(
+        "解释模式出现未预期的错误（会话={}，模型={}，阶段={}，错误类型={}）",
+        "abcd1234",
+        "test-model",
+        "解释模型请求",
+        "RuntimeError",
+    )
+
+
 @respx.mock(assert_all_called=True)
 async def test_zssm_separates_reply_and_focus(app: App, respx_mock: MockRouter, zssm_model):
     """回复消息是解释目标，命令后的文本只作为关注点。"""

@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Fixed
 
 - 将非 JSON 模型响应转换为包含 HTTP 状态、内容类型、响应大小与解析位置的可诊断 Provider 错误
+- 在大模型与解释模式日志中区分可预期警告与未预期异常，并补充会话和处理阶段上下文
 
 ## [0.29.0] - 2026-08-04
 
