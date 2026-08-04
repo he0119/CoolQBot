@@ -24,7 +24,7 @@ async def zssm_model(app: App, mocker):
 
     model = ModelConfig(
         name="test-model",
-        provider="chat",
+        provider="openai_chat_completions",
         base_url="https://api.example.com",
         api_key="sk-test",
     )
@@ -116,7 +116,7 @@ async def test_zssm_uses_temporary_model(app: App, respx_mock: MockRouter, zssm_
     default_model, _ = zssm_model
     temporary_model = ModelConfig(
         name="temporary",
-        provider="chat",
+        provider="openai_chat_completions",
         base_url="https://temporary.example.com",
         api_key="sk-temporary",
     )
@@ -212,7 +212,7 @@ async def test_zssm_explains_text_with_group_model(app: App, respx_mock: MockRou
     explain_model = ModelConfig(
         name="explain",
         model="explain-upstream",
-        provider="chat",
+        provider="openai_chat_completions",
         base_url="https://api.example.com",
         api_key="sk-test",
     )

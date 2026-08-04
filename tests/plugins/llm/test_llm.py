@@ -23,7 +23,7 @@ def mock_models(mocker):
 
     config = ModelConfig(
         name="test-model",
-        provider="chat",
+        provider="openai_chat_completions",
         base_url="https://api.example.com",
         api_key="sk-test",
     )

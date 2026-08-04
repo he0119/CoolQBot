@@ -5,18 +5,17 @@
 ```env
 LLM__BASE_URL=https://api.example.com
 LLM__API_KEY=sk-xxx
-LLM__MODELS='[{"name":"model-a","provider":"chat"}]'
+LLM__MODELS='[{"name":"model-a","provider":"openai_chat_completions"}]'
 ```
 """
 
 from enum import StrEnum
 from typing import Annotated, Any, Literal
 
-from nonebot import get_plugin_config
+from nonebot import get_plugin_config, logger
 from pydantic import AliasChoices, BaseModel, Field, model_validator
 
-ProviderName = Literal["chat", "responses", "anthropic"]
-"""支持的 API 格式"""
+from .providers import LEGACY_PROVIDER_NAMES, ProviderName
 
 
 class ModelCapability(StrEnum):
@@ -64,7 +63,7 @@ class ModelConfig(BaseModel):
     """模型标识，命令中使用此名称选择模型"""
     model: str = ""
     """传给 API 的模型名，留空时与 name 相同"""
-    provider: ProviderName = "chat"
+    provider: ProviderName = ProviderName.OPENAI_CHAT_COMPLETIONS
     """API 格式"""
     base_url: str = ""
     """服务地址，留空时回退到全局 base_url"""
@@ -88,6 +87,25 @@ class ModelConfig(BaseModel):
     """模型能力；默认支持文本，vision 表示可直接接收图片"""
     quota: QuotaConfig | None = None
     """该模型的额度查询配置，留空时不支持额度查询"""
+
+    @model_validator(mode="before")
+    @classmethod
+    def migrate_legacy_provider(cls, data: Any) -> Any:
+        """临时兼容旧 Provider 名称，并提示迁移。"""
+        if not isinstance(data, dict):
+            return data
+        legacy_name = data.get("provider")
+        if not isinstance(legacy_name, str) or legacy_name not in LEGACY_PROVIDER_NAMES:
+            return data
+
+        provider = LEGACY_PROVIDER_NAMES[legacy_name]
+        logger.warning(
+            "模型 Provider 配置已弃用（模型={}，旧值={}，新值={}，将在下个版本移除）",
+            data.get("name", "未命名"),
+            legacy_name,
+            provider.value,
+        )
+        return {**data, "provider": provider}
 
     @model_validator(mode="after")
     def fill_defaults(self) -> "ModelConfig":

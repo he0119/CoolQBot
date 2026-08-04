@@ -333,7 +333,7 @@ def test_model_config_defaults(app: App):
 
     anthropic = ModelConfig(
         name="claude",
-        provider="anthropic",
+        provider="anthropic_messages",
         model="claude-opus-5",
         capabilities={"vision"},
     )

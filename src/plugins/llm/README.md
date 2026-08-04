@@ -4,14 +4,17 @@
 
 ## 支持的 API 格式
 
-| 格式        | 请求地址                      | 认证方式                | 适用服务                              |
-| ----------- | ----------------------------- | ----------------------- | ------------------------------------- |
-| `chat`      | `{base_url}/chat/completions` | `Authorization: Bearer` | DeepSeek、OpenAI 兼容接口、硅基流动等 |
-| `responses` | `{base_url}/responses`        | `Authorization: Bearer` | OpenAI Responses API                  |
-| `anthropic` | `{base_url}/v1/messages`      | `x-api-key`             | Anthropic Claude                      |
+| 格式                      | 请求地址                      | 认证方式                | 适用服务                              |
+| ------------------------- | ----------------------------- | ----------------------- | ------------------------------------- |
+| `openai_chat_completions` | `{base_url}/chat/completions` | `Authorization: Bearer` | DeepSeek、OpenAI 兼容接口、硅基流动等 |
+| `openai_responses`        | `{base_url}/responses`        | `Authorization: Bearer` | OpenAI Responses API                  |
+| `anthropic_messages`      | `{base_url}/v1/messages`      | `x-api-key`             | Anthropic Claude                      |
 
 三种格式在请求结构上差异较大（system 提示词的位置、工具定义的嵌套层级、图片编码方式、
 用量字段名各不相同），插件内部统一归一化，命令与配置的使用方式完全一致。
+
+当前版本仍兼容旧名称 `chat`、`responses` 和 `anthropic`，加载配置时会输出弃用警告；
+这些旧名称将在下个版本移除，请尽快改用表中的完整协议名。
 
 ## 功能
 
@@ -211,7 +214,7 @@ LLM__MODELS='
 [
   {
     "name": "deepseek",
-    "provider": "chat",
+    "provider": "openai_chat_completions",
     "model": "deepseek-chat",
     "quota": {
       "provider": "deepseek"
@@ -219,7 +222,7 @@ LLM__MODELS='
   },
   {
     "name": "deepseek-aperture",
-    "provider": "chat",
+    "provider": "openai_chat_completions",
     "model": "deepseek-chat",
     "base_url": "https://ai.example.com/v1",
     "quota": {
@@ -229,7 +232,7 @@ LLM__MODELS='
   },
   {
     "name": "gpt",
-    "provider": "responses",
+    "provider": "openai_responses",
     "model": "gpt-5",
     "base_url": "https://api.openai.com/v1",
     "api_key": "sk-openai-xxx",
@@ -237,7 +240,7 @@ LLM__MODELS='
   },
   {
     "name": "claude",
-    "provider": "anthropic",
+    "provider": "anthropic_messages",
     "model": "claude-opus-5",
     "base_url": "https://api.anthropic.com",
     "api_key": "sk-ant-xxx",
@@ -260,7 +263,7 @@ LLM__TTS_MODEL=default
 | -------------- | ------------------------------------------------ |
 | `name`         | 模型标识，命令中用此名称选择模型                 |
 | `model`        | 传给 API 的模型名，留空时与 `name` 相同          |
-| `provider`     | API 格式，`chat` / `responses` / `anthropic`     |
+| `provider`     | API 格式，见上方三种完整协议名                   |
 | `base_url`     | 服务地址，留空时回退到 `LLM__BASE_URL`           |
 | `api_key`      | 密钥，留空时回退到 `LLM__API_KEY`                |
 | `prompt`       | 人设，留空时回退到 `LLM__PROMPT`                 |
