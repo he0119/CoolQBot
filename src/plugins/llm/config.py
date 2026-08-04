@@ -20,16 +20,6 @@ ProviderName = Literal["chat", "responses", "anthropic"]
 ModelCapability = Literal["vision"]
 """可由模型配置显式声明的能力"""
 
-DEFAULT_BASE_URLS: dict[str, str] = {
-    "chat": "https://api.deepseek.com",
-    "responses": "https://api.openai.com/v1",
-    "anthropic": "https://api.anthropic.com",
-}
-"""各格式的默认服务地址"""
-
-DEEPSEEK_QUOTA_API_URL = "https://api.deepseek.com/user/balance"
-"""DeepSeek 官方余额查询地址"""
-
 
 class BaseQuotaConfig(BaseModel):
     """额度查询的共用配置"""
@@ -72,7 +62,7 @@ class ModelConfig(BaseModel):
     provider: ProviderName = "chat"
     """API 格式"""
     base_url: str = ""
-    """服务地址，留空时回退到全局 base_url 或按格式取默认值"""
+    """服务地址，留空时回退到全局 base_url"""
     api_key: str = ""
     """密钥，留空时回退到全局 api_key"""
     prompt: str = ""
@@ -207,7 +197,7 @@ class ScopedConfig(BaseModel):
         """
         model = self.get_model(name).model_copy()
         if not model.base_url:
-            model.base_url = self.base_url or DEFAULT_BASE_URLS[model.provider]
+            model.base_url = self.base_url
         if not model.api_key:
             model.api_key = self.api_key
         if not model.prompt:

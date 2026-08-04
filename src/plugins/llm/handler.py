@@ -63,6 +63,8 @@ async def chat(
 ) -> Completion:
     """发起一次对话请求"""
     model = plugin_config.resolve(model_name)
+    if not model.base_url:
+        raise ValueError(f"模型 {model_name} 未配置 base_url，且未设置 LLM__BASE_URL")
     provider = get_provider(model.provider)(model, session_affinity=session_affinity)
     enabled_groups = _get_enabled_tool_groups(enable_web_search)
     tools = registry.to_params(enabled_groups=enabled_groups) if enable_tools else []

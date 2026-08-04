@@ -12,7 +12,7 @@ import httpx
 from nonebot.log import logger
 from pydantic import BaseModel, ValidationError
 
-from .config import DEEPSEEK_QUOTA_API_URL, plugin_config
+from .config import plugin_config
 from .providers.base import USER_AGENT
 
 if TYPE_CHECKING:
@@ -75,8 +75,6 @@ class QuotaProvider(ABC):
 
     endpoint_path: str
     """未显式配置 API 地址时追加到服务地址的路径"""
-    default_api_url: str = ""
-    """服务地址也为空时使用的最终默认地址"""
 
     def __init__(self, config: BaseQuotaConfig, model: ModelConfig) -> None:
         self.config = config
@@ -90,8 +88,6 @@ class QuotaProvider(ABC):
         base_url = plugin_config.base_url or self.model.base_url
         if base_url:
             return f"{base_url.rstrip('/')}{self.endpoint_path}"
-        if self.default_api_url:
-            return self.default_api_url
         raise QuotaError("额度查询未配置 API 地址或 LLM__BASE_URL")
 
     def build_headers(self) -> dict[str, str]:
@@ -154,7 +150,6 @@ class DeepSeekQuotaProvider(QuotaProvider):
 
     config: DeepSeekQuotaConfig
     endpoint_path = "/user/balance"
-    default_api_url = DEEPSEEK_QUOTA_API_URL
 
     def build_headers(self) -> dict[str, str]:
         api_key = self.config.api_key or self.model.api_key
