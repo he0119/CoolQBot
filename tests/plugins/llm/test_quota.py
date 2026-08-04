@@ -68,10 +68,10 @@ async def test_quota_api_url_falls_back_to_global_base_url(app: App, respx_mock:
 @respx.mock(assert_all_called=True)
 async def test_deepseek_quota(app: App, respx_mock: MockRouter, mocker):
     """DeepSeek provider 复用模型密钥并显示充值与赠金余额"""
-    from src.plugins.llm.config import DEEPSEEK_QUOTA_API_URL, ModelConfig, plugin_config
+    from src.plugins.llm.config import ModelConfig, plugin_config
     from src.plugins.llm.quota import get_quota
 
-    route = respx_mock.get(DEEPSEEK_QUOTA_API_URL).mock(
+    route = respx_mock.get("https://api.deepseek.com/user/balance").mock(
         return_value=httpx.Response(
             200,
             json={
@@ -98,7 +98,7 @@ async def test_deepseek_quota(app: App, respx_mock: MockRouter, mocker):
         api_key="sk-model",
         quota={"provider": "deepseek"},
     )
-    mocker.patch.object(plugin_config, "base_url", "")
+    mocker.patch.object(plugin_config, "base_url", "https://api.deepseek.com")
     logger_info = mocker.patch("src.plugins.llm.quota.logger.info")
 
     result = await get_quota(model)
@@ -119,9 +119,24 @@ async def test_deepseek_quota_without_api_key(app: App):
     from src.plugins.llm.config import ModelConfig
     from src.plugins.llm.quota import QuotaError, get_quota
 
-    model = ModelConfig(name="deepseek", quota={"provider": "deepseek"})
+    model = ModelConfig(
+        name="deepseek",
+        quota={"provider": "deepseek", "api_url": "https://api.deepseek.com/user/balance"},
+    )
 
     with pytest.raises(QuotaError, match="未配置 API 密钥"):
+        await get_quota(model)
+
+
+async def test_quota_without_api_url_or_base_url(app: App, mocker):
+    """额度地址没有显式值或全局/模型回退时给出明确错误。"""
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.quota import QuotaError, get_quota
+
+    mocker.patch.object(plugin_config, "base_url", "")
+    model = ModelConfig(name="aperture", quota={"provider": "aperture"})
+
+    with pytest.raises(QuotaError, match="未配置 API 地址或 LLM__BASE_URL"):
         await get_quota(model)
 
 

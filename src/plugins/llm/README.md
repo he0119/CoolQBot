@@ -159,7 +159,7 @@
 快捷对话只过滤 `COMMAND_START` 中的非空前缀；如果命令配置了空前缀，未带前缀的命令无法与普通对话可靠区分。
 
 ```env
-# 全局服务地址，未单独配置服务地址的模型都用它；留空则按 API 格式取内置默认值
+# 全局服务地址，未单独配置服务地址的模型都用它
 LLM__BASE_URL=https://api.example.com
 # 全局密钥，未单独配置密钥的模型都用它
 LLM__API_KEY=sk-xxx
@@ -251,22 +251,22 @@ LLM__TTS_MODEL=default
 
 ### 单个模型的可配置项
 
-| 字段           | 说明                                                    |
-| -------------- | ------------------------------------------------------- |
-| `name`         | 模型标识，命令中用此名称选择模型                        |
-| `model`        | 传给 API 的模型名，留空时与 `name` 相同                 |
-| `provider`     | API 格式，`chat` / `responses` / `anthropic`            |
-| `base_url`     | 服务地址，留空时回退到 `LLM__BASE_URL` 或按格式取默认值 |
-| `api_key`      | 密钥，留空时回退到 `LLM__API_KEY`                       |
-| `prompt`       | 人设，留空时回退到 `LLM__PROMPT`                        |
-| `proxy`        | 代理地址                                                |
-| `stream`       | 是否流式请求，留空时回退到 `LLM__STREAM`                |
-| `max_tokens`   | 最大输出 token 数（`anthropic` 必填，默认 4096）        |
-| `temperature`  | 采样温度                                                |
-| `timeout`      | 非流式请求超时时间（秒）                                |
-| `extra_body`   | 附加到请求体的额外字段，用于传各服务商特有参数          |
-| `capabilities` | 模型能力列表；`vision` 表示可直接接收图片               |
-| `quota`        | 该模型的额度查询配置，留空时不支持 `/llm quota`         |
+| 字段           | 说明                                             |
+| -------------- | ------------------------------------------------ |
+| `name`         | 模型标识，命令中用此名称选择模型                 |
+| `model`        | 传给 API 的模型名，留空时与 `name` 相同          |
+| `provider`     | API 格式，`chat` / `responses` / `anthropic`     |
+| `base_url`     | 服务地址，留空时回退到 `LLM__BASE_URL`           |
+| `api_key`      | 密钥，留空时回退到 `LLM__API_KEY`                |
+| `prompt`       | 人设，留空时回退到 `LLM__PROMPT`                 |
+| `proxy`        | 代理地址                                         |
+| `stream`       | 是否流式请求，留空时回退到 `LLM__STREAM`         |
+| `max_tokens`   | 最大输出 token 数（`anthropic` 必填，默认 4096） |
+| `temperature`  | 采样温度                                         |
+| `timeout`      | 非流式请求超时时间（秒）                         |
+| `extra_body`   | 附加到请求体的额外字段，用于传各服务商特有参数   |
+| `capabilities` | 模型能力列表；`vision` 表示可直接接收图片        |
+| `quota`        | 该模型的额度查询配置，留空时不支持 `/llm quota`  |
 
 ### 额度查询配置
 

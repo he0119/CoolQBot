@@ -834,6 +834,18 @@ async def test_declared_vision_model_uses_single_request(app: App, respx_mock: M
     assert payload["messages"][-1]["content"][1]["type"] == "image_url"
 
 
+async def test_missing_base_url_raises_config_error(app: App, mocker):
+    """模型和全局地址都为空时在发起 HTTP 请求前给出明确错误。"""
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.handler import LLMHandler
+
+    mocker.patch.object(plugin_config, "base_url", "")
+    mocker.patch.object(plugin_config, "models", [ModelConfig(name="missing-url")])
+
+    with pytest.raises(ValueError, match="模型 missing-url 未配置 base_url，且未设置 LLM__BASE_URL"):
+        await LLMHandler("missing-url").ask("你好")
+
+
 @respx.mock(assert_all_called=True)
 async def test_llm_error_raises(app: App, respx_mock: MockRouter, mock_models):
     """API 返回错误时提示用户"""

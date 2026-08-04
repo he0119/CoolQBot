@@ -287,13 +287,15 @@ def test_model_config_defaults(app: App):
     assert anthropic.model == "claude-opus-5"
     assert anthropic.capabilities == {"vision"}
 
-    config = ScopedConfig(models=[chat, anthropic])
+    config = ScopedConfig(base_url="https://global.example.com", models=[chat, anthropic])
     assert config.prefer_markdown is False
     assert config.max_tool_rounds == 10
     assert config.tool_notice_delay == 10.0
     assert config.tool_notice_interval == 60.0
-    assert config.resolve("deepseek-chat").base_url == "https://api.deepseek.com"
-    assert config.resolve("claude").base_url == "https://api.anthropic.com"
+    assert config.resolve("deepseek-chat").base_url == "https://global.example.com"
+    assert config.resolve("claude").base_url == "https://global.example.com"
+
+    assert ScopedConfig(models=[chat]).resolve("deepseek-chat").base_url == ""
 
     assert ScopedConfig.model_validate({"prefer_markdown": True}).prefer_markdown is True
 
