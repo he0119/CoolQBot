@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.29.1] - 2026-08-04
+
 ### Changed
 
 - 重排大模型回复尾注，分行显示模型链与耗时、Token 用量，并使用中文标签和千分位提高可读性
@@ -822,7 +824,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.0...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.1...HEAD
+[0.29.1]: https://github.com/he0119/CoolQBot/compare/v0.29.0...v0.29.1
 [0.29.0]: https://github.com/he0119/CoolQBot/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/he0119/CoolQBot/compare/v0.27.7...v0.28.0
 [0.27.7]: https://github.com/he0119/CoolQBot/compare/v0.27.6...v0.27.7
