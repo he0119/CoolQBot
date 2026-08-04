@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Changed
+
+- 将模型列表与群组模型设置统一为 `/llm model` 子命令，并支持通过 `enable`、`disable` 及 `--all` 增量或批量管理模型
+
 ## [0.29.0] - 2026-08-04
 
 ### Added

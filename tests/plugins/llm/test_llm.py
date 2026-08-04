@@ -114,7 +114,7 @@ async def test_llm_not_configured(app: App):
 
 
 async def test_llm_denies_group_without_available_models(app: App, mocker):
-    """全局存在模型时，未开放模型的群仍默认拒绝调用。"""
+    """全局存在模型时，未启用模型的群仍默认拒绝调用。"""
     from src.plugins.llm import llm_cmd
     from src.plugins.llm.config import ModelConfig, plugin_config
 
@@ -126,7 +126,7 @@ async def test_llm_denies_group_without_available_models(app: App, mocker):
         event = fake_group_message_event_v11(message=Message("/llm 你好"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "本群未开放任何模型，请联系超级管理员配置", True, at_sender=True)
+        ctx.should_call_send(event, "本群未启用任何模型，请联系超级管理员配置", True, at_sender=True)
         ctx.should_finished(llm_cmd)
 
 
@@ -288,7 +288,7 @@ async def test_llm_command_ignores_private_messages(app: App, mock_models):
         bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
         event = fake_private_message_event_v11(
             self_id=123456,
-            message=Message("/llm model --list"),
+            message=Message("/llm model list"),
             to_me=True,
         )
 
@@ -870,13 +870,18 @@ async def test_llm_model_list_and_set(app: App, respx_mock: MockRouter, mock_mod
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model --list"), user_id=10000)
+        event = fake_group_message_event_v11(message=Message("/llm model list"), user_id=10000)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "支持的模型列表：\n- test-model（当前，zssm）\n输入 /llm --model [模型名] [内容] 单次指定模型\n"
-            "输入 /llm model --set [模型名] 设置群组默认模型",
+            "可用模型：\n- test-model（默认对话，zssm）\n\n"
+            "单次对话：\n"
+            "/llm --model [模型名] [内容]\n\n"
+            "群组设置（管理员）：\n"
+            "- 默认对话：/llm model set [模型名]\n"
+            "- zssm：/llm model set-zssm [模型名]\n"
+            "- zssm 视觉：/llm model set-zssm-vision [模型名]",
             True,
         )
         ctx.should_finished(llm_cmd)
@@ -885,7 +890,7 @@ async def test_llm_model_list_and_set(app: App, respx_mock: MockRouter, mock_mod
 
 
 async def test_llm_model_list_denies_group_without_available_models(app: App, mocker):
-    """普通用户不能查看尚未开放模型的群组列表。"""
+    """普通用户不能查看尚未启用模型的群组列表。"""
     from src.plugins.llm import llm_cmd
     from src.plugins.llm.config import ModelConfig, plugin_config
 
@@ -894,16 +899,16 @@ async def test_llm_model_list_denies_group_without_available_models(app: App, mo
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model -l"), user_id=10000)
+        event = fake_group_message_event_v11(message=Message("/llm model list"), user_id=10000)
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "本群未开放任何模型，请联系超级管理员配置", True)
+        ctx.should_call_send(event, "本群未启用任何模型，请联系超级管理员配置", True)
         ctx.should_finished(llm_cmd)
 
 
 @respx.mock(assert_all_called=True)
-async def test_superuser_sets_group_available_models(app: App, respx_mock: MockRouter, mocker):
-    """只有超级管理员能配置本群可用模型。"""
+async def test_superuser_enables_and_disables_group_models(app: App, respx_mock: MockRouter, mocker):
+    """超级管理员可为本群增量启用或禁用模型。"""
     from src.plugins.llm import llm_cmd
     from src.plugins.llm.config import ModelConfig, plugin_config
     from src.plugins.llm.data_source import get_available_model_names
@@ -917,18 +922,26 @@ async def test_superuser_sets_group_available_models(app: App, respx_mock: MockR
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model -l -a"), user_id=10)
+        event = fake_group_message_event_v11(message=Message("/llm model list --all"), user_id=10)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "全部模型列表：\n"
-            "- test-model（未开放）\n"
-            "- other（未开放）\n"
-            "- hidden（未开放）\n"
-            "输入 /llm --model [模型名] [内容] 单次指定模型\n"
-            "输入 /llm model --set [模型名] 设置群组默认模型\n"
-            "输入 /llm model --set-available [模型名...] 设置本群开放模型",
+            "全部模型：\n"
+            "- test-model（未启用）\n"
+            "- other（未启用）\n"
+            "- hidden（未启用）\n\n"
+            "单次对话：\n"
+            "/llm --model [模型名] [内容]\n\n"
+            "群组设置（管理员）：\n"
+            "- 默认对话：/llm model set [模型名]\n"
+            "- zssm：/llm model set-zssm [模型名]\n"
+            "- zssm 视觉：/llm model set-zssm-vision [模型名]\n\n"
+            "模型管理（超级管理员）：\n"
+            "- 启用：/llm model enable [模型名...]\n"
+            "- 全部启用：/llm model enable --all\n"
+            "- 禁用：/llm model disable [模型名...]\n"
+            "- 全部禁用：/llm model disable --all",
             True,
         )
         ctx.should_finished(llm_cmd)
@@ -937,12 +950,23 @@ async def test_superuser_sets_group_available_models(app: App, respx_mock: MockR
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
-            message=Message("/llm model --set-available test-model other"),
+            message=Message("/llm model enable test-model"),
             user_id=10,
         )
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "已设置本群可用模型：test-model、other", True, at_sender=True)
+        ctx.should_call_send(event, "已启用本群模型：test-model", True, at_sender=True)
+        ctx.should_finished(llm_cmd)
+
+    assert await get_available_model_names("QQClient_10000") == ["test-model"]
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/llm model enable other"), user_id=10)
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "已启用本群模型：other", True, at_sender=True)
         ctx.should_finished(llm_cmd)
 
     assert await get_available_model_names("QQClient_10000") == ["test-model", "other"]
@@ -950,16 +974,20 @@ async def test_superuser_sets_group_available_models(app: App, respx_mock: MockR
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model -l"), user_id=10)
+        event = fake_group_message_event_v11(message=Message("/llm model list"), user_id=10)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "支持的模型列表：\n"
-            "- test-model（当前，zssm）\n"
-            "- other\n"
-            "输入 /llm --model [模型名] [内容] 单次指定模型\n"
-            "输入 /llm model --set [模型名] 设置群组默认模型",
+            "可用模型：\n"
+            "- test-model（默认对话，zssm）\n"
+            "- other\n\n"
+            "单次对话：\n"
+            "/llm --model [模型名] [内容]\n\n"
+            "群组设置（管理员）：\n"
+            "- 默认对话：/llm model set [模型名]\n"
+            "- zssm：/llm model set-zssm [模型名]\n"
+            "- zssm 视觉：/llm model set-zssm-vision [模型名]",
             True,
         )
         ctx.should_finished(llm_cmd)
@@ -967,18 +995,26 @@ async def test_superuser_sets_group_available_models(app: App, respx_mock: MockR
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model -l -a"), user_id=10)
+        event = fake_group_message_event_v11(message=Message("/llm model list --all"), user_id=10)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "全部模型列表：\n"
-            "- test-model（已开放，当前，zssm）\n"
-            "- other（已开放）\n"
-            "- hidden（未开放）\n"
-            "输入 /llm --model [模型名] [内容] 单次指定模型\n"
-            "输入 /llm model --set [模型名] 设置群组默认模型\n"
-            "输入 /llm model --set-available [模型名...] 设置本群开放模型",
+            "全部模型：\n"
+            "- test-model（已启用，默认对话，zssm）\n"
+            "- other（已启用）\n"
+            "- hidden（未启用）\n\n"
+            "单次对话：\n"
+            "/llm --model [模型名] [内容]\n\n"
+            "群组设置（管理员）：\n"
+            "- 默认对话：/llm model set [模型名]\n"
+            "- zssm：/llm model set-zssm [模型名]\n"
+            "- zssm 视觉：/llm model set-zssm-vision [模型名]\n\n"
+            "模型管理（超级管理员）：\n"
+            "- 启用：/llm model enable [模型名...]\n"
+            "- 全部启用：/llm model enable --all\n"
+            "- 禁用：/llm model disable [模型名...]\n"
+            "- 全部禁用：/llm model disable --all",
             True,
         )
         ctx.should_finished(llm_cmd)
@@ -986,7 +1022,7 @@ async def test_superuser_sets_group_available_models(app: App, respx_mock: MockR
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model -l -a"), user_id=10000)
+        event = fake_group_message_event_v11(message=Message("/llm model list --all"), user_id=10000)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "该参数仅超级管理员可用", True, at_sender=True)
@@ -996,7 +1032,7 @@ async def test_superuser_sets_group_available_models(app: App, respx_mock: MockR
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
-            message=Message("/llm model --set-available hidden"),
+            message=Message("/llm model enable hidden"),
             user_id=10000,
         )
 
@@ -1018,10 +1054,32 @@ async def test_superuser_sets_group_available_models(app: App, respx_mock: MockR
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model --clear-available"), user_id=10)
+        event = fake_group_message_event_v11(message=Message("/llm model disable other"), user_id=10)
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "已清空本群可用模型", True, at_sender=True)
+        ctx.should_call_send(event, "已禁用本群模型：other", True, at_sender=True)
+        ctx.should_finished(llm_cmd)
+
+    assert await get_available_model_names("QQClient_10000") == ["test-model"]
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/llm model enable --all"), user_id=10)
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "已启用本群全部模型", True, at_sender=True)
+        ctx.should_finished(llm_cmd)
+
+    assert await get_available_model_names("QQClient_10000") == ["test-model", "other", "hidden"]
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/llm model disable --all"), user_id=10)
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "已禁用本群全部模型", True, at_sender=True)
         ctx.should_finished(llm_cmd)
 
     assert await get_available_model_names("QQClient_10000") == []
@@ -1030,11 +1088,14 @@ async def test_superuser_sets_group_available_models(app: App, respx_mock: MockR
 @pytest.mark.parametrize(
     ("command", "expected"),
     [
-        ("/llm model --clear-available", "该指令仅超级管理员可用"),
-        ("/llm model --set-zssm test-model", "该指令仅管理员可用"),
-        ("/llm model --clear-zssm", "该指令仅管理员可用"),
-        ("/llm model --set-vision test-model", "该指令仅管理员可用"),
-        ("/llm model --clear-vision", "该指令仅管理员可用"),
+        ("/llm model enable test-model", "该指令仅超级管理员可用"),
+        ("/llm model enable --all", "该指令仅超级管理员可用"),
+        ("/llm model disable test-model", "该指令仅超级管理员可用"),
+        ("/llm model disable --all", "该指令仅超级管理员可用"),
+        ("/llm model set-zssm test-model", "该指令仅管理员可用"),
+        ("/llm model clear-zssm", "该指令仅管理员可用"),
+        ("/llm model set-zssm-vision test-model", "该指令仅管理员可用"),
+        ("/llm model clear-zssm-vision", "该指令仅管理员可用"),
     ],
 )
 async def test_group_model_management_requires_permission(app: App, mocker, command: str, expected: str):
@@ -1057,10 +1118,13 @@ async def test_group_model_management_requires_permission(app: App, mocker, comm
 @pytest.mark.parametrize(
     ("command", "expected"),
     [
-        ("/llm model --set hidden", "本群未启用的模型：hidden，可用：default、text、vision"),
-        ("/llm model --set-available missing", "未配置的模型：missing"),
-        ("/llm model --set-zssm hidden", "本群未启用的模型：hidden"),
-        ("/llm model --set-vision text", "视觉模型 text 未声明 vision 能力"),
+        ("/llm model set hidden", "本群未启用的模型：hidden，可用：default、text、vision"),
+        ("/llm model enable", "请指定要启用的模型，或使用 --all 启用全部模型"),
+        ("/llm model enable missing", "未配置的模型：missing"),
+        ("/llm model disable", "请指定要禁用的模型，或使用 --all 禁用全部模型"),
+        ("/llm model disable missing", "未配置的模型：missing"),
+        ("/llm model set-zssm hidden", "本群未启用的模型：hidden"),
+        ("/llm model set-zssm-vision text", "视觉模型 text 未声明 vision 能力"),
     ],
 )
 async def test_group_model_management_reports_validation_errors(app: App, mocker, command: str, expected: str):
@@ -1119,7 +1183,7 @@ async def test_admin_clears_group_zssm_models(app: App, mocker):
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model --clear-zssm"), user_id=10)
+        event = fake_group_message_event_v11(message=Message("/llm model clear-zssm"), user_id=10)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "本群解释模型已改为跟随默认模型", True, at_sender=True)
@@ -1128,7 +1192,7 @@ async def test_admin_clears_group_zssm_models(app: App, mocker):
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model --clear-vision"), user_id=10)
+        event = fake_group_message_event_v11(message=Message("/llm model clear-zssm-vision"), user_id=10)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "本群解释视觉模型已恢复自动选择", True, at_sender=True)
@@ -1138,7 +1202,7 @@ async def test_admin_clears_group_zssm_models(app: App, mocker):
     assert await get_zssm_vision_model_name("QQClient_10000") == "vision"
 
 
-async def test_superuser_sets_available_models_with_provider_paths(app: App, mocker):
+async def test_superuser_enables_models_with_provider_paths(app: App, mocker):
     """模型名中的斜杠不会导致群级可用模型列表丢失。"""
     from src.plugins.llm import llm_cmd
     from src.plugins.llm.config import ModelConfig, plugin_config
@@ -1156,16 +1220,14 @@ async def test_superuser_sets_available_models_with_provider_paths(app: App, moc
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
-            message=Message(
-                "/llm model --set-available deepseek-v4-flash deepseek-ai/DeepSeek-V4-Flash Qwen/Qwen3.6-35B-A3B"
-            ),
+            message=Message("/llm model enable deepseek-v4-flash deepseek-ai/DeepSeek-V4-Flash Qwen/Qwen3.6-35B-A3B"),
             user_id=10,
         )
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "已设置本群可用模型：deepseek-v4-flash、deepseek-ai/DeepSeek-V4-Flash、Qwen/Qwen3.6-35B-A3B",
+            "已启用本群模型：deepseek-v4-flash、deepseek-ai/DeepSeek-V4-Flash、Qwen/Qwen3.6-35B-A3B",
             True,
             at_sender=True,
         )
@@ -1197,7 +1259,7 @@ async def test_admin_sets_group_zssm_models(app: App, respx_mock: MockRouter, mo
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model --set-zssm explain"), user_id=10)
+        event = fake_group_message_event_v11(message=Message("/llm model set-zssm explain"), user_id=10)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已设置本群解释模型为：explain", True, at_sender=True)
@@ -1206,7 +1268,7 @@ async def test_admin_sets_group_zssm_models(app: App, respx_mock: MockRouter, mo
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model --set-vision vision"), user_id=10)
+        event = fake_group_message_event_v11(message=Message("/llm model set-zssm-vision vision"), user_id=10)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已设置本群解释视觉模型为：vision", True, at_sender=True)
@@ -1218,17 +1280,21 @@ async def test_admin_sets_group_zssm_models(app: App, respx_mock: MockRouter, mo
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm model -l"), user_id=10)
+        event = fake_group_message_event_v11(message=Message("/llm model list"), user_id=10)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "支持的模型列表：\n"
-            "- test-model（当前）\n"
+            "可用模型：\n"
+            "- test-model（默认对话）\n"
             "- explain（zssm）\n"
-            "- vision（zssm 视觉）\n"
-            "输入 /llm --model [模型名] [内容] 单次指定模型\n"
-            "输入 /llm model --set [模型名] 设置群组默认模型",
+            "- vision（zssm 视觉）\n\n"
+            "单次对话：\n"
+            "/llm --model [模型名] [内容]\n\n"
+            "群组设置（管理员）：\n"
+            "- 默认对话：/llm model set [模型名]\n"
+            "- zssm：/llm model set-zssm [模型名]\n"
+            "- zssm 视觉：/llm model set-zssm-vision [模型名]",
             True,
         )
         ctx.should_finished(llm_cmd)
@@ -1237,19 +1303,23 @@ async def test_admin_sets_group_zssm_models(app: App, respx_mock: MockRouter, mo
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         event = fake_group_message_event_v11(
-            message=Message("/llm model -l -c"),
+            message=Message("/llm model list --capabilities"),
             user_id=10,
         )
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "支持的模型列表：\n"
-            "- test-model（当前，能力：无）\n"
+            "可用模型：\n"
+            "- test-model（默认对话，能力：无）\n"
             "- explain（zssm，能力：无）\n"
-            "- vision（zssm 视觉，能力：视觉）\n"
-            "输入 /llm --model [模型名] [内容] 单次指定模型\n"
-            "输入 /llm model --set [模型名] 设置群组默认模型",
+            "- vision（zssm 视觉，能力：视觉）\n\n"
+            "单次对话：\n"
+            "/llm --model [模型名] [内容]\n\n"
+            "群组设置（管理员）：\n"
+            "- 默认对话：/llm model set [模型名]\n"
+            "- zssm：/llm model set-zssm [模型名]\n"
+            "- zssm 视觉：/llm model set-zssm-vision [模型名]",
             True,
         )
         ctx.should_finished(llm_cmd)
@@ -1269,7 +1339,7 @@ async def test_llm_model_set_by_admin(app: App, respx_mock: MockRouter, mocker):
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         # user_id=10 是超级用户
-        event = fake_group_message_event_v11(message=Message("/llm model --set other"), user_id=10)
+        event = fake_group_message_event_v11(message=Message("/llm model set other"), user_id=10)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已设置群组默认模型为：other", True, at_sender=True)
@@ -1292,7 +1362,7 @@ async def test_llm_model_set_by_normal_user(app: App, respx_mock: MockRouter, mo
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         # user_id=10000 是普通用户
-        event = fake_group_message_event_v11(message=Message("/llm model --set other"), user_id=10000)
+        event = fake_group_message_event_v11(message=Message("/llm model set other"), user_id=10000)
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "该指令仅管理员可用", True, at_sender=True)

@@ -49,11 +49,12 @@ from .data_source import (
     clear_available_model_names,
     clear_zssm_model_name,
     clear_zssm_vision_model_name,
+    disable_model_names,
+    enable_model_names,
     get_available_model_names,
     get_model_name,
     get_model_overview,
     get_tts_model,
-    set_available_model_names,
     set_model_name,
     set_tts_model,
     set_zssm_model_name,
@@ -84,20 +85,29 @@ llm_cmd = on_alconna(
         Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
         Subcommand(
             "model",
-            Option("-l|--list", help_text="查看模型列表"),
-            Option("-a|--all", default=False, action=store_true, help_text="查看全部模型（仅超级管理员）"),
-            Option("-c|--capabilities", default=False, action=store_true, help_text="在模型列表中显示能力"),
-            Option("--set", Args["model#模型名称", str], help_text="设置群组默认模型"),
-            Option(
-                "--set-available",
-                Args["models#模型名称", MultiVar(str, flag="+")],
-                help_text="设置本群可用模型（仅超级管理员）",
+            Subcommand(
+                "list",
+                Option("-a|--all", default=False, action=store_true, help_text="查看全部模型（仅超级管理员）"),
+                Option("-c|--capabilities", default=False, action=store_true, help_text="在模型列表中显示能力"),
+                help_text="查看模型列表",
             ),
-            Option("--clear-available", action=store_true, help_text="清空本群可用模型（仅超级管理员）"),
-            Option("--set-zssm", Args["model#模型名称", str], help_text="设置本群解释模型"),
-            Option("--clear-zssm", action=store_true, help_text="使本群解释模型跟随默认模型"),
-            Option("--set-vision", Args["model#模型名称", str], help_text="设置本群解释视觉模型"),
-            Option("--clear-vision", action=store_true, help_text="使本群解释视觉模型恢复自动选择"),
+            Subcommand("set", Args["model#模型名称", str], help_text="设置群组默认模型"),
+            Subcommand(
+                "enable",
+                Args["models?#模型名称", MultiVar(str, flag="+")],
+                Option("-a|--all", default=False, action=store_true, help_text="启用本群全部模型"),
+                help_text="为本群启用模型（仅超级管理员）",
+            ),
+            Subcommand(
+                "disable",
+                Args["models?#模型名称", MultiVar(str, flag="+")],
+                Option("-a|--all", default=False, action=store_true, help_text="禁用本群全部模型"),
+                help_text="为本群禁用模型（仅超级管理员）",
+            ),
+            Subcommand("set-zssm", Args["model#模型名称", str], help_text="设置本群解释模型"),
+            Subcommand("clear-zssm", help_text="使本群解释模型跟随默认模型"),
+            Subcommand("set-zssm-vision", Args["model#模型名称", str], help_text="设置本群解释视觉模型"),
+            Subcommand("clear-zssm-vision", help_text="使本群解释视觉模型恢复自动选择"),
             help_text="模型相关设置",
         ),
         Subcommand(
@@ -166,7 +176,7 @@ async def _create_handler(
         raise LLMSetupError("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
     model_names = await get_available_model_names(user.session_id)
     if not model_names:
-        raise LLMSetupError("本群未开放任何模型，请联系超级管理员配置", at_sender=True)
+        raise LLMSetupError("本群未启用任何模型，请联系超级管理员配置", at_sender=True)
 
     name = selected_model or await get_model_name(user.session_id)
     if name not in model_names:
@@ -196,8 +206,8 @@ async def llm_model_list_handle(
     bot: Bot,
     event: Event,
     user: UserSession,
-    show_all: Query[bool] = Query("model.all.value", False),
-    show_capabilities: Query[bool] = Query("model.capabilities.value", False),
+    show_all: Query[bool] = Query("model.list.all.value", False),
+    show_capabilities: Query[bool] = Query("model.list.capabilities.value", False),
 ):
     all_names = plugin_config.get_model_names()
     if not all_names:
@@ -208,7 +218,7 @@ async def llm_model_list_handle(
     if show_all.result and not is_superuser:
         await llm_cmd.finish("该参数仅超级管理员可用", at_sender=True)
     if not available_names and not show_all.result:
-        await llm_cmd.finish("本群未开放任何模型，请联系超级管理员配置")
+        await llm_cmd.finish("本群未启用任何模型，请联系超级管理员配置")
 
     current = overview.model_name
     zssm_model = overview.zssm_model_name
@@ -218,9 +228,9 @@ async def llm_model_list_handle(
     def format_model(name: str) -> str:
         labels: list[str] = []
         if show_all.result:
-            labels.append("已开放" if name in available else "未开放")
+            labels.append("已启用" if name in available else "未启用")
         if name == current:
-            labels.append("当前")
+            labels.append("默认对话")
         if name == zssm_model:
             labels.append("zssm")
         if name == vision_model:
@@ -234,12 +244,24 @@ async def llm_model_list_handle(
 
     names = all_names if show_all.result else available_names
     model_list = "\n".join(format_model(name) for name in names)
-    title = "全部模型列表" if show_all.result else "支持的模型列表"
-    access_hint = "\n输入 /llm model --set-available [模型名...] 设置本群开放模型" if show_all.result else ""
+    title = "全部模型" if show_all.result else "可用模型"
+    access_hint = (
+        "\n\n模型管理（超级管理员）："
+        "\n- 启用：/llm model enable [模型名...]"
+        "\n- 全部启用：/llm model enable --all"
+        "\n- 禁用：/llm model disable [模型名...]"
+        "\n- 全部禁用：/llm model disable --all"
+        if show_all.result
+        else ""
+    )
     await llm_cmd.finish(
-        f"{title}：\n{model_list}\n"
-        "输入 /llm --model [模型名] [内容] 单次指定模型\n"
-        f"输入 /llm model --set [模型名] 设置群组默认模型{access_hint}"
+        f"{title}：\n{model_list}\n\n"
+        "单次对话：\n"
+        "/llm --model [模型名] [内容]\n\n"
+        "群组设置（管理员）：\n"
+        "- 默认对话：/llm model set [模型名]\n"
+        "- zssm：/llm model set-zssm [模型名]\n"
+        f"- zssm 视觉：/llm model set-zssm-vision [模型名]{access_hint}"
     )
 
 
@@ -262,28 +284,53 @@ async def llm_model_set_handle(
     await llm_cmd.finish(f"已设置群组默认模型为：{model.result}", at_sender=True)
 
 
-@llm_cmd.assign("model.set-available")
-async def llm_model_set_available_handle(
+@llm_cmd.assign("model.enable")
+async def llm_model_enable_handle(
     bot: Bot,
     event: Event,
     user: UserSession,
-    models: Query[tuple[str, ...]] = Query("model.set-available.models"),
+    models: Query[tuple[str, ...]] = Query("model.enable.models", ()),
+    enable_all: Query[bool] = Query("model.enable.all.value", False),
 ):
     if not await SUPERUSER(bot, event):
         await llm_cmd.finish("该指令仅超级管理员可用", at_sender=True)
+    if enable_all.result:
+        all_names = plugin_config.get_model_names()
+        if not all_names:
+            await llm_cmd.finish("未配置任何模型，请先在 .env 中配置 LLM__MODELS", at_sender=True)
+        await enable_model_names(user.session_id, all_names)
+        await llm_cmd.finish("已启用本群全部模型", at_sender=True)
+    if not models.result:
+        await llm_cmd.finish("请指定要启用的模型，或使用 --all 启用全部模型", at_sender=True)
     try:
-        available = await set_available_model_names(user.session_id, list(models.result))
+        await enable_model_names(user.session_id, list(models.result))
     except ValueError as e:
         await llm_cmd.finish(str(e), at_sender=True)
-    await llm_cmd.finish(f"已设置本群可用模型：{'、'.join(available)}", at_sender=True)
+    enabled = "、".join(dict.fromkeys(models.result))
+    await llm_cmd.finish(f"已启用本群模型：{enabled}", at_sender=True)
 
 
-@llm_cmd.assign("model.clear-available")
-async def llm_model_clear_available_handle(bot: Bot, event: Event, user: UserSession):
+@llm_cmd.assign("model.disable")
+async def llm_model_disable_handle(
+    bot: Bot,
+    event: Event,
+    user: UserSession,
+    models: Query[tuple[str, ...]] = Query("model.disable.models", ()),
+    disable_all: Query[bool] = Query("model.disable.all.value", False),
+):
     if not await SUPERUSER(bot, event):
         await llm_cmd.finish("该指令仅超级管理员可用", at_sender=True)
-    await clear_available_model_names(user.session_id)
-    await llm_cmd.finish("已清空本群可用模型", at_sender=True)
+    if disable_all.result:
+        await clear_available_model_names(user.session_id)
+        await llm_cmd.finish("已禁用本群全部模型", at_sender=True)
+    if not models.result:
+        await llm_cmd.finish("请指定要禁用的模型，或使用 --all 禁用全部模型", at_sender=True)
+    try:
+        await disable_model_names(user.session_id, list(models.result))
+    except ValueError as e:
+        await llm_cmd.finish(str(e), at_sender=True)
+    disabled = "、".join(dict.fromkeys(models.result))
+    await llm_cmd.finish(f"已禁用本群模型：{disabled}", at_sender=True)
 
 
 @llm_cmd.assign("model.set-zssm")
@@ -310,12 +357,12 @@ async def llm_model_clear_zssm_handle(bot: Bot, event: Event, user: UserSession)
     await llm_cmd.finish("本群解释模型已改为跟随默认模型", at_sender=True)
 
 
-@llm_cmd.assign("model.set-vision")
-async def llm_model_set_vision_handle(
+@llm_cmd.assign("model.set-zssm-vision")
+async def llm_model_set_zssm_vision_handle(
     bot: Bot,
     event: Event,
     user: UserSession,
-    model: Query[str] = Query("model.set-vision.model"),
+    model: Query[str] = Query("model.set-zssm-vision.model"),
 ):
     if not await admin_permission()(bot, event):
         await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
@@ -326,8 +373,8 @@ async def llm_model_set_vision_handle(
     await llm_cmd.finish(f"已设置本群解释视觉模型为：{model.result}", at_sender=True)
 
 
-@llm_cmd.assign("model.clear-vision")
-async def llm_model_clear_vision_handle(bot: Bot, event: Event, user: UserSession):
+@llm_cmd.assign("model.clear-zssm-vision")
+async def llm_model_clear_zssm_vision_handle(bot: Bot, event: Event, user: UserSession):
     if not await admin_permission()(bot, event):
         await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
     await clear_zssm_vision_model_name(user.session_id)
@@ -378,7 +425,7 @@ async def llm_quota_handle(user: UserSession, model: Query[str] = Query("quota.m
         await llm_cmd.finish("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
     names = await get_available_model_names(user.session_id)
     if not names:
-        await llm_cmd.finish("本群未开放任何模型，请联系超级管理员配置", at_sender=True)
+        await llm_cmd.finish("本群未启用任何模型，请联系超级管理员配置", at_sender=True)
 
     name = model.result if model.available else await get_model_name(user.session_id)
     if name not in names:
