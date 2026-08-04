@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 将模型列表与群组模型设置统一为 `/llm model` 子命令，并支持通过 `enable`、`disable` 及 `--all` 增量或批量管理模型
 - 模型能力默认包含 `text` 并在列表中显示，允许将模型显式配置为仅 `vision`、专用于图片理解
 - 移除模型与 DeepSeek 额度接口的内置地址，未单独配置时仅回退到 `LLM__BASE_URL`
+- 将模型 Provider 配置改为枚举，并使用 `openai_chat_completions`、`openai_responses` 与 `anthropic_messages` 完整协议名；当前版本仍兼容旧名称并输出弃用警告，旧名称将在下个版本移除
 - 将纯对话与工具调用分别独立为 `/chat` 和 `/agent`，使 `/llm` 专用于 `model`、`tts` 与 `quota`，并将 TTS 管理统一为 `list` / `set` 子命令；@ 对话复用通用选项并支持 `-a|--agent` 按次启用工具，同时规范模型列表帮助与 `--all` 参数校验
 
 ### Fixed

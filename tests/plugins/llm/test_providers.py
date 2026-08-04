@@ -13,6 +13,9 @@ from respx import MockRouter
 PROJECT_VERSION = tomllib.loads((Path(__file__).parents[3] / "pyproject.toml").read_text(encoding="utf-8"))["project"][
     "version"
 ]
+OPENAI_CHAT_COMPLETIONS = "openai_chat_completions"
+OPENAI_RESPONSES = "openai_responses"
+ANTHROPIC_MESSAGES = "anthropic_messages"
 
 
 def make_config(provider: str, **kwargs):
@@ -64,7 +67,7 @@ async def test_chat_request_and_response(app: App, respx_mock: MockRouter):
         )
     )
 
-    provider = ChatProvider(make_config("chat"))
+    provider = ChatProvider(make_config(OPENAI_CHAT_COMPLETIONS))
     completion = await provider.chat(make_messages())
 
     request = route.calls[0].request
@@ -102,7 +105,7 @@ async def test_provider_logs_metadata_without_payload(app: App, respx_mock: Mock
     )
 
     provider = ChatProvider(
-        make_config("chat", api_key="secret-key"),
+        make_config(OPENAI_CHAT_COMPLETIONS, api_key="secret-key"),
         session_affinity="abcdef1234567890",
     )
     await provider.chat([Message.user("private-prompt")])
@@ -127,7 +130,7 @@ async def test_provider_reports_non_json_response_without_body(app: App, respx_m
     )
     logger_warning = mocker.patch("src.plugins.llm.providers.base.logger.warning")
 
-    provider = ChatProvider(make_config("chat"), session_affinity="abcdef1234567890")
+    provider = ChatProvider(make_config(OPENAI_CHAT_COMPLETIONS), session_affinity="abcdef1234567890")
     with pytest.raises(ProviderError, match=r"无效 JSON.*HTTP 502.*Content-Type=text/html.*位置=1:1"):
         await provider.chat(make_messages())
 
@@ -172,7 +175,7 @@ async def test_chat_tools_and_images(app: App, respx_mock: MockRouter):
     tools = [ToolParam(name="get_weather", description="查询天气", parameters={"type": "object", "properties": {}})]
     messages = [Message.user("天气", [ImageContent(data=b"fakeimage", mimetype="image/png")])]
 
-    provider = ChatProvider(make_config("chat"))
+    provider = ChatProvider(make_config(OPENAI_CHAT_COMPLETIONS))
     completion = await provider.chat(messages, tools)
 
     payload = json.loads(route.calls[0].request.content)
@@ -190,7 +193,7 @@ def test_chat_reasoning_content_round_trip(app: App):
     from src.plugins.llm.providers import ChatProvider
     from src.plugins.llm.schemas import Message
 
-    provider = ChatProvider(make_config("chat"))
+    provider = ChatProvider(make_config(OPENAI_CHAT_COMPLETIONS))
     completion = provider.parse_response(
         {
             "model": "test-model",
@@ -236,7 +239,7 @@ async def test_chat_stream(app: App, respx_mock: MockRouter):
         return_value=httpx.Response(200, text="".join(chunks))
     )
 
-    provider = ChatProvider(make_config("chat", stream=True), session_affinity="test-affinity")
+    provider = ChatProvider(make_config(OPENAI_CHAT_COMPLETIONS, stream=True), session_affinity="test-affinity")
     completion = await provider.chat(make_messages())
 
     request = route.calls[0].request
@@ -282,7 +285,7 @@ async def test_responses_request_and_response(app: App, respx_mock: MockRouter):
     )
 
     tools = [ToolParam(name="get_weather", description="查询天气", parameters={"type": "object", "properties": {}})]
-    provider = ResponsesProvider(make_config("responses"))
+    provider = ResponsesProvider(make_config(OPENAI_RESPONSES))
     completion = await provider.chat(make_messages(), tools)
 
     payload = json.loads(route.calls[0].request.content)
@@ -330,7 +333,7 @@ async def test_responses_tool_call_and_result(app: App, respx_mock: MockRouter):
         Message.assistant(tool_calls=[ToolCall(id="call_0", name="get_weather", arguments={"city": "成都"})]),
         Message.tool("call_0", "晴"),
     ]
-    provider = ResponsesProvider(make_config("responses"))
+    provider = ResponsesProvider(make_config(OPENAI_RESPONSES))
     completion = await provider.chat(messages)
 
     payload = json.loads(route.calls[0].request.content)
@@ -360,7 +363,7 @@ def test_responses_output_items_round_trip(app: App):
             "arguments": '{"city":"成都"}',
         },
     ]
-    provider = ResponsesProvider(make_config("responses"))
+    provider = ResponsesProvider(make_config(OPENAI_RESPONSES))
     completion = provider.parse_response({"model": "test-model", "status": "completed", "output": output})
 
     payload = provider.build_payload([Message.user("天气"), completion.message, Message.tool("call_1", "晴")])
@@ -406,7 +409,7 @@ async def test_responses_stream(app: App, respx_mock: MockRouter):
     ]
     respx_mock.post("https://api.example.com/responses").mock(return_value=httpx.Response(200, text="".join(chunks)))
 
-    provider = ResponsesProvider(make_config("responses", stream=True))
+    provider = ResponsesProvider(make_config(OPENAI_RESPONSES, stream=True))
     completion = await provider.chat(make_messages())
 
     assert completion.content == "你好"
@@ -458,7 +461,7 @@ async def test_anthropic_request_and_response(app: App, respx_mock: MockRouter):
     )
 
     tools = [ToolParam(name="get_weather", description="查询天气", parameters={"type": "object", "properties": {}})]
-    provider = AnthropicProvider(make_config("anthropic"))
+    provider = AnthropicProvider(make_config(ANTHROPIC_MESSAGES))
     completion = await provider.chat(make_messages(), tools)
 
     request = route.calls[0].request
@@ -505,7 +508,7 @@ async def test_anthropic_tool_result_folds_into_user(app: App, respx_mock: MockR
         Message.tool("toolu_0", "晴"),
         Message.tool("toolu_x", "26 度"),
     ]
-    provider = AnthropicProvider(make_config("anthropic"))
+    provider = AnthropicProvider(make_config(ANTHROPIC_MESSAGES))
     completion = await provider.chat(messages)
 
     payload = json.loads(route.calls[0].request.content)
@@ -529,7 +532,7 @@ def test_anthropic_thinking_blocks_round_trip(app: App):
         {"type": "redacted_thinking", "data": "encrypted"},
         {"type": "tool_use", "id": "toolu_1", "name": "get_weather", "input": {"city": "成都"}},
     ]
-    provider = AnthropicProvider(make_config("anthropic"))
+    provider = AnthropicProvider(make_config(ANTHROPIC_MESSAGES))
     completion = provider.parse_response(
         {
             "model": "claude-opus-5",
@@ -557,7 +560,7 @@ async def test_anthropic_image_uses_base64_source(app: App, respx_mock: MockRout
     )
 
     messages = [Message.user("这是什么", [ImageContent(data=b"fakeimage", mimetype="image/jpeg")])]
-    provider = AnthropicProvider(make_config("anthropic"))
+    provider = AnthropicProvider(make_config(ANTHROPIC_MESSAGES))
     await provider.chat(messages)
 
     payload = json.loads(route.calls[0].request.content)
@@ -604,7 +607,7 @@ async def test_anthropic_stream(app: App, respx_mock: MockRouter):
     ]
     respx_mock.post("https://api.example.com/v1/messages").mock(return_value=httpx.Response(200, text="".join(chunks)))
 
-    provider = AnthropicProvider(make_config("anthropic", stream=True))
+    provider = AnthropicProvider(make_config(ANTHROPIC_MESSAGES, stream=True))
     completion = await provider.chat(make_messages())
 
     assert completion.content == "你好"
@@ -667,7 +670,7 @@ async def test_stream_request_keeps_timeout(app: App, respx_mock: MockRouter, mo
         return_value=httpx.Response(200, text='data: {"choices":[]}\n\ndata: [DONE]\n\n')
     )
 
-    provider = ChatProvider(make_config("chat", stream=True, timeout=7))
+    provider = ChatProvider(make_config(OPENAI_CHAT_COMPLETIONS, stream=True, timeout=7))
     await provider.chat(make_messages())
 
     assert seen == [7]
@@ -696,7 +699,7 @@ async def test_responses_stream_error_raises(app: App, respx_mock: MockRouter):
     ]
     respx_mock.post("https://api.example.com/responses").mock(return_value=httpx.Response(200, text="".join(chunks)))
 
-    provider = ResponsesProvider(make_config("responses", stream=True))
+    provider = ResponsesProvider(make_config(OPENAI_RESPONSES, stream=True))
     with pytest.raises(ProviderError, match="上游流失败"):
         await provider.chat(make_messages())
 
@@ -709,7 +712,7 @@ async def test_responses_failed_event_raises(app: App, respx_mock: MockRouter):
     chunks = ['event: response.failed\ndata: {"response":{"status":"failed","error":{"message":"响应生成失败"}}}\n\n']
     respx_mock.post("https://api.example.com/responses").mock(return_value=httpx.Response(200, text="".join(chunks)))
 
-    provider = ResponsesProvider(make_config("responses", stream=True))
+    provider = ResponsesProvider(make_config(OPENAI_RESPONSES, stream=True))
     with pytest.raises(ProviderError, match="响应生成失败"):
         await provider.chat(make_messages())
 
@@ -726,7 +729,7 @@ async def test_responses_incomplete_event_marks_length(app: App, respx_mock: Moc
     ]
     respx_mock.post("https://api.example.com/responses").mock(return_value=httpx.Response(200, text="".join(chunks)))
 
-    provider = ResponsesProvider(make_config("responses", stream=True))
+    provider = ResponsesProvider(make_config(OPENAI_RESPONSES, stream=True))
     completion = await provider.chat(make_messages())
 
     assert completion.content == "部分内容"
@@ -742,7 +745,7 @@ async def test_error_response_raises(app: App, respx_mock: MockRouter):
         return_value=httpx.Response(401, json={"error": {"message": "无效的密钥"}})
     )
 
-    provider = ChatProvider(make_config("chat"))
+    provider = ChatProvider(make_config(OPENAI_CHAT_COMPLETIONS))
     with pytest.raises(ProviderError, match="无效的密钥"):
         await provider.chat(make_messages())
 
@@ -755,10 +758,57 @@ async def test_get_provider_unknown(app: App):
         get_provider("gemini")
 
 
+def test_provider_names_use_explicit_enum(app: App):
+    """配置和注册表共享完整的 API 协议枚举。"""
+    from src.plugins.llm.config import ModelConfig
+    from src.plugins.llm.providers import PROVIDERS, ChatProvider, ProviderName, get_provider
+
+    assert [item.value for item in ProviderName] == [
+        OPENAI_CHAT_COMPLETIONS,
+        OPENAI_RESPONSES,
+        ANTHROPIC_MESSAGES,
+    ]
+    assert set(PROVIDERS) == set(ProviderName)
+    assert ModelConfig(name="default").provider is ProviderName.OPENAI_CHAT_COMPLETIONS
+    assert get_provider(ProviderName.OPENAI_CHAT_COMPLETIONS) is ChatProvider
+
+
+@pytest.mark.parametrize(
+    ("legacy_name", "provider_name"),
+    [
+        ("chat", OPENAI_CHAT_COMPLETIONS),
+        ("responses", OPENAI_RESPONSES),
+        ("anthropic", ANTHROPIC_MESSAGES),
+    ],
+)
+def test_legacy_provider_names_are_temporarily_supported(
+    app: App,
+    mocker,
+    legacy_name: str,
+    provider_name: str,
+):
+    """旧名称当前仍可用，但会提示在下个版本前迁移。"""
+    from src.plugins.llm.config import ModelConfig
+    from src.plugins.llm.providers import get_provider
+
+    logger_warning = mocker.patch("src.plugins.llm.config.logger.warning")
+
+    model = ModelConfig.model_validate({"name": "legacy", "provider": legacy_name})
+
+    assert model.provider.value == provider_name
+    assert get_provider(legacy_name) is get_provider(provider_name)
+    logger_warning.assert_called_once_with(
+        "模型 Provider 配置已弃用（模型={}，旧值={}，新值={}，将在下个版本移除）",
+        "legacy",
+        legacy_name,
+        provider_name,
+    )
+
+
 def test_endpoints(app: App):
     """三种格式的请求地址各不相同"""
     from src.plugins.llm.providers import AnthropicProvider, ChatProvider, ResponsesProvider
 
-    assert ChatProvider(make_config("chat")).endpoint == "https://api.example.com/chat/completions"
-    assert ResponsesProvider(make_config("responses")).endpoint == "https://api.example.com/responses"
-    assert AnthropicProvider(make_config("anthropic")).endpoint == "https://api.example.com/v1/messages"
+    assert ChatProvider(make_config(OPENAI_CHAT_COMPLETIONS)).endpoint == "https://api.example.com/chat/completions"
+    assert ResponsesProvider(make_config(OPENAI_RESPONSES)).endpoint == "https://api.example.com/responses"
+    assert AnthropicProvider(make_config(ANTHROPIC_MESSAGES)).endpoint == "https://api.example.com/v1/messages"
