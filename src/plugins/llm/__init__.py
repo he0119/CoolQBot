@@ -63,7 +63,7 @@ from .data_source import (
 )
 from .handler import LLMHandler, send_reaction
 from .providers import ProviderError
-from .quota import QuotaError, get_quota
+from .quota import QuotaError, get_quota, get_quotas
 from .rules import is_non_private
 from .schemas import ImageContent
 from .tts import TTSError, get_tts_models
@@ -115,6 +115,7 @@ llm_cmd = on_alconna(
         Subcommand(
             "quota",
             Args["model?#模型名称", str],
+            Option("-a|--all", default=False, action=store_true, help_text="查询本群全部模型额度"),
             help_text="查询大模型剩余额度",
         ),
         meta=CommandMeta(
@@ -196,8 +197,8 @@ mention_command = _build_dialogue_command(
     allow_agent=True,
 )
 
-llm_cmd.shortcut("quota", command="llm quota", prefix=True, fuzzy=True, humanized="quota [模型名]")
-llm_cmd.shortcut("额度", command="llm quota", prefix=True, fuzzy=True, humanized="额度 [模型名]")
+llm_cmd.shortcut("quota", command="llm quota", prefix=True, fuzzy=True, humanized="quota [模型名|--all]")
+llm_cmd.shortcut("额度", command="llm quota", prefix=True, fuzzy=True, humanized="额度 [模型名|--all]")
 
 
 async def _should_handle_mention(event: Event) -> bool:
@@ -523,12 +524,25 @@ async def llm_tts_set_handle(
 
 
 @llm_cmd.assign("quota")
-async def llm_quota_handle(user: UserSession, model: Query[str] = Query("quota.model")):
+async def llm_quota_handle(
+    user: UserSession,
+    model: Query[str] = Query("quota.model"),
+    query_all: Query[bool] = Query("quota.all.value", False),
+):
     if not plugin_config.get_model_names():
         await llm_cmd.finish("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
     names = await get_available_model_names(user.session_id)
     if not names:
         await llm_cmd.finish("本群未启用任何模型，请联系超级管理员配置", at_sender=True)
+
+    if query_all.result and model.available:
+        await llm_cmd.finish("不能同时指定模型和 --all", at_sender=True)
+    if query_all.result:
+        try:
+            result = await get_quotas([plugin_config.resolve(name) for name in names])
+        except (QuotaError, ValueError) as e:
+            await llm_cmd.finish(str(e), at_sender=True)
+        await llm_cmd.finish(result, at_sender=True)
 
     try:
         name = model.result if model.available else await get_model_name(user.session_id)

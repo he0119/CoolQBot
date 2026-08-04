@@ -10,12 +10,13 @@ LLM__MODELS='[{"name":"model-a","provider":"openai_chat_completions"}]'
 """
 
 from enum import StrEnum
-from typing import Annotated, Any, Literal
+from typing import Any, Literal
 
 from nonebot import get_plugin_config, logger
 from pydantic import AliasChoices, BaseModel, Field, model_validator
 
 from .providers import LEGACY_PROVIDER_NAMES, ProviderName
+from .quota import QuotaConfig
 
 
 class ModelCapability(StrEnum):
@@ -23,37 +24,6 @@ class ModelCapability(StrEnum):
 
     TEXT = "text"
     VISION = "vision"
-
-
-class BaseQuotaConfig(BaseModel):
-    """额度查询的共用配置"""
-
-    api_url: str = ""
-    """完整的额度接口地址；留空时回退到全局 LLM 服务地址"""
-    api_key: str = ""
-    """额度接口密钥；留空时由具体 provider 决定是否复用模型密钥"""
-    proxy: str | None = None
-    """额度查询代理地址；留空时复用模型代理"""
-    timeout: int = 10
-    """额度查询超时时间（秒）"""
-
-
-class ApertureQuotaConfig(BaseQuotaConfig):
-    """Tailscale Aperture 额度接口配置"""
-
-    provider: Literal["aperture"]
-    bucket: str = ""
-    """仅显示指定额度桶；留空时显示接口返回的全部额度桶"""
-
-
-class DeepSeekQuotaConfig(BaseQuotaConfig):
-    """DeepSeek 官方余额接口配置"""
-
-    provider: Literal["deepseek"]
-
-
-QuotaConfig = Annotated[ApertureQuotaConfig | DeepSeekQuotaConfig, Field(discriminator="provider")]
-"""单个模型的额度查询配置"""
 
 
 class ModelConfig(BaseModel):

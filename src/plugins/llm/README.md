@@ -69,6 +69,7 @@
 | `/llm tts list`                       | -                 | 查看可用 TTS 模型列表  | 所有人     |
 | `/llm tts set <模型名>`               | -                 | 设置群组默认 TTS 模型  | 群管理员   |
 | `/llm quota [模型名]`                 | `/quota`、`/额度` | 查询模型剩余额度       | 所有人     |
+| `/llm quota --all`                    | `/quota --all`    | 查询本群全部模型额度   | 所有人     |
 | `@机器人 [选项] <内容>`               | -                 | 快捷发起纯对话         | 所有人     |
 | `@机器人 -a <内容>`                   | -                 | 快捷启用工具增强模式   | 所有人     |
 | `zssm [关注点]`                       | -                 | 解释输入或被回复内容   | 所有人     |
@@ -100,6 +101,7 @@
 /llm model set-zssm-vision gpt   # 本群 zssm 需要时用 gpt 理解图片
 /llm quota                       # 查询本群当前模型的剩余额度
 /llm quota deepseek              # 查询指定模型的剩余额度
+/llm quota --all                 # 查询本群已启用的全部模型额度
 /quota deepseek                  # 使用快捷命令查询指定模型的剩余额度
 @机器人 --model claude 讲个笑话  # @ 对话也可临时指定模型
 @机器人 -a 查询成都今天的天气    # @ 对话按次启用全部工具
@@ -282,14 +284,19 @@ LLM__TTS_MODEL=default
 
 DeepSeek 字段与鉴权方式以[官方余额接口文档](https://api-docs.deepseek.com/zh-cn/api/get-user-balance)为准。
 
-| Provider   | 追加路径        | 说明                                                           |
+| Provider   | 接口根路径      | 说明                                                           |
 | ---------- | --------------- | -------------------------------------------------------------- |
 | `deepseek` | `/user/balance` | 请求 DeepSeek 官方余额接口；默认复用模型 `api_key`             |
 | `aperture` | `/api/quotas`   | 请求 Tailscale Aperture 额度接口；可用 `bucket` 筛选单个额度桶 |
 
-未设置 `quota.api_url` 时，插件优先使用 `LLM__BASE_URL` 并追加上表路径；全局地址也为空时，
-再使用模型解析后的服务地址。`quota.api_url` 可填写完整地址以覆盖这一行为。两种 provider 还可单独设置
+未设置 `quota.api_url` 时，插件优先使用 `LLM__BASE_URL` 的域名根目录解析上表路径；例如
+`https://ai.example.com/v1` 会解析为 `https://ai.example.com/api/quotas`。全局地址为空时，再使用模型解析后的
+服务地址。额度接口位于其他域名或非标准路径时，可用完整的 `quota.api_url` 覆盖。两种 Provider 还可单独设置
 `api_key`、`proxy` 与 `timeout`。
+
+使用 `/llm quota --all` 时，只查询本群已启用的模型。URL、鉴权、代理和超时均相同的额度请求会合并为一次，
+不同请求并发执行；共享同一额度视图（例如相同 Aperture `bucket`）的模型也会合并显示。单个接口查询失败不会
+中断其他模型的结果。
 
 ## 内置工具
 
