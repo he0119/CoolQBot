@@ -14,7 +14,7 @@ class GroupLLMConfig(Model):
     session_id: Mapped[str]
     """群组会话 ID"""
     model_name: Mapped[str | None] = mapped_column(default=None)
-    """默认模型名，为空时使用本群开放的第一个模型"""
+    """默认模型名，为空时使用本群启用的第一个模型"""
     available_models: Mapped[list[str] | None] = mapped_column(JSON(none_as_null=True), default=None)
     """本群可用模型名；为空时不允许使用任何模型"""
     zssm_model: Mapped[str | None] = mapped_column(default=None)

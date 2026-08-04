@@ -94,7 +94,7 @@ def resolve_vision_fallback(model_name: str, vision_model_name: str, *, has_imag
         return ""
 
     if not vision_model_name:
-        raise ValueError("解释模型未声明 vision 能力，且本群没有已开放并声明 vision 能力的模型")
+        raise ValueError("解释模型未声明 vision 能力，且本群没有已启用并声明 vision 能力的模型")
     try:
         vision_model = plugin_config.get_model(vision_model_name)
     except ValueError as e:

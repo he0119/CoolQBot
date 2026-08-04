@@ -37,7 +37,7 @@ def _available_names(config: GroupLLMConfig | None) -> list[str]:
 
 
 def _resolve_zssm_vision_model_name(config: GroupLLMConfig | None, names: list[str]) -> str:
-    """优先使用群组显式设置，否则选择首个已开放的视觉模型。"""
+    """优先使用群组显式设置，否则选择首个已启用的视觉模型。"""
     if config and config.zssm_vision_model in names:
         configured = config.zssm_vision_model
         if configured and "vision" in plugin_config.get_model(configured).capabilities:
@@ -69,7 +69,7 @@ async def get_model_overview(session_id: str) -> GroupModelOverview:
 async def get_model_name(session_id: str) -> str:
     """获取群组当前使用的模型名
 
-    群组未设置或所设模型已下线时，回退到本群开放的第一个模型。
+    群组未设置或所设模型已下线时，回退到本群启用的第一个模型。
     """
     if not plugin_config.get_model_names():
         raise ValueError("未配置任何模型，请先在 .env 中配置 LLM__MODELS")
@@ -77,7 +77,7 @@ async def get_model_name(session_id: str) -> str:
     config = await _get_config(session_id)
     names = _available_names(config)
     if not names:
-        raise ValueError("本群未开放任何模型，请联系超级管理员配置")
+        raise ValueError("本群未启用任何模型，请联系超级管理员配置")
     if config and config.model_name in names:
         return config.model_name
     return names[0]
@@ -100,7 +100,7 @@ async def set_model_name(session_id: str, model_name: str) -> None:
 
 
 async def set_available_model_names(session_id: str, model_names: list[str]) -> list[str]:
-    """设置本群可用模型，并清理不再可用的群级模型选择。"""
+    """设置本群启用模型，并清理不再可用的群级模型选择。"""
     configured_names = plugin_config.get_model_names()
     requested = set(model_names)
     unknown = list(dict.fromkeys(name for name in model_names if name not in configured_names))
@@ -108,7 +108,7 @@ async def set_available_model_names(session_id: str, model_names: list[str]) -> 
         raise ValueError(f"未配置的模型：{'、'.join(unknown)}")
     available = [name for name in configured_names if name in requested]
     if not available:
-        raise ValueError("至少需要为本群开放一个模型")
+        raise ValueError("至少需要为本群启用一个模型")
 
     async with get_session() as session:
         config = (
@@ -140,7 +140,7 @@ async def set_available_model_names(session_id: str, model_names: list[str]) -> 
 
 
 async def clear_available_model_names(session_id: str) -> None:
-    """清空本群模型准入列表。"""
+    """禁用本群全部模型。"""
     async with get_session() as session:
         config = (
             await session.scalars(select(GroupLLMConfig).where(GroupLLMConfig.session_id == session_id))
@@ -151,7 +151,28 @@ async def clear_available_model_names(session_id: str) -> None:
             config.zssm_model = None
             config.zssm_vision_model = None
             await session.commit()
-    logger.info("LLM 群组可用模型已清空")
+    logger.info("LLM 群组模型已全部禁用")
+
+
+async def enable_model_names(session_id: str, model_names: list[str]) -> list[str]:
+    """在本群现有列表上增量启用模型。"""
+    current = await get_available_model_names(session_id)
+    return await set_available_model_names(session_id, [*current, *model_names])
+
+
+async def disable_model_names(session_id: str, model_names: list[str]) -> list[str]:
+    """从本群现有列表中增量禁用模型，并清理失效的群级模型选择。"""
+    configured_names = plugin_config.get_model_names()
+    unknown = list(dict.fromkeys(name for name in model_names if name not in configured_names))
+    if unknown:
+        raise ValueError(f"未配置的模型：{'、'.join(unknown)}")
+
+    disabled = set(model_names)
+    remaining = [name for name in await get_available_model_names(session_id) if name not in disabled]
+    if remaining:
+        return await set_available_model_names(session_id, remaining)
+    await clear_available_model_names(session_id)
+    return []
 
 
 async def get_zssm_model_name(session_id: str) -> str:
