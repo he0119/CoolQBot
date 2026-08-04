@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - 移除模型与 DeepSeek 额度接口的内置地址，未单独配置时仅回退到 `LLM__BASE_URL`
 - 将纯对话与工具调用分别独立为 `/chat` 和 `/agent`，使 `/llm` 专用于 `model`、`tts` 与 `quota`，并将 TTS 管理统一为 `list` / `set` 子命令；@ 对话复用通用选项并支持 `-a|--agent` 按次启用工具，同时规范模型列表帮助与 `--all` 参数校验
 
+### Fixed
+
+- 将非 JSON 模型响应转换为包含 HTTP 状态、内容类型、响应大小与解析位置的可诊断 Provider 错误
+
 ## [0.29.0] - 2026-08-04
 
 ### Added
