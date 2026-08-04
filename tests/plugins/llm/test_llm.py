@@ -265,7 +265,7 @@ async def test_llm_group_mention_uses_default_chat_flow(app: App, mock_models, m
 
 
 async def test_llm_group_mention_supports_chat_options(app: App, mock_models, mocker):
-    """@ 对话复用 /chat 的模型、输出、语音与多轮选项。"""
+    """@ 对话支持按次启用 agent 及常用对话选项。"""
     from src.plugins.llm import llm_mention
 
     handler = mocker.Mock()
@@ -277,7 +277,7 @@ async def test_llm_group_mention_supports_chat_options(app: App, mock_models, mo
         event = fake_group_message_event_v11(
             self_id=123456,
             message_id=42,
-            message=Message("--model temporary -c -r -t 你好"),
+            message=Message("-a --model temporary -c -r -t 你好"),
             to_me=True,
         )
 
@@ -288,7 +288,7 @@ async def test_llm_group_mention_supports_chat_options(app: App, mock_models, mo
         selected_model="temporary",
         render=True,
         use_tts=True,
-        enable_tools=False,
+        enable_tools=True,
     )
     handle_with_context.assert_awaited_once_with(handler, "你好", None, message_id="42")
 

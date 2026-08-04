@@ -131,7 +131,13 @@ llm_cmd = on_alconna(
 )
 
 
-def _build_dialogue_command(name: str, *, description: str, example: str) -> Alconna:
+def _build_dialogue_command(
+    name: str,
+    *,
+    description: str,
+    example: str,
+    allow_agent: bool = False,
+) -> Alconna:
     """构造共享参数的纯对话或工具增强命令。"""
     options = [
         Option("--model", Args["model#模型名称", str], help_text="本次使用指定模型"),
@@ -139,6 +145,8 @@ def _build_dialogue_command(name: str, *, description: str, example: str) -> Alc
         Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
         Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
     ]
+    if allow_agent:
+        options.append(Option("-a|--agent", default=False, action=store_true, help_text="启用工具增强模式"))
     return Alconna(
         name,
         Args["content?#内容", MultiVar(str, flag="+")]["img?#图片", Image],
@@ -181,6 +189,13 @@ agent_cmd = on_alconna(
     ],
 )
 
+mention_command = _build_dialogue_command(
+    "mention",
+    description="通过 @ 机器人发起对话",
+    example="@机器人 -a 查询成都天气",
+    allow_agent=True,
+)
+
 llm_cmd.shortcut("quota", command="llm quota", prefix=True, fuzzy=True, humanized="quota [模型名]")
 llm_cmd.shortcut("额度", command="llm quota", prefix=True, fuzzy=True, humanized="额度 [模型名]")
 
@@ -217,11 +232,12 @@ class ChatRequest:
     use_context: bool
     render: bool
     use_tts: bool
+    enable_tools: bool
 
 
-def _parse_chat_text(text: str) -> ChatRequest:
-    """使用 `/chat` 的 Alconna 定义解析 @ 对话参数。"""
-    result = chat_command.parse(f"/chat {text}".rstrip())
+def _parse_mention_text(text: str) -> ChatRequest:
+    """使用独立的 Alconna 定义解析 @ 对话参数。"""
+    result = mention_command.parse(f"mention {text}".rstrip())
     if not result.matched:
         raise LLMSetupError("对话参数有误，请输入 /chat -h 查看用法", at_sender=True)
     content: tuple[str, ...] = result.query("content", ())
@@ -233,6 +249,7 @@ def _parse_chat_text(text: str) -> ChatRequest:
         use_context=result.query("context.value", False),
         render=result.query("render.value", False),
         use_tts=result.query("tts.value", False),
+        enable_tools=result.query("agent.value", False),
     )
 
 
@@ -646,7 +663,7 @@ async def llm_mention_handle(
         await UniMessage.text(str(e)).finish(reply_to=message_id)
 
     try:
-        request = _parse_chat_text(text)
+        request = _parse_mention_text(text)
     except LLMSetupError as e:
         await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=message_id)
 
@@ -659,7 +676,7 @@ async def llm_mention_handle(
             selected_model=request.model_name,
             render=request.render,
             use_tts=request.use_tts,
-            enable_tools=False,
+            enable_tools=request.enable_tools,
         )
     except LLMSetupError as e:
         await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=message_id)
