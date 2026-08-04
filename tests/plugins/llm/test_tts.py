@@ -7,6 +7,17 @@ from nonebug import App
 from respx import MockRouter
 
 
+def test_tts_management_uses_subcommands(app: App):
+    """TTS 管理使用与模型管理一致的 list/set 子命令。"""
+    from src.plugins.llm import llm_cmd
+
+    command = llm_cmd.command()
+    assert command.parse("/llm tts list").matched
+    assert command.parse("/llm tts set voice-model").matched
+    assert not command.parse("/llm tts --list").matched
+    assert not command.parse("/llm tts --set voice-model").matched
+
+
 async def test_text_to_speech_without_model_shows_valid_command(app: App, mocker):
     """未设置模型时提示可直接使用的设置命令"""
     from src.plugins.llm.config import plugin_config
@@ -14,7 +25,7 @@ async def test_text_to_speech_without_model_shows_valid_command(app: App, mocker
 
     mocker.patch.object(plugin_config, "tts_base_url", "https://tts.example.com")
 
-    with pytest.raises(TTSError, match=r"/llm tts --set"):
+    with pytest.raises(TTSError, match=r"/llm tts set"):
         await text_to_speech("你好", "")
 
 
