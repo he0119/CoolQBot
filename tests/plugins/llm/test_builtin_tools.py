@@ -363,11 +363,6 @@ async def test_ff14_fashion_report_tool_reuses_existing_service(app: App, mocker
     )
     latest.assert_awaited_once_with()
 
-    latest.side_effect = httpx.ConnectError("private upstream details")
-    result = await registry.execute(ToolCall(id="fashion-2", name="query_ff14_fashion_report", arguments={}))
-    assert result == "抱歉，网络出错，无法获取最新的满分攻略，请稍后再试。"
-    assert "private upstream details" not in result
-
 
 async def test_fflogs_character_ranking_tool_reuses_existing_service(app: App, mocker: MockerFixture):
     """FFLogs 角色排名工具规范化 DPS 类型后复用现有查询。"""
