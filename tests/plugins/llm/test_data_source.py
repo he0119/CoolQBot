@@ -534,6 +534,26 @@ def test_format_output_quotes_multiline_thinking(app: App):
     assert format_output(completion, with_thinking=True, with_statistics=False) == "> 第一段\n>\n> 第二段\n\n回答"
 
 
+def test_format_statistics_splits_model_chain(app: App):
+    """模型链分行显示，token 用量使用中文标签与千分位"""
+    from src.plugins.llm.handler import format_statistics
+    from src.plugins.llm.schemas import Completion, Message, Usage
+
+    completion = Completion(
+        message=Message.assistant(),
+        model="Qwen/Qwen3.6-35B-A3B→x-ai/grok-4.5",
+        usage=Usage(input_tokens=1538, output_tokens=1396, cache_read_tokens=128),
+        elapsed_seconds=32.4,
+    )
+
+    assert format_statistics(completion) == (
+        "---\n"
+        "模型　Qwen/Qwen3.6-35B-A3B  \n"
+        "　　　↳ x-ai/grok-4.5  \n"
+        "统计　32.4s · 输入 1,538 · 输出 1,396 · 缓存 128 · 共 2,934"
+    )
+
+
 @pytest.mark.parametrize(
     ("adapter", "status", "expected"),
     [

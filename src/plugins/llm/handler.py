@@ -86,13 +86,19 @@ def split_content(completion: Completion) -> tuple[str, str]:
 
 
 def format_statistics(completion: Completion) -> str:
-    """把本次提问的耗时、模型及 token 用量格式化为紧凑尾注"""
+    """把本次提问的模型链、耗时及 token 用量格式化为尾注"""
     usage = completion.usage
     model = completion.model or "unknown"
+    models = [part.strip() for part in model.split("→") if part.strip()] or ["unknown"]
+    model_lines = [f"模型　{models[0]}"]
+    model_lines.extend(f"　　　↳ {part}" for part in models[1:])
+    model_text = "  \n".join(model_lines)
     return (
-        f"--- {completion.elapsed_seconds:.1f}s  "
-        f"{model}  I:{usage.input_tokens} O:{usage.output_tokens} "
-        f"A:{usage.total_tokens} C:{usage.cache_read_tokens}"
+        "---\n"
+        f"{model_text}  \n"
+        f"统计　{completion.elapsed_seconds:.1f}s · "
+        f"输入 {usage.input_tokens:,} · 输出 {usage.output_tokens:,} · "
+        f"缓存 {usage.cache_read_tokens:,} · 共 {usage.total_tokens:,}"
     )
 
 

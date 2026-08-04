@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ### Changed
 
+- 重排大模型回复尾注，分行显示模型链与耗时、Token 用量，并使用中文标签和千分位提高可读性
 - 将模型列表与群组模型设置统一为 `/llm model` 子命令，并支持通过 `enable`、`disable` 及 `--all` 增量或批量管理模型
 - 模型能力默认包含 `text` 并在列表中显示，允许将模型显式配置为仅 `vision`、专用于图片理解
 - 移除模型与 DeepSeek 额度接口的内置地址，未单独配置时仅回退到 `LLM__BASE_URL`

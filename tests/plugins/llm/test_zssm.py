@@ -150,7 +150,8 @@ async def test_zssm_uses_temporary_model(app: App, respx_mock: MockRouter, zssm_
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message(MessageSegment.reply(1)) + "临时模型解释\n\n--- 5.1s  temporary  I:0 O:0 A:0 C:0",
+            Message(MessageSegment.reply(1))
+            + "临时模型解释\n\n---\n模型　temporary  \n统计　5.1s · 输入 0 · 输出 0 · 缓存 0 · 共 0",
             True,
         )
 
@@ -257,7 +258,8 @@ async def test_zssm_explains_text_with_group_model(app: App, respx_mock: MockRou
             Message(MessageSegment.reply(1))
             + (
                 "关键词：Python | GIL\n\nGIL 是 CPython 用来协调字节码执行的一把全局锁。"
-                "\n\n--- 5.1s  explain-upstream  I:10 O:5 A:15 C:0"
+                "\n\n---\n模型　explain-upstream  \n"
+                "统计　5.1s · 输入 10 · 输出 5 · 缓存 0 · 共 15"
             ),
             True,
         )
@@ -392,7 +394,8 @@ async def test_zssm_separates_reply_and_focus(app: App, respx_mock: MockRouter, 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message(MessageSegment.reply(1)) + "解释结果\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0",
+            Message(MessageSegment.reply(1))
+            + "解释结果\n\n---\n模型　test-model  \n统计　5.1s · 输入 0 · 输出 0 · 缓存 0 · 共 0",
             True,
         )
 

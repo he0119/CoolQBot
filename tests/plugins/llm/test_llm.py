@@ -180,7 +180,9 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message("你好呀\n\n--- 5.1s  deepseek-v4-flash  I:1967 O:410 A:2377 C:1152"),
+            Message(
+                "你好呀\n\n---\n模型　deepseek-v4-flash  \n统计　5.1s · 输入 1,967 · 输出 410 · 缓存 1,152 · 共 2,377"
+            ),
             True,
         )
 
@@ -217,7 +219,7 @@ async def test_agent_enables_all_tools_by_default(app: App, respx_mock: MockRout
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message("你好呀\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0"),
+            Message("你好呀\n\n---\n模型　test-model  \n统计　5.1s · 输入 0 · 输出 0 · 缓存 0 · 共 0"),
             True,
         )
 
@@ -528,7 +530,7 @@ async def test_llm_with_thinking(app: App, respx_mock: MockRouter, mock_models, 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message("> 在想\n\n你好呀\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0"),
+            Message("> 在想\n\n你好呀\n\n---\n模型　test-model  \n统计　5.1s · 输入 0 · 输出 0 · 缓存 0 · 共 0"),
             True,
         )
 
@@ -606,7 +608,7 @@ async def test_llm_with_tool(app: App, respx_mock: MockRouter, mock_models):
             ctx.receive_event(bot, event)
             ctx.should_call_send(
                 event,
-                Message("成都晴，25 度\n\n--- 5.1s  test-model  I:30 O:6 A:36 C:5"),
+                Message("成都晴，25 度\n\n---\n模型　test-model  \n统计　5.1s · 输入 30 · 输出 6 · 缓存 5 · 共 36"),
                 True,
             )
     finally:
@@ -1508,7 +1510,7 @@ async def test_llm_send_md_pic_fallback(app: App, respx_mock: MockRouter, mock_m
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message("**加粗**\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0"),
+            Message("**加粗**\n\n---\n模型　test-model  \n统计　5.1s · 输入 0 · 输出 0 · 缓存 0 · 共 0"),
             True,
         )
 
