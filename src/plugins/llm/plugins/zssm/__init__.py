@@ -93,7 +93,7 @@ async def zssm_handle(
         await UniMessage.text("未配置任何模型，请先在 .env 中配置 LLM__MODELS").finish(reply_to=msg_id)
     names = await get_available_model_names(user.session_id)
     if not names:
-        await UniMessage.text("本群未开放任何模型，请联系超级管理员配置").finish(reply_to=msg_id)
+        await UniMessage.text("本群未启用任何模型，请联系超级管理员配置").finish(reply_to=msg_id)
     model_name = selected_model.result if selected_model.available else await get_zssm_model_name(user.session_id)
     if model_name not in names:
         await UniMessage.text(f"本群未启用解释模型：{model_name}，可用：{'、'.join(names)}").finish(reply_to=msg_id)

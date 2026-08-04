@@ -251,7 +251,7 @@ async def test_llm_quota_denies_group_without_available_models(app: App, mocker)
         event = fake_group_message_event_v11(message=Message("/llm quota"))
 
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "本群未开放任何模型，请联系超级管理员配置", True, at_sender=True)
+        ctx.should_call_send(event, "本群未启用任何模型，请联系超级管理员配置", True, at_sender=True)
         ctx.should_finished(llm_cmd)
 
 

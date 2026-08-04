@@ -17,7 +17,7 @@ async def test_get_model_name_denies_unconfigured_group(app: App, mocker):
         [ModelConfig(name="first"), ModelConfig(name="second")],
     )
 
-    with pytest.raises(ValueError, match="本群未开放任何模型"):
+    with pytest.raises(ValueError, match="本群未启用任何模型"):
         await get_model_name("QQClient_10000")
 
 
@@ -37,7 +37,7 @@ async def test_set_and_get_model_name(app: App, mocker):
 
     assert await get_model_name("QQClient_10000") == "second"
     # 其他群组仍保持默认拒绝
-    with pytest.raises(ValueError, match="本群未开放任何模型"):
+    with pytest.raises(ValueError, match="本群未启用任何模型"):
         await get_model_name("QQClient_20000")
 
 
@@ -97,17 +97,54 @@ async def test_available_models_are_scoped_by_group(app: App, mocker):
     assert await get_available_model_names("QQClient_10000") == []
 
 
+async def test_models_can_be_enabled_and_disabled_incrementally(app: App, mocker):
+    """增量启用保留现有列表，增量禁用会修正失效的默认模型。"""
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import (
+        disable_model_names,
+        enable_model_names,
+        get_available_model_names,
+        get_model_name,
+        set_model_name,
+    )
+
+    mocker.patch.object(
+        plugin_config,
+        "models",
+        [ModelConfig(name="first"), ModelConfig(name="second"), ModelConfig(name="vision")],
+    )
+
+    await enable_model_names("QQClient_10000", ["vision", "second"])
+    assert await get_available_model_names("QQClient_10000") == ["second", "vision"]
+
+    await enable_model_names("QQClient_10000", ["first", "second"])
+    assert await get_available_model_names("QQClient_10000") == ["first", "second", "vision"]
+
+    await set_model_name("QQClient_10000", "second")
+    await disable_model_names("QQClient_10000", ["second"])
+    assert await get_available_model_names("QQClient_10000") == ["first", "vision"]
+    assert await get_model_name("QQClient_10000") == "first"
+
+    await disable_model_names("QQClient_10000", ["first", "vision"])
+    assert await get_available_model_names("QQClient_10000") == []
+
+
 async def test_set_available_models_rejects_unknown_and_empty_lists(app: App, mocker):
     """群组准入列表拒绝未配置模型和空列表。"""
     from src.plugins.llm.config import ModelConfig, plugin_config
-    from src.plugins.llm.data_source import set_available_model_names
+    from src.plugins.llm.data_source import disable_model_names, enable_model_names, set_available_model_names
 
     mocker.patch.object(plugin_config, "models", [ModelConfig(name="first")])
 
     with pytest.raises(ValueError, match="未配置的模型：missing"):
         await set_available_model_names("QQClient_10000", ["missing", "missing"])
-    with pytest.raises(ValueError, match="至少需要为本群开放一个模型"):
+    with pytest.raises(ValueError, match="至少需要为本群启用一个模型"):
         await set_available_model_names("QQClient_10000", [])
+
+    with pytest.raises(ValueError, match="未配置的模型：missing"):
+        await enable_model_names("QQClient_10000", ["missing", "missing"])
+    with pytest.raises(ValueError, match="未配置的模型：missing"):
+        await disable_model_names("QQClient_10000", ["missing", "missing"])
 
 
 async def test_model_overview_reads_group_config_once(app: App, mocker):
@@ -169,7 +206,7 @@ async def test_group_zssm_models_are_independent(app: App, mocker):
 
     assert await get_zssm_model_name("QQClient_10000") == "explain"
     assert await get_zssm_vision_model_name("QQClient_10000") == "vision"
-    with pytest.raises(ValueError, match="本群未开放任何模型"):
+    with pytest.raises(ValueError, match="本群未启用任何模型"):
         await get_zssm_model_name("QQClient_20000")
     assert await get_zssm_vision_model_name("QQClient_20000") == ""
 

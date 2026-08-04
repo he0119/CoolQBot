@@ -88,7 +88,7 @@ async def test_zssm_not_configured(app: App, mocker):
 
 
 async def test_zssm_denies_group_without_available_models(app: App, mocker):
-    """全局存在模型时，未开放模型的群仍不能使用解释模式。"""
+    """全局存在模型时，未启用模型的群仍不能使用解释模式。"""
     from src.plugins.llm.config import ModelConfig, plugin_config
     from src.plugins.llm.plugins.zssm import zssm_cmd
 
@@ -102,7 +102,7 @@ async def test_zssm_denies_group_without_available_models(app: App, mocker):
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message(MessageSegment.reply(1)) + "本群未开放任何模型，请联系超级管理员配置",
+            Message(MessageSegment.reply(1)) + "本群未启用任何模型，请联系超级管理员配置",
             True,
         )
         ctx.should_finished(zssm_cmd)
@@ -403,7 +403,7 @@ def test_model_capability_selects_single_or_two_stage_vision(app: App, mocker):
     assert resolve_vision_fallback("text", "vision", has_images=True) == "vision"
     assert resolve_vision_fallback("text", "vision", has_images=False) == ""
 
-    with pytest.raises(ValueError, match="本群没有已开放并声明 vision 能力的模型"):
+    with pytest.raises(ValueError, match="本群没有已启用并声明 vision 能力的模型"):
         resolve_vision_fallback("text", "", has_images=True)
 
 
