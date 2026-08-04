@@ -81,7 +81,11 @@ async def test_available_models_are_scoped_by_group(app: App, mocker):
     mocker.patch.object(
         plugin_config,
         "models",
-        [ModelConfig(name="first"), ModelConfig(name="second"), ModelConfig(name="vision")],
+        [
+            ModelConfig(name="first"),
+            ModelConfig(name="second"),
+            ModelConfig(name="vision", capabilities={"vision"}),
+        ],
     )
 
     assert await get_available_model_names("QQClient_10000") == []
@@ -127,6 +131,55 @@ async def test_models_can_be_enabled_and_disabled_incrementally(app: App, mocker
 
     await disable_model_names("QQClient_10000", ["first", "vision"])
     assert await get_available_model_names("QQClient_10000") == []
+
+
+async def test_text_capability_controls_default_and_zssm_models(app: App, mocker):
+    """仅视觉模型可启用，但不会承担默认对话或解释文本。"""
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import (
+        get_model_name,
+        get_model_overview,
+        get_zssm_model_name,
+        set_available_model_names,
+        set_model_name,
+        set_zssm_model_name,
+    )
+
+    mocker.patch.object(
+        plugin_config,
+        "models",
+        [
+            ModelConfig(name="vision", capabilities={"vision"}),
+            ModelConfig(name="text"),
+            ModelConfig(name="multimodal", capabilities={"text", "vision"}),
+        ],
+    )
+    await set_available_model_names("QQClient_10000", ["vision", "text", "multimodal"])
+
+    overview = await get_model_overview("QQClient_10000")
+    assert overview.model_name == "text"
+    assert overview.zssm_model_name == "text"
+    assert overview.zssm_vision_model_name == "vision"
+
+    with pytest.raises(ValueError, match="模型 vision 未声明 text 能力，不能用于文本对话"):
+        await set_model_name("QQClient_10000", "vision")
+    with pytest.raises(ValueError, match="模型 vision 未声明 text 能力，不能用于文本解释"):
+        await set_zssm_model_name("QQClient_10000", "vision")
+
+    await set_model_name("QQClient_10000", "multimodal")
+    await set_zssm_model_name("QQClient_10000", "multimodal")
+    assert await get_model_name("QQClient_10000") == "multimodal"
+    assert await get_zssm_model_name("QQClient_10000") == "multimodal"
+
+    await set_available_model_names("QQClient_10000", ["vision"])
+    overview = await get_model_overview("QQClient_10000")
+    assert overview.model_name == ""
+    assert overview.zssm_model_name == ""
+    assert overview.zssm_vision_model_name == "vision"
+    with pytest.raises(ValueError, match="本群未启用支持文本的模型"):
+        await get_model_name("QQClient_10000")
+    with pytest.raises(ValueError, match="本群未启用支持文本的模型"):
+        await get_zssm_model_name("QQClient_10000")
 
 
 async def test_set_available_models_rejects_unknown_and_empty_lists(app: App, mocker):
@@ -272,11 +325,11 @@ async def test_set_and_get_tts_model(app: App, mocker):
 
 def test_model_config_defaults(app: App):
     """模型配置的默认值：模型名、服务地址和工具轮数。"""
-    from src.plugins.llm.config import ModelConfig, ScopedConfig
+    from src.plugins.llm.config import ModelCapability, ModelConfig, ScopedConfig
 
     chat = ModelConfig(name="deepseek-chat")
     assert chat.model == "deepseek-chat"
-    assert chat.capabilities == set()
+    assert chat.capabilities == {ModelCapability.TEXT}
 
     anthropic = ModelConfig(
         name="claude",
@@ -285,7 +338,10 @@ def test_model_config_defaults(app: App):
         capabilities={"vision"},
     )
     assert anthropic.model == "claude-opus-5"
-    assert anthropic.capabilities == {"vision"}
+    assert anthropic.capabilities == {ModelCapability.VISION}
+
+    multimodal = ModelConfig(name="multimodal", capabilities={"text", "vision"})
+    assert multimodal.capabilities == {ModelCapability.TEXT, ModelCapability.VISION}
 
     config = ScopedConfig(base_url="https://global.example.com", models=[chat, anthropic])
     assert config.prefer_markdown is False

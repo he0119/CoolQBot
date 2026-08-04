@@ -44,7 +44,7 @@ from nonebot_plugin_user import UserSession
 from src.utils.helpers import admin_permission
 from src.utils.permission import SUPERUSER
 
-from .config import plugin_config
+from .config import ModelCapability, plugin_config
 from .data_source import (
     clear_available_model_names,
     clear_zssm_model_name,
@@ -177,6 +177,8 @@ async def _create_handler(
     model_names = await get_available_model_names(user.session_id)
     if not model_names:
         raise LLMSetupError("本群未启用任何模型，请联系超级管理员配置", at_sender=True)
+    if not any(ModelCapability.TEXT in plugin_config.get_model(name).capabilities for name in model_names):
+        raise LLMSetupError("本群未启用支持文本的模型，请联系超级管理员配置", at_sender=True)
 
     name = selected_model or await get_model_name(user.session_id)
     if name not in model_names:
@@ -184,6 +186,8 @@ async def _create_handler(
             f"本群未启用的模型：{name}，可用：{'、'.join(model_names)}",
             at_sender=True,
         )
+    if ModelCapability.TEXT not in plugin_config.get_model(name).capabilities:
+        raise LLMSetupError(f"模型 {name} 未声明 text 能力，不能用于文本对话", at_sender=True)
 
     tts_model = await get_tts_model(user.session_id) if use_tts else ""
     if use_tts and not tts_model:
@@ -237,7 +241,8 @@ async def llm_model_list_handle(
             labels.append("zssm 视觉")
         if show_capabilities.result:
             capabilities = plugin_config.get_model(name).capabilities
-            capability_text = "、".join("视觉" if item == "vision" else item for item in sorted(capabilities))
+            capability_labels = {ModelCapability.TEXT: "文本", ModelCapability.VISION: "视觉"}
+            capability_text = "、".join(capability_labels[item] for item in sorted(capabilities))
             labels.append(f"能力：{capability_text or '无'}")
         suffix = f"（{'，'.join(labels)}）" if labels else ""
         return f"- {name}{suffix}"
@@ -280,7 +285,10 @@ async def llm_model_set_handle(
     if model.result not in names:
         await llm_cmd.finish(f"本群未启用的模型：{model.result}，可用：{'、'.join(names)}", at_sender=True)
 
-    await set_model_name(user.session_id, model.result)
+    try:
+        await set_model_name(user.session_id, model.result)
+    except ValueError as e:
+        await llm_cmd.finish(str(e), at_sender=True)
     await llm_cmd.finish(f"已设置群组默认模型为：{model.result}", at_sender=True)
 
 
@@ -427,13 +435,16 @@ async def llm_quota_handle(user: UserSession, model: Query[str] = Query("quota.m
     if not names:
         await llm_cmd.finish("本群未启用任何模型，请联系超级管理员配置", at_sender=True)
 
-    name = model.result if model.available else await get_model_name(user.session_id)
+    try:
+        name = model.result if model.available else await get_model_name(user.session_id)
+    except ValueError as e:
+        await llm_cmd.finish(str(e), at_sender=True)
     if name not in names:
         await llm_cmd.finish(f"本群未启用的模型：{name}，可用：{'、'.join(names)}", at_sender=True)
 
     try:
         result = await get_quota(plugin_config.resolve(name))
-    except QuotaError as e:
+    except (QuotaError, ValueError) as e:
         await llm_cmd.finish(str(e), at_sender=True)
     await llm_cmd.finish(result, at_sender=True)
 

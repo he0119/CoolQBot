@@ -23,7 +23,7 @@
 - 工具调用（function calling），三种格式自动适配；耗时较长时定期提示模型请求与工具调用进度
 - 可通过 `-s` 按次启用网页搜索；网页/PDF 正文读取工具默认可用，均返回来源 URL 并标记不可信外部内容
 - 默认提供最终幻想 XIV 国服物价、时尚品鉴和 FFLogs 角色排名查询工具
-- 图片输入（多模态），需要模型在 `capabilities` 中声明 `vision`
+- 模型默认声明 `text` 能力；图片输入需要额外声明 `vision`，也可将模型配置为仅视觉能力
 - 超级管理员可按群启用或禁用模型，群管理员可分别设置默认对话、`zssm` 解释和视觉模型；未指定视觉模型时自动选择首个已启用且支持视觉的模型
 - 内置“这是什么”解释模式，可解释被回复的文字、图片、网页与 PDF
 - 所有大模型入口仅在群聊、频道等非私聊会话中生效
@@ -230,7 +230,7 @@ LLM__MODELS='
     "model": "gpt-5",
     "base_url": "https://api.openai.com/v1",
     "api_key": "sk-openai-xxx",
-    "capabilities": ["vision"]
+    "capabilities": ["text", "vision"]
   },
   {
     "name": "claude",
@@ -249,6 +249,8 @@ LLM__TTS_ACCESS_TOKEN=your_token
 LLM__TTS_MODEL=default
 ```
 
+省略 `capabilities` 时默认为 `["text"]`。普通多模态模型应配置为 `["text", "vision"]`；配置为 `["vision"]` 的模型只参与 zssm 图片理解，不会被选为默认对话、临时文本对话或 zssm 解释模型。
+
 ### 单个模型的可配置项
 
 | 字段           | 说明                                             |
@@ -265,7 +267,7 @@ LLM__TTS_MODEL=default
 | `temperature`  | 采样温度                                         |
 | `timeout`      | 非流式请求超时时间（秒）                         |
 | `extra_body`   | 附加到请求体的额外字段，用于传各服务商特有参数   |
-| `capabilities` | 模型能力列表；`vision` 表示可直接接收图片        |
+| `capabilities` | 输入能力列表，默认 `text`；可选 `text`、`vision` |
 | `quota`        | 该模型的额度查询配置，留空时不支持 `/llm quota`  |
 
 ### 额度查询配置

@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from nonebot.log import logger
 from nonebot_plugin_alconna import image_fetch
 
-from ...config import plugin_config
+from ...config import ModelCapability, plugin_config
 from ...handler import LLMHandler, split_content
 from ...schemas import Completion, ImageContent
 from ...tools.web import ResourceContent, ResourceError, read_resource, resource_log_target
@@ -90,7 +90,7 @@ def format_explain_response(content: str) -> str:
 
 def resolve_vision_fallback(model_name: str, vision_model_name: str, *, has_images: bool) -> str:
     """按模型能力决定是否需要独立视觉模型。"""
-    if not has_images or "vision" in plugin_config.get_model(model_name).capabilities:
+    if not has_images or ModelCapability.VISION in plugin_config.get_model(model_name).capabilities:
         return ""
 
     if not vision_model_name:
@@ -100,7 +100,7 @@ def resolve_vision_fallback(model_name: str, vision_model_name: str, *, has_imag
     except ValueError as e:
         names = "、".join(plugin_config.get_model_names())
         raise ValueError(f"视觉模型未启用：{vision_model_name}，可用：{names}") from e
-    if "vision" not in vision_model.capabilities:
+    if ModelCapability.VISION not in vision_model.capabilities:
         raise ValueError(f"视觉模型 {vision_model_name} 未声明 vision 能力")
     return vision_model_name
 
@@ -133,7 +133,7 @@ async def fetch_images(
 
 async def describe_images(model_name: str, images: list[ImageContent]) -> tuple[str, Completion]:
     """使用统一 LLM Provider 调用专用视觉模型描述图片。"""
-    if "vision" not in plugin_config.get_model(model_name).capabilities:
+    if ModelCapability.VISION not in plugin_config.get_model(model_name).capabilities:
         raise ValueError(f"视觉模型 {model_name} 未声明 vision 能力")
     logger.info("调用视觉模型 {} 描述 {} 张图片", model_name, len(images))
     handler = LLMHandler(
