@@ -37,6 +37,21 @@ class ProviderError(Exception):
     """调用大模型失败"""
 
 
+def _decode_json_response(response: httpx.Response) -> dict[str, Any]:
+    """解析 JSON 响应，并在不记录正文的前提下保留诊断元数据。"""
+    content_type = response.headers.get("content-type", "").partition(";")[0] or "unknown"
+    metadata = f"HTTP {response.status_code}，Content-Type={content_type}，响应 {len(response.content)} 字节"
+    try:
+        data = response.json()
+    except json.JSONDecodeError as e:
+        raise ProviderError(f"服务返回无效 JSON（{metadata}，解析错误={e.msg}，位置={e.lineno}:{e.colno}）") from e
+    except UnicodeDecodeError as e:
+        raise ProviderError(f"服务返回无法解码的 JSON（{metadata}，编码错误={e.reason}）") from e
+    if not isinstance(data, dict):
+        raise ProviderError(f"服务返回的 JSON 顶层不是对象（{metadata}，实际类型={type(data).__name__}）")
+    return data
+
+
 async def iter_sse(response: httpx.Response) -> AsyncIterator[tuple[str, Any]]:
     """解析 SSE 流，产出 (事件名, 已解析的 JSON 数据)
 
@@ -134,12 +149,13 @@ class Provider(ABC):
                 completion = await self._request_stream(payload, headers)
             else:
                 completion = await self._request(payload, headers)
-        except ProviderError:
+        except ProviderError as e:
             logger.warning(
-                "LLM Provider 返回错误（会话={}，模型={}，协议={}，耗时={:.3f}s）",
+                "LLM Provider 返回错误（会话={}，模型={}，协议={}，错误={}，耗时={:.3f}s）",
                 log_id,
                 self.config.name,
                 self.config.provider,
+                e,
                 perf_counter() - started_at,
             )
             raise
@@ -183,7 +199,7 @@ class Provider(ABC):
                 json=payload,
                 timeout=self.config.timeout,
             )
-        data = response.json()
+        data = _decode_json_response(response)
         self.raise_for_error(data, response.status_code)
         return self.parse_response(data)
 
@@ -193,7 +209,7 @@ class Provider(ABC):
             async with client.stream("POST", self.endpoint, headers=headers, json=payload) as response:
                 if response.status_code != 200:
                     await response.aread()
-                    self.raise_for_error(response.json(), response.status_code)
+                    self.raise_for_error(_decode_json_response(response), response.status_code)
                 return await self.parse_stream(response)
 
     def raise_for_error(self, data: dict[str, Any], status_code: int = 200) -> None:

@@ -117,6 +117,28 @@ async def test_provider_logs_metadata_without_payload(app: App, respx_mock: Mock
 
 
 @respx.mock(assert_all_called=True)
+async def test_provider_reports_non_json_response_without_body(app: App, respx_mock: MockRouter, mocker):
+    """非 JSON 响应转换为可诊断的 ProviderError，但日志不包含响应正文。"""
+    from src.plugins.llm.providers import ChatProvider, ProviderError
+
+    body = "<html>private gateway failure</html>"
+    respx_mock.post("https://api.example.com/chat/completions").mock(
+        return_value=httpx.Response(502, headers={"content-type": "text/html; charset=utf-8"}, text=body)
+    )
+    logger_warning = mocker.patch("src.plugins.llm.providers.base.logger.warning")
+
+    provider = ChatProvider(make_config("chat"), session_affinity="abcdef1234567890")
+    with pytest.raises(ProviderError, match=r"无效 JSON.*HTTP 502.*Content-Type=text/html.*位置=1:1"):
+        await provider.chat(make_messages())
+
+    log_text = " ".join(str(item) for item in logger_warning.call_args_list)
+    assert "abcdef12" in log_text
+    assert "HTTP 502" in log_text
+    assert "Content-Type=text/html" in log_text
+    assert body not in log_text
+
+
+@respx.mock(assert_all_called=True)
 async def test_chat_tools_and_images(app: App, respx_mock: MockRouter):
     """chat 格式：工具嵌套在 function 下，图片用 image_url + data URI"""
     from src.plugins.llm.providers import ChatProvider
