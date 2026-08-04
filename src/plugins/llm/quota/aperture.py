@@ -35,6 +35,11 @@ class ApertureQuotaProvider(QuotaProvider):
     config: ApertureQuotaConfig
     endpoint_path = "/api/quotas"
 
+    @property
+    def result_selector(self) -> str:
+        """同一 Aperture 响应可按额度桶复用于多个模型。"""
+        return self.config.bucket
+
     def build_headers(self) -> dict[str, str]:
         headers = super().build_headers()
         if self.config.api_key:
@@ -43,9 +48,6 @@ class ApertureQuotaProvider(QuotaProvider):
 
     def parse_response(self, data: object) -> QuotaResult:
         response = ApertureResponse.model_validate(data)
-        buckets = response.buckets
-        if self.config.bucket:
-            buckets = [bucket for bucket in buckets if bucket.name == self.config.bucket]
         return QuotaResult(
             items=[
                 QuotaItem(
@@ -53,6 +55,12 @@ class ApertureQuotaProvider(QuotaProvider):
                     amount=bucket.current / Decimal("1000000000"),
                     currency="CNY",
                 )
-                for bucket in buckets
+                for bucket in response.buckets
             ]
         )
+
+    def select_result(self, result: QuotaResult) -> QuotaResult:
+        if not self.config.bucket:
+            return result
+        items = [item for item in result.items if item.name == self.config.bucket]
+        return QuotaResult(items=items, available=result.available)

@@ -13,6 +13,7 @@ from pydantic import BaseModel, ValidationError
 from ..providers.base import USER_AGENT
 
 if TYPE_CHECKING:
+    from collections.abc import Hashable
     from decimal import Decimal
 
     from ..config import ModelConfig
@@ -81,12 +82,33 @@ class QuotaProvider(ABC):
         """构造请求头。"""
         return {"User-Agent": USER_AGENT}
 
+    @property
+    def request_key(self) -> tuple[object, ...]:
+        """标识可合并为同一次 HTTP 请求的配置。"""
+        proxy = self.config.proxy if self.config.proxy is not None else self.model.proxy
+        return (
+            type(self),
+            self.api_url,
+            tuple(sorted(self.build_headers().items())),
+            proxy,
+            self.config.timeout,
+        )
+
+    @property
+    def result_selector(self) -> Hashable:
+        """标识同一请求结果中的模型视图；子类可按桶等筛选项覆盖。"""
+        return None
+
     @abstractmethod
     def parse_response(self, data: object) -> QuotaResult:
         """解析服务商响应。"""
 
-    async def query(self) -> QuotaResult:
-        """请求并解析额度信息。"""
+    def select_result(self, result: QuotaResult) -> QuotaResult:
+        """从共享查询结果中选出当前模型需要的部分。"""
+        return result
+
+    async def query_shared(self) -> QuotaResult:
+        """请求并解析可供同组模型共享的完整额度信息。"""
         proxy = self.config.proxy if self.config.proxy is not None else self.model.proxy
         try:
             async with httpx.AsyncClient(proxy=proxy) as client:
@@ -101,3 +123,7 @@ class QuotaProvider(ABC):
             raise QuotaError("额度查询超时，请稍后再试") from e
         except (httpx.HTTPError, ValidationError, ValueError) as e:
             raise QuotaError("获取额度信息失败，请稍后再试") from e
+
+    async def query(self) -> QuotaResult:
+        """查询并筛选当前模型的额度信息。"""
+        return self.select_result(await self.query_shared())

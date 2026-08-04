@@ -169,6 +169,91 @@ async def test_quota_not_configured(app: App):
         await get_quota(ModelConfig(name="test-model"))
 
 
+@respx.mock(assert_all_called=True)
+async def test_get_quotas_merges_requests_and_result_views(app: App, respx_mock: MockRouter):
+    """批量查询复用同一 Aperture 请求，并合并共享额度桶的模型。"""
+    from src.plugins.llm.config import ModelConfig
+    from src.plugins.llm.quota import get_quotas
+
+    route = respx_mock.get("https://ai.example.com/api/quotas").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "buckets": [
+                    {"name": "deepseek", "current": 4820000000},
+                    {"name": "siliconflow", "current": 1250000000},
+                ]
+            },
+        )
+    )
+    models = [
+        ModelConfig(
+            name="deepseek-flash",
+            quota={
+                "provider": "aperture",
+                "api_url": "https://ai.example.com/api/quotas",
+                "bucket": "deepseek",
+            },
+        ),
+        ModelConfig(
+            name="deepseek-pro",
+            quota={
+                "provider": "aperture",
+                "api_url": "https://ai.example.com/api/quotas",
+                "bucket": "deepseek",
+            },
+        ),
+        ModelConfig(
+            name="qwen",
+            quota={
+                "provider": "aperture",
+                "api_url": "https://ai.example.com/api/quotas",
+                "bucket": "siliconflow",
+            },
+        ),
+        ModelConfig(name="without-quota"),
+    ]
+
+    result = await get_quotas(models)
+
+    assert result == (
+        "deepseek-flash、deepseek-pro 剩余额度：\n"
+        "  deepseek: 4.82 元\n\n"
+        "qwen 剩余额度：\n"
+        "  siliconflow: 1.25 元\n\n"
+        "without-quota：未配置额度查询"
+    )
+    assert route.call_count == 1
+
+
+@respx.mock(assert_all_called=True)
+async def test_get_quotas_keeps_other_results_when_one_request_fails(app: App, respx_mock: MockRouter):
+    """批量查询中的单个接口失败不影响其他请求结果。"""
+    from src.plugins.llm.config import ModelConfig
+    from src.plugins.llm.quota import get_quotas
+
+    respx_mock.get("https://working.example.com/api/quotas").mock(
+        return_value=httpx.Response(200, json={"buckets": [{"name": "working", "current": 2000000000}]})
+    )
+    respx_mock.get("https://failed.example.com/api/quotas").mock(
+        return_value=httpx.Response(503, json={"error": "unavailable"})
+    )
+    models = [
+        ModelConfig(
+            name="working",
+            quota={"provider": "aperture", "api_url": "https://working.example.com/api/quotas"},
+        ),
+        ModelConfig(
+            name="failed",
+            quota={"provider": "aperture", "api_url": "https://failed.example.com/api/quotas"},
+        ),
+    ]
+
+    result = await get_quotas(models)
+
+    assert result == ("working 剩余额度：\n  working: 2.00 元\n\nfailed：获取额度信息失败，请稍后再试")
+
+
 @pytest.mark.parametrize("message", ["/llm quota deepseek", "/quota deepseek", "/额度 deepseek"])
 @respx.mock(assert_all_called=True)
 async def test_llm_quota_command_uses_selected_model(
@@ -226,6 +311,57 @@ async def test_llm_quota_command_uses_selected_model(
             True,
             at_sender=True,
         )
+        ctx.should_finished(llm_cmd)
+
+
+@pytest.mark.parametrize("message", ["/llm quota --all", "/quota --all", "/额度 --all"])
+async def test_llm_quota_command_all_uses_available_models(app: App, mocker, message: str):
+    """--all 只批量查询本群已启用的模型，并支持两个快捷命令。"""
+    from src.plugins.llm import llm_cmd
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names
+
+    mocker.patch.object(
+        plugin_config,
+        "models",
+        [
+            ModelConfig(name="first", quota={"provider": "aperture"}),
+            ModelConfig(name="second"),
+            ModelConfig(name="hidden", quota={"provider": "aperture"}),
+        ],
+    )
+    await set_available_model_names("QQClient_10000", ["first", "second"])
+    get_quotas = mocker.patch("src.plugins.llm.get_quotas", return_value="批量额度结果")
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message(message))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "批量额度结果", True, at_sender=True)
+        ctx.should_finished(llm_cmd)
+
+    queried_models = get_quotas.await_args.args[0]
+    assert [model.name for model in queried_models] == ["first", "second"]
+
+
+async def test_llm_quota_command_rejects_model_with_all(app: App, mocker):
+    """额度查询不能同时指定模型和 --all。"""
+    from src.plugins.llm import llm_cmd
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names
+
+    mocker.patch.object(plugin_config, "models", [ModelConfig(name="first")])
+    await set_available_model_names("QQClient_10000", ["first"])
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/llm quota first --all"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "不能同时指定模型和 --all", True, at_sender=True)
         ctx.should_finished(llm_cmd)
 
 

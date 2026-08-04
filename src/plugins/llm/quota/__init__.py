@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+from dataclasses import dataclass
 from time import perf_counter
 from typing import TYPE_CHECKING, Annotated
 
@@ -13,6 +15,7 @@ from .base import BaseQuotaConfig, QuotaError, QuotaItem, QuotaProvider, QuotaRe
 from .deepseek import DeepSeekQuotaConfig, DeepSeekQuotaProvider
 
 if TYPE_CHECKING:
+    from collections.abc import Hashable
     from decimal import Decimal
 
     from ..config import ModelConfig
@@ -27,6 +30,16 @@ QUOTA_PROVIDERS: dict[str, type[QuotaProvider]] = {
     "deepseek": DeepSeekQuotaProvider,
 }
 """额度 Provider 注册表。"""
+
+
+@dataclass
+class _BatchQuotaResult:
+    """单个模型的批量查询结果及其可合并展示键。"""
+
+    model_name: str
+    display_key: Hashable
+    result: QuotaResult | None = None
+    error: str = ""
 
 
 def _format_amount(amount: Decimal, currency: str) -> str:
@@ -82,6 +95,116 @@ async def get_quota(model: ModelConfig) -> str:
     return format_quota(model.name, result)
 
 
+async def _query_provider_group(
+    request_key: Hashable,
+    items: list[tuple[ModelConfig, QuotaProvider]],
+) -> list[_BatchQuotaResult]:
+    """发起一次共享请求，并为组内模型分别筛选结果。"""
+    provider = items[0][1]
+    started_at = perf_counter()
+    try:
+        shared_result = await provider.query_shared()
+    except QuotaError as e:
+        logger.warning(
+            "LLM 批量额度请求失败（provider={}，模型={}，耗时={:.3f}s）",
+            items[0][0].quota.provider if items[0][0].quota else "unknown",
+            len(items),
+            perf_counter() - started_at,
+        )
+        return [
+            _BatchQuotaResult(
+                model_name=model.name,
+                display_key=("request-error", request_key, str(e)),
+                error=str(e),
+            )
+            for model, _ in items
+        ]
+
+    logger.info(
+        "LLM 批量额度请求完成（provider={}，模型={}，项目={}，耗时={:.3f}s）",
+        items[0][0].quota.provider if items[0][0].quota else "unknown",
+        len(items),
+        len(shared_result.items),
+        perf_counter() - started_at,
+    )
+    return [
+        _BatchQuotaResult(
+            model_name=model.name,
+            display_key=("result", request_key, item_provider.result_selector),
+            result=item_provider.select_result(shared_result),
+        )
+        for model, item_provider in items
+    ]
+
+
+def _format_batch_results(results: list[_BatchQuotaResult]) -> str:
+    """按首次出现顺序合并相同额度视图并格式化。"""
+    grouped: dict[Hashable, list[_BatchQuotaResult]] = {}
+    for result in results:
+        grouped.setdefault(result.display_key, []).append(result)
+
+    sections: list[str] = []
+    for items in grouped.values():
+        names = "、".join(item.model_name for item in items)
+        first = items[0]
+        if first.result is not None:
+            sections.append(format_quota(names, first.result))
+        else:
+            sections.append(f"{names}：{first.error}")
+    return "\n\n".join(sections)
+
+
+async def get_quotas(models: list[ModelConfig]) -> str:
+    """批量查询模型额度，合并相同请求并并发执行不同请求。"""
+    if not models:
+        raise QuotaError("没有可查询额度的模型")
+
+    started_at = perf_counter()
+    request_groups: dict[Hashable, list[tuple[ModelConfig, QuotaProvider]]] = {}
+    results: list[_BatchQuotaResult] = []
+    for index, model in enumerate(models):
+        if model.quota is None:
+            results.append(
+                _BatchQuotaResult(
+                    model_name=model.name,
+                    display_key=("not-configured",),
+                    error="未配置额度查询",
+                )
+            )
+            continue
+
+        provider = QUOTA_PROVIDERS[model.quota.provider](model.quota, model)
+        try:
+            request_key = provider.request_key
+        except QuotaError as e:
+            results.append(
+                _BatchQuotaResult(
+                    model_name=model.name,
+                    display_key=("setup-error", index),
+                    error=str(e),
+                )
+            )
+            continue
+        request_groups.setdefault(request_key, []).append((model, provider))
+
+    logger.info("LLM 批量额度查询开始（模型={}，请求={}）", len(models), len(request_groups))
+    queried = await asyncio.gather(
+        *(_query_provider_group(request_key, items) for request_key, items in request_groups.items())
+    )
+    results.extend(item for group in queried for item in group)
+
+    order = {model.name: index for index, model in enumerate(models)}
+    results.sort(key=lambda item: order[item.model_name])
+    logger.info(
+        "LLM 批量额度查询完成（模型={}，请求={}，失败={}，耗时={:.3f}s）",
+        len(models),
+        len(request_groups),
+        sum(bool(item.error) for item in results),
+        perf_counter() - started_at,
+    )
+    return _format_batch_results(results)
+
+
 __all__ = [
     "QUOTA_PROVIDERS",
     "ApertureQuotaConfig",
@@ -96,4 +219,5 @@ __all__ = [
     "QuotaResult",
     "format_quota",
     "get_quota",
+    "get_quotas",
 ]
