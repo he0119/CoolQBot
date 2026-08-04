@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Changed
+
+- 将额度查询按 Provider 拆分为独立模块，统一复用公共请求、错误处理与结果格式化逻辑
+
+### Fixed
+
+- 修复 `LLM__BASE_URL` 包含 `/v1` 等 API 版本路径时，Aperture 与 DeepSeek 额度接口地址解析错误的问题
+
 ## [0.29.1] - 2026-08-04
 
 ### Changed

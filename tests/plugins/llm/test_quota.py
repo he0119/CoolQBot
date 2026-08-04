@@ -45,7 +45,7 @@ async def test_aperture_quota(app: App, respx_mock: MockRouter):
 
 @respx.mock(assert_all_called=True)
 async def test_quota_api_url_falls_back_to_global_base_url(app: App, respx_mock: MockRouter, mocker):
-    """未配置 api_url 时优先使用全局 LLM 服务地址并追加 provider 路径"""
+    """未配置 api_url 时从带 API 版本的全局地址解析域名根路径。"""
     from src.plugins.llm.config import ModelConfig, plugin_config
     from src.plugins.llm.quota import get_quota
 
@@ -57,7 +57,7 @@ async def test_quota_api_url_falls_back_to_global_base_url(app: App, respx_mock:
         base_url="https://model.example.com",
         quota={"provider": "aperture"},
     )
-    mocker.patch.object(plugin_config, "base_url", "https://global.example.com/")
+    mocker.patch.object(plugin_config, "base_url", "https://global.example.com/v1")
 
     result = await get_quota(model)
 
@@ -98,7 +98,7 @@ async def test_deepseek_quota(app: App, respx_mock: MockRouter, mocker):
         api_key="sk-model",
         quota={"provider": "deepseek"},
     )
-    mocker.patch.object(plugin_config, "base_url", "https://api.deepseek.com")
+    mocker.patch.object(plugin_config, "base_url", "https://api.deepseek.com/v1")
     logger_info = mocker.patch("src.plugins.llm.quota.logger.info")
 
     result = await get_quota(model)
