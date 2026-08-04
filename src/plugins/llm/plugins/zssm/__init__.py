@@ -121,6 +121,8 @@ async def zssm_handle(
         len(images),
     )
     await send_reaction("thinking", message_id=msg_id)
+    stage = "输入准备"
+    handler: LLMHandler | None = None
     try:
         image_contents = await fetch_images(images, event, bot, state)
         resources = await load_resources(target, focus)
@@ -128,6 +130,7 @@ async def zssm_handle(
         vision_completion = None
         final_images = image_contents or None
         if image_contents and vision_model:
+            stage = "视觉模型请求"
             image_descriptions, vision_completion = await describe_images(vision_model, image_contents)
             final_images = None
 
@@ -138,6 +141,7 @@ async def zssm_handle(
             resources,
             image_descriptions,
         )
+        stage = "解释模型请求"
         handler = LLMHandler(
             model_name,
             system_prompt=SYSTEM_PROMPT,
@@ -153,6 +157,7 @@ async def zssm_handle(
         )
         completion = await handler.ask(user_prompt, final_images)
         logger.info("解释模式模型调用完成（会话={}，模型={}）", handler.log_id, completion.model)
+        stage = "响应解析"
         if vision_completion:
             completion.usage = vision_completion.usage + completion.usage
             completion.elapsed_seconds += vision_completion.elapsed_seconds
@@ -160,11 +165,24 @@ async def zssm_handle(
         content_text, _ = split_content(completion)
         completion.message.content = format_explain_response(content_text)
     except (ProviderError, ValueError) as e:
-        logger.warning("解释模式失败（模型={}，错误类型={}）", model_name, type(e).__name__)
+        logger.warning(
+            "解释模式失败（会话={}，模型={}，阶段={}，错误类型={}，错误={}）",
+            handler.log_id if handler else "-",
+            model_name,
+            stage,
+            type(e).__name__,
+            e,
+        )
         await send_reaction("fail", message_id=msg_id)
         await UniMessage.text(f"解释失败：{e}").finish(reply_to=msg_id)
     except Exception as e:
-        logger.opt(exception=e).error("解释模式出现未预期的错误")
+        logger.opt(exception=e).error(
+            "解释模式出现未预期的错误（会话={}，模型={}，阶段={}，错误类型={}）",
+            handler.log_id if handler else "-",
+            model_name,
+            stage,
+            type(e).__name__,
+        )
         await send_reaction("fail", message_id=msg_id)
         await UniMessage.text("解释失败，请稍后重试").finish(reply_to=msg_id)
     else:
