@@ -1,4 +1,4 @@
-"""测试 /llm 命令"""
+"""测试 /chat 对话与 /llm 管理命令。"""
 
 import asyncio
 import json
@@ -35,6 +35,31 @@ def mock_models(mocker):
     return config, reaction
 
 
+def test_dialogue_commands_are_separate_from_management(app: App):
+    """管理关键字在纯对话和工具增强命令中仍作为普通正文。"""
+    from src.plugins.llm import agent_command, chat_command, llm_cmd
+
+    for command, text in [(chat_command, "/chat model tts quota"), (agent_command, "/agent model tts quota")]:
+        result = command.parse(text)
+        assert result.matched
+        assert result.query("content") == ("model", "tts", "quota")
+    assert not llm_cmd.command().parse("/llm 你好").matched
+
+
+async def test_chat_rejects_removed_search_flag(app: App):
+    """纯对话提示改用默认支持搜索的工具增强命令。"""
+    from src.plugins.llm import chat_cmd
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/chat -s 查询"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "纯对话不支持网页搜索，请使用 /agent", True, at_sender=True)
+        ctx.should_finished(chat_cmd)
+
+
 def test_session_affinity_is_per_conversation(app: App, mock_models):
     """每个 LLM 对话上下文使用独立的随机亲和键"""
     from src.plugins.llm.handler import LLMHandler
@@ -63,7 +88,7 @@ def test_extract_context_reply_keeps_message_id(app: App, mocker):
 
 async def test_context_reply_reacts_to_current_message(app: App, mocker):
     """多轮续聊把当前消息 ID 传给模型响应流程"""
-    from src.plugins.llm import _handle_with_context
+    from src.plugins.llm import _handle_with_context, chat_cmd
 
     class StopConversation(Exception):
         pass
@@ -84,8 +109,8 @@ async def test_context_reply_reacts_to_current_message(app: App, mocker):
         await _handle_with_context(handler, "开始", None)
 
     assert ask.await_args_list == [
-        call(handler, "开始", None),
-        call(handler, "继续聊", None, message_id="42"),
+        call(handler, "开始", None, finish_matcher=chat_cmd),
+        call(handler, "继续聊", None, message_id="42", finish_matcher=chat_cmd),
     ]
     handler.send.assert_awaited_once_with(first_completion)
 
@@ -97,12 +122,12 @@ async def test_llm_not_configured(app: App):
 
     plugin_config.models = []
 
-    from src.plugins.llm import llm_cmd
+    from src.plugins.llm import chat_cmd
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm 你好"))
+        event = fake_group_message_event_v11(message=Message("/chat 你好"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -110,12 +135,12 @@ async def test_llm_not_configured(app: App):
             "未配置任何模型，请先在 .env 中配置 LLM__MODELS",
             True,
         )
-        ctx.should_finished(llm_cmd)
+        ctx.should_finished(chat_cmd)
 
 
 async def test_llm_denies_group_without_available_models(app: App, mocker):
     """全局存在模型时，未启用模型的群仍默认拒绝调用。"""
-    from src.plugins.llm import llm_cmd
+    from src.plugins.llm import chat_cmd
     from src.plugins.llm.config import ModelConfig, plugin_config
 
     mocker.patch.object(plugin_config, "models", [ModelConfig(name="test-model")])
@@ -123,16 +148,16 @@ async def test_llm_denies_group_without_available_models(app: App, mocker):
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm 你好"))
+        event = fake_group_message_event_v11(message=Message("/chat 你好"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "本群未启用任何模型，请联系超级管理员配置", True, at_sender=True)
-        ctx.should_finished(llm_cmd)
+        ctx.should_finished(chat_cmd)
 
 
 @respx.mock(assert_all_called=True)
 async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
-    """发送 /llm 你好 得到模型回复"""
+    """发送 /chat 你好得到模型回复。"""
 
     route = respx_mock.post("https://api.example.com/chat/completions").mock(
         return_value=httpx.Response(
@@ -152,7 +177,7 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm 你好"))
+        event = fake_group_message_event_v11(message=Message("/chat 你好"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -169,25 +194,19 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
 
     request = route.calls[0].request
     assert UUID(request.headers["x-session-affinity"]).version == 4
-    tool_names = {tool["function"]["name"] for tool in json.loads(request.content)["tools"]}
-    assert "web_fetch" in tool_names
-    assert "web_search" not in tool_names
-    assert {
-        "query_ff14_item_price",
-        "query_ff14_fashion_report",
-        "query_fflogs_character_ranking",
-    } <= tool_names
+    payload = json.loads(request.content)
+    assert "tools" not in payload
 
 
 @respx.mock(assert_all_called=True)
-async def test_llm_search_option_enables_web_search(app: App, respx_mock: MockRouter, mock_models):
-    """-s 按次启用网页搜索，同时保留默认可用的网页读取工具。"""
+async def test_agent_enables_all_tools_by_default(app: App, respx_mock: MockRouter, mock_models):
+    """工具增强命令默认发送包括网页搜索在内的全部工具。"""
     route = respx_mock.post("https://api.example.com/chat/completions").mock(
         return_value=httpx.Response(
             200,
             json={
                 "model": "test-model",
-                "choices": [{"finish_reason": "stop", "message": {"role": "assistant", "content": "搜索结果"}}],
+                "choices": [{"finish_reason": "stop", "message": {"role": "assistant", "content": "你好呀"}}],
             },
         )
     )
@@ -195,17 +214,16 @@ async def test_llm_search_option_enables_web_search(app: App, respx_mock: MockRo
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm -s 查询新消息"))
+        event = fake_group_message_event_v11(message=Message("/agent 你好"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            Message("搜索结果\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0"),
+            Message("你好呀\n\n--- 5.1s  test-model  I:0 O:0 A:0 C:0"),
             True,
         )
 
-    payload = json.loads(route.calls[0].request.content)
-    tool_names = {tool["function"]["name"] for tool in payload["tools"]}
+    tool_names = {tool["function"]["name"] for tool in json.loads(route.calls[0].request.content)["tools"]}
     assert {"web_search", "web_fetch"} <= tool_names
     assert {
         "query_ff14_item_price",
@@ -236,9 +254,43 @@ async def test_llm_group_mention_uses_default_chat_flow(app: App, mock_models, m
         ctx.receive_event(bot, event)
 
     create_handler.assert_awaited_once()
-    assert create_handler.await_args.kwargs == {}
+    assert create_handler.await_args.kwargs == {
+        "selected_model": "",
+        "render": False,
+        "use_tts": False,
+        "enable_tools": False,
+    }
     ask.assert_awaited_once_with(handler, "你好", None, message_id="42")
     handler.send.assert_awaited_once_with(completion, reply_to="42")
+
+
+async def test_llm_group_mention_supports_chat_options(app: App, mock_models, mocker):
+    """@ 对话复用 /chat 的模型、输出、语音与多轮选项。"""
+    from src.plugins.llm import llm_mention
+
+    handler = mocker.Mock()
+    create_handler = mocker.patch("src.plugins.llm._create_handler", return_value=handler)
+    handle_with_context = mocker.patch("src.plugins.llm._handle_with_context")
+    async with app.test_matcher(llm_mention) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message_id=42,
+            message=Message("--model temporary -c -r -t 你好"),
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+
+    create_handler.assert_awaited_once_with(
+        mocker.ANY,
+        selected_model="temporary",
+        render=True,
+        use_tts=True,
+        enable_tools=False,
+    )
+    handle_with_context.assert_awaited_once_with(handler, "你好", None, message_id="42")
 
 
 async def test_create_handler_prefers_markdown_unless_render_is_explicit(app: App, mock_models, mocker):
@@ -253,13 +305,16 @@ async def test_create_handler_prefers_markdown_unless_render_is_explicit(app: Ap
     handler = await _create_handler(user)
     assert handler.send_markdown is True
     assert handler.send_md_pic is False
+    assert handler.enable_tools is False
+    assert handler.enable_web_search is False
 
     rendered_handler = await _create_handler(user, render=True)
     assert rendered_handler.send_markdown is False
     assert rendered_handler.send_md_pic is True
 
-    search_handler = await _create_handler(user, search=True)
-    assert search_handler.enable_web_search is True
+    agent_handler = await _create_handler(user, enable_tools=True)
+    assert agent_handler.enable_tools is True
+    assert agent_handler.enable_web_search is True
 
 
 async def test_llm_mention_requires_to_me_message(app: App, mock_models):
@@ -279,21 +334,26 @@ async def test_llm_mention_requires_to_me_message(app: App, mock_models):
         ctx.should_not_pass_rule(llm_mention)
 
 
-async def test_llm_command_ignores_private_messages(app: App, mock_models):
-    """所有 /llm 子命令共享同一条非私聊规则。"""
-    from src.plugins.llm import llm_cmd
+@pytest.mark.parametrize(
+    ("matcher_name", "message"),
+    [("chat_cmd", "/chat 你好"), ("agent_cmd", "/agent 你好"), ("llm_cmd", "/llm model list")],
+)
+async def test_llm_commands_ignore_private_messages(app: App, mock_models, matcher_name: str, message: str):
+    """对话与管理命令共享同一条非私聊规则。"""
+    import src.plugins.llm as llm
 
-    async with app.test_matcher(llm_cmd) as ctx:
+    matcher = getattr(llm, matcher_name)
+    async with app.test_matcher(matcher) as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
         event = fake_private_message_event_v11(
             self_id=123456,
-            message=Message("/llm model list"),
+            message=Message(message),
             to_me=True,
         )
 
         ctx.receive_event(bot, event)
-        ctx.should_not_pass_rule(llm_cmd)
+        ctx.should_not_pass_rule(matcher)
 
 
 async def test_llm_mention_ignores_private_messages(app: App, mock_models):
@@ -346,7 +406,7 @@ async def test_llm_mention_ignores_commands(app: App, mock_models, mocker):
         bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
         event = fake_group_message_event_v11(
             self_id=123456,
-            message=Message("/llm -h"),
+            message=Message("/chat -h"),
             to_me=True,
         )
 
@@ -428,16 +488,16 @@ async def test_llm_handler_logs_metadata_without_content(app: App, mock_models, 
 
 async def test_llm_rejects_unknown_model(app: App, mock_models):
     """单次指定未启用模型时给出明确提示"""
-    from src.plugins.llm import llm_cmd
+    from src.plugins.llm import chat_cmd
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm --model missing 你好"))
+        event = fake_group_message_event_v11(message=Message("/chat --model missing 你好"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "本群未启用的模型：missing，可用：test-model", True, at_sender=True)
-        ctx.should_finished(llm_cmd)
+        ctx.should_finished(chat_cmd)
 
 
 @respx.mock(assert_all_called=True)
@@ -465,7 +525,7 @@ async def test_llm_with_thinking(app: App, respx_mock: MockRouter, mock_models, 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm 你好"))
+        event = fake_group_message_event_v11(message=Message("/chat 你好"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -543,7 +603,7 @@ async def test_llm_with_tool(app: App, respx_mock: MockRouter, mock_models):
         async with app.test_matcher() as ctx:
             adapter = get_adapter(Adapter)
             bot = ctx.create_bot(base=Bot, adapter=adapter)
-            event = fake_group_message_event_v11(message=Message("/llm 成都天气"))
+            event = fake_group_message_event_v11(message=Message("/agent 成都天气"))
 
             ctx.receive_event(bot, event)
             ctx.should_call_send(
@@ -836,7 +896,7 @@ async def test_declared_vision_model_uses_single_request(app: App, respx_mock: M
 
 async def test_vision_only_model_is_rejected_for_text_dialogue(app: App, mock_models, mocker):
     """仅视觉模型可以启用，但不能用于普通文本对话。"""
-    from src.plugins.llm import llm_cmd
+    from src.plugins.llm import chat_cmd
     from src.plugins.llm.config import ModelConfig, plugin_config
 
     text_model, _ = mock_models
@@ -850,11 +910,11 @@ async def test_vision_only_model_is_rejected_for_text_dialogue(app: App, mock_mo
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm --model vision-only 你好"))
+        event = fake_group_message_event_v11(message=Message("/chat --model vision-only 你好"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "模型 vision-only 未声明 text 能力，不能用于文本对话", True, at_sender=True)
-        ctx.should_finished(llm_cmd)
+        ctx.should_finished(chat_cmd)
 
 
 async def test_missing_base_url_raises_config_error(app: App, mocker):
@@ -872,7 +932,7 @@ async def test_missing_base_url_raises_config_error(app: App, mocker):
 @respx.mock(assert_all_called=True)
 async def test_llm_error_raises(app: App, respx_mock: MockRouter, mock_models):
     """API 返回错误时提示用户"""
-    from src.plugins.llm import llm_cmd
+    from src.plugins.llm import chat_cmd
 
     respx_mock.post("https://api.example.com/chat/completions").mock(
         return_value=httpx.Response(401, json={"error": {"message": "无效的密钥"}})
@@ -881,11 +941,11 @@ async def test_llm_error_raises(app: App, respx_mock: MockRouter, mock_models):
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm 你好"))
+        event = fake_group_message_event_v11(message=Message("/chat 你好"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "调用失败：无效的密钥", True, at_sender=True)
-        ctx.should_finished(llm_cmd)
+        ctx.should_finished(chat_cmd)
 
     _, reaction = mock_models
     assert reaction.await_args_list == [
@@ -910,13 +970,16 @@ async def test_llm_model_list_and_set(app: App, respx_mock: MockRouter, mock_mod
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "可用模型：\n- test-model（默认对话，zssm）\n\n"
-            "单次对话：\n"
-            "/llm --model [模型名] [内容]\n\n"
+            "本群已启用模型：\n- test-model（默认对话，zssm）\n\n"
+            "对话：\n"
+            "- 纯对话：/chat --model <模型名> <内容>\n"
+            "- 工具增强：/agent --model <模型名> <内容>\n\n"
             "群组设置（管理员）：\n"
-            "- 默认对话：/llm model set [模型名]\n"
-            "- zssm：/llm model set-zssm [模型名]\n"
-            "- zssm 视觉：/llm model set-zssm-vision [模型名]",
+            "- 默认对话：/llm model set <模型名>\n"
+            "- zssm：/llm model set-zssm <模型名>\n"
+            "- zssm 跟随默认：/llm model clear-zssm\n"
+            "- zssm 视觉：/llm model set-zssm-vision <模型名>\n"
+            "- zssm 视觉自动选择：/llm model clear-zssm-vision",
             True,
         )
         ctx.should_finished(llm_cmd)
@@ -944,7 +1007,7 @@ async def test_llm_model_list_denies_group_without_available_models(app: App, mo
 @respx.mock(assert_all_called=True)
 async def test_superuser_enables_and_disables_group_models(app: App, respx_mock: MockRouter, mocker):
     """超级管理员可为本群增量启用或禁用模型。"""
-    from src.plugins.llm import llm_cmd
+    from src.plugins.llm import chat_cmd, llm_cmd
     from src.plugins.llm.config import ModelConfig, plugin_config
     from src.plugins.llm.data_source import get_available_model_names
 
@@ -966,16 +1029,19 @@ async def test_superuser_enables_and_disables_group_models(app: App, respx_mock:
             "- test-model（未启用）\n"
             "- other（未启用）\n"
             "- hidden（未启用）\n\n"
-            "单次对话：\n"
-            "/llm --model [模型名] [内容]\n\n"
+            "对话：\n"
+            "- 纯对话：/chat --model <模型名> <内容>\n"
+            "- 工具增强：/agent --model <模型名> <内容>\n\n"
             "群组设置（管理员）：\n"
-            "- 默认对话：/llm model set [模型名]\n"
-            "- zssm：/llm model set-zssm [模型名]\n"
-            "- zssm 视觉：/llm model set-zssm-vision [模型名]\n\n"
+            "- 默认对话：/llm model set <模型名>\n"
+            "- zssm：/llm model set-zssm <模型名>\n"
+            "- zssm 跟随默认：/llm model clear-zssm\n"
+            "- zssm 视觉：/llm model set-zssm-vision <模型名>\n"
+            "- zssm 视觉自动选择：/llm model clear-zssm-vision\n\n"
             "模型管理（超级管理员）：\n"
-            "- 启用：/llm model enable [模型名...]\n"
+            "- 启用：/llm model enable <模型名...>\n"
             "- 全部启用：/llm model enable --all\n"
-            "- 禁用：/llm model disable [模型名...]\n"
+            "- 禁用：/llm model disable <模型名...>\n"
             "- 全部禁用：/llm model disable --all",
             True,
         )
@@ -1014,15 +1080,18 @@ async def test_superuser_enables_and_disables_group_models(app: App, respx_mock:
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "可用模型：\n"
+            "本群已启用模型：\n"
             "- test-model（默认对话，zssm）\n"
             "- other\n\n"
-            "单次对话：\n"
-            "/llm --model [模型名] [内容]\n\n"
+            "对话：\n"
+            "- 纯对话：/chat --model <模型名> <内容>\n"
+            "- 工具增强：/agent --model <模型名> <内容>\n\n"
             "群组设置（管理员）：\n"
-            "- 默认对话：/llm model set [模型名]\n"
-            "- zssm：/llm model set-zssm [模型名]\n"
-            "- zssm 视觉：/llm model set-zssm-vision [模型名]",
+            "- 默认对话：/llm model set <模型名>\n"
+            "- zssm：/llm model set-zssm <模型名>\n"
+            "- zssm 跟随默认：/llm model clear-zssm\n"
+            "- zssm 视觉：/llm model set-zssm-vision <模型名>\n"
+            "- zssm 视觉自动选择：/llm model clear-zssm-vision",
             True,
         )
         ctx.should_finished(llm_cmd)
@@ -1039,16 +1108,19 @@ async def test_superuser_enables_and_disables_group_models(app: App, respx_mock:
             "- test-model（已启用，默认对话，zssm）\n"
             "- other（已启用）\n"
             "- hidden（未启用）\n\n"
-            "单次对话：\n"
-            "/llm --model [模型名] [内容]\n\n"
+            "对话：\n"
+            "- 纯对话：/chat --model <模型名> <内容>\n"
+            "- 工具增强：/agent --model <模型名> <内容>\n\n"
             "群组设置（管理员）：\n"
-            "- 默认对话：/llm model set [模型名]\n"
-            "- zssm：/llm model set-zssm [模型名]\n"
-            "- zssm 视觉：/llm model set-zssm-vision [模型名]\n\n"
+            "- 默认对话：/llm model set <模型名>\n"
+            "- zssm：/llm model set-zssm <模型名>\n"
+            "- zssm 跟随默认：/llm model clear-zssm\n"
+            "- zssm 视觉：/llm model set-zssm-vision <模型名>\n"
+            "- zssm 视觉自动选择：/llm model clear-zssm-vision\n\n"
             "模型管理（超级管理员）：\n"
-            "- 启用：/llm model enable [模型名...]\n"
+            "- 启用：/llm model enable <模型名...>\n"
             "- 全部启用：/llm model enable --all\n"
-            "- 禁用：/llm model disable [模型名...]\n"
+            "- 禁用：/llm model disable <模型名...>\n"
             "- 全部禁用：/llm model disable --all",
             True,
         )
@@ -1080,11 +1152,11 @@ async def test_superuser_enables_and_disables_group_models(app: App, respx_mock:
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/llm --model hidden 你好"))
+        event = fake_group_message_event_v11(message=Message("/chat --model hidden 你好"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "本群未启用的模型：hidden，可用：test-model、other", True, at_sender=True)
-        ctx.should_finished(llm_cmd)
+        ctx.should_finished(chat_cmd)
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -1156,8 +1228,10 @@ async def test_group_model_management_requires_permission(app: App, mocker, comm
         ("/llm model set hidden", "本群未启用的模型：hidden，可用：default、text、vision"),
         ("/llm model enable", "请指定要启用的模型，或使用 --all 启用全部模型"),
         ("/llm model enable missing", "未配置的模型：missing"),
+        ("/llm model enable default --all", "不能同时指定模型和 --all"),
         ("/llm model disable", "请指定要禁用的模型，或使用 --all 禁用全部模型"),
         ("/llm model disable missing", "未配置的模型：missing"),
+        ("/llm model disable default --all", "不能同时指定模型和 --all"),
         ("/llm model set-zssm hidden", "本群未启用的模型：hidden"),
         ("/llm model set vision", "模型 vision 未声明 text 能力，不能用于文本对话"),
         ("/llm model set-zssm vision", "模型 vision 未声明 text 能力，不能用于文本解释"),
@@ -1322,16 +1396,19 @@ async def test_admin_sets_group_zssm_models(app: App, respx_mock: MockRouter, mo
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "可用模型：\n"
+            "本群已启用模型：\n"
             "- test-model（默认对话）\n"
             "- explain（zssm）\n"
             "- vision（zssm 视觉）\n\n"
-            "单次对话：\n"
-            "/llm --model [模型名] [内容]\n\n"
+            "对话：\n"
+            "- 纯对话：/chat --model <模型名> <内容>\n"
+            "- 工具增强：/agent --model <模型名> <内容>\n\n"
             "群组设置（管理员）：\n"
-            "- 默认对话：/llm model set [模型名]\n"
-            "- zssm：/llm model set-zssm [模型名]\n"
-            "- zssm 视觉：/llm model set-zssm-vision [模型名]",
+            "- 默认对话：/llm model set <模型名>\n"
+            "- zssm：/llm model set-zssm <模型名>\n"
+            "- zssm 跟随默认：/llm model clear-zssm\n"
+            "- zssm 视觉：/llm model set-zssm-vision <模型名>\n"
+            "- zssm 视觉自动选择：/llm model clear-zssm-vision",
             True,
         )
         ctx.should_finished(llm_cmd)
@@ -1347,16 +1424,19 @@ async def test_admin_sets_group_zssm_models(app: App, respx_mock: MockRouter, mo
         ctx.receive_event(bot, event)
         ctx.should_call_send(
             event,
-            "可用模型：\n"
+            "本群已启用模型：\n"
             "- test-model（默认对话，能力：文本）\n"
             "- explain（zssm，能力：文本）\n"
             "- vision（zssm 视觉，能力：视觉）\n\n"
-            "单次对话：\n"
-            "/llm --model [模型名] [内容]\n\n"
+            "对话：\n"
+            "- 纯对话：/chat --model <模型名> <内容>\n"
+            "- 工具增强：/agent --model <模型名> <内容>\n\n"
             "群组设置（管理员）：\n"
-            "- 默认对话：/llm model set [模型名]\n"
-            "- zssm：/llm model set-zssm [模型名]\n"
-            "- zssm 视觉：/llm model set-zssm-vision [模型名]",
+            "- 默认对话：/llm model set <模型名>\n"
+            "- zssm：/llm model set-zssm <模型名>\n"
+            "- zssm 跟随默认：/llm model clear-zssm\n"
+            "- zssm 视觉：/llm model set-zssm-vision <模型名>\n"
+            "- zssm 视觉自动选择：/llm model clear-zssm-vision",
             True,
         )
         ctx.should_finished(llm_cmd)
@@ -1430,7 +1510,7 @@ async def test_llm_send_md_pic_fallback(app: App, respx_mock: MockRouter, mock_m
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
         # -r 要求渲染图片，但渲染失败时应退回文字
-        event = fake_group_message_event_v11(message=Message("/llm -r 你好"))
+        event = fake_group_message_event_v11(message=Message("/chat -r 你好"))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(

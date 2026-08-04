@@ -5,12 +5,14 @@ API 格式，提供多轮对话、推理内容展示、原生 Markdown、Markdow
 额度查询按模型选择独立 provider，目前支持 Aperture 与 DeepSeek。
 """
 
+from dataclasses import dataclass
 from pathlib import Path
 
 import nonebot
 from nonebot import on_message, require
 from nonebot.adapters import Bot, Event
 from nonebot.log import logger
+from nonebot.matcher import Matcher
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.rule import Rule, to_me
 from nonebot.typing import T_State
@@ -36,7 +38,6 @@ from nonebot_plugin_alconna import (
     image_fetch,
     on_alconna,
 )
-from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
 from nonebot_plugin_alconna.builtins.extensions.reply import ReplyMergeExtension
 from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_user import UserSession
@@ -70,19 +71,14 @@ from .tts import TTSError, get_tts_models
 __plugin_meta__ = PluginMetadata(
     name="大模型对话",
     description="接入多种大模型 API，提供智能对话与问答功能",
-    usage="/llm 你好，或在群聊中 @机器人 你好",
+    usage="使用 /chat 纯对话、/agent 工具问答、/llm 管理配置，也可在群聊中 @机器人 你好",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
+# Discord 原生斜杠无法完整翻译根参数与选项或嵌套管理树；Discord 继续使用普通消息命令。
 llm_cmd = on_alconna(
     Alconna(
         "llm",
-        Args["content?#内容", MultiVar(str, flag="+")]["img?#图片", Image],
-        Option("--model", Args["model#模型名称", str], help_text="本次使用指定模型"),
-        Option("-c|--context", default=False, action=store_true, help_text="启用多轮对话"),
-        Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
-        Option("-s|--search", default=False, action=store_true, help_text="启用网页搜索"),
-        Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
         Subcommand(
             "model",
             Subcommand(
@@ -112,8 +108,8 @@ llm_cmd = on_alconna(
         ),
         Subcommand(
             "tts",
-            Option("-l|--list", help_text="查看 TTS 模型列表"),
-            Option("--set", Args["model#模型名称", str], help_text="设置群组默认 TTS 模型"),
+            Subcommand("list", help_text="查看 TTS 模型列表"),
+            Subcommand("set", Args["model#模型名称", str], help_text="设置群组默认 TTS 模型"),
             help_text="TTS 模型相关设置",
         ),
         Subcommand(
@@ -122,17 +118,66 @@ llm_cmd = on_alconna(
             help_text="查询大模型剩余额度",
         ),
         meta=CommandMeta(
-            description=__plugin_meta__.description,
-            example=__plugin_meta__.usage,
+            description="管理大模型与 TTS 配置，并查询模型额度",
+            example="/llm model list",
         ),
     ),
     use_cmd_start=True,
     block=True,
     rule=Rule(is_non_private),
     extensions=[
+        TelegramSlashExtension(),
+    ],
+)
+
+
+def _build_dialogue_command(name: str, *, description: str, example: str) -> Alconna:
+    """构造共享参数的纯对话或工具增强命令。"""
+    options = [
+        Option("--model", Args["model#模型名称", str], help_text="本次使用指定模型"),
+        Option("-c|--context", default=False, action=store_true, help_text="启用多轮对话"),
+        Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
+        Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
+    ]
+    return Alconna(
+        name,
+        Args["content?#内容", MultiVar(str, flag="+")]["img?#图片", Image],
+        *options,
+        meta=CommandMeta(description=description, example=example),
+    )
+
+
+chat_command = _build_dialogue_command(
+    "chat",
+    description="不使用工具，直接与大模型对话",
+    example="/chat 你好，或在群聊中 @机器人 你好",
+)
+
+chat_cmd = on_alconna(
+    chat_command,
+    use_cmd_start=True,
+    block=True,
+    rule=Rule(is_non_private),
+    extensions=[
         ReplyMergeExtension(),
         TelegramSlashExtension(),
-        DiscordSlashExtension(),
+    ],
+)
+
+agent_command = _build_dialogue_command(
+    "agent",
+    description="允许模型调用包括网页搜索在内的工具完成查询与问答",
+    example="/agent 查询成都天气",
+)
+
+agent_cmd = on_alconna(
+    agent_command,
+    use_cmd_start=True,
+    block=True,
+    rule=Rule(is_non_private),
+    extensions=[
+        ReplyMergeExtension(),
+        TelegramSlashExtension(),
     ],
 )
 
@@ -163,13 +208,41 @@ class LLMSetupError(ValueError):
         self.at_sender = at_sender
 
 
+@dataclass(frozen=True)
+class ChatRequest:
+    """统一后的对话文本与选项。"""
+
+    text: str
+    model_name: str
+    use_context: bool
+    render: bool
+    use_tts: bool
+
+
+def _parse_chat_text(text: str) -> ChatRequest:
+    """使用 `/chat` 的 Alconna 定义解析 @ 对话参数。"""
+    result = chat_command.parse(f"/chat {text}".rstrip())
+    if not result.matched:
+        raise LLMSetupError("对话参数有误，请输入 /chat -h 查看用法", at_sender=True)
+    content: tuple[str, ...] = result.query("content", ())
+    if content and content[0] in {"-s", "--search"}:
+        raise LLMSetupError("纯对话不支持网页搜索，请使用 /agent", at_sender=True)
+    return ChatRequest(
+        text=" ".join(content),
+        model_name=result.query("model.model", ""),
+        use_context=result.query("context.value", False),
+        render=result.query("render.value", False),
+        use_tts=result.query("tts.value", False),
+    )
+
+
 async def _create_handler(
     user: UserSession,
     *,
     selected_model: str = "",
     render: bool = False,
-    search: bool = False,
     use_tts: bool = False,
+    enable_tools: bool = False,
 ) -> LLMHandler:
     """按当前会话设置创建处理器。"""
     if not plugin_config.get_model_names():
@@ -192,7 +265,7 @@ async def _create_handler(
     tts_model = await get_tts_model(user.session_id) if use_tts else ""
     if use_tts and not tts_model:
         raise LLMSetupError(
-            "未设置 TTS 模型，请先使用 /llm tts --set 设置",
+            "未设置 TTS 模型，请先使用 /llm tts set 设置",
             at_sender=True,
         )
 
@@ -201,7 +274,8 @@ async def _create_handler(
         send_markdown=plugin_config.prefer_markdown and not render,
         send_md_pic=render or plugin_config.md_to_pic,
         tts_model=tts_model,
-        enable_web_search=search,
+        enable_tools=enable_tools,
+        enable_web_search=enable_tools,
     )
 
 
@@ -249,24 +323,27 @@ async def llm_model_list_handle(
 
     names = all_names if show_all.result else available_names
     model_list = "\n".join(format_model(name) for name in names)
-    title = "全部模型" if show_all.result else "可用模型"
+    title = "全部模型" if show_all.result else "本群已启用模型"
     access_hint = (
         "\n\n模型管理（超级管理员）："
-        "\n- 启用：/llm model enable [模型名...]"
+        "\n- 启用：/llm model enable <模型名...>"
         "\n- 全部启用：/llm model enable --all"
-        "\n- 禁用：/llm model disable [模型名...]"
+        "\n- 禁用：/llm model disable <模型名...>"
         "\n- 全部禁用：/llm model disable --all"
         if show_all.result
         else ""
     )
     await llm_cmd.finish(
         f"{title}：\n{model_list}\n\n"
-        "单次对话：\n"
-        "/llm --model [模型名] [内容]\n\n"
+        "对话：\n"
+        "- 纯对话：/chat --model <模型名> <内容>\n"
+        "- 工具增强：/agent --model <模型名> <内容>\n\n"
         "群组设置（管理员）：\n"
-        "- 默认对话：/llm model set [模型名]\n"
-        "- zssm：/llm model set-zssm [模型名]\n"
-        f"- zssm 视觉：/llm model set-zssm-vision [模型名]{access_hint}"
+        "- 默认对话：/llm model set <模型名>\n"
+        "- zssm：/llm model set-zssm <模型名>\n"
+        "- zssm 跟随默认：/llm model clear-zssm\n"
+        "- zssm 视觉：/llm model set-zssm-vision <模型名>\n"
+        f"- zssm 视觉自动选择：/llm model clear-zssm-vision{access_hint}"
     )
 
 
@@ -302,6 +379,8 @@ async def llm_model_enable_handle(
 ):
     if not await SUPERUSER(bot, event):
         await llm_cmd.finish("该指令仅超级管理员可用", at_sender=True)
+    if enable_all.result and models.result:
+        await llm_cmd.finish("不能同时指定模型和 --all", at_sender=True)
     if enable_all.result:
         all_names = plugin_config.get_model_names()
         if not all_names:
@@ -328,6 +407,8 @@ async def llm_model_disable_handle(
 ):
     if not await SUPERUSER(bot, event):
         await llm_cmd.finish("该指令仅超级管理员可用", at_sender=True)
+    if disable_all.result and models.result:
+        await llm_cmd.finish("不能同时指定模型和 --all", at_sender=True)
     if disable_all.result:
         await clear_available_model_names(user.session_id)
         await llm_cmd.finish("已禁用本群全部模型", at_sender=True)
@@ -449,26 +530,31 @@ async def llm_quota_handle(user: UserSession, model: Query[str] = Query("quota.m
     await llm_cmd.finish(result, at_sender=True)
 
 
-@llm_cmd.handle()
-async def llm_handle(
+async def _handle_dialogue_command(
+    matcher: type[Matcher],
     user: UserSession,
     content: Match[tuple[str, ...]],
-    img: Match[bytes] = AlconnaMatch("img", image_fetch),
-    model_name: Query[str] = Query("model.model"),
-    use_context: Query[bool] = Query("context.value", False),
-    render: Query[bool] = Query("render.value", False),
-    search: Query[bool] = Query("search.value", False),
-    use_tts: Query[bool] = Query("tts.value", False),
-):
+    img: Match[bytes],
+    model_name: Query[str],
+    use_context: Query[bool],
+    render: Query[bool],
+    use_tts: Query[bool],
+    *,
+    enable_tools: bool,
+) -> None:
+    """执行共享的纯对话或工具增强命令流程。"""
     if not content.available and not img.available:
-        await llm_cmd.finish("你想问什么呢？输入 /llm -h 查看用法", at_sender=True)
+        command_name = "agent" if enable_tools else "chat"
+        await matcher.finish(f"你想问什么呢？输入 /{command_name} -h 查看用法", at_sender=True)
+    if not enable_tools and content.available and content.result[0] in {"-s", "--search"}:
+        await matcher.finish("纯对话不支持网页搜索，请使用 /agent", at_sender=True)
 
     images: list[ImageContent] | None = None
     if img.available:
         try:
             images = [ImageContent.from_bytes(img.result)]
         except ValueError as e:
-            await llm_cmd.finish(str(e), at_sender=True)
+            await matcher.finish(str(e), at_sender=True)
     text = " ".join(content.result) if content.available else ""
 
     try:
@@ -476,20 +562,66 @@ async def llm_handle(
             user,
             selected_model=model_name.result if model_name.available else "",
             render=render.result,
-            search=search.result,
             use_tts=use_tts.result,
+            enable_tools=enable_tools,
         )
     except LLMSetupError as e:
         if e.at_sender:
-            await llm_cmd.finish(str(e), at_sender=True)
-        await llm_cmd.finish(str(e))
+            await matcher.finish(str(e), at_sender=True)
+        await matcher.finish(str(e))
 
     if use_context.result:
-        await _handle_with_context(handler, text, images)
+        await _handle_with_context(handler, text, images, finish_matcher=matcher)
         return
 
-    completion = await _ask(handler, text, images)
+    completion = await _ask(handler, text, images, finish_matcher=matcher)
     await handler.send(completion)
+
+
+@chat_cmd.handle()
+async def chat_handle(
+    user: UserSession,
+    content: Match[tuple[str, ...]],
+    img: Match[bytes] = AlconnaMatch("img", image_fetch),
+    model_name: Query[str] = Query("model.model"),
+    use_context: Query[bool] = Query("context.value", False),
+    render: Query[bool] = Query("render.value", False),
+    use_tts: Query[bool] = Query("tts.value", False),
+) -> None:
+    await _handle_dialogue_command(
+        chat_cmd,
+        user,
+        content,
+        img,
+        model_name,
+        use_context,
+        render,
+        use_tts,
+        enable_tools=False,
+    )
+
+
+@agent_cmd.handle()
+async def agent_handle(
+    user: UserSession,
+    content: Match[tuple[str, ...]],
+    img: Match[bytes] = AlconnaMatch("img", image_fetch),
+    model_name: Query[str] = Query("model.model"),
+    use_context: Query[bool] = Query("context.value", False),
+    render: Query[bool] = Query("render.value", False),
+    use_tts: Query[bool] = Query("tts.value", False),
+) -> None:
+    await _handle_dialogue_command(
+        agent_cmd,
+        user,
+        content,
+        img,
+        model_name,
+        use_context,
+        render,
+        use_tts,
+        enable_tools=True,
+    )
 
 
 @llm_mention.handle()
@@ -513,14 +645,28 @@ async def llm_mention_handle(
     except ValueError as e:
         await UniMessage.text(str(e)).finish(reply_to=message_id)
 
-    if not text and not images:
+    try:
+        request = _parse_chat_text(text)
+    except LLMSetupError as e:
+        await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=message_id)
+
+    if not request.text and not images:
         await UniMessage.text("你想问什么呢？").finish(reply_to=message_id)
 
     try:
-        handler = await _create_handler(user)
+        handler = await _create_handler(
+            user,
+            selected_model=request.model_name,
+            render=request.render,
+            use_tts=request.use_tts,
+            enable_tools=False,
+        )
     except LLMSetupError as e:
         await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=message_id)
-    completion = await _ask(handler, text, images or None, message_id=message_id)
+    if request.use_context:
+        await _handle_with_context(handler, request.text, images or None, message_id=message_id)
+        return
+    completion = await _ask(handler, request.text, images or None, message_id=message_id)
     await handler.send(completion, reply_to=message_id)
 
 
@@ -528,6 +674,9 @@ async def _handle_with_context(
     handler: LLMHandler,
     text: str,
     images: list[ImageContent] | None,
+    *,
+    message_id: str | None = None,
+    finish_matcher: type[Matcher] = chat_cmd,
 ) -> None:
     """多轮对话
 
@@ -535,8 +684,12 @@ async def _handle_with_context(
     """
     from nonebot_plugin_waiter import prompt
 
-    completion = await _ask(handler, text, images)
-    await handler.send(completion)
+    if message_id:
+        completion = await _ask(handler, text, images, message_id=message_id, finish_matcher=finish_matcher)
+        await handler.send(completion, reply_to=message_id)
+    else:
+        completion = await _ask(handler, text, images, finish_matcher=finish_matcher)
+        await handler.send(completion)
 
     while True:
         received = await prompt(
@@ -560,7 +713,13 @@ async def _handle_with_context(
         if not message:
             continue
 
-        completion = await _ask(handler, message, None, message_id=reply_message_id)
+        completion = await _ask(
+            handler,
+            message,
+            None,
+            message_id=reply_message_id,
+            finish_matcher=finish_matcher,
+        )
         await handler.send(completion)
 
 
@@ -588,6 +747,7 @@ async def _ask(
     images: list[ImageContent] | None,
     *,
     message_id: str | None = None,
+    finish_matcher: type[Matcher] = chat_cmd,
 ):
     """请求模型，失败时结束当前会话并提示原因"""
     await send_reaction("thinking", message_id=message_id)
@@ -600,15 +760,15 @@ async def _ask(
     except ProviderError as e:
         logger.warning("LLM 调用失败（会话={}，错误类型=ProviderError）", handler.log_id)
         await send_reaction("fail", message_id=message_id)
-        await llm_cmd.finish(f"调用失败：{e}", at_sender=True)
+        await finish_matcher.finish(f"调用失败：{e}", at_sender=True)
     except ValueError as e:
         logger.warning("LLM 调用失败（会话={}，错误类型=ValueError）", handler.log_id)
         await send_reaction("fail", message_id=message_id)
-        await llm_cmd.finish(str(e), at_sender=True)
+        await finish_matcher.finish(str(e), at_sender=True)
     except Exception as e:
         logger.opt(exception=e).error("大模型调用出现未预期的错误")
         await send_reaction("fail", message_id=message_id)
-        await llm_cmd.finish("调用失败，请稍后重试", at_sender=True)
+        await finish_matcher.finish("调用失败，请稍后重试", at_sender=True)
 
     await send_reaction("done", message_id=message_id)
     return completion
