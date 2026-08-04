@@ -9,6 +9,7 @@ LLM__MODELS='[{"name":"model-a","provider":"chat"}]'
 ```
 """
 
+from enum import StrEnum
 from typing import Annotated, Any, Literal
 
 from nonebot import get_plugin_config
@@ -17,8 +18,12 @@ from pydantic import AliasChoices, BaseModel, Field, model_validator
 ProviderName = Literal["chat", "responses", "anthropic"]
 """支持的 API 格式"""
 
-ModelCapability = Literal["vision"]
-"""可由模型配置显式声明的能力"""
+
+class ModelCapability(StrEnum):
+    """模型可声明的输入能力。"""
+
+    TEXT = "text"
+    VISION = "vision"
 
 
 class BaseQuotaConfig(BaseModel):
@@ -79,8 +84,8 @@ class ModelConfig(BaseModel):
     """非流式请求的超时时间（秒）"""
     extra_body: dict[str, Any] = Field(default_factory=dict)
     """附加到请求体的额外字段，用于传递各服务商的特有参数"""
-    capabilities: set[ModelCapability] = Field(default_factory=set)
-    """模型能力；vision 表示可直接接收图片"""
+    capabilities: set[ModelCapability] = Field(default_factory=lambda: {ModelCapability.TEXT})
+    """模型能力；默认支持文本，vision 表示可直接接收图片"""
     quota: QuotaConfig | None = None
     """该模型的额度查询配置，留空时不支持额度查询"""
 

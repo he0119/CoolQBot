@@ -834,6 +834,29 @@ async def test_declared_vision_model_uses_single_request(app: App, respx_mock: M
     assert payload["messages"][-1]["content"][1]["type"] == "image_url"
 
 
+async def test_vision_only_model_is_rejected_for_text_dialogue(app: App, mock_models, mocker):
+    """仅视觉模型可以启用，但不能用于普通文本对话。"""
+    from src.plugins.llm import llm_cmd
+    from src.plugins.llm.config import ModelConfig, plugin_config
+
+    text_model, _ = mock_models
+    vision_model = ModelConfig(name="vision-only", capabilities={"vision"})
+    mocker.patch.object(plugin_config, "models", [text_model, vision_model])
+    mocker.patch(
+        "src.plugins.llm.get_available_model_names",
+        return_value=["test-model", "vision-only"],
+    )
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/llm --model vision-only 你好"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "模型 vision-only 未声明 text 能力，不能用于文本对话", True, at_sender=True)
+        ctx.should_finished(llm_cmd)
+
+
 async def test_missing_base_url_raises_config_error(app: App, mocker):
     """模型和全局地址都为空时在发起 HTTP 请求前给出明确错误。"""
     from src.plugins.llm.config import ModelConfig, plugin_config
@@ -1136,6 +1159,8 @@ async def test_group_model_management_requires_permission(app: App, mocker, comm
         ("/llm model disable", "请指定要禁用的模型，或使用 --all 禁用全部模型"),
         ("/llm model disable missing", "未配置的模型：missing"),
         ("/llm model set-zssm hidden", "本群未启用的模型：hidden"),
+        ("/llm model set vision", "模型 vision 未声明 text 能力，不能用于文本对话"),
+        ("/llm model set-zssm vision", "模型 vision 未声明 text 能力，不能用于文本解释"),
         ("/llm model set-zssm-vision text", "视觉模型 text 未声明 vision 能力"),
     ],
 )
@@ -1323,8 +1348,8 @@ async def test_admin_sets_group_zssm_models(app: App, respx_mock: MockRouter, mo
         ctx.should_call_send(
             event,
             "可用模型：\n"
-            "- test-model（默认对话，能力：无）\n"
-            "- explain（zssm，能力：无）\n"
+            "- test-model（默认对话，能力：文本）\n"
+            "- explain（zssm，能力：文本）\n"
             "- vision（zssm 视觉，能力：视觉）\n\n"
             "单次对话：\n"
             "/llm --model [模型名] [内容]\n\n"

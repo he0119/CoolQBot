@@ -6,7 +6,7 @@ from nonebot.log import logger
 from nonebot_plugin_orm import get_session
 from sqlalchemy import select, update
 
-from .config import plugin_config
+from .config import ModelCapability, plugin_config
 from .models import GroupLLMConfig
 
 
@@ -36,14 +36,19 @@ def _available_names(config: GroupLLMConfig | None) -> list[str]:
     return [name for name in names if name in allowed]
 
 
+def _capable_names(names: list[str], capability: ModelCapability) -> list[str]:
+    """按全局配置顺序筛出声明指定能力的模型。"""
+    return [name for name in names if capability in plugin_config.get_model(name).capabilities]
+
+
 def _resolve_zssm_vision_model_name(config: GroupLLMConfig | None, names: list[str]) -> str:
     """优先使用群组显式设置，否则选择首个已启用的视觉模型。"""
     if config and config.zssm_vision_model in names:
         configured = config.zssm_vision_model
-        if configured and "vision" in plugin_config.get_model(configured).capabilities:
+        if configured and ModelCapability.VISION in plugin_config.get_model(configured).capabilities:
             return configured
     return next(
-        (name for name in names if "vision" in plugin_config.get_model(name).capabilities),
+        (name for name in names if ModelCapability.VISION in plugin_config.get_model(name).capabilities),
         "",
     )
 
@@ -60,8 +65,11 @@ async def get_model_overview(session_id: str) -> GroupModelOverview:
     if not names:
         return GroupModelOverview([], "", "", "")
 
-    model_name = config.model_name if config and config.model_name in names else names[0]
-    zssm_model_name = config.zssm_model if config and config.zssm_model in names else model_name
+    text_names = _capable_names(names, ModelCapability.TEXT)
+    model_name = (
+        config.model_name if config and config.model_name in text_names else (text_names[0] if text_names else "")
+    )
+    zssm_model_name = config.zssm_model if config and config.zssm_model in text_names else model_name
     zssm_vision_model_name = _resolve_zssm_vision_model_name(config, names)
     return GroupModelOverview(names, model_name, zssm_model_name, zssm_vision_model_name)
 
@@ -78,15 +86,20 @@ async def get_model_name(session_id: str) -> str:
     names = _available_names(config)
     if not names:
         raise ValueError("本群未启用任何模型，请联系超级管理员配置")
-    if config and config.model_name in names:
+    text_names = _capable_names(names, ModelCapability.TEXT)
+    if not text_names:
+        raise ValueError("本群未启用支持文本的模型，请联系超级管理员配置")
+    if config and config.model_name in text_names:
         return config.model_name
-    return names[0]
+    return text_names[0]
 
 
 async def set_model_name(session_id: str, model_name: str) -> None:
     """设置群组默认模型"""
     if model_name not in await get_available_model_names(session_id):
         raise ValueError(f"本群未启用的模型：{model_name}")
+    if ModelCapability.TEXT not in plugin_config.get_model(model_name).capabilities:
+        raise ValueError(f"模型 {model_name} 未声明 text 能力，不能用于文本对话")
     async with get_session() as session:
         config = (
             await session.scalars(select(GroupLLMConfig).where(GroupLLMConfig.session_id == session_id))
@@ -109,6 +122,8 @@ async def set_available_model_names(session_id: str, model_names: list[str]) -> 
     available = [name for name in configured_names if name in requested]
     if not available:
         raise ValueError("至少需要为本群启用一个模型")
+    text_available = _capable_names(available, ModelCapability.TEXT)
+    fallback_model = text_available[0] if text_available else None
 
     async with get_session() as session:
         config = (
@@ -120,8 +135,8 @@ async def set_available_model_names(session_id: str, model_names: list[str]) -> 
                 .where(GroupLLMConfig.session_id == session_id)
                 .values(
                     available_models=available,
-                    model_name=config.model_name if config.model_name in available else available[0],
-                    zssm_model=config.zssm_model if config.zssm_model in available else None,
+                    model_name=config.model_name if config.model_name in text_available else fallback_model,
+                    zssm_model=config.zssm_model if config.zssm_model in text_available else None,
                     zssm_vision_model=(config.zssm_vision_model if config.zssm_vision_model in available else None),
                 )
             )
@@ -130,7 +145,7 @@ async def set_available_model_names(session_id: str, model_names: list[str]) -> 
                 GroupLLMConfig(
                     session_id=session_id,
                     available_models=available,
-                    model_name=available[0],
+                    model_name=fallback_model,
                 )
             )
         await session.commit()
@@ -178,7 +193,7 @@ async def disable_model_names(session_id: str, model_names: list[str]) -> list[s
 async def get_zssm_model_name(session_id: str) -> str:
     """获取本群解释模型；未单独设置时跟随本群默认模型。"""
     config = await _get_config(session_id)
-    names = _available_names(config)
+    names = _capable_names(_available_names(config), ModelCapability.TEXT)
     if config and config.zssm_model in names:
         return config.zssm_model
     return await get_model_name(session_id)
@@ -192,6 +207,8 @@ async def set_zssm_model_name(session_id: str, model_name: str) -> None:
         ).one_or_none()
         if not config or model_name not in _available_names(config):
             raise ValueError(f"本群未启用的模型：{model_name}")
+        if ModelCapability.TEXT not in plugin_config.get_model(model_name).capabilities:
+            raise ValueError(f"模型 {model_name} 未声明 text 能力，不能用于文本解释")
         config.zssm_model = model_name
         await session.commit()
     logger.info("LLM 群组解释模型已更新（模型={}）", model_name)
@@ -224,7 +241,7 @@ async def set_zssm_vision_model_name(session_id: str, model_name: str) -> None:
         ).one_or_none()
         if not config or model_name not in _available_names(config):
             raise ValueError(f"本群未启用的模型：{model_name}")
-        if "vision" not in plugin_config.get_model(model_name).capabilities:
+        if ModelCapability.VISION not in plugin_config.get_model(model_name).capabilities:
             raise ValueError(f"视觉模型 {model_name} 未声明 vision 能力")
         config.zssm_vision_model = model_name
         await session.commit()

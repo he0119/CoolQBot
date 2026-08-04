@@ -177,6 +177,31 @@ async def test_zssm_rejects_unknown_temporary_model(app: App, zssm_model):
         ctx.should_finished(zssm_cmd)
 
 
+async def test_zssm_rejects_vision_only_temporary_model(app: App, zssm_model, mocker):
+    """仅视觉模型不能作为临时解释模型处理文本。"""
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names
+    from src.plugins.llm.plugins.zssm import zssm_cmd
+
+    default_model, _ = zssm_model
+    vision_model = ModelConfig(name="vision-only", capabilities={"vision"})
+    mocker.patch.object(plugin_config, "models", [default_model, vision_model])
+    await set_available_model_names("QQClient_10000", ["test-model", "vision-only"])
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("zssm --model vision-only Python GIL"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            Message(MessageSegment.reply(1)) + "解释模型 vision-only 未声明 text 能力，不能用于文本解释",
+            True,
+        )
+        ctx.should_finished(zssm_cmd)
+
+
 @respx.mock(assert_all_called=True)
 async def test_zssm_explains_text_with_group_model(app: App, respx_mock: MockRouter, zssm_model, mocker):
     """直接输入文本时使用本群解释模型、专用提示词并关闭工具。"""
@@ -395,7 +420,7 @@ def test_model_capability_selects_single_or_two_stage_vision(app: App, mocker):
     from src.plugins.llm.config import ModelConfig, plugin_config
     from src.plugins.llm.plugins.zssm.data_source import resolve_vision_fallback
 
-    multimodal = ModelConfig(name="multimodal", capabilities={"vision"})
+    multimodal = ModelConfig(name="multimodal", capabilities={"text", "vision"})
     text = ModelConfig(name="text")
     vision = ModelConfig(name="vision", capabilities={"vision"})
     mocker.patch.object(plugin_config, "models", [multimodal, text, vision])

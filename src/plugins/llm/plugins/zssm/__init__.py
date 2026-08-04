@@ -13,7 +13,7 @@ from nonebot_plugin_alconna.builtins.extensions.reply import ReplyRecordExtensio
 from nonebot_plugin_alconna.uniseg import Image
 from nonebot_plugin_user import UserSession
 
-from ...config import plugin_config
+from ...config import ModelCapability, plugin_config
 from ...data_source import (
     get_available_model_names,
     get_zssm_model_name,
@@ -94,9 +94,14 @@ async def zssm_handle(
     names = await get_available_model_names(user.session_id)
     if not names:
         await UniMessage.text("本群未启用任何模型，请联系超级管理员配置").finish(reply_to=msg_id)
+    text_names = [name for name in names if ModelCapability.TEXT in plugin_config.get_model(name).capabilities]
+    if not text_names:
+        await UniMessage.text("本群未启用支持文本的模型，请联系超级管理员配置").finish(reply_to=msg_id)
     model_name = selected_model.result if selected_model.available else await get_zssm_model_name(user.session_id)
     if model_name not in names:
         await UniMessage.text(f"本群未启用解释模型：{model_name}，可用：{'、'.join(names)}").finish(reply_to=msg_id)
+    if model_name not in text_names:
+        await UniMessage.text(f"解释模型 {model_name} 未声明 text 能力，不能用于文本解释").finish(reply_to=msg_id)
     vision_model = ""
     try:
         vision_model = resolve_vision_fallback(

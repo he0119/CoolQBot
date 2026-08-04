@@ -18,7 +18,7 @@ from uuid import uuid4
 from nonebot.log import logger
 from nonebot_plugin_alconna import SupportAdapter, UniMessage, get_target, message_reaction
 
-from .config import plugin_config
+from .config import ModelCapability, plugin_config
 from .providers import ProviderError, get_provider
 from .schemas import Completion, ImageContent, Message
 from .tools import registry
@@ -201,7 +201,7 @@ class LLMHandler:
         模型请求工具调用时自动执行并继续请求，直到给出最终回复；
         达到 `max_tool_rounds` 轮数上限后禁用工具生成收尾回复。
         """
-        if images and "vision" not in plugin_config.get_model(self.model_name).capabilities:
+        if images and ModelCapability.VISION not in plugin_config.get_model(self.model_name).capabilities:
             raise ValueError(f"模型 {self.model_name} 未声明 vision 能力，不能接收图片")
 
         context_start = len(self.context)
