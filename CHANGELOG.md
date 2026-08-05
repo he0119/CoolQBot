@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.29.2] - 2026-08-05
+
 ### Added
 
 - 为 `/llm quota` 添加 `--all`，批量查询本群已启用模型并合并相同额度请求与展示项
@@ -839,7 +841,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.1...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.2...HEAD
+[0.29.2]: https://github.com/he0119/CoolQBot/compare/v0.29.1...v0.29.2
 [0.29.1]: https://github.com/he0119/CoolQBot/compare/v0.29.0...v0.29.1
 [0.29.0]: https://github.com/he0119/CoolQBot/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/he0119/CoolQBot/compare/v0.27.7...v0.28.0
