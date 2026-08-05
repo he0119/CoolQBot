@@ -13,19 +13,22 @@
   window.addEventListener("scroll", onHeaderScroll, { passive: true });
   onHeaderScroll();
 
-  menuToggle.addEventListener("click", function () {
-    var open = navigation.classList.toggle("is-open");
+  function setNavigationOpen(open) {
+    navigation.classList.toggle("is-open", open);
     menuToggle.setAttribute("aria-expanded", String(open));
     menuToggle.setAttribute(
       "aria-label",
       open ? "关闭导航菜单" : "打开导航菜单",
     );
+  }
+
+  menuToggle.addEventListener("click", function () {
+    setNavigationOpen(!navigation.classList.contains("is-open"));
   });
 
   navigation.querySelectorAll("a").forEach(function (link) {
     link.addEventListener("click", function () {
-      navigation.classList.remove("is-open");
-      menuToggle.setAttribute("aria-expanded", "false");
+      setNavigationOpen(false);
     });
   });
 
@@ -38,6 +41,55 @@
   var resultCount = document.querySelector("[data-result-count]");
   var emptyState = document.querySelector("[data-empty]");
   var total = cards.length;
+  var mobileCatalog = window.matchMedia("(max-width: 760px)");
+
+  function setCardExpanded(card, expanded) {
+    var details = card.querySelector(".fx-details");
+    var toggle = card.querySelector(".fx-toggle");
+    if (!details || !toggle) return;
+    details.hidden = !expanded;
+    toggle.setAttribute("aria-expanded", String(expanded));
+    toggle.querySelector("span").textContent = expanded
+      ? "收起详情"
+      : "展开详情";
+  }
+
+  cards.forEach(function (card) {
+    var header = card.querySelector(".fx-head");
+    if (!header || !card.id) return;
+
+    var details = document.createElement("div");
+    details.className = "fx-details";
+    details.id = card.id + "-details";
+    Array.prototype.slice.call(card.children, 1).forEach(function (child) {
+      details.appendChild(child);
+    });
+
+    var toggle = document.createElement("button");
+    toggle.className = "fx-toggle";
+    toggle.type = "button";
+    toggle.setAttribute("aria-controls", details.id);
+    toggle.innerHTML = "<span>展开详情</span>";
+    toggle.addEventListener("click", function () {
+      setCardExpanded(card, toggle.getAttribute("aria-expanded") !== "true");
+    });
+
+    card.appendChild(toggle);
+    card.appendChild(details);
+    setCardExpanded(card, !mobileCatalog.matches);
+  });
+
+  function syncCardDetails() {
+    cards.forEach(function (card) {
+      setCardExpanded(card, !mobileCatalog.matches);
+    });
+  }
+
+  if (mobileCatalog.addEventListener) {
+    mobileCatalog.addEventListener("change", syncCardDetails);
+  } else {
+    mobileCatalog.addListener(syncCardDetails);
+  }
 
   function applyFilter() {
     var query = searchInput.value.trim().toLowerCase();
@@ -51,6 +103,9 @@
       ).toLowerCase();
       var hit = !query || haystack.indexOf(query) !== -1;
       card.hidden = !hit;
+      if (mobileCatalog.matches && hit) {
+        setCardExpanded(card, Boolean(query));
+      }
       if (hit) visible++;
     });
 

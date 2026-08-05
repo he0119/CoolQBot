@@ -1,6 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="18" fill="#11130f" />
-  <path d="M14 13h36v31c0 5.5-4.5 10-10 10H14V13Z" fill="#c9ff4a" stroke="#11130f" stroke-width="4" />
-  <circle cx="50" cy="14" r="8" fill="#ff6b51" stroke="#11130f" stroke-width="4" />
-  <text x="19" y="38" fill="#11130f" font-family="Arial, sans-serif" font-size="17" font-weight="900" letter-spacing="-2">CQ</text>
+  <rect width="64" height="64" rx="16" fill="#23201a" />
+  <g fill="none" stroke="#e6f45c" stroke-linecap="round" stroke-linejoin="round" stroke-width="7">
+    <path d="M27 21.5A11 14 0 0 0 19.5 18C12.5 18 8 23.5 8 32s4.5 14 11.5 14a11 14 0 0 0 7.5-3.5" />
+    <ellipse cx="42.5" cy="32" rx="10.5" ry="14" />
+    <path d="m47.5 39.5 8 8" />
+  </g>
 </svg>
