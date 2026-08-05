@@ -6,6 +6,7 @@
 ![CI](https://github.com/he0119/CoolQBot/workflows/CI/badge.svg)
 [![Codecov](https://codecov.io/gh/he0119/CoolQBot/branch/main/graph/badge.svg?token=QEC2IWAREH)](https://codecov.io/gh/he0119/CoolQBot)
 [![Powered by NoneBot](https://img.shields.io/badge/Powered%20%20by-NoneBot-red)](https://github.com/nonebot/nonebot2)
+[![Website](https://img.shields.io/badge/Website-CoolQBot-c9ff4a)](https://bot-docs.hehome.xyz/)
 
 </div>
 
@@ -49,4 +50,6 @@ uv run nb run
 
 ## 功能
 
-请完成部署之后，向机器人发送 `/help` 命令获取各种功能的介绍。
+访问 [CoolQBot 功能介绍网站](https://bot-docs.hehome.xyz/) 浏览主要功能与常用命令。
+
+完成部署之后，也可以直接向机器人发送 `/help` 命令获取当前平台和群组可用的功能介绍。

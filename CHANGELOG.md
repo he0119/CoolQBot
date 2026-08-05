@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加 CoolQBot 功能介绍网站，并通过 GitHub Pages 自动部署
+
 ## [0.29.2] - 2026-08-05
 
 ### Added
