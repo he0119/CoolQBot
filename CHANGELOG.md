@@ -10,10 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Added
 
 - 为 `/llm quota` 添加 `--all`，批量查询本群已启用模型并合并相同额度请求与展示项
+- 为 `zssm` 添加 `-a|--agent`，按次启用包括联网搜索在内的工具增强解释
 
 ### Changed
 
 - 将额度查询按 Provider 拆分为独立模块，统一复用公共请求、错误处理与结果格式化逻辑
+- 将工具增强能力收敛为 `/chat -a|--agent`，并保留 `/agent` 作为 `/chat -a` 的快捷入口
 
 ### Fixed
 

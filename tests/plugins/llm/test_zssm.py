@@ -43,7 +43,9 @@ def test_zssm_has_help_metadata(app: App):
 
     command = zssm_cmd.command()
     assert command.meta.description == "使用大模型解释回复或输入的文字、图片、网页与 PDF"
-    assert command.meta.example == "回复一条消息并发送 zssm，可用 --model 临时指定模型，并在后面补充关注点"
+    assert command.meta.example == (
+        "回复一条消息并发送 zssm，可用 --model 临时指定模型、-a 启用联网工具，并在后面补充关注点"
+    )
     help_text = command.get_help()
     assert command.meta.description in help_text
     assert "Unknown" not in help_text
@@ -283,6 +285,47 @@ async def test_zssm_explains_text_with_group_model(app: App, respx_mock: MockRou
         call("thinking", message_id="1"),
         call("done", message_id="1"),
     ]
+
+
+@respx.mock(assert_all_called=True)
+async def test_zssm_agent_option_enables_web_search(app: App, respx_mock: MockRouter, zssm_model):
+    """-a 为本次解释开放包含网页搜索在内的工具。"""
+    route = respx_mock.post("https://api.example.com/chat/completions").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "model": "test-model",
+                "choices": [
+                    {
+                        "finish_reason": "stop",
+                        "message": {
+                            "role": "assistant",
+                            "content": '{"output":"联网解释","keywords":[],"blocked":false}',
+                        },
+                    }
+                ],
+            },
+        )
+    )
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("zssm -a Python 3.14 新特性"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            Message(MessageSegment.reply(1))
+            + "联网解释\n\n---\n模型　test-model  \n统计　5.1s · 输入 0 · 输出 0 · 缓存 0 · 共 0",
+            True,
+        )
+
+    payload = json.loads(route.calls[0].request.content)
+    tool_names = {tool["function"]["name"] for tool in payload["tools"]}
+    assert {"web_search", "web_fetch"} <= tool_names
+    user_data = json.loads(payload["messages"][1]["content"])
+    assert user_data["target"] == "Python 3.14 新特性"
 
 
 async def test_zssm_logs_provider_failure_as_warning(app: App, zssm_model, mocker):
