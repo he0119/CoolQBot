@@ -22,7 +22,7 @@
 - 群聊中直接 @ 机器人即可使用默认模型对话
 - 流式与非流式请求
 - 推理内容以引用块展示（DeepSeek 的 `reasoning_content`、Anthropic 的 `thinking`、Responses 的推理摘要）
-- 使用 emoji reaction 反馈响应状态（思考中、已完成、失败；不支持的平台自动跳过）
+- 使用 emoji reaction 反馈响应状态（思考中、已完成、失败）；QQ 适配器开始处理时改发普通消息，其他不支持的平台自动跳过
 - `/chat` 提供不发送工具定义的纯对话，`/agent` 默认开放全部已注册工具
 - 工具调用（function calling）适配三种 API 格式；耗时较长时定期提示模型请求与工具调用进度
 - 默认提供最终幻想 XIV 国服物价、时尚品鉴和 FFLogs 角色排名查询工具

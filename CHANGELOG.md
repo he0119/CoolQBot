@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 ### Fixed
 
 - 修复 `LLM__BASE_URL` 包含 `/v1` 等 API 版本路径时，Aperture 与 DeepSeek 额度接口地址解析错误的问题
+- 修复 QQ 适配器不支持 reaction 时缺少大模型开始处理提示的问题，改为发送普通消息反馈
 
 ## [0.29.1] - 2026-08-04
 

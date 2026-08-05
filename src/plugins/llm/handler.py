@@ -42,7 +42,10 @@ REACTION_EMOJIS: dict[ReactionStatus, tuple[str, str]] = {
     "thinking": ("424", "👀"),
     "done": ("144", "🎉"),
 }
-"""QQ emoji ID 与其他平台 Unicode emoji 的对应关系"""
+"""OneBot V11 emoji ID 与其他平台 Unicode emoji 的对应关系"""
+
+QQ_THINKING_NOTICE = "👀 已收到，正在处理……"
+"""QQ 适配器不支持 reaction，开始处理时改发普通消息。"""
 
 
 @dataclass
@@ -126,17 +129,22 @@ async def send_reaction(
     *,
     message_id: str | None = None,
 ) -> None:
-    """给触发消息添加响应状态；平台不支持或调用失败时静默跳过"""
+    """反馈响应状态；QQ 开始处理时发消息，其余平台优先使用 reaction。"""
     try:
         target = get_target()
-        is_qq = target.adapter in (SupportAdapter.onebot11, SupportAdapter.qq)
-        if is_qq and target.private:
+        if target.adapter == SupportAdapter.qq:
+            if status == "thinking":
+                await UniMessage.text(QQ_THINKING_NOTICE).send(reply_to=message_id or True)
             return
 
-        emoji = REACTION_EMOJIS[status][0 if is_qq else 1]
+        is_onebot = target.adapter == SupportAdapter.onebot11
+        if is_onebot and target.private:
+            return
+
+        emoji = REACTION_EMOJIS[status][0 if is_onebot else 1]
         await message_reaction(emoji, message_id=message_id)
     except Exception as e:
-        logger.opt(exception=e).debug("添加大模型响应状态失败，已忽略")
+        logger.opt(exception=e).debug("发送大模型响应状态失败，已忽略")
 
 
 async def execute_tool_calls(
