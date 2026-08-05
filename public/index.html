@@ -1,0 +1,984 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f1e7" />
+    <meta
+      name="description"
+      content="CoolQBot 功能图鉴：开源多平台群聊机器人，25 项功能的详细介绍与命令速查——AI 对话、群聊创作、FF14 工具、内容订阅与群组管理。"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:title" content="CoolQBot 功能图鉴 · 让群聊多一点灵气" />
+    <meta
+      property="og:description"
+      content="25 项功能逐一详解：AI 问答、复读词云、壁画表情包、FF14 工具箱、订阅推送、打卡早安与群组管理。"
+    />
+    <meta property="og:url" content="https://bot-docs.hehome.xyz/" />
+    <link rel="canonical" href="https://bot-docs.hehome.xyz/" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <title>CoolQBot 功能图鉴 · 让群聊多一点灵气</title>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <header class="site-header" data-header>
+      <div class="nav-shell">
+        <a class="brand" href="#top" aria-label="CoolQBot 首页">
+          <span class="brand-mark" aria-hidden="true">CQ</span>
+          <span class="brand-name">CoolQBot<em>功能图鉴</em></span>
+        </a>
+
+        <nav id="site-navigation" class="site-navigation" aria-label="主要导航" data-navigation>
+          <a href="#highlights">特色</a>
+          <a href="#catalog">功能图鉴</a>
+          <a href="#start">快速上手</a>
+          <a href="#open-source">开源部署</a>
+          <a class="nav-github" href="https://github.com/he0119/CoolQBot" target="_blank" rel="noreferrer">
+            GitHub
+            <svg aria-hidden="true"><use href="#i-arrow-ur" /></svg>
+          </a>
+        </nav>
+
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-label="打开导航菜单"
+          aria-expanded="false"
+          aria-controls="site-navigation"
+          data-menu-toggle
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ===================== HERO ===================== -->
+      <section id="top" class="hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="shell hero-layout">
+          <div class="hero-copy reveal">
+            <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>开源 · 多平台 · 基于 NoneBot2</p>
+            <h1>你的群聊，<br />值得一位<mark>全能群友</mark></h1>
+            <p class="hero-lead">
+              CoolQBot 把 <strong>25 项功能</strong>装进同一个机器人：AI 对话、群聊创作、FF14 工具箱、
+              生活记录与群组管理。下面这本图鉴，是它的全部本领。
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#catalog">
+                翻阅功能图鉴
+                <svg aria-hidden="true"><use href="#i-arrow-down" /></svg>
+              </a>
+              <a class="btn btn-ghost" href="https://github.com/he0119/CoolQBot" target="_blank" rel="noreferrer">
+                <svg aria-hidden="true"><use href="#i-github" /></svg>
+                源代码
+              </a>
+            </div>
+            <ul class="hero-facts" aria-label="项目概况">
+              <li><strong>25</strong><span>项功能</span></li>
+              <li><strong>9</strong><span>聊天平台</span></li>
+              <li><strong>按群</strong><span>独立配置</span></li>
+            </ul>
+          </div>
+
+          <div class="chat-stage reveal" aria-label="CoolQBot 对话示例">
+            <div class="chat-window">
+              <div class="chat-topbar">
+                <span class="bot-avatar" aria-hidden="true">CQ</span>
+                <div class="chat-title">
+                  <strong>CoolQBot</strong>
+                  <span><i aria-hidden="true"></i>在线 · 某群</span>
+                </div>
+                <div class="window-dots" aria-hidden="true"><b></b><b></b><b></b></div>
+              </div>
+              <div class="chat-body">
+                <div class="msg msg-user">
+                  <span>周末群活动有什么主意？</span>
+                  <small>14:32</small>
+                </div>
+                <div class="msg msg-cmd"><code>/agent 结合周末天气出一个方案</code></div>
+                <div class="msg msg-bot">
+                  <span class="tiny-avatar" aria-hidden="true">CQ</span>
+                  <div>
+                    <strong>周六多云 26°C，适合户外。</strong>
+                    <p>方案：下午城市定向 + 晚上火锅。我已把报名接龙和路线查好了，要发到群里吗？</p>
+                    <div class="msg-meta"><span>✦ 工具调用 ×3</span><span>2.4s</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="float-card float-a" aria-hidden="true">
+              <svg><use href="#i-cloud-sun" /></svg>
+              <div><span>成都</span><strong>26°C 多云</strong></div>
+            </div>
+            <div class="float-card float-b" aria-hidden="true">
+              <span class="float-dice">D20</span>
+              <div><span>今日手气</span><strong>18 · 很不错</strong></div>
+            </div>
+            <div class="sticker" aria-hidden="true">OPEN<br />SOURCE</div>
+          </div>
+        </div>
+
+        <div class="platform-rail" aria-label="支持的平台">
+          <div class="platform-track">
+            <span>QQ</span><i></i><span>Discord</span><i></i><span>Telegram</span><i></i><span>飞书</span><i></i><span>DoDo</span><i></i><span>KOOK</span><i></i><span>OneBot</span><i></i><span>Satori</span><i></i><span>Red</span><i></i>
+            <span aria-hidden="true">QQ</span><i aria-hidden="true"></i><span aria-hidden="true">Discord</span><i aria-hidden="true"></i><span aria-hidden="true">Telegram</span><i aria-hidden="true"></i><span aria-hidden="true">飞书</span><i aria-hidden="true"></i><span aria-hidden="true">DoDo</span><i aria-hidden="true"></i><span aria-hidden="true">KOOK</span><i aria-hidden="true"></i><span aria-hidden="true">OneBot</span><i aria-hidden="true"></i><span aria-hidden="true">Satori</span><i aria-hidden="true"></i><span aria-hidden="true">Red</span><i aria-hidden="true"></i>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== 特色 ===================== -->
+      <section id="highlights" class="highlights">
+        <div class="shell">
+          <div class="section-head reveal">
+            <span class="kicker">壹 · 为什么是 CoolQBot</span>
+            <h2>不只是会回答问题</h2>
+            <p>它能参与群聊，也懂得什么时候安静。工具、记忆与权限，都围绕真实的群组场景设计。</p>
+          </div>
+          <div class="hl-grid">
+            <article class="hl-card reveal">
+              <span class="hl-no" aria-hidden="true">01</span>
+              <div class="hl-icon"><svg aria-hidden="true"><use href="#i-spark" /></svg></div>
+              <h3>对话，也能办事</h3>
+              <p>
+                日常聊天保持轻快；需要时 Agent 会联网搜索、查天气、读网页和 PDF。
+                回复一句 <code>zssm</code>，让它把看不懂的内容讲清楚。
+              </p>
+            </article>
+            <article class="hl-card reveal">
+              <span class="hl-no" aria-hidden="true">02</span>
+              <div class="hl-icon"><svg aria-hidden="true"><use href="#i-people" /></svg></div>
+              <h3>群聊，自有默契</h3>
+              <p>
+                复读、词云、壁画、表情包、赛博医院——不是冷冰冰的工具菜单，
+                而是群友之间会自然发生的小剧场。
+              </p>
+            </article>
+            <article class="hl-card reveal">
+              <span class="hl-no" aria-hidden="true">03</span>
+              <div class="hl-icon"><svg aria-hidden="true"><use href="#i-sliders" /></svg></div>
+              <h3>每群，各有性格</h3>
+              <p>
+                模型、问候、复读与推送都能按群设置。权限边界清楚，
+                普通用户、群管理员和超级用户各司其职。
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== 功能图鉴 ===================== -->
+      <section id="catalog" class="catalog">
+        <div class="shell">
+          <div class="section-head section-head-center reveal">
+            <span class="kicker">贰 · 功能图鉴</span>
+            <h2>今天想让它做什么？</h2>
+            <p>25 项功能逐一详解：每项都附详细说明与命令速查。实际可用范围随平台与群组配置而变化。</p>
+          </div>
+
+          <div class="catalog-layout">
+            <!-- 侧边目录 -->
+            <aside class="catalog-aside" aria-label="功能目录">
+              <div class="aside-box" data-aside>
+                <label class="search-box">
+                  <svg aria-hidden="true"><use href="#i-search" /></svg>
+                  <input
+                    type="search"
+                    placeholder="搜索功能或命令…"
+                    aria-label="搜索功能或命令"
+                    data-search-input
+                  />
+                </label>
+                <p class="aside-count" aria-live="polite" data-result-count>共 25 项功能</p>
+                <nav class="aside-nav" aria-label="功能分类" data-aside-nav>
+                  <a href="#cat-ai" class="aside-link"><span class="aside-glyph">智</span>AI 与查询<i>4</i></a>
+                  <a href="#cat-community" class="aside-link"><span class="aside-glyph">玩</span>群聊创作<i>6</i></a>
+                  <a href="#cat-game" class="aside-link"><span class="aside-glyph">游</span>游戏与 FF14<i>7</i></a>
+                  <a href="#cat-life" class="aside-link"><span class="aside-glyph">记</span>生活记录<i>3</i></a>
+                  <a href="#cat-admin" class="aside-link"><span class="aside-glyph">管</span>账户与管理<i>5</i></a>
+                </nav>
+              </div>
+            </aside>
+
+            <!-- 图鉴主体 -->
+            <div class="catalog-body" data-catalog>
+              <!-- ===== 分类一：AI 与查询 ===== -->
+              <section id="cat-ai" class="fx-group" aria-labelledby="cat-ai-title">
+                <header class="fx-group-head reveal">
+                  <span class="fx-group-glyph">智</span>
+                  <div>
+                    <h3 id="cat-ai-title">AI 与查询</h3>
+                    <p>大模型对话、内容解释、天气与链接解析。</p>
+                  </div>
+                </header>
+
+                <article class="fx-card reveal" id="fx-chat" data-search="大模型对话 chat agent llm ai 人工智能 模型 @机器人 语音">
+                  <header class="fx-head">
+                    <span class="fx-no">01</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-message" /></svg></span>
+                    <div class="fx-title">
+                      <h4>大模型对话</h4>
+                      <div class="fx-tags"><span class="tag tag-coral">AI</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    接入多种主流大模型 API，日常聊天用 <code>/chat</code> 或直接 @机器人 即可，支持多轮上下文与图片理解；
+                    需要查资料时加 <code>-a</code> 启用联网搜索等工具，让 AI 边查边答。
+                    每个群可以独立设置默认模型，管理员还能控制本群可用的模型范围，回复甚至可以用语音播放。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/chat 帮我想一个群活动</code></dt><dd>与大模型对话，保留多轮上下文</dd></div>
+                    <div><dt><code>/chat -a 明天北京天气如何</code></dt><dd>启用工具调用（联网搜索等）</dd></div>
+                    <div><dt><code>@机器人 你好</code></dt><dd>群聊中直接 @ 机器人开始对话</dd></div>
+                    <div><dt><code>/llm model list</code></dt><dd>查看当前群可用模型</dd></div>
+                    <div><dt><code>/llm model set 模型名</code></dt><dd>设置本群默认模型（管理员）</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/chat -a 查一下周末成都天气，安排一次群活动</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-zssm" data-search="这是什么 zssm 解释 总结 翻译 网页 pdf 图片">
+                  <header class="fx-head">
+                    <span class="fx-no">02</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-help" /></svg></span>
+                    <div class="fx-title">
+                      <h4>这是什么（zssm）</h4>
+                      <div class="fx-tags"><span class="tag tag-coral">AI</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    看不懂群友发的内容？<strong>回复那条消息并发送 <code>zssm</code></strong>，大模型会帮你解释其中的
+                    文字、图片、网页甚至 PDF 文件。可以临时切换模型、启用联网工具，也可以在后面补充你关心的重点，
+                    是群聊里的"随叫随到的课代表"。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>回复消息 + zssm</code></dt><dd>解释被回复消息的内容</dd></div>
+                    <div><dt><code>zssm -a 这篇文章的要点</code></dt><dd>启用联网工具，并说明关注点</dd></div>
+                    <div><dt><code>zssm --model 模型名</code></dt><dd>临时指定本次使用的模型</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>（回复一张截图）zssm 这张图在说什么</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-weather" data-search="天气 weather 预报 艾欧泽亚 ff14 气温">
+                  <header class="fx-head">
+                    <span class="fx-no">03</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-cloud-sun" /></svg></span>
+                    <div class="fx-title">
+                      <h4>天气查询</h4>
+                      <div class="fx-tags"><span class="tag tag-indigo">查询</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    查询全球城市的天气预报，中文、英文和外文地名都可以；结果不对时补上行政区划即可消歧。
+                    它甚至接入了《最终幻想 XIV》的<strong>艾欧泽亚天气</strong>，
+                    方便光之战士安排挖宝和特殊天气狩猎。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/weather 成都</code></dt><dd>查询城市天气（也支持 /天气）</dd></div>
+                    <div><dt><code>/weather Tokyo</code></dt><dd>支持外国城市与英文地名</dd></div>
+                    <div><dt><code>/weather 西安 黑龙江</code></dt><dd>指定行政区划，消除同名歧义</dd></div>
+                    <div><dt><code>/weather 格里达尼亚</code></dt><dd>查询艾欧泽亚地区天气</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/天气 上海</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-parser" data-search="链接解析 parser b站 bilibili 微博 小红书 抖音 nga 分享">
+                  <header class="fx-head">
+                    <span class="fx-no">04</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-link" /></svg></span>
+                    <div class="fx-title">
+                      <h4>链接分享解析</h4>
+                      <div class="fx-tags"><span class="tag tag-indigo">自动触发</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    群里分享链接不用再点开——机器人自动识别 <strong>Bilibili、微博、小红书、抖音、NGA</strong>
+                    等常见平台的链接，提取标题、封面、作者与关键数据，整理成卡片直接发在群里。
+                    无需任何命令，发送链接即可。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>（直接发送链接）</code></dt><dd>自动解析，无需命令</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>https://www.bilibili.com/video/BV1xx411c7mD</code></p>
+                </article>
+              </section>
+
+              <!-- ===== 分类二：群聊创作 ===== -->
+              <section id="cat-community" class="fx-group" aria-labelledby="cat-community-title">
+                <header class="fx-group-head reveal">
+                  <span class="fx-group-glyph">玩</span>
+                  <div>
+                    <h3 id="cat-community-title">群聊创作</h3>
+                    <p>复读、词云、壁画、表情包与抽象话——群友之间的小剧场。</p>
+                  </div>
+                </header>
+
+                <article class="fx-card reveal" id="fx-repeat" data-search="复读 repeat rank history 排行榜 统计 消息">
+                  <header class="fx-head">
+                    <span class="fx-no">05</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-repeat" /></svg></span>
+                    <div class="fx-title">
+                      <h4>复读与排行榜</h4>
+                      <div class="fx-tags"><span class="tag tag-mint">群聊</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    群聊的保留节目。开启后机器人会按概率参与复读（人类的本质），并默默统计每个人的
+                    消息数与复读次数，随时生成排行榜；还能回看任意一天或任意一个月的历史数据，
+                    见证谁是本群真正的"复读机"。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/repeat</code></dt><dd>查看当前群是否启用复读</dd></div>
+                    <div><dt><code>/repeat on / off</code></dt><dd>开启或关闭本群复读（管理员）</dd></div>
+                    <div><dt><code>/rank</code></dt><dd>当前排行榜，默认前三名</dd></div>
+                    <div><dt><code>/rank 3n30</code></dt><dd>显示前 3 名，且至少发送 30 条消息</dd></div>
+                    <div><dt><code>/history 2020-1</code></dt><dd>查看 2020 年 1 月的复读数据</dd></div>
+                    <div><dt><code>/history 2020-1-1</code></dt><dd>查看指定日期的数据</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/rank 5n30</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-wordcloud" data-search="词云 wordcloud 今日 本周 本月 年度 历史 聊天回顾">
+                  <header class="fx-head">
+                    <span class="fx-no">06</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-cloud" /></svg></span>
+                    <div class="fx-title">
+                      <h4>词云</h4>
+                      <div class="fx-tags"><span class="tag tag-mint">回顾</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    想知道大家最近在聊什么？词云会把群聊消息整理成一张图：出现越频繁的关键词越醒目，
+                    发言越多的人名字越大。支持今日、本周、本月、本年度，以及任意历史日期的回顾。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/今日词云</code></dt><dd>生成今天的群聊词云</dd></div>
+                    <div><dt><code>/本周词云 /本月词云 /年度词云</code></dt><dd>更大时间跨度的回顾</dd></div>
+                    <div><dt><code>/历史词云 2024-01-01</code></dt><dd>回看指定日期的词云</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/今日词云</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-bihua" data-search="壁画 bihua 收藏 图片 搜索 名画 梗图">
+                  <header class="fx-head">
+                    <span class="fx-no">07</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-image" /></svg></span>
+                    <div class="fx-title">
+                      <h4>壁画收藏</h4>
+                      <div class="fx-tags"><span class="tag tag-mint">收藏</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    每个群都有自己的传世名画。看到经典图片时<strong>回复它并发送收藏命令</strong>，
+                    图片就会按名字存入本群独立的壁画库；随时可以查看、按关键词模糊搜索，
+                    管理员也能清理过时收藏——再也不怕梗图失传。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>回复图片 + /收藏壁画 名称</code></dt><dd>把图片按名称收藏入库</dd></div>
+                    <div><dt><code>/壁画 名称</code></dt><dd>查看收藏的壁画</dd></div>
+                    <div><dt><code>/搜索壁画 关键词</code></dt><dd>按关键词模糊搜索</dd></div>
+                    <div><dt><code>/删除壁画 名称</code></dt><dd>删除指定壁画（管理员）</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>（回复一张梗图）/收藏壁画 猫猫震惊</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-memes" data-search="表情包 memes 梗图 制作 模板 头像">
+                  <header class="fx-head">
+                    <span class="fx-no">08</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-smile" /></svg></span>
+                    <div class="fx-title">
+                      <h4>表情包制作</h4>
+                      <div class="fx-tags"><span class="tag tag-mint">创作</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    内置数百个热门表情包模板：输入文字、发送图片、回复别人的消息，或者直接用群友头像，
+                    就能生成"摸头""举牌""永远喜欢"等经典梗图。记不清模板名字时，随时可以翻看完整列表。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/表情包列表</code></dt><dd>查看全部可用模板</dd></div>
+                    <div><dt><code>/摸头 @群友</code></dt><dd>用群友头像生成表情包</dd></div>
+                    <div><dt><code>回复消息 + /模板名 文字</code></dt><dd>以回复内容作为素材生成</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/举牌 周末开黑，不见不散</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-abs" data-search="抽象 abs emoji 文字 转换 抽象话">
+                  <header class="fx-head">
+                    <span class="fx-no">09</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-type" /></svg></span>
+                    <div class="fx-title">
+                      <h4>抽象表达</h4>
+                      <div class="fx-tags"><span class="tag tag-mint">文字玩法</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    把普通文字翻译成 emoji 拼成的"抽象话"。有些话不方便直说的时候，
+                    就让 emoji 替你表达——懂的人自然懂。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/抽象 愤怒的分奴</code></dt><dd>把文字转换成 emoji 抽象表达</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/抽象 今晚一定早睡</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-hospital" data-search="赛博医院 hospital 入院 出院 查房 病历 病情">
+                  <header class="fx-head">
+                    <span class="fx-no">10</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-hospital" /></svg></span>
+                    <div class="fx-title">
+                      <h4>赛博医院</h4>
+                      <div class="fx-tags"><span class="tag tag-mint">小剧场</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    群聊小剧场开张了：把"病得不轻"的群友安排入院，医生查房时记录症状，康复后办理出院，
+                    还会留下完整病历。每个人的入院次数和出入院时间都有案可查——
+                    节目效果拉满，但不提供任何医学建议。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/入院 @群友</code></dt><dd>为群友办理入院手续</dd></div>
+                    <div><dt><code>/查房</code></dt><dd>查看当前在院病人列表</dd></div>
+                    <div><dt><code>/查房 @群友 症状</code></dt><dd>查房并记录病情</dd></div>
+                    <div><dt><code>/出院 @群友</code></dt><dd>为群友办理出院</dd></div>
+                    <div><dt><code>/病历 @群友</code></dt><dd>查看完整病历</dd></div>
+                    <div><dt><code>/入院记录</code></dt><dd>所有人的入院次数统计</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/查房 @群友 又熬夜打本了</code></p>
+                </article>
+              </section>
+
+              <!-- ===== 分类三：游戏与 FF14 ===== -->
+              <section id="cat-game" class="fx-group" aria-labelledby="cat-game-title">
+                <header class="fx-group-head reveal">
+                  <span class="fx-group-glyph">游</span>
+                  <div>
+                    <h3 id="cat-game-title">游戏与 FF14</h3>
+                    <p>Roll 点、听歌房，以及一站齐全的光之战士工具箱。</p>
+                  </div>
+                </header>
+
+                <article class="fx-card reveal" id="fx-roll" data-search="roll rand 掷骰子 随机 概率 点数 nga">
+                  <header class="fx-head">
+                    <span class="fx-no">11</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-dice" /></svg></span>
+                    <div class="fx-title">
+                      <h4>Roll 点与概率</h4>
+                      <div class="fx-tags"><span class="tag tag-sun">随机</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    两种随机工具：<strong>NGA 风格的复合骰子</strong>，支持任意面数与次数的自由组合；
+                    以及给任何突发奇想一个 0–100 的随机答案——"今天早睡的概率"也能被量化。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/roll d100</code></dt><dd>掷一次 100 面骰</dd></div>
+                    <div><dt><code>/roll 2d100+2d50</code></dt><dd>复合掷骰，自由组合</dd></div>
+                    <div><dt><code>/rand</code></dt><dd>获得一个 0–100 的点数</dd></div>
+                    <div><dt><code>/rand 今天早睡的概率</code></dt><dd>给指定事件一个随机概率</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/roll 2d100+2d50</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-music" data-search="点歌 alisten 音乐 听歌 网易云 qq音乐 bilibili 切歌">
+                  <header class="fx-head">
+                    <span class="fx-no">12</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-music" /></svg></span>
+                    <div class="fx-title">
+                      <h4>点歌与共同播放</h4>
+                      <div class="fx-tags"><span class="tag tag-sun">听歌房</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    群里的共同听歌房：从<strong>网易云、QQ 音乐或 Bilibili</strong> 搜索点歌，
+                    加入播放列表后全群一起听；可以随时查看当前曲目与播放列表，
+                    不合口味的歌也能投票切掉。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/点歌 青花瓷</code></dt><dd>搜索并加入播放列表</dd></div>
+                    <div><dt><code>/当前音乐</code></dt><dd>查看正在播放的曲目</dd></div>
+                    <div><dt><code>/切歌</code></dt><dd>投票切换当前歌曲</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/点歌 周杰伦 晴天</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-price" data-search="查价 price ff14 市场 物价 最低价 板子">
+                  <header class="fx-head">
+                    <span class="fx-no">13</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-crystal" /></svg></span>
+                    <div class="fx-title">
+                      <h4>FF14 查价</h4>
+                      <div class="fx-tags"><span class="tag tag-ff">FFXIV</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    查询国服市场布告板的<strong>实时最低价</strong>，支持整个大区或具体服务器；
+                    每个用户都能设置自己的默认查询范围，之后查价一句话搞定。
+                    买东西前先查价，不当冤大头。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/查价 萨维奈舞裙 猫小胖</code></dt><dd>查询整个大区的最低价</dd></div>
+                    <div><dt><code>/查价 萨维奈舞裙 静语庄园</code></dt><dd>查询指定服务器的最低价</dd></div>
+                    <div><dt><code>/查价 默认值 静语庄园</code></dt><dd>设置你的默认查询范围</dd></div>
+                    <div><dt><code>/查价 默认值</code></dt><dd>查看当前默认设置</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/查价 萨维奈舞裙 静语庄园</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-fflogs" data-search="fflogs dps 排名 输出 副本 职业 rdps 绑定角色">
+                  <header class="fx-head">
+                    <span class="fx-no">14</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-gauge" /></svg></span>
+                    <div class="fx-title">
+                      <h4>FFLogs 排名</h4>
+                      <div class="fx-tags"><span class="tag tag-ff">FFXIV</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    副本输出查询工具：查看任意副本、任意职业的 <strong>rdps / adps / pdps</strong> 排行榜。
+                    绑定自己的角色后，一句 <code>/dps 副本名 me</code> 就能查到自己的排名，
+                    也可以顺手看看群友打得怎么样。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/dps update</code></dt><dd>更新副本数据（管理员）</dd></div>
+                    <div><dt><code>/dps 副本名 职业 rdps</code></dt><dd>查询职业输出排行榜</dd></div>
+                    <div><dt><code>/dps me 角色名 服务器名</code></dt><dd>绑定自己的游戏角色</dd></div>
+                    <div><dt><code>/dps 副本名 me</code></dt><dd>查询自己绑定角色的排名</dd></div>
+                    <div><dt><code>/dps 副本名 @群友</code></dt><dd>查询群友绑定角色的排名</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/dps 阿卡狄亚零式登天斗技场 轻量级4 me</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-daily" data-search="每日委托 daily ff14 日常 组队 配对">
+                  <header class="fx-head">
+                    <span class="fx-no">15</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-check" /></svg></span>
+                    <div class="fx-title">
+                      <h4>每日委托</h4>
+                      <div class="fx-tags"><span class="tag tag-ff">FFXIV</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    上报自己今天的每日委托，机器人会帮你找出<strong>拿了相同委托的群友</strong>，
+                    组队清日常再也不用挨个问；也可以随时查看今日全群的委托总览。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/每日委托 乐园都市笑笑镇, 伊弗利特歼灭战</code></dt><dd>记录今日委托并自动配对</dd></div>
+                    <div><dt><code>/每日委托</code></dt><dd>查询与自己委托相同的群友</dd></div>
+                    <div><dt><code>/每日委托 总览</code></dt><dd>今日全群委托总览</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/每日委托 总览</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-nuannuan" data-search="时尚品鉴 nuannuan ff14 金碟 暖暖 攻略">
+                  <header class="fx-head">
+                    <span class="fx-no">16</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-spark" /></svg></span>
+                    <div class="fx-title">
+                      <h4>时尚品鉴</h4>
+                      <div class="fx-tags"><span class="tag tag-ff">FFXIV</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    每周金碟游乐场的时尚品鉴，不用自己琢磨穿搭——机器人直接给出最新一期的
+                    <strong>满分攻略</strong>，轻松拿满奖励。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/时尚品鉴</code></dt><dd>获取最新一期满分攻略</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/时尚品鉴</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-gate" data-search="藏宝选门 gate ff14 挖宝 门 玄学">
+                  <header class="fx-head">
+                    <span class="fx-no">17</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-shield" /></svg></span>
+                    <div class="fx-title">
+                      <h4>藏宝选门</h4>
+                      <div class="fx-tags"><span class="tag tag-ff">FFXIV</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    挖宝进到藏宝洞，左门还是右门？告诉机器人门有几扇，
+                    它会用玄学给你一个坚定的答案——选错了概不负责。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/gate 2</code></dt><dd>两扇门，帮你选一扇</dd></div>
+                    <div><dt><code>/gate 3</code></dt><dd>三扇门，帮你选一扇</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/gate 3</code></p>
+                </article>
+              </section>
+
+              <!-- ===== 分类四：生活记录 ===== -->
+              <section id="cat-life" class="fx-group" aria-labelledby="cat-life-title">
+                <header class="fx-group-head reveal">
+                  <span class="fx-group-glyph">记</span>
+                  <div>
+                    <h3 id="cat-life-title">生活记录</h3>
+                    <p>健身打卡与每日问候，把坚持变成小事。</p>
+                  </div>
+                </header>
+
+                <article class="fx-card reveal" id="fx-checkin" data-search="打卡 checkin 健身 饮食 体重 体脂 目标 历史 趋势">
+                  <header class="fx-head">
+                    <span class="fx-no">18</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-activity" /></svg></span>
+                    <div class="fx-title">
+                      <h4>健身打卡</h4>
+                      <div class="fx-tags"><span class="tag tag-mint">记录</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    把健身、饮食、体重和体脂变成可以坚持的小事：四项数据分开记录，
+                    可以给自己设定体重与体脂目标；历史记录会自动整理成<strong>趋势图</strong>，
+                    回头看时很有成就感。数据绑定统一账户，换平台也不会丢。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/健身打卡 跑步 30 分钟</code></dt><dd>记录今天的健身内容</dd></div>
+                    <div><dt><code>/饮食打卡 A</code></dt><dd>A 健康饮食 / B 摆了偷吃</dd></div>
+                    <div><dt><code>/体重打卡 60</code></dt><dd>记录当前体重</dd></div>
+                    <div><dt><code>/目标体重 55</code></dt><dd>设置目标体重（体脂同理）</dd></div>
+                    <div><dt><code>/体脂打卡 20</code></dt><dd>记录当前体脂率</dd></div>
+                    <div><dt><code>/打卡历史 体重</code></dt><dd>查看历史记录与趋势图</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/打卡历史 体重</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-morning" data-search="早安 morning hello 问候 节假日 周末 倒计时 启动问候">
+                  <header class="fx-head">
+                    <span class="fx-no">19</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-sunrise" /></svg></span>
+                    <div class="fx-title">
+                      <h4>问候与节假日提醒</h4>
+                      <div class="fx-tags"><span class="tag tag-mint">自动化</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    机器人上线时在群里打个招呼；开启每日早安后，每天早晨准点问好，
+                    顺便播报<strong>今天距离周末还有几天、离下一个法定节假日还有多久</strong>——
+                    打工人的精神支柱。两项功能都可按群独立开关。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/morning on / off</code></dt><dd>开启或关闭每日早安（管理员）</dd></div>
+                    <div><dt><code>/hello on / off</code></dt><dd>开启或关闭启动问候（管理员）</dd></div>
+                    <div><dt><code>/morning /hello</code></dt><dd>查看当前群的开关状态</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/morning on</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-bison" data-search="订阅 bison 推送 b站 bilibili 微博 rss 动态 更新 主播 明日方舟">
+                  <header class="fx-head">
+                    <span class="fx-no">20</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-bell" /></svg></span>
+                    <div class="fx-title">
+                      <h4>内容订阅推送</h4>
+                      <div class="fx-tags"><span class="tag tag-mint">订阅</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    由 <strong>nonebot-bison</strong> 驱动的订阅机器人：订阅 <strong>B站 UP 主、微博博主、RSS 源、
+                    明日方舟公告</strong>等内容源，有新动态时自动把消息推送到群里，
+                    追更新再也不用反复刷 App。订阅按群管理，随时可以查询和清理。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>添加订阅</code></dt><dd>交互式添加 B站、微博、RSS 等订阅</dd></div>
+                    <div><dt><code>查询订阅</code></dt><dd>查看本群已订阅的内容源</dd></div>
+                    <div><dt><code>删除订阅</code></dt><dd>移除不再需要的订阅</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>添加订阅 → 选择平台 → 输入 UP 主</code></p>
+                </article>
+              </section>
+
+              <!-- ===== 分类五：账户与管理 ===== -->
+              <section id="cat-admin" class="fx-group" aria-labelledby="cat-admin-title">
+                <header class="fx-group-head reveal">
+                  <span class="fx-group-glyph">管</span>
+                  <div>
+                    <h3 id="cat-admin-title">账户与管理</h3>
+                    <p>跨平台账户、帮助系统与部署者的管理工具。</p>
+                  </div>
+                </header>
+
+                <article class="fx-card reveal" id="fx-user" data-search="统一账户 bind inspect 绑定 跨平台 用户">
+                  <header class="fx-head">
+                    <span class="fx-no">21</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-user" /></svg></span>
+                    <div class="fx-title">
+                      <h4>统一用户账户</h4>
+                      <div class="fx-tags"><span class="tag tag-indigo">跨平台</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    同一个人可能在 QQ、Discord、Telegram 上都在群里。把各平台账号绑定到同一个
+                    CoolQBot 账户后，<strong>打卡记录、角色绑定等个人数据全部互通</strong>，
+                    换平台也不用从头再来。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/bind</code></dt><dd>获取绑定指令，关联其他平台账号</dd></div>
+                    <div><dt><code>/inspect</code></dt><dd>查看当前会话标识（调试用）</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/bind</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-help" data-search="帮助 help 树形 目录 用法 文档">
+                  <header class="fx-head">
+                    <span class="fx-no">22</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-help" /></svg></span>
+                    <div class="fx-title">
+                      <h4>分层帮助</h4>
+                      <div class="fx-tags"><span class="tag tag-indigo">自助</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    不用背整本说明书：<code>/help</code> 先给出简洁的功能目录，
+                    再加上插件名称就能看到该插件的每一条命令和用法，
+                    一层一层找到你需要的入口。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/help</code></dt><dd>查看功能目录</dd></div>
+                    <div><dt><code>/help 大模型对话</code></dt><dd>查看指定插件的详细命令</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/help 复读</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-status" data-search="状态 status cpu 内存 运行 监控">
+                  <header class="fx-head">
+                    <span class="fx-no">23</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-gauge" /></svg></span>
+                    <div class="fx-title">
+                      <h4>运行状态查看</h4>
+                      <div class="fx-tags"><span class="tag tag-indigo">状态</span><span class="tag">全平台</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    一键查看机器人的运行状况：CPU 占用、内存使用、运行时长一目了然，
+                    随时确认它是否保持着好状态。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/状态</code></dt><dd>查看 CPU、内存与运行时长</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/状态</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-ban" data-search="自主禁言 ban 禁言 冷静 qq onebot">
+                  <header class="fx-head">
+                    <span class="fx-no">24</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-mute" /></svg></span>
+                    <div class="fx-title">
+                      <h4>自主禁言</h4>
+                      <div class="fx-tags"><span class="tag tag-indigo">自律</span><span class="tag tag-warn">仅 QQ（OneBot V11）</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    想专心做事又管不住手？给自己安排一段冷静期。禁言时长按分钟计算，
+                    到期自动解除；反悔了也可以随时发送 <code>/ban 0</code> 提前出来，
+                    私聊时补上群号即可。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/ban 30</code></dt><dd>禁言自己 30 分钟</dd></div>
+                    <div><dt><code>/ban 0</code></dt><dd>立即解除自己的禁言</dd></div>
+                    <div><dt><code>/ban 0 12345678</code></dt><dd>私聊时指定群号解除</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/禁言 30</code></p>
+                </article>
+
+                <article class="fx-card reveal" id="fx-permission" data-search="权限 permission 群组绑定 管理 超级用户 绑定群组">
+                  <header class="fx-head">
+                    <span class="fx-no">25</span>
+                    <span class="fx-icon"><svg aria-hidden="true"><use href="#i-sliders" /></svg></span>
+                    <div class="fx-title">
+                      <h4>权限与群组管理</h4>
+                      <div class="fx-tags"><span class="tag tag-indigo">高级</span><span class="tag tag-warn">管理员</span></div>
+                    </div>
+                  </header>
+                  <p class="fx-desc">
+                    为部署者与管理员准备的管理工具：把多个平台的群组绑定为同一个"群"，
+                    让复读、壁画等群数据跨平台互通；再用细粒度权限系统控制高级命令的使用范围，
+                    普通用户、群管理员和超级用户各司其职。
+                  </p>
+                  <dl class="fx-cmds">
+                    <div><dt><code>/绑定群组</code></dt><dd>绑定多平台群组，群数据互通</dd></div>
+                    <div><dt><code>/permission</code></dt><dd>查看与管理命令权限</dd></div>
+                  </dl>
+                  <p class="fx-example"><span>示例</span><code>/help 群组绑定</code></p>
+                </article>
+              </section>
+
+              <div class="catalog-empty" data-empty hidden>
+                <svg aria-hidden="true"><use href="#i-search" /></svg>
+                <p>没有找到匹配的功能</p>
+                <span>试试搜索"天气""复读"或"ff14"</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== 快速上手 ===================== -->
+      <section id="start" class="start">
+        <div class="shell start-layout">
+          <div class="start-intro reveal">
+            <span class="kicker kicker-light">叁 · 怎么开始</span>
+            <h2>不用背命令，<br />先说一句话。</h2>
+            <p>大多数功能支持中文命令与交互式补充。记不住时发送 <code>/help</code>，机器人会带你找到入口。</p>
+            <ol class="steps">
+              <li><span>1</span><div><strong>在群里找到 CoolQBot</strong><p>发送 <code>/help</code>，看看当前群开放了哪些功能。</p></div></li>
+              <li><span>2</span><div><strong>选一种交流方式</strong><p>用斜杠命令精确调用，或直接 @机器人 开始 AI 对话。</p></div></li>
+              <li><span>3</span><div><strong>让它适应这个群</strong><p>管理员可设置模型、问候、复读等群组偏好。</p></div></li>
+            </ol>
+          </div>
+
+          <div class="cmd-board reveal" aria-label="常用命令示例">
+            <div class="board-topbar">
+              <span>QUICK START</span>
+              <div aria-hidden="true"><i></i><i></i><i></i></div>
+            </div>
+            <div class="cmd-list">
+              <div class="cmd-row">
+                <div><span>问 AI</span><code>/chat 帮我想一个群活动</code></div>
+                <button type="button" data-copy="/chat 帮我想一个群活动" aria-label="复制命令：/chat 帮我想一个群活动"><svg aria-hidden="true"><use href="#i-copy" /></svg><em>复制</em></button>
+              </div>
+              <div class="cmd-row">
+                <div><span>使用工具</span><code>/chat -a 查一下成都周末天气</code></div>
+                <button type="button" data-copy="/chat -a 查一下成都周末天气" aria-label="复制命令：/chat -a 查一下成都周末天气"><svg aria-hidden="true"><use href="#i-copy" /></svg><em>复制</em></button>
+              </div>
+              <div class="cmd-row">
+                <div><span>解释消息</span><code>回复一条消息：zssm</code></div>
+                <button type="button" data-copy="zssm" aria-label="复制命令：zssm"><svg aria-hidden="true"><use href="#i-copy" /></svg><em>复制</em></button>
+              </div>
+              <div class="cmd-row">
+                <div><span>FF14 查价</span><code>/查价 萨维奈舞裙 静语庄园</code></div>
+                <button type="button" data-copy="/查价 萨维奈舞裙 静语庄园" aria-label="复制命令：/查价 萨维奈舞裙 静语庄园"><svg aria-hidden="true"><use href="#i-copy" /></svg><em>复制</em></button>
+              </div>
+              <div class="cmd-row">
+                <div><span>今日词云</span><code>/今日词云</code></div>
+                <button type="button" data-copy="/今日词云" aria-label="复制命令：/今日词云"><svg aria-hidden="true"><use href="#i-copy" /></svg><em>复制</em></button>
+              </div>
+              <div class="cmd-row">
+                <div><span>查看帮助</span><code>/help</code></div>
+                <button type="button" data-copy="/help" aria-label="复制命令：/help"><svg aria-hidden="true"><use href="#i-copy" /></svg><em>复制</em></button>
+              </div>
+            </div>
+            <p class="board-note"><span>TIP</span>页面中的命令默认使用 <code>/</code> 前缀；实际前缀由部署配置决定。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== 开源部署 ===================== -->
+      <section id="open-source" class="open-source">
+        <div class="shell os-layout">
+          <div class="os-mark reveal" aria-hidden="true">
+            <span class="os-ring os-ring-a"></span>
+            <span class="os-ring os-ring-b"></span>
+            <div>CQ</div>
+          </div>
+          <div class="os-copy reveal">
+            <span class="kicker">肆 · 开源与自托管</span>
+            <h2>你的机器人，<br />应该由你掌控。</h2>
+            <p>
+              CoolQBot 基于 NoneBot2 构建，源代码完整开放。
+              选择适合自己的平台、模型与插件，在自己的服务器上运行——数据与规则，都归你所有。
+            </p>
+            <ul class="os-points">
+              <li><svg aria-hidden="true"><use href="#i-check" /></svg>Python 3.14+</li>
+              <li><svg aria-hidden="true"><use href="#i-check" /></svg>Docker 一键部署</li>
+              <li><svg aria-hidden="true"><use href="#i-check" /></svg>模块化插件架构</li>
+              <li><svg aria-hidden="true"><use href="#i-check" /></svg>9 个平台统一适配</li>
+            </ul>
+            <div class="os-actions">
+              <a class="btn btn-dark" href="https://github.com/he0119/CoolQBot#运行" target="_blank" rel="noreferrer">
+                阅读部署说明
+                <svg aria-hidden="true"><use href="#i-arrow-ur" /></svg>
+              </a>
+              <a class="text-link" href="https://nonebot.dev/" target="_blank" rel="noreferrer">了解 NoneBot2 ↗</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell footer-top">
+        <div class="footer-brand">
+          <a class="brand" href="#top">
+            <span class="brand-mark" aria-hidden="true">CQ</span>
+            <span class="brand-name">CoolQBot</span>
+          </a>
+          <p>一个认真参与群聊，也认真保持分寸的开源机器人。</p>
+        </div>
+        <div class="footer-links">
+          <div>
+            <strong>探索</strong>
+            <a href="#highlights">特色</a>
+            <a href="#catalog">功能图鉴</a>
+            <a href="#start">快速上手</a>
+          </div>
+          <div>
+            <strong>项目</strong>
+            <a href="https://github.com/he0119/CoolQBot" target="_blank" rel="noreferrer">GitHub</a>
+            <a href="https://github.com/he0119/CoolQBot/issues" target="_blank" rel="noreferrer">问题反馈</a>
+            <a href="https://github.com/he0119/CoolQBot/blob/main/LICENSE" target="_blank" rel="noreferrer">许可证</a>
+          </div>
+        </div>
+      </div>
+      <div class="shell footer-bottom">
+        <span>© <span data-year></span> CoolQBot contributors</span>
+        <span>Made for lively conversations.</span>
+      </div>
+    </footer>
+
+    <button class="back-top" type="button" aria-label="回到顶部" data-back-top hidden>
+      <svg aria-hidden="true"><use href="#i-arrow-up" /></svg>
+    </button>
+
+    <!-- ============ SVG 图标库 ============ -->
+    <svg class="svg-defs" aria-hidden="true">
+      <defs>
+        <symbol id="i-arrow-ur" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10" /></symbol>
+        <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14m-6-6 6 6 6-6" /></symbol>
+        <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6" /></symbol>
+        <symbol id="i-github" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.3 3.5 6.5 6.8 6.9A4.8 4.8 0 0 0 8 18v4m-3 0c-4 1.5-4-2.5-6-3" /></symbol>
+        <symbol id="i-cloud-sun" viewBox="0 0 24 24"><path d="M12 2v2m7.1.9-1.4 1.4M22 12h-2M4.9 4.9l1.4 1.4M2 12h2m12.2-2.5A5 5 0 0 0 7 12a4 4 0 0 0 0 8h9a3 3 0 0 0 .2-6 5 5 0 0 0 0-4.5Z" /></symbol>
+        <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3Zm7 13 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z" /></symbol>
+        <symbol id="i-people" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.9m-2-12a4 4 0 0 1 0 7.8" /></symbol>
+        <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6M9 8h6m2 8h6" /></symbol>
+        <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" /><path d="M8 9h8m-8 4h5" /></symbol>
+        <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" /></symbol>
+        <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 1 4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4m14-2v2a4 4 0 0 1-4 4H3" /></symbol>
+        <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></symbol>
+        <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M17.5 19H6a4 4 0 1 1 .7-7.9A6 6 0 0 1 18.4 9a5 5 0 0 1-.9 10Z" /><path d="M8 15h8m-6-3h4" /></symbol>
+        <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" /></symbol>
+        <symbol id="i-type" viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16" /></symbol>
+        <symbol id="i-crystal" viewBox="0 0 24 24"><path d="m12 2 7 6-3 11-4 3-4-3L5 8l7-6Z" /><path d="m5 8 7 4 7-4m-7 4v10" /></symbol>
+        <symbol id="i-dice" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" /><circle cx="8" cy="8" r="1" /><circle cx="16" cy="8" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="8" cy="16" r="1" /><circle cx="16" cy="16" r="1" /></symbol>
+        <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13M9 9l11-2" /><circle cx="6" cy="18" r="3" /><circle cx="17" cy="16" r="3" /></symbol>
+        <symbol id="i-hospital" viewBox="0 0 24 24"><path d="M4 22V5h16v17M2 22h20M9 5V2h6v3m-3 4v6m-3-3h6M8 22v-3h8v3" /></symbol>
+        <symbol id="i-mute" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4V5Zm8 4-6 6m0-6 6 6" /></symbol>
+        <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l2-7 4 14 2-7h6" /></symbol>
+        <symbol id="i-sunrise" viewBox="0 0 24 24"><path d="M17 18a5 5 0 0 0-10 0M12 2v4m7.1.9-2.8 2.8M22 14h-4M4.9 4.9l2.8 2.8M2 14h4m-4 6h20" /></symbol>
+        <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 13h4" /></symbol>
+        <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 22a8 8 0 0 1 16 0" /></symbol>
+        <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9.5 9a2.7 2.7 0 1 1 4.2 2.2c-1 .7-1.7 1.2-1.7 2.8m0 4h.01" /></symbol>
+        <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M20.4 15a9 9 0 1 0-16.8 0M12 12l4-4M5 19h14" /></symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /><path d="m9 12 2 2 4-4" /></symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></symbol>
+      </defs>
+    </svg>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

@@ -1,5 +1,5 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# Deploy the CoolQBot introduction website and public data to GitHub Pages.
+name: Deploy website to GitHub Pages
 
 on:
   # Runs on pushes targeting the default branch
@@ -7,6 +7,7 @@ on:
     branches: [main]
     paths:
       - "public/**"
+      - ".github/workflows/static.yml"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -40,7 +41,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          # Upload json files
+          # Keep the website and its public JSON data under one Pages origin.
           path: "public/"
 
       - name: Deploy to GitHub Pages
