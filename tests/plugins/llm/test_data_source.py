@@ -562,7 +562,7 @@ def test_format_statistics_splits_model_chain(app: App):
     ],
 )
 async def test_send_reaction_uses_adapter_emoji(app: App, mocker, adapter, status, expected):
-    """QQ 使用 emoji ID，其他平台使用 Unicode emoji"""
+    """OneBot V11 使用 emoji ID，其他支持的平台使用 Unicode emoji"""
     from src.plugins.llm.handler import send_reaction
 
     get_target = mocker.patch(
@@ -577,8 +577,54 @@ async def test_send_reaction_uses_adapter_emoji(app: App, mocker, adapter, statu
     reaction.assert_awaited_once_with(expected, message_id="42")
 
 
+@pytest.mark.parametrize(
+    ("message_id", "expected_reply"),
+    [(None, True), ("42", "42")],
+)
+async def test_send_reaction_sends_qq_thinking_notice(app: App, mocker, message_id, expected_reply):
+    """QQ 适配器不支持 reaction，开始处理时改发普通消息。"""
+    from nonebot_plugin_alconna import SupportAdapter
+
+    from src.plugins.llm.handler import QQ_THINKING_NOTICE, send_reaction
+
+    mocker.patch(
+        "src.plugins.llm.handler.get_target",
+        return_value=SimpleNamespace(adapter=SupportAdapter.qq, private=False),
+    )
+    reaction = mocker.patch("src.plugins.llm.handler.message_reaction")
+    message = mocker.Mock()
+    message.send = mocker.AsyncMock()
+    text = mocker.patch("src.plugins.llm.handler.UniMessage.text", return_value=message)
+
+    await send_reaction("thinking", message_id=message_id)
+
+    text.assert_called_once_with(QQ_THINKING_NOTICE)
+    message.send.assert_awaited_once_with(reply_to=expected_reply)
+    reaction.assert_not_awaited()
+
+
+@pytest.mark.parametrize("status", ["done", "fail"])
+async def test_send_reaction_skips_qq_terminal_status(app: App, mocker, status):
+    """QQ 普通消息只提示开始处理，完成和失败仍由最终回复说明。"""
+    from nonebot_plugin_alconna import SupportAdapter
+
+    from src.plugins.llm.handler import send_reaction
+
+    mocker.patch(
+        "src.plugins.llm.handler.get_target",
+        return_value=SimpleNamespace(adapter=SupportAdapter.qq, private=False),
+    )
+    reaction = mocker.patch("src.plugins.llm.handler.message_reaction")
+    text = mocker.patch("src.plugins.llm.handler.UniMessage.text")
+
+    await send_reaction(status, message_id="42")
+
+    text.assert_not_called()
+    reaction.assert_not_awaited()
+
+
 async def test_send_reaction_skips_qq_private_message(app: App, mocker):
-    """QQ 私聊不支持消息 reaction，直接跳过"""
+    """OneBot V11 私聊不支持消息 reaction，直接跳过"""
     from nonebot_plugin_alconna import SupportAdapter
 
     from src.plugins.llm.handler import send_reaction
