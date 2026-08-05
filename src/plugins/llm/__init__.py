@@ -71,7 +71,7 @@ from .tts import TTSError, get_tts_models
 __plugin_meta__ = PluginMetadata(
     name="大模型对话",
     description="接入多种大模型 API，提供智能对话与问答功能",
-    usage="使用 /chat 纯对话、/agent 工具问答、/llm 管理配置，也可在群聊中 @机器人 你好",
+    usage="使用 /chat 对话（可加 -a 启用工具）、/llm 管理配置，也可在群聊中 @机器人 你好",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
@@ -132,34 +132,18 @@ llm_cmd = on_alconna(
 )
 
 
-def _build_dialogue_command(
-    name: str,
-    *,
-    description: str,
-    example: str,
-    allow_agent: bool = False,
-) -> Alconna:
-    """构造共享参数的纯对话或工具增强命令。"""
-    options = [
-        Option("--model", Args["model#模型名称", str], help_text="本次使用指定模型"),
-        Option("-c|--context", default=False, action=store_true, help_text="启用多轮对话"),
-        Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
-        Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
-    ]
-    if allow_agent:
-        options.append(Option("-a|--agent", default=False, action=store_true, help_text="启用工具增强模式"))
-    return Alconna(
-        name,
-        Args["content?#内容", MultiVar(str, flag="+")]["img?#图片", Image],
-        *options,
-        meta=CommandMeta(description=description, example=example),
-    )
-
-
-chat_command = _build_dialogue_command(
+chat_command = Alconna(
     "chat",
-    description="不使用工具，直接与大模型对话",
-    example="/chat 你好，或在群聊中 @机器人 你好",
+    Args["content?#内容", MultiVar(str, flag="+")]["img?#图片", Image],
+    Option("--model", Args["model#模型名称", str], help_text="本次使用指定模型"),
+    Option("-c|--context", default=False, action=store_true, help_text="启用多轮对话"),
+    Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
+    Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
+    Option("-a|--agent", default=False, action=store_true, help_text="启用工具增强模式"),
+    meta=CommandMeta(
+        description="与大模型对话，可按次启用工具增强模式",
+        example="/chat 你好，或使用 /chat -a 查询成都天气",
+    ),
 )
 
 chat_cmd = on_alconna(
@@ -172,30 +156,7 @@ chat_cmd = on_alconna(
         TelegramSlashExtension(),
     ],
 )
-
-agent_command = _build_dialogue_command(
-    "agent",
-    description="允许模型调用工具完成查询与问答",
-    example="/agent 查询成都天气",
-)
-
-agent_cmd = on_alconna(
-    agent_command,
-    use_cmd_start=True,
-    block=True,
-    rule=Rule(is_non_private),
-    extensions=[
-        ReplyMergeExtension(),
-        TelegramSlashExtension(),
-    ],
-)
-
-mention_command = _build_dialogue_command(
-    "mention",
-    description="通过 @ 机器人发起对话",
-    example="@机器人 -a 查询成都天气",
-    allow_agent=True,
-)
+chat_cmd.shortcut("agent", command="chat -a", prefix=True, fuzzy=True, humanized="agent [选项] <内容>")
 
 llm_cmd.shortcut("quota", command="llm quota", prefix=True, fuzzy=True, humanized="quota [模型名|--all]")
 llm_cmd.shortcut("额度", command="llm quota", prefix=True, fuzzy=True, humanized="额度 [模型名|--all]")
@@ -237,8 +198,8 @@ class ChatRequest:
 
 
 def _parse_mention_text(text: str) -> ChatRequest:
-    """使用独立的 Alconna 定义解析 @ 对话参数。"""
-    result = mention_command.parse(f"mention {text}".rstrip())
+    """复用 /chat 的 Alconna 定义解析 @ 对话参数。"""
+    result = chat_command.parse(f"/chat {text}".rstrip())
     if not result.matched:
         raise LLMSetupError("对话参数有误，请输入 /chat -h 查看用法", at_sender=True)
     content: tuple[str, ...] = result.query("content", ())
@@ -613,6 +574,7 @@ async def chat_handle(
     use_context: Query[bool] = Query("context.value", False),
     render: Query[bool] = Query("render.value", False),
     use_tts: Query[bool] = Query("tts.value", False),
+    use_agent: Query[bool] = Query("agent.value", False),
 ) -> None:
     await _handle_dialogue_command(
         chat_cmd,
@@ -623,30 +585,7 @@ async def chat_handle(
         use_context,
         render,
         use_tts,
-        enable_tools=False,
-    )
-
-
-@agent_cmd.handle()
-async def agent_handle(
-    user: UserSession,
-    content: Match[tuple[str, ...]],
-    img: Match[bytes] = AlconnaMatch("img", image_fetch),
-    model_name: Query[str] = Query("model.model"),
-    use_context: Query[bool] = Query("context.value", False),
-    render: Query[bool] = Query("render.value", False),
-    use_tts: Query[bool] = Query("tts.value", False),
-) -> None:
-    await _handle_dialogue_command(
-        agent_cmd,
-        user,
-        content,
-        img,
-        model_name,
-        use_context,
-        render,
-        use_tts,
-        enable_tools=True,
+        enable_tools=use_agent.result,
     )
 
 

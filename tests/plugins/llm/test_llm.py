@@ -35,14 +35,17 @@ def mock_models(mocker):
     return config, reaction
 
 
-def test_dialogue_commands_are_separate_from_management(app: App):
-    """管理关键字在纯对话和工具增强命令中仍作为普通正文。"""
-    from src.plugins.llm import agent_command, chat_command, llm_cmd
+def test_dialogue_command_is_separate_from_management(app: App):
+    """管理关键字在普通与工具增强对话中仍作为普通正文。"""
+    from src.plugins.llm import chat_command, llm_cmd
 
-    for command, text in [(chat_command, "/chat model tts quota"), (agent_command, "/agent model tts quota")]:
-        result = command.parse(text)
-        assert result.matched
-        assert result.query("content") == ("model", "tts", "quota")
+    result = chat_command.parse("/chat model tts quota")
+    assert result.matched
+    assert result.query("content") == ("model", "tts", "quota")
+    result = chat_command.parse("/chat -a model tts quota")
+    assert result.matched
+    assert result.query("agent.value") is True
+    assert result.query("content") == ("model", "tts", "quota")
     assert not llm_cmd.command().parse("/llm 你好").matched
 
 
@@ -198,9 +201,15 @@ async def test_llm_chat(app: App, respx_mock: MockRouter, mock_models):
     assert "tools" not in payload
 
 
+@pytest.mark.parametrize("message", ["/chat -a 你好", "/agent 你好"])
 @respx.mock(assert_all_called=True)
-async def test_agent_enables_all_tools_by_default(app: App, respx_mock: MockRouter, mock_models):
-    """工具增强命令默认发送包括网页搜索在内的全部工具。"""
+async def test_chat_agent_option_and_shortcut_enable_all_tools(
+    app: App,
+    respx_mock: MockRouter,
+    mock_models,
+    message: str,
+):
+    """-a 及其 /agent 快捷入口都发送包括网页搜索在内的全部工具。"""
     route = respx_mock.post("https://api.example.com/chat/completions").mock(
         return_value=httpx.Response(
             200,
@@ -214,7 +223,7 @@ async def test_agent_enables_all_tools_by_default(app: App, respx_mock: MockRout
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
-        event = fake_group_message_event_v11(message=Message("/agent 你好"))
+        event = fake_group_message_event_v11(message=Message(message))
 
         ctx.receive_event(bot, event)
         ctx.should_call_send(
@@ -334,7 +343,7 @@ async def test_llm_mention_requires_to_me_message(app: App, mock_models):
 
 @pytest.mark.parametrize(
     ("matcher_name", "message"),
-    [("chat_cmd", "/chat 你好"), ("agent_cmd", "/agent 你好"), ("llm_cmd", "/llm model list")],
+    [("chat_cmd", "/chat 你好"), ("chat_cmd", "/agent 你好"), ("llm_cmd", "/llm model list")],
 )
 async def test_llm_commands_ignore_private_messages(app: App, mock_models, matcher_name: str, message: str):
     """对话与管理命令共享同一条非私聊规则。"""
