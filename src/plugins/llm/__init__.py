@@ -5,30 +5,30 @@ API 格式，提供多轮对话、推理内容展示、原生 Markdown、Markdow
 额度查询按模型选择独立 provider，目前支持 Aperture 与 DeepSeek。
 """
 
-from dataclasses import dataclass
 from pathlib import Path
 
 import nonebot
-from nonebot import on_message, require
+from nonebot import require
 from nonebot.adapters import Bot, Event
 from nonebot.log import logger
 from nonebot.matcher import Matcher
+from nonebot.permission import MESSAGE
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from nonebot.rule import Rule, to_me
 from nonebot.typing import T_State
 
 require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
 require("nonebot_plugin_waiter")
 require("nonebot_plugin_alconna")
-from arclet.alconna import store_true
+from arclet.alconna import AllParam, store_true
 from nonebot_plugin_alconna import (
     Alconna,
-    AlconnaMatch,
     Args,
     CommandMeta,
+    Extension,
     Image,
     Match,
+    MsgId,
     MultiVar,
     Option,
     Query,
@@ -38,7 +38,7 @@ from nonebot_plugin_alconna import (
     image_fetch,
     on_alconna,
 )
-from nonebot_plugin_alconna.builtins.extensions.reply import ReplyMergeExtension
+from nonebot_plugin_alconna.builtins.extensions.reply import ReplyRecordExtension
 from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 from nonebot_plugin_user import UserSession
 
@@ -64,7 +64,7 @@ from .data_source import (
 from .handler import LLMHandler, send_reaction
 from .providers import ProviderError
 from .quota import QuotaError, get_quota, get_quotas
-from .rules import is_non_private
+from .rules import MENTION_RULE, NON_PRIVATE_RULE
 from .schemas import ImageContent
 from .tts import TTSError, get_tts_models
 
@@ -125,7 +125,8 @@ llm_cmd = on_alconna(
     ),
     use_cmd_start=True,
     block=True,
-    rule=Rule(is_non_private),
+    rule=NON_PRIVATE_RULE,
+    permission=MESSAGE,
     extensions=[
         TelegramSlashExtension(),
     ],
@@ -134,7 +135,7 @@ llm_cmd = on_alconna(
 
 chat_command = Alconna(
     "chat",
-    Args["content?#内容", MultiVar(str, flag="+")]["img?#图片", Image],
+    Args["content?#内容", AllParam],
     Option("--model", Args["model#模型名称", str], help_text="本次使用指定模型"),
     Option("-c|--context", default=False, action=store_true, help_text="启用多轮对话"),
     Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
@@ -150,9 +151,10 @@ chat_cmd = on_alconna(
     chat_command,
     use_cmd_start=True,
     block=True,
-    rule=Rule(is_non_private),
+    rule=NON_PRIVATE_RULE,
+    permission=MESSAGE,
     extensions=[
-        ReplyMergeExtension(),
+        ReplyRecordExtension(),
         TelegramSlashExtension(),
     ],
 )
@@ -162,18 +164,49 @@ llm_cmd.shortcut("quota", command="llm quota", prefix=True, fuzzy=True, humanize
 llm_cmd.shortcut("额度", command="llm quota", prefix=True, fuzzy=True, humanized="额度 [模型名|--all]")
 
 
-async def _should_handle_mention(event: Event) -> bool:
-    """按配置启用快捷对话，并避免带非空前缀的命令被重复处理。"""
-    if not plugin_config.respond_to_mention:
-        return False
-    text = event.get_plaintext().lstrip()
-    return not any(prefix and text.startswith(prefix) for prefix in nonebot.get_driver().config.command_start)
+class MentionChatExtension(Extension):
+    """为 @ 对话补上 chat 命令头，让消息交由 Alconna 正常解析。"""
+
+    @property
+    def priority(self) -> int:
+        return 15
+
+    @property
+    def id(self) -> str:
+        return "coolqbot.llm:mention_chat"
+
+    async def message_provider(
+        self,
+        event: Event,
+        state: T_State,
+        bot: Bot,
+        use_origin: bool = False,
+    ) -> UniMessage | None:
+        """为空的纯回复提供占位消息，使其仍能进入命令包装与回复记录流程。"""
+        try:
+            if event.get_message():
+                return None
+        except (NotImplementedError, ValueError):
+            return None
+        return UniMessage.text(" ")
+
+    async def receive_wrapper(self, bot: Bot, event: Event, command: Alconna, receive: UniMessage) -> UniMessage:
+        command_prefix = command.prefixes[0] if command.prefixes else ""
+        message = UniMessage.text(f"{command_prefix}{command.command} ")
+        message.extend(receive)
+        return message
 
 
-llm_mention = on_message(
-    rule=Rule(is_non_private) & to_me() & Rule(_should_handle_mention),
+llm_mention = on_alconna(
+    chat_command,
+    rule=MENTION_RULE,
+    permission=MESSAGE,
     priority=15,
     block=True,
+    extensions=[
+        ReplyRecordExtension(),
+        MentionChatExtension(),
+    ],
 )
 
 
@@ -183,34 +216,6 @@ class LLMSetupError(ValueError):
     def __init__(self, message: str, *, at_sender: bool = False) -> None:
         super().__init__(message)
         self.at_sender = at_sender
-
-
-@dataclass(frozen=True)
-class ChatRequest:
-    """统一后的对话文本与选项。"""
-
-    text: str
-    model_name: str
-    use_context: bool
-    render: bool
-    use_tts: bool
-    enable_tools: bool
-
-
-def _parse_mention_text(text: str) -> ChatRequest:
-    """复用 /chat 的 Alconna 定义解析 @ 对话参数。"""
-    result = chat_command.parse(f"/chat {text}".rstrip())
-    if not result.matched:
-        raise LLMSetupError("对话参数有误，请输入 /chat -h 查看用法", at_sender=True)
-    content: tuple[str, ...] = result.query("content", ())
-    return ChatRequest(
-        text=" ".join(content),
-        model_name=result.query("model.model", ""),
-        use_context=result.query("context.value", False),
-        render=result.query("render.value", False),
-        use_tts=result.query("tts.value", False),
-        enable_tools=result.query("agent.value", False),
-    )
 
 
 async def _create_handler(
@@ -519,11 +524,101 @@ async def llm_quota_handle(
     await llm_cmd.finish(result, at_sender=True)
 
 
+async def _extract_dialogue_content(
+    content: Match[UniMessage],
+    msg_id: MsgId,
+    ext: ReplyRecordExtension,
+    bot: Bot,
+    event: Event,
+    state: T_State,
+) -> tuple[str, list[ImageContent] | None]:
+    """分别提取当前消息与被回复消息，并编码其回复关系。"""
+    current_message = content.result if content.available else UniMessage()
+    reply_message = UniMessage()
+    reply = ext.get_reply(msg_id)
+    has_reply = reply is not None
+    if reply is not None:
+        if not reply.msg:
+            raise ValueError("上一条消息内容为空")
+        raw_reply_message = reply.msg
+        if isinstance(raw_reply_message, str):
+            raw_reply_message = event.get_message().__class__(raw_reply_message)
+        reply_message = UniMessage.of(raw_reply_message, bot=bot)
+
+    current_text = current_message.extract_plain_text().strip()
+    replied_text = reply_message.extract_plain_text().strip()
+    current_images = current_message.get(Image)
+    replied_images = reply_message.get(Image)
+    images = await _fetch_message_images([*current_images, *replied_images], event, bot, state)
+
+    if has_reply and not current_text and not current_images:
+        return replied_text, images or None
+    if has_reply:
+        text = _format_reply_context(
+            current_text,
+            replied_text,
+            current_image_count=len(current_images),
+            replied_image_count=len(replied_images),
+        )
+    else:
+        text = current_text
+    return text, images or None
+
+
+def _format_reply_context(
+    current_text: str,
+    replied_text: str,
+    *,
+    current_image_count: int,
+    replied_image_count: int,
+) -> str:
+    """明确标记回复目标与当前请求，避免模型把结构本身当成待处理数据。"""
+    parts = [
+        "【用户正在回复或引用的消息】",
+        replied_text or "（无文字）",
+        "",
+        "【用户本次发送的消息】",
+        current_text or "（无文字）",
+    ]
+    if current_image_count or replied_image_count:
+        parts.extend(["", "【图片归属】"])
+        if current_image_count and replied_image_count:
+            parts.append(
+                f"随请求提供的前 {current_image_count} 张图片属于用户本次发送的消息，"
+                f"后 {replied_image_count} 张属于用户正在回复或引用的消息。"
+            )
+        elif current_image_count:
+            parts.append(f"随请求提供的 {current_image_count} 张图片均属于用户本次发送的消息。")
+        else:
+            parts.append(f"随请求提供的 {replied_image_count} 张图片均属于用户正在回复或引用的消息。")
+    return "\n".join(parts)
+
+
+async def _fetch_message_images(
+    image_segments: list[Image],
+    event: Event,
+    bot: Bot,
+    state: T_State,
+) -> list[ImageContent]:
+    """读取一条消息中的全部图片。"""
+    images: list[ImageContent] = []
+    for image in image_segments:
+        data = await image_fetch(event, bot, state, image)
+        if not data:
+            raise ValueError("图片读取失败")
+        images.append(ImageContent.from_bytes(data))
+    return images
+
+
 async def _handle_dialogue_command(
     matcher: type[Matcher],
+    bot: Bot,
+    event: Event,
+    state: T_State,
+    msg_id: MsgId,
+    ext: ReplyRecordExtension,
     user: UserSession,
-    content: Match[tuple[str, ...]],
-    img: Match[bytes],
+    content: Match[UniMessage],
     model_name: Query[str],
     use_context: Query[bool],
     render: Query[bool],
@@ -532,17 +627,14 @@ async def _handle_dialogue_command(
     enable_tools: bool,
 ) -> None:
     """执行共享的纯对话或工具增强命令流程。"""
-    if not content.available and not img.available:
+    try:
+        text, images = await _extract_dialogue_content(content, msg_id, ext, bot, event, state)
+    except ValueError as e:
+        await matcher.finish(str(e), at_sender=True)
+
+    if not text and not images:
         command_name = "agent" if enable_tools else "chat"
         await matcher.finish(f"你想问什么呢？输入 /{command_name} -h 查看用法", at_sender=True)
-
-    images: list[ImageContent] | None = None
-    if img.available:
-        try:
-            images = [ImageContent.from_bytes(img.result)]
-        except ValueError as e:
-            await matcher.finish(str(e), at_sender=True)
-    text = " ".join(content.result) if content.available else ""
 
     try:
         handler = await _create_handler(
@@ -567,9 +659,13 @@ async def _handle_dialogue_command(
 
 @chat_cmd.handle()
 async def chat_handle(
+    bot: Bot,
+    event: Event,
+    state: T_State,
+    msg_id: MsgId,
+    ext: ReplyRecordExtension,
     user: UserSession,
-    content: Match[tuple[str, ...]],
-    img: Match[bytes] = AlconnaMatch("img", image_fetch),
+    content: Match[UniMessage],
     model_name: Query[str] = Query("model.model"),
     use_context: Query[bool] = Query("context.value", False),
     render: Query[bool] = Query("render.value", False),
@@ -578,9 +674,13 @@ async def chat_handle(
 ) -> None:
     await _handle_dialogue_command(
         chat_cmd,
+        bot,
+        event,
+        state,
+        msg_id,
+        ext,
         user,
         content,
-        img,
         model_name,
         use_context,
         render,
@@ -594,45 +694,40 @@ async def llm_mention_handle(
     bot: Bot,
     event: Event,
     state: T_State,
+    msg_id: MsgId,
+    ext: ReplyRecordExtension,
     user: UserSession,
+    content: Match[UniMessage],
+    model_name: Query[str] = Query("model.model"),
+    use_context: Query[bool] = Query("context.value", False),
+    render: Query[bool] = Query("render.value", False),
+    use_tts: Query[bool] = Query("tts.value", False),
+    use_agent: Query[bool] = Query("agent.value", False),
 ) -> None:
-    """把群聊中 @ 机器人的内容直接交给默认模型。"""
-    message_id = get_message_id(event)
-    message = UniMessage.of(event.get_message(), bot=bot)
-    text = message.extract_plain_text().strip()
-    images: list[ImageContent] = []
+    """把群聊中 @ 机器人的 Alconna 解析结果交给对话流程。"""
     try:
-        for image in message.get(Image):
-            data = await image_fetch(event, bot, state, image)
-            if not data:
-                raise ValueError("图片读取失败")
-            images.append(ImageContent.from_bytes(data))
+        text, images = await _extract_dialogue_content(content, msg_id, ext, bot, event, state)
     except ValueError as e:
-        await UniMessage.text(str(e)).finish(reply_to=message_id)
+        await UniMessage.text(str(e)).finish(reply_to=msg_id)
 
-    try:
-        request = _parse_mention_text(text)
-    except LLMSetupError as e:
-        await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=message_id)
-
-    if not request.text and not images:
-        await UniMessage.text("你想问什么呢？").finish(reply_to=message_id)
+    if not text and not images:
+        await UniMessage.text("你想问什么呢？").finish(reply_to=msg_id)
 
     try:
         handler = await _create_handler(
             user,
-            selected_model=request.model_name,
-            render=request.render,
-            use_tts=request.use_tts,
-            enable_tools=request.enable_tools,
+            selected_model=model_name.result if model_name.available else "",
+            render=render.result,
+            use_tts=use_tts.result,
+            enable_tools=use_agent.result,
         )
     except LLMSetupError as e:
-        await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=message_id)
-    if request.use_context:
-        await _handle_with_context(handler, request.text, images or None, message_id=message_id)
+        await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=msg_id)
+    if use_context.result:
+        await _handle_with_context(handler, text, images, message_id=msg_id)
         return
-    completion = await _ask(handler, request.text, images or None, message_id=message_id)
-    await handler.send(completion, reply_to=message_id)
+    completion = await _ask(handler, text, images, message_id=msg_id)
+    await handler.send(completion, reply_to=msg_id)
 
 
 async def _handle_with_context(
@@ -664,7 +759,7 @@ async def _handle_with_context(
         )
         if received is None:
             await UniMessage.text("等待超时，已结束对话").finish()
-        reply, reply_message_id = received
+        reply, reply_message_id, reply_event, reply_bot, reply_state = received
 
         message = reply.extract_plain_text().strip()
         if message in ("结束", "取消"):
@@ -675,22 +770,27 @@ async def _handle_with_context(
             else:
                 await UniMessage.text("当前没有可回滚的对话").send()
             continue
-        if not message:
+        try:
+            reply_images = await _fetch_message_images(reply.get(Image), reply_event, reply_bot, reply_state)
+        except ValueError as e:
+            await finish_matcher.finish(str(e), at_sender=True)
+        if not message and not reply_images:
             continue
 
         completion = await _ask(
             handler,
             message,
-            None,
+            reply_images or None,
             message_id=reply_message_id,
             finish_matcher=finish_matcher,
         )
         await handler.send(completion)
 
 
-def _extract_reply(reply_event: Event):
-    """提取续聊消息，并在 waiter 事件上下文中保存其消息 ID"""
-    return reply_event.get_message(), get_message_id(reply_event)
+def _extract_reply(reply_event: Event, bot: Bot, state: T_State):
+    """提取续聊消息及下载其中媒体所需的事件上下文。"""
+    message = UniMessage.of(reply_event.get_message(), bot=bot)
+    return message, get_message_id(reply_event), reply_event, bot, state
 
 
 async def _send_request_wait_notice(

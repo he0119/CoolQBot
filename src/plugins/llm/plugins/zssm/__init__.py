@@ -5,8 +5,8 @@ from pathlib import Path
 from arclet.alconna import AllParam, store_true
 from nonebot.adapters import Bot, Event
 from nonebot.log import logger
+from nonebot.permission import MESSAGE
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from nonebot.rule import Rule
 from nonebot.typing import T_State
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, MsgId, Option, Query, UniMessage, on_alconna
 from nonebot_plugin_alconna.builtins.extensions.reply import ReplyRecordExtension
@@ -21,7 +21,7 @@ from ...data_source import (
 )
 from ...handler import LLMHandler, send_reaction, split_content
 from ...providers import ProviderError
-from ...rules import is_non_private
+from ...rules import NON_PRIVATE_RULE
 from .data_source import (
     build_user_prompt,
     describe_images,
@@ -52,7 +52,8 @@ zssm_cmd = on_alconna(
         ),
     ),
     block=True,
-    rule=Rule(is_non_private),
+    rule=NON_PRIVATE_RULE,
+    permission=MESSAGE,
     extensions=[ReplyRecordExtension()],
 )
 
