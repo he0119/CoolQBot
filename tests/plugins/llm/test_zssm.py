@@ -51,6 +51,16 @@ def test_zssm_has_help_metadata(app: App):
     assert "Unknown" not in help_text
 
 
+async def test_zssm_rejects_non_message_events_before_rules(app: App, mocker):
+    """zssm 与其他 LLM 入口一样先拒绝非消息事件。"""
+    from src.plugins.llm.plugins.zssm import zssm_cmd
+
+    event = mocker.Mock()
+    event.get_type.return_value = "notice"
+
+    assert await zssm_cmd.check_perm(mocker.Mock(), event) is False
+
+
 async def test_zssm_ignores_private_messages(app: App):
     """解释模式与主 LLM 入口一样不允许在私聊中使用。"""
     from src.plugins.llm.plugins.zssm import zssm_cmd

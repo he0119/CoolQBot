@@ -41,24 +41,66 @@ def test_dialogue_command_is_separate_from_management(app: App):
 
     result = chat_command.parse("/chat model tts quota")
     assert result.matched
-    assert result.query("content") == ("model", "tts", "quota")
+    assert result.query("content").extract_plain_text() == "model tts quota"
     result = chat_command.parse("/chat -a model tts quota")
     assert result.matched
     assert result.query("agent.value") is True
-    assert result.query("content") == ("model", "tts", "quota")
+    assert result.query("content").extract_plain_text() == "model tts quota"
     assert not llm_cmd.command().parse("/llm 你好").matched
 
 
 @pytest.mark.parametrize("flag", ["-s", "--search"])
 def test_removed_search_flags_are_plain_dialogue_content(app: App, flag: str):
     """已移除的搜索参数不再保留特殊语义。"""
-    from src.plugins.llm import _parse_mention_text, chat_command
+    from src.plugins.llm import chat_command
 
     result = chat_command.parse(f"/chat {flag} 查询")
 
     assert result.matched
-    assert result.query("content") == (flag, "查询")
-    assert _parse_mention_text(f"{flag} 查询").text == f"{flag} 查询"
+    assert result.query("content").extract_plain_text() == f"{flag} 查询"
+
+
+@pytest.mark.parametrize(
+    ("current_count", "replied_count", "expected"),
+    [
+        (1, 0, "随请求提供的 1 张图片均属于用户本次发送的消息。"),
+        (1, 2, "随请求提供的前 1 张图片属于用户本次发送的消息，后 2 张属于用户正在回复或引用的消息。"),
+    ],
+)
+def test_reply_context_describes_image_ownership(
+    app: App,
+    current_count: int,
+    replied_count: int,
+    expected: str,
+):
+    """图片归属说明覆盖当前消息独有及双方均有图片的情况。"""
+    from src.plugins.llm import _format_reply_context
+
+    result = _format_reply_context(
+        "当前消息",
+        "原消息",
+        current_image_count=current_count,
+        replied_image_count=replied_count,
+    )
+
+    assert result.endswith(expected)
+
+
+def test_reply_context_defines_reply_target_without_negative_constraints(app: App):
+    """自指问题使用明确的回复对象关系，不再加入诱发元分析的否定指令。"""
+    from src.plugins.llm import _format_reply_context
+
+    result = _format_reply_context(
+        "我回复了什么？",
+        "你好",
+        current_image_count=0,
+        replied_image_count=0,
+    )
+
+    assert result.startswith("【用户正在回复或引用的消息】\n你好")
+    assert "【用户本次发送的消息】\n我回复了什么？" in result
+    assert "不要" not in result
+    assert "请" not in result
 
 
 def test_session_affinity_is_per_conversation(app: App, mock_models):
@@ -74,16 +116,20 @@ def test_session_affinity_is_per_conversation(app: App, mock_models):
 
 
 def test_extract_context_reply_keeps_message_id(app: App, mocker):
-    """续聊消息在 waiter 的事件上下文中保存消息 ID"""
+    """续聊消息保留消息 ID 与下载图片所需的事件上下文。"""
     from src.plugins.llm import _extract_reply
 
     event = fake_group_message_event_v11(message=Message("继续聊"), message_id=42)
+    bot = mocker.Mock()
+    state = {}
+    message = mocker.Mock()
+    message_of = mocker.patch("src.plugins.llm.UniMessage.of", return_value=message)
     get_message_id = mocker.patch("src.plugins.llm.get_message_id", return_value="42")
 
-    message, message_id = _extract_reply(event)
+    result = _extract_reply(event, bot, state)
 
-    assert message == event.get_message()
-    assert message_id == "42"
+    assert result == (message, "42", event, bot, state)
+    message_of.assert_called_once_with(event.get_message(), bot=bot)
     get_message_id.assert_called_once_with(event)
 
 
@@ -103,7 +149,13 @@ async def test_context_reply_reacts_to_current_message(app: App, mocker):
     )
     mocker.patch(
         "nonebot_plugin_waiter.prompt",
-        return_value=(Message("继续聊"), "42"),
+        return_value=(
+            mocker.Mock(extract_plain_text=mocker.Mock(return_value="继续聊"), get=mocker.Mock(return_value=[])),
+            "42",
+            mocker.Mock(),
+            mocker.Mock(),
+            {},
+        ),
     )
 
     with pytest.raises(StopConversation):
@@ -113,6 +165,44 @@ async def test_context_reply_reacts_to_current_message(app: App, mocker):
         call(handler, "开始", None, finish_matcher=chat_cmd),
         call(handler, "继续聊", None, message_id="42", finish_matcher=chat_cmd),
     ]
+    handler.send.assert_awaited_once_with(first_completion)
+
+
+@pytest.mark.parametrize("reply_text", ["", "继续聊"])
+async def test_context_reply_supports_images(app: App, mocker, reply_text: str):
+    """多轮续聊保留仅图片和图文混合消息中的图片。"""
+    from nonebot_plugin_alconna import Image, UniMessage
+
+    from src.plugins.llm import _handle_with_context, chat_cmd
+
+    class StopConversation(Exception):
+        pass
+
+    png = b"\x89PNG\r\n\x1a\n" + b"test"
+    reply = UniMessage.text(reply_text) + Image(raw=png)
+    reply_event = mocker.Mock()
+    reply_bot = mocker.Mock()
+    reply_state = {}
+    handler = mocker.Mock()
+    handler.send = mocker.AsyncMock()
+    first_completion = object()
+    ask = mocker.patch("src.plugins.llm._ask", side_effect=[first_completion, StopConversation])
+    mocker.patch(
+        "nonebot_plugin_waiter.prompt",
+        return_value=(reply, "42", reply_event, reply_bot, reply_state),
+    )
+    image_fetch = mocker.patch("src.plugins.llm.image_fetch", return_value=png)
+
+    with pytest.raises(StopConversation):
+        await _handle_with_context(handler, "开始", None)
+
+    assert ask.await_args_list[0] == call(handler, "开始", None, finish_matcher=chat_cmd)
+    assert ask.await_args_list[1].args[:2] == (handler, reply_text)
+    images = ask.await_args_list[1].args[2]
+    assert len(images) == 1
+    assert images[0].data == png
+    assert ask.await_args_list[1].kwargs == {"message_id": "42", "finish_matcher": chat_cmd}
+    image_fetch.assert_awaited_once_with(reply_event, reply_bot, reply_state, reply.get(Image)[0])
     handler.send.assert_awaited_once_with(first_completion)
 
 
@@ -241,6 +331,155 @@ async def test_chat_agent_option_and_shortcut_enable_all_tools(
     } <= tool_names
 
 
+@pytest.mark.parametrize(
+    ("message", "enable_tools"),
+    [("/chat 这句话什么意思？", False), ("/agent 这句话什么意思？", True)],
+)
+async def test_chat_and_agent_share_structured_reply_context(
+    app: App,
+    mock_models,
+    mocker,
+    message: str,
+    enable_tools: bool,
+):
+    """/chat 与 /agent 都分别保留当前消息、被回复消息及图片归属。"""
+    from nonebot.adapters.onebot.v11 import MessageSegment
+    from nonebot.adapters.onebot.v11.event import Reply, Sender
+
+    from src.plugins.llm import chat_cmd
+
+    png = b"\x89PNG\r\n\x1a\n" + b"test"
+    reply = Reply(
+        time=1,
+        message_type="group",
+        message_id=99,
+        real_id=99,
+        sender=Sender(user_id=20, nickname="群友"),
+        message=Message("测试协议啊") + MessageSegment.image(png),
+    )
+    handler = mocker.Mock()
+    handler.send = mocker.AsyncMock()
+    completion = object()
+    create_handler = mocker.patch("src.plugins.llm._create_handler", return_value=handler)
+    ask = mocker.patch("src.plugins.llm._ask", return_value=completion)
+    fetch_image = mocker.patch("src.plugins.llm.image_fetch", return_value=png)
+
+    async with app.test_matcher(chat_cmd) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message_id=42,
+            message=Message(message),
+            reply=reply,
+        )
+
+        ctx.receive_event(bot, event)
+
+    create_handler.assert_awaited_once_with(
+        mocker.ANY,
+        selected_model="",
+        render=False,
+        use_tts=False,
+        enable_tools=enable_tools,
+    )
+    ask.assert_awaited_once()
+    assert ask.await_args.args[0] is handler
+    assert ask.await_args.args[1] == (
+        "【用户正在回复或引用的消息】\n测试协议啊\n\n"
+        "【用户本次发送的消息】\n这句话什么意思？\n\n"
+        "【图片归属】\n随请求提供的 1 张图片均属于用户正在回复或引用的消息。"
+    )
+    images = ask.await_args.args[2]
+    assert len(images) == 1
+    assert images[0].data == png
+    assert ask.await_args.kwargs == {"finish_matcher": chat_cmd}
+    fetch_image.assert_awaited_once()
+    handler.send.assert_awaited_once_with(completion)
+
+
+async def test_chat_reports_reply_without_content(app: App, mock_models):
+    """存在回复关系但平台未提供原消息时给出明确提示。"""
+    from nonebot.adapters.onebot.v11.event import Reply, Sender
+
+    from src.plugins.llm import chat_cmd
+
+    reply = Reply(
+        time=1,
+        message_type="group",
+        message_id=99,
+        real_id=99,
+        sender=Sender(user_id=20, nickname="群友"),
+        message=Message(),
+    )
+    async with app.test_matcher(chat_cmd) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message_id=42,
+            message=Message("/chat 这句话什么意思？"),
+            reply=reply,
+        )
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "上一条消息内容为空", True, at_sender=True)
+        ctx.should_finished(chat_cmd)
+
+
+@pytest.mark.parametrize(
+    ("message", "enable_tools"),
+    [("/chat", False), ("/agent", True)],
+)
+async def test_chat_reply_without_supplement_uses_replied_message_as_request(
+    app: App,
+    mock_models,
+    mocker,
+    message: str,
+    enable_tools: bool,
+):
+    """只回复并发送命令时，直接把被回复内容作为实际请求。"""
+    from nonebot.adapters.onebot.v11.event import Reply, Sender
+
+    from src.plugins.llm import chat_cmd
+
+    reply = Reply(
+        time=1,
+        message_type="group",
+        message_id=99,
+        real_id=99,
+        sender=Sender(user_id=20, nickname="群友"),
+        message=Message("测试协议啊"),
+    )
+    handler = mocker.Mock()
+    handler.send = mocker.AsyncMock()
+    completion = object()
+    create_handler = mocker.patch("src.plugins.llm._create_handler", return_value=handler)
+    ask = mocker.patch("src.plugins.llm._ask", return_value=completion)
+
+    async with app.test_matcher(chat_cmd) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message_id=42,
+            message=Message(message),
+            reply=reply,
+        )
+
+        ctx.receive_event(bot, event)
+
+    create_handler.assert_awaited_once_with(
+        mocker.ANY,
+        selected_model="",
+        render=False,
+        use_tts=False,
+        enable_tools=enable_tools,
+    )
+    ask.assert_awaited_once_with(handler, "测试协议啊", None, finish_matcher=chat_cmd)
+    handler.send.assert_awaited_once_with(completion)
+
+
 async def test_llm_group_mention_uses_default_chat_flow(app: App, mock_models, mocker):
     """群聊明确 @ 机器人时复用默认模型与标准问答流程。"""
     from src.plugins.llm import llm_mention
@@ -302,6 +541,186 @@ async def test_llm_group_mention_supports_chat_options(app: App, mock_models, mo
     handle_with_context.assert_awaited_once_with(handler, "你好", None, message_id="42")
 
 
+async def test_llm_group_mention_labels_replied_text(app: App, mock_models, mocker):
+    """回复文字与当前问题使用明确标记分隔，避免模型误认为连续正文。"""
+    from nonebot.adapters.onebot.v11.event import Reply, Sender
+
+    from src.plugins.llm import llm_mention
+
+    reply = Reply(
+        time=1,
+        message_type="group",
+        message_id=99,
+        real_id=99,
+        sender=Sender(user_id=20, nickname="群友"),
+        message=Message("测试协议啊"),
+    )
+    handler = mocker.Mock()
+    handler.send = mocker.AsyncMock()
+    completion = object()
+    mocker.patch("src.plugins.llm._create_handler", return_value=handler)
+    ask = mocker.patch("src.plugins.llm._ask", return_value=completion)
+
+    async with app.test_matcher(llm_mention) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message_id=42,
+            message=Message("这句话什么意思？"),
+            reply=reply,
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+
+    ask.assert_awaited_once_with(
+        handler,
+        "【用户正在回复或引用的消息】\n测试协议啊\n\n【用户本次发送的消息】\n这句话什么意思？",
+        None,
+        message_id="42",
+    )
+    handler.send.assert_awaited_once_with(completion, reply_to="42")
+
+
+async def test_llm_group_mention_reply_without_supplement_uses_replied_message(
+    app: App,
+    mock_models,
+    mocker,
+):
+    """只回复并 @ 机器人时，被回复内容直接成为当前请求。"""
+    from nonebot.adapters.onebot.v11.event import Reply, Sender
+
+    from src.plugins.llm import llm_mention
+
+    reply = Reply(
+        time=1,
+        message_type="group",
+        message_id=99,
+        real_id=99,
+        sender=Sender(user_id=20, nickname="群友"),
+        message=Message("测试协议啊"),
+    )
+    handler = mocker.Mock()
+    handler.send = mocker.AsyncMock()
+    completion = object()
+    mocker.patch("src.plugins.llm._create_handler", return_value=handler)
+    ask = mocker.patch("src.plugins.llm._ask", return_value=completion)
+
+    async with app.test_matcher(llm_mention) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message_id=42,
+            message=Message(),
+            reply=reply,
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+
+    ask.assert_awaited_once_with(handler, "测试协议啊", None, message_id="42")
+    handler.send.assert_awaited_once_with(completion, reply_to="42")
+
+
+async def test_llm_group_mention_reply_only_image_uses_image_as_request(app: App, mock_models, mocker):
+    """只回复图片并 @ 机器人时，直接把该图片作为当前请求。"""
+    from nonebot.adapters.onebot.v11 import MessageSegment
+    from nonebot.adapters.onebot.v11.event import Reply, Sender
+
+    from src.plugins.llm import llm_mention
+
+    png = b"\x89PNG\r\n\x1a\n" + b"test"
+    reply = Reply(
+        time=1,
+        message_type="group",
+        message_id=99,
+        real_id=99,
+        sender=Sender(user_id=20, nickname="群友"),
+        message=Message(MessageSegment.image(png)),
+    )
+    handler = mocker.Mock()
+    handler.send = mocker.AsyncMock()
+    completion = object()
+    mocker.patch("src.plugins.llm._create_handler", return_value=handler)
+    ask = mocker.patch("src.plugins.llm._ask", return_value=completion)
+    image_fetch = mocker.patch("src.plugins.llm.image_fetch", return_value=png)
+
+    async with app.test_matcher(llm_mention) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message_id=42,
+            message=Message(),
+            reply=reply,
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+
+    ask.assert_awaited_once()
+    assert ask.await_args.args[:2] == (handler, "")
+    images = ask.await_args.args[2]
+    assert len(images) == 1
+    assert images[0].data == png
+    assert ask.await_args.kwargs == {"message_id": "42"}
+    image_fetch.assert_awaited_once()
+    handler.send.assert_awaited_once_with(completion, reply_to="42")
+
+
+async def test_llm_group_mention_merges_replied_image(app: App, mock_models, mocker):
+    """@ 对话通过 Alconna 的回复扩展读取被回复消息中的图片。"""
+    from nonebot.adapters.onebot.v11 import MessageSegment
+    from nonebot.adapters.onebot.v11.event import Reply, Sender
+
+    from src.plugins.llm import llm_mention
+
+    png = b"\x89PNG\r\n\x1a\n" + b"test"
+    reply = Reply(
+        time=1,
+        message_type="group",
+        message_id=99,
+        real_id=99,
+        sender=Sender(user_id=20, nickname="群友"),
+        message=Message(MessageSegment.image(png)),
+    )
+    handler = mocker.Mock()
+    handler.send = mocker.AsyncMock()
+    completion = object()
+    mocker.patch("src.plugins.llm._create_handler", return_value=handler)
+    ask = mocker.patch("src.plugins.llm._ask", return_value=completion)
+    fetch_image = mocker.patch("src.plugins.llm.image_fetch", return_value=png)
+
+    async with app.test_matcher(llm_mention) as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter, self_id="123456")
+        event = fake_group_message_event_v11(
+            self_id=123456,
+            message_id=42,
+            message=Message("请结合图片里的文字回答"),
+            reply=reply,
+            to_me=True,
+        )
+
+        ctx.receive_event(bot, event)
+
+    ask.assert_awaited_once()
+    assert ask.await_args.args[0] is handler
+    assert ask.await_args.args[1] == (
+        "【用户正在回复或引用的消息】\n（无文字）\n\n"
+        "【用户本次发送的消息】\n请结合图片里的文字回答\n\n"
+        "【图片归属】\n随请求提供的 1 张图片均属于用户正在回复或引用的消息。"
+    )
+    images = ask.await_args.args[2]
+    assert len(images) == 1
+    assert images[0].data == png
+    assert ask.await_args.kwargs == {"message_id": "42"}
+    fetch_image.assert_awaited_once()
+    handler.send.assert_awaited_once_with(completion, reply_to="42")
+
+
 async def test_create_handler_prefers_markdown_unless_render_is_explicit(app: App, mock_models, mocker):
     """全局 Markdown 偏好生效，但显式 -r 仍强制渲染图片。"""
     from src.plugins.llm import _create_handler
@@ -339,6 +758,41 @@ async def test_llm_mention_requires_to_me_message(app: App, mock_models):
 
         ctx.receive_event(bot, event)
         ctx.should_not_pass_rule(llm_mention)
+
+
+async def test_llm_mention_rule_ignores_events_without_message(app: App, mocker):
+    """Alconna matcher 收到通知等非消息事件时不应读取消息正文。"""
+    from src.plugins.llm.rules import should_handle_mention
+
+    event = mocker.Mock()
+    event.get_type.return_value = "notice"
+
+    assert await should_handle_mention(mocker.Mock(), event, {}) is False
+    event.get_plaintext.assert_not_called()
+
+
+async def test_llm_mention_rule_checks_config_before_event(app: App, mocker):
+    """关闭 @ 响应时直接短路，不再读取事件类型。"""
+    from src.plugins.llm.config import plugin_config
+    from src.plugins.llm.rules import should_handle_mention
+
+    mocker.patch.object(plugin_config, "respond_to_mention", False)
+    event = mocker.Mock()
+
+    assert await should_handle_mention(mocker.Mock(), event, {}) is False
+    event.get_type.assert_not_called()
+
+
+@pytest.mark.parametrize("matcher_name", ["llm_cmd", "chat_cmd", "llm_mention"])
+async def test_llm_entrypoints_reject_non_message_events_before_rules(app: App, mocker, matcher_name: str):
+    """所有主 LLM 入口都在执行 Alconna 与业务规则前拒绝非消息事件。"""
+    import src.plugins.llm as llm
+
+    matcher = getattr(llm, matcher_name)
+    event = mocker.Mock()
+    event.get_type.return_value = "notice"
+
+    assert await matcher.check_perm(mocker.Mock(), event) is False
 
 
 @pytest.mark.parametrize(
@@ -395,10 +849,10 @@ async def test_llm_rule_rejects_only_private_scenes(app: App, mocker, scene_type
 
     from src.plugins.llm.rules import is_non_private
 
-    user = mocker.Mock()
-    user.session.scene = Scene(id="scene", type=SceneType[scene_type])
+    session = mocker.Mock()
+    session.scene = Scene(id="scene", type=SceneType[scene_type])
 
-    assert await is_non_private(user) is expected
+    assert await is_non_private(session) is expected
 
 
 async def test_llm_mention_ignores_commands(app: App, mock_models, mocker):
