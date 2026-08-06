@@ -638,11 +638,11 @@ async def test_llm_with_tool(app: App, respx_mock: MockRouter, mock_models):
 @pytest.mark.parametrize(
     ("count", "request_count", "tool_call_count", "message_id", "expected", "expected_reply"),
     [
-        (1, 1, 2, None, "🔍 正在查询资料（模型请求 1/10 次，工具调用 2 次），请稍候……", True),
-        (2, 3, 4, "42", "⏳ 查询仍在进行（模型请求 3/10 次，工具调用 4 次），请再稍候……", "42"),
+        (1, 1, 0, None, "⏳ 模型正在处理（模型请求 1/10 次），请稍候……", True),
+        (2, 3, 4, "42", "⏳ 处理仍在进行（模型请求 3/10 次，工具调用 4 次），请再稍候……", "42"),
     ],
 )
-async def test_tool_wait_notice_replies_to_trigger_message(
+async def test_request_wait_notice_replies_to_trigger_message(
     app: App,
     mocker,
     count: int,
@@ -652,8 +652,8 @@ async def test_tool_wait_notice_replies_to_trigger_message(
     expected: str,
     expected_reply: str | bool,
 ):
-    """工具等待提示回复触发消息，并区分首次与后续心跳。"""
-    from src.plugins.llm import _send_tool_wait_notice
+    """请求等待提示回复触发消息，并区分首次与后续心跳。"""
+    from src.plugins.llm import _send_request_wait_notice
     from src.plugins.llm.config import plugin_config
 
     mocker.patch.object(plugin_config, "max_requests", 10)
@@ -661,14 +661,14 @@ async def test_tool_wait_notice_replies_to_trigger_message(
     message.send = mocker.AsyncMock()
     text = mocker.patch("src.plugins.llm.UniMessage.text", return_value=message)
 
-    await _send_tool_wait_notice(count, request_count, tool_call_count, message_id=message_id)
+    await _send_request_wait_notice(count, request_count, tool_call_count, message_id=message_id)
 
     text.assert_called_once_with(expected)
     message.send.assert_awaited_once_with(reply_to=expected_reply)
 
 
-async def test_tool_wait_notice_repeats_until_final_completion(app: App, mock_models, mocker):
-    """首次工具调用启动一个心跳，并持续到工具后的最终模型回复完成。"""
+async def test_request_wait_notice_repeats_until_final_completion(app: App, mock_models, mocker):
+    """等待提示从首次模型请求开始，并持续到工具后的最终回复完成。"""
     from src.plugins.llm.config import plugin_config
     from src.plugins.llm.handler import LLMHandler
     from src.plugins.llm.schemas import Completion, Message, ToolCall
@@ -689,33 +689,82 @@ async def test_tool_wait_notice_repeats_until_final_completion(app: App, mock_mo
         nonlocal chat_count
         chat_count += 1
         if chat_count == 1:
+            await first_notice_sent.wait()
             return tool_completion
         second_request_started.set()
         await second_notice_sent.wait()
         return final_completion
 
     async def execute(calls, context, **kwargs):
-        await first_notice_sent.wait()
         context.append(Message.tool(calls[0].id, "搜索结果"))
 
     async def notify(count: int, request_count: int, tool_call_count: int) -> None:
         notices.append((count, request_count, tool_call_count))
         if count == 1:
             first_notice_sent.set()
-            await second_request_started.wait()
         else:
+            await second_request_started.wait()
             second_notice_sent.set()
             await keep_second_notice_pending.wait()
 
-    mocker.patch.object(plugin_config, "tool_notice_delay", 0)
-    mocker.patch.object(plugin_config, "tool_notice_interval", 0.001)
+    mocker.patch.object(plugin_config, "request_notice_delay", 0)
+    mocker.patch.object(plugin_config, "request_notice_interval", 0.001)
     mocker.patch("src.plugins.llm.handler.chat", side_effect=fake_chat)
     mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
 
-    completion = await LLMHandler("test-model").ask("查资料", on_tool_wait=notify)
+    completion = await LLMHandler("test-model").ask("查资料", on_request_wait=notify)
 
     assert completion.content == "结果"
-    assert notices == [(1, 1, 1), (2, 2, 1)]
+    assert notices == [(1, 1, 0), (2, 2, 1)]
+
+
+async def test_request_wait_notice_is_cancelled_before_delay_for_fast_response(app: App, mock_models, mocker):
+    """Agent 在提示延迟内直接完成时不发送等待提示。"""
+    from src.plugins.llm.config import plugin_config
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.schemas import Completion, Message
+
+    notify = mocker.AsyncMock()
+    mocker.patch.object(plugin_config, "request_notice_delay", 60)
+    mocker.patch(
+        "src.plugins.llm.handler.chat",
+        return_value=Completion(message=Message.assistant(content="结果"), finish_reason="stop"),
+    )
+
+    completion = await LLMHandler("test-model").ask("直接回答", on_request_wait=notify)
+
+    assert completion.content == "结果"
+    notify.assert_not_awaited()
+
+
+async def test_request_wait_notice_is_cancelled_when_initial_request_fails(app: App, mock_models, mocker):
+    """首次模型请求异常时也会取消并等待提示任务退出。"""
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.providers import ProviderError
+
+    notice_started = asyncio.Event()
+    notice_cancelled = asyncio.Event()
+
+    async def send_notices(*args, **kwargs):
+        notice_started.set()
+        try:
+            await asyncio.Event().wait()
+        except asyncio.CancelledError:
+            notice_cancelled.set()
+            raise
+
+    async def fail_chat(*args, **kwargs):
+        await notice_started.wait()
+        raise ProviderError("请求失败")
+
+    handler = LLMHandler("test-model")
+    mocker.patch.object(handler, "_send_request_wait_notices", side_effect=send_notices)
+    mocker.patch("src.plugins.llm.handler.chat", side_effect=fail_chat)
+
+    with pytest.raises(ProviderError, match="请求失败"):
+        await handler.ask("查资料", on_request_wait=mocker.AsyncMock())
+
+    assert notice_cancelled.is_set()
 
 
 async def test_request_limit_generates_final_response_with_tool_choice_none(app: App, mock_models, mocker):

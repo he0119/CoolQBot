@@ -57,7 +57,7 @@ DSML_TOOL_CALL_PATTERN = re.compile(
 """部分 DeepSeek 兼容服务在禁止工具后把私有工具协议降级到正文。"""
 
 ReactionStatus = Literal["fail", "thinking", "done"]
-ToolWaitNotifier = Callable[[int, int, int], Awaitable[None]]
+RequestWaitNotifier = Callable[[int, int, int], Awaitable[None]]
 REACTION_EMOJIS: dict[ReactionStatus, tuple[str, str]] = {
     "fail": ("10060", "❌"),
     "thinking": ("424", "👀"),
@@ -70,8 +70,8 @@ QQ_THINKING_NOTICE = "👀 已收到，正在处理……"
 
 
 @dataclass
-class _ToolWaitProgress:
-    """等待提示使用的非敏感工具调用进度。"""
+class _RequestWaitProgress:
+    """等待提示使用的非敏感请求进度。"""
 
     request_count: int = 1
     tool_call_count: int = 0
@@ -262,7 +262,7 @@ class LLMHandler:
         content: str,
         images: list[ImageContent] | None = None,
         *,
-        on_tool_wait: ToolWaitNotifier | None = None,
+        on_request_wait: RequestWaitNotifier | None = None,
     ) -> Completion:
         """追加一轮用户输入并请求模型
 
@@ -285,40 +285,42 @@ class LLMHandler:
             len(images or []),
             "启用" if self.enable_tools else "禁用",
         )
-        completion = await chat(
-            self.model_name,
-            list(self.context),
-            session_affinity=self.session_affinity,
-            enable_tools=self.enable_tools,
+        request_progress = _RequestWaitProgress()
+        notice_task = (
+            asyncio.create_task(self._send_request_wait_notices(on_request_wait, request_progress))
+            if on_request_wait and self.enable_tools
+            else None
         )
-        if completion.tool_calls and not self.enable_tools:
-            del self.context[context_start:]
-            logger.warning(
-                "LLM 会话拒绝工具调用（会话={}，调用数量={}）",
-                self.log_id,
-                len(completion.tool_calls),
-            )
-            raise ProviderError("当前模式不允许工具调用")
-        total_usage = completion.usage
-        actual_model = completion.model
-        notice_task: asyncio.Task[None] | None = None
-        tool_progress = _ToolWaitProgress()
         reached_request_limit = False
         try:
+            completion = await chat(
+                self.model_name,
+                list(self.context),
+                session_affinity=self.session_affinity,
+                enable_tools=self.enable_tools,
+            )
+            if completion.tool_calls and not self.enable_tools:
+                del self.context[context_start:]
+                logger.warning(
+                    "LLM 会话拒绝工具调用（会话={}，调用数量={}）",
+                    self.log_id,
+                    len(completion.tool_calls),
+                )
+                raise ProviderError("当前模式不允许工具调用")
+            total_usage = completion.usage
+            actual_model = completion.model
             while completion.tool_calls:
-                tool_progress.tool_call_count += len(completion.tool_calls)
-                if on_tool_wait and notice_task is None:
-                    notice_task = asyncio.create_task(self._send_tool_wait_notices(on_tool_wait, tool_progress))
+                request_progress.tool_call_count += len(completion.tool_calls)
                 logger.info(
                     "LLM 会话执行工具（会话={}，模型请求={}，调用数量={}）",
                     self.log_id,
-                    tool_progress.request_count,
+                    request_progress.request_count,
                     len(completion.tool_calls),
                 )
                 self.context.append(completion.message)
                 await execute_tool_calls(completion.tool_calls, self.context)
-                tool_progress.request_count += 1
-                is_final_request = tool_progress.request_count == plugin_config.max_requests
+                request_progress.request_count += 1
+                is_final_request = request_progress.request_count == plugin_config.max_requests
                 request_context = list(self.context)
                 if is_final_request:
                     reached_request_limit = True
@@ -326,11 +328,11 @@ class LLMHandler:
                         "LLM 会话模型请求达到上限，转为禁止工具收尾（会话={}，上限={}，工具调用={}）",
                         self.log_id,
                         plugin_config.max_requests,
-                        tool_progress.tool_call_count,
+                        request_progress.tool_call_count,
                     )
                     self.context.append(Message.user(REQUEST_LIMIT_PROMPT))
                     request_context = list(self.context)
-                elif tool_progress.request_count == plugin_config.max_requests - 1:
+                elif request_progress.request_count == plugin_config.max_requests - 1:
                     self.context.append(Message.user(LAST_TOOL_REQUEST_PROMPT))
                     request_context = list(self.context)
                 try:
@@ -348,7 +350,7 @@ class LLMHandler:
                         "LLM 会话禁止工具收尾请求失败，改用已有结果（会话={}，上限={}，工具调用={}）",
                         self.log_id,
                         plugin_config.max_requests,
-                        tool_progress.tool_call_count,
+                        request_progress.tool_call_count,
                     )
                     completion = Completion(
                         message=Message.assistant(
@@ -400,8 +402,8 @@ class LLMHandler:
             self.log_id,
             completion.model,
             completion.finish_reason,
-            tool_progress.request_count,
-            tool_progress.tool_call_count,
+            request_progress.request_count,
+            request_progress.tool_call_count,
             completion.usage.input_tokens,
             completion.usage.output_tokens,
             completion.usage.cache_read_tokens,
@@ -409,9 +411,13 @@ class LLMHandler:
         )
         return completion
 
-    async def _send_tool_wait_notices(self, notify: ToolWaitNotifier, progress: _ToolWaitProgress) -> None:
-        """工具阶段未完成时按配置周期发送等待提示。"""
-        delay = plugin_config.tool_notice_delay
+    async def _send_request_wait_notices(
+        self,
+        notify: RequestWaitNotifier,
+        progress: _RequestWaitProgress,
+    ) -> None:
+        """Agent 请求未完成时按配置周期发送等待提示。"""
+        delay = plugin_config.request_notice_delay
         count = 0
         while True:
             await asyncio.sleep(delay)
@@ -420,7 +426,7 @@ class LLMHandler:
                 await notify(count, progress.request_count, progress.tool_call_count)
             except Exception as e:
                 logger.opt(exception=e).debug(
-                    "LLM 工具等待提示发送失败，已忽略（会话={}，次数={}，模型请求={}，工具调用={}）",
+                    "LLM 请求等待提示发送失败，已忽略（会话={}，次数={}，模型请求={}，工具调用={}）",
                     self.log_id,
                     count,
                     progress.request_count,
@@ -428,13 +434,13 @@ class LLMHandler:
                 )
             else:
                 logger.info(
-                    "LLM 会话发送工具等待提示（会话={}，次数={}，模型请求={}，工具调用={}）",
+                    "LLM 会话发送请求等待提示（会话={}，次数={}，模型请求={}，工具调用={}）",
                     self.log_id,
                     count,
                     progress.request_count,
                     progress.tool_call_count,
                 )
-            delay = plugin_config.tool_notice_interval
+            delay = plugin_config.request_notice_interval
 
     def rollback(self) -> bool:
         """回滚最近一轮对话，成功时返回 True"""
