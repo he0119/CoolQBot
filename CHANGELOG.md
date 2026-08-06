@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.29.3] - 2026-08-06
+
 ### Added
 
 - 添加 CoolQBot 功能介绍网站，并通过 GitHub Pages 自动部署
@@ -850,7 +852,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.2...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.3...HEAD
+[0.29.3]: https://github.com/he0119/CoolQBot/compare/v0.29.2...v0.29.3
 [0.29.2]: https://github.com/he0119/CoolQBot/compare/v0.29.1...v0.29.2
 [0.29.1]: https://github.com/he0119/CoolQBot/compare/v0.29.0...v0.29.1
 [0.29.0]: https://github.com/he0119/CoolQBot/compare/v0.28.0...v0.29.0
