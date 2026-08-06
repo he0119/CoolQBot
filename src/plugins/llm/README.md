@@ -185,7 +185,7 @@ LLM__MD_TO_PIC=false
 LLM__RESPOND_TO_MENTION=true
 # 是否流式请求
 LLM__STREAM=false
-# 单次提问允许的最大模型请求次数，最后一次请求会禁用工具并基于已有结果收尾
+# 单次提问允许的最大模型请求次数；Agent 会提前获知预算，最后一次请求禁止工具调用并基于已有结果收尾
 LLM__MAX_REQUESTS=10
 # 工具调用开始后首次提示与后续重复提示的间隔（秒）
 LLM__TOOL_NOTICE_DELAY=2

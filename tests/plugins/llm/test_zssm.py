@@ -158,7 +158,8 @@ async def test_zssm_uses_temporary_model(app: App, respx_mock: MockRouter, zssm_
         )
 
     payload = json.loads(route.calls[0].request.content)
-    user_data = json.loads(payload["messages"][1]["content"])
+    user_message = next(message for message in payload["messages"] if message["role"] == "user")
+    user_data = json.loads(user_message["content"])
     assert user_data["target"] == "Python GIL"
 
 
@@ -324,7 +325,8 @@ async def test_zssm_agent_option_enables_web_search(app: App, respx_mock: MockRo
     payload = json.loads(route.calls[0].request.content)
     tool_names = {tool["function"]["name"] for tool in payload["tools"]}
     assert {"web_search", "web_fetch"} <= tool_names
-    user_data = json.loads(payload["messages"][1]["content"])
+    user_message = next(message for message in payload["messages"] if message["role"] == "user")
+    user_data = json.loads(user_message["content"])
     assert user_data["target"] == "Python 3.14 新特性"
 
 

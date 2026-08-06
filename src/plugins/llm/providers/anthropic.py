@@ -21,7 +21,7 @@ from .base import Provider, iter_sse
 if TYPE_CHECKING:
     import httpx
 
-    from ..schemas import ToolParam
+    from ..schemas import ToolChoice, ToolParam
 
 ANTHROPIC_VERSION = "2023-06-01"
 """Anthropic API 版本，通过 anthropic-version 请求头发送"""
@@ -50,6 +50,7 @@ class AnthropicProvider(Provider):
         messages: list[Message],
         tools: list[ToolParam] | None = None,
         stream: bool = False,
+        tool_choice: ToolChoice = "auto",
     ) -> dict[str, Any]:
         system_parts = [m.content for m in messages if m.role == "system" and m.content]
         payload: dict[str, Any] = {
@@ -72,6 +73,8 @@ class AnthropicProvider(Provider):
                 for tool in tools
             ]
         payload.update(self.config.extra_body)
+        if tools and tool_choice == "none":
+            payload["tool_choice"] = {"type": "none"}
         return payload
 
     def _dump_messages(self, messages: list[Message]) -> list[dict[str, Any]]:

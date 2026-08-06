@@ -19,7 +19,7 @@ from .base import Provider, ProviderError, iter_sse
 if TYPE_CHECKING:
     import httpx
 
-    from ..schemas import ToolParam
+    from ..schemas import ToolChoice, ToolParam
 
 
 class ResponsesProvider(Provider):
@@ -41,6 +41,7 @@ class ResponsesProvider(Provider):
         messages: list[Message],
         tools: list[ToolParam] | None = None,
         stream: bool = False,
+        tool_choice: ToolChoice = "auto",
     ) -> dict[str, Any]:
         payload: dict[str, Any] = {"model": self.config.model, "stream": stream}
         if self.config.max_tokens:
@@ -71,6 +72,8 @@ class ResponsesProvider(Provider):
                 for tool in tools
             ]
         payload.update(self.config.extra_body)
+        if tools and tool_choice == "none":
+            payload["tool_choice"] = "none"
         return payload
 
     def _dump_items(self, message: Message) -> list[dict[str, Any]]:

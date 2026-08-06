@@ -43,6 +43,30 @@ def make_messages():
     ]
 
 
+@pytest.mark.parametrize(
+    ("provider_name", "expected"),
+    [
+        (OPENAI_CHAT_COMPLETIONS, "none"),
+        (OPENAI_RESPONSES, "none"),
+        (ANTHROPIC_MESSAGES, {"type": "none"}),
+    ],
+)
+def test_tool_choice_none_keeps_tools_and_overrides_extra_body(app: App, provider_name: str, expected: object):
+    """收尾请求保留工具定义，并强制覆盖模型配置中的工具选择。"""
+    from src.plugins.llm.providers import get_provider
+    from src.plugins.llm.schemas import ToolParam
+
+    tools = [ToolParam(name="get_weather", description="查询天气", parameters={"type": "object"})]
+    provider = get_provider(provider_name)(
+        make_config(provider_name, extra_body={"tool_choice": "required"}),
+    )
+
+    payload = provider.build_payload(make_messages(), tools, tool_choice="none")
+
+    assert payload["tools"]
+    assert payload["tool_choice"] == expected
+
+
 # ---------------------------------------------------------------- chat 格式
 
 
