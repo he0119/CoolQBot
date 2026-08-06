@@ -17,7 +17,7 @@ from .base import Provider, iter_sse
 if TYPE_CHECKING:
     import httpx
 
-    from ..schemas import ToolParam
+    from ..schemas import ToolChoice, ToolParam
 
 
 class ChatProvider(Provider):
@@ -39,6 +39,7 @@ class ChatProvider(Provider):
         messages: list[Message],
         tools: list[ToolParam] | None = None,
         stream: bool = False,
+        tool_choice: ToolChoice = "auto",
     ) -> dict[str, Any]:
         payload: dict[str, Any] = {
             "model": self.config.model,
@@ -65,6 +66,9 @@ class ChatProvider(Provider):
                 for tool in tools
             ]
         payload.update(self.config.extra_body)
+        if tools and tool_choice == "none":
+            # 收尾请求必须覆盖模型级 extra_body，避免 required/auto 重新开启工具。
+            payload["tool_choice"] = "none"
         return payload
 
     def _dump_message(self, message: Message) -> dict[str, Any]:

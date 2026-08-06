@@ -346,8 +346,8 @@ def test_model_config_defaults(app: App):
     config = ScopedConfig(base_url="https://global.example.com", models=[chat, anthropic])
     assert config.prefer_markdown is False
     assert config.max_requests == 10
-    assert config.tool_notice_delay == 10.0
-    assert config.tool_notice_interval == 60.0
+    assert config.request_notice_delay == 20.0
+    assert config.request_notice_interval == 60.0
     assert config.resolve("deepseek-chat").base_url == "https://global.example.com"
     assert config.resolve("claude").base_url == "https://global.example.com"
 

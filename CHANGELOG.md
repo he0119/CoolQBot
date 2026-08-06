@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 添加 CoolQBot 功能介绍网站，并通过 GitHub Pages 自动部署
 
+### Fixed
+
+- 修复 Agent 达到模型请求上限时，DeepSeek 兼容服务可能把工具调用协议作为普通正文返回的问题；会话开始时提前告知请求预算，收尾请求显式禁止工具调用，并在异常响应时保留已获得结果
+- 修复 Agent 等待提示从首次工具调用返回后才开始计时的问题，改为从首次模型请求发出时开始计时，默认延迟 20 秒
+
 ## [0.29.2] - 2026-08-05
 
 ### Added

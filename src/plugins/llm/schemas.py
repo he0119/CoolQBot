@@ -12,6 +12,8 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 Role = Literal["system", "user", "assistant", "tool"]
+ToolChoice = Literal["auto", "none"]
+"""工具选择策略：自动选择，或保留工具定义但禁止调用。"""
 
 
 @dataclass

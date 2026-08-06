@@ -185,11 +185,11 @@ LLM__MD_TO_PIC=false
 LLM__RESPOND_TO_MENTION=true
 # 是否流式请求
 LLM__STREAM=false
-# 单次提问允许的最大模型请求次数，最后一次请求会禁用工具并基于已有结果收尾
+# 单次提问允许的最大模型请求次数；Agent 会提前获知预算，最后一次请求禁止工具调用并基于已有结果收尾
 LLM__MAX_REQUESTS=10
-# 工具调用开始后首次提示与后续重复提示的间隔（秒）
-LLM__TOOL_NOTICE_DELAY=2
-LLM__TOOL_NOTICE_INTERVAL=30
+# Agent 首次模型请求开始后的等待提示延迟，以及后续重复提示的间隔（秒）
+LLM__REQUEST_NOTICE_DELAY=20
+LLM__REQUEST_NOTICE_INTERVAL=30
 # 网页搜索配置；结果数量还会受模型传入的 max_results 限制
 LLM__WEB_SEARCH_MAX_RESULTS=5
 LLM__WEB_SEARCH_TIMEOUT=10

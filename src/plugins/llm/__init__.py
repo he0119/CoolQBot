@@ -693,16 +693,18 @@ def _extract_reply(reply_event: Event):
     return reply_event.get_message(), get_message_id(reply_event)
 
 
-async def _send_tool_wait_notice(
+async def _send_request_wait_notice(
     count: int,
     request_count: int,
     tool_call_count: int,
     *,
     message_id: str | None = None,
 ) -> None:
-    """提示用户工具调用仍在进行；首次与后续心跳使用不同文案。"""
-    progress = f"模型请求 {request_count}/{plugin_config.max_requests} 次，工具调用 {tool_call_count} 次"
-    text = f"🔍 正在查询资料（{progress}），请稍候……" if count == 1 else f"⏳ 查询仍在进行（{progress}），请再稍候……"
+    """提示用户 Agent 请求仍在进行；首次与后续心跳使用不同文案。"""
+    progress = f"模型请求 {request_count}/{plugin_config.max_requests} 次"
+    if tool_call_count:
+        progress += f"，工具调用 {tool_call_count} 次"
+    text = f"⏳ 模型正在处理（{progress}），请稍候……" if count == 1 else f"⏳ 处理仍在进行（{progress}），请再稍候……"
     await UniMessage.text(text).send(reply_to=message_id or True)
 
 
@@ -717,11 +719,11 @@ async def _ask(
     """请求模型，失败时结束当前会话并提示原因"""
     await send_reaction("thinking", message_id=message_id)
 
-    async def notify_tool_wait(count: int, request_count: int, tool_call_count: int) -> None:
-        await _send_tool_wait_notice(count, request_count, tool_call_count, message_id=message_id)
+    async def notify_request_wait(count: int, request_count: int, tool_call_count: int) -> None:
+        await _send_request_wait_notice(count, request_count, tool_call_count, message_id=message_id)
 
     try:
-        completion = await handler.ask(text, images, on_tool_wait=notify_tool_wait)
+        completion = await handler.ask(text, images, on_request_wait=notify_request_wait)
     except ProviderError as e:
         logger.warning("LLM 调用失败（会话={}，错误类型=ProviderError，错误={}）", handler.log_id, e)
         await send_reaction("fail", message_id=message_id)

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
     from ..config import ModelConfig
-    from ..schemas import Completion, Message, ToolParam
+    from ..schemas import Completion, Message, ToolChoice, ToolParam
 
 
 def _get_bot_version() -> str:
@@ -113,6 +113,7 @@ class Provider(ABC):
         messages: list[Message],
         tools: list[ToolParam] | None = None,
         stream: bool = False,
+        tool_choice: ToolChoice = "auto",
     ) -> dict[str, Any]:
         """构造请求体"""
 
@@ -124,7 +125,13 @@ class Provider(ABC):
     async def parse_stream(self, response: httpx.Response) -> Completion:
         """解析流式响应"""
 
-    async def chat(self, messages: list[Message], tools: list[ToolParam] | None = None) -> Completion:
+    async def chat(
+        self,
+        messages: list[Message],
+        tools: list[ToolParam] | None = None,
+        *,
+        tool_choice: ToolChoice = "auto",
+    ) -> Completion:
         """发起一次对话请求"""
         stream = bool(self.config.stream)
         log_id = self.session_affinity[:8] or "-"
@@ -138,7 +145,7 @@ class Provider(ABC):
             len(messages),
             len(tools or []),
         )
-        payload = self.build_payload(messages, tools, stream=stream)
+        payload = self.build_payload(messages, tools, stream=stream, tool_choice=tool_choice)
         headers = self.build_headers()
         headers["User-Agent"] = USER_AGENT
         if self.session_affinity:

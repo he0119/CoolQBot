@@ -638,11 +638,11 @@ async def test_llm_with_tool(app: App, respx_mock: MockRouter, mock_models):
 @pytest.mark.parametrize(
     ("count", "request_count", "tool_call_count", "message_id", "expected", "expected_reply"),
     [
-        (1, 1, 2, None, "🔍 正在查询资料（模型请求 1/10 次，工具调用 2 次），请稍候……", True),
-        (2, 3, 4, "42", "⏳ 查询仍在进行（模型请求 3/10 次，工具调用 4 次），请再稍候……", "42"),
+        (1, 1, 0, None, "⏳ 模型正在处理（模型请求 1/10 次），请稍候……", True),
+        (2, 3, 4, "42", "⏳ 处理仍在进行（模型请求 3/10 次，工具调用 4 次），请再稍候……", "42"),
     ],
 )
-async def test_tool_wait_notice_replies_to_trigger_message(
+async def test_request_wait_notice_replies_to_trigger_message(
     app: App,
     mocker,
     count: int,
@@ -652,8 +652,8 @@ async def test_tool_wait_notice_replies_to_trigger_message(
     expected: str,
     expected_reply: str | bool,
 ):
-    """工具等待提示回复触发消息，并区分首次与后续心跳。"""
-    from src.plugins.llm import _send_tool_wait_notice
+    """请求等待提示回复触发消息，并区分首次与后续心跳。"""
+    from src.plugins.llm import _send_request_wait_notice
     from src.plugins.llm.config import plugin_config
 
     mocker.patch.object(plugin_config, "max_requests", 10)
@@ -661,14 +661,14 @@ async def test_tool_wait_notice_replies_to_trigger_message(
     message.send = mocker.AsyncMock()
     text = mocker.patch("src.plugins.llm.UniMessage.text", return_value=message)
 
-    await _send_tool_wait_notice(count, request_count, tool_call_count, message_id=message_id)
+    await _send_request_wait_notice(count, request_count, tool_call_count, message_id=message_id)
 
     text.assert_called_once_with(expected)
     message.send.assert_awaited_once_with(reply_to=expected_reply)
 
 
-async def test_tool_wait_notice_repeats_until_final_completion(app: App, mock_models, mocker):
-    """首次工具调用启动一个心跳，并持续到工具后的最终模型回复完成。"""
+async def test_request_wait_notice_repeats_until_final_completion(app: App, mock_models, mocker):
+    """等待提示从首次模型请求开始，并持续到工具后的最终回复完成。"""
     from src.plugins.llm.config import plugin_config
     from src.plugins.llm.handler import LLMHandler
     from src.plugins.llm.schemas import Completion, Message, ToolCall
@@ -689,39 +689,93 @@ async def test_tool_wait_notice_repeats_until_final_completion(app: App, mock_mo
         nonlocal chat_count
         chat_count += 1
         if chat_count == 1:
+            await first_notice_sent.wait()
             return tool_completion
         second_request_started.set()
         await second_notice_sent.wait()
         return final_completion
 
     async def execute(calls, context, **kwargs):
-        await first_notice_sent.wait()
         context.append(Message.tool(calls[0].id, "搜索结果"))
 
     async def notify(count: int, request_count: int, tool_call_count: int) -> None:
         notices.append((count, request_count, tool_call_count))
         if count == 1:
             first_notice_sent.set()
-            await second_request_started.wait()
         else:
+            await second_request_started.wait()
             second_notice_sent.set()
             await keep_second_notice_pending.wait()
 
-    mocker.patch.object(plugin_config, "tool_notice_delay", 0)
-    mocker.patch.object(plugin_config, "tool_notice_interval", 0.001)
+    mocker.patch.object(plugin_config, "request_notice_delay", 0)
+    mocker.patch.object(plugin_config, "request_notice_interval", 0.001)
     mocker.patch("src.plugins.llm.handler.chat", side_effect=fake_chat)
     mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
 
-    completion = await LLMHandler("test-model").ask("查资料", on_tool_wait=notify)
+    completion = await LLMHandler("test-model").ask("查资料", on_request_wait=notify)
 
     assert completion.content == "结果"
-    assert notices == [(1, 1, 1), (2, 2, 1)]
+    assert notices == [(1, 1, 0), (2, 2, 1)]
 
 
-async def test_request_limit_generates_final_response_without_tools(app: App, mock_models, mocker):
-    """最后一次模型请求基于已有工具结果生成无工具收尾回复。"""
+async def test_request_wait_notice_is_cancelled_before_delay_for_fast_response(app: App, mock_models, mocker):
+    """Agent 在提示延迟内直接完成时不发送等待提示。"""
     from src.plugins.llm.config import plugin_config
-    from src.plugins.llm.handler import REQUEST_LIMIT_PROMPT, LLMHandler
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.schemas import Completion, Message
+
+    notify = mocker.AsyncMock()
+    mocker.patch.object(plugin_config, "request_notice_delay", 60)
+    mocker.patch(
+        "src.plugins.llm.handler.chat",
+        return_value=Completion(message=Message.assistant(content="结果"), finish_reason="stop"),
+    )
+
+    completion = await LLMHandler("test-model").ask("直接回答", on_request_wait=notify)
+
+    assert completion.content == "结果"
+    notify.assert_not_awaited()
+
+
+async def test_request_wait_notice_is_cancelled_when_initial_request_fails(app: App, mock_models, mocker):
+    """首次模型请求异常时也会取消并等待提示任务退出。"""
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.providers import ProviderError
+
+    notice_started = asyncio.Event()
+    notice_cancelled = asyncio.Event()
+
+    async def send_notices(*args, **kwargs):
+        notice_started.set()
+        try:
+            await asyncio.Event().wait()
+        except asyncio.CancelledError:
+            notice_cancelled.set()
+            raise
+
+    async def fail_chat(*args, **kwargs):
+        await notice_started.wait()
+        raise ProviderError("请求失败")
+
+    handler = LLMHandler("test-model")
+    mocker.patch.object(handler, "_send_request_wait_notices", side_effect=send_notices)
+    mocker.patch("src.plugins.llm.handler.chat", side_effect=fail_chat)
+
+    with pytest.raises(ProviderError, match="请求失败"):
+        await handler.ask("查资料", on_request_wait=mocker.AsyncMock())
+
+    assert notice_cancelled.is_set()
+
+
+async def test_request_limit_generates_final_response_with_tool_choice_none(app: App, mock_models, mocker):
+    """最后一次请求保留缓存前缀，并以显式 none 生成收尾回复。"""
+    from src.plugins.llm.config import plugin_config
+    from src.plugins.llm.handler import (
+        LAST_TOOL_REQUEST_PROMPT,
+        REQUEST_BUDGET_PROMPT,
+        REQUEST_LIMIT_PROMPT,
+        LLMHandler,
+    )
     from src.plugins.llm.schemas import Completion, Message, ToolCall, Usage
 
     first_tool_completion = Completion(
@@ -753,26 +807,53 @@ async def test_request_limit_generates_final_response_without_tools(app: App, mo
     assert completion.content == "根据已有天气信息：晴。"
     assert completion.usage == Usage(input_tokens=6, output_tokens=8)
     assert completion.model == "final-model"
-    assert [message.role for message in handler.context] == ["system", "user", "assistant", "tool", "assistant"]
+    assert [message.role for message in handler.context] == [
+        "system",
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "user",
+        "assistant",
+    ]
     assert handler.context[-1] is completion.message
     execute_calls.assert_awaited_once()
     assert execute_calls.await_args.args[0] == first_tool_completion.tool_calls
     assert execute_calls.await_args.args[1] is handler.context
     assert chat.await_count == 2
+    initial_call = chat.await_args_list[0]
+    assert initial_call.args[1] == handler.context[:3]
+    assert initial_call.args[1][1] == Message(
+        role="system",
+        content=REQUEST_BUDGET_PROMPT.format(max_requests=2),
+    )
     final_call = chat.await_args_list[-1]
-    assert final_call.kwargs == {"session_affinity": handler.session_affinity, "enable_tools": False}
-    assert final_call.args[1][:2] == [
-        Message(role="system", content="测试人设"),
-        Message(role="system", content=REQUEST_LIMIT_PROMPT),
+    assert final_call.kwargs == {
+        "session_affinity": handler.session_affinity,
+        "enable_tools": True,
+        "tool_choice": "none",
+    }
+    assert final_call.args[1] == handler.context[:-1]
+    assert [message.role for message in final_call.args[1]] == [
+        "system",
+        "system",
+        "user",
+        "assistant",
+        "tool",
+        "user",
     ]
-    assert final_call.args[1][2:] == handler.context[1:-1]
+    assert final_call.args[1][-1] == Message.user(REQUEST_LIMIT_PROMPT)
+    assert LAST_TOOL_REQUEST_PROMPT not in [message.content for message in handler.context]
 
 
-async def test_request_limit_rolls_back_when_final_response_still_calls_tools(app: App, mock_models, mocker):
-    """无工具收尾仍返回工具调用时不保留不完整的上下文。"""
+async def test_request_limit_uses_completed_results_when_final_response_still_calls_tools(
+    app: App,
+    mock_models,
+    mocker,
+):
+    """收尾仍返回结构化调用时保留已完成结果并生成确定性兜底。"""
     from src.plugins.llm.config import plugin_config
     from src.plugins.llm.handler import LLMHandler
-    from src.plugins.llm.providers import ProviderError
     from src.plugins.llm.schemas import Completion, Message, ToolCall
 
     tool_completion = Completion(
@@ -788,19 +869,25 @@ async def test_request_limit_rolls_back_when_final_response_still_calls_tools(ap
     async def execute(calls, context, **kwargs):
         context.append(Message.tool(calls[0].id, "晴"))
 
-    mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
+    execute_calls = mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
     handler = LLMHandler("test-model")
-    original_context = list(handler.context)
 
-    with pytest.raises(ProviderError, match="达到上限后仍未生成最终回复"):
-        await handler.ask("天气")
+    completion = await handler.ask("天气")
 
-    assert handler.context == original_context
-    assert chat.await_args_list[-1].kwargs["enable_tools"] is False
+    assert "get_weather" in completion.content
+    assert "晴" in completion.content
+    assert not completion.tool_calls
+    assert [message.role for message in handler.context] == ["system", "user", "assistant", "tool", "user", "assistant"]
+    execute_calls.assert_awaited_once()
+    assert chat.await_args_list[-1].kwargs == {
+        "session_affinity": handler.session_affinity,
+        "enable_tools": True,
+        "tool_choice": "none",
+    }
 
 
-async def test_request_limit_rolls_back_when_final_request_fails(app: App, mock_models, mocker):
-    """无工具收尾请求失败时回滚当前问题。"""
+async def test_request_limit_uses_completed_results_when_final_request_fails(app: App, mock_models, mocker):
+    """收尾请求失败时保留已完成结果并生成确定性兜底。"""
     from src.plugins.llm.config import plugin_config
     from src.plugins.llm.handler import LLMHandler
     from src.plugins.llm.providers import ProviderError
@@ -821,12 +908,78 @@ async def test_request_limit_rolls_back_when_final_request_fails(app: App, mock_
 
     mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
     handler = LLMHandler("test-model")
-    original_context = list(handler.context)
 
-    with pytest.raises(ProviderError, match="收尾请求失败"):
-        await handler.ask("天气")
+    completion = await handler.ask("天气")
 
-    assert handler.context == original_context
+    assert "get_weather" in completion.content
+    assert "晴" in completion.content
+    assert [message.role for message in handler.context] == ["system", "user", "assistant", "tool", "user", "assistant"]
+
+
+async def test_request_limit_rejects_dsml_content_and_uses_completed_results(app: App, mock_models, mocker):
+    """DeepSeek 把工具协议降级到正文时不得将 DSML 作为最终答案发送。"""
+    from src.plugins.llm.config import plugin_config
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.schemas import Completion, Message, ToolCall
+
+    tool_completion = Completion(
+        message=Message.assistant(
+            tool_calls=[ToolCall(id="call_1", name="query_fflogs_character_ranking", arguments={})],
+        ),
+        finish_reason="tool_calls",
+    )
+    dsml_completion = Completion(
+        message=Message.assistant(
+            content=(
+                '<｜｜DSML｜｜tool_calls>\n<｜｜DSML｜｜invoke name="query_fflogs_character_ranking">\n'
+                "</｜｜DSML｜｜invoke>\n</｜｜DSML｜｜tool_calls>"
+            ),
+        ),
+        finish_reason="stop",
+    )
+    mocker.patch.object(plugin_config, "max_requests", 2)
+    mocker.patch("src.plugins.llm.handler.chat", side_effect=[tool_completion, dsml_completion])
+
+    async def execute(calls, context, **kwargs):
+        context.append(Message.tool(calls[0].id, "角色排名：95"))
+
+    mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
+
+    completion = await LLMHandler("test-model").ask("查询排名")
+
+    assert "角色排名：95" in completion.content
+    assert "DSML" not in completion.content
+    assert not completion.tool_calls
+
+
+async def test_penultimate_request_warns_model_to_finish_tool_calls(app: App, mock_models, mocker):
+    """最后一次允许工具的请求会提前要求模型集中完成剩余查询。"""
+    from src.plugins.llm.config import plugin_config
+    from src.plugins.llm.handler import LAST_TOOL_REQUEST_PROMPT, LLMHandler
+    from src.plugins.llm.schemas import Completion, Message, ToolCall
+
+    tool_completion = Completion(
+        message=Message.assistant(tool_calls=[ToolCall(id="call_1", name="get_weather", arguments={})]),
+        finish_reason="tool_calls",
+    )
+    final_completion = Completion(message=Message.assistant(content="天气是晴。"), finish_reason="stop")
+    mocker.patch.object(plugin_config, "max_requests", 3)
+    chat = mocker.patch("src.plugins.llm.handler.chat", side_effect=[tool_completion, final_completion])
+
+    async def execute(calls, context, **kwargs):
+        context.append(Message.tool(calls[0].id, "晴"))
+
+    mocker.patch("src.plugins.llm.handler.execute_tool_calls", side_effect=execute)
+    handler = LLMHandler("test-model")
+
+    completion = await handler.ask("天气")
+
+    assert completion.content == "天气是晴。"
+    assert chat.await_count == 2
+    second_context = chat.await_args_list[1].args[1]
+    assert second_context == handler.context[:-1]
+    assert second_context[-1] == Message.user(LAST_TOOL_REQUEST_PROMPT)
+    assert LAST_TOOL_REQUEST_PROMPT in [message.content for message in handler.context]
 
 
 async def test_disabled_tools_are_not_executed(app: App, mock_models, mocker):
