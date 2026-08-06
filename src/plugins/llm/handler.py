@@ -133,11 +133,6 @@ def _format_request_limit_fallback(context: list[Message], context_start: int) -
     return "\n\n".join(sections)
 
 
-def _contains_dsml_tool_call(content: str) -> bool:
-    """识别被供应商错误放进正文的 DeepSeek 工具调用标记。"""
-    return bool(DSML_TOOL_CALL_PATTERN.search(content))
-
-
 def split_content(completion: Completion) -> tuple[str, str]:
     """拆分模型回复为 (正文, 推理内容)
 
@@ -372,10 +367,12 @@ class LLMHandler:
                 with suppress(asyncio.CancelledError):
                     await notice_task
 
+        leaked_dsml = False
         if reached_request_limit and (
-            completion.tool_calls or not completion.content.strip() or _contains_dsml_tool_call(completion.content)
+            completion.tool_calls
+            or not completion.content.strip()
+            or (leaked_dsml := bool(DSML_TOOL_CALL_PATTERN.search(completion.content)))
         ):
-            leaked_dsml = _contains_dsml_tool_call(completion.content)
             logger.warning(
                 "LLM 会话达到模型请求上限后返回无效收尾，改用已有结果"
                 "（会话={}，上限={}，调用数量={}，DSML={}，正文字符={}）",
