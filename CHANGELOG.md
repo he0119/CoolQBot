@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.29.4] - 2026-08-09
+
 ### Added
 
 - 添加“xxxx吃啥/吃什么”自然语言命令，从 90 种美食中随机推荐，并在可用时附带人工挑选的 Wikimedia Commons 图片和署名
@@ -856,7 +858,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.3...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.4...HEAD
+[0.29.4]: https://github.com/he0119/CoolQBot/compare/v0.29.3...v0.29.4
 [0.29.3]: https://github.com/he0119/CoolQBot/compare/v0.29.2...v0.29.3
 [0.29.2]: https://github.com/he0119/CoolQBot/compare/v0.29.1...v0.29.2
 [0.29.1]: https://github.com/he0119/CoolQBot/compare/v0.29.0...v0.29.1
