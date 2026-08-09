@@ -125,7 +125,9 @@ async def test_query_holiday_status_tool(app: App, mocker: MockerFixture):
     from src.plugins.llm.schemas import ToolCall
     from src.plugins.llm.tools import registry
 
-    today = date.today()
+    today = date(2026, 8, 3)
+    mocked_date = mocker.patch("src.plugins.morning.plugins.morning_greeting.data_source.date")
+    mocked_date.today.return_value = today
     get_recent_holiday = mocker.patch(
         "src.plugins.morning.plugins.morning_greeting.data_source.get_recent_holiday",
         return_value={
@@ -149,6 +151,7 @@ async def test_query_holiday_status_tool(app: App, mocker: MockerFixture):
     )
 
     assert result == "明天就是测试节了，开不开心？"
+    mocked_date.today.assert_called_once_with()
     get_recent_holiday.assert_awaited_once_with()
     get_recent_workday.assert_awaited_once_with()
 
