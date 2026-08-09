@@ -653,7 +653,7 @@ requires-dist = [
     { name = "nonebot-adapter-feishu", specifier = ">=2.7.2" },
     { name = "nonebot-adapter-kaiheila", specifier = ">=0.3.4" },
     { name = "nonebot-adapter-onebot", specifier = ">=2.4.6" },
-    { name = "nonebot-adapter-qq", specifier = ">=1.7.1" },
+    { name = "nonebot-adapter-qq", specifier = ">=1.7.2" },
     { name = "nonebot-adapter-red", specifier = ">=0.9.0" },
     { name = "nonebot-adapter-satori", specifier = ">=1.3.0" },
     { name = "nonebot-adapter-telegram", specifier = ">=0.1.0b20" },
@@ -1798,7 +1798,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-adapter-qq"
-version = "1.7.1"
+version = "1.7.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
@@ -1807,9 +1807,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/55/22/c2063502050372297c532f76d414582ae185545a842f4829056f7a73f9e7/nonebot_adapter_qq-1.7.1.tar.gz", hash = "sha256:cc7891fda36155ea9c7524273bbe8b4f6a4637340668c04503aad80f451ca9c5", size = 33126, upload-time = "2026-05-22T02:56:20.312Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/88/0a/04db32e598a37595ae5bd4908cb483818160ce1981e624353992107a30fd/nonebot_adapter_qq-1.7.2.tar.gz", hash = "sha256:07a2a1613def7a0d555597cf9103adf7934167d7f644172252fd69bb4a7f87fa", size = 34435, upload-time = "2026-08-09T08:24:15.241Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/44/ba/e9eb92190889c23126e902da7b5f393548429781fa4faef54aab98d4409e/nonebot_adapter_qq-1.7.1-py3-none-any.whl", hash = "sha256:9cd41d4ae56bc31b15681e3fdb63c599770dddf35fce381c232b9ec1b68f53f8", size = 37947, upload-time = "2026-05-22T02:56:19.336Z" },
+    { url = "https://files.pythonhosted.org/packages/8c/68/adcff2c5601d1e35e759b40018fc76aac05fb61481d91a744551a1c3d0fc/nonebot_adapter_qq-1.7.2-py3-none-any.whl", hash = "sha256:487aa6473c1c9874fe5ed088817589f7c6a09967b8ac468b29a48e41cce4f1e6", size = 39199, upload-time = "2026-08-09T08:24:13.833Z" },
 ]
 
 [[package]]
