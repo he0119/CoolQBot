@@ -104,7 +104,7 @@ def test_recommend_food(mocker: MockerFixture):
 def test_foods_have_unique_commons_files(app: App):
     from src.plugins.what_to_eat.data_source import FOODS
 
-    assert len(FOODS) == 60
+    assert len(FOODS) == 90
     assert len({food.name for food in FOODS}) == len(FOODS)
     assert len({food.commons_file for food in FOODS}) == len(FOODS)
     assert all(food.commons_file.startswith("File:") for food in FOODS)
