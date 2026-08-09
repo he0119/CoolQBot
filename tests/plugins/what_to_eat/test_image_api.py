@@ -41,15 +41,15 @@ def commons_response(thumbnail_url: str = THUMBNAIL_URL, mimetype: str = "image/
 
 
 @respx.mock
-async def test_search_food_image(app: App):
-    from src.plugins.what_to_eat.image_api import COMMONS_USER_AGENT, search_food_image
+async def test_get_food_image(app: App):
+    from src.plugins.what_to_eat.image_api import COMMONS_USER_AGENT, get_food_image
 
     search = respx.get(url__startswith=COMMONS_API_URL).mock(return_value=httpx.Response(200, json=commons_response()))
     thumbnail = respx.get(THUMBNAIL_URL).mock(
         return_value=httpx.Response(200, content=b"image", headers={"Content-Type": "image/jpeg"})
     )
 
-    image = await search_food_image("火锅")
+    image = await get_food_image("File:Hot pot dinner.jpg")
 
     assert image is not None
     assert image.content == b"image"
@@ -59,30 +59,30 @@ async def test_search_food_image(app: App):
     assert image.source_url == SOURCE_URL
     assert image.license_url == "https://creativecommons.org/licenses/by-sa/4.0/"
     assert search.calls[0].request.headers["User-Agent"] == COMMONS_USER_AGENT
-    assert search.calls[0].request.url.params["gsrsearch"] == "火锅"
-    assert search.calls[0].request.url.params["gsrnamespace"] == "6"
+    assert search.calls[0].request.url.params["titles"] == "File:Hot pot dinner.jpg"
+    assert search.calls[0].request.url.params["redirects"] == "1"
     assert search.calls[0].request.url.params["iiurlwidth"] == "640"
 
-    assert await search_food_image("火锅") is image
+    assert await get_food_image("File:Hot pot dinner.jpg") is image
     assert search.call_count == 1
     assert thumbnail.call_count == 1
 
 
 @respx.mock
-async def test_search_food_image_rejects_untrusted_thumbnail_host(app: App):
-    from src.plugins.what_to_eat.image_api import search_food_image
+async def test_get_food_image_rejects_untrusted_thumbnail_host(app: App):
+    from src.plugins.what_to_eat.image_api import get_food_image
 
     search = respx.get(url__startswith=COMMONS_API_URL).mock(
         return_value=httpx.Response(200, json=commons_response("https://example.com/image.jpg"))
     )
 
-    assert await search_food_image("火锅") is None
+    assert await get_food_image("File:Hot pot dinner.jpg") is None
     assert search.called
 
 
 @respx.mock
-async def test_search_food_image_rejects_oversized_image(app: App):
-    from src.plugins.what_to_eat.image_api import MAX_IMAGE_BYTES, search_food_image
+async def test_get_food_image_rejects_oversized_image(app: App):
+    from src.plugins.what_to_eat.image_api import MAX_IMAGE_BYTES, get_food_image
 
     respx.get(url__startswith=COMMONS_API_URL).mock(return_value=httpx.Response(200, json=commons_response()))
     respx.get(THUMBNAIL_URL).mock(
@@ -93,13 +93,13 @@ async def test_search_food_image_rejects_oversized_image(app: App):
         )
     )
 
-    assert await search_food_image("火锅") is None
+    assert await get_food_image("File:Hot pot dinner.jpg") is None
 
 
 @respx.mock
-async def test_search_food_image_falls_back_when_api_fails(app: App):
-    from src.plugins.what_to_eat.image_api import search_food_image
+async def test_get_food_image_falls_back_when_api_fails(app: App):
+    from src.plugins.what_to_eat.image_api import get_food_image
 
     respx.get(url__startswith=COMMONS_API_URL).mock(return_value=httpx.Response(503))
 
-    assert await search_food_image("火锅") is None
+    assert await get_food_image("File:Hot pot dinner.jpg") is None

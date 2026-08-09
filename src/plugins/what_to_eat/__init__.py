@@ -6,7 +6,7 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Image, MultiVar, Text, on_alconna
 
 from .data_source import recommend_food
-from .image_api import search_food_image
+from .image_api import get_food_image
 
 __plugin_meta__ = PluginMetadata(
     name="吃什么",
@@ -44,8 +44,8 @@ what_to_eat_cmd.shortcut(
 @what_to_eat_cmd.handle()
 async def what_to_eat_handle():
     food = recommend_food()
-    text = f"推荐你吃：{food}！"
-    image = await search_food_image(food)
+    text = f"推荐你吃：{food.name}！"
+    image = await get_food_image(food.commons_file)
     if not image:
         await what_to_eat_cmd.finish(text, at_sender=True)
 

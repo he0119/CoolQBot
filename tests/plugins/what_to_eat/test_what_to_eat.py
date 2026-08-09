@@ -18,9 +18,11 @@ from tests.fake import fake_group_message_event_v11
 )
 async def test_what_to_eat(app: App, mocker: MockerFixture, message: str):
     from src.plugins.what_to_eat import what_to_eat_cmd
+    from src.plugins.what_to_eat.data_source import Food
 
-    recommend_food = mocker.patch("src.plugins.what_to_eat.recommend_food", return_value="火锅")
-    search_food_image = mocker.patch("src.plugins.what_to_eat.search_food_image", return_value=None)
+    food = Food("火锅", "File:Hot pot dinner.jpg")
+    recommend_food = mocker.patch("src.plugins.what_to_eat.recommend_food", return_value=food)
+    get_food_image = mocker.patch("src.plugins.what_to_eat.get_food_image", return_value=None)
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -32,16 +34,18 @@ async def test_what_to_eat(app: App, mocker: MockerFixture, message: str):
         ctx.should_finished(what_to_eat_cmd)
 
     recommend_food.assert_called_once_with()
-    search_food_image.assert_awaited_once_with("火锅")
+    get_food_image.assert_awaited_once_with(food.commons_file)
 
 
 async def test_what_to_eat_with_image(app: App, mocker: MockerFixture):
     from src.plugins.what_to_eat import what_to_eat_cmd
+    from src.plugins.what_to_eat.data_source import Food
     from src.plugins.what_to_eat.image_api import FoodImage
 
-    mocker.patch("src.plugins.what_to_eat.recommend_food", return_value="火锅")
-    search_food_image = mocker.patch(
-        "src.plugins.what_to_eat.search_food_image",
+    food = Food("火锅", "File:Hot pot dinner.jpg")
+    mocker.patch("src.plugins.what_to_eat.recommend_food", return_value=food)
+    get_food_image = mocker.patch(
+        "src.plugins.what_to_eat.get_food_image",
         return_value=FoodImage(
             content=b"image",
             mimetype="image/jpeg",
@@ -72,7 +76,7 @@ async def test_what_to_eat_with_image(app: App, mocker: MockerFixture):
         )
         ctx.should_finished(what_to_eat_cmd)
 
-    search_food_image.assert_awaited_once_with("火锅")
+    get_food_image.assert_awaited_once_with(food.commons_file)
 
 
 async def test_what_to_eat_does_not_match_trailing_text(app: App):
@@ -88,9 +92,19 @@ async def test_what_to_eat_does_not_match_trailing_text(app: App):
 
 
 def test_recommend_food(mocker: MockerFixture):
-    from src.plugins.what_to_eat.data_source import FOODS, recommend_food
+    from src.plugins.what_to_eat.data_source import FOODS, Food, recommend_food
 
-    choice = mocker.patch("src.plugins.what_to_eat.data_source.choice", return_value="火锅")
+    food = Food("火锅", "File:Hot pot dinner.jpg")
+    choice = mocker.patch("src.plugins.what_to_eat.data_source.choice", return_value=food)
 
-    assert recommend_food() == "火锅"
+    assert recommend_food() == food
     choice.assert_called_once_with(FOODS)
+
+
+def test_foods_have_unique_commons_files(app: App):
+    from src.plugins.what_to_eat.data_source import FOODS
+
+    assert len(FOODS) == 60
+    assert len({food.name for food in FOODS}) == len(FOODS)
+    assert len({food.commons_file for food in FOODS}) == len(FOODS)
+    assert all(food.commons_file.startswith("File:") for food in FOODS)

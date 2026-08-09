@@ -15,7 +15,6 @@ COMMONS_USER_AGENT = "CoolQBot (+https://github.com/he0119/CoolQBot)"
 COMMONS_THUMBNAIL_HOST = "upload.wikimedia.org"
 COMMONS_PAGE_HOST = "commons.wikimedia.org"
 COMMONS_IMAGE_WIDTH = 640
-COMMONS_SEARCH_LIMIT = 5
 MAX_IMAGE_BYTES = 3 * 1024 * 1024
 IMAGE_CACHE_SIZE = 32
 SUPPORTED_IMAGE_TYPES = {"image/gif", "image/jpeg", "image/png", "image/webp"}
@@ -76,7 +75,7 @@ def _safe_license_url(value: str | None) -> str | None:
     return url if _is_https_url(url, SAFE_LICENSE_HOSTS) else None
 
 
-def _parse_search_result(payload: object) -> tuple[str, str, str, str, str, str | None] | None:
+def _parse_file_result(payload: object) -> tuple[str, str, str, str, str, str | None] | None:
     if not isinstance(payload, dict):
         return None
     query = payload.get("query")
@@ -90,11 +89,7 @@ def _parse_search_result(payload: object) -> tuple[str, str, str, str, str, str 
     else:
         return None
 
-    ordered_pages = sorted(
-        (page for page in page_values if isinstance(page, dict)),
-        key=lambda page: page.get("index", COMMONS_SEARCH_LIMIT + 1),
-    )
-    for page in ordered_pages:
+    for page in (page for page in page_values if isinstance(page, dict)):
         image_info = page.get("imageinfo")
         if not isinstance(image_info, list) or not image_info or not isinstance(image_info[0], dict):
             continue
@@ -136,25 +131,23 @@ async def _download_image(client: httpx.AsyncClient, url: str) -> tuple[bytes, s
         return bytes(content), mimetype
 
 
-def _cache_image(query: str, image: FoodImage) -> None:
-    _IMAGE_CACHE[query] = image
-    _IMAGE_CACHE.move_to_end(query)
+def _cache_image(file_title: str, image: FoodImage) -> None:
+    _IMAGE_CACHE[file_title] = image
+    _IMAGE_CACHE.move_to_end(file_title)
     while len(_IMAGE_CACHE) > IMAGE_CACHE_SIZE:
         _IMAGE_CACHE.popitem(last=False)
 
 
-async def search_food_image(query: str) -> FoodImage | None:
-    """搜索并下载一张 Wikimedia Commons 美食缩略图。"""
-    if cached := _IMAGE_CACHE.get(query):
-        _IMAGE_CACHE.move_to_end(query)
+async def get_food_image(file_title: str) -> FoodImage | None:
+    """按文件标题下载一张 Wikimedia Commons 美食缩略图。"""
+    if cached := _IMAGE_CACHE.get(file_title):
+        _IMAGE_CACHE.move_to_end(file_title)
         return cached
 
     params = {
         "action": "query",
-        "generator": "search",
-        "gsrsearch": query,
-        "gsrnamespace": 6,
-        "gsrlimit": COMMONS_SEARCH_LIMIT,
+        "titles": file_title,
+        "redirects": 1,
         "prop": "imageinfo",
         "iiprop": "url|mime|extmetadata",
         "iiurlwidth": COMMONS_IMAGE_WIDTH,
@@ -169,7 +162,7 @@ async def search_food_image(query: str) -> FoodImage | None:
         ) as client:
             response = await client.get(COMMONS_API_URL, params=params)
             response.raise_for_status()
-            result = _parse_search_result(response.json())
+            result = _parse_file_result(response.json())
             if not result:
                 return None
             thumbnail_url, expected_mimetype, creator, license_name, source_url, license_url = result
@@ -178,7 +171,7 @@ async def search_food_image(query: str) -> FoodImage | None:
                 return None
             content, mimetype = downloaded
             if mimetype != expected_mimetype:
-                logger.debug("Commons 美食图片格式与元数据不同：菜名={}，实际格式={}", query, mimetype)
+                logger.debug("Commons 美食图片格式与元数据不同：文件={}，实际格式={}", file_title, mimetype)
             image = FoodImage(
                 content=content,
                 mimetype=mimetype,
@@ -188,8 +181,8 @@ async def search_food_image(query: str) -> FoodImage | None:
                 license_url=license_url,
             )
     except (httpx.HTTPError, KeyError, TypeError, ValueError):
-        logger.warning("Commons 美食图片获取失败：菜名={}，回退为纯文字", query)
+        logger.warning("Commons 美食图片获取失败：文件={}，回退为纯文字", file_title)
         return None
 
-    _cache_image(query, image)
+    _cache_image(file_title, image)
     return image
