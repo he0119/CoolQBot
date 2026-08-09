@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 添加“xxxx吃啥/吃什么”自然语言命令，从 90 种美食中随机推荐，并在可用时附带人工挑选的 Wikimedia Commons 图片和署名
+
 ## [0.29.3] - 2026-08-06
 
 ### Added
