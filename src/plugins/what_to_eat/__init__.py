@@ -9,6 +9,8 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
 require("nonebot_plugin_localstore")
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Image, MultiVar, Subcommand, Text, on_alconna
+from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
+from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
 from src.utils.helpers import admin_permission
 from src.utils.remote_data import RemoteDataError
@@ -20,17 +22,18 @@ __plugin_meta__ = PluginMetadata(
     name="吃什么",
     description="随机推荐一种美食",
     usage="""随机推荐一种美食
-吃什么
+/吃什么
+/what_to_eat（Telegram）
 吃啥？
 今晚吃什么
 今天 中午吃啥？
-管理员更新美食数据：吃什么 update""",
+管理员更新美食数据：/吃什么 update 或 /what_to_eat update""",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
 )
 
 what_to_eat_cmd = on_alconna(
     Alconna(
-        "吃什么",
+        "what_to_eat",
         Subcommand("update", help_text="更新美食数据（仅管理员）"),
         Args["context?#场景", MultiVar(str, flag="+")],
         meta=CommandMeta(
@@ -38,12 +41,19 @@ what_to_eat_cmd = on_alconna(
             example=__plugin_meta__.usage,
         ),
     ),
-    use_cmd_start=False,
+    aliases={"吃什么"},
+    use_cmd_start=True,
     block=True,
+    extensions=[
+        TelegramSlashExtension(),
+        DiscordSlashExtension(name_localizations={"zh-CN": "吃什么"}),
+    ],
 )
 
+_command_prefix = next((prefix for prefix in what_to_eat_cmd.command().prefixes if isinstance(prefix, str)), "")
 what_to_eat_cmd.shortcut(
     re.compile(r"(?P<context>.*?)吃(?:啥|什么)[?？]?"),
+    command=f"{_command_prefix}what_to_eat",
     arguments=["{context}"],
     fuzzy=False,
     compact=False,

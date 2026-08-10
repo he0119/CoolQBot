@@ -22,6 +22,8 @@ async def clear_food_data(app: App, mocker: MockerFixture):
 @pytest.mark.parametrize(
     "message",
     [
+        "/what_to_eat",
+        "/吃什么",
         "吃什么",
         "吃啥？",
         "中午吃啥",
@@ -103,6 +105,22 @@ async def test_what_to_eat_does_not_match_trailing_text(app: App):
         ctx.should_not_pass_rule(what_to_eat_cmd)
 
 
+async def test_update_foods_data_requires_command_start(app: App, mocker: MockerFixture):
+    from src.plugins.what_to_eat import FOODS_DATA, what_to_eat_cmd
+
+    update = mocker.patch.object(FOODS_DATA, "update")
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+
+        event = fake_group_message_event_v11(message=Message("吃什么 update"))
+        ctx.receive_event(bot, event)
+        ctx.should_not_pass_rule(what_to_eat_cmd)
+
+    update.assert_not_awaited()
+
+
 async def test_recommend_food(mocker: MockerFixture):
     from src.plugins.what_to_eat.data_source import FOODS_DATA, Food, recommend_food
 
@@ -145,16 +163,17 @@ async def test_recommend_food_downloads_public_data(app: App, mocker: MockerFixt
 
 
 @pytest.mark.parametrize(
-    ("user_id", "message", "updated"),
+    ("user_id", "command", "message", "updated"),
     [
-        (10, "美食数据更新成功", True),
-        (10000, "该指令仅管理员可用", False),
+        (10, "/what_to_eat update", "美食数据更新成功", True),
+        (10000, "/吃什么 update", "该指令仅管理员可用", False),
     ],
 )
 async def test_update_foods_data(
     app: App,
     mocker: MockerFixture,
     user_id: int,
+    command: str,
     message: str,
     updated: bool,
 ):
@@ -166,7 +185,7 @@ async def test_update_foods_data(
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
-        event = fake_group_message_event_v11(message=Message("吃什么 update"), user_id=user_id)
+        event = fake_group_message_event_v11(message=Message(command), user_id=user_id)
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, message, "result", at_sender=True)
         ctx.should_finished(what_to_eat_cmd)
@@ -187,7 +206,7 @@ async def test_update_foods_data_failure(app: App, mocker: MockerFixture):
         adapter = get_adapter(Adapter)
         bot = ctx.create_bot(base=Bot, adapter=adapter)
 
-        event = fake_group_message_event_v11(message=Message("吃什么 update"))
+        event = fake_group_message_event_v11(message=Message("/what_to_eat update"))
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "美食数据更新失败，已保留原缓存", "result", at_sender=True)
         ctx.should_finished(what_to_eat_cmd)
