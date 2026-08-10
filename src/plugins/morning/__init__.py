@@ -8,6 +8,7 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
 require("nonebot_plugin_apscheduler")
 require("nonebot_plugin_datastore")
+require("nonebot_plugin_localstore")
 require("nonebot_plugin_orm")
 require("nonebot_plugin_saa")
 require("nonebot_plugin_alconna")

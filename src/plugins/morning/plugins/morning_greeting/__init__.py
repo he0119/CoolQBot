@@ -15,6 +15,7 @@ from sqlalchemy import select
 from src.plugins.morning import plugin_config
 from src.utils.annotated import AsyncSession
 from src.utils.helpers import admin_permission, strtobool
+from src.utils.remote_data import RemoteDataError
 
 from .data_source import HOLIDAYS_DATA, get_moring_message
 from .models import MorningGreeting
@@ -91,7 +92,11 @@ async def morning_handle(session: AsyncSession, arg: Match[str], target: Platfor
             await morning_cmd.finish(await get_moring_message())
 
         if arg.result == "update":
-            await HOLIDAYS_DATA.update()
+            try:
+                await HOLIDAYS_DATA.update()
+            except RemoteDataError as e:
+                logger.warning("节假日数据更新失败: {}", e)
+                await morning_cmd.finish("节假日数据更新失败，已保留原缓存")
             await morning_cmd.finish("节假日数据更新成功")
 
     group = (

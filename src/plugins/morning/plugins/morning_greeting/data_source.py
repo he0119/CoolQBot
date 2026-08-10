@@ -2,12 +2,11 @@ from datetime import date, timedelta
 from typing import TypedDict
 
 from dateutil import parser
-from nonebot_plugin_datastore import get_plugin_data
+from nonebot_plugin_localstore import get_cache_file
 
 from src.plugins.llm.tools import registry
 from src.utils.helpers import render_expression
-
-plugin_data = get_plugin_data()
+from src.utils.remote_data import RemoteJsonData
 
 
 class HolidayInfo(TypedDict):
@@ -33,11 +32,10 @@ def process_data(data: dict) -> dict:
     return holidays
 
 
-HOLIDAYS_DATA = plugin_data.network_file(
+HOLIDAYS_DATA = RemoteJsonData(
     "https://bot-docs.hehome.xyz/holidays.json",
-    "holidays.json",
+    lambda: get_cache_file("morning_greeting", "holidays.json"),
     process_data,
-    cache=True,
 )
 
 
