@@ -1,3 +1,5 @@
+import asyncio
+
 import httpx
 import pytest
 import respx
@@ -11,9 +13,10 @@ SOURCE_URL = "https://commons.wikimedia.org/wiki/File:Hot-pot.jpg"
 
 @pytest.fixture(autouse=True)
 async def clear_image_cache(app: App, mocker: MockerFixture):
-    from src.plugins.what_to_eat.image_api import _IMAGE_CACHE
+    from src.plugins.what_to_eat.image_api import _IMAGE_CACHE, _IMAGE_LOCKS
 
     mocker.patch.dict(_IMAGE_CACHE, clear=True)
+    mocker.patch.dict(_IMAGE_LOCKS, clear=True)
 
 
 def commons_response(thumbnail_url: str = THUMBNAIL_URL, mimetype: str = "image/jpeg") -> dict:
@@ -42,7 +45,9 @@ def commons_response(thumbnail_url: str = THUMBNAIL_URL, mimetype: str = "image/
 
 @respx.mock
 async def test_get_food_image(app: App):
-    from src.plugins.what_to_eat.image_api import COMMONS_USER_AGENT, get_food_image
+    import nonebot_plugin_localstore as store
+
+    from src.plugins.what_to_eat.image_api import COMMONS_USER_AGENT, _disk_cache_paths, get_food_image
 
     search = respx.get(url__startswith=COMMONS_API_URL).mock(return_value=httpx.Response(200, json=commons_response()))
     thumbnail = respx.get(THUMBNAIL_URL).mock(
@@ -64,8 +69,55 @@ async def test_get_food_image(app: App):
     assert search.calls[0].request.url.params["iiurlwidth"] == "640"
 
     assert await get_food_image("File:Hot pot dinner.jpg") is image
+    metadata_file, image_file = _disk_cache_paths("File:Hot pot dinner.jpg")
+    assert metadata_file.parent == store.BASE_CACHE_DIR / "what_to_eat" / "images"
+    assert metadata_file.is_file()
+    assert image_file.read_bytes() == b"image"
+
+    from src.plugins.what_to_eat.image_api import _IMAGE_CACHE
+
+    _IMAGE_CACHE.clear()
+    assert await get_food_image("File:Hot pot dinner.jpg") == image
     assert search.call_count == 1
     assert thumbnail.call_count == 1
+
+
+@respx.mock
+async def test_get_food_image_coalesces_concurrent_requests(app: App):
+    from src.plugins.what_to_eat.image_api import get_food_image
+
+    search = respx.get(url__startswith=COMMONS_API_URL).mock(return_value=httpx.Response(200, json=commons_response()))
+    thumbnail = respx.get(THUMBNAIL_URL).mock(
+        return_value=httpx.Response(200, content=b"image", headers={"Content-Type": "image/jpeg"})
+    )
+
+    images = await asyncio.gather(*(get_food_image("File:Hot pot dinner.jpg") for _ in range(5)))
+
+    assert all(image is images[0] for image in images)
+    assert search.call_count == 1
+    assert thumbnail.call_count == 1
+
+
+@respx.mock
+async def test_get_food_image_replaces_corrupted_disk_cache(app: App):
+    from src.plugins.what_to_eat.image_api import _IMAGE_CACHE, _disk_cache_paths, get_food_image
+
+    search = respx.get(url__startswith=COMMONS_API_URL).mock(return_value=httpx.Response(200, json=commons_response()))
+    thumbnail = respx.get(THUMBNAIL_URL).mock(
+        return_value=httpx.Response(200, content=b"image", headers={"Content-Type": "image/jpeg"})
+    )
+    assert await get_food_image("File:Hot pot dinner.jpg") is not None
+
+    _IMAGE_CACHE.clear()
+    _, image_file = _disk_cache_paths("File:Hot pot dinner.jpg")
+    image_file.write_bytes(b"corrupted")
+
+    image = await get_food_image("File:Hot pot dinner.jpg")
+
+    assert image is not None
+    assert image.content == b"image"
+    assert search.call_count == 2
+    assert thumbnail.call_count == 2
 
 
 @respx.mock

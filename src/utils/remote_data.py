@@ -2,14 +2,14 @@
 
 import asyncio
 import json
-import os
-import tempfile
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
 import httpx
 from nonebot.log import logger
+
+from src.utils.files import write_bytes_atomic
 
 DEFAULT_MAX_BYTES = 1024 * 1024
 DEFAULT_USER_AGENT = "CoolQBot (+https://github.com/he0119/CoolQBot)"
@@ -98,7 +98,7 @@ class RemoteJsonData[T]:
         try:
             content = await self._download()
             data = self._process_data(json.loads(content))
-            self._write_atomic(cache_file, content)
+            write_bytes_atomic(cache_file, content)
         except RemoteDataError:
             raise
         except Exception as e:
@@ -130,18 +130,3 @@ class RemoteJsonData[T]:
     def _check_size(self, size: int) -> None:
         if size > self._max_bytes:
             raise RemoteDataTooLargeError(f"远程数据超过 {self._max_bytes} 字节限制")
-
-    @staticmethod
-    def _write_atomic(cache_file: Path, content: bytes) -> None:
-        cache_file.parent.mkdir(parents=True, exist_ok=True)
-        temporary_path: Path | None = None
-        try:
-            with tempfile.NamedTemporaryFile(dir=cache_file.parent, prefix=f".{cache_file.name}.", delete=False) as f:
-                temporary_path = Path(f.name)
-                f.write(content)
-                f.flush()
-                os.fsync(f.fileno())
-            temporary_path.replace(cache_file)
-        finally:
-            if temporary_path is not None:
-                temporary_path.unlink(missing_ok=True)

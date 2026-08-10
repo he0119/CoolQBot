@@ -1,14 +1,22 @@
 """从 Wikimedia Commons 获取带授权信息的美食图片。"""
 
+import asyncio
+import contextlib
 import html
+import json
 import re
 from collections import OrderedDict
 from dataclasses import dataclass
+from hashlib import sha256
+from pathlib import Path
 from typing import TypeGuard
 from urllib.parse import urljoin, urlparse
 
 import httpx
 from nonebot import logger
+from nonebot_plugin_localstore import get_plugin_cache_dir
+
+from src.utils.files import write_bytes_atomic
 
 COMMONS_API_URL = "https://commons.wikimedia.org/w/api.php"
 COMMONS_USER_AGENT = "CoolQBot (+https://github.com/he0119/CoolQBot)"
@@ -17,11 +25,13 @@ COMMONS_PAGE_HOST = "commons.wikimedia.org"
 COMMONS_IMAGE_WIDTH = 640
 MAX_IMAGE_BYTES = 3 * 1024 * 1024
 IMAGE_CACHE_SIZE = 32
+IMAGE_DISK_CACHE_VERSION = 1
 SUPPORTED_IMAGE_TYPES = {"image/gif", "image/jpeg", "image/png", "image/webp"}
 SAFE_LICENSE_HOSTS = {"commons.wikimedia.org", "creativecommons.org", "www.gnu.org"}
 
 _HTML_TAG_PATTERN = re.compile(r"<[^>]+>")
 _IMAGE_CACHE: OrderedDict[str, "FoodImage"] = OrderedDict()
+_IMAGE_LOCKS: dict[str, asyncio.Lock] = {}
 
 
 @dataclass(frozen=True)
@@ -128,7 +138,7 @@ async def _download_image(client: httpx.AsyncClient, url: str) -> tuple[bytes, s
             content.extend(chunk)
             if len(content) > MAX_IMAGE_BYTES:
                 return None
-        return bytes(content), mimetype
+        return (bytes(content), mimetype) if content else None
 
 
 def _cache_image(file_title: str, image: FoodImage) -> None:
@@ -138,51 +148,146 @@ def _cache_image(file_title: str, image: FoodImage) -> None:
         _IMAGE_CACHE.popitem(last=False)
 
 
+def _disk_cache_paths(file_title: str) -> tuple[Path, Path]:
+    digest = sha256(file_title.encode()).hexdigest()
+    cache_dir = get_plugin_cache_dir() / "images"
+    return cache_dir / f"{digest}.json", cache_dir / f"{digest}.image"
+
+
+def _discard_disk_cache(metadata_file: Path, image_file: Path) -> None:
+    with contextlib.suppress(OSError):
+        metadata_file.unlink(missing_ok=True)
+    with contextlib.suppress(OSError):
+        image_file.unlink(missing_ok=True)
+
+
+def _load_disk_image(file_title: str) -> FoodImage | None:
+    metadata_file, image_file = _disk_cache_paths(file_title)
+    if not metadata_file.is_file() or not image_file.is_file():
+        _discard_disk_cache(metadata_file, image_file)
+        return None
+
+    try:
+        metadata = json.loads(metadata_file.read_bytes())
+        if not isinstance(metadata, dict):
+            raise ValueError("缓存元数据不是对象")
+        if metadata.get("version") != IMAGE_DISK_CACHE_VERSION or metadata.get("file_title") != file_title:
+            raise ValueError("缓存版本或文件标题不匹配")
+
+        mimetype = metadata.get("mimetype")
+        creator = metadata.get("creator")
+        license_name = metadata.get("license_name")
+        source_url = metadata.get("source_url")
+        license_url = metadata.get("license_url")
+        size = metadata.get("size")
+        content_hash = metadata.get("sha256")
+        if mimetype not in SUPPORTED_IMAGE_TYPES:
+            raise ValueError("缓存图片格式无效")
+        if not isinstance(creator, str) or not creator or len(creator) > 100:
+            raise ValueError("缓存作者信息无效")
+        if not isinstance(license_name, str) or not license_name or len(license_name) > 60:
+            raise ValueError("缓存许可名称无效")
+        if not _is_https_url(source_url, {COMMONS_PAGE_HOST}):
+            raise ValueError("缓存来源地址无效")
+        if license_url is not None and not _is_https_url(license_url, SAFE_LICENSE_HOSTS):
+            raise ValueError("缓存许可地址无效")
+        if not isinstance(size, int) or not 0 < size <= MAX_IMAGE_BYTES:
+            raise ValueError("缓存图片大小无效")
+        if not isinstance(content_hash, str) or len(content_hash) != 64:
+            raise ValueError("缓存图片哈希无效")
+
+        content = image_file.read_bytes()
+        if len(content) != size or sha256(content).hexdigest() != content_hash:
+            raise ValueError("缓存图片内容不完整")
+        return FoodImage(
+            content=content,
+            mimetype=mimetype,
+            creator=creator,
+            license_name=license_name,
+            source_url=source_url,
+            license_url=license_url,
+        )
+    except (json.JSONDecodeError, OSError, TypeError, ValueError) as e:
+        logger.warning("Commons 本地图片缓存损坏，将重新下载：文件={}，原因={}", file_title, e)
+        _discard_disk_cache(metadata_file, image_file)
+        return None
+
+
+def _store_disk_image(file_title: str, image: FoodImage) -> None:
+    metadata_file, image_file = _disk_cache_paths(file_title)
+    metadata = {
+        "version": IMAGE_DISK_CACHE_VERSION,
+        "file_title": file_title,
+        "mimetype": image.mimetype,
+        "creator": image.creator,
+        "license_name": image.license_name,
+        "source_url": image.source_url,
+        "license_url": image.license_url,
+        "size": len(image.content),
+        "sha256": sha256(image.content).hexdigest(),
+    }
+    write_bytes_atomic(image_file, image.content)
+    write_bytes_atomic(metadata_file, json.dumps(metadata, ensure_ascii=False, separators=(",", ":")).encode())
+
+
 async def get_food_image(file_title: str) -> FoodImage | None:
-    """按文件标题下载一张 Wikimedia Commons 美食缩略图。"""
+    """按文件标题获取一张 Wikimedia Commons 美食缩略图。"""
     if cached := _IMAGE_CACHE.get(file_title):
         _IMAGE_CACHE.move_to_end(file_title)
         return cached
 
-    params = {
-        "action": "query",
-        "titles": file_title,
-        "redirects": 1,
-        "prop": "imageinfo",
-        "iiprop": "url|mime|extmetadata",
-        "iiurlwidth": COMMONS_IMAGE_WIDTH,
-        "format": "json",
-        "formatversion": 2,
-    }
-    try:
-        async with httpx.AsyncClient(
-            headers={"User-Agent": COMMONS_USER_AGENT},
-            timeout=10,
-            follow_redirects=False,
-        ) as client:
-            response = await client.get(COMMONS_API_URL, params=params)
-            response.raise_for_status()
-            result = _parse_file_result(response.json())
-            if not result:
-                return None
-            thumbnail_url, expected_mimetype, creator, license_name, source_url, license_url = result
-            downloaded = await _download_image(client, thumbnail_url)
-            if not downloaded:
-                return None
-            content, mimetype = downloaded
-            if mimetype != expected_mimetype:
-                logger.debug("Commons 美食图片格式与元数据不同：文件={}，实际格式={}", file_title, mimetype)
-            image = FoodImage(
-                content=content,
-                mimetype=mimetype,
-                creator=creator,
-                license_name=license_name,
-                source_url=source_url,
-                license_url=license_url,
-            )
-    except (httpx.HTTPError, KeyError, TypeError, ValueError):
-        logger.warning("Commons 美食图片获取失败：文件={}，回退为纯文字", file_title)
-        return None
+    lock = _IMAGE_LOCKS.setdefault(file_title, asyncio.Lock())
+    async with lock:
+        if cached := _IMAGE_CACHE.get(file_title):
+            _IMAGE_CACHE.move_to_end(file_title)
+            return cached
+        if cached := _load_disk_image(file_title):
+            _cache_image(file_title, cached)
+            return cached
 
-    _cache_image(file_title, image)
-    return image
+        params = {
+            "action": "query",
+            "titles": file_title,
+            "redirects": 1,
+            "prop": "imageinfo",
+            "iiprop": "url|mime|extmetadata",
+            "iiurlwidth": COMMONS_IMAGE_WIDTH,
+            "format": "json",
+            "formatversion": 2,
+        }
+        try:
+            async with httpx.AsyncClient(
+                headers={"User-Agent": COMMONS_USER_AGENT},
+                timeout=10,
+                follow_redirects=False,
+            ) as client:
+                response = await client.get(COMMONS_API_URL, params=params)
+                response.raise_for_status()
+                result = _parse_file_result(response.json())
+                if not result:
+                    return None
+                thumbnail_url, expected_mimetype, creator, license_name, source_url, license_url = result
+                downloaded = await _download_image(client, thumbnail_url)
+                if not downloaded:
+                    return None
+                content, mimetype = downloaded
+                if mimetype != expected_mimetype:
+                    logger.debug("Commons 美食图片格式与元数据不同：文件={}，实际格式={}", file_title, mimetype)
+                image = FoodImage(
+                    content=content,
+                    mimetype=mimetype,
+                    creator=creator,
+                    license_name=license_name,
+                    source_url=source_url,
+                    license_url=license_url,
+                )
+        except (httpx.HTTPError, KeyError, TypeError, ValueError):
+            logger.warning("Commons 美食图片获取失败：文件={}，回退为纯文字", file_title)
+            return None
+
+        try:
+            _store_disk_image(file_title, image)
+        except OSError as e:
+            logger.warning("Commons 美食图片写入本地缓存失败：文件={}，原因={}", file_title, e)
+        _cache_image(file_title, image)
+        return image
