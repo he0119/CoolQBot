@@ -1,4 +1,5 @@
 import json
+from datetime import date
 from pathlib import Path
 
 import httpx
@@ -122,10 +123,10 @@ async def test_update_foods_data_requires_command_start(app: App, mocker: Mocker
 
 
 async def test_recommend_food(mocker: MockerFixture):
-    from src.plugins.what_to_eat.data_source import FOODS_DATA, Food, recommend_food
+    from src.plugins.what_to_eat.data_source import FOODS_DATA, Food, FoodDataset, recommend_food
 
     food = Food("火锅", "File:Hot pot dinner.jpg")
-    mocker.patch.object(FOODS_DATA, "_data", (food,))
+    mocker.patch.object(FOODS_DATA, "_data", FoodDataset(date(2026, 8, 11), (food,)))
     choice = mocker.patch("src.plugins.what_to_eat.data_source.choice", return_value=food)
 
     assert await recommend_food() == food
@@ -137,12 +138,25 @@ def test_public_foods_data(app: App):
 
     data_file = Path(__file__).parents[3] / "public" / "foods.json"
     data = json.loads(data_file.read_text(encoding="utf-8"))
-    foods = process_data(data)
+    dataset = process_data(data)
 
+    assert dataset.version == date(2026, 8, 11)
     assert len(data["categories"]) == 12
-    assert len(foods) == 90
-    assert len({food.name for food in foods}) == len(foods)
-    assert len({food.commons_file for food in foods}) == len(foods)
+    assert len(dataset.foods) == 90
+    assert len({food.name for food in dataset.foods}) == len(dataset.foods)
+    assert len({food.commons_file for food in dataset.foods}) == len(dataset.foods)
+
+
+@pytest.mark.parametrize("version", [1, "1", "2026/08/11", "2026-8-11"])
+def test_foods_data_rejects_invalid_version(app: App, version: object):
+    from src.plugins.what_to_eat.data_source import process_data
+
+    data_file = Path(__file__).parents[3] / "public" / "foods.json"
+    data = json.loads(data_file.read_text(encoding="utf-8"))
+    data["version"] = version
+
+    with pytest.raises(ValueError, match="美食数据版本"):
+        process_data(data)
 
 
 @respx.mock
@@ -165,7 +179,7 @@ async def test_recommend_food_downloads_public_data(app: App, mocker: MockerFixt
 @pytest.mark.parametrize(
     ("user_id", "command", "message", "updated"),
     [
-        (10, "/what_to_eat update", "美食数据更新成功", True),
+        (10, "/what_to_eat update", "美食数据更新成功，数据日期：2026-08-11", True),
         (10000, "/吃什么 update", "该指令仅管理员可用", False),
     ],
 )
@@ -178,8 +192,9 @@ async def test_update_foods_data(
     updated: bool,
 ):
     from src.plugins.what_to_eat import FOODS_DATA, what_to_eat_cmd
+    from src.plugins.what_to_eat.data_source import FoodDataset
 
-    update = mocker.patch.object(FOODS_DATA, "update")
+    update = mocker.patch.object(FOODS_DATA, "update", return_value=FoodDataset(date(2026, 8, 11), ()))
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)

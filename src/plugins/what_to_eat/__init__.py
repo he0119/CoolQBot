@@ -81,8 +81,8 @@ async def what_to_eat_update_handle(bot: Bot, event: Event):
         await what_to_eat_cmd.finish("该指令仅管理员可用", at_sender=True)
 
     try:
-        await FOODS_DATA.update()
+        dataset = await FOODS_DATA.update()
     except RemoteDataError as e:
         logger.warning("美食数据更新失败: {}", e)
         await what_to_eat_cmd.finish("美食数据更新失败，已保留原缓存", at_sender=True)
-    await what_to_eat_cmd.finish("美食数据更新成功", at_sender=True)
+    await what_to_eat_cmd.finish(f"美食数据更新成功，数据日期：{dataset.version.isoformat()}", at_sender=True)

@@ -1,6 +1,7 @@
 """随机美食推荐数据。"""
 
 from dataclasses import dataclass
+from datetime import date
 from random import choice
 
 from nonebot_plugin_localstore import get_cache_file
@@ -18,10 +19,28 @@ class Food:
     commons_file: str
 
 
-def process_data(data: object) -> tuple[Food, ...]:
+@dataclass(frozen=True)
+class FoodDataset:
+    """已校验的美食数据及其发布日期。"""
+
+    version: date
+    foods: tuple[Food, ...]
+
+
+def process_data(data: object) -> FoodDataset:
     """校验并展开按菜系分类的美食数据。"""
-    if not isinstance(data, dict) or data.get("version") != 1:
+    if not isinstance(data, dict):
         raise ValueError("不支持的美食数据格式")
+
+    version = data.get("version")
+    if not isinstance(version, str):
+        raise ValueError("美食数据版本必须是日期")
+    try:
+        version_date = date.fromisoformat(version)
+    except ValueError as e:
+        raise ValueError("美食数据版本必须是 YYYY-MM-DD 格式的日期") from e
+    if version_date.isoformat() != version:
+        raise ValueError("美食数据版本必须是 YYYY-MM-DD 格式的日期")
 
     categories = data.get("categories")
     if not isinstance(categories, list) or not categories:
@@ -49,7 +68,7 @@ def process_data(data: object) -> tuple[Food, ...]:
         raise ValueError("美食名称不能重复")
     if len({food.commons_file for food in foods}) != len(foods):
         raise ValueError("Wikimedia Commons 文件名不能重复")
-    return tuple(foods)
+    return FoodDataset(version=version_date, foods=tuple(foods))
 
 
 FOODS_DATA = RemoteJsonData(
@@ -61,5 +80,5 @@ FOODS_DATA = RemoteJsonData(
 
 async def recommend_food() -> Food:
     """从已缓存的远程数据中随机选择一种美食。"""
-    foods = await FOODS_DATA.data
-    return choice(foods)
+    dataset = await FOODS_DATA.data
+    return choice(dataset.foods)
