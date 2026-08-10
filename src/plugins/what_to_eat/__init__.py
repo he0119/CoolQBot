@@ -2,10 +2,18 @@
 
 import re
 
+from nonebot import require
+from nonebot.adapters import Bot, Event
+from nonebot.log import logger
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
-from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Image, MultiVar, Text, on_alconna
 
-from .data_source import recommend_food
+require("nonebot_plugin_localstore")
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Image, MultiVar, Subcommand, Text, on_alconna
+
+from src.utils.helpers import admin_permission
+from src.utils.remote_data import RemoteDataError
+
+from .data_source import FOODS_DATA, recommend_food
 from .image_api import get_food_image
 
 __plugin_meta__ = PluginMetadata(
@@ -15,13 +23,15 @@ __plugin_meta__ = PluginMetadata(
 吃什么
 吃啥？
 今晚吃什么
-今天 中午吃啥？""",
+今天 中午吃啥？
+管理员更新美食数据：吃什么 update""",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
 )
 
 what_to_eat_cmd = on_alconna(
     Alconna(
         "吃什么",
+        Subcommand("update", help_text="更新美食数据（仅管理员）"),
         Args["context?#场景", MultiVar(str, flag="+")],
         meta=CommandMeta(
             description=__plugin_meta__.description,
@@ -41,9 +51,9 @@ what_to_eat_cmd.shortcut(
 )
 
 
-@what_to_eat_cmd.handle()
+@what_to_eat_cmd.assign("$main")
 async def what_to_eat_handle():
-    food = recommend_food()
+    food = await recommend_food()
     text = f"推荐你吃：{food.name}！"
     image = await get_food_image(food.commons_file)
     if not image:
@@ -52,3 +62,17 @@ async def what_to_eat_handle():
     message = Text(f"{text}\n") + Image(raw=image.content, mimetype=image.mimetype)
     message += Text(f"\n{image.attribution}")
     await what_to_eat_cmd.finish(message, at_sender=True)
+
+
+@what_to_eat_cmd.assign("update")
+async def what_to_eat_update_handle(bot: Bot, event: Event):
+    """由管理员手动拉取 Pages 上的最新美食数据。"""
+    if not await admin_permission()(bot, event):
+        await what_to_eat_cmd.finish("该指令仅管理员可用", at_sender=True)
+
+    try:
+        await FOODS_DATA.update()
+    except RemoteDataError as e:
+        logger.warning("美食数据更新失败: {}", e)
+        await what_to_eat_cmd.finish("美食数据更新失败，已保留原缓存", at_sender=True)
+    await what_to_eat_cmd.finish("美食数据更新成功", at_sender=True)
