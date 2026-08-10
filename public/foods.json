@@ -237,14 +237,17 @@
       "foods": [
         {
           "name": "海南鸡饭",
-          "commons_file": "File:Home-cooked Hainanese chicken rice.jpg"
+          "commons_file": "File:Hainanese chicken rice.jpg"
         },
         { "name": "越南河粉", "commons_file": "File:Bowl of Meatball pho.jpg" },
         {
           "name": "冬阴功",
           "commons_file": "File:Tom Yum Koong Soup with Prawn and Straw Mushroom.jpg"
         },
-        { "name": "咖喱鸡", "commons_file": "File:A chicken curry dish.jpg" }
+        {
+          "name": "咖喱鸡",
+          "commons_file": "File:Red Curry with Chicken - Little Thai, Brighton 2024-03-01.jpg"
+        }
       ]
     },
     {
