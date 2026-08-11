@@ -2,7 +2,7 @@ from datetime import date, timedelta
 from typing import TypedDict
 
 from dateutil import parser
-from nonebot_plugin_localstore import get_cache_file
+from nonebot_plugin_localstore import get_plugin_cache_dir
 
 from src.plugins.llm.tools import registry
 from src.utils.helpers import render_expression
@@ -34,7 +34,7 @@ def process_data(data: dict) -> dict:
 
 HOLIDAYS_DATA = RemoteJsonData(
     "https://bot-docs.hehome.xyz/holidays.json",
-    lambda: get_cache_file("morning_greeting", "holidays.json"),
+    lambda: get_plugin_cache_dir() / "holidays.json",
     process_data,
 )
 

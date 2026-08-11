@@ -134,7 +134,9 @@ async def test_recommend_food(mocker: MockerFixture):
 
 
 def test_public_foods_data(app: App):
-    from src.plugins.what_to_eat.data_source import process_data
+    import nonebot_plugin_localstore as store
+
+    from src.plugins.what_to_eat.data_source import FOODS_DATA, process_data
 
     data_file = Path(__file__).parents[3] / "public" / "foods.json"
     data = json.loads(data_file.read_text(encoding="utf-8"))
@@ -145,6 +147,7 @@ def test_public_foods_data(app: App):
     assert len(dataset.foods) == 90
     assert len({food.name for food in dataset.foods}) == len(dataset.foods)
     assert len({food.commons_file for food in dataset.foods}) == len(dataset.foods)
+    assert FOODS_DATA.cache_file == store.BASE_CACHE_DIR / "what_to_eat" / "foods.json"
 
 
 @pytest.mark.parametrize("version", [1, "1", "2026/08/11", "2026-8-11"])

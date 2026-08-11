@@ -112,6 +112,8 @@ async def test_morning_disable(app: App):
 @respx.mock
 async def test_morning_today(app: App, mocker: MockerFixture):
     """测试每日早安，查询今日早安的情况"""
+    import nonebot_plugin_localstore as store
+
     from src.plugins.morning.plugins.morning_greeting import morning_cmd
     from src.plugins.morning.plugins.morning_greeting.data_source import EXPR_MORNING, HOLIDAYS_DATA
 
@@ -138,6 +140,7 @@ async def test_morning_today(app: App, mocker: MockerFixture):
 
     mocked_date.today.assert_called()
     assert request.call_count == 1
+    assert HOLIDAYS_DATA.cache_file == store.BASE_CACHE_DIR / "morning" / "morning_greeting" / "holidays.json"
     render_expression.assert_called_once_with(
         EXPR_MORNING,
         message="今天就是元旦，好好玩吧！",

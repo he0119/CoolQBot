@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - “吃什么”插件改为从站点获取并缓存美食数据，管理员可通过 `/吃什么 update` 独立刷新并查看数据日期，无需等待机器人版本更新
 - “吃什么”标准命令遵循命令前缀并支持 Telegram、Discord Slash Command，无前缀自然语言仍通过 shortcut 响应
-- 统一节假日、美食和 FFLogs 的远程 JSON 缓存；更新时会校验响应及数据、原子替换文件，并在失败时保留原缓存
+- 统一节假日、美食和 FFLogs 的远程 JSON 缓存并使用各插件的 localstore 缓存目录；更新时会校验响应及数据、原子替换文件，并在失败时保留原缓存
 - 将 Wikimedia Commons 美食图片及署名许可元数据持久化到 localstore 缓存目录，避免机器人重启后重复下载
 
 ## [0.29.4] - 2026-08-09

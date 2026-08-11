@@ -65,6 +65,14 @@ async def fflogs_job_rankings_empty(app: App) -> dict[str, Any]:
     return data
 
 
+def test_fflogs_data_cache_path(app: App):
+    import nonebot_plugin_localstore as store
+
+    from src.plugins.ff14.plugins.ff14_fflogs.data import FFLOGS_DATA
+
+    assert FFLOGS_DATA.cache_file == store.BASE_CACHE_DIR / "ff14" / "ff14_fflogs" / "fflogs_data.json"
+
+
 async def test_dps_help(app: App, mocker: MockerFixture):
     """测试 FFLOGS，返回帮助的情况"""
     from src.plugins.ff14.plugins.ff14_fflogs import (

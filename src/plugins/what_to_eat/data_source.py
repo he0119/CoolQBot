@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import date
 from random import choice
 
-from nonebot_plugin_localstore import get_cache_file
+from nonebot_plugin_localstore import get_plugin_cache_dir
 
 from src.utils.remote_data import RemoteJsonData
 
@@ -73,7 +73,7 @@ def process_data(data: object) -> FoodDataset:
 
 FOODS_DATA = RemoteJsonData(
     FOODS_DATA_URL,
-    lambda: get_cache_file("what_to_eat", "foods.json"),
+    lambda: get_plugin_cache_dir() / "foods.json",
     process_data,
 )
 

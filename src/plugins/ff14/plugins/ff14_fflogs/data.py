@@ -3,7 +3,7 @@
 副本与职业数据
 """
 
-from nonebot_plugin_localstore import get_cache_file
+from nonebot_plugin_localstore import get_plugin_cache_dir
 
 from src.utils.remote_data import RemoteJsonData
 
@@ -17,7 +17,7 @@ def parse_data(data: dict) -> FFlogsDataModel:
 
 FFLOGS_DATA = RemoteJsonData(
     "https://bot-docs.hehome.xyz/fflogs_data.json",
-    lambda: get_cache_file("ff14_fflogs", "fflogs_data.json"),
+    lambda: get_plugin_cache_dir() / "fflogs_data.json",
     parse_data,
 )
 
