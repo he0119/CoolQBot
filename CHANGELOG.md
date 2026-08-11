@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.29.5] - 2026-08-11
+
 ### Changed
 
 - 重构“吃什么”插件，支持独立刷新远程美食数据、跨平台正式命令、带署名的远程图片缓存与场景化回复，并统一远程 JSON 缓存逻辑
@@ -863,7 +865,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.4...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.5...HEAD
+[0.29.5]: https://github.com/he0119/CoolQBot/compare/v0.29.4...v0.29.5
 [0.29.4]: https://github.com/he0119/CoolQBot/compare/v0.29.3...v0.29.4
 [0.29.3]: https://github.com/he0119/CoolQBot/compare/v0.29.2...v0.29.3
 [0.29.2]: https://github.com/he0119/CoolQBot/compare/v0.29.1...v0.29.2
