@@ -44,7 +44,7 @@ def test_zssm_has_help_metadata(app: App):
     command = zssm_cmd.command()
     assert command.meta.description == "使用大模型解释回复或输入的文字、图片、网页与 PDF"
     assert command.meta.example == (
-        "回复一条消息并发送 zssm，可用 --model 临时指定模型、-a 启用联网工具，并在后面补充关注点"
+        "回复一条消息并发送 zssm，可用 --model 临时指定模型、-r 渲染图片、-a 启用联网工具，并在后面补充关注点"
     )
     help_text = command.get_help()
     assert command.meta.description in help_text
@@ -338,6 +338,51 @@ async def test_zssm_agent_option_enables_web_search(app: App, respx_mock: MockRo
     user_message = next(message for message in payload["messages"] if message["role"] == "user")
     user_data = json.loads(user_message["content"])
     assert user_data["target"] == "Python 3.14 新特性"
+
+
+@respx.mock(assert_all_called=True)
+async def test_zssm_render_option_sends_markdown_image(
+    app: App,
+    respx_mock: MockRouter,
+    zssm_model,
+    mocker,
+):
+    """-r 将本次解释渲染成图片，并保持回复关系。"""
+    rendered = b"\x89PNG\r\n\x1a\nrendered"
+    render_markdown = mocker.patch("src.plugins.llm.handler.try_render_markdown", return_value=rendered)
+    respx_mock.post("https://api.example.com/chat/completions").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "model": "test-model",
+                "choices": [
+                    {
+                        "finish_reason": "stop",
+                        "message": {
+                            "role": "assistant",
+                            "content": '{"output":"**图片解释**","keywords":[],"blocked":false}',
+                        },
+                    }
+                ],
+            },
+        )
+    )
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("zssm -r Python GIL"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            Message(MessageSegment.reply(1)) + MessageSegment.image(rendered),
+            True,
+        )
+
+    render_markdown.assert_awaited_once_with(
+        "**图片解释**\n\n---\n模型　test-model  \n统计　5.1s · 输入 0 · 输出 0 · 缓存 0 · 共 0"
+    )
 
 
 async def test_zssm_logs_provider_failure_as_warning(app: App, zssm_model, mocker):

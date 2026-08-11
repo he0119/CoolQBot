@@ -34,7 +34,7 @@ from .data_source import (
 __plugin_meta__ = PluginMetadata(
     name="这是什么",
     description="使用大模型解释回复或输入的文字、图片、网页与 PDF",
-    usage="回复一条消息并发送 zssm，可用 --model 临时指定模型、-a 启用联网工具，并在后面补充关注点",
+    usage="回复一条消息并发送 zssm，可用 --model 临时指定模型、-r 渲染图片、-a 启用联网工具，并在后面补充关注点",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
@@ -45,6 +45,7 @@ zssm_cmd = on_alconna(
         "zssm",
         Args["content?", AllParam],
         Option("--model", Args["model#模型名称", str], help_text="本次使用指定模型"),
+        Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
         Option("-a|--agent", default=False, action=store_true, help_text="启用联网搜索等工具"),
         meta=CommandMeta(
             description=__plugin_meta__.description,
@@ -68,6 +69,7 @@ async def zssm_handle(
     user: UserSession,
     content: Match[UniMessage],
     selected_model: Query[str] = Query("model.model"),
+    render: Query[bool] = Query("render.value", False),
     use_agent: Query[bool] = Query("agent.value", False),
 ) -> None:
     """收集被回复消息与关注点，并交给解释模式处理。"""
@@ -149,6 +151,7 @@ async def zssm_handle(
             model_name,
             system_prompt=SYSTEM_PROMPT,
             enable_tools=use_agent.result,
+            send_md_pic=render.result,
             show_thinking=False,
         )
         logger.info(
