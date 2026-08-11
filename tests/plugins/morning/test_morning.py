@@ -2,6 +2,8 @@ import json
 from datetime import date
 from pathlib import Path
 
+import httpx
+import respx
 from nonebot import get_adapter
 from nonebot.adapters.onebot.v11 import Adapter, Bot, Message
 from nonebug import App
@@ -10,27 +12,6 @@ from pytest_mock import MockerFixture
 from sqlalchemy import select
 
 from tests.fake import fake_group_message_event_v11
-
-
-def mocked_get(url: str, **kwargs):
-    class MockResponse:
-        def __init__(self, json: dict):
-            self._json = json
-
-        def json(self):
-            return self._json
-
-        @property
-        def content(self):
-            return json.dumps(self._json).encode("utf-8")
-
-    test_dir = Path(__file__).parent
-    if url == "https://bot-docs.hehome.xyz/holidays.json":
-        with open(test_dir / "holidays.json", encoding="utf-8") as f:
-            data = json.load(f)
-        return MockResponse(data)
-
-    return MockResponse({})
 
 
 async def test_morning_enabled(app: App):
@@ -128,14 +109,19 @@ async def test_morning_disable(app: App):
         assert len(groups) == 0
 
 
+@respx.mock
 async def test_morning_today(app: App, mocker: MockerFixture):
     """测试每日早安，查询今日早安的情况"""
+    import nonebot_plugin_localstore as store
+
     from src.plugins.morning.plugins.morning_greeting import morning_cmd
-    from src.plugins.morning.plugins.morning_greeting.data_source import EXPR_MORNING
+    from src.plugins.morning.plugins.morning_greeting.data_source import EXPR_MORNING, HOLIDAYS_DATA
 
     mocked_date = mocker.patch("src.plugins.morning.plugins.morning_greeting.data_source.date")
     mocked_date.today.return_value = date(2022, 1, 1)
-    get = mocker.patch("httpx.AsyncClient.get", side_effect=mocked_get)
+    HOLIDAYS_DATA.clear_memory_cache()
+    data = json.loads((Path(__file__).parent / "holidays.json").read_text(encoding="utf-8"))
+    request = respx.get("https://bot-docs.hehome.xyz/holidays.json").mock(return_value=httpx.Response(200, json=data))
     render_expression = mocker.patch("src.plugins.morning.plugins.morning_greeting.data_source.render_expression")
     render_expression.return_value = Message("test")
 
@@ -153,11 +139,28 @@ async def test_morning_today(app: App, mocker: MockerFixture):
         ctx.should_finished(morning_cmd)
 
     mocked_date.today.assert_called()
-    get.assert_called_once_with("https://bot-docs.hehome.xyz/holidays.json")
+    assert request.call_count == 1
+    assert HOLIDAYS_DATA.cache_file == store.BASE_CACHE_DIR / "morning" / "morning_greeting" / "holidays.json"
     render_expression.assert_called_once_with(
         EXPR_MORNING,
         message="今天就是元旦，好好玩吧！",
     )
+
+
+async def test_morning_update_failure(app: App, mocker: MockerFixture):
+    from src.plugins.morning.plugins.morning_greeting import HOLIDAYS_DATA, morning_cmd
+    from src.utils.remote_data import RemoteDataError
+
+    mocker.patch.object(HOLIDAYS_DATA, "update", side_effect=RemoteDataError("unavailable"))
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+
+        event = fake_group_message_event_v11(message=Message("/morning update"))
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "节假日数据更新失败，已保留原缓存", "result")
+        ctx.should_finished(morning_cmd)
 
 
 async def test_morning_push(app: App, mocker: MockerFixture):

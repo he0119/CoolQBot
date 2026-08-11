@@ -15,6 +15,7 @@ from nonebot_plugin_user import UserSession, get_user
 
 from src.utils.helpers import strtobool
 from src.utils.permission import is_superuser
+from src.utils.remote_data import RemoteDataError
 
 from .api import fflogs
 from .config import plugin_config
@@ -73,8 +74,11 @@ async def fflogs_handle(session: UserSession, argv: tuple[str | At, ...]):
         await fflogs_cmd.finish("对不起，Token 未设置，无法查询数据。\n请先在 .env 中配置好 Token 后再尝试查询数据。")
 
     if argv[0] == "update" and len(argv) == 1:
-        await FFLOGS_DATA.update()
-        data = await FFLOGS_DATA.data
+        try:
+            data = await FFLOGS_DATA.update()
+        except RemoteDataError as e:
+            logger.warning("副本数据更新失败: {}", e)
+            await fflogs_cmd.finish("副本数据更新失败，已保留原缓存。")
         await fflogs_cmd.finish(f"副本数据更新成功，当前版本为 {data.version}。")
 
     # 缓存相关设置

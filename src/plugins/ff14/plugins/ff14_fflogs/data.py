@@ -3,11 +3,11 @@
 副本与职业数据
 """
 
-from nonebot_plugin_datastore import get_plugin_data
+from nonebot_plugin_localstore import get_plugin_cache_dir
+
+from src.utils.remote_data import RemoteJsonData
 
 from .models import BossInfo, FFlogsDataModel, JobInfo
-
-plugin_data = get_plugin_data()
 
 
 def parse_data(data: dict) -> FFlogsDataModel:
@@ -15,11 +15,10 @@ def parse_data(data: dict) -> FFlogsDataModel:
     return FFlogsDataModel.model_validate(data)
 
 
-FFLOGS_DATA = plugin_data.network_file(
+FFLOGS_DATA = RemoteJsonData(
     "https://bot-docs.hehome.xyz/fflogs_data.json",
-    "fflogs_data.json",
+    lambda: get_plugin_cache_dir() / "fflogs_data.json",
     parse_data,
-    cache=True,
 )
 
 

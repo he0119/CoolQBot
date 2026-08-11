@@ -1,0 +1,688 @@
+{
+  "version": "2026-08-11",
+  "categories": [
+    {
+      "name": "川渝风味",
+      "foods": [
+        {
+          "name": "火锅",
+          "image": {
+            "provider": "commons",
+            "id": "File:Chengdu hot pot.jpg"
+          }
+        },
+        {
+          "name": "麻辣烫",
+          "image": {
+            "provider": "commons",
+            "id": "File:Malatang from Hope Tree (20220226172344).jpg"
+          }
+        },
+        {
+          "name": "冒菜",
+          "image": {
+            "provider": "commons",
+            "id": "File:传奇冒菜 1.jpg"
+          }
+        },
+        {
+          "name": "串串香",
+          "image": {
+            "provider": "openverse",
+            "id": "8e4f0401-a9ec-4a53-b521-eae1323d6ff7"
+          }
+        },
+        {
+          "name": "酸菜鱼",
+          "image": {
+            "provider": "commons",
+            "id": "File:酸菜鱼 Preserved Mustard Green with Fish - Charming Spice AUD24.80 (4104355401).jpg"
+          }
+        },
+        {
+          "name": "水煮肉片",
+          "image": {
+            "provider": "commons",
+            "id": "File:Shuizhu Roupian at Daqian Restaurant, Dachenglu (20260126131330).jpg"
+          }
+        },
+        {
+          "name": "烤鱼",
+          "image": {
+            "provider": "commons",
+            "id": "File:Grilled Fish with Douhua.jpg"
+          }
+        },
+        {
+          "name": "宫保鸡丁",
+          "image": {
+            "provider": "commons",
+            "id": "File:2016-08-14 Kung Pao Chicken dish in Beijing anagoria.jpg"
+          }
+        },
+        {
+          "name": "鱼香肉丝",
+          "image": {
+            "provider": "commons",
+            "id": "File:川菜鱼香肉丝.jpg"
+          }
+        },
+        {
+          "name": "回锅肉",
+          "image": {
+            "provider": "commons",
+            "id": "File:Twice cooked pork, Jia Yan, 5 rue Humblot, Paris 003.jpg"
+          }
+        },
+        {
+          "name": "口水鸡",
+          "image": {
+            "provider": "commons",
+            "id": "File:Koushuiji.jpg"
+          }
+        },
+        {
+          "name": "辣子鸡",
+          "image": {
+            "provider": "commons",
+            "id": "File:Làzijī (chicken with chilies).png"
+          }
+        },
+        {
+          "name": "担担面",
+          "image": {
+            "provider": "commons",
+            "id": "File:Dandan Noodles.jpg"
+          }
+        },
+        {
+          "name": "麻婆豆腐",
+          "image": {
+            "provider": "commons",
+            "id": "File:麻婆豆腐2024.jpg"
+          }
+        },
+        {
+          "name": "毛血旺",
+          "image": {
+            "provider": "commons",
+            "id": "File:Chongqing-style boiled blood curd (Mao Xuewang).jpg"
+          }
+        },
+        {
+          "name": "重庆小面",
+          "image": {
+            "provider": "commons",
+            "id": "File:重庆小面 - 2024-05-25.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "湘鄂风味",
+      "foods": [
+        {
+          "name": "小炒肉",
+          "image": {
+            "provider": "commons",
+            "id": "File:Lajiao Chaorou at Xiangzhongyuan Hunan Cuisine, Beijing (20240131171407).jpg"
+          }
+        },
+        {
+          "name": "剁椒鱼头",
+          "image": {
+            "provider": "commons",
+            "id": "File:Hunan cuisine, steamed fish head in chili sauce.jpg"
+          }
+        },
+        {
+          "name": "热干面",
+          "image": {
+            "provider": "commons",
+            "id": "File:Hot dry noodles.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "粤港澳及客家风味",
+      "foods": [
+        {
+          "name": "白切鸡",
+          "image": {
+            "provider": "commons",
+            "id": "File:HK SYP 西環 Sai Ying Pun 德輔道西 308 Des Voeux Road West 食神麗宮酒家 Chinese Banquet Seafood Restaurant food 海南 文昌 白切雞 Hainan Wenchang White Cut Chicken January 2026 N13P 03.jpg"
+          }
+        },
+        {
+          "name": "烧鹅",
+          "image": {
+            "provider": "commons",
+            "id": "File:Cantonese roasted goose.jpg"
+          }
+        },
+        {
+          "name": "叉烧",
+          "image": {
+            "provider": "commons",
+            "id": "File:Char siu, West Villa Restaurant, Hong Kong - 20160221.jpg"
+          }
+        },
+        {
+          "name": "梅菜扣肉",
+          "image": {
+            "provider": "commons",
+            "id": "File:11月17日 梅菜扣肉.jpg"
+          }
+        },
+        {
+          "name": "煲仔饭",
+          "image": {
+            "provider": "commons",
+            "id": "File:Claypot Chicken Rice, Singapore.JPG"
+          }
+        },
+        {
+          "name": "肠粉",
+          "image": {
+            "provider": "commons",
+            "id": "File:Dried shrimp rice noodle roll.jpg"
+          }
+        },
+        {
+          "name": "炒河粉",
+          "image": {
+            "provider": "commons",
+            "id": "File:Dry Fried Beef Ho Fun - Ho Chiak 2023-12-08.jpg"
+          }
+        },
+        {
+          "name": "云吞面",
+          "image": {
+            "provider": "commons",
+            "id": "File:Wonton egg noodle soup.jpg"
+          }
+        },
+        {
+          "name": "烧卖",
+          "image": {
+            "provider": "commons",
+            "id": "File:HK SW 上環 Sheung Wan 星月樓 Sky Cuisine Restaurant Friday morning 早餐 breakfast steamed 燒賣 siu mai 點心 dim sum March 2026 N13P 04.jpg"
+          }
+        },
+        {
+          "name": "蛋挞",
+          "image": {
+            "provider": "commons",
+            "id": "File:Portuguese egg tart in Macau.jpg"
+          }
+        },
+        {
+          "name": "粥",
+          "image": {
+            "provider": "commons",
+            "id": "File:A Bowl of Congee in Tuen Mun.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "江浙沪风味",
+      "foods": [
+        {
+          "name": "红烧肉",
+          "image": {
+            "provider": "commons",
+            "id": "File:Red braised pork belly.jpg"
+          }
+        },
+        {
+          "name": "东坡肉",
+          "image": {
+            "provider": "commons",
+            "id": "File:Dongpo pork garnished.jpg"
+          }
+        },
+        {
+          "name": "糖醋排骨",
+          "image": {
+            "provider": "commons",
+            "id": "File:糖醋排骨.JPG"
+          }
+        },
+        {
+          "name": "小笼包",
+          "image": {
+            "provider": "commons",
+            "id": "File:Xiao Long Bao by Junhao!.jpg"
+          }
+        },
+        {
+          "name": "生煎包",
+          "image": {
+            "provider": "commons",
+            "id": "File:Shengjian mantou.jpg"
+          }
+        },
+        {
+          "name": "葱油拌面",
+          "image": {
+            "provider": "commons",
+            "id": "File:葱花葱油拌面.jpg"
+          }
+        },
+        {
+          "name": "馄饨",
+          "image": {
+            "provider": "commons",
+            "id": "File:Wonton.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "华北及东北风味",
+      "foods": [
+        {
+          "name": "北京烤鸭",
+          "image": {
+            "provider": "commons",
+            "id": "File:2016-08-27 Peking Duck at Great Wall Restaurant Beijing anagoria.jpg"
+          }
+        },
+        {
+          "name": "炸酱面",
+          "image": {
+            "provider": "commons",
+            "id": "File:Zhajiangmian in Handan.jpg"
+          }
+        },
+        {
+          "name": "刀削面",
+          "image": {
+            "provider": "openverse",
+            "id": "70eba2cd-ffaa-4070-858d-db17e169e9a9"
+          }
+        },
+        {
+          "name": "饺子",
+          "image": {
+            "provider": "commons",
+            "id": "File:中国饺子（Jiaozi；Dumplings；餃子）.jpg"
+          }
+        },
+        {
+          "name": "包子",
+          "image": {
+            "provider": "commons",
+            "id": "File:Baozi.JPG"
+          }
+        },
+        {
+          "name": "锅贴",
+          "image": {
+            "provider": "commons",
+            "id": "File:Potstickers RTE.jpg"
+          }
+        },
+        {
+          "name": "煎饼果子",
+          "image": {
+            "provider": "commons",
+            "id": "File:Jianbing Guozi 20170610.jpg"
+          }
+        },
+        {
+          "name": "锅包肉",
+          "image": {
+            "provider": "commons",
+            "id": "File:Guōbāoròu.jpg"
+          }
+        },
+        {
+          "name": "烤冷面",
+          "image": {
+            "provider": "commons",
+            "id": "File:Grilled cold noodles (20241101).jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "西北风味",
+      "foods": [
+        {
+          "name": "牛肉面",
+          "image": {
+            "provider": "commons",
+            "id": "File:兰州牛肉面.jpg"
+          }
+        },
+        {
+          "name": "凉皮",
+          "image": {
+            "provider": "commons",
+            "id": "File:Liangpi.JPG"
+          }
+        },
+        {
+          "name": "肉夹馍",
+          "image": {
+            "provider": "commons",
+            "id": "File:Xi'an roujiamo 05.jpg"
+          }
+        },
+        {
+          "name": "烤羊肉串",
+          "image": {
+            "provider": "commons",
+            "id": "File:新疆羊肉串.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "广西及云南风味",
+      "foods": [
+        {
+          "name": "螺蛳粉",
+          "image": {
+            "provider": "commons",
+            "id": "File:Luosifen at Guangya, Liuzhou (20190420141814).jpg"
+          }
+        },
+        {
+          "name": "桂林米粉",
+          "image": {
+            "provider": "commons",
+            "id": "File:Guilin rice noodles in Beijing (20150915111711).jpg"
+          }
+        },
+        {
+          "name": "米线",
+          "image": {
+            "provider": "commons",
+            "id": "File:米线 Rice Noodles - 原味小吃 Yuanwei Xiaochi Y3.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "全国常见家常菜、快餐及街头小吃",
+      "foods": [
+        {
+          "name": "烤肉",
+          "image": {
+            "provider": "openverse",
+            "id": "09cfa4d3-87db-405a-858c-7504b31cf359"
+          }
+        },
+        {
+          "name": "番茄炒蛋",
+          "image": {
+            "provider": "openverse",
+            "id": "274f3029-f595-40d0-ad68-2edff610f4af"
+          }
+        },
+        {
+          "name": "黄焖鸡米饭",
+          "image": {
+            "provider": "commons",
+            "id": "File:黄焖鸡米饭.jpg"
+          }
+        },
+        {
+          "name": "盖浇饭",
+          "image": {
+            "provider": "commons",
+            "id": "File:Rice with 3 toppings at a food court in Fangcaodi (20210923124853).jpg"
+          }
+        },
+        {
+          "name": "炒饭",
+          "image": {
+            "provider": "commons",
+            "id": "File:Chinese fried rice.jpg"
+          }
+        },
+        {
+          "name": "烧烤",
+          "image": {
+            "provider": "commons",
+            "id": "File:Barbecue skewers.jpg"
+          }
+        },
+        {
+          "name": "糖醋里脊",
+          "image": {
+            "provider": "commons",
+            "id": "File:Sweet-and-sour pork.jpg"
+          }
+        },
+        {
+          "name": "可乐鸡翅",
+          "image": {
+            "provider": "commons",
+            "id": "File:可乐鸡翅.jpg"
+          }
+        },
+        {
+          "name": "红烧排骨",
+          "image": {
+            "provider": "commons",
+            "id": "File:红烧排骨 Braised Pork Ribs - Dainty Sichuan (2283778476).jpg"
+          }
+        },
+        {
+          "name": "春卷",
+          "image": {
+            "provider": "commons",
+            "id": "File:Golden Vegetable Spring Rolls Served with Dipping Sauce.jpg"
+          }
+        },
+        {
+          "name": "粽子",
+          "image": {
+            "provider": "commons",
+            "id": "File:Zongzi.jpg"
+          }
+        },
+        {
+          "name": "鸡排",
+          "image": {
+            "provider": "commons",
+            "id": "File:Chicken-cutlet.jpg"
+          }
+        },
+        {
+          "name": "烤红薯",
+          "image": {
+            "provider": "commons",
+            "id": "File:Ishi yaki imo by Kanko.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "日本料理",
+      "foods": [
+        {
+          "name": "咖喱饭",
+          "image": {
+            "provider": "commons",
+            "id": "File:日式咖喱饭.jpg"
+          }
+        },
+        {
+          "name": "寿司",
+          "image": {
+            "provider": "commons",
+            "id": "File:Sushi platter, Nikko, Japan.jpg"
+          }
+        },
+        {
+          "name": "日式拉面",
+          "image": {
+            "provider": "commons",
+            "id": "File:A bowl of ramen in Osaka, Japan.jpg"
+          }
+        },
+        {
+          "name": "章鱼烧",
+          "image": {
+            "provider": "commons",
+            "id": "File:Takoyaki at Macha Café.jpg"
+          }
+        },
+        {
+          "name": "乌冬面",
+          "image": {
+            "provider": "commons",
+            "id": "File:Bowl of Kitsune Udon.jpg"
+          }
+        },
+        {
+          "name": "天妇罗",
+          "image": {
+            "provider": "commons",
+            "id": "File:Tempura.JPG"
+          }
+        },
+        {
+          "name": "蛋包饭",
+          "image": {
+            "provider": "commons",
+            "id": "File:Omurice by Taimeiken.jpg"
+          }
+        },
+        {
+          "name": "关东煮",
+          "image": {
+            "provider": "commons",
+            "id": "File:Oden, Japanese food for winter.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "韩国料理",
+      "foods": [
+        {
+          "name": "石锅拌饭",
+          "image": {
+            "provider": "commons",
+            "id": "File:Bibimbap in stone bowl 비빔밥 (5534738694).jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "东南亚及南亚料理",
+      "foods": [
+        {
+          "name": "海南鸡饭",
+          "image": {
+            "provider": "commons",
+            "id": "File:Hainanese chicken rice.jpg"
+          }
+        },
+        {
+          "name": "越南河粉",
+          "image": {
+            "provider": "commons",
+            "id": "File:Bowl of Meatball pho.jpg"
+          }
+        },
+        {
+          "name": "冬阴功",
+          "image": {
+            "provider": "commons",
+            "id": "File:Tom Yum Koong Soup with Prawn and Straw Mushroom.jpg"
+          }
+        },
+        {
+          "name": "咖喱鸡",
+          "image": {
+            "provider": "commons",
+            "id": "File:Red Curry with Chicken - Little Thai, Brighton 2024-03-01.jpg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "欧美常见餐食",
+      "foods": [
+        {
+          "name": "汉堡",
+          "image": {
+            "provider": "commons",
+            "id": "File:NCI Visuals Food Hamburger.jpg"
+          }
+        },
+        {
+          "name": "披萨",
+          "image": {
+            "provider": "commons",
+            "id": "File:Vegetarian Pizza.jpg"
+          }
+        },
+        {
+          "name": "炸鸡",
+          "image": {
+            "provider": "commons",
+            "id": "File:Fried-Chicken-Set.jpg"
+          }
+        },
+        {
+          "name": "轻食沙拉",
+          "image": {
+            "provider": "openverse",
+            "id": "c8314f30-7bff-406f-b658-8d593ff80e0d"
+          }
+        },
+        {
+          "name": "意大利面",
+          "image": {
+            "provider": "commons",
+            "id": "File:Spaghetti bolognese.jpg"
+          }
+        },
+        {
+          "name": "牛排",
+          "image": {
+            "provider": "commons",
+            "id": "File:Steak-frites (steak-and-chips).jpg"
+          }
+        },
+        {
+          "name": "三明治",
+          "image": {
+            "provider": "openverse",
+            "id": "7ef1012f-52dd-4162-8c21-979a6455a604"
+          }
+        },
+        {
+          "name": "墨西哥卷饼",
+          "image": {
+            "provider": "commons",
+            "id": "File:(20251114) Chicken burrito 01.jpg"
+          }
+        },
+        {
+          "name": "薯条",
+          "image": {
+            "provider": "commons",
+            "id": "File:French Fries.JPG"
+          }
+        },
+        {
+          "name": "热狗",
+          "image": {
+            "provider": "commons",
+            "id": "File:Hot dog with mustard.png"
+          }
+        }
+      ]
+    }
+  ]
+}

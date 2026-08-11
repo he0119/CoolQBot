@@ -30,7 +30,7 @@ async def app(app: App):
         await session.execute(delete(User))
 
     # 清除缓存的数据
-    FFLOGS_DATA._data = None
+    FFLOGS_DATA.clear_memory_cache()
 
 
 @pytest.fixture
@@ -63,6 +63,14 @@ async def fflogs_job_rankings_empty(app: App) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as f:
         data = json.load(f)
     return data
+
+
+def test_fflogs_data_cache_path(app: App):
+    import nonebot_plugin_localstore as store
+
+    from src.plugins.ff14.plugins.ff14_fflogs.data import FFLOGS_DATA
+
+    assert FFLOGS_DATA.cache_file == store.BASE_CACHE_DIR / "ff14" / "ff14_fflogs" / "fflogs_data.json"
 
 
 async def test_dps_help(app: App, mocker: MockerFixture):
@@ -387,6 +395,23 @@ async def test_dps_update_data(
         ctx.should_finished(fflogs_cmd)
 
     assert fflogs_data_mock.call_count == 1
+
+
+async def test_dps_update_data_failure(app: App, mocker: MockerFixture):
+    from src.plugins.ff14.plugins.ff14_fflogs import FFLOGS_DATA, fflogs_cmd, plugin_config
+    from src.utils.remote_data import RemoteDataError
+
+    mocker.patch.object(plugin_config, "fflogs_token", "test")
+    mocker.patch.object(FFLOGS_DATA, "update", side_effect=RemoteDataError("unavailable"))
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/dps update"))
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(event, "副本数据更新失败，已保留原缓存。", True)
+        ctx.should_finished(fflogs_cmd)
 
 
 @respx.mock(assert_all_called=True)
