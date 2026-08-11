@@ -8,7 +8,7 @@ from nonebot.log import logger
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
 require("nonebot_plugin_localstore")
-from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Image, MultiVar, Subcommand, Text, on_alconna
+from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Image, Match, MultiVar, Subcommand, Text, on_alconna
 from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
 from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
@@ -62,9 +62,10 @@ what_to_eat_cmd.shortcut(
 
 
 @what_to_eat_cmd.assign("$main")
-async def what_to_eat_handle():
+async def what_to_eat_handle(context: Match[tuple[str, ...]]):
     food = await recommend_food()
-    text = f"推荐你吃：{food.name}！"
+    scene = "".join(context.result).strip() if context.available else ""
+    text = f"{scene}吃{food.name}！" if scene else f"推荐你吃：{food.name}！"
     image = await get_food_image(food.image)
     if not image:
         await what_to_eat_cmd.finish(text, at_sender=True)

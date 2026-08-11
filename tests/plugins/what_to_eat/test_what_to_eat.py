@@ -21,17 +21,18 @@ async def clear_food_data(app: App, mocker: MockerFixture):
 
 
 @pytest.mark.parametrize(
-    "message",
+    ("message", "expected"),
     [
-        "/what_to_eat",
-        "/吃什么",
-        "吃什么",
-        "吃啥？",
-        "中午吃啥",
-        "今天 中午吃什么？",
+        ("/what_to_eat", "推荐你吃：火锅！"),
+        ("/吃什么", "推荐你吃：火锅！"),
+        ("吃什么", "推荐你吃：火锅！"),
+        ("吃啥？", "推荐你吃：火锅！"),
+        ("中午吃啥", "中午吃火锅！"),
+        ("今晚吃什么？", "今晚吃火锅！"),
+        ("今天 中午吃什么？", "今天中午吃火锅！"),
     ],
 )
-async def test_what_to_eat(app: App, mocker: MockerFixture, message: str):
+async def test_what_to_eat(app: App, mocker: MockerFixture, message: str, expected: str):
     from src.plugins.what_to_eat import what_to_eat_cmd
     from src.plugins.what_to_eat.data_source import Food, FoodImageRef
 
@@ -45,7 +46,7 @@ async def test_what_to_eat(app: App, mocker: MockerFixture, message: str):
 
         event = fake_group_message_event_v11(message=Message(message))
         ctx.receive_event(bot, event)
-        ctx.should_call_send(event, "推荐你吃：火锅！", "result", at_sender=True)
+        ctx.should_call_send(event, expected, "result", at_sender=True)
         ctx.should_finished(what_to_eat_cmd)
 
     recommend_food.assert_awaited_once_with()
@@ -80,7 +81,7 @@ async def test_what_to_eat_with_image(app: App, mocker: MockerFixture):
         ctx.should_call_send(
             event,
             MessageSegment.at(10)
-            + MessageSegment.text("推荐你吃：火锅！\n")
+            + MessageSegment.text("今晚吃火锅！\n")
             + MessageSegment.image(b"image")
             + MessageSegment.text(
                 "\n图片：测试作者｜CC BY-SA 4.0\n"
