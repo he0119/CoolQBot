@@ -33,9 +33,9 @@ async def clear_food_data(app: App, mocker: MockerFixture):
 )
 async def test_what_to_eat(app: App, mocker: MockerFixture, message: str):
     from src.plugins.what_to_eat import what_to_eat_cmd
-    from src.plugins.what_to_eat.data_source import Food
+    from src.plugins.what_to_eat.data_source import Food, FoodImageRef
 
-    food = Food("火锅", "File:Chengdu hot pot.jpg")
+    food = Food("火锅", FoodImageRef("commons", "File:Chengdu hot pot.jpg"))
     recommend_food = mocker.patch("src.plugins.what_to_eat.recommend_food", return_value=food)
     get_food_image = mocker.patch("src.plugins.what_to_eat.get_food_image", return_value=None)
 
@@ -49,15 +49,15 @@ async def test_what_to_eat(app: App, mocker: MockerFixture, message: str):
         ctx.should_finished(what_to_eat_cmd)
 
     recommend_food.assert_awaited_once_with()
-    get_food_image.assert_awaited_once_with(food.commons_file)
+    get_food_image.assert_awaited_once_with(food.image)
 
 
 async def test_what_to_eat_with_image(app: App, mocker: MockerFixture):
     from src.plugins.what_to_eat import what_to_eat_cmd
-    from src.plugins.what_to_eat.data_source import Food
+    from src.plugins.what_to_eat.data_source import Food, FoodImageRef
     from src.plugins.what_to_eat.image_api import FoodImage
 
-    food = Food("火锅", "File:Chengdu hot pot.jpg")
+    food = Food("火锅", FoodImageRef("commons", "File:Chengdu hot pot.jpg"))
     mocker.patch("src.plugins.what_to_eat.recommend_food", return_value=food)
     get_food_image = mocker.patch(
         "src.plugins.what_to_eat.get_food_image",
@@ -91,7 +91,7 @@ async def test_what_to_eat_with_image(app: App, mocker: MockerFixture):
         )
         ctx.should_finished(what_to_eat_cmd)
 
-    get_food_image.assert_awaited_once_with(food.commons_file)
+    get_food_image.assert_awaited_once_with(food.image)
 
 
 async def test_what_to_eat_does_not_match_trailing_text(app: App):
@@ -123,9 +123,9 @@ async def test_update_foods_data_requires_command_start(app: App, mocker: Mocker
 
 
 async def test_recommend_food(mocker: MockerFixture):
-    from src.plugins.what_to_eat.data_source import FOODS_DATA, Food, FoodDataset, recommend_food
+    from src.plugins.what_to_eat.data_source import FOODS_DATA, Food, FoodDataset, FoodImageRef, recommend_food
 
-    food = Food("火锅", "File:Chengdu hot pot.jpg")
+    food = Food("火锅", FoodImageRef("commons", "File:Chengdu hot pot.jpg"))
     mocker.patch.object(FOODS_DATA, "_data", FoodDataset(date(2026, 8, 11), (food,)))
     choice = mocker.patch("src.plugins.what_to_eat.data_source.choice", return_value=food)
 
@@ -141,25 +141,65 @@ def test_public_foods_data(app: App):
     data_file = Path(__file__).parents[3] / "public" / "foods.json"
     data = json.loads(data_file.read_text(encoding="utf-8"))
     dataset = process_data(data)
+    raw_foods = [food for category in data["categories"] for food in category["foods"]]
 
     assert dataset.version == date(2026, 8, 11)
     assert len(data["categories"]) == 12
     expected_images = {
-        "火锅": "File:Chengdu hot pot.jpg",
-        "串串香": "File:Fried Chuan.jpg",
-        "刀削面": "File:Daoxiaomian at Beixinqiao, Beijing (20201011183536).jpg",
-        "烤肉": "File:Smoky grilled pork and dodo.jpg",
-        "番茄炒蛋": "File:番茄炒蛋2.PNG",
-        "轻食沙拉": "File:Healthy Lentil Salad (Unsplash).jpg",
-        "三明治": "File:Club sandwich at Café Picnic.jpg",
+        "火锅": ("commons", "File:Chengdu hot pot.jpg"),
+        "串串香": ("openverse", "8e4f0401-a9ec-4a53-b521-eae1323d6ff7"),
+        "刀削面": ("openverse", "70eba2cd-ffaa-4070-858d-db17e169e9a9"),
+        "烤肉": ("openverse", "09cfa4d3-87db-405a-858c-7504b31cf359"),
+        "番茄炒蛋": ("openverse", "274f3029-f595-40d0-ad68-2edff610f4af"),
+        "轻食沙拉": ("openverse", "c8314f30-7bff-406f-b658-8d593ff80e0d"),
+        "三明治": ("openverse", "7ef1012f-52dd-4162-8c21-979a6455a604"),
     }
 
     assert len(dataset.foods) == 89
+    assert all("image" in food and "commons_file" not in food for food in raw_foods)
+    assert sum(food.image.provider == "commons" for food in dataset.foods) == 83
+    assert sum(food.image.provider == "openverse" for food in dataset.foods) == 6
     assert len({food.name for food in dataset.foods}) == len(dataset.foods)
-    assert len({food.commons_file for food in dataset.foods}) == len(dataset.foods)
+    assert len({food.image.cache_key for food in dataset.foods}) == len(dataset.foods)
     assert "自选菜" not in {food.name for food in dataset.foods}
-    assert {food.name: food.commons_file for food in dataset.foods if food.name in expected_images} == expected_images
+    assert {
+        food.name: (food.image.provider, food.image.id) for food in dataset.foods if food.name in expected_images
+    } == expected_images
     assert FOODS_DATA.cache_file == store.BASE_CACHE_DIR / "what_to_eat" / "foods.json"
+
+
+def test_foods_data_rejects_invalid_openverse_id(app: App):
+    from src.plugins.what_to_eat.data_source import process_data
+
+    data = {
+        "version": "2026-08-11",
+        "categories": [
+            {
+                "name": "测试",
+                "foods": [{"name": "测试菜", "image": {"provider": "openverse", "id": "not-a-uuid"}}],
+            }
+        ],
+    }
+
+    with pytest.raises(ValueError, match="Openverse 图片 ID"):
+        process_data(data)
+
+
+def test_foods_data_rejects_legacy_commons_file(app: App):
+    from src.plugins.what_to_eat.data_source import process_data
+
+    data = {
+        "version": "2026-08-11",
+        "categories": [
+            {
+                "name": "测试",
+                "foods": [{"name": "测试菜", "commons_file": "File:Test.jpg"}],
+            }
+        ],
+    }
+
+    with pytest.raises(ValueError, match="图片格式错误"):
+        process_data(data)
 
 
 @pytest.mark.parametrize("version", [1, "1", "2026/08/11", "2026-8-11"])

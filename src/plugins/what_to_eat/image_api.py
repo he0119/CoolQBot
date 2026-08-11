@@ -1,4 +1,4 @@
-"""从 Wikimedia Commons 获取带授权信息的美食图片。"""
+"""从受支持的开放图片来源获取带授权信息的美食图片。"""
 
 import asyncio
 import contextlib
@@ -18,18 +18,29 @@ from nonebot_plugin_localstore import get_plugin_cache_dir
 
 from src.utils.files import write_bytes_atomic
 
+from .data_source import FoodImageRef
+
 COMMONS_API_URL = "https://commons.wikimedia.org/w/api.php"
-COMMONS_USER_AGENT = "CoolQBot (+https://github.com/he0119/CoolQBot)"
+OPENVERSE_API_URL = "https://api.openverse.org/v1/images"
+IMAGE_USER_AGENT = "CoolQBot (+https://github.com/he0119/CoolQBot)"
 COMMONS_THUMBNAIL_HOST = "upload.wikimedia.org"
 COMMONS_PAGE_HOST = "commons.wikimedia.org"
+OPENVERSE_API_HOST = "api.openverse.org"
 COMMONS_IMAGE_WIDTH = 640
 MAX_IMAGE_BYTES = 3 * 1024 * 1024
 IMAGE_CACHE_SIZE = 32
-IMAGE_DISK_CACHE_VERSION = 1
+IMAGE_DISK_CACHE_VERSION = 2
 SUPPORTED_IMAGE_TYPES = {"image/gif", "image/jpeg", "image/png", "image/webp"}
 SAFE_LICENSE_HOSTS = {"commons.wikimedia.org", "creativecommons.org", "www.gnu.org"}
+OPENVERSE_LICENSE_NAMES = {
+    "by": "CC BY",
+    "by-sa": "CC BY-SA",
+    "cc0": "CC0",
+    "pdm": "Public Domain Mark",
+}
 
 _HTML_TAG_PATTERN = re.compile(r"<[^>]+>")
+_LICENSE_VERSION_PATTERN = re.compile(r"\d+(?:\.\d+)?")
 _IMAGE_CACHE: OrderedDict[str, "FoodImage"] = OrderedDict()
 _IMAGE_LOCKS: dict[str, asyncio.Lock] = {}
 
@@ -54,6 +65,16 @@ class FoodImage:
         return "\n".join(lines)
 
 
+@dataclass(frozen=True)
+class _ResolvedImage:
+    thumbnail_url: str
+    expected_mimetype: str | None
+    creator: str
+    license_name: str
+    source_url: str
+    license_url: str | None
+
+
 def _plain_text(value: object, default: str, max_length: int) -> str:
     if not isinstance(value, str):
         return default
@@ -71,11 +92,17 @@ def _metadata_value(metadata: object, key: str) -> str | None:
     return value if isinstance(value, str) else None
 
 
-def _is_https_url(url: object, allowed_hosts: set[str]) -> TypeGuard[str]:
-    if not isinstance(url, str):
+def _is_https_url(url: object, allowed_hosts: set[str] | None = None) -> TypeGuard[str]:
+    if not isinstance(url, str) or len(url) > 2048:
         return False
     parsed = urlparse(url)
-    return parsed.scheme == "https" and parsed.hostname in allowed_hosts and not parsed.username and not parsed.password
+    return (
+        parsed.scheme == "https"
+        and parsed.hostname is not None
+        and (allowed_hosts is None or parsed.hostname in allowed_hosts)
+        and not parsed.username
+        and not parsed.password
+    )
 
 
 def _safe_license_url(value: str | None) -> str | None:
@@ -85,7 +112,7 @@ def _safe_license_url(value: str | None) -> str | None:
     return url if _is_https_url(url, SAFE_LICENSE_HOSTS) else None
 
 
-def _parse_file_result(payload: object) -> tuple[str, str, str, str, str, str | None] | None:
+def _parse_commons_result(payload: object) -> _ResolvedImage | None:
     if not isinstance(payload, dict):
         return None
     query = payload.get("query")
@@ -115,10 +142,66 @@ def _parse_file_result(payload: object) -> tuple[str, str, str, str, str, str | 
             continue
 
         metadata = info.get("extmetadata")
-        creator = _plain_text(_metadata_value(metadata, "Artist"), "未知作者", 100)
-        license_name = _plain_text(_metadata_value(metadata, "LicenseShortName"), "授权信息见来源页", 60)
-        license_url = _safe_license_url(_metadata_value(metadata, "LicenseUrl"))
-        return thumbnail_url, mimetype, creator, license_name, source_url, license_url
+        return _ResolvedImage(
+            thumbnail_url=thumbnail_url,
+            expected_mimetype=mimetype,
+            creator=_plain_text(_metadata_value(metadata, "Artist"), "未知作者", 100),
+            license_name=_plain_text(_metadata_value(metadata, "LicenseShortName"), "授权信息见来源页", 60),
+            source_url=source_url,
+            license_url=_safe_license_url(_metadata_value(metadata, "LicenseUrl")),
+        )
+    return None
+
+
+def _parse_openverse_result(payload: object, image_id: str) -> _ResolvedImage | None:
+    if not isinstance(payload, dict) or payload.get("id") != image_id:
+        return None
+
+    license_code = payload.get("license")
+    license_version = payload.get("license_version")
+    license_url = payload.get("license_url")
+    source_url = payload.get("foreign_landing_url")
+    if not isinstance(license_code, str) or license_code not in OPENVERSE_LICENSE_NAMES:
+        return None
+    if not isinstance(license_version, str) or not _LICENSE_VERSION_PATTERN.fullmatch(license_version):
+        return None
+    if not _is_https_url(license_url, {"creativecommons.org"}):
+        return None
+    if not _is_https_url(source_url):
+        return None
+
+    thumbnail_url = f"{OPENVERSE_API_URL}/{image_id}/thumb/"
+    if not _is_https_url(thumbnail_url, {OPENVERSE_API_HOST}):
+        return None
+    return _ResolvedImage(
+        thumbnail_url=thumbnail_url,
+        expected_mimetype=None,
+        creator=_plain_text(payload.get("creator"), "未知作者", 100),
+        license_name=f"{OPENVERSE_LICENSE_NAMES[license_code]} {license_version}",
+        source_url=source_url,
+        license_url=license_url,
+    )
+
+
+async def _resolve_image(client: httpx.AsyncClient, source: FoodImageRef) -> _ResolvedImage | None:
+    if source.provider == "commons":
+        params = {
+            "action": "query",
+            "titles": source.id,
+            "redirects": 1,
+            "prop": "imageinfo",
+            "iiprop": "url|mime|extmetadata",
+            "iiurlwidth": COMMONS_IMAGE_WIDTH,
+            "format": "json",
+            "formatversion": 2,
+        }
+        response = await client.get(COMMONS_API_URL, params=params)
+        response.raise_for_status()
+        return _parse_commons_result(response.json())
+    if source.provider == "openverse":
+        response = await client.get(f"{OPENVERSE_API_URL}/{source.id}/")
+        response.raise_for_status()
+        return _parse_openverse_result(response.json(), source.id)
     return None
 
 
@@ -141,15 +224,15 @@ async def _download_image(client: httpx.AsyncClient, url: str) -> tuple[bytes, s
         return (bytes(content), mimetype) if content else None
 
 
-def _cache_image(file_title: str, image: FoodImage) -> None:
-    _IMAGE_CACHE[file_title] = image
-    _IMAGE_CACHE.move_to_end(file_title)
+def _cache_image(cache_key: str, image: FoodImage) -> None:
+    _IMAGE_CACHE[cache_key] = image
+    _IMAGE_CACHE.move_to_end(cache_key)
     while len(_IMAGE_CACHE) > IMAGE_CACHE_SIZE:
         _IMAGE_CACHE.popitem(last=False)
 
 
-def _disk_cache_paths(file_title: str) -> tuple[Path, Path]:
-    digest = sha256(file_title.encode()).hexdigest()
+def _disk_cache_paths(source: FoodImageRef) -> tuple[Path, Path]:
+    digest = sha256(source.cache_key.encode()).hexdigest()
     cache_dir = get_plugin_cache_dir() / "images"
     return cache_dir / f"{digest}.json", cache_dir / f"{digest}.image"
 
@@ -161,8 +244,14 @@ def _discard_disk_cache(metadata_file: Path, image_file: Path) -> None:
         image_file.unlink(missing_ok=True)
 
 
-def _load_disk_image(file_title: str) -> FoodImage | None:
-    metadata_file, image_file = _disk_cache_paths(file_title)
+def _is_valid_source_url(source: FoodImageRef, source_url: str) -> bool:
+    if source.provider == "commons":
+        return _is_https_url(source_url, {COMMONS_PAGE_HOST})
+    return source.provider == "openverse" and _is_https_url(source_url)
+
+
+def _load_disk_image(source: FoodImageRef) -> FoodImage | None:
+    metadata_file, image_file = _disk_cache_paths(source)
     if not metadata_file.is_file() or not image_file.is_file():
         _discard_disk_cache(metadata_file, image_file)
         return None
@@ -171,8 +260,12 @@ def _load_disk_image(file_title: str) -> FoodImage | None:
         metadata = json.loads(metadata_file.read_bytes())
         if not isinstance(metadata, dict):
             raise ValueError("缓存元数据不是对象")
-        if metadata.get("version") != IMAGE_DISK_CACHE_VERSION or metadata.get("file_title") != file_title:
-            raise ValueError("缓存版本或文件标题不匹配")
+        if (
+            metadata.get("version") != IMAGE_DISK_CACHE_VERSION
+            or metadata.get("provider") != source.provider
+            or metadata.get("id") != source.id
+        ):
+            raise ValueError("缓存版本或图片标识不匹配")
 
         mimetype = metadata.get("mimetype")
         creator = metadata.get("creator")
@@ -187,7 +280,7 @@ def _load_disk_image(file_title: str) -> FoodImage | None:
             raise ValueError("缓存作者信息无效")
         if not isinstance(license_name, str) or not license_name or len(license_name) > 60:
             raise ValueError("缓存许可名称无效")
-        if not _is_https_url(source_url, {COMMONS_PAGE_HOST}):
+        if not isinstance(source_url, str) or not _is_valid_source_url(source, source_url):
             raise ValueError("缓存来源地址无效")
         if license_url is not None and not _is_https_url(license_url, SAFE_LICENSE_HOSTS):
             raise ValueError("缓存许可地址无效")
@@ -208,16 +301,22 @@ def _load_disk_image(file_title: str) -> FoodImage | None:
             license_url=license_url,
         )
     except (json.JSONDecodeError, OSError, TypeError, ValueError) as e:
-        logger.warning("Commons 本地图片缓存损坏，将重新下载：文件={}，原因={}", file_title, e)
+        logger.warning(
+            "美食图片本地缓存损坏，将重新下载：来源={}，ID={}，原因={}",
+            source.provider,
+            source.id,
+            e,
+        )
         _discard_disk_cache(metadata_file, image_file)
         return None
 
 
-def _store_disk_image(file_title: str, image: FoodImage) -> None:
-    metadata_file, image_file = _disk_cache_paths(file_title)
+def _store_disk_image(source: FoodImageRef, image: FoodImage) -> None:
+    metadata_file, image_file = _disk_cache_paths(source)
     metadata = {
         "version": IMAGE_DISK_CACHE_VERSION,
-        "file_title": file_title,
+        "provider": source.provider,
+        "id": source.id,
         "mimetype": image.mimetype,
         "creator": image.creator,
         "license_name": image.license_name,
@@ -230,64 +329,62 @@ def _store_disk_image(file_title: str, image: FoodImage) -> None:
     write_bytes_atomic(metadata_file, json.dumps(metadata, ensure_ascii=False, separators=(",", ":")).encode())
 
 
-async def get_food_image(file_title: str) -> FoodImage | None:
-    """按文件标题获取一张 Wikimedia Commons 美食缩略图。"""
-    if cached := _IMAGE_CACHE.get(file_title):
-        _IMAGE_CACHE.move_to_end(file_title)
+async def get_food_image(source: FoodImageRef) -> FoodImage | None:
+    """按人工指定的来源和 ID 获取一张美食缩略图。"""
+    cache_key = source.cache_key
+    if cached := _IMAGE_CACHE.get(cache_key):
+        _IMAGE_CACHE.move_to_end(cache_key)
         return cached
 
-    lock = _IMAGE_LOCKS.setdefault(file_title, asyncio.Lock())
+    lock = _IMAGE_LOCKS.setdefault(cache_key, asyncio.Lock())
     async with lock:
-        if cached := _IMAGE_CACHE.get(file_title):
-            _IMAGE_CACHE.move_to_end(file_title)
+        if cached := _IMAGE_CACHE.get(cache_key):
+            _IMAGE_CACHE.move_to_end(cache_key)
             return cached
-        if cached := _load_disk_image(file_title):
-            _cache_image(file_title, cached)
+        if cached := _load_disk_image(source):
+            _cache_image(cache_key, cached)
             return cached
 
-        params = {
-            "action": "query",
-            "titles": file_title,
-            "redirects": 1,
-            "prop": "imageinfo",
-            "iiprop": "url|mime|extmetadata",
-            "iiurlwidth": COMMONS_IMAGE_WIDTH,
-            "format": "json",
-            "formatversion": 2,
-        }
         try:
             async with httpx.AsyncClient(
-                headers={"User-Agent": COMMONS_USER_AGENT},
+                headers={"User-Agent": IMAGE_USER_AGENT},
                 timeout=10,
                 follow_redirects=False,
             ) as client:
-                response = await client.get(COMMONS_API_URL, params=params)
-                response.raise_for_status()
-                result = _parse_file_result(response.json())
-                if not result:
+                resolved = await _resolve_image(client, source)
+                if not resolved:
                     return None
-                thumbnail_url, expected_mimetype, creator, license_name, source_url, license_url = result
-                downloaded = await _download_image(client, thumbnail_url)
+                downloaded = await _download_image(client, resolved.thumbnail_url)
                 if not downloaded:
                     return None
                 content, mimetype = downloaded
-                if mimetype != expected_mimetype:
-                    logger.debug("Commons 美食图片格式与元数据不同：文件={}，实际格式={}", file_title, mimetype)
+                if resolved.expected_mimetype and mimetype != resolved.expected_mimetype:
+                    logger.debug(
+                        "美食图片格式与元数据不同：来源={}，ID={}，实际格式={}",
+                        source.provider,
+                        source.id,
+                        mimetype,
+                    )
                 image = FoodImage(
                     content=content,
                     mimetype=mimetype,
-                    creator=creator,
-                    license_name=license_name,
-                    source_url=source_url,
-                    license_url=license_url,
+                    creator=resolved.creator,
+                    license_name=resolved.license_name,
+                    source_url=resolved.source_url,
+                    license_url=resolved.license_url,
                 )
         except (httpx.HTTPError, KeyError, TypeError, ValueError):
-            logger.warning("Commons 美食图片获取失败：文件={}，回退为纯文字", file_title)
+            logger.warning("美食图片获取失败：来源={}，ID={}，回退为纯文字", source.provider, source.id)
             return None
 
         try:
-            _store_disk_image(file_title, image)
+            _store_disk_image(source, image)
         except OSError as e:
-            logger.warning("Commons 美食图片写入本地缓存失败：文件={}，原因={}", file_title, e)
-        _cache_image(file_title, image)
+            logger.warning(
+                "美食图片写入本地缓存失败：来源={}，ID={}，原因={}",
+                source.provider,
+                source.id,
+                e,
+            )
+        _cache_image(cache_key, image)
         return image

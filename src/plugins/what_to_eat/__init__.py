@@ -65,9 +65,10 @@ what_to_eat_cmd.shortcut(
 async def what_to_eat_handle():
     food = await recommend_food()
     text = f"推荐你吃：{food.name}！"
-    image = await get_food_image(food.commons_file)
+    image = await get_food_image(food.image)
     if not image:
         await what_to_eat_cmd.finish(text, at_sender=True)
+        return
 
     message = Text(f"{text}\n") + Image(raw=image.content, mimetype=image.mimetype)
     message += Text(f"\n{image.attribution}")
@@ -85,4 +86,5 @@ async def what_to_eat_update_handle(bot: Bot, event: Event):
     except RemoteDataError as e:
         logger.warning("美食数据更新失败: {}", e)
         await what_to_eat_cmd.finish("美食数据更新失败，已保留原缓存", at_sender=True)
+        return
     await what_to_eat_cmd.finish(f"美食数据更新成功，数据日期：{dataset.version.isoformat()}", at_sender=True)

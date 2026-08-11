@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from datetime import date
 from random import choice
+from typing import Literal
+from uuid import UUID
 
 from nonebot_plugin_localstore import get_plugin_cache_dir
 
@@ -10,13 +12,28 @@ from src.utils.remote_data import RemoteJsonData
 
 FOODS_DATA_URL = "https://bot-docs.hehome.xyz/foods.json"
 
+type FoodImageProvider = Literal["commons", "openverse"]
+
+
+@dataclass(frozen=True)
+class FoodImageRef:
+    """人工挑选的图片来源及其稳定标识。"""
+
+    provider: FoodImageProvider
+    id: str
+
+    @property
+    def cache_key(self) -> str:
+        """生成跨图片来源唯一的缓存键。"""
+        return f"{self.provider}:{self.id}"
+
 
 @dataclass(frozen=True)
 class Food:
-    """美食名称及人工挑选的 Wikimedia Commons 文件。"""
+    """美食名称及人工挑选的图片。"""
 
     name: str
-    commons_file: str
+    image: FoodImageRef
 
 
 @dataclass(frozen=True)
@@ -25,6 +42,30 @@ class FoodDataset:
 
     version: date
     foods: tuple[Food, ...]
+
+
+def _parse_image_ref(item: dict[str, object], food_name: str) -> FoodImageRef:
+    image = item.get("image")
+    if not isinstance(image, dict):
+        raise ValueError(f"美食 {food_name} 的图片格式错误")
+
+    provider = image.get("provider")
+    image_id = image.get("id")
+    if not isinstance(image_id, str) or not image_id:
+        raise ValueError(f"美食 {food_name} 的图片来源或标识无效")
+    if provider == "commons":
+        if not image_id.startswith("File:"):
+            raise ValueError(f"美食 {food_name} 的 Wikimedia Commons 文件名无效")
+        return FoodImageRef(provider="commons", id=image_id)
+    if provider == "openverse":
+        try:
+            parsed_id = UUID(image_id)
+        except ValueError as e:
+            raise ValueError(f"美食 {food_name} 的 Openverse 图片 ID 无效") from e
+        if str(parsed_id) != image_id:
+            raise ValueError(f"美食 {food_name} 的 Openverse 图片 ID 无效")
+        return FoodImageRef(provider="openverse", id=image_id)
+    raise ValueError(f"美食 {food_name} 的图片来源或标识无效")
 
 
 def process_data(data: object) -> FoodDataset:
@@ -57,17 +98,14 @@ def process_data(data: object) -> FoodDataset:
             if not isinstance(item, dict):
                 raise ValueError("美食条目格式错误")
             name = item.get("name")
-            commons_file = item.get("commons_file")
             if not isinstance(name, str) or not name.strip():
                 raise ValueError("美食名称不能为空")
-            if not isinstance(commons_file, str) or not commons_file.startswith("File:"):
-                raise ValueError(f"美食 {name} 的 Wikimedia Commons 文件名无效")
-            foods.append(Food(name=name, commons_file=commons_file))
+            foods.append(Food(name=name, image=_parse_image_ref(item, name)))
 
     if len({food.name for food in foods}) != len(foods):
         raise ValueError("美食名称不能重复")
-    if len({food.commons_file for food in foods}) != len(foods):
-        raise ValueError("Wikimedia Commons 文件名不能重复")
+    if len({food.image.cache_key for food in foods}) != len(foods):
+        raise ValueError("美食图片不能重复")
     return FoodDataset(version=version_date, foods=tuple(foods))
 
 
