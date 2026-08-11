@@ -35,7 +35,7 @@ async def test_what_to_eat(app: App, mocker: MockerFixture, message: str):
     from src.plugins.what_to_eat import what_to_eat_cmd
     from src.plugins.what_to_eat.data_source import Food
 
-    food = Food("火锅", "File:Hot pot dinner.jpg")
+    food = Food("火锅", "File:Chengdu hot pot.jpg")
     recommend_food = mocker.patch("src.plugins.what_to_eat.recommend_food", return_value=food)
     get_food_image = mocker.patch("src.plugins.what_to_eat.get_food_image", return_value=None)
 
@@ -57,7 +57,7 @@ async def test_what_to_eat_with_image(app: App, mocker: MockerFixture):
     from src.plugins.what_to_eat.data_source import Food
     from src.plugins.what_to_eat.image_api import FoodImage
 
-    food = Food("火锅", "File:Hot pot dinner.jpg")
+    food = Food("火锅", "File:Chengdu hot pot.jpg")
     mocker.patch("src.plugins.what_to_eat.recommend_food", return_value=food)
     get_food_image = mocker.patch(
         "src.plugins.what_to_eat.get_food_image",
@@ -125,7 +125,7 @@ async def test_update_foods_data_requires_command_start(app: App, mocker: Mocker
 async def test_recommend_food(mocker: MockerFixture):
     from src.plugins.what_to_eat.data_source import FOODS_DATA, Food, FoodDataset, recommend_food
 
-    food = Food("火锅", "File:Hot pot dinner.jpg")
+    food = Food("火锅", "File:Chengdu hot pot.jpg")
     mocker.patch.object(FOODS_DATA, "_data", FoodDataset(date(2026, 8, 11), (food,)))
     choice = mocker.patch("src.plugins.what_to_eat.data_source.choice", return_value=food)
 
@@ -144,9 +144,21 @@ def test_public_foods_data(app: App):
 
     assert dataset.version == date(2026, 8, 11)
     assert len(data["categories"]) == 12
-    assert len(dataset.foods) == 90
+    expected_images = {
+        "火锅": "File:Chengdu hot pot.jpg",
+        "串串香": "File:Fried Chuan.jpg",
+        "刀削面": "File:Daoxiaomian at Beixinqiao, Beijing (20201011183536).jpg",
+        "烤肉": "File:Smoky grilled pork and dodo.jpg",
+        "番茄炒蛋": "File:番茄炒蛋2.PNG",
+        "轻食沙拉": "File:Healthy Lentil Salad (Unsplash).jpg",
+        "三明治": "File:Club sandwich at Café Picnic.jpg",
+    }
+
+    assert len(dataset.foods) == 89
     assert len({food.name for food in dataset.foods}) == len(dataset.foods)
     assert len({food.commons_file for food in dataset.foods}) == len(dataset.foods)
+    assert "自选菜" not in {food.name for food in dataset.foods}
+    assert {food.name: food.commons_file for food in dataset.foods if food.name in expected_images} == expected_images
     assert FOODS_DATA.cache_file == store.BASE_CACHE_DIR / "what_to_eat" / "foods.json"
 
 

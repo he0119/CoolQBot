@@ -4,7 +4,7 @@
     {
       "name": "川渝风味",
       "foods": [
-        { "name": "火锅", "commons_file": "File:Hot pot dinner.jpg" },
+        { "name": "火锅", "commons_file": "File:Chengdu hot pot.jpg" },
         {
           "name": "麻辣烫",
           "commons_file": "File:Malatang from Hope Tree (20220226172344).jpg"
@@ -12,7 +12,7 @@
         { "name": "冒菜", "commons_file": "File:传奇冒菜 1.jpg" },
         {
           "name": "串串香",
-          "commons_file": "File:冷锅 串 Cold-pot Skewers Y1 per skewer (1495465364).jpg"
+          "commons_file": "File:Fried Chuan.jpg"
         },
         {
           "name": "酸菜鱼",
@@ -123,7 +123,10 @@
           "commons_file": "File:2016-08-27 Peking Duck at Great Wall Restaurant Beijing anagoria.jpg"
         },
         { "name": "炸酱面", "commons_file": "File:Zhajiangmian in Handan.jpg" },
-        { "name": "刀削面", "commons_file": "File:Datong Daoxiaomian.jpg" },
+        {
+          "name": "刀削面",
+          "commons_file": "File:Daoxiaomian at Beixinqiao, Beijing (20201011183536).jpg"
+        },
         {
           "name": "饺子",
           "commons_file": "File:中国饺子（Jiaozi；Dumplings；餃子）.jpg"
@@ -170,10 +173,13 @@
     {
       "name": "全国常见家常菜、快餐及街头小吃",
       "foods": [
-        { "name": "烤肉", "commons_file": "File:烤肉 (5904967326).jpg" },
+        {
+          "name": "烤肉",
+          "commons_file": "File:Smoky grilled pork and dodo.jpg"
+        },
         {
           "name": "番茄炒蛋",
-          "commons_file": "File:Stir Fried Tomatoes with Scrambled Eggs.jpg"
+          "commons_file": "File:番茄炒蛋2.PNG"
         },
         { "name": "黄焖鸡米饭", "commons_file": "File:黄焖鸡米饭.jpg" },
         {
@@ -182,10 +188,6 @@
         },
         { "name": "炒饭", "commons_file": "File:Chinese fried rice.jpg" },
         { "name": "烧烤", "commons_file": "File:Barbecue skewers.jpg" },
-        {
-          "name": "自选菜",
-          "commons_file": "File:Buffet dishes at Khua Din Restaurant.jpg"
-        },
         { "name": "糖醋里脊", "commons_file": "File:Sweet-and-sour pork.jpg" },
         { "name": "可乐鸡翅", "commons_file": "File:可乐鸡翅.jpg" },
         {
@@ -259,7 +261,10 @@
         },
         { "name": "披萨", "commons_file": "File:Vegetarian Pizza.jpg" },
         { "name": "炸鸡", "commons_file": "File:Fried-Chicken-Set.jpg" },
-        { "name": "轻食沙拉", "commons_file": "File:Healthy Green Salad.JPG" },
+        {
+          "name": "轻食沙拉",
+          "commons_file": "File:Healthy Lentil Salad (Unsplash).jpg"
+        },
         { "name": "意大利面", "commons_file": "File:Spaghetti bolognese.jpg" },
         {
           "name": "牛排",
@@ -267,7 +272,7 @@
         },
         {
           "name": "三明治",
-          "commons_file": "File:Classic Club Sandwich, Dôme East Fremantle, 2026 (02).jpg"
+          "commons_file": "File:Club sandwich at Café Picnic.jpg"
         },
         {
           "name": "墨西哥卷饼",

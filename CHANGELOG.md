@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 - “吃什么”标准命令遵循命令前缀并支持 Telegram、Discord Slash Command，无前缀自然语言仍通过 shortcut 响应
 - 统一节假日、美食和 FFLogs 的远程 JSON 缓存并使用各插件的 localstore 缓存目录；更新时会校验响应及数据、原子替换文件，并在失败时保留原缓存
 - 将 Wikimedia Commons 美食图片及署名许可元数据持久化到 localstore 缓存目录，避免机器人重启后重复下载
+- 调整“火锅”“串串香”“刀削面”“烤肉”“番茄炒蛋”“轻食沙拉”和“三明治”的 Wikimedia Commons 配图，并移除“自选菜”
 
 ## [0.29.4] - 2026-08-09
 
