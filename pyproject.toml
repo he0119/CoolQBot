@@ -7,12 +7,12 @@ readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.14"
 dependencies = [
-    "pydantic>=2.13.4",
+    "pydantic>=2.13.5",
     "eorzeaenv>=2.2.11",
-    "matplotlib>=3.11.1",
-    "uvicorn[standard]>=0.52.1",
+    "matplotlib>=3.11.2",
+    "uvicorn[standard]>=0.52.4",
     "uvicorn-worker>=0.4.0",
-    "gunicorn>=26.0.0",
+    "gunicorn>=26.2.0",
     "nonebot2[aiohttp,fastapi,httpx,websockets]>=2.5.0",
     "nb-cli>=1.7.4",
     "nonebot-adapter-discord>=1.1.9",
@@ -48,7 +48,7 @@ dependencies = [
     "nonebot-plugin-waiter>=0.8.1",
     "playwright==1.61.0",
     "pymupdf>=1.28.2",
-    "ddgs>=9.14.4",
+    "ddgs>=9.16.0",
 ]
 
 [project.urls]
