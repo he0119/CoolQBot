@@ -62,7 +62,7 @@ dev = [
     "nonebug>=0.4.4",
     "nonebug-saa>=0.5.0",
     "pytest-cov>=7.1.0",
-    "pytest-mock>=3.15.1",
+    "pytest-mock>=3.16.0",
     "pytest-xdist>=3.8.0",
     "pytest-asyncio>=1.4.0",
     "pytest-loguru>=0.4.1",
@@ -70,7 +70,7 @@ dev = [
     "freezegun>=1.5.5",
     "beautifulsoup4>=4.15.0",
     "poethepoet>=0.48.0",
-    "inline-snapshot>=0.35.2",
+    "inline-snapshot>=0.36.0",
 ]
 
 [tool.uv]
