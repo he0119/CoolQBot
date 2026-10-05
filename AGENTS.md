@@ -24,9 +24,11 @@ CoolQBot 是一个基于 [NoneBot2](https://nonebot.dev/) 的多平台聊天机�
 from nonebot_plugin_orm import Model
 from sqlalchemy.orm import Mapped, mapped_column
 
+
 class SignInHistory(Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     # ... 其他字段
+
 
 # 在服务或命令处理函数中使用
 from nonebot_plugin_orm import get_session
@@ -49,7 +51,7 @@ from src.utils.permission import SUPERUSER
 
 some_cmd = on_alconna(
     # ...,
-    permission=SUPERUSER, # 仅允许超级用户执行
+    permission=SUPERUSER,  # 仅允许超级用户执行
 )
 ```
 
@@ -105,6 +107,7 @@ weather_cmd = on_alconna(
 ```python
 # 获取群组 ID
 from nonebot_plugin_user import UserSession
+
 
 async def handle_group_command(user: UserSession):
     session_id = user.session_id
