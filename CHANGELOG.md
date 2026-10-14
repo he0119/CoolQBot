@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Added
+
+- 为 `chat` 命令接入内置 `--shortcut` 选项，超级管理员可把最近一次对话命令（含 `--model` 等选项）注册成 `/ds` 这样的快捷命令
+
 ## [0.29.5] - 2026-08-11
 
 ### Changed
