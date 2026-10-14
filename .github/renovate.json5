@@ -9,6 +9,10 @@
   labels: ["dependencies"],
   rangeStrategy: "bump",
   ignoreDeps: ["eorzeaenv"],
+  // 每周刷新一次 uv.lock 中的传递依赖，避免安全漏洞在锁文件里长期累积
+  lockFileMaintenance: {
+    enabled: true,
+  },
   customManagers: [
     {
       customType: "regex",
