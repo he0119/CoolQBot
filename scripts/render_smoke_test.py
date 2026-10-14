@@ -31,12 +31,13 @@ def _load_htmlrender():
 async def main() -> int:
     render_markdown = _load_htmlrender()
 
-    image = await render_markdown("# render smoke test")
+    result = await render_markdown("# render smoke test")
 
-    # htmlrender 0.8 返回的是 RenderedImage，不是裸 bytes。
-    data = getattr(image, "data", None)
-    if not data or data[:8] != b"\x89PNG\r\n\x1a\n":
-        print(f"渲染没有返回 PNG（拿到 {type(image).__name__}）", file=sys.stderr)
+    # 0.7 返回裸 bytes，0.8 返回 RenderedImage（图片在 .data 上），两种都接受，
+    # 这样将来升级 htmlrender 时这个脚本不用改。
+    data = getattr(result, "data", result)
+    if not isinstance(data, bytes) or data[:8] != b"\x89PNG\r\n\x1a\n":
+        print(f"渲染没有返回 PNG（拿到 {type(result).__name__}）", file=sys.stderr)
         return 1
     print(f"渲染成功，{len(data)} 字节")
     return 0

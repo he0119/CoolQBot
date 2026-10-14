@@ -63,6 +63,19 @@
       description: "Weekly update of nonebot plugins",
     },
     {
+      // bison 0.9.14 用的还是 htmlrender 0.7 的 API（md_to_pic / text_to_pic /
+      // get_new_page / nonebot_plugin_htmlrender.browser），0.8 把这些全删了，
+      // 上游至今没适配。原来的上界 <0.8.0 是 2026-08 手动加的，10-14 被
+      // Renovate 当成普通升级放开了——因为它属于 major 更新，不在上面那条
+      // "只升 minor/patch" 的规则里。这里显式锁死，避免再被自动放开。
+      //
+      // bison 适配之后删掉这条，并同步放开 pyproject.toml 的上界。
+      matchManagers: ["pep621"],
+      matchPackageNames: ["nonebot-plugin-htmlrender"],
+      allowedVersions: "<0.8.0",
+      description: "htmlrender 锁在 0.7.x，bison 尚未适配 0.8",
+    },
+    {
       groupName: "Python dependencies",
       matchManagers: ["pep621"],
       matchDepTypes: ["project.dependencies"],
