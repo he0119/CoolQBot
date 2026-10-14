@@ -64,9 +64,6 @@ jobs:
     name: Docker
     runs-on: ubuntu-latest
     needs: test
-    services:
-      playwright:
-        image: jacoblincool/playwright:chromium-server-1.61.1
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -125,38 +122,73 @@ jobs:
       - name: Test Image
         if: github.event_name == 'pull_request'
         run: |
-          cleanup_container() {
-              docker rm -f test-docker-container > /dev/null 2>&1 || true
+          NET=ci-net
+          BROWSER=pw-ci-browser
+          APP=test-docker-container
+
+          cleanup() {
+              docker rm -f "$APP" "$BROWSER" > /dev/null 2>&1 || true
+              docker network rm "$NET" > /dev/null 2>&1 || true
           }
+          trap cleanup EXIT
 
-          check_container() {
-              CONTAINER_STATE=$(docker ps -f name=test-docker-container -a --format '{{.State}}')
-              HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' test-docker-container 2>/dev/null || echo "unknown")
+          # 浏览器容器和机器人容器放在同一个网络里，地址用服务名 playwright。
+          # 注意：GitHub Actions 的 service 容器没法覆盖启动命令，所以这里用
+          # docker run 自己起一个，跟 docker-compose.yml 保持一致。
+          docker network create "$NET" > /dev/null
+          echo "正在启动浏览器容器..."
+          docker run -d --name "$BROWSER" --network "$NET" --network-alias playwright \
+            --init --ipc=host --user pwuser --workdir /home/pwuser \
+            mcr.microsoft.com/playwright:v1.64.0-noble \
+            /bin/sh -c "npx -y playwright@1.64.0 run-server --port 53333 --host 0.0.0.0" > /dev/null
 
-              echo "状态: $CONTAINER_STATE, 健康状态: $HEALTH_STATUS"
-          }
+          # 等浏览器就绪
+          for i in $(seq 1 30); do
+              if curl -fsS --max-time 2 http://localhost:53333/ > /dev/null 2>&1 \
+                 || docker exec "$BROWSER" curl -fsS --max-time 2 http://localhost:53333/ > /dev/null 2>&1; then
+                  echo "✅ 浏览器就绪"
+                  break
+              fi
+              echo "⏳ 等待浏览器启动... (${i}/30)"
+              sleep 2
+          done
 
-          # 启动容器
-          echo "正在启动容器..."
-          docker run --env HTMLRENDER_CONNECT=ws://playwright:53333/playwright --network=${{ job.services.playwright.network }} --name test-docker-container -d he0119/coolqbot:test > /dev/null
+          # 镜像内的 .env 用的是 docker-compose 的服务名（coolqbot），这里要换掉。
+          # 配置必须用 htmlrender 0.8 的 render.* 命名空间，旧的 HTMLRENDER_CONNECT
+          # 和 RENDER_PLAYWRIGHT 会被插件直接拒绝启动。
+          echo "正在启动机器人容器..."
+          docker run -d --name "$APP" --network "$NET" \
+            --env RENDER__PROVIDER=playwright \
+            --env RENDER__PROVIDER_CONFIG='{"connect_ws":{"endpoint":"ws://playwright:53333/"},"resource_resolve_mode":"auto","remote_local_resource_policy":"filehost"}' \
+            --env RENDER__RESOURCES__FILEHOST__PUBLIC_BASE_URL=http://localhost:8080 \
+            he0119/coolqbot:test > /dev/null
 
           TIMEOUT=60
           ELAPSED=0
           INTERVAL=5
 
           while [ $ELAPSED -lt $TIMEOUT ]; do
-              check_container
+              CONTAINER_STATE=$(docker ps -f name="$APP" -a --format '{{.State}}')
+              HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' "$APP" 2>/dev/null || echo "unknown")
+              echo "状态: $CONTAINER_STATE, 健康状态: $HEALTH_STATUS"
 
               if [[ $CONTAINER_STATE = "running" && $HEALTH_STATUS = "healthy" ]]; then
                   echo "✅ 容器健康检查通过"
-                  cleanup_container
-                  exit 0
+                  # /health 只是固定回一句 ok，根本不碰浏览器，所以这里真渲染一次。
+                  # 这样 Python 包和浏览器镜像版本对不上时，CI 会直接失败。
+                  echo "正在验证 Markdown 渲染链路..."
+                  if docker exec "$APP" uv run /app/scripts/render_smoke_test.py; then
+                      echo "✅ Markdown 渲染验证通过"
+                      exit 0
+                  fi
+                  echo "❌ Markdown 渲染验证失败（可能是 playwright 与浏览器镜像版本不一致）"
+                  docker logs "$APP"
+                  exit 1
               fi
 
               if [[ $CONTAINER_STATE != "running" ]]; then
                   echo "❌ 容器异常停止"
-                  docker logs test-docker-container
-                  cleanup_container
+                  docker logs "$APP"
                   exit 1
               fi
 
@@ -166,8 +198,7 @@ jobs:
           done
 
           echo "❌ 健康检查超时"
-          docker logs test-docker-container
-          cleanup_container
+          docker logs "$APP"
           exit 1
 
   deploy_dev:

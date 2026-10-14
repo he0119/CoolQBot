@@ -148,6 +148,10 @@ ignore = [
     "RUF003", # ambiguous-unicode-character-comment
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# 命令行脚本，靠 print 输出结果和报错
+"scripts/*.py" = ["T201"]
+
 [tool.coverage.report]
 omit = ["*/migrations/*"]
 
