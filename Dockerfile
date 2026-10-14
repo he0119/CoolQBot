@@ -49,6 +49,8 @@ ENV MAX_WORKERS=1
 # 机器人本体
 COPY bot.py .env prestart.sh /app/
 COPY src /app/src/
+# 冒烟脚本，供 CI 验证浏览器渲染链路
+COPY scripts /app/scripts/
 
 # 健康检查
 HEALTHCHECK --interval=5s --timeout=4s --start-period=180s --retries=5 CMD curl -f http://localhost:${PORT:-8080}/health || exit 1

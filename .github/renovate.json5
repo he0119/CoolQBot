@@ -21,6 +21,29 @@
       versioningTemplate: "python",
       extractVersionTemplate: "^(?<version>\\d+\\.\\d+)",
     },
+    {
+      // 官方浏览器镜像的 tag 就是 playwright 的版本号（v1.64.0-noble 里的 1.64.0），
+      // 但整个字符串里没有 "playwright" 这个包名，Renovate 认不出来，只会把它当成
+      // 一个普通字符串，于是这个 tag 永远不会被升级，和 Python 包越差越远。
+      // 这里手动告诉 Renovate：这个数字要从 PyPI 的 playwright 版本一路跟过来。
+      //
+      // docker-compose.yml 里还有两处要跟着变：run-server 命令里的 playwright@版本，
+      // 所以下面用两个 matchStrings 一起匹配。
+      customType: "regex",
+      description: "Update Playwright browser image tag from the PyPI playwright version",
+      managerFilePatterns: [
+        "/^docker-compose\\.yml$/",
+        "/^\\.github/workflows/main\\.yml$/",
+      ],
+      matchStrings: [
+        "mcr\\.microsoft\\.com/playwright:v(?<currentValue>\\d+\\.\\d+\\.\\d+)",
+        "playwright@(?<currentValue>\\d+\\.\\d+\\.\\d+) run-server",
+      ],
+      depNameTemplate: "playwright",
+      datasourceTemplate: "pypi",
+      versioningTemplate: "semver",
+      extractVersionTemplate: "^(?<version>\\d+\\.\\d+\\.\\d+)$",
+    },
   ],
   packageRules: [
     {
@@ -73,9 +96,22 @@
     },
     {
       groupName: "Playwright dependencies",
-      matchManagers: ["docker-compose", "pep621"],
+      matchManagers: ["docker-compose", "pep621", "custom.regex"],
       matchPackageNames: ["/playwright/"],
       description: "Weekly update of Playwright dependencies",
+    },
+    {
+      // Python 的 playwright 包和浏览器镜像必须完全同一个版本，差一点就连不上，
+      // 所有 Markdown 转图片都会失败，而且只会静默变成文字，不会报错。
+      //
+      // 官方镜像跟着 playwright 每个版本一起发，PyPI 有新版镜像就一定有。
+      // 镜像 tag 由上面那条自定义规则从同一个 PyPI 版本号推导，两边会一起升；
+      // 万一有人只改了其中一边，tests/test_playwright_version_consistency.py
+      // 会在 CI 里直接报错。
+      matchManagers: ["pep621"],
+      matchPackageNames: ["playwright"],
+      matchDepTypes: ["project.dependencies"],
+      description: "Playwright Python 包与浏览器镜像保持同步升级",
     },
     {
       groupName: "Python version",

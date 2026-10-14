@@ -19,27 +19,26 @@ services:
     restart: always
 
   playwright:
-    image: jacoblincool/playwright:chromium-server-1.61.1
+    # 官方镜像，tag 跟着 playwright 的每个版本一起发布，不会像第三方镜像那样滞后，
+    # 也就不会出现"Python 包已升、镜像还没有"的漂移。
+    # 版本必须和 pyproject.toml 里的 playwright 完全一致，否则 Playwright 会拒绝连接。
+    image: mcr.microsoft.com/playwright:v1.64.0-noble
     container_name: playwright
     restart: always
     ports:
       - "53333:53333"
+    # 官方推荐：避免 PID=1 产生僵尸进程，并给 Chromium 足够共享内存
+    init: true
+    ipc: host
+    # 官方镜像里的非 root 用户
+    user: pwuser
+    working_dir: /home/pwuser
     command:
-      - node
-      - -e
-      - |
-        const { chromium } = require("playwright-core");
-
-        (async () => {
-          const server = await chromium.launchServer({
-            host: "0.0.0.0",
-            port: Number(process.env.BROWSER_PORT || 53333),
-            wsPath: process.env.BROWSER_WS_ENDPOINT || "/playwright",
-          });
-          console.log(server.wsEndpoint());
-        })();
+      - /bin/sh
+      - -c
+      - npx -y playwright@1.64.0 run-server --port 53333 --host 0.0.0.0
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:53333/playwright"]
+      test: ["CMD", "curl", "-f", "http://localhost:53333/"]
       interval: 1m30s
       timeout: 30s
       retries: 5
