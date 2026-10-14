@@ -43,7 +43,7 @@ from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExt
 from nonebot_plugin_user import UserSession
 
 from src.utils.helpers import admin_permission
-from src.utils.permission import SUPERUSER
+from src.utils.permission import SUPERUSER, SuperUserShortcutExtension
 
 from .config import ModelCapability, plugin_config
 from .data_source import (
@@ -156,6 +156,7 @@ chat_cmd = on_alconna(
     extensions=[
         ReplyRecordExtension(),
         TelegramSlashExtension(),
+        SuperUserShortcutExtension(),
     ],
 )
 chat_cmd.shortcut("agent", command="chat -a", prefix=True, fuzzy=True, humanized="agent [选项] <内容>")
@@ -206,6 +207,7 @@ llm_mention = on_alconna(
     extensions=[
         ReplyRecordExtension(),
         MentionChatExtension(),
+        SuperUserShortcutExtension(),
     ],
 )
 
