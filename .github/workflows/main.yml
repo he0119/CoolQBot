@@ -30,6 +30,14 @@ jobs:
         with:
           enable-cache: true
 
+      # Python 3.15 还没有 wheel 的依赖（pyyaml / brotli / lru-dict / wordcloud /
+      # rjieba / pycryptodome 等）需要从源码编译，装好编译链和头文件。
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc g++ cmake make libxml2-dev libxslt1-dev
+
       - name: Run tests
         run: uv run poe test
         env:

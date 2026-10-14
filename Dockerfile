@@ -24,11 +24,14 @@ ENV UV_NO_DEV=1
 ENV UV_LINK_MODE=copy
 
 # 安装依赖
+# g++ / cmake / make：Python 3.15 下不少依赖还没有 wheel（pycares 要 cmake 编 c-ares，
+#   kiwisolver / contourpy 要 g++ 等），只能从源码编译。
+# libxml2-dev / libxslt1-dev：lxml 在没有 cp315 wheel 的版本上需要这两个头文件。
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt-get update \
   && apt-get -y upgrade \
-  && apt-get install -y --no-install-recommends gcc git curl locales fontconfig fonts-noto-color-emoji python3-dev ffmpeg \
+  && apt-get install -y --no-install-recommends gcc g++ cmake make git curl locales fontconfig fonts-noto-color-emoji python3-dev ffmpeg libxml2-dev libxslt1-dev \
   && localedef -i zh_CN -c -f UTF-8 -A /usr/share/locale/locale.alias zh_CN.UTF-8
 
 # Python 依赖
