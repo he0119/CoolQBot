@@ -15,6 +15,12 @@
   },
   customManagers: [
     {
+      // Pyright 的 pythonVersion 只有"主.次"两段（3.14），所以 extractVersion 只取两段。
+      // 这里不能用 python versioning：它底层是 poetry 的算法，遇到不足三段的版本会
+      // 直接返回旧值（源码日志："Cannot massage python version to npm - returning
+      // currentValue"），Renovate 就把这次更新当成"新值没变"丢掉。结果就是这条规则
+      // 从 #857 加进来之后从未自动生效，3.13→3.14 只能手改。
+      // pep440 能正常算出 3.14 → 3.15，改完这条才会真的跟着升。
       customType: "regex",
       description: "Update Pyright Python version",
       managerFilePatterns: ["/^pyproject\\.toml$/"],
@@ -22,7 +28,7 @@
       depNameTemplate: "python",
       depTypeTemplate: "tool.pyright",
       datasourceTemplate: "python-version",
-      versioningTemplate: "python",
+      versioningTemplate: "pep440",
       extractVersionTemplate: "^(?<version>\\d+\\.\\d+)",
     },
     {
@@ -158,12 +164,21 @@
       description: "Weekly update of Python version",
     },
     {
-      groupName: "Project Python version",
+      // 解释器版本必须整组一起动：Dockerfile 的 python 镜像、.python-version、
+      // pyproject.toml 的 requires-python，任何一处单独先升都会坏——比如
+      // requires-python 先升到 >=3.15.0，uv 就会直接报
+      // "The Python request from `.python-version` resolved to Python 3.14.6,
+      // which is incompatible with the project's Python requirement"（#895 就是这样）。
+      //
+      // 所以 pyproject.toml 这边不再单独建组（原来叫 "Project Python version"），
+      // 统一并入上面的 "Python version"：同一个 groupName 就是同一个分支，
+      // 四处一起升、或者都不升。requires-python 仍然只跟主/次版本，不跟补丁版本。
+      groupName: "Python version",
       matchPackageNames: ["python"],
       matchManagers: ["pep621", "custom.regex"],
       matchDepTypes: ["requires-python", "tool.pyright"],
       matchUpdateTypes: ["major", "minor"],
-      description: "Weekly update of project Python version",
+      description: "Python 解释器版本：pyproject.toml 跟着 Dockerfile / .python-version 一起升",
     },
     {
       groupName: "pre-commit dependencies",
