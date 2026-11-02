@@ -238,11 +238,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/37/41/48460d135db4be801fbb4840f60f4671b41cc5043f6c1d48a6cbeb91f4b5/apilmoji-0.3.1-py3-none-any.whl", hash = "sha256:305ec445d19b1cd11f21e07cf1d2bd9f3ae5be9fc688a6589f823dd67428da15", size = 9175, upload-time = "2026-02-26T05:15:49.906Z" },
 ]
 
-[package.optional-dependencies]
-rich = [
-    { name = "rich" },
-]
-
 [[package]]
 name = "apscheduler"
 version = "3.11.3"
@@ -727,8 +722,8 @@ dependencies = [
     { name = "nonebot-plugin-htmlrender", extra = ["filehost", "prometheus", "sentry"] },
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot-plugin-memes" },
-    { name = "nonebot-plugin-orm", extra = ["default"] },
-    { name = "nonebot-plugin-parser", extra = ["htmlkit"] },
+    { name = "nonebot-plugin-orm" },
+    { name = "nonebot-plugin-parser" },
     { name = "nonebot-plugin-permission" },
     { name = "nonebot-plugin-prometheus" },
     { name = "nonebot-plugin-send-anything-anywhere" },
@@ -789,8 +784,8 @@ requires-dist = [
     { name = "nonebot-plugin-htmlrender", extras = ["filehost", "prometheus", "sentry"], specifier = ">=0.7.2,<0.8.0" },
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4" },
     { name = "nonebot-plugin-memes", specifier = "==0.8.1" },
-    { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.8.3" },
-    { name = "nonebot-plugin-parser", extras = ["htmlkit"], specifier = "==2.6.10" },
+    { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.8.4" },
+    { name = "nonebot-plugin-parser", extras = ["htmlkit"], specifier = "==2.7.1" },
     { name = "nonebot-plugin-permission", specifier = ">=0.3.1" },
     { name = "nonebot-plugin-prometheus", specifier = "==0.4.1" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
@@ -2400,40 +2395,6 @@ wheels = [
 ]
 
 [[package]]
-name = "nonebot-plugin-htmlkit"
-version = "0.1.0rc5"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "aiofiles" },
-    { name = "jinja2" },
-    { name = "markdown" },
-    { name = "nonebot2" },
-    { name = "pygments" },
-    { name = "pymdown-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/29/79/7f0b60a19132e335cb2d6ec2902e330afc97e82462dc152ae033864acf25/nonebot_plugin_htmlkit-0.1.0rc5.tar.gz", hash = "sha256:5c9fc3ed1d1cbf95711006761d19e7a1dc0d0e8b7989c2e806a2bff3aeff7b17", size = 65089, upload-time = "2026-01-17T12:54:01.959Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/c8/36/66cedb5d3170c24ec3261392c090c830bb921570f9373c2686c26495973d/nonebot_plugin_htmlkit-0.1.0rc5-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:3d495d8b7e7fa22f45a21ee4bbd1052fd12a4236aee23396f9e5de71eb66189f", size = 6842648, upload-time = "2026-01-17T12:53:39.564Z" },
-    { url = "https://files.pythonhosted.org/packages/b4/68/330b0a4cc81d82ca382f9a5f464939cdfb3482cf29e27c7f4e40278b5884/nonebot_plugin_htmlkit-0.1.0rc5-cp310-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:ef8348e1433bbfe178e668acb7c46994c0a6cfa2f30446abbf7f8f08ffb25bd6", size = 8866549, upload-time = "2026-01-17T12:53:56.172Z" },
-    { url = "https://files.pythonhosted.org/packages/2f/96/2385871a9d23601fb2c8fc933c145b8fb8776edc65d873b122df3eea0f6c/nonebot_plugin_htmlkit-0.1.0rc5-cp310-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:74b35033fd0d23e9d5c9a509b596c522630aafcfc2a2f37c605a9c5b36ce8138", size = 9276525, upload-time = "2026-01-17T12:53:41.618Z" },
-    { url = "https://files.pythonhosted.org/packages/7a/a2/b2f20c9a87c4b1a3b88b5481407095b7aa03b7a0811b34325847b0751b14/nonebot_plugin_htmlkit-0.1.0rc5-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:c1c5550490a9efbfbf491f9ab42fadf347af81fc214e113773ff77bd72c4c095", size = 10103686, upload-time = "2026-01-17T12:53:37.478Z" },
-    { url = "https://files.pythonhosted.org/packages/fd/b2/750298c5c1c35ec208370494d659437da82635190755df076c7771baaca7/nonebot_plugin_htmlkit-0.1.0rc5-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:4921f529a6eec4b7f4cf3085d8cf9ca2617029e62c43631561a1188f9eadc9bc", size = 10371929, upload-time = "2026-01-17T12:54:02.977Z" },
-    { url = "https://files.pythonhosted.org/packages/bb/b7/14cf8b2d1984c56cc2214665f3d2b382400c8dc423c6642cc1ed31939d15/nonebot_plugin_htmlkit-0.1.0rc5-cp310-abi3-win_amd64.whl", hash = "sha256:e8c49e8618fae48b6a499af416fe2725c324b159eec5d6694352d275c7f598f5", size = 7270297, upload-time = "2026-01-17T12:53:28.157Z" },
-    { url = "https://files.pythonhosted.org/packages/6a/13/b76bf3fc1f8a2ac48616a6420c682662566bf9965e2d3daec17ca6d4040a/nonebot_plugin_htmlkit-0.1.0rc5-cp312-abi3-macosx_11_0_arm64.whl", hash = "sha256:b60f891c21da4ff024773eca695dcc92ae648656c7be8a2f1c9839c052971d8b", size = 6842579, upload-time = "2026-01-17T12:53:54.641Z" },
-    { url = "https://files.pythonhosted.org/packages/85/98/15d572a75544e1bf7901cf465a4f1f5d17fff6d1c3e93c210bd688409630/nonebot_plugin_htmlkit-0.1.0rc5-cp312-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:0a105bcc2714ef1bb07b689af74bda3ba3165a19f061bf1177bf8b5b0a3c9411", size = 8865642, upload-time = "2026-01-17T12:54:12.881Z" },
-    { url = "https://files.pythonhosted.org/packages/42/89/52b440b99c40930bf9ec26b5479f6b9355021533b01cd7354b727d36c805/nonebot_plugin_htmlkit-0.1.0rc5-cp312-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:30dff5ea120ee64c042112c1bf968de6929ee48e903504ca6e5221ad6d61ba90", size = 9275035, upload-time = "2026-01-17T12:54:10.509Z" },
-    { url = "https://files.pythonhosted.org/packages/0a/31/0dc54b1469ac81186521a4814d4688923c6e28e19b1d487f569c30f3983b/nonebot_plugin_htmlkit-0.1.0rc5-cp312-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:c452af6bb67738d54a0d6ba29ba81a4e1117f32c8b3686d1ab33f977c95fd473", size = 10102799, upload-time = "2026-01-17T12:53:30.291Z" },
-    { url = "https://files.pythonhosted.org/packages/a8/cf/cb94ceba5472eb10412345840418ca9bf535aad32d7a9c53562a8ca25c20/nonebot_plugin_htmlkit-0.1.0rc5-cp312-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:34dd2ed57748bcd7480da3938a3753de333d5c69cf3488188dc139890e8942fb", size = 10371308, upload-time = "2026-01-17T12:54:08.588Z" },
-    { url = "https://files.pythonhosted.org/packages/5c/1f/702efa35ff59feb30799d3a8f1978719facd8bab286cc5f141136b91df1a/nonebot_plugin_htmlkit-0.1.0rc5-cp312-abi3-win_amd64.whl", hash = "sha256:97d39efcb1d82e7f7a3daf2f6903baacadcce84cfd978fef486c8e1183a4dc55", size = 7270093, upload-time = "2026-01-17T12:54:05.037Z" },
-    { url = "https://files.pythonhosted.org/packages/15/9d/534f66b60d9538f8ef111e2a51adcd90db8a718f95a988d9f0fcb5e085ab/nonebot_plugin_htmlkit-0.1.0rc5-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:8255d25e141be2eae55b24b290e40c8db33d416822ba426789166ca5988873cb", size = 6843601, upload-time = "2026-01-17T12:54:17.399Z" },
-    { url = "https://files.pythonhosted.org/packages/5b/8d/9dcc91ff91181eab1f4c3c72e2b6288c07986b4f25cc92305d1c48382155/nonebot_plugin_htmlkit-0.1.0rc5-cp314-cp314t-manylinux_2_34_aarch64.whl", hash = "sha256:c9c8cd3ede2d2c43160c69faa5136da9d5e6f485aff30ffc7dbc43d4beb1c603", size = 8865919, upload-time = "2026-01-17T12:53:32.768Z" },
-    { url = "https://files.pythonhosted.org/packages/77/b4/b7a6ff3502caa4e8dad5360d9f830abe239beb3bb5f0e676a41537fc866f/nonebot_plugin_htmlkit-0.1.0rc5-cp314-cp314t-manylinux_2_34_x86_64.whl", hash = "sha256:eb8276e7058c02e914aa6d72dc8974f221bbe0a153addc8724115ef3aef8f1ed", size = 9275058, upload-time = "2026-01-17T12:53:35.16Z" },
-    { url = "https://files.pythonhosted.org/packages/c9/8c/51af35e1e3f03538b96d2d1e6b8c6db8ddb0dd0ac71eac9a25bd71d3f06c/nonebot_plugin_htmlkit-0.1.0rc5-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:e591e0083b1364bb7921ece4348aaf6c451572f87ba3df17588b44dd3b407ff5", size = 10103191, upload-time = "2026-01-17T12:53:58.649Z" },
-    { url = "https://files.pythonhosted.org/packages/b4/72/f39f4b78352322336077cf703a129fb342019fe9633b2cd8185a63d6e2c0/nonebot_plugin_htmlkit-0.1.0rc5-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:d0b30fe30fe364f9e4d34a80bf134d79de67bc8550becd095ffeb709cf4105f2", size = 10371572, upload-time = "2026-01-17T12:53:50.478Z" },
-    { url = "https://files.pythonhosted.org/packages/fa/03/2b0493a871217abd1dc916804cbe4e1aac0852d9e54f97039841b472aadb/nonebot_plugin_htmlkit-0.1.0rc5-cp314-cp314t-win_amd64.whl", hash = "sha256:4562b1b2e2ca257294f52671970c431a4e253aeb8b133d90104ff5bbafacb06e", size = 7495003, upload-time = "2026-01-17T12:53:52.779Z" },
-]
-
-[[package]]
 name = "nonebot-plugin-htmlrender"
 version = "0.7.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2518,33 +2479,28 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-orm"
-version = "0.8.3"
+version = "0.8.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "alembic" },
     { name = "click" },
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot2" },
-    { name = "sqlalchemy" },
+    { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9c/70/06e8fffd9b7f88513507e0455806bc772dfbf150eafee10474dad7f5110f/nonebot_plugin_orm-0.8.3.tar.gz", hash = "sha256:c51918f6d39761c5e78185f58745dec888b95a7795b77c345bf97f08406f878d", size = 26491, upload-time = "2026-01-01T11:40:52.285Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f8/ce/abffce111b2d9afd050279f15931fb83260c2244990c9df3a18e1ca1aea7/nonebot_plugin_orm-0.8.4.tar.gz", hash = "sha256:724737ffa23c7c959ab5687eb27f8c02e8167fd0efef1c1b09e5ef84da0e927b", size = 26337, upload-time = "2026-10-22T05:39:35.446Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3d/ce/b14c6b5ced478403b7e7aaab24944e3071ca0bb30f62bb9c150a92800bb6/nonebot_plugin_orm-0.8.3-py3-none-any.whl", hash = "sha256:d64f01500a0eca1e25502347923fa54d0bff3cbe2531720adc1b0f485cd2d701", size = 31770, upload-time = "2026-01-01T11:40:50.854Z" },
-]
-
-[package.optional-dependencies]
-default = [
-    { name = "sqlalchemy", extra = ["aiosqlite"] },
+    { url = "https://files.pythonhosted.org/packages/32/b0/b1693461f1dc69524585e9a804e9882da9ee1af8353c00d6bd58f7fffd5f/nonebot_plugin_orm-0.8.4-py3-none-any.whl", hash = "sha256:9d96ed0e9204dce46eeb4003c122e724a00f287116394d269cc4089e03c1d2f9", size = 31759, upload-time = "2026-10-22T05:39:34.037Z" },
 ]
 
 [[package]]
 name = "nonebot-plugin-parser"
-version = "2.6.10"
+version = "2.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
-    { name = "apilmoji", extra = ["rich"] },
+    { name = "apilmoji" },
     { name = "beautifulsoup4" },
     { name = "bilibili-api-python" },
     { name = "curl-cffi" },
@@ -2556,16 +2512,11 @@ dependencies = [
     { name = "nonebot-plugin-uninfo" },
     { name = "nonebot2" },
     { name = "pillow" },
-    { name = "rich" },
+    { name = "takumi-py" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6d/ff/8410403d898d1be75982ee20c6cd0ff86e2d4efef9e2820a6e195a10135e/nonebot_plugin_parser-2.6.10.tar.gz", hash = "sha256:866d3a3cb001976e801d53bdbb957d91ce01bb00e445b918c903835a8e5e68c4", size = 2884906, upload-time = "2026-09-26T05:02:25.712Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4b/f7/9ac7213e4e573d2a81eb1ca2bdef36e19853f3cdd3aaaeba85c06d725dce/nonebot_plugin_parser-2.7.1.tar.gz", hash = "sha256:937001e70fa8790983585467b67cc4438b748678b753fb03ac389f3b99d811b2", size = 2893798, upload-time = "2026-10-26T15:30:32.958Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ab/2b/f01c61244755ea1b08ca926b84d3326ad2ca937e7c742a96f57ac90142d0/nonebot_plugin_parser-2.6.10-py3-none-any.whl", hash = "sha256:6864ab4ce427d31de6d4eba86718f52c264281b69d972c58b8d85f557b724f0b", size = 2911261, upload-time = "2026-09-26T05:02:24.098Z" },
-]
-
-[package.optional-dependencies]
-htmlkit = [
-    { name = "nonebot-plugin-htmlkit" },
+    { url = "https://files.pythonhosted.org/packages/61/65/a555d0370cb7c41090feda5662fee34ed005cf9b7533e65b6879bee9ecc6/nonebot_plugin_parser-2.7.1-py3-none-any.whl", hash = "sha256:9854a121f87de29126fc2c06ead3b93f99f5e2a78e660de257c7ce02e53898f1", size = 2911175, upload-time = "2026-10-26T15:30:31.197Z" },
 ]
 
 [[package]]
@@ -3923,6 +3874,9 @@ aiosqlite = [
     { name = "aiosqlite" },
     { name = "greenlet" },
 ]
+asyncio = [
+    { name = "greenlet" },
+]
 
 [[package]]
 name = "starlette"
@@ -3943,6 +3897,23 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/85/ad/430fb60d90e1d112a62ff57bdd1f286ec73a2a0331272febfddd21f330e1/StrEnum-0.4.15.tar.gz", hash = "sha256:878fb5ab705442070e4dd1929bb5e2249511c0bcf2b0eeacf3bcd80875c82eff", size = 23384, upload-time = "2023-06-29T22:02:58.399Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/81/69/297302c5f5f59c862faa31e6cb9a4cd74721cd1e052b38e464c5b402df8b/StrEnum-0.4.15-py3-none-any.whl", hash = "sha256:a30cda4af7cc6b5bf52c8055bc4bf4b2b6b14a93b574626da33df53cf7740659", size = 8851, upload-time = "2023-06-29T22:02:56.947Z" },
+]
+
+[[package]]
+name = "takumi-py"
+version = "0.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "jinja2" },
+    { name = "msgspec" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a8/47/801fc2b3496b915f0ecd08d848812fb565d8dcdd0ed5ea9f22ab6d91f73c/takumi_py-0.3.0.tar.gz", hash = "sha256:9488faab28a5f8fa6a4388f20ca23659165e41980e82b48de1784d9d467b2f7e", size = 6692539, upload-time = "2026-08-02T10:05:28.481Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b6/0a/df80a7432b62a9b91347bcaba1712b02f4307992ca028d6d1dcc12e061af/takumi_py-0.3.0-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:695be994267c34e11a8eca7820b39ce5e2f21f32d42490e1f1a20b872cc7b7fc", size = 4480828, upload-time = "2026-08-02T10:05:22.512Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/a7/9f32507e0cacd63d399c01f8839c89c67fd40b5d376f29cd638e52c0e827/takumi_py-0.3.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b73e4a79c6ea1f01439c9800c15cb50ede0a76ebd5489702e8ecde1caaf684c6", size = 4901822, upload-time = "2026-08-02T10:05:24.05Z" },
+    { url = "https://files.pythonhosted.org/packages/1f/e1/0bd18ab68d5a1c3466417701c0c6d3beec76076232341e18dcbb1a92113d/takumi_py-0.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:89d061d8c3d3a7a9283e14a43bcd1b2d5745072d064499991261c37b7029cb57", size = 4950024, upload-time = "2026-08-02T10:05:25.504Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/3e/0d2ba467d47779db9138c5fb1261284aba8409a84a3cd968e9480eb74d4b/takumi_py-0.3.0-cp310-abi3-win_amd64.whl", hash = "sha256:3eec35de469f8fe6bfc2a81f1b8f395f94ed13d6e22b9410721b521b7dd22a3b", size = 4332645, upload-time = "2026-08-02T10:05:27.044Z" },
 ]
 
 [[package]]
