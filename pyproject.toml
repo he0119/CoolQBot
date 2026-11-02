@@ -7,7 +7,7 @@ readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.14"
 dependencies = [
-    "pydantic>=2.14.1",
+    "pydantic>=2.14.2",
     "eorzeaenv>=2.2.11",
     "matplotlib>=3.11.2",
     "uvicorn[standard]>=0.54.0",
@@ -51,7 +51,7 @@ dependencies = [
     "nonebot-plugin-waiter>=0.8.1",
     "playwright==1.64.0",
     "pymupdf>=1.28.2",
-    "ddgs>=9.16.0",
+    "ddgs>=9.16.1",
 ]
 
 [project.urls]
