@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+## [0.29.6] - 2026-11-02
+
 ### Added
 
 - 为 `chat` 命令接入内置 `--shortcut` 选项，超级管理员可把最近一次对话命令（含 `--model` 等选项）注册成 `/ds` 这样的快捷命令
@@ -869,7 +871,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 - 正常工作的版本。
 
-[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.5...HEAD
+[Unreleased]: https://github.com/he0119/CoolQBot/compare/v0.29.6...HEAD
+[0.29.6]: https://github.com/he0119/CoolQBot/compare/v0.29.5...v0.29.6
 [0.29.5]: https://github.com/he0119/CoolQBot/compare/v0.29.4...v0.29.5
 [0.29.4]: https://github.com/he0119/CoolQBot/compare/v0.29.3...v0.29.4
 [0.29.3]: https://github.com/he0119/CoolQBot/compare/v0.29.2...v0.29.3
