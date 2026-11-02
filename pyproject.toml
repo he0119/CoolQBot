@@ -28,7 +28,7 @@ dependencies = [
     "nonebot-plugin-treehelp>=0.5.0",
     "nonebot-plugin-user[inspect]>=0.6.1",
     "nonebot-plugin-alisten>=0.4.3",
-    "nonebot-plugin-orm[default]>=0.8.3",
+    "nonebot-plugin-orm[default]>=0.8.4",
     "nonebot-plugin-apscheduler>=0.5.0",
     "nonebot-plugin-send-anything-anywhere>=0.7.1",
     "nonebot-plugin-uninfo>=0.11.2",
@@ -43,7 +43,7 @@ dependencies = [
     "nonebot-plugin-status==0.9.0",
     "nonebot-plugin-prometheus==0.4.1",
     "nonebot-plugin-abs==1.1.0",
-    "nonebot-plugin-parser[htmlkit]==2.6.10",
+    "nonebot-plugin-parser[htmlkit]==2.7.1",
     # bison 用的是 0.7 的 API（md_to_pic / text_to_pic / get_new_page /
     # nonebot_plugin_htmlrender.browser），0.8 把这几个全删了，上游也还没适配。
     # 在 bison 跟上之前必须锁在 0.7.x，见 tests/test_htmlrender_bison_compat.py
