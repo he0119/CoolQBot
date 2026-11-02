@@ -49,7 +49,7 @@ dependencies = [
     # 在 bison 跟上之前必须锁在 0.7.x，见 tests/test_htmlrender_bison_compat.py
     "nonebot-plugin-htmlrender[filehost,prometheus,sentry]>=0.7.2,<0.8.0",
     "nonebot-plugin-waiter>=0.8.1",
-    "playwright==1.64.0",
+    "playwright==1.64.1",
     "pymupdf>=1.28.2",
     "ddgs>=9.16.1",
 ]

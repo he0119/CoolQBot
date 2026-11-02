@@ -139,8 +139,8 @@ jobs:
           echo "正在启动浏览器容器..."
           docker run -d --name "$BROWSER" --network "$NET" --network-alias playwright \
             --init --ipc=host --user pwuser --workdir /home/pwuser \
-            mcr.microsoft.com/playwright:v1.64.0-noble \
-            /bin/sh -c "npx -y playwright@1.64.0 run-server --port 53333 --host 0.0.0.0" > /dev/null
+            mcr.microsoft.com/playwright:v1.64.1-noble \
+            /bin/sh -c "npx -y playwright@1.64.1 run-server --port 53333 --host 0.0.0.0" > /dev/null
 
           # 等浏览器就绪
           for i in $(seq 1 30); do
