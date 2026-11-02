@@ -22,7 +22,7 @@ services:
     # 官方镜像，tag 跟着 playwright 的每个版本一起发布，不会像第三方镜像那样滞后，
     # 也就不会出现"Python 包已升、镜像还没有"的漂移。
     # 版本必须和 pyproject.toml 里的 playwright 完全一致，否则 Playwright 会拒绝连接。
-    image: mcr.microsoft.com/playwright:v1.64.0-noble
+    image: mcr.microsoft.com/playwright:v1.64.1-noble
     container_name: playwright
     restart: always
     ports:
@@ -36,7 +36,7 @@ services:
     command:
       - /bin/sh
       - -c
-      - npx -y playwright@1.64.0 run-server --port 53333 --host 0.0.0.0
+      - npx -y playwright@1.64.1 run-server --port 53333 --host 0.0.0.0
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:53333/"]
       interval: 1m30s
