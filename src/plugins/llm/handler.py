@@ -309,6 +309,7 @@ class LLMHandler:
                 raise ProviderError("当前模式不允许工具调用")
             total_usage = completion.usage
             actual_model = completion.model
+            generated_images = list(completion.images)
             while completion.tool_calls:
                 request_progress.tool_call_count += len(completion.tool_calls)
                 logger.info(
@@ -361,6 +362,7 @@ class LLMHandler:
                     )
                 total_usage = total_usage + completion.usage
                 actual_model = completion.model or actual_model
+                generated_images.extend(completion.images)
                 if is_final_request:
                     break
         finally:
@@ -372,7 +374,7 @@ class LLMHandler:
         leaked_dsml = False
         if reached_request_limit and (
             completion.tool_calls
-            or not completion.content.strip()
+            or (not completion.content.strip() and not completion.images)
             or (leaked_dsml := bool(DSML_TOOL_CALL_PATTERN.search(completion.content)))
         ):
             logger.warning(
@@ -394,6 +396,7 @@ class LLMHandler:
             )
 
         completion.usage = total_usage
+        completion.message.images = generated_images
         completion.model = actual_model or plugin_config.resolve(self.model_name).model
         completion.elapsed_seconds = perf_counter() - started_at
         self.context.append(completion.message)
@@ -463,8 +466,13 @@ class LLMHandler:
         reply_to: str | bool = False,
     ) -> None:
         """按配置发送模型回复"""
+        for image in completion.images:
+            await UniMessage.image(raw=image.data).send(reply_to=reply_to)
         text = format_output(completion, with_thinking=self.show_thinking)
         if not text:
+            if completion.images:
+                await UniMessage.text(format_statistics(completion)).send(reply_to=reply_to)
+                return
             logger.warning("LLM 会话没有可发送内容（会话={}）", self.log_id)
             await UniMessage.text("模型没有返回任何内容").send(reply_to=reply_to)
             return
