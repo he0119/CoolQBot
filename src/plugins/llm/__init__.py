@@ -71,7 +71,7 @@ from .tts import TTSError, get_tts_models
 __plugin_meta__ = PluginMetadata(
     name="大模型对话",
     description="接入多种大模型 API，提供智能对话与问答功能",
-    usage="使用 /chat 对话（可加 -a 启用工具）、/llm 管理配置，也可在群聊中 @机器人 你好",
+    usage="使用 /chat 对话（可加 -a 启用工具）、/draw 绘图、/llm 管理配置，也可在群聊中 @机器人 你好",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
@@ -141,6 +141,7 @@ chat_command = Alconna(
     Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
     Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
     Option("-a|--agent", default=False, action=store_true, help_text="启用工具增强模式"),
+    Option("-d|--draw", default=False, action=store_true, help_text="使用当前模型生成图片"),
     meta=CommandMeta(
         description="与大模型对话，可按次启用工具增强模式",
         example="/chat 你好，或使用 /chat -a 查询成都天气",
@@ -160,6 +161,7 @@ chat_cmd = on_alconna(
     ],
 )
 chat_cmd.shortcut("agent", command="chat -a", prefix=True, fuzzy=True, humanized="agent [选项] <内容>")
+chat_cmd.shortcut("draw", command="chat --draw", prefix=True, fuzzy=True, humanized="draw [选项] <描述>")
 
 llm_cmd.shortcut("quota", command="llm quota", prefix=True, fuzzy=True, humanized="quota [模型名|--all]")
 llm_cmd.shortcut("额度", command="llm quota", prefix=True, fuzzy=True, humanized="额度 [模型名|--all]")
@@ -627,6 +629,7 @@ async def _handle_dialogue_command(
     use_tts: Query[bool],
     *,
     enable_tools: bool,
+    generate_image: bool = False,
 ) -> None:
     """执行共享的纯对话或工具增强命令流程。"""
     try:
@@ -635,7 +638,7 @@ async def _handle_dialogue_command(
         await matcher.finish(str(e), at_sender=True)
 
     if not text and not images:
-        command_name = "agent" if enable_tools else "chat"
+        command_name = "draw" if generate_image else "agent" if enable_tools else "chat"
         await matcher.finish(f"你想问什么呢？输入 /{command_name} -h 查看用法", at_sender=True)
 
     try:
@@ -644,13 +647,14 @@ async def _handle_dialogue_command(
             selected_model=model_name.result if model_name.available else "",
             render=render.result,
             use_tts=use_tts.result,
-            enable_tools=enable_tools,
+            enable_tools=enable_tools and not generate_image,
         )
     except LLMSetupError as e:
         if e.at_sender:
             await matcher.finish(str(e), at_sender=True)
         await matcher.finish(str(e))
 
+    handler.generate_image = generate_image
     if use_context.result:
         await _handle_with_context(handler, text, images, finish_matcher=matcher)
         return
@@ -673,6 +677,7 @@ async def chat_handle(
     render: Query[bool] = Query("render.value", False),
     use_tts: Query[bool] = Query("tts.value", False),
     use_agent: Query[bool] = Query("agent.value", False),
+    use_draw: Query[bool] = Query("draw.value", False),
 ) -> None:
     await _handle_dialogue_command(
         chat_cmd,
@@ -688,6 +693,7 @@ async def chat_handle(
         render,
         use_tts,
         enable_tools=use_agent.result,
+        generate_image=use_draw.result,
     )
 
 
@@ -705,6 +711,7 @@ async def llm_mention_handle(
     render: Query[bool] = Query("render.value", False),
     use_tts: Query[bool] = Query("tts.value", False),
     use_agent: Query[bool] = Query("agent.value", False),
+    use_draw: Query[bool] = Query("draw.value", False),
 ) -> None:
     """把群聊中 @ 机器人的 Alconna 解析结果交给对话流程。"""
     try:
@@ -721,10 +728,11 @@ async def llm_mention_handle(
             selected_model=model_name.result if model_name.available else "",
             render=render.result,
             use_tts=use_tts.result,
-            enable_tools=use_agent.result,
+            enable_tools=use_agent.result and not use_draw.result,
         )
     except LLMSetupError as e:
         await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=msg_id)
+    handler.generate_image = use_draw.result
     if use_context.result:
         await _handle_with_context(handler, text, images, message_id=msg_id)
         return
