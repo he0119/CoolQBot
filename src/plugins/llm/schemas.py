@@ -12,8 +12,18 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 Role = Literal["system", "user", "assistant", "tool"]
-ToolChoice = Literal["auto", "none"]
-"""工具选择策略：自动选择，或保留工具定义但禁止调用。"""
+
+
+@dataclass(frozen=True)
+class ForceTool:
+    """强制模型调用指定函数工具"""
+
+    name: str
+    """工具名"""
+
+
+ToolChoice = Literal["auto", "none"] | ForceTool
+"""工具选择策略：自动选择、禁止调用，或强制调用指定函数工具。"""
 
 
 @dataclass
@@ -74,7 +84,7 @@ class Message:
     content: str = ""
     """文本内容"""
     images: list[ImageContent] = field(default_factory=list)
-    """图片内容，仅 user 消息有效"""
+    """用户输入的图片，或助手生成的图片"""
     reasoning: str = ""
     """推理内容，仅 assistant 消息有效"""
     tool_calls: list[ToolCall] = field(default_factory=list)
@@ -96,6 +106,7 @@ class Message:
         reasoning: str = "",
         tool_calls: list[ToolCall] | None = None,
         provider_data: dict[str, Any] | None = None,
+        images: list[ImageContent] | None = None,
     ) -> Message:
         """构造助手消息"""
         return cls(
@@ -104,6 +115,7 @@ class Message:
             reasoning=reasoning,
             tool_calls=tool_calls or [],
             provider_data=provider_data or {},
+            images=images or [],
         )
 
     @classmethod
@@ -179,6 +191,11 @@ class Completion:
     def content(self) -> str:
         """模型返回的文本内容"""
         return self.message.content
+
+    @property
+    def images(self) -> list[ImageContent]:
+        """模型生成的图片"""
+        return self.message.images
 
     @property
     def reasoning(self) -> str:

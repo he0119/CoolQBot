@@ -1,11 +1,13 @@
 """大模型对话插件
 
-支持 OpenAI Chat Completions / OpenAI Responses / Anthropic Messages 三种
-API 格式，提供多轮对话、推理内容展示、原生 Markdown、Markdown 转图片与 TTS 语音回复。
+支持 OpenAI Chat Completions / OpenAI Responses / Anthropic Messages 三种对话
+API 格式，以及 OpenAI Image API 生图模型，提供多轮对话、推理内容展示、原生 Markdown、
+Markdown 转图片与 TTS 语音回复。
 额度查询按模型选择独立 provider，目前支持 Aperture 与 DeepSeek。
 """
 
 from pathlib import Path
+from typing import Any
 
 import nonebot
 from nonebot import require
@@ -48,14 +50,17 @@ from src.utils.permission import SUPERUSER, SuperUserShortcutExtension
 from .config import ModelCapability, plugin_config
 from .data_source import (
     clear_available_model_names,
+    clear_image_model_name,
     clear_zssm_model_name,
     clear_zssm_vision_model_name,
     disable_model_names,
     enable_model_names,
     get_available_model_names,
+    get_image_model_name,
     get_model_name,
     get_model_overview,
     get_tts_model,
+    set_image_model_name,
     set_model_name,
     set_tts_model,
     set_zssm_model_name,
@@ -71,7 +76,7 @@ from .tts import TTSError, get_tts_models
 __plugin_meta__ = PluginMetadata(
     name="大模型对话",
     description="接入多种大模型 API，提供智能对话与问答功能",
-    usage="使用 /chat 对话（可加 -a 启用工具）、/llm 管理配置，也可在群聊中 @机器人 你好",
+    usage="使用 /chat 对话（可加 -a 启用工具）、/draw 绘图、/llm 管理配置，也可在群聊中 @机器人 你好",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
@@ -104,6 +109,8 @@ llm_cmd = on_alconna(
             Subcommand("clear-zssm", help_text="使本群解释模型跟随默认模型"),
             Subcommand("set-zssm-vision", Args["model#模型名称", str], help_text="设置本群解释视觉模型"),
             Subcommand("clear-zssm-vision", help_text="使本群解释视觉模型恢复自动选择"),
+            Subcommand("set-image", Args["model#模型名称", str], help_text="设置本群生图模型"),
+            Subcommand("clear-image", help_text="使本群生图模型恢复自动选择"),
             help_text="模型相关设置",
         ),
         Subcommand(
@@ -141,6 +148,7 @@ chat_command = Alconna(
     Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
     Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
     Option("-a|--agent", default=False, action=store_true, help_text="启用工具增强模式"),
+    Option("-d|--draw", default=False, action=store_true, help_text="使用当前模型生成图片"),
     meta=CommandMeta(
         description="与大模型对话，可按次启用工具增强模式",
         example="/chat 你好，或使用 /chat -a 查询成都天气",
@@ -160,6 +168,7 @@ chat_cmd = on_alconna(
     ],
 )
 chat_cmd.shortcut("agent", command="chat -a", prefix=True, fuzzy=True, humanized="agent [选项] <内容>")
+chat_cmd.shortcut("draw", command="chat --draw", prefix=True, fuzzy=True, humanized="draw [选项] <描述>")
 
 llm_cmd.shortcut("quota", command="llm quota", prefix=True, fuzzy=True, humanized="quota [模型名|--all]")
 llm_cmd.shortcut("额度", command="llm quota", prefix=True, fuzzy=True, humanized="额度 [模型名|--all]")
@@ -227,6 +236,7 @@ async def _create_handler(
     render: bool = False,
     use_tts: bool = False,
     enable_tools: bool = False,
+    generate_image: bool = False,
 ) -> LLMHandler:
     """按当前会话设置创建处理器。"""
     if not plugin_config.get_model_names():
@@ -253,12 +263,20 @@ async def _create_handler(
             at_sender=True,
         )
 
+    image_model_name = await get_image_model_name(user.session_id) if (generate_image or enable_tools) else ""
+    if generate_image:
+        if not image_model_name:
+            raise LLMSetupError("本群未启用生图模型，请联系超级管理员启用并设置", at_sender=True)
+
     return LLMHandler(
         name,
         send_markdown=plugin_config.prefer_markdown and not render,
         send_md_pic=render or plugin_config.md_to_pic,
         tts_model=tts_model,
         enable_tools=enable_tools,
+        generate_image=generate_image,
+        session_id=user.session_id,
+        image_model_name=image_model_name,
     )
 
 
@@ -284,6 +302,7 @@ async def llm_model_list_handle(
     current = overview.model_name
     zssm_model = overview.zssm_model_name
     vision_model = overview.zssm_vision_model_name
+    image_model = overview.image_model_name
     available = set(available_names)
 
     def format_model(name: str) -> str:
@@ -296,10 +315,18 @@ async def llm_model_list_handle(
             labels.append("zssm")
         if name == vision_model:
             labels.append("zssm 视觉")
+        if name == image_model:
+            labels.append("生图")
         if show_capabilities.result:
             capabilities = plugin_config.get_model(name).capabilities
-            capability_labels = {ModelCapability.TEXT: "文本", ModelCapability.VISION: "视觉"}
-            capability_text = "、".join(capability_labels[item] for item in sorted(capabilities))
+            capability_labels = {
+                ModelCapability.TEXT: "文本",
+                ModelCapability.VISION: "视觉",
+                ModelCapability.IMAGE_GENERATION: "绘图",
+            }
+            capability_text = "、".join(
+                label for capability, label in capability_labels.items() if capability in capabilities
+            )
             labels.append(f"能力：{capability_text or '无'}")
         suffix = f"（{'，'.join(labels)}）" if labels else ""
         return f"- {name}{suffix}"
@@ -326,7 +353,9 @@ async def llm_model_list_handle(
         "- zssm：/llm model set-zssm <模型名>\n"
         "- zssm 跟随默认：/llm model clear-zssm\n"
         "- zssm 视觉：/llm model set-zssm-vision <模型名>\n"
-        f"- zssm 视觉自动选择：/llm model clear-zssm-vision{access_hint}"
+        "- zssm 视觉自动选择：/llm model clear-zssm-vision\n"
+        "- 生图：/llm model set-image <模型名>\n"
+        f"- 生图自动选择：/llm model clear-image{access_hint}"
     )
 
 
@@ -451,6 +480,30 @@ async def llm_model_clear_zssm_vision_handle(bot: Bot, event: Event, user: UserS
         await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
     await clear_zssm_vision_model_name(user.session_id)
     await llm_cmd.finish("本群解释视觉模型已恢复自动选择", at_sender=True)
+
+
+@llm_cmd.assign("model.set-image")
+async def llm_model_set_image_handle(
+    bot: Bot,
+    event: Event,
+    user: UserSession,
+    model: Query[str] = Query("model.set-image.model"),
+):
+    if not await admin_permission()(bot, event):
+        await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
+    try:
+        await set_image_model_name(user.session_id, model.result)
+    except ValueError as e:
+        await llm_cmd.finish(str(e), at_sender=True)
+    await llm_cmd.finish(f"已设置本群生图模型为：{model.result}", at_sender=True)
+
+
+@llm_cmd.assign("model.clear-image")
+async def llm_model_clear_image_handle(bot: Bot, event: Event, user: UserSession):
+    if not await admin_permission()(bot, event):
+        await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
+    await clear_image_model_name(user.session_id)
+    await llm_cmd.finish("本群生图模型已恢复自动选择", at_sender=True)
 
 
 @llm_cmd.assign("tts.list")
@@ -627,6 +680,7 @@ async def _handle_dialogue_command(
     use_tts: Query[bool],
     *,
     enable_tools: bool,
+    generate_image: bool = False,
 ) -> None:
     """执行共享的纯对话或工具增强命令流程。"""
     try:
@@ -635,17 +689,19 @@ async def _handle_dialogue_command(
         await matcher.finish(str(e), at_sender=True)
 
     if not text and not images:
-        command_name = "agent" if enable_tools else "chat"
+        command_name = "draw" if generate_image else "agent" if enable_tools else "chat"
         await matcher.finish(f"你想问什么呢？输入 /{command_name} -h 查看用法", at_sender=True)
 
     try:
-        handler = await _create_handler(
-            user,
-            selected_model=model_name.result if model_name.available else "",
-            render=render.result,
-            use_tts=use_tts.result,
-            enable_tools=enable_tools,
-        )
+        handler_options: dict[str, Any] = {
+            "selected_model": model_name.result if model_name.available else "",
+            "render": render.result,
+            "use_tts": use_tts.result,
+            "enable_tools": enable_tools,
+        }
+        if generate_image:
+            handler_options["generate_image"] = True
+        handler = await _create_handler(user, **handler_options)
     except LLMSetupError as e:
         if e.at_sender:
             await matcher.finish(str(e), at_sender=True)
@@ -673,6 +729,7 @@ async def chat_handle(
     render: Query[bool] = Query("render.value", False),
     use_tts: Query[bool] = Query("tts.value", False),
     use_agent: Query[bool] = Query("agent.value", False),
+    use_draw: Query[bool] = Query("draw.value", False),
 ) -> None:
     await _handle_dialogue_command(
         chat_cmd,
@@ -688,6 +745,7 @@ async def chat_handle(
         render,
         use_tts,
         enable_tools=use_agent.result,
+        generate_image=use_draw.result,
     )
 
 
@@ -705,6 +763,7 @@ async def llm_mention_handle(
     render: Query[bool] = Query("render.value", False),
     use_tts: Query[bool] = Query("tts.value", False),
     use_agent: Query[bool] = Query("agent.value", False),
+    use_draw: Query[bool] = Query("draw.value", False),
 ) -> None:
     """把群聊中 @ 机器人的 Alconna 解析结果交给对话流程。"""
     try:
@@ -716,13 +775,15 @@ async def llm_mention_handle(
         await UniMessage.text("你想问什么呢？").finish(reply_to=msg_id)
 
     try:
-        handler = await _create_handler(
-            user,
-            selected_model=model_name.result if model_name.available else "",
-            render=render.result,
-            use_tts=use_tts.result,
-            enable_tools=use_agent.result,
-        )
+        handler_options = {
+            "selected_model": model_name.result if model_name.available else "",
+            "render": render.result,
+            "use_tts": use_tts.result,
+            "enable_tools": use_agent.result,
+        }
+        if use_draw.result:
+            handler_options["generate_image"] = True
+        handler = await _create_handler(user, **handler_options)
     except LLMSetupError as e:
         await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=msg_id)
     if use_context.result:

@@ -16,6 +16,7 @@ PROJECT_VERSION = tomllib.loads((Path(__file__).parents[3] / "pyproject.toml").r
 OPENAI_CHAT_COMPLETIONS = "openai_chat_completions"
 OPENAI_RESPONSES = "openai_responses"
 ANTHROPIC_MESSAGES = "anthropic_messages"
+OPENAI_IMAGES = "openai_images"
 
 
 def make_config(provider: str, **kwargs):
@@ -791,6 +792,7 @@ def test_provider_names_use_explicit_enum(app: App):
         OPENAI_CHAT_COMPLETIONS,
         OPENAI_RESPONSES,
         ANTHROPIC_MESSAGES,
+        "openai_images",
     ]
     assert set(PROVIDERS) == set(ProviderName)
     assert ModelConfig(name="default").provider is ProviderName.OPENAI_CHAT_COMPLETIONS
@@ -836,3 +838,246 @@ def test_endpoints(app: App):
     assert ChatProvider(make_config(OPENAI_CHAT_COMPLETIONS)).endpoint == "https://api.example.com/chat/completions"
     assert ResponsesProvider(make_config(OPENAI_RESPONSES)).endpoint == "https://api.example.com/responses"
     assert AnthropicProvider(make_config(ANTHROPIC_MESSAGES)).endpoint == "https://api.example.com/v1/messages"
+
+
+@respx.mock(assert_all_called=True)
+async def test_images_provider_generates(app: App, respx_mock: MockRouter):
+    """生图模型通过 Image API 生成图片，请求体带上模型和输出参数。"""
+    import base64
+
+    from src.plugins.llm.config import ModelConfig
+    from src.plugins.llm.providers import ImagesProvider, ProviderName
+
+    png = b"\x89PNG\r\n\x1a\n" + b"0" * 16
+    route = respx_mock.post("https://api.example.com/images/generations").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "data": [{"b64_json": base64.b64encode(png).decode()}],
+                "usage": {"input_tokens": 3, "output_tokens": 4},
+            },
+        )
+    )
+    config = ModelConfig(
+        name="painter",
+        provider=ProviderName.OPENAI_IMAGES,
+        model="gpt-image-2.5-sunburst",
+        base_url="https://api.example.com",
+        api_key="sk-test",
+        extra_body={"size": "1024x1024"},
+    )
+    result = await ImagesProvider(config).generate("一只猫")
+
+    payload = json.loads(route.calls[0].request.content)
+    assert payload == {"model": "gpt-image-2.5-sunburst", "prompt": "一只猫", "size": "1024x1024"}
+    assert result.images[0].data == png
+    assert result.images[0].mimetype == "image/png"
+    assert result.usage.input_tokens == 3
+    assert result.usage.output_tokens == 4
+
+
+@pytest.mark.parametrize(
+    ("provider_name", "expected"),
+    [
+        (OPENAI_CHAT_COMPLETIONS, {"type": "function", "function": {"name": "generate_image"}}),
+        (OPENAI_RESPONSES, {"type": "function", "name": "generate_image"}),
+        (ANTHROPIC_MESSAGES, {"type": "tool", "name": "generate_image"}),
+    ],
+)
+def test_force_tool_choice_payload(app: App, provider_name: str, expected: object):
+    """三种对话协议都能把工具选择强制到指定函数。"""
+    from src.plugins.llm.providers import get_provider
+    from src.plugins.llm.schemas import ForceTool, Message, ToolParam
+
+    tools = [ToolParam(name="generate_image", description="画图", parameters={"type": "object", "properties": {}})]
+    provider = get_provider(provider_name)(make_config(provider_name))
+    payload = provider.build_payload([Message.user("画猫")], tools, tool_choice=ForceTool("generate_image"))
+    assert payload["tool_choice"] == expected
+
+
+def test_responses_extra_body_tools_validation_and_merge(app: App):
+    """extra_body.tools 必须是数组，并和函数工具合并下发。"""
+    from src.plugins.llm.providers import ProviderError, ResponsesProvider
+    from src.plugins.llm.schemas import Message, ToolParam
+
+    invalid = ResponsesProvider(make_config(OPENAI_RESPONSES, extra_body={"tools": {}}))
+    with pytest.raises(ProviderError, match="工具数组"):
+        invalid.build_payload([Message.user("你好")])
+
+    tools = [ToolParam(name="get_weather", description="天气", parameters={"type": "object"})]
+    provider = ResponsesProvider(make_config(OPENAI_RESPONSES, extra_body={"tools": [{"type": "web_search"}]}))
+    payload = provider.build_payload([Message.user("你好")], tools)
+    assert [item["type"] for item in payload["tools"]] == ["function", "web_search"]
+
+
+def test_responses_parse_response_terminal_status(app: App):
+    """失败、取消和工具参数不完整的响应要明确报错。"""
+    from src.plugins.llm.providers import ProviderError, ResponsesProvider
+
+    provider = ResponsesProvider(make_config(OPENAI_RESPONSES))
+    with pytest.raises(ProviderError, match="失败或已取消"):
+        provider.parse_response({"status": "failed"})
+    with pytest.raises(ProviderError, match="失败或已取消"):
+        provider.parse_response({"status": "cancelled"})
+    with pytest.raises(ProviderError, match="工具调用尚未完成"):
+        provider.parse_response(
+            {"status": "incomplete", "output": [{"type": "function_call", "name": "get_weather", "arguments": "{}"}]}
+        )
+
+
+@respx.mock(assert_all_called=True)
+async def test_responses_stream_terminal_snapshot_with_refusal(app: App, respx_mock: MockRouter):
+    """结束事件带完整快照时以快照为准，拒绝内容并入正文。"""
+    from src.plugins.llm.providers import ResponsesProvider
+
+    chunks = [
+        'event: response.refusal.delta\ndata: {"delta":"不能"}\n\n',
+        'event: response.completed\ndata: {"response":{"model":"m","status":"completed","output":['
+        '{"type":"message","role":"assistant","content":[{"type":"refusal","refusal":"不能"}]}]}}\n\n',
+    ]
+    respx_mock.post("https://api.example.com/responses").mock(return_value=httpx.Response(200, text="".join(chunks)))
+
+    completion = await ResponsesProvider(make_config(OPENAI_RESPONSES, stream=True)).chat(make_messages())
+    assert completion.content == "不能"
+
+
+@respx.mock(assert_all_called=True)
+async def test_responses_stream_without_terminal_event_raises(app: App, respx_mock: MockRouter):
+    """只收到分片、没有结束事件时不能把半截内容当成功。"""
+    from src.plugins.llm.providers import ProviderError, ResponsesProvider
+
+    chunks = ['event: response.output_text.delta\ndata: {"delta":"半截"}\n\n']
+    respx_mock.post("https://api.example.com/responses").mock(return_value=httpx.Response(200, text="".join(chunks)))
+
+    with pytest.raises(ProviderError, match="流式响应中断"):
+        await ResponsesProvider(make_config(OPENAI_RESPONSES, stream=True)).chat(make_messages())
+
+
+@respx.mock(assert_all_called=True)
+async def test_responses_incomplete_with_tool_calls_raises(app: App, respx_mock: MockRouter):
+    """不完整响应里出现工具调用时整轮报错，避免执行半截参数。"""
+    from src.plugins.llm.providers import ProviderError, ResponsesProvider
+
+    chunks = [
+        'event: response.output_item.done\ndata: {"output_index":0,"item":{"type":"function_call",'
+        '"id":"fc_1","call_id":"call_1","name":"get_weather","arguments":"{}"}}\n\n',
+        'event: response.incomplete\ndata: {"response":{"status":"incomplete"}}\n\n',
+    ]
+    respx_mock.post("https://api.example.com/responses").mock(return_value=httpx.Response(200, text="".join(chunks)))
+
+    with pytest.raises(ProviderError, match="工具调用尚未完成"):
+        await ResponsesProvider(make_config(OPENAI_RESPONSES, stream=True)).chat(make_messages())
+
+
+def test_responses_image_generation_call_parses_and_rejects(app: App):
+    """解析图片生成结果，损坏的 base64 要转成明确的错误。"""
+    import base64
+
+    from src.plugins.llm.providers import ProviderError, ResponsesProvider
+
+    png = b"\x89PNG\r\n\x1a\n" + b"0" * 16
+    provider = ResponsesProvider(make_config(OPENAI_RESPONSES))
+    completion = provider.parse_response(
+        {"status": "completed", "output": [{"type": "image_generation_call", "result": base64.b64encode(png).decode()}]}
+    )
+    assert completion.images[0].data == png
+    with pytest.raises(ProviderError, match="数据无效"):
+        provider.parse_response({"status": "completed", "output": [{"type": "image_generation_call", "result": "@@@"}]})
+
+
+def test_responses_invalid_tool_arguments_raise(app: App):
+    """工具参数不是 JSON 对象时直接报错，不再静默当成空参数。"""
+    from src.plugins.llm.providers import ProviderError, ResponsesProvider
+
+    provider = ResponsesProvider(make_config(OPENAI_RESPONSES))
+    with pytest.raises(ProviderError, match="无效 JSON"):
+        provider.parse_response(
+            {"status": "completed", "output": [{"type": "function_call", "id": "c", "name": "f", "arguments": "oops"}]}
+        )
+    with pytest.raises(ProviderError, match="JSON 对象"):
+        provider.parse_response(
+            {"status": "completed", "output": [{"type": "function_call", "id": "c", "name": "f", "arguments": "[]"}]}
+        )
+
+
+async def test_sse_top_level_not_object_raises(app: App):
+    """SSE 的 JSON 顶层不是对象时报错，而不是当成响应用。"""
+    from src.plugins.llm.providers import ProviderError
+    from src.plugins.llm.providers.base import iter_sse
+
+    with pytest.raises(ProviderError, match="顶层不是对象"):
+        async for _ in iter_sse(httpx.Response(200, text="data: []\n\n")):
+            pass
+
+
+async def test_sse_flushes_event_without_trailing_blank_line(app: App):
+    """连接在最后一个事件后直接关闭时也要把事件交出去。"""
+    from src.plugins.llm.providers.base import iter_sse
+
+    events = [item async for item in iter_sse(httpx.Response(200, text='event: custom\ndata: {"a": 1}'))]
+    assert events == [("custom", {"a": 1})]
+
+
+async def test_images_provider_rejects_chat(app: App):
+    """生图模型不能用于对话接口。"""
+    from src.plugins.llm.providers import ImagesProvider, ProviderError
+    from src.plugins.llm.schemas import Message
+
+    provider = ImagesProvider(make_config(OPENAI_IMAGES))
+    with pytest.raises(ProviderError, match="只用于图片生成"):
+        provider.build_payload([Message.user("你好")])
+    with pytest.raises(ProviderError, match="只用于图片生成"):
+        provider.parse_response({})
+    with pytest.raises(ProviderError, match="只用于图片生成"):
+        await provider.parse_stream(httpx.Response(200, text=""))
+    with pytest.raises(ProviderError, match="只用于图片生成"):
+        await provider.chat([Message.user("你好")])
+
+
+@pytest.mark.parametrize(
+    ("payload", "match"),
+    [
+        ({"data": []}, "没有返回图片数据"),
+        ({"data": [{}]}, "没有返回 base64"),
+        ({"data": [{"b64_json": "@@@"}]}, "数据无效"),
+    ],
+)
+@respx.mock(assert_all_called=True)
+async def test_images_provider_generation_errors(app: App, respx_mock: MockRouter, payload: dict, match: str):
+    """图片接口返回异常数据时给出可读的错误。"""
+    from src.plugins.llm.providers import ImagesProvider, ProviderError
+
+    respx_mock.post("https://api.example.com/images/generations").mock(return_value=httpx.Response(200, json=payload))
+    with pytest.raises(ProviderError, match=match):
+        await ImagesProvider(make_config(OPENAI_IMAGES)).generate("一只猫")
+
+
+@respx.mock(assert_all_called=True)
+async def test_images_provider_without_usage_and_session_affinity(app: App, respx_mock: MockRouter):
+    """没有用量时返回空统计，并带上会话头。"""
+    import base64
+
+    from src.plugins.llm.providers import ImagesProvider
+    from src.plugins.llm.schemas import Usage
+
+    png = b"\x89PNG\r\n\x1a\n" + b"0" * 16
+    route = respx_mock.post("https://api.example.com/images/generations").mock(
+        return_value=httpx.Response(200, json={"data": [{"b64_json": base64.b64encode(png).decode()}]})
+    )
+    provider = ImagesProvider(make_config(OPENAI_IMAGES), session_affinity="test-affinity")
+    result = await provider.generate("一只猫")
+    assert result.usage == Usage()
+    assert route.calls[0].request.headers["x-session-affinity"] == "test-affinity"
+
+
+async def test_images_provider_network_errors(app: App, respx_mock: MockRouter):
+    """超时和连接错误都要转成 ProviderError。"""
+    from src.plugins.llm.providers import ImagesProvider, ProviderError
+
+    respx_mock.post("https://api.example.com/images/generations").mock(side_effect=httpx.ReadTimeout("slow"))
+    with pytest.raises(ProviderError, match="超时"):
+        await ImagesProvider(make_config(OPENAI_IMAGES)).generate("一只猫")
+
+    respx_mock.post("https://api.example.com/images/generations").mock(side_effect=httpx.ConnectError("boom"))
+    with pytest.raises(ProviderError, match="请求失败"):
+        await ImagesProvider(make_config(OPENAI_IMAGES)).generate("一只猫")

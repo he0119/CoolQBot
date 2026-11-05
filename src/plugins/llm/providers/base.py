@@ -52,7 +52,17 @@ def _decode_json_response(response: httpx.Response) -> dict[str, Any]:
     return data
 
 
-async def iter_sse(response: httpx.Response) -> AsyncIterator[tuple[str, Any]]:
+def _decode_sse_data(value: str) -> dict[str, Any]:
+    try:
+        data = json.loads(value)
+    except json.JSONDecodeError as e:
+        raise ProviderError("流式响应包含无效 JSON") from e
+    if not isinstance(data, dict):
+        raise ProviderError("流式响应的 JSON 顶层不是对象")
+    return data
+
+
+async def iter_sse(response: httpx.Response) -> AsyncIterator[tuple[str, dict[str, Any]]]:
     """解析 SSE 流，产出 (事件名, 已解析的 JSON 数据)
 
     三种格式的 SSE 都遵循同一套行协议，差别只在事件名与数据结构：
@@ -63,11 +73,18 @@ async def iter_sse(response: httpx.Response) -> AsyncIterator[tuple[str, Any]]:
     因此这里统一按行解析，事件名缺失时以空字符串表示。
     """
     event = ""
+    data_lines: list[str] = []
     async for line in response.aiter_lines():
         line = line.rstrip("\r")
-        # 空行代表一个事件结束，重置事件名
+        # 空行结束事件；同一事件的多个 data 行以换行拼接。
         if not line:
+            if data_lines:
+                value = "\n".join(data_lines)
+                if value == "[DONE]":
+                    return
+                yield event, _decode_sse_data(value)
             event = ""
+            data_lines.clear()
             continue
         # 以冒号开头的是注释（心跳），直接忽略
         if line.startswith(":"):
@@ -76,16 +93,17 @@ async def iter_sse(response: httpx.Response) -> AsyncIterator[tuple[str, Any]]:
             continue
 
         field, _, value = line.partition(":")
-        value = value.lstrip()
+        value = value.removeprefix(" ")
         if field == "event":
             event = value
         elif field == "data":
-            if value == "[DONE]":
-                return
-            try:
-                yield event, json.loads(value)
-            except json.JSONDecodeError as e:
-                raise ProviderError("流式响应包含无效 JSON") from e
+            data_lines.append(value)
+
+    # 部分兼容服务在最后一个事件后直接关闭连接，不发送额外空行。
+    if data_lines:
+        value = "\n".join(data_lines)
+        if value != "[DONE]":
+            yield event, _decode_sse_data(value)
 
 
 class Provider(ABC):

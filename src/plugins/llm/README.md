@@ -21,6 +21,8 @@
 - 单轮与多轮对话，多轮支持「结束」「回滚」指令
 - 群聊中直接 @ 机器人即可使用默认模型对话
 - 流式与非流式请求
+- 独立的生图模型（`openai_images`），对话模型通过工具调用它；生成结果直接发送为聊天图片
+- `/draw <描述>` 用本群生图模型作图；Responses 对话模型走原生工具并支持多轮改图，其他接口走本地工具
 - 推理内容以引用块展示（DeepSeek 的 `reasoning_content`、Anthropic 的 `thinking`、Responses 的推理摘要）
 - 使用 emoji reaction 反馈响应状态（思考中、已完成、失败）；QQ 适配器开始处理时改发普通消息，其他不支持的平台自动跳过
 - `/chat` 默认不发送工具定义，增加 `-a|--agent` 后开放全部已注册工具；`/agent` 是 `/chat -a` 的快捷入口
@@ -55,6 +57,9 @@
 | `/chat -t <内容>`                     | -                 | 使用语音回复           | 所有人     |
 | `/chat -a <内容>`                     | `/agent <内容>`   | 使用全部工具完成问答   | 所有人     |
 | `/chat -a --model <模型名> <内容>`    | `/agent --model`  | 指定模型进行工具问答   | 所有人     |
+| `/draw <描述>`                        | `/chat -d`        | 用本群生图模型生成图片 | 所有人     |
+| `/draw -c <描述>`                     | -                 | 开启多轮对话           | 所有人     |
+| `/draw --model <模型名> <描述>`       | -                 | 本次指定对话模型       | 所有人     |
 | `/<快捷指令名> [选项] <内容>`         | -                 | 用已注册的快捷命令对话 | 所有人     |
 | `/llm model list`                     | -                 | 查看本群已启用模型     | 所有人     |
 | `/llm model list --all`               | -                 | 查看全部模型及启用状态 | 超级管理员 |
@@ -64,6 +69,8 @@
 | `/llm model clear-zssm`               | -                 | 解释模型跟随默认模型   | 群管理员   |
 | `/llm model set-zssm-vision <模型名>` | -                 | 设置群组解释视觉模型   | 群管理员   |
 | `/llm model clear-zssm-vision`        | -                 | 视觉模型恢复自动选择   | 群管理员   |
+| `/llm model set-image <模型名>`       | -                 | 设置本群生图模型       | 群管理员   |
+| `/llm model clear-image`              | -                 | 生图模型恢复自动选择   | 群管理员   |
 | `/llm model enable <模型名...>`       | -                 | 启用一个或多个群组模型 | 超级管理员 |
 | `/llm model enable --all`             | -                 | 启用群组全部模型       | 超级管理员 |
 | `/llm model disable <模型名...>`      | -                 | 禁用一个或多个群组模型 | 超级管理员 |
@@ -79,8 +86,8 @@
 | `zssm -r [关注点]`                    | -                 | 将解释渲染为图片       | 所有人     |
 | `zssm --model <模型名> [关注点]`      | -                 | 本次使用指定解释模型   | 所有人     |
 
-对话及解释选项应写在内容前；`<内容>` 是可变长参数，放在内容后的选项可能被当作正文。`/chat` 支持 `--model`、`-c`、`-r`、`-t` 和 `-a|--agent`；`/agent` 是预先启用 `-a` 的快捷入口并支持其余相同选项。@ 对话支持相同选项，`zssm` 可用 `--model`、`-r|--render` 和 `-a|--agent`。
-`/llm model list` 对所有人都只显示本群已启用的模型及其“默认对话”、`zssm` 和 `zssm 视觉`用途标签，并分区列出对话与群组设置命令；超级管理员增加 `--all` 后才会看到全局全部模型及本群启用状态。增加 `--capabilities` 后，当前列表才会同时显示每个模型的能力，两个参数可以组合使用。
+对话及解释选项应写在内容前；`<内容>` 是可变长参数，放在内容后的选项可能被当作正文。`/chat` 支持 `--model`、`-c`、`-r`、`-t`、`-a|--agent` 和 `-d|--draw`；`/agent` 是预先启用 `-a` 的快捷入口，`/draw` 是预先启用 `-d` 的绘图入口。绘图模式只开放生图工具：对话模型是 `openai_responses` 时使用原生 `image_generation` 工具，其他接口使用本地 `generate_image` 工具调用生图模型。@ 对话支持相同选项，`zssm` 可用 `--model`、`-r|--render` 和 `-a|--agent`。
+`/llm model list` 对所有人都只显示本群已启用的模型及其“默认对话”、`zssm`、`zssm 视觉`和“生图”用途标签，并分区列出对话与群组设置命令；超级管理员增加 `--all` 后才会看到全局全部模型及本群启用状态。增加 `--capabilities` 后，当前列表才会同时显示每个模型的能力（文本、视觉、绘图），两个参数可以组合使用。
 `/chat --shortcut` 注册的快捷命令与 `/chat` 同源：其后的选项按对话选项解析，目标模型仍受本群启用列表限制，详见「模型快捷命令」。快捷命令名注册在命令解析层，是进程级全局的，所有群共用同一批名字，群之间的差异只体现在可用模型上。
 所有命令、快捷命令、`zssm` 和 @ 对话仅支持群聊、频道等非私聊会话；私聊消息不会触发大模型。
 
@@ -92,6 +99,7 @@
 /chat 帮我写一段冒泡排序         # 与默认模型对话
 /chat 这张图是什么               # 附带图片时会一起发给模型
 /chat -a 查询成都今天的天气      # 允许模型调用工具（/agent 是等价快捷写法）
+/draw 画一只戴围巾的猫          # 用本群生图模型生成图片
 ```
 
 ### 指定模型
@@ -197,7 +205,8 @@
 
 ## 配置说明
 
-通过 `LLM__` 前缀在 `.env` 中配置。`models` 的第一项为默认模型。
+通过 `LLM__` 前缀在 `.env` 中配置。`models` 的第一项为默认模型，以下示例默认使用 `gpt-6.1-sol`。
+已有群组可先执行 `/llm model enable gpt`，再通过 `/llm model set gpt` 切换默认模型。
 快捷对话只过滤 `COMMAND_START` 中的非空前缀；如果命令配置了空前缀，未带前缀的命令无法与普通对话可靠区分。
 
 ```env
@@ -249,6 +258,28 @@ LLM__ZSSM_MAX_RESOURCES=2
 LLM__MODELS='
 [
   {
+    "name": "gpt",
+    "provider": "openai_responses",
+    "model": "gpt-6.1-sol",
+    "base_url": "https://api.openai.com/v1",
+    "api_key": "sk-openai-xxx",
+    "capabilities": ["text", "vision"]
+  },
+  {
+    "name": "painter",
+    "provider": "openai_images",
+    "model": "gpt-image-2.5-sunburst",
+    "base_url": "https://api.openai.com/v1",
+    "api_key": "sk-openai-xxx",
+    "capabilities": ["image_generation"],
+    "timeout": 300,
+    "extra_body": {
+      "size": "1024x1024",
+      "quality": "high",
+      "output_format": "png"
+    }
+  },
+  {
     "name": "deepseek",
     "provider": "openai_chat_completions",
     "model": "deepseek-chat",
@@ -267,14 +298,6 @@ LLM__MODELS='
     }
   },
   {
-    "name": "gpt",
-    "provider": "openai_responses",
-    "model": "gpt-5",
-    "base_url": "https://api.openai.com/v1",
-    "api_key": "sk-openai-xxx",
-    "capabilities": ["text", "vision"]
-  },
-  {
     "name": "claude",
     "provider": "anthropic_messages",
     "model": "claude-opus-5",
@@ -290,26 +313,70 @@ LLM__TTS_ACCESS_TOKEN=your_token
 LLM__TTS_MODEL=default
 ```
 
-省略 `capabilities` 时默认为 `["text"]`。普通多模态模型应配置为 `["text", "vision"]`；配置为 `["vision"]` 的模型只参与 zssm 图片理解，不会被选为默认对话、临时文本对话或 zssm 解释模型。
+省略 `capabilities` 时默认为 `["text"]`。普通多模态模型应配置为 `["text", "vision"]`；配置为 `["vision"]` 的模型只参与 zssm 图片理解，不会被选为默认对话、临时文本对话或 zssm 解释模型。`image_generation` 标记的是**独立的生图模型**（`provider` 使用 `openai_images`），它不参与文本对话；对话模型不需要声明这个能力，而是通过工具调用生图模型。
 
 ### 单个模型的可配置项
 
-| 字段           | 说明                                             |
-| -------------- | ------------------------------------------------ |
-| `name`         | 模型标识，命令中用此名称选择模型                 |
-| `model`        | 传给 API 的模型名，留空时与 `name` 相同          |
-| `provider`     | API 格式，见上方三种完整协议名                   |
-| `base_url`     | 服务地址，留空时回退到 `LLM__BASE_URL`           |
-| `api_key`      | 密钥，留空时回退到 `LLM__API_KEY`                |
-| `prompt`       | 人设，留空时回退到 `LLM__PROMPT`                 |
-| `proxy`        | 代理地址                                         |
-| `stream`       | 是否流式请求，留空时回退到 `LLM__STREAM`         |
-| `max_tokens`   | 最大输出 token 数（`anthropic` 必填，默认 4096） |
-| `temperature`  | 采样温度                                         |
-| `timeout`      | 非流式请求超时时间（秒）                         |
-| `extra_body`   | 附加到请求体的额外字段，用于传各服务商特有参数   |
-| `capabilities` | 输入能力列表，默认 `text`；可选 `text`、`vision` |
-| `quota`        | 该模型的额度查询配置，留空时不支持 `/llm quota`  |
+| 字段           | 说明                                                                             |
+| -------------- | -------------------------------------------------------------------------------- |
+| `name`         | 模型标识，命令中用此名称选择模型                                                 |
+| `model`        | 传给 API 的模型名，留空时与 `name` 相同                                          |
+| `provider`     | API 格式，对话模型用三种对话协议，生图模型用 `openai_images`                     |
+| `base_url`     | 服务地址，留空时回退到 `LLM__BASE_URL`                                           |
+| `api_key`      | 密钥，留空时回退到 `LLM__API_KEY`                                                |
+| `prompt`       | 人设，留空时回退到 `LLM__PROMPT`                                                 |
+| `proxy`        | 代理地址                                                                         |
+| `stream`       | 是否流式请求，留空时回退到 `LLM__STREAM`                                         |
+| `max_tokens`   | 最大输出 token 数（`anthropic` 必填，默认 4096）                                 |
+| `temperature`  | 采样温度                                                                         |
+| `timeout`      | 非流式请求超时时间（秒）                                                         |
+| `extra_body`   | 附加到请求体的额外字段，用于传各服务商特有参数                                   |
+| `capabilities` | 模型能力列表，默认 `text`；可选 `text`、`vision`、`image_generation`（生图模型） |
+| `quota`        | 该模型的额度查询配置，留空时不支持 `/llm quota`                                  |
+
+### OpenAI Responses 与图片生成
+
+使用 OpenAI 官方接口时，`provider` 设为 `openai_responses`，`base_url` 设为
+`https://api.openai.com/v1`。`model` 填写账号可用的模型 ID；推理强度、推理摘要和文本详细程度
+可通过 `extra_body.reasoning`、`extra_body.text` 配置，具体取值取决于所选模型。
+`max_tokens` 会转换为 `max_output_tokens`，包含推理 token；`temperature` 留空时不发送。
+
+图片生成由单独的**生图模型**完成，例如 `gpt-image-2.5-sunburst` 或 `gpt-image-2.5-flare`。
+在 `LLM__MODELS` 里单独声明一个生图模型条目：`provider` 用 `openai_images`，`capabilities` 只写
+`image_generation`，大小、质量、格式等输出参数放在 `extra_body`。示例见上方的 `painter`。
+
+为本群启用这个模型（`/llm model enable painter`）后，`/draw` 默认使用本群已启用的第一个生图模型；
+有多个时用 `/llm model set-image <模型名>` 指定，`/llm model clear-image` 恢复自动选择。
+`/llm model list --capabilities` 会在生图模型旁显示“生图”和“能力：绘图”。
+
+`/draw` 按当前对话模型使用的接口自动选择实现：
+
+- `openai_responses` 对话模型：把生图模型写进原生 `image_generation` 工具的 `model` 字段，
+  图片在工具回合里返回，支持多轮改图；
+- 其他对话模型（Chat Completions、Anthropic）：插件注册本地 `generate_image` 工具，
+  由它调用生图模型的 `POST /images/generations`，生成的图片直接发给用户，工具只把一句结果交回模型。
+
+`/chat -a` 也会带上 `generate_image` 工具，模型可以自行判断是否需要画图；本群没有生图模型时，
+这个工具不会下发给模型。`/draw --model` 仍然指定**对话模型**，生图模型由群设置决定。
+如果 Responses 对话模型本身不支持原生 `image_generation` 工具，接口会报错；这时可以换一个
+Chat Completions 或 Anthropic 对话模型，让插件走本地工具调用生图模型。
+
+图片大小、质量、格式、压缩、背景等通过生图模型的 `extra_body` 配置。Responses 原生工具只透传
+`size`、`quality`、`background`、`output_format`、`output_compression`、`moderation`、`action`
+这几项，其余字段只对 Image API 生效。多轮改图目前只由 Responses 原生工具支持；走本地
+`generate_image` 的模型每轮都会重新生成一张图，不会把上一张图作为输入。
+
+PNG、JPEG、WebP 和 GIF 会作为原图发送，只有图片时也会附带统计。流式请求等待最终图片，
+不发送中间预览。`extra_body.tools` 里显式配置的原生工具对 Responses 对话模型的普通 `/chat`
+同样生效；`-a|--agent` 会额外开放本地注册的函数工具，两者合并发送。模型请求达到上限时，
+`tool_choice: "none"` 会同时禁止原生工具与函数工具。
+
+插件在本地维护完整上下文，Responses 默认发送 `store: false`，并请求加密推理数据以兼容旧版
+接口；后续请求保留原始输出中的加密推理、助手 `phase` 和图片生成结果。可通过 `extra_body`
+显式覆盖 `store`、`include` 等字段。接入方式参考 OpenAI 的
+[Responses 迁移指南](https://developers.openai.com/api/docs/guides/migrate-to-responses)、
+[推理上下文说明](https://developers.openai.com/api/docs/guides/reasoning)和
+[图片生成工具文档](https://developers.openai.com/api/docs/guides/tools-image-generation)。
 
 ### 额度查询配置
 

@@ -8,6 +8,7 @@ from sqlalchemy import select, update
 
 from .config import ModelCapability, plugin_config
 from .models import GroupLLMConfig
+from .providers import ProviderName
 
 
 @dataclass(frozen=True)
@@ -18,6 +19,7 @@ class GroupModelOverview:
     model_name: str
     zssm_model_name: str
     zssm_vision_model_name: str
+    image_model_name: str = ""
 
 
 async def _get_config(session_id: str) -> GroupLLMConfig | None:
@@ -39,6 +41,19 @@ def _available_names(config: GroupLLMConfig | None) -> list[str]:
 def _capable_names(names: list[str], capability: ModelCapability) -> list[str]:
     """按全局配置顺序筛出声明指定能力的模型。"""
     return [name for name in names if capability in plugin_config.get_model(name).capabilities]
+
+
+def _is_image_model(name: str) -> bool:
+    """生图模型需要声明 image_generation 能力并使用 openai_images 接口。"""
+    model = plugin_config.get_model(name)
+    return ModelCapability.IMAGE_GENERATION in model.capabilities and model.provider == ProviderName.OPENAI_IMAGES
+
+
+def _resolve_image_model_name(config: GroupLLMConfig | None, names: list[str]) -> str:
+    """优先使用群组显式设置，否则选择本群首个已启用的生图模型。"""
+    if config and config.image_model in names and config.image_model and _is_image_model(config.image_model):
+        return config.image_model
+    return next((name for name in names if _is_image_model(name)), "")
 
 
 def _resolve_zssm_vision_model_name(config: GroupLLMConfig | None, names: list[str]) -> str:
@@ -71,7 +86,13 @@ async def get_model_overview(session_id: str) -> GroupModelOverview:
     )
     zssm_model_name = config.zssm_model if config and config.zssm_model in text_names else model_name
     zssm_vision_model_name = _resolve_zssm_vision_model_name(config, names)
-    return GroupModelOverview(names, model_name, zssm_model_name, zssm_vision_model_name)
+    return GroupModelOverview(
+        names,
+        model_name,
+        zssm_model_name,
+        zssm_vision_model_name,
+        _resolve_image_model_name(config, names),
+    )
 
 
 async def get_model_name(session_id: str) -> str:
@@ -138,6 +159,7 @@ async def set_available_model_names(session_id: str, model_names: list[str]) -> 
                     model_name=config.model_name if config.model_name in text_available else fallback_model,
                     zssm_model=config.zssm_model if config.zssm_model in text_available else None,
                     zssm_vision_model=(config.zssm_vision_model if config.zssm_vision_model in available else None),
+                    image_model=(config.image_model if config.image_model in available else None),
                 )
             )
         else:
@@ -165,6 +187,7 @@ async def clear_available_model_names(session_id: str) -> None:
             config.model_name = None
             config.zssm_model = None
             config.zssm_vision_model = None
+            config.image_model = None
             await session.commit()
     logger.info("LLM 群组模型已全部禁用")
 
@@ -280,3 +303,39 @@ async def set_tts_model(session_id: str, tts_model: str) -> None:
             session.add(GroupLLMConfig(session_id=session_id, tts_model=tts_model))
         await session.commit()
     logger.info("LLM 群组默认 TTS 模型已更新（模型={}）", tts_model)
+
+
+async def get_image_model_name(session_id: str) -> str:
+    """获取本群生图模型；未设置时自动选择本群首个生图模型。"""
+    config = await _get_config(session_id)
+    return _resolve_image_model_name(config, _available_names(config))
+
+
+async def set_image_model_name(session_id: str, model_name: str) -> None:
+    """设置本群生图模型。"""
+    async with get_session() as session:
+        config = (
+            await session.scalars(select(GroupLLMConfig).where(GroupLLMConfig.session_id == session_id))
+        ).one_or_none()
+        if not config or model_name not in _available_names(config):
+            raise ValueError(f"本群未启用的模型：{model_name}")
+        model = plugin_config.get_model(model_name)
+        if ModelCapability.IMAGE_GENERATION not in model.capabilities:
+            raise ValueError(f"模型 {model_name} 未声明 image_generation 能力，不能用于生成图片")
+        if model.provider != ProviderName.OPENAI_IMAGES:
+            raise ValueError(f"模型 {model_name} 使用 {model.provider} 接口，生图模型需要 openai_images 接口")
+        config.image_model = model_name
+        await session.commit()
+    logger.info("LLM 群组生图模型已更新（模型={}）", model_name)
+
+
+async def clear_image_model_name(session_id: str) -> None:
+    """清除本群显式设置的生图模型，使其恢复自动选择。"""
+    async with get_session() as session:
+        config = (
+            await session.scalars(select(GroupLLMConfig).where(GroupLLMConfig.session_id == session_id))
+        ).one_or_none()
+        if config:
+            config.image_model = None
+            await session.commit()
+    logger.info("LLM 群组生图模型已恢复自动选择")

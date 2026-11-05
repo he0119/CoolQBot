@@ -1,10 +1,11 @@
 """大模型 API 客户端
 
-支持三种请求格式，通过 `ModelConfig.provider` 选择：
+支持三种对话格式和一种图片生成格式，通过 `ModelConfig.provider` 选择：
 
 - `openai_chat_completions`：OpenAI Chat Completions，`POST {base_url}/chat/completions`
 - `openai_responses`：OpenAI Responses，`POST {base_url}/responses`
 - `anthropic_messages`：Anthropic Messages，`POST {base_url}/v1/messages`
+- `openai_images`：OpenAI Image API，`POST {base_url}/images/generations`，仅用于生图模型
 """
 
 from enum import StrEnum
@@ -12,6 +13,7 @@ from enum import StrEnum
 from .anthropic import AnthropicProvider
 from .base import Provider, ProviderError, iter_sse
 from .chat import ChatProvider
+from .images import ImagesProvider
 from .responses import ResponsesProvider
 
 
@@ -21,6 +23,7 @@ class ProviderName(StrEnum):
     OPENAI_CHAT_COMPLETIONS = "openai_chat_completions"
     OPENAI_RESPONSES = "openai_responses"
     ANTHROPIC_MESSAGES = "anthropic_messages"
+    OPENAI_IMAGES = "openai_images"
 
 
 LEGACY_PROVIDER_NAMES: dict[str, ProviderName] = {
@@ -35,6 +38,7 @@ PROVIDERS: dict[ProviderName, type[Provider]] = {
     ProviderName.OPENAI_CHAT_COMPLETIONS: ChatProvider,
     ProviderName.OPENAI_RESPONSES: ResponsesProvider,
     ProviderName.ANTHROPIC_MESSAGES: AnthropicProvider,
+    ProviderName.OPENAI_IMAGES: ImagesProvider,
 }
 """API 协议到实现的映射。"""
 
@@ -54,6 +58,7 @@ __all__ = [
     "PROVIDERS",
     "AnthropicProvider",
     "ChatProvider",
+    "ImagesProvider",
     "Provider",
     "ProviderError",
     "ProviderName",

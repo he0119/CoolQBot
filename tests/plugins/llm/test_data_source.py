@@ -326,6 +326,7 @@ async def test_set_and_get_tts_model(app: App, mocker):
 def test_model_config_defaults(app: App):
     """模型配置的默认值：模型名、服务地址和请求上限。"""
     from src.plugins.llm.config import ModelCapability, ModelConfig, ScopedConfig
+    from src.plugins.llm.providers import ProviderName
 
     chat = ModelConfig(name="deepseek-chat")
     assert chat.model == "deepseek-chat"
@@ -342,6 +343,13 @@ def test_model_config_defaults(app: App):
 
     multimodal = ModelConfig(name="multimodal", capabilities={"text", "vision"})
     assert multimodal.capabilities == {ModelCapability.TEXT, ModelCapability.VISION}
+
+    painter = ModelConfig(
+        name="painter",
+        provider=ProviderName.OPENAI_RESPONSES,
+        capabilities={ModelCapability.TEXT, ModelCapability.IMAGE_GENERATION},
+    )
+    assert painter.capabilities == {ModelCapability.TEXT, ModelCapability.IMAGE_GENERATION}
 
     config = ScopedConfig(base_url="https://global.example.com", models=[chat, anthropic])
     assert config.prefer_markdown is False
@@ -464,8 +472,12 @@ async def test_tool_registry_errors(app: App):
         """
         return f"你好，{name}"
 
-    assert "未注册的工具" in await registry.execute(ToolCall(id="1", name="unknown", arguments={}))
-    assert "缺少必填参数" in await registry.execute(ToolCall(id="2", name="greet", arguments={}))
+    unknown = await registry.execute(ToolCall(id="1", name="unknown", arguments={}))
+    missing = await registry.execute(ToolCall(id="2", name="greet", arguments={}))
+    assert isinstance(unknown, str)
+    assert isinstance(missing, str)
+    assert "未注册的工具" in unknown
+    assert "缺少必填参数" in missing
 
 
 async def test_tool_registry_logs_metadata_without_values(app: App, mocker):
@@ -647,3 +659,65 @@ async def test_send_reaction_failure_does_not_interrupt_response(app: App, mocke
     mocker.patch("src.plugins.llm.handler.get_target", side_effect=RuntimeError("unsupported"))
 
     await send_reaction("thinking")
+
+
+async def test_group_image_model_setting(app: App, mocker):
+    """生图模型需要显式能力，可按群设置和恢复自动选择。"""
+    from src.plugins.llm.config import ModelCapability, ModelConfig, plugin_config
+    from src.plugins.llm.data_source import (
+        clear_image_model_name,
+        get_image_model_name,
+        set_available_model_names,
+        set_image_model_name,
+    )
+    from src.plugins.llm.providers import ProviderName
+
+    chat = ModelConfig(name="deepseek")
+    painter = ModelConfig(
+        name="painter",
+        provider=ProviderName.OPENAI_IMAGES,
+        capabilities={ModelCapability.IMAGE_GENERATION},
+    )
+    mocker.patch.object(plugin_config, "models", [chat, painter])
+    await set_available_model_names("QQClient_10000", ["deepseek", "painter"])
+
+    assert await get_image_model_name("QQClient_10000") == "painter"
+    with pytest.raises(ValueError, match="未声明 image_generation 能力"):
+        await set_image_model_name("QQClient_10000", "deepseek")
+
+    await set_image_model_name("QQClient_10000", "painter")
+    assert await get_image_model_name("QQClient_10000") == "painter"
+
+    await clear_image_model_name("QQClient_10000")
+    assert await get_image_model_name("QQClient_10000") == "painter"
+
+
+async def test_group_image_model_validation(app: App, mocker):
+    """生图模型必须已启用且使用 openai_images 接口。"""
+    from src.plugins.llm.config import ModelCapability, ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names, set_image_model_name
+    from src.plugins.llm.providers import ProviderName
+
+    chat = ModelConfig(name="deepseek")
+    fake_painter = ModelConfig(
+        name="fake-painter",
+        provider=ProviderName.OPENAI_CHAT_COMPLETIONS,
+        capabilities={ModelCapability.IMAGE_GENERATION},
+    )
+    mocker.patch.object(plugin_config, "models", [chat, fake_painter])
+    await set_available_model_names("QQClient_10000", ["deepseek", "fake-painter"])
+
+    with pytest.raises(ValueError, match="本群未启用的模型"):
+        await set_image_model_name("QQClient_10000", "missing")
+    with pytest.raises(ValueError, match="openai_images"):
+        await set_image_model_name("QQClient_10000", "fake-painter")
+
+
+async def test_generate_image_tool_requires_context(app: App):
+    """生图工具缺少会话上下文时返回错误文本，不抛异常。"""
+    from src.plugins.llm.schemas import ToolCall
+    from src.plugins.llm.tools import registry
+
+    result = await registry.execute(ToolCall(id="call_1", name="generate_image", arguments={"prompt": "猫"}))
+    assert isinstance(result, str)
+    assert "缺少运行上下文" in result
