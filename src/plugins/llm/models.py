@@ -21,5 +21,7 @@ class GroupLLMConfig(Model):
     """“这是什么”解释模型名，为空时跟随本群默认模型"""
     zssm_vision_model: Mapped[str | None] = mapped_column(default=None)
     """“这是什么”视觉模型名"""
+    image_model: Mapped[str | None] = mapped_column(default=None)
+    """生图模型名，为空时使用本群启用的第一个生图模型"""
     tts_model: Mapped[str | None] = mapped_column(default=None)
     """默认 TTS 模型名"""

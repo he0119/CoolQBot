@@ -1,11 +1,13 @@
 """大模型对话插件
 
-支持 OpenAI Chat Completions / OpenAI Responses / Anthropic Messages 三种
-API 格式，提供多轮对话、推理内容展示、原生 Markdown、Markdown 转图片与 TTS 语音回复。
+支持 OpenAI Chat Completions / OpenAI Responses / Anthropic Messages 三种对话
+API 格式，以及 OpenAI Image API 生图模型，提供多轮对话、推理内容展示、原生 Markdown、
+Markdown 转图片与 TTS 语音回复。
 额度查询按模型选择独立 provider，目前支持 Aperture 与 DeepSeek。
 """
 
 from pathlib import Path
+from typing import Any
 
 import nonebot
 from nonebot import require
@@ -48,21 +50,24 @@ from src.utils.permission import SUPERUSER, SuperUserShortcutExtension
 from .config import ModelCapability, plugin_config
 from .data_source import (
     clear_available_model_names,
+    clear_image_model_name,
     clear_zssm_model_name,
     clear_zssm_vision_model_name,
     disable_model_names,
     enable_model_names,
     get_available_model_names,
+    get_image_model_name,
     get_model_name,
     get_model_overview,
     get_tts_model,
+    set_image_model_name,
     set_model_name,
     set_tts_model,
     set_zssm_model_name,
     set_zssm_vision_model_name,
 )
 from .handler import LLMHandler, send_reaction
-from .providers import ProviderError
+from .providers import ProviderError, ProviderName
 from .quota import QuotaError, get_quota, get_quotas
 from .rules import MENTION_RULE, NON_PRIVATE_RULE
 from .schemas import ImageContent
@@ -104,6 +109,8 @@ llm_cmd = on_alconna(
             Subcommand("clear-zssm", help_text="使本群解释模型跟随默认模型"),
             Subcommand("set-zssm-vision", Args["model#模型名称", str], help_text="设置本群解释视觉模型"),
             Subcommand("clear-zssm-vision", help_text="使本群解释视觉模型恢复自动选择"),
+            Subcommand("set-image", Args["model#模型名称", str], help_text="设置本群生图模型"),
+            Subcommand("clear-image", help_text="使本群生图模型恢复自动选择"),
             help_text="模型相关设置",
         ),
         Subcommand(
@@ -229,6 +236,7 @@ async def _create_handler(
     render: bool = False,
     use_tts: bool = False,
     enable_tools: bool = False,
+    generate_image: bool = False,
 ) -> LLMHandler:
     """按当前会话设置创建处理器。"""
     if not plugin_config.get_model_names():
@@ -255,12 +263,23 @@ async def _create_handler(
             at_sender=True,
         )
 
+    image_model_name = await get_image_model_name(user.session_id) if (generate_image or enable_tools) else ""
+    if generate_image:
+        if not image_model_name:
+            raise LLMSetupError("本群未启用生图模型，请联系超级管理员启用并设置", at_sender=True)
+        image_model = plugin_config.get_model(image_model_name)
+        if image_model.provider != ProviderName.OPENAI_IMAGES:
+            raise LLMSetupError(f"生图模型 {image_model_name} 未使用 openai_images 接口", at_sender=True)
+
     return LLMHandler(
         name,
         send_markdown=plugin_config.prefer_markdown and not render,
         send_md_pic=render or plugin_config.md_to_pic,
         tts_model=tts_model,
         enable_tools=enable_tools,
+        generate_image=generate_image,
+        session_id=user.session_id,
+        image_model_name=image_model_name,
     )
 
 
@@ -286,6 +305,7 @@ async def llm_model_list_handle(
     current = overview.model_name
     zssm_model = overview.zssm_model_name
     vision_model = overview.zssm_vision_model_name
+    image_model = overview.image_model_name
     available = set(available_names)
 
     def format_model(name: str) -> str:
@@ -298,10 +318,18 @@ async def llm_model_list_handle(
             labels.append("zssm")
         if name == vision_model:
             labels.append("zssm 视觉")
+        if name == image_model:
+            labels.append("生图")
         if show_capabilities.result:
             capabilities = plugin_config.get_model(name).capabilities
-            capability_labels = {ModelCapability.TEXT: "文本", ModelCapability.VISION: "视觉"}
-            capability_text = "、".join(capability_labels[item] for item in sorted(capabilities))
+            capability_labels = {
+                ModelCapability.TEXT: "文本",
+                ModelCapability.VISION: "视觉",
+                ModelCapability.IMAGE_GENERATION: "绘图",
+            }
+            capability_text = "、".join(
+                label for capability, label in capability_labels.items() if capability in capabilities
+            )
             labels.append(f"能力：{capability_text or '无'}")
         suffix = f"（{'，'.join(labels)}）" if labels else ""
         return f"- {name}{suffix}"
@@ -328,7 +356,9 @@ async def llm_model_list_handle(
         "- zssm：/llm model set-zssm <模型名>\n"
         "- zssm 跟随默认：/llm model clear-zssm\n"
         "- zssm 视觉：/llm model set-zssm-vision <模型名>\n"
-        f"- zssm 视觉自动选择：/llm model clear-zssm-vision{access_hint}"
+        "- zssm 视觉自动选择：/llm model clear-zssm-vision\n"
+        "- 生图：/llm model set-image <模型名>\n"
+        f"- 生图自动选择：/llm model clear-image{access_hint}"
     )
 
 
@@ -453,6 +483,30 @@ async def llm_model_clear_zssm_vision_handle(bot: Bot, event: Event, user: UserS
         await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
     await clear_zssm_vision_model_name(user.session_id)
     await llm_cmd.finish("本群解释视觉模型已恢复自动选择", at_sender=True)
+
+
+@llm_cmd.assign("model.set-image")
+async def llm_model_set_image_handle(
+    bot: Bot,
+    event: Event,
+    user: UserSession,
+    model: Query[str] = Query("model.set-image.model"),
+):
+    if not await admin_permission()(bot, event):
+        await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
+    try:
+        await set_image_model_name(user.session_id, model.result)
+    except ValueError as e:
+        await llm_cmd.finish(str(e), at_sender=True)
+    await llm_cmd.finish(f"已设置本群生图模型为：{model.result}", at_sender=True)
+
+
+@llm_cmd.assign("model.clear-image")
+async def llm_model_clear_image_handle(bot: Bot, event: Event, user: UserSession):
+    if not await admin_permission()(bot, event):
+        await llm_cmd.finish("该指令仅管理员可用", at_sender=True)
+    await clear_image_model_name(user.session_id)
+    await llm_cmd.finish("本群生图模型已恢复自动选择", at_sender=True)
 
 
 @llm_cmd.assign("tts.list")
@@ -642,19 +696,20 @@ async def _handle_dialogue_command(
         await matcher.finish(f"你想问什么呢？输入 /{command_name} -h 查看用法", at_sender=True)
 
     try:
-        handler = await _create_handler(
-            user,
-            selected_model=model_name.result if model_name.available else "",
-            render=render.result,
-            use_tts=use_tts.result,
-            enable_tools=enable_tools and not generate_image,
-        )
+        handler_options: dict[str, Any] = {
+            "selected_model": model_name.result if model_name.available else "",
+            "render": render.result,
+            "use_tts": use_tts.result,
+            "enable_tools": enable_tools,
+        }
+        if generate_image:
+            handler_options["generate_image"] = True
+        handler = await _create_handler(user, **handler_options)
     except LLMSetupError as e:
         if e.at_sender:
             await matcher.finish(str(e), at_sender=True)
         await matcher.finish(str(e))
 
-    handler.generate_image = generate_image
     if use_context.result:
         await _handle_with_context(handler, text, images, finish_matcher=matcher)
         return
@@ -723,16 +778,17 @@ async def llm_mention_handle(
         await UniMessage.text("你想问什么呢？").finish(reply_to=msg_id)
 
     try:
-        handler = await _create_handler(
-            user,
-            selected_model=model_name.result if model_name.available else "",
-            render=render.result,
-            use_tts=use_tts.result,
-            enable_tools=use_agent.result and not use_draw.result,
-        )
+        handler_options = {
+            "selected_model": model_name.result if model_name.available else "",
+            "render": render.result,
+            "use_tts": use_tts.result,
+            "enable_tools": use_agent.result,
+        }
+        if use_draw.result:
+            handler_options["generate_image"] = True
+        handler = await _create_handler(user, **handler_options)
     except LLMSetupError as e:
         await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=msg_id)
-    handler.generate_image = use_draw.result
     if use_context.result:
         await _handle_with_context(handler, text, images, message_id=msg_id)
         return

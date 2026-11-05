@@ -15,7 +15,7 @@ import copy
 import json
 from typing import TYPE_CHECKING, Any
 
-from ..schemas import Completion, ImageContent, Message, ToolCall, Usage
+from ..schemas import Completion, ForceTool, ImageContent, Message, ToolCall, Usage
 from .base import Provider, ProviderError, iter_sse
 
 if TYPE_CHECKING:
@@ -89,6 +89,8 @@ class ResponsesProvider(Provider):
             payload.setdefault("tools", []).extend(native_tools)
         if payload.get("tools") and tool_choice == "none":
             payload["tool_choice"] = "none"
+        elif payload.get("tools") and isinstance(tool_choice, ForceTool):
+            payload["tool_choice"] = {"type": "function", "name": tool_choice.name}
         return payload
 
     def _dump_items(self, message: Message) -> list[dict[str, Any]]:
