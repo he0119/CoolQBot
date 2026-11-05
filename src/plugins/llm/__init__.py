@@ -67,7 +67,7 @@ from .data_source import (
     set_zssm_vision_model_name,
 )
 from .handler import LLMHandler, send_reaction
-from .providers import ProviderError, ProviderName
+from .providers import ProviderError
 from .quota import QuotaError, get_quota, get_quotas
 from .rules import MENTION_RULE, NON_PRIVATE_RULE
 from .schemas import ImageContent
@@ -267,9 +267,6 @@ async def _create_handler(
     if generate_image:
         if not image_model_name:
             raise LLMSetupError("本群未启用生图模型，请联系超级管理员启用并设置", at_sender=True)
-        image_model = plugin_config.get_model(image_model_name)
-        if image_model.provider != ProviderName.OPENAI_IMAGES:
-            raise LLMSetupError(f"生图模型 {image_model_name} 未使用 openai_images 接口", at_sender=True)
 
     return LLMHandler(
         name,
