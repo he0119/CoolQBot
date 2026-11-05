@@ -13,14 +13,14 @@ from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from dataclasses import dataclass
 from time import perf_counter
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 from uuid import uuid4
 
 from nonebot.log import logger
 from nonebot_plugin_alconna import SupportAdapter, UniMessage, get_target, message_reaction
 
 from .config import ModelCapability, plugin_config
-from .providers import ProviderError, get_provider
+from .providers import ProviderError, ProviderName, get_provider
 from .schemas import Completion, ImageContent, Message
 from .tools import registry
 from .tts import TTSError, text_to_speech
@@ -84,13 +84,27 @@ async def chat(
     session_affinity: str = "",
     enable_tools: bool = True,
     tool_choice: ToolChoice = "auto",
+    generate_image: bool = False,
 ) -> Completion:
     """发起一次对话请求"""
     model = plugin_config.resolve(model_name)
     if not model.base_url:
         raise ValueError(f"模型 {model_name} 未配置 base_url，且未设置 LLM__BASE_URL")
+    if generate_image:
+        if model.provider != ProviderName.OPENAI_RESPONSES:
+            raise ValueError(f"模型 {model_name} 不支持绘图，请切换默认模型或使用 /draw --model <模型名> 指定绘图模型")
+        model = model.model_copy(deep=True)
+        native_tools = model.extra_body.get("tools", [])
+        if not isinstance(native_tools, list):
+            raise ProviderError("Responses extra_body.tools 必须为工具数组")
+        image_tool = next(
+            (tool for tool in native_tools if isinstance(tool, dict) and tool.get("type") == "image_generation"),
+            {"type": "image_generation", "output_format": "png"},
+        )
+        model.extra_body["tools"] = [image_tool]
+        model.extra_body["tool_choice"] = {"type": "image_generation"}
     provider = get_provider(model.provider)(model, session_affinity=session_affinity)
-    tools = registry.to_params() if enable_tools else []
+    tools = registry.to_params() if enable_tools and not generate_image else []
     return await provider.chat(messages, tools or None, tool_choice=tool_choice)
 
 
@@ -231,13 +245,15 @@ class LLMHandler:
         system_prompt: str | None = None,
         enable_tools: bool = True,
         show_thinking: bool | None = None,
+        generate_image: bool = False,
     ) -> None:
         self.model_name = model_name
         self.session_affinity = session_affinity or uuid4().hex
         self.send_markdown = send_markdown
         self.send_md_pic = send_md_pic
         self.tts_model = tts_model
-        self.enable_tools = enable_tools
+        self.enable_tools = enable_tools and not generate_image
+        self.generate_image = generate_image
         self.show_thinking = plugin_config.send_thinking if show_thinking is None else show_thinking
         self.context: list[Message] = []
 
@@ -286,9 +302,10 @@ class LLMHandler:
             "启用" if self.enable_tools else "禁用",
         )
         request_progress = _RequestWaitProgress()
+        request_options: dict[str, Any] = {"generate_image": True} if self.generate_image else {}
         notice_task = (
             asyncio.create_task(self._send_request_wait_notices(on_request_wait, request_progress))
-            if on_request_wait and self.enable_tools
+            if on_request_wait and (self.enable_tools or self.generate_image)
             else None
         )
         reached_request_limit = False
@@ -298,6 +315,7 @@ class LLMHandler:
                 list(self.context),
                 session_affinity=self.session_affinity,
                 enable_tools=self.enable_tools,
+                **request_options,
             )
             if completion.tool_calls and not self.enable_tools:
                 del self.context[context_start:]
@@ -343,6 +361,7 @@ class LLMHandler:
                         session_affinity=self.session_affinity,
                         enable_tools=self.enable_tools,
                         tool_choice="none" if is_final_request else "auto",
+                        **request_options,
                     )
                 except ProviderError:
                     if not is_final_request:
