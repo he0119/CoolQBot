@@ -9,11 +9,13 @@
 
 from __future__ import annotations
 
+import base64
+import binascii
 import copy
 import json
 from typing import TYPE_CHECKING, Any
 
-from ..schemas import Completion, Message, ToolCall, Usage
+from ..schemas import Completion, ImageContent, Message, ToolCall, Usage
 from .base import Provider, ProviderError, iter_sse
 
 if TYPE_CHECKING:
@@ -78,8 +80,14 @@ class ResponsesProvider(Provider):
                 }
                 for tool in tools
             ]
-        payload.update(self.config.extra_body)
-        if tools and tool_choice == "none":
+        extra_body = copy.deepcopy(self.config.extra_body)
+        native_tools = extra_body.pop("tools", [])
+        if not isinstance(native_tools, list):
+            raise ProviderError("Responses extra_body.tools 必须为工具数组")
+        payload.update(extra_body)
+        if native_tools:
+            payload.setdefault("tools", []).extend(native_tools)
+        if payload.get("tools") and tool_choice == "none":
             payload["tool_choice"] = "none"
         return payload
 
@@ -243,6 +251,7 @@ class ResponsesProvider(Provider):
         text: list[str] = []
         reasoning: list[str] = []
         tool_calls: list[ToolCall] = []
+        images: list[ImageContent] = []
 
         for item in output_items:
             item_type = item.get("type")
@@ -264,12 +273,18 @@ class ResponsesProvider(Provider):
                         arguments=_loads(item.get("arguments")),
                     )
                 )
+            elif item_type == "image_generation_call" and (result := item.get("result")):
+                try:
+                    images.append(ImageContent.from_bytes(base64.b64decode(result, validate=True)))
+                except (binascii.Error, TypeError, ValueError) as e:
+                    raise ProviderError("生成图片的数据无效或格式不受支持") from e
 
         return Message.assistant(
             content="".join(text),
             reasoning="\n".join(reasoning),
             tool_calls=tool_calls,
             provider_data={"responses_output": copy.deepcopy(output_items)},
+            images=images,
         )
 
     def _parse_usage(self, raw: dict[str, Any] | None) -> Usage:
