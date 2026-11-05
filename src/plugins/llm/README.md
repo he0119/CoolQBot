@@ -198,7 +198,8 @@
 
 ## 配置说明
 
-通过 `LLM__` 前缀在 `.env` 中配置。`models` 的第一项为默认模型。
+通过 `LLM__` 前缀在 `.env` 中配置。`models` 的第一项为默认模型，以下示例默认使用 `gpt-6.1-sol`。
+已有群组可先执行 `/llm model enable gpt`，再通过 `/llm model set gpt` 切换默认模型。
 快捷对话只过滤 `COMMAND_START` 中的非空前缀；如果命令配置了空前缀，未带前缀的命令无法与普通对话可靠区分。
 
 ```env
@@ -250,6 +251,14 @@ LLM__ZSSM_MAX_RESOURCES=2
 LLM__MODELS='
 [
   {
+    "name": "gpt",
+    "provider": "openai_responses",
+    "model": "gpt-6.1-sol",
+    "base_url": "https://api.openai.com/v1",
+    "api_key": "sk-openai-xxx",
+    "capabilities": ["text", "vision"]
+  },
+  {
     "name": "deepseek",
     "provider": "openai_chat_completions",
     "model": "deepseek-chat",
@@ -266,14 +275,6 @@ LLM__MODELS='
       "provider": "aperture",
       "bucket": "deepseek"
     }
-  },
-  {
-    "name": "gpt",
-    "provider": "openai_responses",
-    "model": "gpt-6-astra",
-    "base_url": "https://api.openai.com/v1",
-    "api_key": "sk-openai-xxx",
-    "capabilities": ["text", "vision"]
   },
   {
     "name": "claude",
@@ -326,7 +327,7 @@ LLM__TTS_MODEL=default
 {
   "name": "gpt-image",
   "provider": "openai_responses",
-  "model": "gpt-6-astra",
+  "model": "gpt-6.1-sol",
   "base_url": "https://api.openai.com/v1",
   "api_key": "sk-openai-xxx",
   "capabilities": ["text", "vision"],
