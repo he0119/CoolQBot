@@ -13,14 +13,14 @@ from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from dataclasses import dataclass
 from time import perf_counter
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 from uuid import uuid4
 
 from nonebot.log import logger
 from nonebot_plugin_alconna import SupportAdapter, UniMessage, get_target, message_reaction
 
 from .config import ModelCapability, plugin_config
-from .providers import ProviderError, get_provider
+from .providers import ProviderError, ProviderName, get_provider
 from .schemas import Completion, ImageContent, Message
 from .tools import registry
 from .tts import TTSError, text_to_speech
@@ -84,13 +84,27 @@ async def chat(
     session_affinity: str = "",
     enable_tools: bool = True,
     tool_choice: ToolChoice = "auto",
+    generate_image: bool = False,
 ) -> Completion:
     """发起一次对话请求"""
     model = plugin_config.resolve(model_name)
     if not model.base_url:
         raise ValueError(f"模型 {model_name} 未配置 base_url，且未设置 LLM__BASE_URL")
+    if generate_image:
+        if model.provider != ProviderName.OPENAI_RESPONSES:
+            raise ValueError(f"模型 {model_name} 不支持绘图，请切换默认模型或使用 /draw --model <模型名> 指定绘图模型")
+        model = model.model_copy(deep=True)
+        native_tools = model.extra_body.get("tools", [])
+        if not isinstance(native_tools, list):
+            raise ProviderError("Responses extra_body.tools 必须为工具数组")
+        image_tool = next(
+            (tool for tool in native_tools if isinstance(tool, dict) and tool.get("type") == "image_generation"),
+            {"type": "image_generation", "output_format": "png"},
+        )
+        model.extra_body["tools"] = [image_tool]
+        model.extra_body["tool_choice"] = {"type": "image_generation"}
     provider = get_provider(model.provider)(model, session_affinity=session_affinity)
-    tools = registry.to_params() if enable_tools else []
+    tools = registry.to_params() if enable_tools and not generate_image else []
     return await provider.chat(messages, tools or None, tool_choice=tool_choice)
 
 
@@ -231,13 +245,15 @@ class LLMHandler:
         system_prompt: str | None = None,
         enable_tools: bool = True,
         show_thinking: bool | None = None,
+        generate_image: bool = False,
     ) -> None:
         self.model_name = model_name
         self.session_affinity = session_affinity or uuid4().hex
         self.send_markdown = send_markdown
         self.send_md_pic = send_md_pic
         self.tts_model = tts_model
-        self.enable_tools = enable_tools
+        self.enable_tools = enable_tools and not generate_image
+        self.generate_image = generate_image
         self.show_thinking = plugin_config.send_thinking if show_thinking is None else show_thinking
         self.context: list[Message] = []
 
@@ -286,9 +302,10 @@ class LLMHandler:
             "启用" if self.enable_tools else "禁用",
         )
         request_progress = _RequestWaitProgress()
+        request_options: dict[str, Any] = {"generate_image": True} if self.generate_image else {}
         notice_task = (
             asyncio.create_task(self._send_request_wait_notices(on_request_wait, request_progress))
-            if on_request_wait and self.enable_tools
+            if on_request_wait and (self.enable_tools or self.generate_image)
             else None
         )
         reached_request_limit = False
@@ -298,6 +315,7 @@ class LLMHandler:
                 list(self.context),
                 session_affinity=self.session_affinity,
                 enable_tools=self.enable_tools,
+                **request_options,
             )
             if completion.tool_calls and not self.enable_tools:
                 del self.context[context_start:]
@@ -309,6 +327,7 @@ class LLMHandler:
                 raise ProviderError("当前模式不允许工具调用")
             total_usage = completion.usage
             actual_model = completion.model
+            generated_images = list(completion.images)
             while completion.tool_calls:
                 request_progress.tool_call_count += len(completion.tool_calls)
                 logger.info(
@@ -342,6 +361,7 @@ class LLMHandler:
                         session_affinity=self.session_affinity,
                         enable_tools=self.enable_tools,
                         tool_choice="none" if is_final_request else "auto",
+                        **request_options,
                     )
                 except ProviderError:
                     if not is_final_request:
@@ -361,6 +381,7 @@ class LLMHandler:
                     )
                 total_usage = total_usage + completion.usage
                 actual_model = completion.model or actual_model
+                generated_images.extend(completion.images)
                 if is_final_request:
                     break
         finally:
@@ -372,7 +393,7 @@ class LLMHandler:
         leaked_dsml = False
         if reached_request_limit and (
             completion.tool_calls
-            or not completion.content.strip()
+            or (not completion.content.strip() and not completion.images)
             or (leaked_dsml := bool(DSML_TOOL_CALL_PATTERN.search(completion.content)))
         ):
             logger.warning(
@@ -394,6 +415,7 @@ class LLMHandler:
             )
 
         completion.usage = total_usage
+        completion.message.images = generated_images
         completion.model = actual_model or plugin_config.resolve(self.model_name).model
         completion.elapsed_seconds = perf_counter() - started_at
         self.context.append(completion.message)
@@ -463,8 +485,13 @@ class LLMHandler:
         reply_to: str | bool = False,
     ) -> None:
         """按配置发送模型回复"""
+        for image in completion.images:
+            await UniMessage.image(raw=image.data).send(reply_to=reply_to)
         text = format_output(completion, with_thinking=self.show_thinking)
         if not text:
+            if completion.images:
+                await UniMessage.text(format_statistics(completion)).send(reply_to=reply_to)
+                return
             logger.warning("LLM 会话没有可发送内容（会话={}）", self.log_id)
             await UniMessage.text("模型没有返回任何内容").send(reply_to=reply_to)
             return

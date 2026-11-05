@@ -21,6 +21,8 @@
 - 单轮与多轮对话，多轮支持「结束」「回滚」指令
 - 群聊中直接 @ 机器人即可使用默认模型对话
 - 流式与非流式请求
+- OpenAI Responses 原生图片生成，生成结果直接发送为聊天图片，支持图文混合与多轮修改
+- `/draw <描述>` 使用本群默认模型绘图，自动启用图片工具；`/draw -c` 可继续修改图片
 - 推理内容以引用块展示（DeepSeek 的 `reasoning_content`、Anthropic 的 `thinking`、Responses 的推理摘要）
 - 使用 emoji reaction 反馈响应状态（思考中、已完成、失败）；QQ 适配器开始处理时改发普通消息，其他不支持的平台自动跳过
 - `/chat` 默认不发送工具定义，增加 `-a|--agent` 后开放全部已注册工具；`/agent` 是 `/chat -a` 的快捷入口
@@ -55,6 +57,9 @@
 | `/chat -t <内容>`                     | -                 | 使用语音回复           | 所有人     |
 | `/chat -a <内容>`                     | `/agent <内容>`   | 使用全部工具完成问答   | 所有人     |
 | `/chat -a --model <模型名> <内容>`    | `/agent --model`  | 指定模型进行工具问答   | 所有人     |
+| `/draw <描述>`                        | `/chat -d`        | 使用本群默认模型绘图   | 所有人     |
+| `/draw -c <描述>`                     | -                 | 开启多轮绘图与修改     | 所有人     |
+| `/draw --model <模型名> <描述>`       | -                 | 本次指定绘图模型       | 所有人     |
 | `/<快捷指令名> [选项] <内容>`         | -                 | 用已注册的快捷命令对话 | 所有人     |
 | `/llm model list`                     | -                 | 查看本群已启用模型     | 所有人     |
 | `/llm model list --all`               | -                 | 查看全部模型及启用状态 | 超级管理员 |
@@ -79,7 +84,7 @@
 | `zssm -r [关注点]`                    | -                 | 将解释渲染为图片       | 所有人     |
 | `zssm --model <模型名> [关注点]`      | -                 | 本次使用指定解释模型   | 所有人     |
 
-对话及解释选项应写在内容前；`<内容>` 是可变长参数，放在内容后的选项可能被当作正文。`/chat` 支持 `--model`、`-c`、`-r`、`-t` 和 `-a|--agent`；`/agent` 是预先启用 `-a` 的快捷入口并支持其余相同选项。@ 对话支持相同选项，`zssm` 可用 `--model`、`-r|--render` 和 `-a|--agent`。
+对话及解释选项应写在内容前；`<内容>` 是可变长参数，放在内容后的选项可能被当作正文。`/chat` 支持 `--model`、`-c`、`-r`、`-t`、`-a|--agent` 和 `-d|--draw`；`/agent` 是预先启用 `-a` 的快捷入口，`/draw` 是预先启用 `-d` 的绘图入口。绘图模式只开放图片生成工具。@ 对话支持相同选项，`zssm` 可用 `--model`、`-r|--render` 和 `-a|--agent`。
 `/llm model list` 对所有人都只显示本群已启用的模型及其“默认对话”、`zssm` 和 `zssm 视觉`用途标签，并分区列出对话与群组设置命令；超级管理员增加 `--all` 后才会看到全局全部模型及本群启用状态。增加 `--capabilities` 后，当前列表才会同时显示每个模型的能力，两个参数可以组合使用。
 `/chat --shortcut` 注册的快捷命令与 `/chat` 同源：其后的选项按对话选项解析，目标模型仍受本群启用列表限制，详见「模型快捷命令」。快捷命令名注册在命令解析层，是进程级全局的，所有群共用同一批名字，群之间的差异只体现在可用模型上。
 所有命令、快捷命令、`zssm` 和 @ 对话仅支持群聊、频道等非私聊会话；私聊消息不会触发大模型。
@@ -92,6 +97,7 @@
 /chat 帮我写一段冒泡排序         # 与默认模型对话
 /chat 这张图是什么               # 附带图片时会一起发给模型
 /chat -a 查询成都今天的天气      # 允许模型调用工具（/agent 是等价快捷写法）
+/draw 画一只戴围巾的猫          # 使用本群默认模型生成图片
 ```
 
 ### 指定模型
@@ -197,7 +203,8 @@
 
 ## 配置说明
 
-通过 `LLM__` 前缀在 `.env` 中配置。`models` 的第一项为默认模型。
+通过 `LLM__` 前缀在 `.env` 中配置。`models` 的第一项为默认模型，以下示例默认使用 `gpt-6.1-sol`。
+已有群组可先执行 `/llm model enable gpt`，再通过 `/llm model set gpt` 切换默认模型。
 快捷对话只过滤 `COMMAND_START` 中的非空前缀；如果命令配置了空前缀，未带前缀的命令无法与普通对话可靠区分。
 
 ```env
@@ -249,6 +256,14 @@ LLM__ZSSM_MAX_RESOURCES=2
 LLM__MODELS='
 [
   {
+    "name": "gpt",
+    "provider": "openai_responses",
+    "model": "gpt-6.1-sol",
+    "base_url": "https://api.openai.com/v1",
+    "api_key": "sk-openai-xxx",
+    "capabilities": ["text", "vision"]
+  },
+  {
     "name": "deepseek",
     "provider": "openai_chat_completions",
     "model": "deepseek-chat",
@@ -265,14 +280,6 @@ LLM__MODELS='
       "provider": "aperture",
       "bucket": "deepseek"
     }
-  },
-  {
-    "name": "gpt",
-    "provider": "openai_responses",
-    "model": "gpt-5",
-    "base_url": "https://api.openai.com/v1",
-    "api_key": "sk-openai-xxx",
-    "capabilities": ["text", "vision"]
   },
   {
     "name": "claude",
@@ -310,6 +317,57 @@ LLM__TTS_MODEL=default
 | `extra_body`   | 附加到请求体的额外字段，用于传各服务商特有参数   |
 | `capabilities` | 输入能力列表，默认 `text`；可选 `text`、`vision` |
 | `quota`        | 该模型的额度查询配置，留空时不支持 `/llm quota`  |
+
+### OpenAI Responses 与图片生成
+
+使用 OpenAI 官方接口时，`provider` 设为 `openai_responses`，`base_url` 设为
+`https://api.openai.com/v1`。`model` 填写账号可用的模型 ID；推理强度、推理摘要和文本详细程度
+可通过 `extra_body.reasoning`、`extra_body.text` 配置，具体取值取决于所选模型。
+`max_tokens` 会转换为 `max_output_tokens`，包含推理 token；`temperature` 留空时不发送。
+
+日常绘图只需 `/draw 画一只戴围巾的猫`，无需单独配置 `gpt-image` 模型或手写工具参数。
+它使用本群当前默认模型，例如示例中的 `gpt-6.1-sol`，并仅为本次请求启用、强制调用图片生成工具。
+`/draw -c 画一只猫` 开启多轮后，可继续发送“把围巾改成蓝色”；回复一张图片并发送 `/draw 把背景换成海边`
+也可以编辑现有图片。临时换模型使用 `/draw --model <模型名> <描述>`，仍受本群已启用模型列表限制。
+
+绘图模型和服务端需要支持 Responses 原生 `image_generation` 工具；不支持时会提示切换模型。
+底层图片生成模型默认由服务端选择，也可在 `extra_body.tools` 的图片工具中指定 `model`。
+`/draw` 会沿用已配置的图片质量、格式等选项，不会改变后续普通对话的配置。
+
+需要自定义图片工具，或让普通 `/chat` 也能按需生成图片时，可在 `LLM__MODELS` 中配置，例如：
+
+```json
+{
+  "name": "gpt-image",
+  "provider": "openai_responses",
+  "model": "gpt-6.1-sol",
+  "base_url": "https://api.openai.com/v1",
+  "api_key": "sk-openai-xxx",
+  "capabilities": ["text", "vision"],
+  "stream": true,
+  "timeout": 300,
+  "extra_body": {
+    "reasoning": { "effort": "medium", "summary": "auto" },
+    "tools": [{ "type": "image_generation", "output_format": "png" }]
+  }
+}
+```
+
+为本群启用模型后，使用 `/chat --model gpt-image 画一只戴围巾的猫`；使用 `-c` 开启多轮后，
+可继续要求“把围巾改成蓝色”。模型自行判断是否生成图片；需要强制生成时可在 `extra_body` 中
+增加 `"tool_choice": {"type": "image_generation"}`。PNG、JPEG、WebP 和 GIF 会作为原图发送，
+只有图片时也会附带统计。流式请求等待最终图片，不发送中间预览。
+
+`extra_body.tools` 中显式配置的原生工具对该模型的普通 `/chat` 同样生效；`-a|--agent`
+会额外开放本地注册的函数工具，两者合并发送。模型请求达到上限时，`tool_choice: "none"`
+会同时禁止原生工具与函数工具。
+
+插件在本地维护完整上下文，Responses 默认发送 `store: false`，并请求加密推理数据以兼容旧版
+接口；后续请求保留原始输出中的加密推理、助手 `phase` 和图片生成结果。可通过 `extra_body`
+显式覆盖 `store`、`include` 等字段。接入方式参考 OpenAI 的
+[Responses 迁移指南](https://developers.openai.com/api/docs/guides/migrate-to-responses)、
+[推理上下文说明](https://developers.openai.com/api/docs/guides/reasoning)和
+[图片生成工具文档](https://developers.openai.com/api/docs/guides/tools-image-generation)。
 
 ### 额度查询配置
 
