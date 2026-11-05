@@ -21,6 +21,7 @@
 - 单轮与多轮对话，多轮支持「结束」「回滚」指令
 - 群聊中直接 @ 机器人即可使用默认模型对话
 - 流式与非流式请求
+- OpenAI Responses 原生图片生成，生成结果直接发送为聊天图片，支持图文混合与多轮修改
 - 推理内容以引用块展示（DeepSeek 的 `reasoning_content`、Anthropic 的 `thinking`、Responses 的推理摘要）
 - 使用 emoji reaction 反馈响应状态（思考中、已完成、失败）；QQ 适配器开始处理时改发普通消息，其他不支持的平台自动跳过
 - `/chat` 默认不发送工具定义，增加 `-a|--agent` 后开放全部已注册工具；`/agent` 是 `/chat -a` 的快捷入口
@@ -269,7 +270,7 @@ LLM__MODELS='
   {
     "name": "gpt",
     "provider": "openai_responses",
-    "model": "gpt-5",
+    "model": "gpt-6-astra",
     "base_url": "https://api.openai.com/v1",
     "api_key": "sk-openai-xxx",
     "capabilities": ["text", "vision"]
@@ -310,6 +311,49 @@ LLM__TTS_MODEL=default
 | `extra_body`   | 附加到请求体的额外字段，用于传各服务商特有参数   |
 | `capabilities` | 输入能力列表，默认 `text`；可选 `text`、`vision` |
 | `quota`        | 该模型的额度查询配置，留空时不支持 `/llm quota`  |
+
+### OpenAI Responses 与图片生成
+
+使用 OpenAI 官方接口时，`provider` 设为 `openai_responses`，`base_url` 设为
+`https://api.openai.com/v1`。`model` 填写账号可用的模型 ID；推理强度、推理摘要和文本详细程度
+可通过 `extra_body.reasoning`、`extra_body.text` 配置，具体取值取决于所选模型。
+`max_tokens` 会转换为 `max_output_tokens`，包含推理 token；`temperature` 留空时不发送。
+
+图片生成需要模型和服务端支持 Responses 原生 `image_generation` 工具。在 `LLM__MODELS`
+中增加一个配置项即可启用，例如：
+
+```json
+{
+  "name": "gpt-image",
+  "provider": "openai_responses",
+  "model": "gpt-6-astra",
+  "base_url": "https://api.openai.com/v1",
+  "api_key": "sk-openai-xxx",
+  "capabilities": ["text", "vision"],
+  "stream": true,
+  "timeout": 300,
+  "extra_body": {
+    "reasoning": { "effort": "medium", "summary": "auto" },
+    "tools": [{ "type": "image_generation", "output_format": "png" }]
+  }
+}
+```
+
+为本群启用模型后，使用 `/chat --model gpt-image 画一只戴围巾的猫`；使用 `-c` 开启多轮后，
+可继续要求“把围巾改成蓝色”。模型自行判断是否生成图片；需要强制生成时可在 `extra_body` 中
+增加 `"tool_choice": {"type": "image_generation"}`。PNG、JPEG、WebP 和 GIF 会作为原图发送，
+只有图片时也会附带统计。流式请求等待最终图片，不发送中间预览。
+
+`extra_body.tools` 中显式配置的原生工具对该模型的普通 `/chat` 同样生效；`-a|--agent`
+会额外开放本地注册的函数工具，两者合并发送。模型请求达到上限时，`tool_choice: "none"`
+会同时禁止原生工具与函数工具。
+
+插件在本地维护完整上下文，Responses 默认发送 `store: false`，并请求加密推理数据以兼容旧版
+接口；后续请求保留原始输出中的加密推理、助手 `phase` 和图片生成结果。可通过 `extra_body`
+显式覆盖 `store`、`include` 等字段。接入方式参考 OpenAI 的
+[Responses 迁移指南](https://developers.openai.com/api/docs/guides/migrate-to-responses)、
+[推理上下文说明](https://developers.openai.com/api/docs/guides/reasoning)和
+[图片生成工具文档](https://developers.openai.com/api/docs/guides/tools-image-generation)。
 
 ### 额度查询配置
 
