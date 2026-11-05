@@ -791,6 +791,7 @@ def test_provider_names_use_explicit_enum(app: App):
         OPENAI_CHAT_COMPLETIONS,
         OPENAI_RESPONSES,
         ANTHROPIC_MESSAGES,
+        "openai_images",
     ]
     assert set(PROVIDERS) == set(ProviderName)
     assert ModelConfig(name="default").provider is ProviderName.OPENAI_CHAT_COMPLETIONS
@@ -836,3 +837,39 @@ def test_endpoints(app: App):
     assert ChatProvider(make_config(OPENAI_CHAT_COMPLETIONS)).endpoint == "https://api.example.com/chat/completions"
     assert ResponsesProvider(make_config(OPENAI_RESPONSES)).endpoint == "https://api.example.com/responses"
     assert AnthropicProvider(make_config(ANTHROPIC_MESSAGES)).endpoint == "https://api.example.com/v1/messages"
+
+
+@respx.mock(assert_all_called=True)
+async def test_images_provider_generates(app: App, respx_mock: MockRouter):
+    """生图模型通过 Image API 生成图片，请求体带上模型和输出参数。"""
+    import base64
+
+    from src.plugins.llm.config import ModelConfig
+    from src.plugins.llm.providers import ImagesProvider, ProviderName
+
+    png = b"\x89PNG\r\n\x1a\n" + b"0" * 16
+    route = respx_mock.post("https://api.example.com/images/generations").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "data": [{"b64_json": base64.b64encode(png).decode()}],
+                "usage": {"input_tokens": 3, "output_tokens": 4},
+            },
+        )
+    )
+    config = ModelConfig(
+        name="painter",
+        provider=ProviderName.OPENAI_IMAGES,
+        model="gpt-image-2.5-sunburst",
+        base_url="https://api.example.com",
+        api_key="sk-test",
+        extra_body={"size": "1024x1024"},
+    )
+    result = await ImagesProvider(config).generate("一只猫")
+
+    payload = json.loads(route.calls[0].request.content)
+    assert payload == {"model": "gpt-image-2.5-sunburst", "prompt": "一只猫", "size": "1024x1024"}
+    assert result.images[0].data == png
+    assert result.images[0].mimetype == "image/png"
+    assert result.usage.input_tokens == 3
+    assert result.usage.output_tokens == 4

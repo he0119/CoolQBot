@@ -12,8 +12,18 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 Role = Literal["system", "user", "assistant", "tool"]
-ToolChoice = Literal["auto", "none"]
-"""工具选择策略：自动选择，或保留工具定义但禁止调用。"""
+
+
+@dataclass(frozen=True)
+class ForceTool:
+    """强制模型调用指定函数工具"""
+
+    name: str
+    """工具名"""
+
+
+ToolChoice = Literal["auto", "none"] | ForceTool
+"""工具选择策略：自动选择、禁止调用，或强制调用指定函数工具。"""
 
 
 @dataclass

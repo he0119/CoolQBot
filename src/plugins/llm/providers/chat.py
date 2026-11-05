@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ..schemas import Completion, Message, ToolCall, Usage
+from ..schemas import Completion, ForceTool, Message, ToolCall, Usage
 from .base import Provider, iter_sse
 
 if TYPE_CHECKING:
@@ -69,6 +69,8 @@ class ChatProvider(Provider):
         if tools and tool_choice == "none":
             # 收尾请求必须覆盖模型级 extra_body，避免 required/auto 重新开启工具。
             payload["tool_choice"] = "none"
+        elif tools and isinstance(tool_choice, ForceTool):
+            payload["tool_choice"] = {"type": "function", "function": {"name": tool_choice.name}}
         return payload
 
     def _dump_message(self, message: Message) -> dict[str, Any]:

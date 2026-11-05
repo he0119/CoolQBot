@@ -20,10 +20,14 @@ from .quota import QuotaConfig
 
 
 class ModelCapability(StrEnum):
-    """模型可声明的输入能力。"""
+    """模型可声明的能力。"""
 
     TEXT = "text"
+    """能处理文本对话"""
     VISION = "vision"
+    """能直接接收图片输入"""
+    IMAGE_GENERATION = "image_generation"
+    """独立的生图模型，使用 openai_images 接口，不参与文本对话"""
 
 
 class ModelConfig(BaseModel):
@@ -54,7 +58,7 @@ class ModelConfig(BaseModel):
     extra_body: dict[str, Any] = Field(default_factory=dict)
     """附加到请求体的额外字段，用于传递各服务商的特有参数"""
     capabilities: set[ModelCapability] = Field(default_factory=lambda: {ModelCapability.TEXT})
-    """模型能力；默认支持文本，vision 表示可直接接收图片"""
+    """模型能力；默认支持文本，vision 表示可直接接收图片，image_generation 表示这是生图模型"""
     quota: QuotaConfig | None = None
     """该模型的额度查询配置，留空时不支持额度查询"""
 

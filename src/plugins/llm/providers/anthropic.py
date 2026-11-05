@@ -15,7 +15,7 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Any
 
-from ..schemas import Completion, Message, ToolCall, Usage
+from ..schemas import Completion, ForceTool, Message, ToolCall, Usage
 from .base import Provider, iter_sse
 
 if TYPE_CHECKING:
@@ -75,6 +75,8 @@ class AnthropicProvider(Provider):
         payload.update(self.config.extra_body)
         if tools and tool_choice == "none":
             payload["tool_choice"] = {"type": "none"}
+        elif tools and isinstance(tool_choice, ForceTool):
+            payload["tool_choice"] = {"type": "tool", "name": tool_choice.name}
         return payload
 
     def _dump_messages(self, messages: list[Message]) -> list[dict[str, Any]]:
