@@ -1,9 +1,13 @@
-"""测试节假日数据生成脚本对国务院通知两种写法的解析"""
+"""测试节假日数据生成脚本：通知解析、写出排版、把新数据并进已有文件"""
+
+import json
+from pathlib import Path
 
 import httpx
 import respx
 
 NOTICE_URL = "https://example.com/notice.html"
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 # 2027 年通知：短假写「放假，共N天」，日期后带（周X），春节带农历说明
 NOTICE_2027 = """
@@ -91,3 +95,58 @@ def test_parse_holidays_2024():
                 },
             }
         }
+
+
+def test_dump_holidays_keeps_repo_style(tmp_path: Path):
+    """写出的排版要和仓库里的 public/holidays.json 一字不差，更新一年数据才不会整篇重排"""
+    from src.plugins.morning.plugins.morning_greeting.generate_holidays import dump_holidays
+
+    source = REPO_ROOT / "public" / "holidays.json"
+    data = json.loads(source.read_text(encoding="utf-8"))
+
+    target = tmp_path / "holidays.json"
+    dump_holidays(data, target)
+
+    assert target.read_text(encoding="utf-8") == source.read_text(encoding="utf-8")
+    assert json.loads(target.read_text(encoding="utf-8")) == data
+
+
+def test_main_adds_new_year(tmp_path: Path):
+    """把解析出的新一年并进已有文件，旧年份保持原样"""
+    from src.plugins.morning.plugins.morning_greeting.generate_holidays import main
+
+    data_file = tmp_path / "holidays.json"
+    data_file.write_text(
+        """{
+  "2026": {
+    "2026-01-01": {
+      "name": "元旦",
+      "duration": 3,
+      "workdays": ["2026-01-04"]
+    }
+  }
+}
+""",
+        encoding="utf-8",
+    )
+
+    with respx.mock:
+        respx.get(NOTICE_URL).mock(return_value=httpx.Response(200, text=NOTICE_2027))
+        main(NOTICE_URL, data_file)
+
+    text = data_file.read_text(encoding="utf-8")
+    assert text.startswith(
+        """{
+  "2026": {
+    "2026-01-01": {
+      "name": "元旦",
+      "duration": 3,
+      "workdays": ["2026-01-04"]
+    }
+  },
+  "2027": {
+"""
+    )
+    data = json.loads(text)
+    assert list(data) == ["2026", "2027"]
+    assert data["2027"]["2027-06-09"] == {"name": "端午节", "duration": 1, "workdays": []}

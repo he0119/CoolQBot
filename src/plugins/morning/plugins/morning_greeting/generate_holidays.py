@@ -182,10 +182,14 @@ def dump_holidays(data: dict, path: Path) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-if __name__ == "__main__":
-    url = sys.argv[1]
+def main(url: str, data_file: Path = DATA_FILE) -> None:
+    """解析通知，把结果并进已有的节假日文件"""
     holidays = parse_holidays(url)
-    with DATA_FILE.open("r", encoding="utf-8") as f:
+    with data_file.open("r", encoding="utf-8") as f:
         data = json.load(f)
     data.update(holidays)
-    dump_holidays(data, DATA_FILE)
+    dump_holidays(data, data_file)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1])
