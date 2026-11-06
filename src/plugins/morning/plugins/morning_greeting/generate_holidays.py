@@ -20,8 +20,9 @@ def parse_holidays(url: str):
 
     网址：
         https://www.gov.cn/zhengce/content/202310/content_6911527.htm
+        https://www.xinhuanet.com/20261105/ac6792e1565949dc8e7d6e8261b9a055/c.html
 
-    原始数据：
+    原始数据（2024 年，短假用「与周末连休」表述）：
         一、元旦：1月1日放假，与周末连休。
 
         二、春节：2月10日至17日放假调休，共8天。2月4日（星期日）、2月18日（星期日）上班。鼓励各单位结合带薪年休假等制度落实，安排职工在除夕（2月9日）休息。
@@ -96,8 +97,14 @@ def parse_holidays(url: str):
 
     # 定义正则表达式模式
     year_pattern = re.compile(r"国务院办公厅关于(\d{4})年")
+    workday_pattern = r"\d+月\d+日（(?:周|星期)[一二三四五六日]）"
     pattern = re.compile(
-        r"[一二三四五六七]、(\S+?)：(?:(\d+月\d+日)(?:（\S+?）)?(?:至\d+日(?:（\S+?）)?)?)放假(?:调休，共(\d+)天)?(?:，与周末连休)?(?:。(\d+月\d+日（周[一二三四五六日]）(?:、\d+月\d+日（周[一二三四五六日]）)?上班)?)?"
+        # 一、元旦：1月1日（周五）至3日（周日）放假，共3天。1月31日（周日）、2月14日（周日）上班。
+        r"[一二三四五六七]、(\S+?)："
+        r"(\d+月\d+日)(?:（\S+?）)?"
+        r"(?:至(?:\d+月)?\d+日(?:（\S+?）)?)?"
+        r"放假(?P<tail>(?:调休)?(?:，(?:共\d+天|与周末连休))?)"
+        r"(?:[。，](?P<workdays>" + workday_pattern + r"(?:、" + workday_pattern + r")*)上班)?"
     )
 
     # 匹配所有节假日信息
@@ -109,14 +116,15 @@ def parse_holidays(url: str):
     # 构建字典
     holidays = {}
     current_year = year_match.group(1)
-    for match in matches:
-        name, date_range, days_off, work_days = match
-        start_date_str = date_range.split("至")[0]
-        start_date = datetime.strptime(f"{current_year}-{start_date_str}", "%Y-%m月%d日")
+    for name, date_range, tail, work_days in matches:
+        start_date = datetime.strptime(f"{current_year}-{date_range}", "%Y-%m月%d日")
         start_date_iso = start_date.isoformat()[:10]
 
+        # 通知里「放假，共N天」「放假调休，共N天」都写了天数，直接取用
+        days_off = re.search(r"共(\d+)天", tail)
+
         # 处理 与周末连休 的情况
-        if "与周末连休" in rtext:
+        if "与周末连休" in tail:
             # 如果节假日是周一，则 start_date_iso 为周六
             if start_date.weekday() == 0:
                 start_date_iso = (start_date - timedelta(days=2)).isoformat()[:10]
@@ -131,7 +139,7 @@ def parse_holidays(url: str):
                 case _:
                     duration = 3
         else:
-            duration = int(days_off) if days_off else 3
+            duration = int(days_off.group(1)) if days_off else 3
 
         holidays[start_date_iso] = {
             "name": name,
@@ -147,11 +155,37 @@ def parse_holidays(url: str):
     return {str(current_year): holidays}
 
 
+def dump_holidays(data: dict, path: Path) -> None:
+    """按 public/holidays.json 现有排版写出
+
+    调休日期很少，`workdays` 数组照原样排成一行，这样更新一年数据时
+    文件里只有新增的那一段，不会整篇重排。
+    """
+    lines = ["{"]
+    years = list(data)
+    for year_index, year in enumerate(years):
+        lines.append(f'  "{year}": {{')
+        entries = list(data[year].items())
+        for entry_index, (start_date, info) in enumerate(entries):
+            workdays = ", ".join(f'"{day}"' for day in info["workdays"])
+            lines.extend(
+                (
+                    f'    "{start_date}": {{',
+                    f'      "name": "{info["name"]}",',
+                    f'      "duration": {info["duration"]},',
+                    f'      "workdays": [{workdays}]',
+                    "    }" + ("" if entry_index == len(entries) - 1 else ","),
+                )
+            )
+        lines.append("  }" + ("" if year_index == len(years) - 1 else ","))
+    lines.append("}")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 if __name__ == "__main__":
     url = sys.argv[1]
     holidays = parse_holidays(url)
     with DATA_FILE.open("r", encoding="utf-8") as f:
         data = json.load(f)
     data.update(holidays)
-    with DATA_FILE.open("w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
+    dump_holidays(data, DATA_FILE)

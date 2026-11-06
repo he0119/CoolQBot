@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-CN/
 
 ## [Unreleased]
 
+### Changed
+
+- 更新 2027 年法定节假日数据（春节 2 月 5 日至 13 日放假 9 天，端午、中秋各 1 天）
+- 节假日数据生成脚本的解析补齐两种情况：「放假，共N天」的短假、调休日期写作「（星期日）」，此前一日假期会被当成 3 天、调休日期会被丢掉
+
 ## [0.29.6] - 2026-11-02
 
 ### Added
