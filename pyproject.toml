@@ -7,7 +7,7 @@ readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.14"
 dependencies = [
-    "pydantic>=2.14.2",
+    "pydantic>=2.14.3",
     "eorzeaenv>=2.2.11",
     "matplotlib>=3.11.2",
     "uvicorn[standard]>=0.54.0",
