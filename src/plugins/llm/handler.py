@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import json
 import re
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Collection
 from contextlib import suppress
 from dataclasses import dataclass
 from time import perf_counter
@@ -23,6 +23,7 @@ from .config import ModelCapability, ModelConfig, plugin_config
 from .providers import ProviderError, ProviderName, get_provider
 from .schemas import Completion, ForceTool, ImageContent, Message
 from .tools import ToolContext, ToolResult, registry
+from .tools.image import IMAGE_TOOL_NAME
 from .tts import TTSError, text_to_speech
 
 if TYPE_CHECKING:
@@ -113,9 +114,30 @@ def _uses_native_draw(model_name: str, image_model_name: str) -> bool:
     """
     if plugin_config.resolve(model_name).provider != ProviderName.OPENAI_RESPONSES:
         return False
-    if not image_model_name or image_model_name == model_name:
+    if image_model_name == model_name:
         return True
     return plugin_config.get_model(image_model_name).provider == ProviderName.OPENAI_IMAGES
+
+
+def _select_tool_names(
+    *,
+    enable_tools: bool,
+    allow_image: bool,
+    generate_image: bool,
+    draw_local: bool,
+) -> frozenset[str]:
+    """按命令选项决定下发给模型的函数工具
+
+    - 绘图模式（-d）：只用本地 generate_image，或者走原生工具时不下发函数工具
+    - 工具增强（-a）：除生图外的全部工具；生图会产生费用，必须再加 -i 才开放
+    - 按需生图（-i）：开放 generate_image
+    """
+    if generate_image:
+        return frozenset({IMAGE_TOOL_NAME}) if draw_local else frozenset()
+    names = {name for name in registry.names() if name != IMAGE_TOOL_NAME} if enable_tools else set()
+    if allow_image:
+        names.add(IMAGE_TOOL_NAME)
+    return frozenset(names)
 
 
 async def chat(
@@ -123,42 +145,31 @@ async def chat(
     messages: list[Message],
     *,
     session_affinity: str = "",
-    enable_tools: bool = True,
+    tool_names: Collection[str] = (),
     tool_choice: ToolChoice = "auto",
-    generate_image: bool = False,
-    image_model: ModelConfig | None = None,
-    tool_names: set[str] | None = None,
-    image_model_name: str = "",
+    native_image_model: ModelConfig | None = None,
 ) -> Completion:
     """发起一次对话请求
 
-    - `generate_image`：使用 Responses 原生的 image_generation 工具，`image_model` 指定生图模型。
-    - `tool_names`：只下发这些函数工具；`image_model_name` 为空时不下发生图工具。
+    - `tool_names`：下发给模型的函数工具，为空时不下发。
+    - `native_image_model`：设置后追加 Responses 原生 image_generation 工具并强制调用，用于绘图模式。
     """
     model = plugin_config.resolve(model_name)
     if not model.base_url:
         raise ValueError(f"模型 {model_name} 未配置 base_url，且未设置 LLM__BASE_URL")
-    if generate_image:
+    if native_image_model is not None:
         if model.provider != ProviderName.OPENAI_RESPONSES:
             raise ValueError(f"模型 {model_name} 使用 {model.provider} 接口，只有 openai_responses 支持原生绘图工具")
-        if image_model is None:
-            raise ValueError("本群未设置生图模型，请先启用并设置生图模型")
         model = model.model_copy(deep=True)
         # 追加到模型已配置的原生工具之后，避免覆盖联网搜索等已有工具。
         native_tools = model.extra_body.get("tools") or []
         if not isinstance(native_tools, list):
             raise ValueError(f"模型 {model_name} 的 extra_body.tools 必须为工具数组")
-        model.extra_body["tools"] = [*native_tools, _native_image_tool(image_model)]
+        model.extra_body["tools"] = [*native_tools, _native_image_tool(native_image_model)]
         model.extra_body["tool_choice"] = {"type": "image_generation"}
     provider = get_provider(model.provider)(model, session_affinity=session_affinity)
-    tools = []
-    if enable_tools:
-        tools = registry.to_params()
-        if tool_names is not None:
-            tools = [tool for tool in tools if tool.name in tool_names]
-        if not image_model_name:
-            tools = [tool for tool in tools if tool.name != "generate_image"]
-    return await provider.chat(messages, tools or None, tool_choice=tool_choice)
+    tools = registry.to_params(tool_names) if tool_names else None
+    return await provider.chat(messages, tools, tool_choice=tool_choice)
 
 
 def _collect_tool_results(messages: list[Message]) -> list[dict[str, object]]:
@@ -278,7 +289,7 @@ async def send_reaction(
 async def execute_tool_calls(
     calls: list[ToolCall],
     context: list[Message],
-    tool_context: ToolContext | None = None,
+    tool_context: ToolContext,
 ) -> list[ImageContent]:
     """并行执行模型请求的工具调用，并按原顺序把结果加入上下文
 
@@ -319,15 +330,24 @@ class LLMHandler:
         self.send_markdown = send_markdown
         self.send_md_pic = send_md_pic
         self.tts_model = tts_model
-        self.session_id = session_id
+        if (generate_image or allow_image) and not image_model_name:
+            raise ValueError("本群未设置生图模型，请先启用并设置生图模型")
         self.image_model_name = image_model_name
-        self.generate_image = generate_image
+        self.tool_context = ToolContext(session_id=session_id, image_model_name=image_model_name)
+
+        # 绘图模式：对话模型能用原生工具时直接用，否则强制它调用本地 generate_image 工具。
         self.draw_local = generate_image and not _uses_native_draw(model_name, image_model_name)
-        self.enable_tools = enable_tools
-        # allow_image：用户显式允许模型按需调用 generate_image；绘图模式已经强制生图，不再叠加。
-        self.allow_image = allow_image and not generate_image
-        self.tools_enabled = self.draw_local or self.allow_image or (enable_tools and not generate_image)
-        self.tool_names = {"generate_image"} if self.draw_local or (self.allow_image and not enable_tools) else None
+        self.native_image_model = (
+            plugin_config.get_model(image_model_name) if generate_image and not self.draw_local else None
+        )
+        self.tool_names = _select_tool_names(
+            enable_tools=enable_tools,
+            allow_image=allow_image,
+            generate_image=generate_image,
+            draw_local=self.draw_local,
+        )
+        # 只有第一轮强制调用工具；之后仍强制会让模型反复生图直到请求上限。
+        self.first_tool_choice: ToolChoice = ForceTool(IMAGE_TOOL_NAME) if self.draw_local else "auto"
         self.show_thinking = plugin_config.send_thinking if show_thinking is None else show_thinking
         self.context: list[Message] = []
 
@@ -341,15 +361,6 @@ class LLMHandler:
                     content=REQUEST_BUDGET_PROMPT.format(max_requests=plugin_config.max_requests),
                 )
             )
-
-    def _tool_options(self) -> dict[str, Any]:
-        """按需使用的工具过滤参数，未设置时不传，保持请求参数简洁。"""
-        options: dict[str, Any] = {}
-        if self.tool_names is not None:
-            options["tool_names"] = self.tool_names
-        if self.image_model_name:
-            options["image_model_name"] = self.image_model_name
-        return options
 
     @property
     def log_id(self) -> str:
@@ -382,38 +393,25 @@ class LLMHandler:
             context_start,
             len(content),
             len(images or []),
-            "启用" if self.tools_enabled else "禁用",
+            "、".join(sorted(self.tool_names)) or "无",
         )
         request_progress = _RequestWaitProgress()
-        request_options: dict[str, Any] = {}
-        if self.generate_image and not self.draw_local:
-            request_options = {
-                "generate_image": True,
-                "image_model": plugin_config.get_model(self.image_model_name),
-            }
-        tool_choice: ToolChoice = ForceTool("generate_image") if self.draw_local else "auto"
-        tool_context = (
-            ToolContext(session_id=self.session_id, image_model_name=self.image_model_name)
-            if self.image_model_name
-            else None
-        )
         notice_task = (
             asyncio.create_task(self._send_request_wait_notices(on_request_wait, request_progress))
-            if on_request_wait and (self.tools_enabled or self.generate_image)
+            if on_request_wait and (self.tool_names or self.native_image_model)
             else None
         )
         reached_request_limit = False
         try:
-            first_options: dict[str, Any] = {
-                "session_affinity": self.session_affinity,
-                "enable_tools": self.tools_enabled,
-                **self._tool_options(),
-                **request_options,
-            }
-            if tool_choice != "auto":
-                first_options["tool_choice"] = tool_choice
-            completion = await chat(self.model_name, list(self.context), **first_options)
-            if completion.tool_calls and not self.tools_enabled:
+            completion = await chat(
+                self.model_name,
+                list(self.context),
+                session_affinity=self.session_affinity,
+                tool_names=self.tool_names,
+                tool_choice=self.first_tool_choice,
+                native_image_model=self.native_image_model,
+            )
+            if completion.tool_calls and not self.tool_names:
                 del self.context[context_start:]
                 logger.warning(
                     "LLM 会话拒绝工具调用（会话={}，调用数量={}）",
@@ -433,12 +431,9 @@ class LLMHandler:
                     len(completion.tool_calls),
                 )
                 self.context.append(completion.message)
-                if tool_context is None:
-                    tool_images = await execute_tool_calls(completion.tool_calls, self.context)
-                else:
-                    tool_images = await execute_tool_calls(completion.tool_calls, self.context, tool_context)
-                if tool_images:
-                    generated_images.extend(tool_images)
+                generated_images.extend(
+                    await execute_tool_calls(completion.tool_calls, self.context, self.tool_context)
+                )
                 request_progress.request_count += 1
                 is_final_request = request_progress.request_count == plugin_config.max_requests
                 request_context = list(self.context)
@@ -460,11 +455,9 @@ class LLMHandler:
                         self.model_name,
                         request_context,
                         session_affinity=self.session_affinity,
-                        enable_tools=self.tools_enabled,
-                        # 只有第一轮强制调用工具；之后仍强制会让模型反复生图直到请求上限。
+                        tool_names=self.tool_names,
                         tool_choice="none" if is_final_request else "auto",
-                        **self._tool_options(),
-                        **request_options,
+                        native_image_model=self.native_image_model,
                     )
                 except ProviderError:
                     if not is_final_request:

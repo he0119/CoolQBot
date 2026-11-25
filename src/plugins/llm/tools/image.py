@@ -12,9 +12,12 @@ from ..config import ModelCapability, plugin_config
 from ..providers import ProviderError, generate_images
 from . import ToolContext, ToolResult, registry
 
+IMAGE_TOOL_NAME = "generate_image"
+"""生图工具名；生图会产生费用，只在用户显式要求时下发"""
+
 
 @registry.register(
-    "generate_image",
+    IMAGE_TOOL_NAME,
     "根据文字描述生成图片。用户要求画图、生成图片或修改图片时调用；生成结果会直接发送给用户。",
     needs_context=True,
 )

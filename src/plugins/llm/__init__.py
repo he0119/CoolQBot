@@ -7,7 +7,6 @@ Markdown 转图片与 TTS 语音回复。
 """
 
 from pathlib import Path
-from typing import Any
 
 import nonebot
 from nonebot import require
@@ -697,17 +696,15 @@ async def _handle_dialogue_command(
         await matcher.finish(f"你想问什么呢？输入 /{command_name} -h 查看用法", at_sender=True)
 
     try:
-        handler_options: dict[str, Any] = {
-            "selected_model": model_name.result if model_name.available else "",
-            "render": render.result,
-            "use_tts": use_tts.result,
-            "enable_tools": enable_tools,
-        }
-        if generate_image:
-            handler_options["generate_image"] = True
-        if allow_image:
-            handler_options["allow_image"] = True
-        handler = await _create_handler(user, **handler_options)
+        handler = await _create_handler(
+            user,
+            selected_model=model_name.result if model_name.available else "",
+            render=render.result,
+            use_tts=use_tts.result,
+            enable_tools=enable_tools,
+            generate_image=generate_image,
+            allow_image=allow_image,
+        )
     except LLMSetupError as e:
         if e.at_sender:
             await matcher.finish(str(e), at_sender=True)
@@ -784,17 +781,15 @@ async def llm_mention_handle(
         await UniMessage.text("你想问什么呢？").finish(reply_to=msg_id)
 
     try:
-        handler_options = {
-            "selected_model": model_name.result if model_name.available else "",
-            "render": render.result,
-            "use_tts": use_tts.result,
-            "enable_tools": use_agent.result,
-        }
-        if use_draw.result:
-            handler_options["generate_image"] = True
-        if use_image.result:
-            handler_options["allow_image"] = True
-        handler = await _create_handler(user, **handler_options)
+        handler = await _create_handler(
+            user,
+            selected_model=model_name.result if model_name.available else "",
+            render=render.result,
+            use_tts=use_tts.result,
+            enable_tools=use_agent.result,
+            generate_image=use_draw.result,
+            allow_image=use_image.result,
+        )
     except LLMSetupError as e:
         await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=msg_id)
     if use_context.result:

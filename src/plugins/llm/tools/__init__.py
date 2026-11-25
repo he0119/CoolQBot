@@ -33,7 +33,7 @@ from nonebot.log import logger
 from ..schemas import ImageContent, ToolParam
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Collection
 
     from ..schemas import ToolCall
 
@@ -125,8 +125,12 @@ class ToolRegistry:
 
         return decorator
 
-    def to_params(self) -> list[ToolParam]:
-        """转换为与格式无关的工具定义列表"""
+    def names(self) -> list[str]:
+        """已注册的全部工具名"""
+        return list(self._registry)
+
+    def to_params(self, names: Collection[str] | None = None) -> list[ToolParam]:
+        """转换为与格式无关的工具定义列表；传入 names 时只保留这些工具"""
         return [
             ToolParam(
                 name=name,
@@ -138,6 +142,7 @@ class ToolRegistry:
                 },
             )
             for name, info in self._registry.items()
+            if names is None or name in names
         ]
 
     async def execute(self, call: ToolCall, context: ToolContext | None = None) -> str | ToolResult:
