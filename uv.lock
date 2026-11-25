@@ -785,7 +785,7 @@ requires-dist = [
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4" },
     { name = "nonebot-plugin-memes", specifier = "==0.8.1" },
     { name = "nonebot-plugin-orm", extras = ["default"], specifier = ">=0.8.4" },
-    { name = "nonebot-plugin-parser", extras = ["htmlkit"], specifier = "==2.7.1" },
+    { name = "nonebot-plugin-parser", extras = ["htmlkit"], specifier = "==2.7.3" },
     { name = "nonebot-plugin-permission", specifier = ">=0.3.1" },
     { name = "nonebot-plugin-prometheus", specifier = "==0.4.1" },
     { name = "nonebot-plugin-send-anything-anywhere", specifier = ">=0.7.1" },
@@ -2496,7 +2496,7 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-parser"
-version = "2.7.1"
+version = "2.7.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -2514,9 +2514,9 @@ dependencies = [
     { name = "pillow" },
     { name = "takumi-py" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4b/f7/9ac7213e4e573d2a81eb1ca2bdef36e19853f3cdd3aaaeba85c06d725dce/nonebot_plugin_parser-2.7.1.tar.gz", hash = "sha256:937001e70fa8790983585467b67cc4438b748678b753fb03ac389f3b99d811b2", size = 2893798, upload-time = "2026-10-26T15:30:32.958Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d9/e7/f72822b398975e5e628af0523548e0829d550f12df559c3926ed8947c080/nonebot_plugin_parser-2.7.3.tar.gz", hash = "sha256:f0e7c22ecffd6d405f6828ede3c08e64b46234c3c5e85043db4fc75f68cb0ad8", size = 2893913, upload-time = "2026-11-12T11:37:23.194Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/61/65/a555d0370cb7c41090feda5662fee34ed005cf9b7533e65b6879bee9ecc6/nonebot_plugin_parser-2.7.1-py3-none-any.whl", hash = "sha256:9854a121f87de29126fc2c06ead3b93f99f5e2a78e660de257c7ce02e53898f1", size = 2911175, upload-time = "2026-10-26T15:30:31.197Z" },
+    { url = "https://files.pythonhosted.org/packages/75/63/343e03bff317c3871a778687a0a2a809c6958b8063afd01d19ff9dcbff94/nonebot_plugin_parser-2.7.3-py3-none-any.whl", hash = "sha256:2eb5c67a664806f41a88c774560ba6ae3c6ff0906eb3be07c1ab108bd849b3da", size = 2911263, upload-time = "2026-11-12T11:37:21.74Z" },
 ]
 
 [[package]]
