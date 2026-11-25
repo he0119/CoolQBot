@@ -106,6 +106,22 @@ async def iter_sse(response: httpx.Response) -> AsyncIterator[tuple[str, dict[st
             yield event, _decode_sse_data(value)
 
 
+def raise_for_error(data: dict[str, Any], status_code: int = 200) -> None:
+    """检查响应中的错误信息
+
+    各接口的错误体都是 `{"error": {"message": ...}}`，
+    少数服务商会直接返回 `{"message": ...}`。
+    """
+    error = data.get("error")
+    if isinstance(error, dict):
+        raise ProviderError(str(error.get("message") or error))
+    if isinstance(error, str):
+        raise ProviderError(error)
+    if status_code != 200:
+        message = data.get("message") or f"HTTP {status_code}"
+        raise ProviderError(str(message))
+
+
 class Provider(ABC):
     """大模型 API 客户端基类
 
@@ -238,16 +254,5 @@ class Provider(ABC):
                 return await self.parse_stream(response)
 
     def raise_for_error(self, data: dict[str, Any], status_code: int = 200) -> None:
-        """检查响应中的错误信息
-
-        三种格式的错误体都是 `{"error": {"message": ...}}`，
-        少数服务商会直接返回 `{"message": ...}`。
-        """
-        error = data.get("error")
-        if isinstance(error, dict):
-            raise ProviderError(str(error.get("message") or error))
-        if isinstance(error, str):
-            raise ProviderError(error)
-        if status_code != 200:
-            message = data.get("message") or f"HTTP {status_code}"
-            raise ProviderError(str(message))
+        """检查响应中的错误信息"""
+        raise_for_error(data, status_code)

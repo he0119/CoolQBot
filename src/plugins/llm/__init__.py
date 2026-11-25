@@ -76,7 +76,7 @@ from .tts import TTSError, get_tts_models
 __plugin_meta__ = PluginMetadata(
     name="大模型对话",
     description="接入多种大模型 API，提供智能对话与问答功能",
-    usage="使用 /chat 对话（可加 -a 启用工具）、/draw 绘图、/llm 管理配置，也可在群聊中 @机器人 你好",
+    usage="使用 /chat 对话（可加 -a 启用工具、-i 允许按需生图）、/draw 绘图、/llm 管理配置，也可在群聊中 @机器人 你好",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
 )
 
@@ -149,6 +149,7 @@ chat_command = Alconna(
     Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
     Option("-a|--agent", default=False, action=store_true, help_text="启用工具增强模式"),
     Option("-d|--draw", default=False, action=store_true, help_text="使用当前模型生成图片"),
+    Option("-i|--image", default=False, action=store_true, help_text="允许模型按需调用本群生图模型"),
     meta=CommandMeta(
         description="与大模型对话，可按次启用工具增强模式",
         example="/chat 你好，或使用 /chat -a 查询成都天气",
@@ -237,6 +238,7 @@ async def _create_handler(
     use_tts: bool = False,
     enable_tools: bool = False,
     generate_image: bool = False,
+    allow_image: bool = False,
 ) -> LLMHandler:
     """按当前会话设置创建处理器。"""
     if not plugin_config.get_model_names():
@@ -263,10 +265,10 @@ async def _create_handler(
             at_sender=True,
         )
 
-    image_model_name = await get_image_model_name(user.session_id) if (generate_image or enable_tools) else ""
-    if generate_image:
-        if not image_model_name:
-            raise LLMSetupError("本群未启用生图模型，请联系超级管理员启用并设置", at_sender=True)
+    # 生图会产生额外费用，只有 -d/--draw 或 -i/--image 显式要求时才开放，-a 不会自动带上。
+    image_model_name = await get_image_model_name(user.session_id) if (generate_image or allow_image) else ""
+    if (generate_image or allow_image) and not image_model_name:
+        raise LLMSetupError("本群未启用生图模型，请联系超级管理员启用并设置", at_sender=True)
 
     return LLMHandler(
         name,
@@ -277,6 +279,7 @@ async def _create_handler(
         generate_image=generate_image,
         session_id=user.session_id,
         image_model_name=image_model_name,
+        allow_image=allow_image,
     )
 
 
@@ -681,6 +684,7 @@ async def _handle_dialogue_command(
     *,
     enable_tools: bool,
     generate_image: bool = False,
+    allow_image: bool = False,
 ) -> None:
     """执行共享的纯对话或工具增强命令流程。"""
     try:
@@ -701,6 +705,8 @@ async def _handle_dialogue_command(
         }
         if generate_image:
             handler_options["generate_image"] = True
+        if allow_image:
+            handler_options["allow_image"] = True
         handler = await _create_handler(user, **handler_options)
     except LLMSetupError as e:
         if e.at_sender:
@@ -730,6 +736,7 @@ async def chat_handle(
     use_tts: Query[bool] = Query("tts.value", False),
     use_agent: Query[bool] = Query("agent.value", False),
     use_draw: Query[bool] = Query("draw.value", False),
+    use_image: Query[bool] = Query("image.value", False),
 ) -> None:
     await _handle_dialogue_command(
         chat_cmd,
@@ -746,6 +753,7 @@ async def chat_handle(
         use_tts,
         enable_tools=use_agent.result,
         generate_image=use_draw.result,
+        allow_image=use_image.result,
     )
 
 
@@ -764,6 +772,7 @@ async def llm_mention_handle(
     use_tts: Query[bool] = Query("tts.value", False),
     use_agent: Query[bool] = Query("agent.value", False),
     use_draw: Query[bool] = Query("draw.value", False),
+    use_image: Query[bool] = Query("image.value", False),
 ) -> None:
     """把群聊中 @ 机器人的 Alconna 解析结果交给对话流程。"""
     try:
@@ -783,6 +792,8 @@ async def llm_mention_handle(
         }
         if use_draw.result:
             handler_options["generate_image"] = True
+        if use_image.result:
+            handler_options["allow_image"] = True
         handler = await _create_handler(user, **handler_options)
     except LLMSetupError as e:
         await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=msg_id)

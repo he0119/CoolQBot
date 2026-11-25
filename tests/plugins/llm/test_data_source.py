@@ -693,24 +693,33 @@ async def test_group_image_model_setting(app: App, mocker):
 
 
 async def test_group_image_model_validation(app: App, mocker):
-    """生图模型必须已启用且使用 openai_images 接口。"""
+    """生图模型必须已启用；能否生图只看声明的能力，Responses 模型也可以。"""
     from src.plugins.llm.config import ModelCapability, ModelConfig, plugin_config
-    from src.plugins.llm.data_source import set_available_model_names, set_image_model_name
+    from src.plugins.llm.data_source import (
+        get_image_model_name,
+        set_available_model_names,
+        set_image_model_name,
+        set_model_name,
+    )
     from src.plugins.llm.providers import ProviderName
 
     chat = ModelConfig(name="deepseek")
-    fake_painter = ModelConfig(
-        name="fake-painter",
-        provider=ProviderName.OPENAI_CHAT_COMPLETIONS,
-        capabilities={ModelCapability.IMAGE_GENERATION},
+    painter = ModelConfig(
+        name="gpt-painter",
+        provider=ProviderName.OPENAI_RESPONSES,
+        capabilities={ModelCapability.TEXT, ModelCapability.IMAGE_GENERATION},
     )
-    mocker.patch.object(plugin_config, "models", [chat, fake_painter])
-    await set_available_model_names("QQClient_10000", ["deepseek", "fake-painter"])
+    mocker.patch.object(plugin_config, "models", [chat, painter])
+    await set_available_model_names("QQClient_10000", ["deepseek", "gpt-painter"])
 
     with pytest.raises(ValueError, match="本群未启用的模型"):
         await set_image_model_name("QQClient_10000", "missing")
-    with pytest.raises(ValueError, match="openai_images"):
-        await set_image_model_name("QQClient_10000", "fake-painter")
+    with pytest.raises(ValueError, match="未声明 image_generation 能力"):
+        await set_image_model_name("QQClient_10000", "deepseek")
+    # 同时声明 text 和 image_generation 的模型既能作为生图模型，也能对话
+    assert await get_image_model_name("QQClient_10000") == "gpt-painter"
+    await set_image_model_name("QQClient_10000", "gpt-painter")
+    await set_model_name("QQClient_10000", "gpt-painter")
 
 
 async def test_generate_image_tool_requires_context(app: App):

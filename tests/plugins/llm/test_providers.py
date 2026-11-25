@@ -794,7 +794,8 @@ def test_provider_names_use_explicit_enum(app: App):
         ANTHROPIC_MESSAGES,
         "openai_images",
     ]
-    assert set(PROVIDERS) == set(ProviderName)
+    # openai_images 只能生图，不注册为对话接口
+    assert set(PROVIDERS) == set(ProviderName) - {ProviderName.OPENAI_IMAGES}
     assert ModelConfig(name="default").provider is ProviderName.OPENAI_CHAT_COMPLETIONS
     assert get_provider(ProviderName.OPENAI_CHAT_COMPLETIONS) is ChatProvider
 
@@ -846,7 +847,7 @@ async def test_images_provider_generates(app: App, respx_mock: MockRouter):
     import base64
 
     from src.plugins.llm.config import ModelConfig
-    from src.plugins.llm.providers import ImagesProvider, ProviderName
+    from src.plugins.llm.providers import ImagesClient, ProviderName
 
     png = b"\x89PNG\r\n\x1a\n" + b"0" * 16
     route = respx_mock.post("https://api.example.com/images/generations").mock(
@@ -866,7 +867,7 @@ async def test_images_provider_generates(app: App, respx_mock: MockRouter):
         api_key="sk-test",
         extra_body={"size": "1024x1024"},
     )
-    result = await ImagesProvider(config).generate("一只猫")
+    result = await ImagesClient(config).generate("一只猫")
 
     payload = json.loads(route.calls[0].request.content)
     assert payload == {"model": "gpt-image-2.5-sunburst", "prompt": "一只猫", "size": "1024x1024"}
@@ -1018,20 +1019,76 @@ async def test_sse_flushes_event_without_trailing_blank_line(app: App):
     assert events == [("custom", {"a": 1})]
 
 
-async def test_images_provider_rejects_chat(app: App):
-    """生图模型不能用于对话接口。"""
-    from src.plugins.llm.providers import ImagesProvider, ProviderError
-    from src.plugins.llm.schemas import Message
+def test_images_provider_is_not_chat_provider(app: App):
+    """openai_images 只能生图，按对话接口取用时直接报错。"""
+    from src.plugins.llm.providers import ProviderError, get_provider
 
-    provider = ImagesProvider(make_config(OPENAI_IMAGES))
-    with pytest.raises(ProviderError, match="只用于图片生成"):
-        provider.build_payload([Message.user("你好")])
-    with pytest.raises(ProviderError, match="只用于图片生成"):
-        provider.parse_response({})
-    with pytest.raises(ProviderError, match="只用于图片生成"):
-        await provider.parse_stream(httpx.Response(200, text=""))
-    with pytest.raises(ProviderError, match="只用于图片生成"):
-        await provider.chat([Message.user("你好")])
+    with pytest.raises(ProviderError, match="只能生图，不能对话"):
+        get_provider(OPENAI_IMAGES)
+
+
+def test_capabilities_must_match_provider(app: App):
+    """能力声明必须是接口做得到的：Image API 只能生图，生图只支持 Image API 与 Responses。"""
+    from pydantic import ValidationError
+
+    from src.plugins.llm.config import ModelCapability, ModelConfig
+
+    # openai_images 省略 capabilities 时默认只生图，不会被当成对话模型
+    assert ModelConfig(name="painter", provider=OPENAI_IMAGES).capabilities == {ModelCapability.IMAGE_GENERATION}
+    with pytest.raises(ValidationError, match="只能生图"):
+        ModelConfig(name="painter", provider=OPENAI_IMAGES, capabilities={"text", "image_generation"})
+    with pytest.raises(ValidationError, match="暂不支持生图"):
+        ModelConfig(name="painter", provider=OPENAI_CHAT_COMPLETIONS, capabilities={"text", "image_generation"})
+    # Responses 模型可以同时对话和生图
+    both = ModelConfig(name="painter", provider=OPENAI_RESPONSES, capabilities={"text", "image_generation"})
+    assert both.capabilities == {ModelCapability.TEXT, ModelCapability.IMAGE_GENERATION}
+
+
+@respx.mock(assert_all_called=True)
+async def test_generate_images_with_responses_model(app: App, respx_mock: MockRouter):
+    """既能对话又能生图的 Responses 模型，通过强制原生 image_generation 工具生图。"""
+    import base64
+
+    from src.plugins.llm.providers import generate_images
+
+    png = b"\x89PNG\r\n\x1a\n" + b"0" * 16
+    route = respx_mock.post("https://api.example.com/responses").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "status": "completed",
+                "output": [{"type": "image_generation_call", "result": base64.b64encode(png).decode()}],
+                "usage": {"input_tokens": 5, "output_tokens": 6},
+            },
+        )
+    )
+    config = make_config(
+        OPENAI_RESPONSES,
+        capabilities={"text", "image_generation"},
+        extra_body={"tools": [{"type": "web_search"}]},
+    )
+    result = await generate_images(config, "一只猫")
+
+    payload = json.loads(route.calls[0].request.content)
+    assert payload["tools"] == [{"type": "web_search"}, {"type": "image_generation"}]
+    assert payload["tool_choice"] == {"type": "image_generation"}
+    assert [image.data for image in result.images] == [png]
+    assert result.usage.output_tokens == 6
+    # 不修改原配置
+    assert config.extra_body == {"tools": [{"type": "web_search"}]}
+
+
+@respx.mock(assert_all_called=True)
+async def test_generate_images_requires_image_output(app: App, respx_mock: MockRouter):
+    """Responses 模型只回了文字、没有图片时报错。"""
+    from src.plugins.llm.providers import ProviderError, generate_images
+
+    respx_mock.post("https://api.example.com/responses").mock(
+        return_value=httpx.Response(200, json={"status": "completed", "output": []})
+    )
+    config = make_config(OPENAI_RESPONSES, capabilities={"text", "image_generation"})
+    with pytest.raises(ProviderError, match="没有生成图片"):
+        await generate_images(config, "一只猫")
 
 
 @pytest.mark.parametrize(
@@ -1045,11 +1102,11 @@ async def test_images_provider_rejects_chat(app: App):
 @respx.mock(assert_all_called=True)
 async def test_images_provider_generation_errors(app: App, respx_mock: MockRouter, payload: dict, match: str):
     """图片接口返回异常数据时给出可读的错误。"""
-    from src.plugins.llm.providers import ImagesProvider, ProviderError
+    from src.plugins.llm.providers import ImagesClient, ProviderError
 
     respx_mock.post("https://api.example.com/images/generations").mock(return_value=httpx.Response(200, json=payload))
     with pytest.raises(ProviderError, match=match):
-        await ImagesProvider(make_config(OPENAI_IMAGES)).generate("一只猫")
+        await ImagesClient(make_config(OPENAI_IMAGES)).generate("一只猫")
 
 
 @respx.mock(assert_all_called=True)
@@ -1057,14 +1114,14 @@ async def test_images_provider_without_usage_and_session_affinity(app: App, resp
     """没有用量时返回空统计，并带上会话头。"""
     import base64
 
-    from src.plugins.llm.providers import ImagesProvider
+    from src.plugins.llm.providers import ImagesClient
     from src.plugins.llm.schemas import Usage
 
     png = b"\x89PNG\r\n\x1a\n" + b"0" * 16
     route = respx_mock.post("https://api.example.com/images/generations").mock(
         return_value=httpx.Response(200, json={"data": [{"b64_json": base64.b64encode(png).decode()}]})
     )
-    provider = ImagesProvider(make_config(OPENAI_IMAGES), session_affinity="test-affinity")
+    provider = ImagesClient(make_config(OPENAI_IMAGES), session_affinity="test-affinity")
     result = await provider.generate("一只猫")
     assert result.usage == Usage()
     assert route.calls[0].request.headers["x-session-affinity"] == "test-affinity"
@@ -1072,12 +1129,12 @@ async def test_images_provider_without_usage_and_session_affinity(app: App, resp
 
 async def test_images_provider_network_errors(app: App, respx_mock: MockRouter):
     """超时和连接错误都要转成 ProviderError。"""
-    from src.plugins.llm.providers import ImagesProvider, ProviderError
+    from src.plugins.llm.providers import ImagesClient, ProviderError
 
     respx_mock.post("https://api.example.com/images/generations").mock(side_effect=httpx.ReadTimeout("slow"))
     with pytest.raises(ProviderError, match="超时"):
-        await ImagesProvider(make_config(OPENAI_IMAGES)).generate("一只猫")
+        await ImagesClient(make_config(OPENAI_IMAGES)).generate("一只猫")
 
     respx_mock.post("https://api.example.com/images/generations").mock(side_effect=httpx.ConnectError("boom"))
     with pytest.raises(ProviderError, match="请求失败"):
-        await ImagesProvider(make_config(OPENAI_IMAGES)).generate("一只猫")
+        await ImagesClient(make_config(OPENAI_IMAGES)).generate("一只猫")

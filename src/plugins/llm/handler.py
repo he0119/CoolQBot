@@ -90,12 +90,32 @@ IMAGE_TOOL_KEYS = (
 
 
 def _native_image_tool(image_model: ModelConfig) -> dict[str, Any]:
-    """把生图模型配置转换成 Responses 原生 image_generation 工具。"""
-    tool: dict[str, Any] = {"type": "image_generation", "model": image_model.model}
+    """把生图模型配置转换成 Responses 原生 image_generation 工具。
+
+    生图模型是 openai_images 时，把它的模型名和输出参数写进工具；
+    否则生图模型就是对话模型本身，由服务端选择默认的图片模型。
+    """
+    tool: dict[str, Any] = {"type": "image_generation"}
+    if image_model.provider != ProviderName.OPENAI_IMAGES:
+        return tool
+    tool["model"] = image_model.model
     for key in IMAGE_TOOL_KEYS:
         if key in image_model.extra_body:
             tool[key] = image_model.extra_body[key]
     return tool
+
+
+def _uses_native_draw(model_name: str, image_model_name: str) -> bool:
+    """绘图模式是否走 Responses 原生 image_generation 工具
+
+    对话模型必须是 openai_responses，且生图模型是 openai_images（借用它的模型名），
+    或者生图模型就是对话模型本身。其他组合走本地 generate_image 工具，按生图模型自己的配置调用。
+    """
+    if plugin_config.resolve(model_name).provider != ProviderName.OPENAI_RESPONSES:
+        return False
+    if not image_model_name or image_model_name == model_name:
+        return True
+    return plugin_config.get_model(image_model_name).provider == ProviderName.OPENAI_IMAGES
 
 
 async def chat(
@@ -292,6 +312,7 @@ class LLMHandler:
         generate_image: bool = False,
         session_id: str = "",
         image_model_name: str = "",
+        allow_image: bool = False,
     ) -> None:
         self.model_name = model_name
         self.session_affinity = session_affinity or uuid4().hex
@@ -301,10 +322,12 @@ class LLMHandler:
         self.session_id = session_id
         self.image_model_name = image_model_name
         self.generate_image = generate_image
-        self.draw_local = generate_image and plugin_config.resolve(model_name).provider != ProviderName.OPENAI_RESPONSES
+        self.draw_local = generate_image and not _uses_native_draw(model_name, image_model_name)
         self.enable_tools = enable_tools
-        self.tools_enabled = self.draw_local or (enable_tools and not generate_image)
-        self.tool_names = {"generate_image"} if self.draw_local else None
+        # allow_image：用户显式允许模型按需调用 generate_image；绘图模式已经强制生图，不再叠加。
+        self.allow_image = allow_image and not generate_image
+        self.tools_enabled = self.draw_local or self.allow_image or (enable_tools and not generate_image)
+        self.tool_names = {"generate_image"} if self.draw_local or (self.allow_image and not enable_tools) else None
         self.show_thinking = plugin_config.send_thinking if show_thinking is None else show_thinking
         self.context: list[Message] = []
 

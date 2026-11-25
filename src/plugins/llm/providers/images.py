@@ -1,7 +1,7 @@
 """OpenAI Image API 客户端
 
-只用于声明了 `image_generation` 能力的生图模型，不参与对话。
-请求 `POST {base_url}/images/generations`，返回的 `b64_json` 解码后交给调用方。
+只给使用 `openai_images` 接口的生图模型用。这个接口不能对话，所以不继承对话用的 `Provider`，
+也不注册到对话接口表里。请求 `POST {base_url}/images/generations`，返回的 `b64_json` 解码后交给调用方。
 """
 
 from __future__ import annotations
@@ -10,15 +10,15 @@ import base64
 import binascii
 import copy
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, NoReturn
+from typing import TYPE_CHECKING, Any
 
 import httpx
 
 from ..schemas import ImageContent, Usage
-from .base import USER_AGENT, Provider, ProviderError, _decode_json_response
+from .base import USER_AGENT, ProviderError, _decode_json_response, raise_for_error
 
 if TYPE_CHECKING:
-    from ..schemas import Message, ToolChoice, ToolParam
+    from ..config import ModelConfig
 
 
 @dataclass
@@ -31,42 +31,24 @@ class GeneratedImages:
     """图片接口返回的 token 用量"""
 
 
-class ImagesProvider(Provider):
-    """生图模型使用的 Image API，不参与文本对话"""
+class ImagesClient:
+    """OpenAI Image API 客户端，只能生图"""
+
+    def __init__(self, config: ModelConfig, *, session_affinity: str = "") -> None:
+        self.config = config
+        self.session_affinity = session_affinity
 
     @property
     def endpoint(self) -> str:
         return f"{self.config.base_url.rstrip('/')}/images/generations"
 
     def build_headers(self) -> dict[str, str]:
-        headers = {"Content-Type": "application/json"}
+        headers = {"Content-Type": "application/json", "User-Agent": USER_AGENT}
         if self.config.api_key:
             headers["Authorization"] = f"Bearer {self.config.api_key}"
+        if self.session_affinity:
+            headers["X-Session-Affinity"] = self.session_affinity
         return headers
-
-    def build_payload(
-        self,
-        messages: list[Message],
-        tools: list[ToolParam] | None = None,
-        stream: bool = False,
-        tool_choice: ToolChoice = "auto",
-    ) -> dict[str, Any]:
-        raise ProviderError(f"模型 {self.config.name} 使用 openai_images 接口，只用于图片生成，不能对话")
-
-    def parse_response(self, data: dict[str, Any]) -> NoReturn:
-        raise ProviderError(f"模型 {self.config.name} 使用 openai_images 接口，只用于图片生成，不能对话")
-
-    async def parse_stream(self, response: httpx.Response) -> NoReturn:
-        raise ProviderError(f"模型 {self.config.name} 使用 openai_images 接口，只用于图片生成，不能对话")
-
-    async def chat(
-        self,
-        messages: list[Message],
-        tools: list[ToolParam] | None = None,
-        *,
-        tool_choice: ToolChoice = "auto",
-    ) -> NoReturn:
-        raise ProviderError(f"模型 {self.config.name} 使用 openai_images 接口，只用于图片生成，不能对话")
 
     async def generate(self, prompt: str) -> GeneratedImages:
         """按提示词生成图片"""
@@ -75,15 +57,11 @@ class ImagesProvider(Provider):
             "prompt": prompt,
             **copy.deepcopy(self.config.extra_body),
         }
-        headers = self.build_headers()
-        headers["User-Agent"] = USER_AGENT
-        if self.session_affinity:
-            headers["X-Session-Affinity"] = self.session_affinity
         try:
             async with httpx.AsyncClient(proxy=self.config.proxy) as client:
                 response = await client.post(
                     self.endpoint,
-                    headers=headers,
+                    headers=self.build_headers(),
                     json=payload,
                     timeout=self.config.timeout,
                 )
@@ -92,7 +70,7 @@ class ImagesProvider(Provider):
         except httpx.HTTPError as e:
             raise ProviderError(f"图片生成请求失败：{e}") from e
         data = _decode_json_response(response)
-        self.raise_for_error(data, response.status_code)
+        raise_for_error(data, response.status_code)
         return self._parse_images(data)
 
     def _parse_images(self, data: dict[str, Any]) -> GeneratedImages:

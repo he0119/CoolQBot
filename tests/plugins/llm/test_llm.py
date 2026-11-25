@@ -2328,9 +2328,9 @@ async def test_local_draw_uses_generate_image_tool(app: App, mocker):
         get_model=lambda name: models[name],
     )
     mocker.patch("src.plugins.llm.handler.plugin_config", config)
-    mocker.patch("src.plugins.llm.tools.image.plugin_config", mocker.Mock(get_model=lambda name: models[name]))
+    mocker.patch("src.plugins.llm.tools.image.plugin_config", mocker.Mock(resolve=lambda name: models[name]))
     generate = mocker.patch(
-        "src.plugins.llm.tools.image.ImagesProvider.generate",
+        "src.plugins.llm.providers.images.ImagesClient.generate",
         new=mocker.AsyncMock(return_value=GeneratedImages(images=[ImageContent.from_bytes(png)])),
     )
 
@@ -2525,9 +2525,9 @@ async def test_draw_command_requires_image_model(app: App, mock_models):
 
 
 async def test_generate_image_tool_errors(app: App, mocker):
-    """生图工具在缺配置、模型失效、接口不符和生成失败时都返回错误文本。"""
+    """生图工具在缺配置、模型失效、未声明生图能力和生成失败时都返回错误文本。"""
     from src.plugins.llm.config import ModelConfig
-    from src.plugins.llm.providers import ImagesProvider, ProviderError, ProviderName
+    from src.plugins.llm.providers import ImagesClient, ProviderError, ProviderName
     from src.plugins.llm.tools import ToolContext
     from src.plugins.llm.tools.image import generate_image
 
@@ -2536,19 +2536,19 @@ async def test_generate_image_tool_errors(app: App, mocker):
 
     mocker.patch(
         "src.plugins.llm.tools.image.plugin_config",
-        mocker.Mock(get_model=mocker.Mock(side_effect=ValueError("missing"))),
+        mocker.Mock(resolve=mocker.Mock(side_effect=ValueError("missing"))),
     )
     result = await generate_image("一只猫", context=ToolContext(image_model_name="gone"))
     assert "不再可用" in result.text
 
-    wrong = ModelConfig(name="wrong", provider=ProviderName.OPENAI_CHAT_COMPLETIONS)
-    mocker.patch("src.plugins.llm.tools.image.plugin_config", mocker.Mock(get_model=lambda name: wrong))
-    result = await generate_image("一只猫", context=ToolContext(image_model_name="wrong"))
-    assert "未使用 openai_images" in result.text
+    text_only = ModelConfig(name="text-only", provider=ProviderName.OPENAI_CHAT_COMPLETIONS)
+    mocker.patch("src.plugins.llm.tools.image.plugin_config", mocker.Mock(resolve=lambda name: text_only))
+    result = await generate_image("一只猫", context=ToolContext(image_model_name="text-only"))
+    assert "未声明 image_generation 能力" in result.text
 
     good = ModelConfig(name="painter", provider=ProviderName.OPENAI_IMAGES)
-    mocker.patch("src.plugins.llm.tools.image.plugin_config", mocker.Mock(get_model=lambda name: good))
-    mocker.patch.object(ImagesProvider, "generate", side_effect=ProviderError("boom"))
+    mocker.patch("src.plugins.llm.tools.image.plugin_config", mocker.Mock(resolve=lambda name: good))
+    mocker.patch.object(ImagesClient, "generate", side_effect=ProviderError("boom"))
     result = await generate_image("一只猫", context=ToolContext(image_model_name="painter"))
     assert "生成图片失败" in result.text
 
@@ -2625,3 +2625,67 @@ async def test_llm_model_set_and_clear_image(app: App, mocker):
         ctx.should_finished(llm_cmd)
 
     assert await get_image_model_name("QQClient_10000") == "painter"
+
+
+async def test_image_tool_requires_explicit_option(app: App, mocker):
+    """生图会产生费用：/chat -a 不再自动带上生图工具，只有 -i/--image 显式要求时才开放。"""
+    from src.plugins.llm import _create_handler
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names
+    from src.plugins.llm.providers import ProviderName
+
+    chat_model = ModelConfig(name="test-model")
+    painter = ModelConfig(name="painter", provider=ProviderName.OPENAI_IMAGES)
+    mocker.patch.object(plugin_config, "models", [chat_model, painter])
+    await set_available_model_names("QQClient_10000", ["test-model", "painter"])
+    user: Any = mocker.Mock(session_id="QQClient_10000")
+
+    agent = await _create_handler(user, enable_tools=True)
+    assert agent.image_model_name == ""
+    assert agent.tool_names is None
+
+    image_only = await _create_handler(user, allow_image=True)
+    assert image_only.image_model_name == "painter"
+    assert image_only.tools_enabled is True
+    assert image_only.tool_names == {"generate_image"}
+
+    agent_with_image = await _create_handler(user, enable_tools=True, allow_image=True)
+    assert agent_with_image.image_model_name == "painter"
+    assert agent_with_image.tool_names is None
+
+
+async def test_image_option_requires_image_model(app: App, mock_models):
+    """本群没有生图模型时 /chat -i 直接提示。"""
+    from src.plugins.llm import chat_cmd
+
+    async with app.test_matcher() as ctx:
+        adapter = get_adapter(Adapter)
+        bot = ctx.create_bot(base=Bot, adapter=adapter)
+        event = fake_group_message_event_v11(message=Message("/chat -i 画一只猫"), user_id=10)
+
+        ctx.receive_event(bot, event)
+        ctx.should_call_send(
+            event,
+            "本群未启用生图模型，请联系超级管理员启用并设置",
+            True,
+            at_sender=True,
+        )
+        ctx.should_finished(chat_cmd)
+
+
+async def test_draw_path_follows_image_model(app: App, mocker):
+    """Responses 对话模型：生图模型是自己时走原生工具，是另一个 Responses 模型时走本地工具。"""
+    from src.plugins.llm.config import ModelConfig
+    from src.plugins.llm.handler import LLMHandler, _native_image_tool
+    from src.plugins.llm.providers import ProviderName
+
+    gpt = ModelConfig(name="gpt", provider=ProviderName.OPENAI_RESPONSES, capabilities={"text", "image_generation"})
+    other = ModelConfig(name="other", provider=ProviderName.OPENAI_RESPONSES, capabilities={"text", "image_generation"})
+    models = {"gpt": gpt, "other": other}
+    config = mocker.Mock(send_thinking=False, resolve=lambda name: models[name], get_model=lambda name: models[name])
+    mocker.patch("src.plugins.llm.handler.plugin_config", config)
+
+    assert LLMHandler("gpt", enable_tools=False, generate_image=True, image_model_name="gpt").draw_local is False
+    assert LLMHandler("gpt", enable_tools=False, generate_image=True, image_model_name="other").draw_local is True
+    # 生图模型就是对话模型本身时，不往原生工具里写模型名
+    assert _native_image_tool(gpt) == {"type": "image_generation"}

@@ -8,7 +8,6 @@ from sqlalchemy import select, update
 
 from .config import ModelCapability, plugin_config
 from .models import GroupLLMConfig
-from .providers import ProviderName
 
 
 @dataclass(frozen=True)
@@ -44,9 +43,8 @@ def _capable_names(names: list[str], capability: ModelCapability) -> list[str]:
 
 
 def _is_image_model(name: str) -> bool:
-    """生图模型需要声明 image_generation 能力并使用 openai_images 接口。"""
-    model = plugin_config.get_model(name)
-    return ModelCapability.IMAGE_GENERATION in model.capabilities and model.provider == ProviderName.OPENAI_IMAGES
+    """声明了 image_generation 能力的模型才能作为生图模型；接口是否支持已在加载配置时校验。"""
+    return ModelCapability.IMAGE_GENERATION in plugin_config.get_model(name).capabilities
 
 
 def _resolve_image_model_name(config: GroupLLMConfig | None, names: list[str]) -> str:
@@ -322,8 +320,6 @@ async def set_image_model_name(session_id: str, model_name: str) -> None:
         model = plugin_config.get_model(model_name)
         if ModelCapability.IMAGE_GENERATION not in model.capabilities:
             raise ValueError(f"模型 {model_name} 未声明 image_generation 能力，不能用于生成图片")
-        if model.provider != ProviderName.OPENAI_IMAGES:
-            raise ValueError(f"模型 {model_name} 使用 {model.provider} 接口，生图模型需要 openai_images 接口")
         config.image_model = model_name
         await session.commit()
     logger.info("LLM 群组生图模型已更新（模型={}）", model_name)
