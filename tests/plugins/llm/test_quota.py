@@ -331,7 +331,7 @@ async def test_llm_quota_command_all_uses_available_models(app: App, mocker, mes
         ],
     )
     await set_available_model_names("QQClient_10000", ["first", "second"])
-    get_quotas = mocker.patch("src.plugins.llm.get_quotas", return_value="批量额度结果")
+    get_quotas = mocker.patch("src.plugins.llm.management.get_quotas", return_value="批量额度结果")
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)

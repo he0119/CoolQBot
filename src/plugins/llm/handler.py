@@ -1,7 +1,7 @@
 """大模型对话处理
 
-负责组装上下文、驱动多轮对话、执行工具调用，并按配置决定回复形式
-（文本 / 原生 Markdown / Markdown 图片 / TTS 语音）。
+负责组装上下文、驱动“请求模型 → 执行工具 → 再请求”的循环，并在请求次数到上限时生成收尾回复。
+回复如何发送给用户见 `reply.py`。
 """
 
 from __future__ import annotations
@@ -11,26 +11,22 @@ import json
 import re
 from collections.abc import Awaitable, Callable, Collection
 from contextlib import suppress
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from time import perf_counter
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from nonebot.log import logger
-from nonebot_plugin_alconna import SupportAdapter, UniMessage, get_target, message_reaction
 
-from .config import ModelCapability, ModelConfig, plugin_config
+from .config import ModelCapability, plugin_config
 from .providers import ProviderError, ProviderName, get_provider
-from .schemas import Completion, ForceTool, ImageContent, Message
+from .schemas import Completion, ForceTool, ImageContent, Message, Usage
 from .tools import ToolContext, ToolResult, registry
 from .tools.image import IMAGE_TOOL_NAME
-from .tts import TTSError, text_to_speech
 
 if TYPE_CHECKING:
+    from .config import ModelConfig
     from .schemas import ToolCall, ToolChoice
-
-THINK_PATTERN = re.compile(r"<think>(.*?)</think>", re.DOTALL)
-"""部分服务商把推理内容混在正文的 think 标签里"""
 
 REQUEST_LIMIT_PROMPT = (
     "模型请求次数已达到上限，不得再调用工具。请仅根据用户问题和已经获取的工具结果直接回答；"
@@ -57,26 +53,7 @@ DSML_TOOL_CALL_PATTERN = re.compile(
 )
 """部分 DeepSeek 兼容服务在禁止工具后把私有工具协议降级到正文。"""
 
-ReactionStatus = Literal["fail", "thinking", "done"]
 RequestWaitNotifier = Callable[[int, int, int], Awaitable[None]]
-REACTION_EMOJIS: dict[ReactionStatus, tuple[str, str]] = {
-    "fail": ("10060", "❌"),
-    "thinking": ("424", "👀"),
-    "done": ("144", "🎉"),
-}
-"""OneBot V11 emoji ID 与其他平台 Unicode emoji 的对应关系"""
-
-QQ_THINKING_NOTICE = "👀 已收到，正在处理……"
-"""QQ 适配器不支持 reaction，开始处理时改发普通消息。"""
-
-
-@dataclass
-class _RequestWaitProgress:
-    """等待提示使用的非敏感请求进度。"""
-
-    request_count: int = 1
-    tool_call_count: int = 0
-
 
 IMAGE_TOOL_KEYS = (
     "size",
@@ -88,6 +65,29 @@ IMAGE_TOOL_KEYS = (
     "action",
 )
 """生图模型的 extra_body 中可以直接传给原生 image_generation 工具的字段。"""
+
+
+@dataclass
+class _TurnState:
+    """一次提问内跨多次模型请求累计的状态"""
+
+    request_count: int = 1
+    """已发出的模型请求次数，等待提示会展示它"""
+    tool_call_count: int = 0
+    """已执行的工具调用次数，等待提示会展示它"""
+    usage: Usage = field(default_factory=Usage)
+    """各次请求的用量合计"""
+    model: str = ""
+    """服务端返回的实际模型名"""
+    images: list[ImageContent] = field(default_factory=list)
+    """模型或工具生成、需要发给用户的图片"""
+    reached_limit: bool = False
+    """是否已用到最后一次（禁止工具的）请求"""
+
+    def record(self, completion: Completion) -> None:
+        self.usage = self.usage + completion.usage
+        self.model = completion.model or self.model
+        self.images.extend(completion.images)
 
 
 def _native_image_tool(image_model: ModelConfig) -> dict[str, Any]:
@@ -106,17 +106,15 @@ def _native_image_tool(image_model: ModelConfig) -> dict[str, Any]:
     return tool
 
 
-def _uses_native_draw(model_name: str, image_model_name: str) -> bool:
+def _uses_native_draw(model: ModelConfig, image_model: ModelConfig) -> bool:
     """绘图模式是否走 Responses 原生 image_generation 工具
 
     对话模型必须是 openai_responses，且生图模型是 openai_images（借用它的模型名），
     或者生图模型就是对话模型本身。其他组合走本地 generate_image 工具，按生图模型自己的配置调用。
     """
-    if plugin_config.resolve(model_name).provider != ProviderName.OPENAI_RESPONSES:
+    if model.provider != ProviderName.OPENAI_RESPONSES:
         return False
-    if image_model_name == model_name:
-        return True
-    return plugin_config.get_model(image_model_name).provider == ProviderName.OPENAI_IMAGES
+    return image_model.name == model.name or image_model.provider == ProviderName.OPENAI_IMAGES
 
 
 def _select_tool_names(
@@ -141,7 +139,7 @@ def _select_tool_names(
 
 
 async def chat(
-    model_name: str,
+    model: ModelConfig,
     messages: list[Message],
     *,
     session_affinity: str = "",
@@ -151,20 +149,20 @@ async def chat(
 ) -> Completion:
     """发起一次对话请求
 
+    - `model`：已经回退过全局配置的模型配置（见 `ScopedConfig.resolve`）。
     - `tool_names`：下发给模型的函数工具，为空时不下发。
     - `native_image_model`：设置后追加 Responses 原生 image_generation 工具并强制调用，用于绘图模式。
     """
-    model = plugin_config.resolve(model_name)
     if not model.base_url:
-        raise ValueError(f"模型 {model_name} 未配置 base_url，且未设置 LLM__BASE_URL")
+        raise ValueError(f"模型 {model.name} 未配置 base_url，且未设置 LLM__BASE_URL")
     if native_image_model is not None:
         if model.provider != ProviderName.OPENAI_RESPONSES:
-            raise ValueError(f"模型 {model_name} 使用 {model.provider} 接口，只有 openai_responses 支持原生绘图工具")
+            raise ValueError(f"模型 {model.name} 使用 {model.provider} 接口，只有 openai_responses 支持原生绘图工具")
         model = model.model_copy(deep=True)
         # 追加到模型已配置的原生工具之后，避免覆盖联网搜索等已有工具。
         native_tools = model.extra_body.get("tools") or []
         if not isinstance(native_tools, list):
-            raise ValueError(f"模型 {model_name} 的 extra_body.tools 必须为工具数组")
+            raise ValueError(f"模型 {model.name} 的 extra_body.tools 必须为工具数组")
         model.extra_body["tools"] = [*native_tools, _native_image_tool(native_image_model)]
         model.extra_body["tool_choice"] = {"type": "image_generation"}
     provider = get_provider(model.provider)(model, session_affinity=session_affinity)
@@ -211,81 +209,6 @@ def _format_request_limit_fallback(context: list[Message], context_start: int) -
     return "\n\n".join(sections)
 
 
-def split_content(completion: Completion) -> tuple[str, str]:
-    """拆分模型回复为 (正文, 推理内容)
-
-    Anthropic 的 thinking 块与 OpenAI 的 reasoning_content 已由 provider
-    归一化到 `reasoning`；此处再兜底处理混在正文里的 think 标签。
-    """
-    content = completion.content
-    reasoning = completion.reasoning
-
-    if not reasoning:
-        blocks = THINK_PATTERN.findall(content)
-        reasoning = "\n".join(block.strip() for block in blocks if block.strip())
-
-    return THINK_PATTERN.sub("", content).strip(), reasoning
-
-
-def format_statistics(completion: Completion) -> str:
-    """把本次提问的模型链、耗时及 token 用量格式化为尾注"""
-    usage = completion.usage
-    model = completion.model or "unknown"
-    models = [part.strip() for part in model.split("→") if part.strip()] or ["unknown"]
-    model_lines = [f"模型　{models[0]}"]
-    model_lines.extend(f"　　　↳ {part}" for part in models[1:])
-    model_text = "  \n".join(model_lines)
-    return (
-        "---\n"
-        f"{model_text}  \n"
-        f"统计　{completion.elapsed_seconds:.1f}s · "
-        f"输入 {usage.input_tokens:,} · 输出 {usage.output_tokens:,} · "
-        f"缓存 {usage.cache_read_tokens:,} · 共 {usage.total_tokens:,}"
-    )
-
-
-def format_thinking(reasoning: str) -> str:
-    """把推理内容格式化为 Markdown 引用块"""
-    return "\n".join(f"> {line}" if line else ">" for line in reasoning.splitlines())
-
-
-def format_output(completion: Completion, *, with_thinking: bool, with_statistics: bool = True) -> str:
-    """把模型回复格式化为最终文本"""
-    content, reasoning = split_content(completion)
-    if with_thinking and reasoning:
-        thinking = format_thinking(reasoning)
-        text = f"{thinking}\n\n{content}" if content else thinking
-    else:
-        text = content
-
-    if text and with_statistics:
-        return f"{text}\n\n{format_statistics(completion)}"
-    return text
-
-
-async def send_reaction(
-    status: ReactionStatus,
-    *,
-    message_id: str | None = None,
-) -> None:
-    """反馈响应状态；QQ 开始处理时发消息，其余平台优先使用 reaction。"""
-    try:
-        target = get_target()
-        if target.adapter == SupportAdapter.qq:
-            if status == "thinking":
-                await UniMessage.text(QQ_THINKING_NOTICE).send(reply_to=message_id or True)
-            return
-
-        is_onebot = target.adapter == SupportAdapter.onebot11
-        if is_onebot and target.private:
-            return
-
-        emoji = REACTION_EMOJIS[status][0 if is_onebot else 1]
-        await message_reaction(emoji, message_id=message_id)
-    except Exception as e:
-        logger.opt(exception=e).debug("发送大模型响应状态失败，已忽略")
-
-
 async def execute_tool_calls(
     calls: list[ToolCall],
     context: list[Message],
@@ -307,39 +230,37 @@ async def execute_tool_calls(
 
 
 class LLMHandler:
-    """一次提问的处理流程"""
+    """一次对话的上下文与请求流程
+
+    创建时一次性读取模型配置和插件配置，之后的请求流程只使用这里保存的值。
+    """
 
     def __init__(
         self,
         model_name: str,
         *,
         session_affinity: str | None = None,
-        send_markdown: bool = False,
-        send_md_pic: bool = False,
-        tts_model: str = "",
         system_prompt: str | None = None,
         enable_tools: bool = True,
-        show_thinking: bool | None = None,
         generate_image: bool = False,
-        session_id: str = "",
-        image_model_name: str = "",
         allow_image: bool = False,
+        image_model_name: str = "",
+        session_id: str = "",
     ) -> None:
-        self.model_name = model_name
-        self.session_affinity = session_affinity or uuid4().hex
-        self.send_markdown = send_markdown
-        self.send_md_pic = send_md_pic
-        self.tts_model = tts_model
         if (generate_image or allow_image) and not image_model_name:
             raise ValueError("本群未设置生图模型，请先启用并设置生图模型")
-        self.image_model_name = image_model_name
-        self.tool_context = ToolContext(session_id=session_id, image_model_name=image_model_name)
+        self.model = plugin_config.resolve(model_name)
+        image_model = plugin_config.resolve(image_model_name) if image_model_name else None
+        self.max_requests = plugin_config.max_requests
+        self.notice_delay = plugin_config.request_notice_delay
+        self.notice_interval = plugin_config.request_notice_interval
+        self.session_affinity = session_affinity or uuid4().hex
+        self.tool_context = ToolContext(session_id=session_id, image_model=image_model)
 
         # 绘图模式：对话模型能用原生工具时直接用，否则强制它调用本地 generate_image 工具。
-        self.draw_local = generate_image and not _uses_native_draw(model_name, image_model_name)
-        self.native_image_model = (
-            plugin_config.get_model(image_model_name) if generate_image and not self.draw_local else None
-        )
+        native_draw = generate_image and image_model is not None and _uses_native_draw(self.model, image_model)
+        self.draw_local = generate_image and not native_draw
+        self.native_image_model = image_model if native_draw else None
         self.tool_names = _select_tool_names(
             enable_tools=enable_tools,
             allow_image=allow_image,
@@ -348,19 +269,20 @@ class LLMHandler:
         )
         # 只有第一轮强制调用工具；之后仍强制会让模型反复生图直到请求上限。
         self.first_tool_choice: ToolChoice = ForceTool(IMAGE_TOOL_NAME) if self.draw_local else "auto"
-        self.show_thinking = plugin_config.send_thinking if show_thinking is None else show_thinking
-        self.context: list[Message] = []
 
-        prompt = plugin_config.resolve(model_name).prompt if system_prompt is None else system_prompt
+        self.context: list[Message] = []
+        prompt = self.model.prompt if system_prompt is None else system_prompt
         if prompt:
             self.context.append(Message(role="system", content=prompt))
         if enable_tools:
             self.context.append(
-                Message(
-                    role="system",
-                    content=REQUEST_BUDGET_PROMPT.format(max_requests=plugin_config.max_requests),
-                )
+                Message(role="system", content=REQUEST_BUDGET_PROMPT.format(max_requests=self.max_requests))
             )
+
+    @property
+    def model_name(self) -> str:
+        """配置中的模型名"""
+        return self.model.name
 
     @property
     def log_id(self) -> str:
@@ -379,7 +301,7 @@ class LLMHandler:
         模型请求工具调用时自动执行并继续请求，直到给出最终回复；
         最后一次模型请求保留工具定义、禁止工具调用并生成收尾回复。
         """
-        if images and ModelCapability.VISION not in plugin_config.get_model(self.model_name).capabilities:
+        if images and ModelCapability.VISION not in self.model.capabilities:
             raise ValueError(f"模型 {self.model_name} 未声明 vision 能力，不能接收图片")
 
         context_start = len(self.context)
@@ -395,126 +317,26 @@ class LLMHandler:
             len(images or []),
             "、".join(sorted(self.tool_names)) or "无",
         )
-        request_progress = _RequestWaitProgress()
+        turn = _TurnState()
         notice_task = (
-            asyncio.create_task(self._send_request_wait_notices(on_request_wait, request_progress))
+            asyncio.create_task(self._send_request_wait_notices(on_request_wait, turn))
             if on_request_wait and (self.tool_names or self.native_image_model)
             else None
         )
-        reached_request_limit = False
         try:
-            completion = await chat(
-                self.model_name,
-                list(self.context),
-                session_affinity=self.session_affinity,
-                tool_names=self.tool_names,
-                tool_choice=self.first_tool_choice,
-                native_image_model=self.native_image_model,
-            )
-            if completion.tool_calls and not self.tool_names:
-                del self.context[context_start:]
-                logger.warning(
-                    "LLM 会话拒绝工具调用（会话={}，调用数量={}）",
-                    self.log_id,
-                    len(completion.tool_calls),
-                )
-                raise ProviderError("当前模式不允许工具调用")
-            total_usage = completion.usage
-            actual_model = completion.model
-            generated_images = list(completion.images)
-            while completion.tool_calls:
-                request_progress.tool_call_count += len(completion.tool_calls)
-                logger.info(
-                    "LLM 会话执行工具（会话={}，模型请求={}，调用数量={}）",
-                    self.log_id,
-                    request_progress.request_count,
-                    len(completion.tool_calls),
-                )
-                self.context.append(completion.message)
-                generated_images.extend(
-                    await execute_tool_calls(completion.tool_calls, self.context, self.tool_context)
-                )
-                request_progress.request_count += 1
-                is_final_request = request_progress.request_count == plugin_config.max_requests
-                request_context = list(self.context)
-                if is_final_request:
-                    reached_request_limit = True
-                    logger.warning(
-                        "LLM 会话模型请求达到上限，转为禁止工具收尾（会话={}，上限={}，工具调用={}）",
-                        self.log_id,
-                        plugin_config.max_requests,
-                        request_progress.tool_call_count,
-                    )
-                    self.context.append(Message.user(REQUEST_LIMIT_PROMPT))
-                    request_context = list(self.context)
-                elif request_progress.request_count == plugin_config.max_requests - 1:
-                    self.context.append(Message.user(LAST_TOOL_REQUEST_PROMPT))
-                    request_context = list(self.context)
-                try:
-                    completion = await chat(
-                        self.model_name,
-                        request_context,
-                        session_affinity=self.session_affinity,
-                        tool_names=self.tool_names,
-                        tool_choice="none" if is_final_request else "auto",
-                        native_image_model=self.native_image_model,
-                    )
-                except ProviderError:
-                    if not is_final_request:
-                        raise
-                    logger.warning(
-                        "LLM 会话禁止工具收尾请求失败，改用已有结果（会话={}，上限={}，工具调用={}）",
-                        self.log_id,
-                        plugin_config.max_requests,
-                        request_progress.tool_call_count,
-                    )
-                    completion = Completion(
-                        message=Message.assistant(
-                            content=_format_request_limit_fallback(self.context, context_start),
-                        ),
-                        model=actual_model,
-                        finish_reason="stop",
-                    )
-                total_usage = total_usage + completion.usage
-                actual_model = completion.model or actual_model
-                generated_images.extend(completion.images)
-                if is_final_request:
-                    break
+            completion = await self._run_turn(context_start, turn)
         finally:
             if notice_task:
                 notice_task.cancel()
                 with suppress(asyncio.CancelledError):
                     await notice_task
 
-        leaked_dsml = False
-        if reached_request_limit and (
-            completion.tool_calls
-            or (not completion.content.strip() and not completion.images)
-            or (leaked_dsml := bool(DSML_TOOL_CALL_PATTERN.search(completion.content)))
-        ):
-            logger.warning(
-                "LLM 会话达到模型请求上限后返回无效收尾，改用已有结果"
-                "（会话={}，上限={}，调用数量={}，DSML={}，正文字符={}）",
-                self.log_id,
-                plugin_config.max_requests,
-                len(completion.tool_calls),
-                leaked_dsml,
-                len(completion.content),
-            )
-            completion = Completion(
-                message=Message.assistant(
-                    content=_format_request_limit_fallback(self.context, context_start),
-                ),
-                usage=completion.usage,
-                model=completion.model or actual_model,
-                finish_reason="stop",
-            )
-
-        completion.usage = total_usage
+        completion = self._replace_invalid_final_reply(completion, context_start, turn)
+        completion.usage = turn.usage
         # 生成的图片只发给用户，不挂到放回上下文的消息上：
         # Chat Completions 不接受助手消息带图片，续聊会直接报错。
-        completion.images = generated_images
-        completion.model = actual_model or plugin_config.resolve(self.model_name).model
+        completion.images = turn.images
+        completion.model = turn.model or self.model.model
         completion.elapsed_seconds = perf_counter() - started_at
         self.context.append(completion.message)
         logger.info(
@@ -522,8 +344,8 @@ class LLMHandler:
             self.log_id,
             completion.model,
             completion.finish_reason,
-            request_progress.request_count,
-            request_progress.tool_call_count,
+            turn.request_count,
+            turn.tool_call_count,
             completion.usage.input_tokens,
             completion.usage.output_tokens,
             completion.usage.cache_read_tokens,
@@ -531,36 +353,123 @@ class LLMHandler:
         )
         return completion
 
-    async def _send_request_wait_notices(
-        self,
-        notify: RequestWaitNotifier,
-        progress: _RequestWaitProgress,
-    ) -> None:
+    async def _request(self, tool_choice: ToolChoice) -> Completion:
+        """用当前上下文请求一次模型"""
+        return await chat(
+            self.model,
+            list(self.context),
+            session_affinity=self.session_affinity,
+            tool_names=self.tool_names,
+            tool_choice=tool_choice,
+            native_image_model=self.native_image_model,
+        )
+
+    async def _run_turn(self, context_start: int, turn: _TurnState) -> Completion:
+        """请求模型并循环执行工具，返回最后一次请求的结果"""
+        completion = await self._request(self.first_tool_choice)
+        if completion.tool_calls and not self.tool_names:
+            del self.context[context_start:]
+            logger.warning("LLM 会话拒绝工具调用（会话={}，调用数量={}）", self.log_id, len(completion.tool_calls))
+            raise ProviderError("当前模式不允许工具调用")
+        turn.record(completion)
+
+        while completion.tool_calls:
+            turn.tool_call_count += len(completion.tool_calls)
+            logger.info(
+                "LLM 会话执行工具（会话={}，模型请求={}，调用数量={}）",
+                self.log_id,
+                turn.request_count,
+                len(completion.tool_calls),
+            )
+            self.context.append(completion.message)
+            turn.images.extend(await execute_tool_calls(completion.tool_calls, self.context, self.tool_context))
+            turn.request_count += 1
+            completion = await self._request_after_tools(context_start, turn)
+            turn.record(completion)
+            if turn.reached_limit:
+                break
+        return completion
+
+    async def _request_after_tools(self, context_start: int, turn: _TurnState) -> Completion:
+        """工具执行后的下一次请求；最后一次请求禁止工具，只生成收尾回复"""
+        if turn.request_count == self.max_requests:
+            turn.reached_limit = True
+            logger.warning(
+                "LLM 会话模型请求达到上限，转为禁止工具收尾（会话={}，上限={}，工具调用={}）",
+                self.log_id,
+                self.max_requests,
+                turn.tool_call_count,
+            )
+            self.context.append(Message.user(REQUEST_LIMIT_PROMPT))
+        elif turn.request_count == self.max_requests - 1:
+            self.context.append(Message.user(LAST_TOOL_REQUEST_PROMPT))
+
+        if not turn.reached_limit:
+            return await self._request("auto")
+        try:
+            return await self._request("none")
+        except ProviderError:
+            logger.warning(
+                "LLM 会话禁止工具收尾请求失败，改用已有结果（会话={}，上限={}，工具调用={}）",
+                self.log_id,
+                self.max_requests,
+                turn.tool_call_count,
+            )
+            return self._fallback_reply(context_start, model=turn.model)
+
+    def _replace_invalid_final_reply(self, completion: Completion, context_start: int, turn: _TurnState) -> Completion:
+        """达到请求上限后，收尾回复仍在调用工具、为空或泄漏工具协议时，改用已有结果"""
+        if not turn.reached_limit:
+            return completion
+        leaked_dsml = bool(DSML_TOOL_CALL_PATTERN.search(completion.content))
+        is_empty = not completion.content.strip() and not completion.images
+        if not (completion.tool_calls or is_empty or leaked_dsml):
+            return completion
+        logger.warning(
+            "LLM 会话达到模型请求上限后返回无效收尾，改用已有结果"
+            "（会话={}，上限={}，调用数量={}，DSML={}，正文字符={}）",
+            self.log_id,
+            self.max_requests,
+            len(completion.tool_calls),
+            leaked_dsml,
+            len(completion.content),
+        )
+        return self._fallback_reply(context_start, model=completion.model or turn.model)
+
+    def _fallback_reply(self, context_start: int, *, model: str) -> Completion:
+        """用已获得的工具结果拼出确定性的收尾回复"""
+        return Completion(
+            message=Message.assistant(content=_format_request_limit_fallback(self.context, context_start)),
+            model=model,
+            finish_reason="stop",
+        )
+
+    async def _send_request_wait_notices(self, notify: RequestWaitNotifier, turn: _TurnState) -> None:
         """Agent 请求未完成时按配置周期发送等待提示。"""
-        delay = plugin_config.request_notice_delay
+        delay = self.notice_delay
         count = 0
         while True:
             await asyncio.sleep(delay)
             count += 1
             try:
-                await notify(count, progress.request_count, progress.tool_call_count)
+                await notify(count, turn.request_count, turn.tool_call_count)
             except Exception as e:
                 logger.opt(exception=e).debug(
                     "LLM 请求等待提示发送失败，已忽略（会话={}，次数={}，模型请求={}，工具调用={}）",
                     self.log_id,
                     count,
-                    progress.request_count,
-                    progress.tool_call_count,
+                    turn.request_count,
+                    turn.tool_call_count,
                 )
             else:
                 logger.info(
                     "LLM 会话发送请求等待提示（会话={}，次数={}，模型请求={}，工具调用={}）",
                     self.log_id,
                     count,
-                    progress.request_count,
-                    progress.tool_call_count,
+                    turn.request_count,
+                    turn.tool_call_count,
                 )
-            delay = plugin_config.request_notice_interval
+            delay = self.notice_interval
 
     def rollback(self) -> bool:
         """回滚最近一轮对话，成功时返回 True"""
@@ -575,89 +484,3 @@ class LLMHandler:
         if removed_count:
             logger.info("LLM 会话已回滚（会话={}，移除消息={}）", self.log_id, removed_count)
         return bool(removed_count)
-
-    async def send(
-        self,
-        completion: Completion,
-        *,
-        reply_to: str | bool = False,
-    ) -> None:
-        """按配置发送模型回复"""
-        for image in completion.images:
-            await UniMessage.image(raw=image.data).send(reply_to=reply_to)
-        text = format_output(completion, with_thinking=self.show_thinking)
-        if not text:
-            if completion.images:
-                await UniMessage.text(format_statistics(completion)).send(reply_to=reply_to)
-                return
-            logger.warning("LLM 会话没有可发送内容（会话={}）", self.log_id)
-            await UniMessage.text("模型没有返回任何内容").send(reply_to=reply_to)
-            return
-
-        if self.tts_model:
-            # 语音回复不朗读推理内容
-            spoken = format_output(completion, with_thinking=False, with_statistics=False) or text
-            try:
-                audio = await text_to_speech(spoken, self.tts_model)
-            except TTSError as e:
-                logger.warning("LLM 会话语音合成失败，改用文字回复（会话={}）", self.log_id)
-                await UniMessage.text(f"语音合成失败（{e}），以下是文字回复：").send(reply_to=reply_to)
-            else:
-                logger.info(
-                    "LLM 会话发送回复（会话={}，方式=语音，音频字节={}）",
-                    self.log_id,
-                    len(audio),
-                )
-                await UniMessage.audio(raw=audio).send(reply_to=reply_to)
-                await UniMessage.text(format_statistics(completion)).send(reply_to=reply_to)
-                return
-
-        if self.send_markdown and await try_send_markdown(text, reply_to=reply_to):
-            logger.info("LLM 会话发送回复（会话={}，方式=原生 Markdown，字符={}）", self.log_id, len(text))
-            return
-
-        if self.send_md_pic:
-            if image := await try_render_markdown(text):
-                logger.info(
-                    "LLM 会话发送回复（会话={}，方式=Markdown 图片，图片字节={}）",
-                    self.log_id,
-                    len(image),
-                )
-                await UniMessage.image(raw=image).send(reply_to=reply_to)
-                return
-
-        logger.info("LLM 会话发送回复（会话={}，方式=文本，字符={}）", self.log_id, len(text))
-        await UniMessage.text(text).send(reply_to=reply_to)
-
-
-async def try_send_markdown(text: str, *, reply_to: str | bool = False) -> bool:
-    """在支持的平台发送原生 Markdown，无法发送时返回 False 以便继续回退。"""
-    try:
-        adapter = get_target().adapter
-    except Exception as e:
-        logger.opt(exception=e).debug("无法判断当前平台的 Markdown 支持情况，继续使用回退格式")
-        return False
-
-    if adapter != SupportAdapter.qq:
-        return False
-
-    try:
-        await UniMessage.style(text, "markdown").send(reply_to=reply_to)
-    except Exception as e:
-        logger.opt(exception=e).warning("原生 Markdown 回复发送失败，继续使用回退格式")
-        return False
-    return True
-
-
-async def try_render_markdown(text: str) -> bytes | None:
-    """把 Markdown 渲染成图片，失败时返回 None 以便退回文字
-
-    htmlrender 依赖浏览器环境，导入与渲染都可能失败，因此一并兜底。
-    """
-    try:
-        from nonebot_plugin_htmlrender import render_markdown
-
-        return await render_markdown(text)
-    except Exception as e:
-        logger.opt(exception=e).warning("Markdown 渲染图片失败，改用文字回复")
-        return None

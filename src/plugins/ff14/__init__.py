@@ -13,6 +13,8 @@ require("nonebot_plugin_orm")
 require("nonebot_plugin_user")
 require("src.utils.group_bind")
 require("nonebot_plugin_alconna")
+# 子插件向大模型插件注册查询工具
+require("src.plugins.llm")
 
 __plugin_meta__ = PluginMetadata(
     name="最终幻想XIV",

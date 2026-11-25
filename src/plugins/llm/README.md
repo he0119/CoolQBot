@@ -433,9 +433,13 @@ PDF 页数和提取字符数。两项工具返回的内容都带有“不可信�
 
 ## 注册工具
 
-在自己的模块中向注册表登记工具，模型即可按需调用：
+在自己的模块中向注册表登记工具，模型即可按需调用。导入注册表前先用 `require` 声明依赖大模型插件，
+保证它先于本插件加载（带子插件的插件在父插件的 `__init__.py` 里声明即可）：
 
 ```python
+from nonebot import require
+
+require("src.plugins.llm")
 from src.plugins.llm.tools import registry
 
 

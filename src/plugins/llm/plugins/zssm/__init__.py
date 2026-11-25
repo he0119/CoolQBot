@@ -19,8 +19,9 @@ from ...data_source import (
     get_zssm_model_name,
     get_zssm_vision_model_name,
 )
-from ...handler import LLMHandler, send_reaction, split_content
+from ...handler import LLMHandler
 from ...providers import ProviderError
+from ...reply import ReplySender, send_reaction, split_content
 from ...rules import NON_PRIVATE_RULE
 from .data_source import (
     build_user_prompt,
@@ -151,8 +152,6 @@ async def zssm_handle(
             model_name,
             system_prompt=SYSTEM_PROMPT,
             enable_tools=use_agent.result,
-            send_md_pic=render.result,
-            show_thinking=False,
         )
         logger.info(
             "解释模式调用模型（会话={}，模型={}，直传图片={}，外部资源={}）",
@@ -193,4 +192,4 @@ async def zssm_handle(
         await UniMessage.text("解释失败，请稍后重试").finish(reply_to=msg_id)
     else:
         await send_reaction("done", message_id=msg_id)
-        await handler.send(completion, reply_to=msg_id)
+        await ReplySender(send_md_pic=render.result, log_id=handler.log_id).send(completion, reply_to=msg_id)

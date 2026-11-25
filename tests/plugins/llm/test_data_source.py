@@ -526,7 +526,7 @@ def test_usage_normalizes_across_formats(app: App):
 
 def test_split_content_extracts_think_tags(app: App):
     """兼容把推理内容混在正文 think 标签里的服务商"""
-    from src.plugins.llm.handler import split_content
+    from src.plugins.llm.reply import split_content
     from src.plugins.llm.schemas import Completion, Message
 
     completion = Completion(message=Message.assistant(content="<think>在想</think>你好"))
@@ -538,7 +538,7 @@ def test_split_content_extracts_think_tags(app: App):
 
 def test_format_output_quotes_multiline_thinking(app: App):
     """推理内容使用 Markdown 引用块，并保留段落结构"""
-    from src.plugins.llm.handler import format_output
+    from src.plugins.llm.reply import format_output
     from src.plugins.llm.schemas import Completion, Message
 
     completion = Completion(message=Message.assistant(content="回答", reasoning="第一段\n\n第二段"))
@@ -548,7 +548,7 @@ def test_format_output_quotes_multiline_thinking(app: App):
 
 def test_format_statistics_splits_model_chain(app: App):
     """模型链分行显示，token 用量使用中文标签与千分位"""
-    from src.plugins.llm.handler import format_statistics
+    from src.plugins.llm.reply import format_statistics
     from src.plugins.llm.schemas import Completion, Message, Usage
 
     completion = Completion(
@@ -575,13 +575,13 @@ def test_format_statistics_splits_model_chain(app: App):
 )
 async def test_send_reaction_uses_adapter_emoji(app: App, mocker, adapter, status, expected):
     """OneBot V11 使用 emoji ID，其他支持的平台使用 Unicode emoji"""
-    from src.plugins.llm.handler import send_reaction
+    from src.plugins.llm.reply import send_reaction
 
     get_target = mocker.patch(
-        "src.plugins.llm.handler.get_target",
+        "src.plugins.llm.reply.get_target",
         return_value=SimpleNamespace(adapter=adapter, private=False),
     )
-    reaction = mocker.patch("src.plugins.llm.handler.message_reaction")
+    reaction = mocker.patch("src.plugins.llm.reply.message_reaction")
 
     await send_reaction(status, message_id="42")
 
@@ -597,16 +597,16 @@ async def test_send_reaction_sends_qq_thinking_notice(app: App, mocker, message_
     """QQ 适配器不支持 reaction，开始处理时改发普通消息。"""
     from nonebot_plugin_alconna import SupportAdapter
 
-    from src.plugins.llm.handler import QQ_THINKING_NOTICE, send_reaction
+    from src.plugins.llm.reply import QQ_THINKING_NOTICE, send_reaction
 
     mocker.patch(
-        "src.plugins.llm.handler.get_target",
+        "src.plugins.llm.reply.get_target",
         return_value=SimpleNamespace(adapter=SupportAdapter.qq, private=False),
     )
-    reaction = mocker.patch("src.plugins.llm.handler.message_reaction")
+    reaction = mocker.patch("src.plugins.llm.reply.message_reaction")
     message = mocker.Mock()
     message.send = mocker.AsyncMock()
-    text = mocker.patch("src.plugins.llm.handler.UniMessage.text", return_value=message)
+    text = mocker.patch("src.plugins.llm.reply.UniMessage.text", return_value=message)
 
     await send_reaction("thinking", message_id=message_id)
 
@@ -620,14 +620,14 @@ async def test_send_reaction_skips_qq_terminal_status(app: App, mocker, status):
     """QQ 普通消息只提示开始处理，完成和失败仍由最终回复说明。"""
     from nonebot_plugin_alconna import SupportAdapter
 
-    from src.plugins.llm.handler import send_reaction
+    from src.plugins.llm.reply import send_reaction
 
     mocker.patch(
-        "src.plugins.llm.handler.get_target",
+        "src.plugins.llm.reply.get_target",
         return_value=SimpleNamespace(adapter=SupportAdapter.qq, private=False),
     )
-    reaction = mocker.patch("src.plugins.llm.handler.message_reaction")
-    text = mocker.patch("src.plugins.llm.handler.UniMessage.text")
+    reaction = mocker.patch("src.plugins.llm.reply.message_reaction")
+    text = mocker.patch("src.plugins.llm.reply.UniMessage.text")
 
     await send_reaction(status, message_id="42")
 
@@ -639,13 +639,13 @@ async def test_send_reaction_skips_qq_private_message(app: App, mocker):
     """OneBot V11 私聊不支持消息 reaction，直接跳过"""
     from nonebot_plugin_alconna import SupportAdapter
 
-    from src.plugins.llm.handler import send_reaction
+    from src.plugins.llm.reply import send_reaction
 
     mocker.patch(
-        "src.plugins.llm.handler.get_target",
+        "src.plugins.llm.reply.get_target",
         return_value=SimpleNamespace(adapter=SupportAdapter.onebot11, private=True),
     )
-    reaction = mocker.patch("src.plugins.llm.handler.message_reaction")
+    reaction = mocker.patch("src.plugins.llm.reply.message_reaction")
 
     await send_reaction("thinking")
 
@@ -654,9 +654,9 @@ async def test_send_reaction_skips_qq_private_message(app: App, mocker):
 
 async def test_send_reaction_failure_does_not_interrupt_response(app: App, mocker):
     """reaction 不可用时不影响后续模型请求"""
-    from src.plugins.llm.handler import send_reaction
+    from src.plugins.llm.reply import send_reaction
 
-    mocker.patch("src.plugins.llm.handler.get_target", side_effect=RuntimeError("unsupported"))
+    mocker.patch("src.plugins.llm.reply.get_target", side_effect=RuntimeError("unsupported"))
 
     await send_reaction("thinking")
 

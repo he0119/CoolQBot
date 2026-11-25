@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from nonebot.log import logger
 
-from ..config import ModelCapability, plugin_config
+from ..config import ModelCapability
 from ..providers import ProviderError, generate_images
 from . import ToolContext, ToolResult, registry
 
@@ -27,13 +27,9 @@ async def generate_image(prompt: str, *, context: ToolContext) -> ToolResult:
     Args:
         prompt: 图片描述，尽量写清主体、风格和构图
     """
-    if not context.image_model_name:
+    model = context.image_model
+    if model is None:
         return ToolResult(text="错误：本群未启用生图模型，请联系管理员配置")
-    try:
-        # resolve 会把留空的 base_url、api_key 回退到全局配置
-        model = plugin_config.resolve(context.image_model_name)
-    except ValueError:
-        return ToolResult(text=f"错误：生图模型 {context.image_model_name} 不再可用")
     if ModelCapability.IMAGE_GENERATION not in model.capabilities:
         return ToolResult(text=f"错误：模型 {model.name} 未声明 image_generation 能力，不能生成图片")
     try:

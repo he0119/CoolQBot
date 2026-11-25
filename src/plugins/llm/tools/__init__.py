@@ -35,6 +35,7 @@ from ..schemas import ImageContent, ToolParam
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection
 
+    from ..config import ModelConfig
     from ..schemas import ToolCall
 
 _TYPE_TO_SCHEMA: dict[Any, str] = {
@@ -56,9 +57,9 @@ class ToolContext:
     """工具执行时的会话上下文，不暴露给模型。"""
 
     session_id: str = ""
-    """群组会话 ID，用于读取本群配置"""
-    image_model_name: str = ""
-    """本群当前使用的生图模型名"""
+    """群组会话 ID"""
+    image_model: ModelConfig | None = None
+    """本群当前使用的生图模型，已回退过全局配置；未开放生图时为空"""
 
 
 @dataclass

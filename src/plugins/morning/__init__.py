@@ -12,6 +12,8 @@ require("nonebot_plugin_localstore")
 require("nonebot_plugin_orm")
 require("nonebot_plugin_saa")
 require("nonebot_plugin_alconna")
+# 子插件向大模型插件注册查询工具
+require("src.plugins.llm")
 
 from .config import Config
 
