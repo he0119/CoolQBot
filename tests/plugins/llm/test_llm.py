@@ -2255,6 +2255,49 @@ async def test_native_draw_uses_group_image_model(app: App, mocker):
     assert image_model.extra_body == {"size": "1024x1024", "quality": "high", "n": 1}
 
 
+async def test_native_draw_keeps_configured_native_tools(app: App, mocker):
+    """原生绘图工具追加到模型已配置的原生工具之后，不覆盖，也不改动原配置。"""
+    from src.plugins.llm.config import ModelConfig
+    from src.plugins.llm.handler import chat
+    from src.plugins.llm.providers import ProviderName
+    from src.plugins.llm.schemas import Completion, Message, Usage
+
+    chat_model = ModelConfig(
+        name="gpt",
+        provider=ProviderName.OPENAI_RESPONSES,
+        base_url="https://api.example.com",
+        api_key="sk-test",
+        extra_body={"tools": [{"type": "web_search"}]},
+    )
+    image_model = ModelConfig(
+        name="painter",
+        provider=ProviderName.OPENAI_IMAGES,
+        model="gpt-image-2.5-sunburst",
+        base_url="https://api.example.com",
+        api_key="sk-test",
+    )
+    models = {"gpt": chat_model, "painter": image_model}
+    mocker.patch("src.plugins.llm.handler.plugin_config", mocker.Mock(resolve=lambda name: models[name]))
+    captured: dict[str, Any] = {}
+
+    class FakeProvider:
+        def __init__(self, model_config, *, session_affinity=""):
+            captured["model_config"] = model_config
+
+        async def chat(self, messages, tools=None, tool_choice="auto"):
+            return Completion(message=Message.assistant(content="ok"), usage=Usage())
+
+    mocker.patch("src.plugins.llm.handler.get_provider", return_value=FakeProvider)
+    await chat("gpt", [Message.user("画一只猫")], enable_tools=False, generate_image=True, image_model=image_model)
+
+    request_config: Any = captured["model_config"]
+    assert request_config.extra_body["tools"] == [
+        {"type": "web_search"},
+        {"type": "image_generation", "model": "gpt-image-2.5-sunburst"},
+    ]
+    assert chat_model.extra_body == {"tools": [{"type": "web_search"}]}
+
+
 async def test_local_draw_uses_generate_image_tool(app: App, mocker):
     """非 Responses 对话模型通过本地 generate_image 工具调用生图模型。"""
     from src.plugins.llm.config import ModelConfig
@@ -2295,7 +2338,8 @@ async def test_local_draw_uses_generate_image_tool(app: App, mocker):
 
     async def fake_chat(model_name, messages, **kwargs):
         calls.append(kwargs)
-        if len(calls) == 1:
+        # 与真实接口一致：被强制调用工具时，模型每次都会再调用一次。
+        if isinstance(kwargs.get("tool_choice"), ForceTool):
             return Completion(
                 message=Message.assistant(
                     tool_calls=[ToolCall(id="call_1", name="generate_image", arguments={"prompt": "一只猫"})]
@@ -2322,8 +2366,13 @@ async def test_local_draw_uses_generate_image_tool(app: App, mocker):
     assert calls[0]["tool_names"] == {"generate_image"}
     assert calls[0]["tool_choice"] == ForceTool("generate_image")
     assert calls[0]["image_model_name"] == "painter"
+    # 只有第一轮强制生图，后续请求交给模型自行收尾，否则会一直生图到请求上限。
+    assert len(calls) == 2
+    assert calls[1]["tool_choice"] == "auto"
     assert completion.content == "画好了"
     assert [image.data for image in completion.images] == [png]
+    # 生成的图片不放回上下文，续聊时 Chat Completions 不接受助手消息带图片。
+    assert all(not message.images for message in handler.context)
     assert any(message.role == "tool" and "已生成 1 张图片" in message.content for message in handler.context)
     generate.assert_awaited_once()
     assert generate.await_args.args[0] == "一只猫"
@@ -2445,7 +2494,8 @@ async def test_send_image_only_sends_statistics(app: App, mock_models, mocker):
     send = mocker.patch.object(UniMessage, "send", autospec=True)
     image = ImageContent.from_bytes(b"\x89PNG\r\n\x1a\n" + b"0" * 16)
     completion = Completion(
-        message=Message.assistant(images=[image]),
+        message=Message.assistant(),
+        images=[image],
         usage=Usage(input_tokens=1, output_tokens=2),
         model="test-model",
         elapsed_seconds=1.0,

@@ -141,6 +141,7 @@ class ResponsesProvider(Provider):
             usage=self._parse_usage(data.get("usage")),
             model=data.get("model", ""),
             finish_reason="tool_calls" if message.tool_calls else _finish_reason(data),
+            images=_extract_images(output_items),
         )
 
     async def parse_stream(self, response: httpx.Response) -> Completion:
@@ -227,7 +228,8 @@ class ResponsesProvider(Provider):
                 item_id = item.get("id") or item.get("call_id") or ""
                 if item_id in arguments:
                     item["arguments"] = arguments[item_id]
-        message = self._extract_message([item for _, item in sorted(raw_output.items())])
+        output_items = [item for _, item in sorted(raw_output.items())]
+        message = self._extract_message(output_items)
         tool_calls = [
             ToolCall(
                 id=call_ids.get(item_id, item_id),
@@ -247,13 +249,13 @@ class ResponsesProvider(Provider):
             usage=usage,
             model=model,
             finish_reason="tool_calls" if tool_calls else finish_reason,
+            images=_extract_images(output_items),
         )
 
     def _extract_message(self, output_items: list[dict[str, Any]]) -> Message:
         text: list[str] = []
         reasoning: list[str] = []
         tool_calls: list[ToolCall] = []
-        images: list[ImageContent] = []
 
         for item in output_items:
             item_type = item.get("type")
@@ -275,18 +277,12 @@ class ResponsesProvider(Provider):
                         arguments=_loads(item.get("arguments")),
                     )
                 )
-            elif item_type == "image_generation_call" and (result := item.get("result")):
-                try:
-                    images.append(ImageContent.from_bytes(base64.b64decode(result, validate=True)))
-                except (binascii.Error, TypeError, ValueError) as e:
-                    raise ProviderError("生成图片的数据无效或格式不受支持") from e
 
         return Message.assistant(
             content="".join(text),
             reasoning="\n".join(reasoning),
             tool_calls=tool_calls,
             provider_data={"responses_output": copy.deepcopy(output_items)},
-            images=images,
         )
 
     def _parse_usage(self, raw: dict[str, Any] | None) -> Usage:
@@ -308,6 +304,19 @@ def _finish_reason(data: dict[str, Any]) -> str:
         reason = (data.get("incomplete_details") or {}).get("reason")
         return "length" if reason == "max_output_tokens" else str(reason or "")
     return "stop" if data.get("status") == "completed" else ""
+
+
+def _extract_images(output_items: list[dict[str, Any]]) -> list[ImageContent]:
+    """解码原生 image_generation 工具生成的图片"""
+    images: list[ImageContent] = []
+    for item in output_items:
+        if item.get("type") != "image_generation_call" or not (result := item.get("result")):
+            continue
+        try:
+            images.append(ImageContent.from_bytes(base64.b64decode(result, validate=True)))
+        except (binascii.Error, TypeError, ValueError) as e:
+            raise ProviderError("生成图片的数据无效或格式不受支持") from e
+    return images
 
 
 def _loads(raw: Any) -> dict[str, Any]:

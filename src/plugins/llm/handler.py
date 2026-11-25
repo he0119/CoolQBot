@@ -124,7 +124,11 @@ async def chat(
         if image_model is None:
             raise ValueError("本群未设置生图模型，请先启用并设置生图模型")
         model = model.model_copy(deep=True)
-        model.extra_body["tools"] = [_native_image_tool(image_model)]
+        # 追加到模型已配置的原生工具之后，避免覆盖联网搜索等已有工具。
+        native_tools = model.extra_body.get("tools") or []
+        if not isinstance(native_tools, list):
+            raise ValueError(f"模型 {model_name} 的 extra_body.tools 必须为工具数组")
+        model.extra_body["tools"] = [*native_tools, _native_image_tool(image_model)]
         model.extra_body["tool_choice"] = {"type": "image_generation"}
     provider = get_provider(model.provider)(model, session_affinity=session_affinity)
     tools = []
@@ -434,7 +438,8 @@ class LLMHandler:
                         request_context,
                         session_affinity=self.session_affinity,
                         enable_tools=self.tools_enabled,
-                        tool_choice="none" if is_final_request else tool_choice,
+                        # 只有第一轮强制调用工具；之后仍强制会让模型反复生图直到请求上限。
+                        tool_choice="none" if is_final_request else "auto",
                         **self._tool_options(),
                         **request_options,
                     )
@@ -490,7 +495,9 @@ class LLMHandler:
             )
 
         completion.usage = total_usage
-        completion.message.images = generated_images
+        # 生成的图片只发给用户，不挂到放回上下文的消息上：
+        # Chat Completions 不接受助手消息带图片，续聊会直接报错。
+        completion.images = generated_images
         completion.model = actual_model or plugin_config.resolve(self.model_name).model
         completion.elapsed_seconds = perf_counter() - started_at
         self.context.append(completion.message)

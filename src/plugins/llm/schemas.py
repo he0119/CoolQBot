@@ -84,7 +84,7 @@ class Message:
     content: str = ""
     """文本内容"""
     images: list[ImageContent] = field(default_factory=list)
-    """用户输入的图片，或助手生成的图片"""
+    """图片内容，仅 user 消息有效"""
     reasoning: str = ""
     """推理内容，仅 assistant 消息有效"""
     tool_calls: list[ToolCall] = field(default_factory=list)
@@ -106,7 +106,6 @@ class Message:
         reasoning: str = "",
         tool_calls: list[ToolCall] | None = None,
         provider_data: dict[str, Any] | None = None,
-        images: list[ImageContent] | None = None,
     ) -> Message:
         """构造助手消息"""
         return cls(
@@ -115,7 +114,6 @@ class Message:
             reasoning=reasoning,
             tool_calls=tool_calls or [],
             provider_data=provider_data or {},
-            images=images or [],
         )
 
     @classmethod
@@ -186,16 +184,13 @@ class Completion:
     """结束原因，已归一化为 stop / length / tool_calls / content_filter"""
     elapsed_seconds: float = 0.0
     """完成本次提问的耗时（秒）"""
+    images: list[ImageContent] = field(default_factory=list)
+    """模型或工具生成的图片，只发送给用户，不放回对话上下文"""
 
     @property
     def content(self) -> str:
         """模型返回的文本内容"""
         return self.message.content
-
-    @property
-    def images(self) -> list[ImageContent]:
-        """模型生成的图片"""
-        return self.message.images
 
     @property
     def reasoning(self) -> str:
