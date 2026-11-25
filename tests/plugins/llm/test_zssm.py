@@ -349,7 +349,7 @@ async def test_zssm_render_option_sends_markdown_image(
 ):
     """-r 将本次解释渲染成图片，并保持回复关系。"""
     rendered = b"\x89PNG\r\n\x1a\nrendered"
-    render_markdown = mocker.patch("src.plugins.llm.handler.try_render_markdown", return_value=rendered)
+    render_markdown = mocker.patch("src.plugins.llm.reply.try_render_markdown", return_value=rendered)
     respx_mock.post("https://api.example.com/chat/completions").mock(
         return_value=httpx.Response(
             200,

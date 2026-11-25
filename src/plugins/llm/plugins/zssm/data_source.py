@@ -13,7 +13,8 @@ from nonebot.log import logger
 from nonebot_plugin_alconna import image_fetch
 
 from ...config import ModelCapability, plugin_config
-from ...handler import LLMHandler, split_content
+from ...handler import LLMHandler
+from ...reply import split_content
 from ...schemas import Completion, ImageContent
 from ...tools.web import ResourceContent, ResourceError, read_resource, resource_log_target
 
@@ -140,7 +141,6 @@ async def describe_images(model_name: str, images: list[ImageContent]) -> tuple[
         model_name,
         system_prompt=VISION_PROMPT,
         enable_tools=False,
-        show_thinking=False,
     )
     completion = await handler.ask(f"请依次描述这 {len(images)} 张图片。", images)
     description, _ = split_content(completion)

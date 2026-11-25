@@ -31,10 +31,10 @@ def model_env(mocker):
         api_key="sk-test",
     )
     mocker.patch.object(plugin_config, "models", [config])
-    mocker.patch("src.plugins.llm.get_available_model_names", return_value=["test-model"])
-    mocker.patch("src.plugins.llm.get_model_name", return_value="test-model")
+    mocker.patch("src.plugins.llm.dialogue.get_available_model_names", return_value=["test-model"])
+    mocker.patch("src.plugins.llm.dialogue.get_model_name", return_value="test-model")
     mocker.patch("src.plugins.llm.handler.perf_counter", side_effect=[10.0, 15.1])
-    mocker.patch("src.plugins.llm.send_reaction")
+    mocker.patch("src.plugins.llm.dialogue.send_reaction")
     return config
 
 

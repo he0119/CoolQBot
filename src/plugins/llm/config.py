@@ -20,10 +20,18 @@ from .quota import QuotaConfig
 
 
 class ModelCapability(StrEnum):
-    """模型可声明的输入能力。"""
+    """模型可声明的能力。"""
 
     TEXT = "text"
+    """能处理文本对话"""
     VISION = "vision"
+    """能直接接收图片输入"""
+    IMAGE_GENERATION = "image_generation"
+    """能生成图片，可被设为本群生图模型"""
+
+
+IMAGE_GENERATION_PROVIDERS = frozenset({ProviderName.OPENAI_IMAGES, ProviderName.OPENAI_RESPONSES})
+"""能生成图片的接口：openai_images 调用 Image API，openai_responses 使用原生 image_generation 工具"""
 
 
 class ModelConfig(BaseModel):
@@ -54,7 +62,10 @@ class ModelConfig(BaseModel):
     extra_body: dict[str, Any] = Field(default_factory=dict)
     """附加到请求体的额外字段，用于传递各服务商的特有参数"""
     capabilities: set[ModelCapability] = Field(default_factory=lambda: {ModelCapability.TEXT})
-    """模型能力；默认支持文本，vision 表示可直接接收图片"""
+    """模型能力；是否能对话、看图、生图都只看这里的声明
+
+    默认为 text；openai_images 接口只能生图，省略时默认为 image_generation。
+    """
     quota: QuotaConfig | None = None
     """该模型的额度查询配置，留空时不支持额度查询"""
 
@@ -81,6 +92,24 @@ class ModelConfig(BaseModel):
     def fill_defaults(self) -> "ModelConfig":
         if not self.model:
             self.model = self.name
+        if self.provider == ProviderName.OPENAI_IMAGES and "capabilities" not in self.model_fields_set:
+            self.capabilities = {ModelCapability.IMAGE_GENERATION}
+        return self
+
+    @model_validator(mode="after")
+    def check_capabilities(self) -> "ModelConfig":
+        """能力声明必须是接口真正做得到的，避免运行时才发现不能对话或不能生图。"""
+        if self.provider == ProviderName.OPENAI_IMAGES:
+            if self.capabilities != {ModelCapability.IMAGE_GENERATION}:
+                raise ValueError(
+                    f"模型 {self.name} 使用 openai_images 接口，只能生图，capabilities 只能是 image_generation；"
+                    "既能对话又能生图的模型请改用 openai_responses 接口"
+                )
+        elif ModelCapability.IMAGE_GENERATION in self.capabilities and self.provider not in IMAGE_GENERATION_PROVIDERS:
+            raise ValueError(
+                f"模型 {self.name} 使用 {self.provider} 接口，暂不支持生图；"
+                "生图模型请使用 openai_images 或 openai_responses 接口"
+            )
         return self
 
 

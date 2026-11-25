@@ -12,8 +12,18 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 Role = Literal["system", "user", "assistant", "tool"]
-ToolChoice = Literal["auto", "none"]
-"""工具选择策略：自动选择，或保留工具定义但禁止调用。"""
+
+
+@dataclass(frozen=True)
+class ForceTool:
+    """强制模型调用指定函数工具"""
+
+    name: str
+    """工具名"""
+
+
+ToolChoice = Literal["auto", "none"] | ForceTool
+"""工具选择策略：自动选择、禁止调用，或强制调用指定函数工具。"""
 
 
 @dataclass
@@ -174,6 +184,8 @@ class Completion:
     """结束原因，已归一化为 stop / length / tool_calls / content_filter"""
     elapsed_seconds: float = 0.0
     """完成本次提问的耗时（秒）"""
+    images: list[ImageContent] = field(default_factory=list)
+    """模型或工具生成的图片，只发送给用户，不放回对话上下文"""
 
     @property
     def content(self) -> str:

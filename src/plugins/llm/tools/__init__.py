@@ -24,16 +24,18 @@ from __future__ import annotations
 import inspect
 import json
 import re
+from dataclasses import dataclass, field
 from time import perf_counter
 from typing import TYPE_CHECKING, Any, get_type_hints
 
 from nonebot.log import logger
 
-from ..schemas import ToolParam
+from ..schemas import ImageContent, ToolParam
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Collection
 
+    from ..config import ModelConfig
     from ..schemas import ToolCall
 
 _TYPE_TO_SCHEMA: dict[Any, str] = {
@@ -50,6 +52,26 @@ _SCHEMA_TO_TYPE: dict[str, Any] = {v: k for k, v in _TYPE_TO_SCHEMA.items()}
 """JSON Schema 类型到 Python 类型的映射"""
 
 
+@dataclass(frozen=True)
+class ToolContext:
+    """工具执行时的会话上下文，不暴露给模型。"""
+
+    session_id: str = ""
+    """群组会话 ID"""
+    image_model: ModelConfig | None = None
+    """本群当前使用的生图模型，已回退过全局配置；未开放生图时为空"""
+
+
+@dataclass
+class ToolResult:
+    """工具执行结果：交回模型的文本，以及直接发送给用户的图片。"""
+
+    text: str
+    """交回模型的文本结果"""
+    images: list[ImageContent] = field(default_factory=list)
+    """生成后直接发送给用户的图片"""
+
+
 class ToolRegistry:
     """工具注册表"""
 
@@ -63,6 +85,8 @@ class ToolRegistry:
         self,
         name: str,
         description: str,
+        *,
+        needs_context: bool = False,
     ) -> Callable[[Callable], Callable]:
         """注册工具
 
@@ -81,6 +105,8 @@ class ToolRegistry:
             required: list[str] = []
 
             for param_name, param in signature.parameters.items():
+                if needs_context and param_name == "context":
+                    continue
                 annotation = annotations.get(param_name, param.annotation)
                 properties[param_name] = {
                     "type": _TYPE_TO_SCHEMA.get(annotation, "string"),
@@ -94,13 +120,18 @@ class ToolRegistry:
                 "func": func,
                 "properties": properties,
                 "required": required,
+                "needs_context": needs_context,
             }
             return func
 
         return decorator
 
-    def to_params(self) -> list[ToolParam]:
-        """转换为与格式无关的工具定义列表"""
+    def names(self) -> list[str]:
+        """已注册的全部工具名"""
+        return list(self._registry)
+
+    def to_params(self, names: Collection[str] | None = None) -> list[ToolParam]:
+        """转换为与格式无关的工具定义列表；传入 names 时只保留这些工具"""
         return [
             ToolParam(
                 name=name,
@@ -112,9 +143,10 @@ class ToolRegistry:
                 },
             )
             for name, info in self._registry.items()
+            if names is None or name in names
         ]
 
-    async def execute(self, call: ToolCall) -> str:
+    async def execute(self, call: ToolCall, context: ToolContext | None = None) -> str | ToolResult:
         """执行一次工具调用，返回交回模型的结果
 
         执行失败时返回错误描述而非抛出异常，让模型有机会自行调整。
@@ -146,6 +178,11 @@ class ToolRegistry:
                 )
                 return f"错误：缺少必填参数 {'、'.join(missing)}"
 
+            if info["needs_context"]:
+                if context is None:
+                    return f"错误：工具 {call.name} 缺少运行上下文"
+                arguments["context"] = context
+
             result = info["func"](**arguments)
             if inspect.isawaitable(result):
                 result = await result
@@ -158,14 +195,19 @@ class ToolRegistry:
             )
             return f"错误：工具 {call.name} 执行失败：{e}"
 
-        output = result if isinstance(result, str) else json.dumps(result, ensure_ascii=False)
+        output = (
+            result.text
+            if isinstance(result, ToolResult)
+            else (result if isinstance(result, str) else json.dumps(result, ensure_ascii=False))
+        )
         logger.info(
-            "LLM 工具执行完成（工具={}，结果字符={}，耗时={:.3f}s）",
+            "LLM 工具执行完成（工具={}，结果字符={}，图片={}，耗时={:.3f}s）",
             call.name,
             len(output),
+            len(result.images) if isinstance(result, ToolResult) else 0,
             perf_counter() - started_at,
         )
-        return output
+        return result if isinstance(result, ToolResult) else output
 
 
 def _parse_param_docs(docstring: str) -> dict[str, str]:
@@ -207,4 +249,5 @@ registry = ToolRegistry()
 """全局工具注册表"""
 
 # 内置工具在注册表创建后导入，避免模块初始化时的循环依赖。
+from . import image as image
 from . import web as web
