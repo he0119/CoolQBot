@@ -1,227 +1,139 @@
 {
-  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
   dependencyDashboard: {
     enabled: true,
   },
   extends: [
-    'config:recommended',
-    'schedule:weekly',
-    ':semanticCommitTypeAll(chore)',
+    "config:recommended",
+    "schedule:weekly",
+    ":semanticCommitTypeAll(chore)",
   ],
-  labels: [
-    'dependencies',
-  ],
-  rangeStrategy: 'bump',
-  ignoreDeps: [
-    'eorzeaenv',
-  ],
+  labels: ["dependencies"],
+  rangeStrategy: "bump",
+  ignoreDeps: ["eorzeaenv"],
   lockFileMaintenance: {
     enabled: true,
   },
   customManagers: [
     {
-      customType: 'regex',
-      description: 'Update Pyright Python version',
-      managerFilePatterns: [
-        '/^pyproject\\.toml$/',
-      ],
-      matchStrings: [
-        'pythonVersion\\s*=\\s*"(?<currentValue>\\d+\\.\\d+)"',
-      ],
-      depNameTemplate: 'python',
-      depTypeTemplate: 'tool.pyright',
-      datasourceTemplate: 'python-version',
-      versioningTemplate: 'pep440',
-      extractVersionTemplate: '^(?<version>\\d+\\.\\d+)',
+      customType: "regex",
+      description: "Update Pyright Python version",
+      managerFilePatterns: ["/^pyproject\\.toml$/"],
+      matchStrings: ['pythonVersion\\s*=\\s*"(?<currentValue>\\d+\\.\\d+)"'],
+      depNameTemplate: "python",
+      depTypeTemplate: "tool.pyright",
+      datasourceTemplate: "python-version",
+      versioningTemplate: "pep440",
+      extractVersionTemplate: "^(?<version>\\d+\\.\\d+)",
     },
     {
-      customType: 'regex',
-      description: 'Update Playwright browser image tag from the PyPI playwright version',
+      customType: "regex",
+      description: "Update Playwright browser image tag from the PyPI playwright version",
       managerFilePatterns: [
-        '/^docker-compose\\.yml$/',
-        '/^\\.github/workflows/main\\.yml$/',
+        "/^docker-compose\\.yml$/",
+        "/^\\.github/workflows/main\\.yml$/",
       ],
       matchStrings: [
-        'mcr\\.microsoft\\.com/playwright:v(?<currentValue>\\d+\\.\\d+\\.\\d+)',
-        'playwright@(?<currentValue>\\d+\\.\\d+\\.\\d+) run-server',
+        "mcr\\.microsoft\\.com/playwright:v(?<currentValue>\\d+\\.\\d+\\.\\d+)",
+        "playwright@(?<currentValue>\\d+\\.\\d+\\.\\d+) run-server",
       ],
-      depNameTemplate: 'playwright',
-      datasourceTemplate: 'pypi',
-      versioningTemplate: 'semver',
-      extractVersionTemplate: '^(?<version>\\d+\\.\\d+\\.\\d+)$',
+      depNameTemplate: "playwright",
+      datasourceTemplate: "pypi",
+      versioningTemplate: "semver",
+      extractVersionTemplate: "^(?<version>\\d+\\.\\d+\\.\\d+)$",
     },
   ],
   packageRules: [
     {
-      groupName: 'NoneBot adapters',
-      matchManagers: [
-        'pep621',
-      ],
-      matchPackageNames: [
-        '/^nonebot-adapter-/',
-      ],
-      matchDepTypes: [
-        'project.dependencies',
-      ],
-      matchUpdateTypes: [
-        'minor',
-        'patch',
-      ],
-      description: 'Weekly update of nonebot adapters',
+      groupName: "NoneBot adapters",
+      matchManagers: ["pep621"],
+      matchPackageNames: ["/^nonebot-adapter-/"],
+      matchDepTypes: ["project.dependencies"],
+      matchUpdateTypes: ["minor", "patch"],
+      description: "Weekly update of nonebot adapters",
     },
     {
-      groupName: 'NoneBot plugins',
-      matchManagers: [
-        'pep621',
-      ],
-      matchDepTypes: [
-        'project.dependencies',
-      ],
-      matchUpdateTypes: [
-        'minor',
-        'patch',
-      ],
-      matchPackageNames: [
-        '/^nonebot-plugin-/',
-        'nonebot-bison',
-      ],
-      description: 'Weekly update of nonebot plugins',
+      groupName: "NoneBot plugins",
+      matchManagers: ["pep621"],
+      matchDepTypes: ["project.dependencies"],
+      matchUpdateTypes: ["minor", "patch"],
+      matchPackageNames: ["/^nonebot-plugin-/", "nonebot-bison"],
+      description: "Weekly update of nonebot plugins",
     },
     {
-      matchManagers: [
-        'pep621',
-      ],
-      matchPackageNames: [
-        'nonebot-plugin-htmlrender',
-      ],
-      allowedVersions: '<0.8.0',
-      description: 'htmlrender 锁在 0.7.x，bison 尚未适配 0.8',
+      matchManagers: ["pep621"],
+      matchPackageNames: ["nonebot-plugin-htmlrender"],
+      allowedVersions: "<0.8.0",
+      description: "htmlrender 锁在 0.7.x，bison 尚未适配 0.8",
     },
     {
-      groupName: 'Python dependencies',
-      matchManagers: [
-        'pep621',
-      ],
-      matchDepTypes: [
-        'project.dependencies',
-      ],
-      matchUpdateTypes: [
-        'minor',
-        'patch',
-      ],
-      description: 'Weekly update of Python dependencies',
+      groupName: "Python dependencies",
+      matchManagers: ["pep621"],
+      matchDepTypes: ["project.dependencies"],
+      matchUpdateTypes: ["minor", "patch"],
+      description: "Weekly update of Python dependencies",
       matchPackageNames: [
-        '!playwright',
-        '!/^nonebot-adapter-/',
-        '!/^nonebot-plugin-/',
-        '!nonebot-bison',
+        "!playwright",
+        "!/^nonebot-adapter-/",
+        "!/^nonebot-plugin-/",
+        "!nonebot-bison",
       ],
     },
     {
-      groupName: 'Python dev-dependencies',
-      matchManagers: [
-        'pep621',
-      ],
-      matchDepTypes: [
-        'dependency-groups',
-      ],
-      matchUpdateTypes: [
-        'minor',
-        'patch',
-      ],
-      description: 'Weekly update of Python dev-dependencies',
-      matchPackageNames: [
-        '!playwright',
-      ],
+      groupName: "Python dev-dependencies",
+      matchManagers: ["pep621"],
+      matchDepTypes: ["dependency-groups"],
+      matchUpdateTypes: ["minor", "patch"],
+      description: "Weekly update of Python dev-dependencies",
+      matchPackageNames: ["!playwright"],
     },
     {
-      groupName: 'GitHub actions dependencies',
-      matchManagers: [
-        'github-actions',
-      ],
-      description: 'Weekly update of GitHub actions dependencies',
+      groupName: "GitHub actions dependencies",
+      matchManagers: ["github-actions"],
+      description: "Weekly update of GitHub actions dependencies",
     },
     {
-      groupName: 'Docker dependencies',
-      matchManagers: [
-        'dockerfile',
-        'docker-compose',
-      ],
-      description: 'Weekly update of Docker dependencies',
-      matchPackageNames: [
-        '!/playwright/',
-      ],
+      groupName: "Docker dependencies",
+      matchManagers: ["dockerfile", "docker-compose"],
+      description: "Weekly update of Docker dependencies",
+      matchPackageNames: ["!/playwright/"],
     },
     {
-      groupName: 'Playwright dependencies',
-      matchManagers: [
-        'docker-compose',
-        'pep621',
-        'custom.regex',
-      ],
-      matchPackageNames: [
-        '/playwright/',
-      ],
-      description: 'Weekly update of Playwright dependencies',
+      groupName: "Playwright dependencies",
+      matchManagers: ["docker-compose", "pep621", "custom.regex"],
+      matchPackageNames: ["/playwright/"],
+      description: "Weekly update of Playwright dependencies",
     },
     {
-      matchManagers: [
-        'pep621',
-      ],
-      matchPackageNames: [
-        'playwright',
-      ],
-      matchDepTypes: [
-        'project.dependencies',
-      ],
-      description: 'Playwright Python 包与浏览器镜像保持同步升级',
+      matchManagers: ["pep621"],
+      matchPackageNames: ["playwright"],
+      matchDepTypes: ["project.dependencies"],
+      description: "Playwright Python 包与浏览器镜像保持同步升级",
     },
     {
-      matchManagers: [
-        'docker-compose',
-      ],
-      matchPackageNames: [
-        'mcr.microsoft.com/playwright',
-      ],
+      matchManagers: ["docker-compose"],
+      matchPackageNames: ["mcr.microsoft.com/playwright"],
       enabled: false,
-      description: 'Playwright 镜像 tag 只由 PyPI 版本驱动，禁止 docker datasource 单独升级',
+      description: "Playwright 镜像 tag 只由 PyPI 版本驱动，禁止 docker datasource 单独升级",
     },
     {
-      groupName: 'Python version',
-      matchPackageNames: [
-        'python',
-      ],
-      matchManagers: [
-        'dockerfile',
-        'pyenv',
-      ],
-      description: 'Weekly update of Python version',
+      groupName: "Python version",
+      matchPackageNames: ["python"],
+      matchManagers: ["dockerfile", "pyenv"],
+      description: "Weekly update of Python version",
     },
     {
-      groupName: 'Python version',
-      matchPackageNames: [
-        'python',
-      ],
-      matchManagers: [
-        'pep621',
-        'custom.regex',
-      ],
-      matchDepTypes: [
-        'requires-python',
-        'tool.pyright',
-      ],
-      matchUpdateTypes: [
-        'major',
-        'minor',
-      ],
-      description: 'Python 解释器版本：pyproject.toml 跟着 Dockerfile / .python-version 一起升',
+      groupName: "Python version",
+      matchPackageNames: ["python"],
+      matchManagers: ["pep621", "custom.regex"],
+      matchDepTypes: ["requires-python", "tool.pyright"],
+      matchUpdateTypes: ["major", "minor"],
+      description: "Python 解释器版本：pyproject.toml 跟着 Dockerfile / .python-version 一起升",
     },
     {
-      groupName: 'pre-commit dependencies',
-      matchManagers: [
-        'pre-commit',
-      ],
-      description: 'Weekly update of pre-commit dependencies',
+      groupName: "pre-commit dependencies",
+      matchManagers: ["pre-commit"],
+      description: "Weekly update of pre-commit dependencies",
     },
   ],
 }
