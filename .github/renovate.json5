@@ -1,189 +1,227 @@
 {
-  $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  dependencyDashboard: true,
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  dependencyDashboard: {
+    enabled: true,
+  },
   extends: [
-    "config:recommended",
-    "schedule:weekly",
-    ":semanticCommitTypeAll(chore)",
+    'config:recommended',
+    'schedule:weekly',
+    ':semanticCommitTypeAll(chore)',
   ],
-  labels: ["dependencies"],
-  rangeStrategy: "bump",
-  ignoreDeps: ["eorzeaenv"],
-  // 每周刷新一次 uv.lock 中的传递依赖，避免安全漏洞在锁文件里长期累积
+  labels: [
+    'dependencies',
+  ],
+  rangeStrategy: 'bump',
+  ignoreDeps: [
+    'eorzeaenv',
+  ],
   lockFileMaintenance: {
     enabled: true,
   },
   customManagers: [
     {
-      // Pyright 的 pythonVersion 只有"主.次"两段（3.14），所以 extractVersion 只取两段。
-      // 这里不能用 python versioning：它底层是 poetry 的算法，遇到不足三段的版本会
-      // 直接返回旧值（源码日志："Cannot massage python version to npm - returning
-      // currentValue"），Renovate 就把这次更新当成"新值没变"丢掉。结果就是这条规则
-      // 从 #857 加进来之后从未自动生效，3.13→3.14 只能手改。
-      // pep440 能正常算出 3.14 → 3.15，改完这条才会真的跟着升。
-      customType: "regex",
-      description: "Update Pyright Python version",
-      managerFilePatterns: ["/^pyproject\\.toml$/"],
-      matchStrings: ['pythonVersion\\s*=\\s*"(?<currentValue>\\d+\\.\\d+)"'],
-      depNameTemplate: "python",
-      depTypeTemplate: "tool.pyright",
-      datasourceTemplate: "python-version",
-      versioningTemplate: "pep440",
-      extractVersionTemplate: "^(?<version>\\d+\\.\\d+)",
-    },
-    {
-      // 官方浏览器镜像的 tag 就是 playwright 的版本号（v1.64.0-noble 里的 1.64.0），
-      // 但整个字符串里没有 "playwright" 这个包名，Renovate 认不出来，只会把它当成
-      // 一个普通字符串，于是这个 tag 永远不会被升级，和 Python 包越差越远。
-      // 这里手动告诉 Renovate：这个数字要从 PyPI 的 playwright 版本一路跟过来。
-      //
-      // 注意：镜像 tag 只能由这里（pypi datasource）驱动。docker-compose 管理器
-      // 会额外用 docker datasource 单独看 MCR 的 tag，而 MCR 经常比 PyPI 先发，
-      // 于是会生成"只升镜像、pyproject 没升"的半截 PR（比如 #892）。
-      // packageRules 里那条 enabled: false 把 docker datasource 的提取关掉了。
-      //
-      // docker-compose.yml 和 .github/workflows/main.yml 里各有两处要跟着变：
-      // 镜像 tag 和 run-server 命令里的 playwright@版本，所以下面用两个 matchStrings。
-      customType: "regex",
-      description: "Update Playwright browser image tag from the PyPI playwright version",
+      customType: 'regex',
+      description: 'Update Pyright Python version',
       managerFilePatterns: [
-        "/^docker-compose\\.yml$/",
-        "/^\\.github/workflows/main\\.yml$/",
+        '/^pyproject\\.toml$/',
       ],
       matchStrings: [
-        "mcr\\.microsoft\\.com/playwright:v(?<currentValue>\\d+\\.\\d+\\.\\d+)",
-        "playwright@(?<currentValue>\\d+\\.\\d+\\.\\d+) run-server",
+        'pythonVersion\\s*=\\s*"(?<currentValue>\\d+\\.\\d+)"',
       ],
-      depNameTemplate: "playwright",
-      datasourceTemplate: "pypi",
-      versioningTemplate: "semver",
-      extractVersionTemplate: "^(?<version>\\d+\\.\\d+\\.\\d+)$",
+      depNameTemplate: 'python',
+      depTypeTemplate: 'tool.pyright',
+      datasourceTemplate: 'python-version',
+      versioningTemplate: 'pep440',
+      extractVersionTemplate: '^(?<version>\\d+\\.\\d+)',
+    },
+    {
+      customType: 'regex',
+      description: 'Update Playwright browser image tag from the PyPI playwright version',
+      managerFilePatterns: [
+        '/^docker-compose\\.yml$/',
+        '/^\\.github/workflows/main\\.yml$/',
+      ],
+      matchStrings: [
+        'mcr\\.microsoft\\.com/playwright:v(?<currentValue>\\d+\\.\\d+\\.\\d+)',
+        'playwright@(?<currentValue>\\d+\\.\\d+\\.\\d+) run-server',
+      ],
+      depNameTemplate: 'playwright',
+      datasourceTemplate: 'pypi',
+      versioningTemplate: 'semver',
+      extractVersionTemplate: '^(?<version>\\d+\\.\\d+\\.\\d+)$',
     },
   ],
   packageRules: [
     {
-      groupName: "NoneBot adapters",
-      matchManagers: ["pep621"],
-      matchPackageNames: ["/^nonebot-adapter-/"],
-      matchDepTypes: ["project.dependencies"],
-      matchUpdateTypes: ["minor", "patch"],
-      description: "Weekly update of nonebot adapters",
-    },
-    {
-      groupName: "NoneBot plugins",
-      matchManagers: ["pep621"],
-      matchDepTypes: ["project.dependencies"],
-      matchUpdateTypes: ["minor", "patch"],
-      matchPackageNames: ["/^nonebot-plugin-/", "nonebot-bison"],
-      description: "Weekly update of nonebot plugins",
-    },
-    {
-      // bison 0.9.14 用的还是 htmlrender 0.7 的 API（md_to_pic / text_to_pic /
-      // get_new_page / nonebot_plugin_htmlrender.browser），0.8 把这些全删了，
-      // 上游至今没适配。原来的上界 <0.8.0 是 2026-08 手动加的，10-14 被
-      // Renovate 当成普通升级放开了——因为它属于 major 更新，不在上面那条
-      // "只升 minor/patch" 的规则里。这里显式锁死，避免再被自动放开。
-      //
-      // bison 适配之后删掉这条，并同步放开 pyproject.toml 的上界。
-      matchManagers: ["pep621"],
-      matchPackageNames: ["nonebot-plugin-htmlrender"],
-      allowedVersions: "<0.8.0",
-      description: "htmlrender 锁在 0.7.x，bison 尚未适配 0.8",
-    },
-    {
-      groupName: "Python dependencies",
-      matchManagers: ["pep621"],
-      matchDepTypes: ["project.dependencies"],
-      matchUpdateTypes: ["minor", "patch"],
-      description: "Weekly update of Python dependencies",
+      groupName: 'NoneBot adapters',
+      matchManagers: [
+        'pep621',
+      ],
       matchPackageNames: [
-        "!playwright",
-        "!/^nonebot-adapter-/",
-        "!/^nonebot-plugin-/",
-        "!nonebot-bison",
+        '/^nonebot-adapter-/',
+      ],
+      matchDepTypes: [
+        'project.dependencies',
+      ],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+      ],
+      description: 'Weekly update of nonebot adapters',
+    },
+    {
+      groupName: 'NoneBot plugins',
+      matchManagers: [
+        'pep621',
+      ],
+      matchDepTypes: [
+        'project.dependencies',
+      ],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+      ],
+      matchPackageNames: [
+        '/^nonebot-plugin-/',
+        'nonebot-bison',
+      ],
+      description: 'Weekly update of nonebot plugins',
+    },
+    {
+      matchManagers: [
+        'pep621',
+      ],
+      matchPackageNames: [
+        'nonebot-plugin-htmlrender',
+      ],
+      allowedVersions: '<0.8.0',
+      description: 'htmlrender 锁在 0.7.x，bison 尚未适配 0.8',
+    },
+    {
+      groupName: 'Python dependencies',
+      matchManagers: [
+        'pep621',
+      ],
+      matchDepTypes: [
+        'project.dependencies',
+      ],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+      ],
+      description: 'Weekly update of Python dependencies',
+      matchPackageNames: [
+        '!playwright',
+        '!/^nonebot-adapter-/',
+        '!/^nonebot-plugin-/',
+        '!nonebot-bison',
       ],
     },
     {
-      groupName: "Python dev-dependencies",
-      matchManagers: ["pep621"],
-      matchDepTypes: ["dependency-groups"],
-      matchUpdateTypes: ["minor", "patch"],
-      description: "Weekly update of Python dev-dependencies",
-      matchPackageNames: ["!playwright"],
+      groupName: 'Python dev-dependencies',
+      matchManagers: [
+        'pep621',
+      ],
+      matchDepTypes: [
+        'dependency-groups',
+      ],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+      ],
+      description: 'Weekly update of Python dev-dependencies',
+      matchPackageNames: [
+        '!playwright',
+      ],
     },
     {
-      groupName: "GitHub actions dependencies",
-      matchManagers: ["github-actions"],
-      description: "Weekly update of GitHub actions dependencies",
+      groupName: 'GitHub actions dependencies',
+      matchManagers: [
+        'github-actions',
+      ],
+      description: 'Weekly update of GitHub actions dependencies',
     },
     {
-      groupName: "Docker dependencies",
-      matchManagers: ["dockerfile", "docker-compose"],
-      description: "Weekly update of Docker dependencies",
-      matchPackageNames: ["!/playwright/"],
+      groupName: 'Docker dependencies',
+      matchManagers: [
+        'dockerfile',
+        'docker-compose',
+      ],
+      description: 'Weekly update of Docker dependencies',
+      matchPackageNames: [
+        '!/playwright/',
+      ],
     },
     {
-      groupName: "Playwright dependencies",
-      matchManagers: ["docker-compose", "pep621", "custom.regex"],
-      matchPackageNames: ["/playwright/"],
-      description: "Weekly update of Playwright dependencies",
+      groupName: 'Playwright dependencies',
+      matchManagers: [
+        'docker-compose',
+        'pep621',
+        'custom.regex',
+      ],
+      matchPackageNames: [
+        '/playwright/',
+      ],
+      description: 'Weekly update of Playwright dependencies',
     },
     {
-      // Python 的 playwright 包和浏览器镜像必须完全同一个版本，差一点就连不上，
-      // 所有 Markdown 转图片都会失败，而且只会静默变成文字，不会报错。
-      //
-      // 版本号以 PyPI 为准，镜像 tag 由上面那条自定义规则从同一个 PyPI 版本号
-      // 推导，五处（pyproject.toml、uv.lock、docker-compose.yml 两处、CI 两处）
-      // 会一起升；万一有人只改了其中一边，tests/test_playwright_version_consistency.py
-      // 会在 CI 里直接报错。
-      matchManagers: ["pep621"],
-      matchPackageNames: ["playwright"],
-      matchDepTypes: ["project.dependencies"],
-      description: "Playwright Python 包与浏览器镜像保持同步升级",
+      matchManagers: [
+        'pep621',
+      ],
+      matchPackageNames: [
+        'playwright',
+      ],
+      matchDepTypes: [
+        'project.dependencies',
+      ],
+      description: 'Playwright Python 包与浏览器镜像保持同步升级',
     },
     {
-      // 根治 #892 那种半截 PR：MCR 的 tag 只是 PyPI 版本的搬运工，但它是独立
-      // 发布的，经常比 PyPI 先发（v1.64.1 的镜像和 npm 包 10-14 就有了，PyPI
-      // 到 10-19 还停在 1.64.0）。docker-compose 管理器用它自己的 docker
-      // datasource 就会单独把镜像升上去，而 pyproject.toml 和 CI 里由 pypi
-      // datasource 驱动的几处没有新版本可升，结果 PR 只改一行、必然过不了版本
-      // 一致性测试。
-      //
-      // 关掉 docker-compose 管理器对 mcr.microsoft.com/playwright 的提取后，
-      // 镜像 tag 就只剩上面 custom.regex（pypi datasource）一个来源，
-      // 永远和 pyproject.toml 里的 playwright 同进同退。
-      matchManagers: ["docker-compose"],
-      matchPackageNames: ["mcr.microsoft.com/playwright"],
+      matchManagers: [
+        'docker-compose',
+      ],
+      matchPackageNames: [
+        'mcr.microsoft.com/playwright',
+      ],
       enabled: false,
-      description: "Playwright 镜像 tag 只由 PyPI 版本驱动，禁止 docker datasource 单独升级",
+      description: 'Playwright 镜像 tag 只由 PyPI 版本驱动，禁止 docker datasource 单独升级',
     },
     {
-      groupName: "Python version",
-      matchPackageNames: ["python"],
-      matchManagers: ["dockerfile", "pyenv"],
-      description: "Weekly update of Python version",
+      groupName: 'Python version',
+      matchPackageNames: [
+        'python',
+      ],
+      matchManagers: [
+        'dockerfile',
+        'pyenv',
+      ],
+      description: 'Weekly update of Python version',
     },
     {
-      // 解释器版本必须整组一起动：Dockerfile 的 python 镜像、.python-version、
-      // pyproject.toml 的 requires-python，任何一处单独先升都会坏——比如
-      // requires-python 先升到 >=3.15.0，uv 就会直接报
-      // "The Python request from `.python-version` resolved to Python 3.14.6,
-      // which is incompatible with the project's Python requirement"（#895 就是这样）。
-      //
-      // 所以 pyproject.toml 这边不再单独建组（原来叫 "Project Python version"），
-      // 统一并入上面的 "Python version"：同一个 groupName 就是同一个分支，
-      // 四处一起升、或者都不升。requires-python 仍然只跟主/次版本，不跟补丁版本。
-      groupName: "Python version",
-      matchPackageNames: ["python"],
-      matchManagers: ["pep621", "custom.regex"],
-      matchDepTypes: ["requires-python", "tool.pyright"],
-      matchUpdateTypes: ["major", "minor"],
-      description: "Python 解释器版本：pyproject.toml 跟着 Dockerfile / .python-version 一起升",
+      groupName: 'Python version',
+      matchPackageNames: [
+        'python',
+      ],
+      matchManagers: [
+        'pep621',
+        'custom.regex',
+      ],
+      matchDepTypes: [
+        'requires-python',
+        'tool.pyright',
+      ],
+      matchUpdateTypes: [
+        'major',
+        'minor',
+      ],
+      description: 'Python 解释器版本：pyproject.toml 跟着 Dockerfile / .python-version 一起升',
     },
     {
-      groupName: "pre-commit dependencies",
-      matchManagers: ["pre-commit"],
-      description: "Weekly update of pre-commit dependencies",
+      groupName: 'pre-commit dependencies',
+      matchManagers: [
+        'pre-commit',
+      ],
+      description: 'Weekly update of pre-commit dependencies',
     },
   ],
 }
