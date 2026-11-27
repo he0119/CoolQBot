@@ -5,7 +5,9 @@ from nonebot_plugin_alconna import Alconna, CommandMeta, on_alconna
 from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
 from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
-from .data_source import get_latest_nuannuan
+from src.utils.llm_tools import BUSINESS_TOOLS_KEY, BusinessTool
+
+from .data_source import get_latest_nuannuan, query_ff14_fashion_report
 
 __plugin_meta__ = PluginMetadata(
     name="时尚品鉴",
@@ -13,6 +15,15 @@ __plugin_meta__ = PluginMetadata(
     usage="""获取最新的满分攻略
 /时尚品鉴""",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
+    extra={
+        BUSINESS_TOOLS_KEY: (
+            BusinessTool(
+                "query_ff14_fashion_report",
+                "查询最终幻想 XIV 国服本周时尚品鉴的最新满分攻略",
+                query_ff14_fashion_report,
+            ),
+        ),
+    },
 )
 
 nuannuan_cmd = on_alconna(

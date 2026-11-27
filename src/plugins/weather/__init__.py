@@ -6,12 +6,11 @@ from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 from nonebot.typing import T_State
 
 require("nonebot_plugin_alconna")
-require("src.plugins.llm")
 from nonebot_plugin_alconna import Alconna, Args, CommandMeta, Match, MultiVar, on_alconna
 from nonebot_plugin_alconna.builtins.extensions.discord import DiscordSlashExtension
 from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExtension
 
-from src.plugins.llm.tools import registry
+from src.utils.llm_tools import BUSINESS_TOOLS_KEY, BusinessTool
 
 from .eorzean_api import eorzean_weather
 from .heweather_api import heweather
@@ -68,7 +67,6 @@ async def weather_handle(location: tuple[str, ...]):
     await weather_cmd.finish(weather_report)
 
 
-@registry.register("query_weather", "查询现实城市或最终幻想 XIV 艾欧泽亚地区的天气")
 async def get_weather_of_location(location: str, adm: str | None = None) -> str:
     """根据城市名与城市所属行政区划获取天气数据
 
@@ -83,3 +81,8 @@ async def get_weather_of_location(location: str, adm: str | None = None) -> str:
     if not str_data:
         str_data = f"我才不是因为不知道才不告诉你{location}的天气呢"
     return str_data
+
+
+__plugin_meta__.extra[BUSINESS_TOOLS_KEY] = (
+    BusinessTool("query_weather", "查询现实城市或最终幻想 XIV 艾欧泽亚地区的天气", get_weather_of_location),
+)

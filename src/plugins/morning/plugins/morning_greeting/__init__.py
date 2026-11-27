@@ -15,9 +15,10 @@ from sqlalchemy import select
 from src.plugins.morning import plugin_config
 from src.utils.annotated import AsyncSession
 from src.utils.helpers import admin_permission, strtobool
+from src.utils.llm_tools import BUSINESS_TOOLS_KEY, BusinessTool
 from src.utils.remote_data import RemoteDataError
 
-from .data_source import HOLIDAYS_DATA, get_moring_message
+from .data_source import HOLIDAYS_DATA, get_holiday_message, get_moring_message
 from .models import MorningGreeting
 
 __plugin_meta__ = PluginMetadata(
@@ -36,6 +37,11 @@ __plugin_meta__ = PluginMetadata(
 获取今天的问好
 /morning today""",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_saa"),
+    extra={
+        BUSINESS_TOOLS_KEY: (
+            BusinessTool("query_holiday_status", "查询今天、周末、最近节假日及调休安排", get_holiday_message),
+        ),
+    },
 )
 
 
