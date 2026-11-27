@@ -52,10 +52,15 @@ class Hospital:
             results = await session.scalars(statement)
             return results.all()
 
-    async def get_admitted_patient(self, uid: int) -> Patient | None:
+    async def get_admitted_patient(self, user_id: int, group_id: str) -> Patient | None:
         """获取入院病人"""
         async with get_session() as session:
-            statement = select(Patient).where(Patient.user_id == uid).where(Patient.discharged_at == None)
+            statement = (
+                select(Patient)
+                .where(Patient.user_id == user_id)
+                .where(Patient.group_id == group_id)
+                .where(Patient.discharged_at == None)
+            )
             results = await session.scalars(statement)
             return results.first()
 
@@ -73,11 +78,16 @@ class Hospital:
                 raise ValueError("病人未入院")
             return patient.records
 
-    async def add_record(self, uid: int, content: str) -> None:
+    async def add_record(self, user_id: int, group_id: str, admission_id: int, content: str) -> None:
         async with get_session() as session:
-            statement = select(Patient).where(Patient.user_id == uid).where(Patient.discharged_at == None)
-            results = await session.scalars(statement)
-            patient = results.first()
+            statement = (
+                select(Patient)
+                .where(Patient.id == admission_id)
+                .where(Patient.user_id == user_id)
+                .where(Patient.group_id == group_id)
+                .where(Patient.discharged_at == None)
+            )
+            patient = await session.scalar(statement)
             if patient is None:
                 raise ValueError("病人未入院")
 
