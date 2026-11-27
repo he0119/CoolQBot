@@ -1,22 +1,7 @@
-"""大模型工具调用
+"""大模型工具调用。
 
-通过 `@registry.register(name, description)` 装饰器注册工具，运行时根据模型
-请求的参数自动转换并执行，执行结果作为下一轮对话的上下文交回模型。
-
-业务插件按需向注册表登记工具。当前内置天气与节假日查询，也可以继续在自己的模块中注册：
-
-```python
-from src.plugins.llm.tools import registry
-
-@registry.register("get_weather", "查询指定城市的天气")
-async def get_weather(city: str) -> str:
-    \"\"\"查询天气
-
-    Args:
-        city: 城市名称
-    \"\"\"
-    return "晴，25 度"
-```
+LLM 内置工具通过 `@registry.register(name, description)` 装饰器注册。普通插件通过
+其 PluginMetadata.extra 中的 BusinessTool 声明可选工具，无需加载本插件。
 """
 
 from __future__ import annotations
@@ -28,7 +13,10 @@ from dataclasses import dataclass, field
 from time import perf_counter
 from typing import TYPE_CHECKING, Any, get_type_hints
 
+from nonebot import get_loaded_plugins
 from nonebot.log import logger
+
+from src.utils.llm_tools import BUSINESS_TOOLS_KEY
 
 from ..schemas import ImageContent, ToolParam
 
@@ -75,11 +63,12 @@ class ToolResult:
 class ToolRegistry:
     """工具注册表"""
 
-    def __init__(self) -> None:
+    def __init__(self, *, include_business: bool = False) -> None:
         self._registry: dict[str, dict[str, Any]] = {}
+        self._include_business = include_business
 
     def __len__(self) -> int:
-        return len(self._registry)
+        return len(self._available())
 
     def register(
         self,
@@ -95,40 +84,35 @@ class ToolRegistry:
         """
 
         def decorator(func: Callable) -> Callable:
-            signature = inspect.signature(func)
-            try:
-                annotations = get_type_hints(func)
-            except (NameError, TypeError):
-                annotations = {}
-            param_docs = _parse_param_docs(func.__doc__ or "")
-            properties: dict[str, Any] = {}
-            required: list[str] = []
-
-            for param_name, param in signature.parameters.items():
-                if needs_context and param_name == "context":
-                    continue
-                annotation = annotations.get(param_name, param.annotation)
-                properties[param_name] = {
-                    "type": _TYPE_TO_SCHEMA.get(annotation, "string"),
-                    "description": param_docs.get(param_name, ""),
-                }
-                if param.default is inspect.Parameter.empty:
-                    required.append(param_name)
-
-            self._registry[name] = {
-                "description": description,
-                "func": func,
-                "properties": properties,
-                "required": required,
-                "needs_context": needs_context,
-            }
+            self._registry[name] = _describe_tool(description, func, needs_context=needs_context)
             return func
 
         return decorator
 
+    def _available(self) -> dict[str, dict[str, Any]]:
+        if not self._include_business:
+            return self._registry
+
+        # NoneBot 在插件成功加载后才设置 metadata。每次读取时装配，支持任意加载顺序。
+        # 同名工具优先使用内置项；业务项之间按插件模块名顺序取第一个。
+        available = self._registry.copy()
+        loaded = get_loaded_plugins()
+        for plugin in sorted(loaded, key=lambda plugin: plugin.module_name):
+            if plugin.metadata is None:
+                continue
+            parent = plugin.parent_plugin
+            while parent is not None and parent in loaded:
+                parent = parent.parent_plugin
+            if parent is not None:
+                continue
+            for tool in plugin.metadata.extra.get(BUSINESS_TOOLS_KEY, ()):
+                if tool.name not in available:
+                    available[tool.name] = _describe_tool(tool.description, tool.function)
+        return available
+
     def names(self) -> list[str]:
-        """已注册的全部工具名"""
-        return list(self._registry)
+        """当前可用的全部工具名"""
+        return list(self._available())
 
     def to_params(self, names: Collection[str] | None = None) -> list[ToolParam]:
         """转换为与格式无关的工具定义列表；传入 names 时只保留这些工具"""
@@ -142,7 +126,7 @@ class ToolRegistry:
                     "required": info["required"],
                 },
             )
-            for name, info in self._registry.items()
+            for name, info in self._available().items()
             if names is None or name in names
         ]
 
@@ -151,7 +135,7 @@ class ToolRegistry:
 
         执行失败时返回错误描述而非抛出异常，让模型有机会自行调整。
         """
-        info = self._registry.get(call.name)
+        info = self._available().get(call.name)
         if not info:
             logger.warning("LLM 请求了未注册的工具")
             return f"错误：未注册的工具 {call.name}"
@@ -210,6 +194,36 @@ class ToolRegistry:
         return result if isinstance(result, ToolResult) else output
 
 
+def _describe_tool(description: str, func: Callable, *, needs_context: bool = False) -> dict[str, Any]:
+    signature = inspect.signature(func)
+    try:
+        annotations = get_type_hints(func)
+    except (NameError, TypeError):
+        annotations = {}
+    param_docs = _parse_param_docs(func.__doc__ or "")
+    properties: dict[str, Any] = {}
+    required: list[str] = []
+
+    for param_name, param in signature.parameters.items():
+        if needs_context and param_name == "context":
+            continue
+        annotation = annotations.get(param_name, param.annotation)
+        properties[param_name] = {
+            "type": _TYPE_TO_SCHEMA.get(annotation, "string"),
+            "description": param_docs.get(param_name, ""),
+        }
+        if param.default is inspect.Parameter.empty:
+            required.append(param_name)
+
+    return {
+        "description": description,
+        "func": func,
+        "properties": properties,
+        "required": required,
+        "needs_context": needs_context,
+    }
+
+
 def _parse_param_docs(docstring: str) -> dict[str, str]:
     """从 docstring 的 Args 小节中提取参数说明"""
     param_docs: dict[str, str] = {}
@@ -245,7 +259,7 @@ def _convert_value(value: Any, schema_type: str) -> Any:
     return target(value)
 
 
-registry = ToolRegistry()
+registry = ToolRegistry(include_business=True)
 """全局工具注册表"""
 
 # 内置工具在注册表创建后导入，避免模块初始化时的循环依赖。

@@ -10,8 +10,6 @@ from datetime import datetime
 import httpx
 from pydantic import BaseModel, Field
 
-from src.plugins.llm.tools import registry
-
 
 class TeamcraftSearchItem(BaseModel):
     item_id: int = Field(alias="itemId")
@@ -81,10 +79,6 @@ async def get_item_price(name: str, world_or_dc: str) -> str:
         return f"抱歉，没有找到 {item.name} 的价格。"
 
 
-@registry.register(
-    "query_ff14_item_price",
-    "查询最终幻想 XIV 国服指定物品在服务器或大区中的当前市场最低价",
-)
 async def query_ff14_item_price(item_name: str, world_or_dc: str = "猫小胖") -> str:
     """查询最终幻想 XIV 国服市场价格
 

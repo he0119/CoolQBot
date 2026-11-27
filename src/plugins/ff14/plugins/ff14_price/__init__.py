@@ -8,7 +8,9 @@ from nonebot_plugin_alconna.builtins.extensions.telegram import TelegramSlashExt
 from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_user import UserSession
 
-from .data_source import get_item_price
+from src.utils.llm_tools import BUSINESS_TOOLS_KEY, BusinessTool
+
+from .data_source import get_item_price, query_ff14_item_price
 
 __plugin_meta__ = PluginMetadata(
     name="查价",
@@ -22,6 +24,15 @@ __plugin_meta__ = PluginMetadata(
 查询当前设置的默认值
 /查价 默认值""",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
+    extra={
+        BUSINESS_TOOLS_KEY: (
+            BusinessTool(
+                "query_ff14_item_price",
+                "查询最终幻想 XIV 国服指定物品在服务器或大区中的当前市场最低价",
+                query_ff14_item_price,
+            ),
+        ),
+    },
 )
 
 plugin_data = get_plugin_data()

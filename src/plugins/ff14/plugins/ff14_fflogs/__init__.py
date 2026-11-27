@@ -14,10 +14,11 @@ from nonebot_plugin_datastore import get_plugin_data
 from nonebot_plugin_user import UserSession, get_user
 
 from src.utils.helpers import strtobool
+from src.utils.llm_tools import BUSINESS_TOOLS_KEY, BusinessTool
 from src.utils.permission import is_superuser
 from src.utils.remote_data import RemoteDataError
 
-from .api import fflogs
+from .api import fflogs, query_fflogs_character_ranking
 from .config import plugin_config
 from .data import FFLOGS_DATA
 
@@ -42,6 +43,15 @@ __plugin_meta__ = PluginMetadata(
 查询他人绑定的角色
 /dps @他人""",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna", "nonebot_plugin_user"),
+    extra={
+        BUSINESS_TOOLS_KEY: (
+            BusinessTool(
+                "query_fflogs_character_ranking",
+                "查询最终幻想 XIV 国服角色在指定副本中的 FFLogs 排名、百分位和输出",
+                query_fflogs_character_ranking,
+            ),
+        ),
+    },
 )
 
 plugin_data = get_plugin_data()
