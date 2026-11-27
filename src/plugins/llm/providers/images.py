@@ -15,10 +15,11 @@ from typing import TYPE_CHECKING, Any
 import httpx
 
 from ..schemas import ImageContent, Usage
-from .base import USER_AGENT, ProviderError, _decode_json_response, raise_for_error
+from .base import USER_AGENT, ImageResponseError, ProviderError, _decode_json_response, raise_for_error
 
 if TYPE_CHECKING:
     from ..config import ModelConfig
+    from ..schemas import Message
 
 
 @dataclass
@@ -27,8 +28,10 @@ class GeneratedImages:
 
     images: list[ImageContent] = field(default_factory=list)
     """生成的图片"""
-    usage: Usage = field(default_factory=Usage)
-    """图片接口返回的 token 用量"""
+    usage: Usage | None = None
+    """图片接口返回的 token 用量；服务未提供时为空"""
+    continuation: Message | None = None
+    """可在同一 Responses 接入内回放的原生图片记录"""
 
 
 class ImagesClient:
@@ -53,9 +56,9 @@ class ImagesClient:
     async def generate(self, prompt: str) -> GeneratedImages:
         """按提示词生成图片"""
         payload: dict[str, Any] = {
+            **copy.deepcopy(self.config.extra_body),
             "model": self.config.model,
             "prompt": prompt,
-            **copy.deepcopy(self.config.extra_body),
         }
         try:
             async with httpx.AsyncClient(proxy=self.config.proxy) as client:
@@ -74,26 +77,26 @@ class ImagesClient:
         return self._parse_images(data)
 
     def _parse_images(self, data: dict[str, Any]) -> GeneratedImages:
+        usage = self._parse_usage(data.get("usage"))
         items = data.get("data")
         if not isinstance(items, list) or not items:
-            raise ProviderError("图片接口没有返回图片数据")
+            raise ImageResponseError("图片接口没有返回图片数据", usage)
         images: list[ImageContent] = []
         for item in items:
             encoded = item.get("b64_json") if isinstance(item, dict) else None
             if not encoded:
-                raise ProviderError("图片接口没有返回 base64 数据")
+                raise ImageResponseError("图片接口没有返回 base64 数据", usage)
             try:
                 raw = base64.b64decode(encoded, validate=True)
                 images.append(ImageContent.from_bytes(raw))
             except (binascii.Error, TypeError, ValueError) as e:
-                raise ProviderError("生成图片的数据无效或格式不受支持") from e
-        usage = self._parse_usage(data.get("usage"))
+                raise ImageResponseError("生成图片的数据无效或格式不受支持", usage) from e
         return GeneratedImages(images=images, usage=usage)
 
     @staticmethod
-    def _parse_usage(raw: dict[str, Any] | None) -> Usage:
-        if not raw:
-            return Usage()
+    def _parse_usage(raw: object) -> Usage | None:
+        if not isinstance(raw, dict) or not raw.keys() & {"input_tokens", "output_tokens"}:
+            return None
         return Usage(
             input_tokens=int(raw.get("input_tokens") or 0),
             output_tokens=int(raw.get("output_tokens") or 0),

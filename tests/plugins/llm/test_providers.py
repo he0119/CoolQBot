@@ -1111,11 +1111,10 @@ async def test_images_provider_generation_errors(app: App, respx_mock: MockRoute
 
 @respx.mock(assert_all_called=True)
 async def test_images_provider_without_usage_and_session_affinity(app: App, respx_mock: MockRouter):
-    """没有用量时返回空统计，并带上会话头。"""
+    """区分未返回用量与明确的零用量，并发送会话头。"""
     import base64
 
     from src.plugins.llm.providers import ImagesClient
-    from src.plugins.llm.schemas import Usage
 
     png = b"\x89PNG\r\n\x1a\n" + b"0" * 16
     route = respx_mock.post("https://api.example.com/images/generations").mock(
@@ -1123,7 +1122,7 @@ async def test_images_provider_without_usage_and_session_affinity(app: App, resp
     )
     provider = ImagesClient(make_config(OPENAI_IMAGES), session_affinity="test-affinity")
     result = await provider.generate("一只猫")
-    assert result.usage == Usage()
+    assert result.usage is None
     assert route.calls[0].request.headers["x-session-affinity"] == "test-affinity"
 
 

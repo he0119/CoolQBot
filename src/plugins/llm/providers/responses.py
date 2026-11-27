@@ -13,15 +13,25 @@ import base64
 import binascii
 import copy
 import json
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from ..schemas import Completion, ForceTool, ImageContent, Message, ToolCall, Usage
-from .base import Provider, ProviderError, iter_sse
+from .base import ImageResponseError, Provider, ProviderError, iter_sse
 
 if TYPE_CHECKING:
     import httpx
 
     from ..schemas import ToolChoice, ToolParam
+
+
+@dataclass
+class ResponsesCompletion(Completion):
+    usage_reported: bool = False
+
+
+def _has_usage(raw: dict[str, Any] | None) -> bool:
+    return bool(raw and raw.keys() & {"input_tokens", "output_tokens"})
 
 
 class ResponsesProvider(Provider):
@@ -136,12 +146,15 @@ class ResponsesProvider(Provider):
         if data.get("status") == "incomplete" and any(item.get("type") == "function_call" for item in output_items):
             raise ProviderError("工具调用尚未完成，请增加 max_tokens 或重试")
         message = self._extract_message(output_items)
-        return Completion(
+        usage = self._parse_usage(data.get("usage"))
+        usage_reported = _has_usage(data.get("usage"))
+        return ResponsesCompletion(
             message=message,
-            usage=self._parse_usage(data.get("usage")),
+            usage=usage,
+            usage_reported=usage_reported,
             model=data.get("model", ""),
             finish_reason="tool_calls" if message.tool_calls else _finish_reason(data),
-            images=_extract_images(output_items),
+            images=_extract_images(output_items, usage if usage_reported else None),
         )
 
     async def parse_stream(self, response: httpx.Response) -> Completion:
@@ -155,6 +168,7 @@ class ResponsesProvider(Provider):
         order: list[str] = []
         raw_output: dict[int, dict[str, Any]] = {}
         usage = Usage()
+        usage_reported = False
         model = ""
         finish_reason = ""
         terminal_response: dict[str, Any] | None = None
@@ -177,6 +191,7 @@ class ResponsesProvider(Provider):
                 finish_reason = _finish_reason(response_data) or finish_reason
                 if raw_usage := response_data.get("usage"):
                     usage = self._parse_usage(raw_usage)
+                    usage_reported = _has_usage(raw_usage)
                 if event != "response.created":
                     terminal_response = dict(response_data)
                     terminal_response.setdefault("status", event.removeprefix("response."))
@@ -244,12 +259,13 @@ class ResponsesProvider(Provider):
         message.content = message.content or "".join(content)
         message.reasoning = message.reasoning or "".join(reasoning)
         message.tool_calls = tool_calls or message.tool_calls
-        return Completion(
+        return ResponsesCompletion(
             message=message,
             usage=usage,
+            usage_reported=usage_reported,
             model=model,
             finish_reason="tool_calls" if tool_calls else finish_reason,
-            images=_extract_images(output_items),
+            images=_extract_images(output_items, usage if usage_reported else None),
         )
 
     def _extract_message(self, output_items: list[dict[str, Any]]) -> Message:
@@ -306,7 +322,7 @@ def _finish_reason(data: dict[str, Any]) -> str:
     return "stop" if data.get("status") == "completed" else ""
 
 
-def _extract_images(output_items: list[dict[str, Any]]) -> list[ImageContent]:
+def _extract_images(output_items: list[dict[str, Any]], usage: Usage | None) -> list[ImageContent]:
     """解码原生 image_generation 工具生成的图片"""
     images: list[ImageContent] = []
     for item in output_items:
@@ -315,7 +331,7 @@ def _extract_images(output_items: list[dict[str, Any]]) -> list[ImageContent]:
         try:
             images.append(ImageContent.from_bytes(base64.b64decode(result, validate=True)))
         except (binascii.Error, TypeError, ValueError) as e:
-            raise ProviderError("生成图片的数据无效或格式不受支持") from e
+            raise ImageResponseError("生成图片的数据无效或格式不受支持", usage) from e
     return images
 
 

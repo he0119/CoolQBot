@@ -13,16 +13,17 @@ from collections.abc import Awaitable, Callable, Collection
 from contextlib import suppress
 from dataclasses import dataclass, field
 from time import perf_counter
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from nonebot.log import logger
 
 from .config import ModelCapability, plugin_config
+from .image_service import ImageChatCompletion, ImageRequirements, ImageTask
 from .providers import ProviderError, ProviderName, get_provider
-from .schemas import Completion, ForceTool, ImageContent, Message, Usage
+from .schemas import Completion, ImageContent, Message, Usage
 from .tools import ToolContext, ToolResult, registry
-from .tools.image import IMAGE_TOOL_NAME
+from .tools.image import IMAGE_TOOL_NAME, ImageToolContext, ImageToolTurn
 
 if TYPE_CHECKING:
     from .config import ModelConfig
@@ -55,17 +56,6 @@ DSML_TOOL_CALL_PATTERN = re.compile(
 
 RequestWaitNotifier = Callable[[int, int, int], Awaitable[None]]
 
-IMAGE_TOOL_KEYS = (
-    "size",
-    "quality",
-    "background",
-    "output_format",
-    "output_compression",
-    "moderation",
-    "action",
-)
-"""生图模型的 extra_body 中可以直接传给原生 image_generation 工具的字段。"""
-
 
 @dataclass
 class _TurnState:
@@ -90,52 +80,16 @@ class _TurnState:
         self.images.extend(completion.images)
 
 
-def _native_image_tool(image_model: ModelConfig) -> dict[str, Any]:
-    """把生图模型配置转换成 Responses 原生 image_generation 工具。
-
-    生图模型是 openai_images 时，把它的模型名和输出参数写进工具；
-    否则生图模型就是对话模型本身，由服务端选择默认的图片模型。
-    """
-    tool: dict[str, Any] = {"type": "image_generation"}
-    if image_model.provider != ProviderName.OPENAI_IMAGES:
-        return tool
-    tool["model"] = image_model.model
-    for key in IMAGE_TOOL_KEYS:
-        if key in image_model.extra_body:
-            tool[key] = image_model.extra_body[key]
-    return tool
-
-
-def _uses_native_draw(model: ModelConfig, image_model: ModelConfig) -> bool:
-    """绘图模式是否走 Responses 原生 image_generation 工具
-
-    对话模型必须是 openai_responses，且生图模型是 openai_images（借用它的模型名），
-    或者生图模型就是对话模型本身。其他组合走本地 generate_image 工具，按生图模型自己的配置调用。
-    """
-    if model.provider != ProviderName.OPENAI_RESPONSES:
-        return False
-    return image_model.name == model.name or image_model.provider == ProviderName.OPENAI_IMAGES
-
-
-def _select_tool_names(
-    *,
-    enable_tools: bool,
-    allow_image: bool,
-    generate_image: bool,
-    draw_local: bool,
-) -> frozenset[str]:
-    """按命令选项决定下发给模型的函数工具
-
-    - 绘图模式（-d）：只用本地 generate_image，或者走原生工具时不下发函数工具
-    - 工具增强（-a）：除生图外的全部工具；生图会产生费用，必须再加 -i 才开放
-    - 按需生图（-i）：开放 generate_image
-    """
-    if generate_image:
-        return frozenset({IMAGE_TOOL_NAME}) if draw_local else frozenset()
+def _select_tool_names(*, enable_tools: bool, allow_image: bool) -> frozenset[str]:
+    """工具增强默认不开放单独计费的生图工具。"""
     names = {name for name in registry.names() if name != IMAGE_TOOL_NAME} if enable_tools else set()
     if allow_image:
         names.add(IMAGE_TOOL_NAME)
     return frozenset(names)
+
+
+def _is_native_image_tool(tool: object) -> bool:
+    return isinstance(tool, dict) and tool.get("type") == "image_generation"
 
 
 async def chat(
@@ -145,26 +99,27 @@ async def chat(
     session_affinity: str = "",
     tool_names: Collection[str] = (),
     tool_choice: ToolChoice = "auto",
-    native_image_model: ModelConfig | None = None,
 ) -> Completion:
     """发起一次对话请求
 
     - `model`：已经回退过全局配置的模型配置（见 `ScopedConfig.resolve`）。
     - `tool_names`：下发给模型的函数工具，为空时不下发。
-    - `native_image_model`：设置后追加 Responses 原生 image_generation 工具并强制调用，用于绘图模式。
     """
     if not model.base_url:
         raise ValueError(f"模型 {model.name} 未配置 base_url，且未设置 LLM__BASE_URL")
-    if native_image_model is not None:
-        if model.provider != ProviderName.OPENAI_RESPONSES:
-            raise ValueError(f"模型 {model.name} 使用 {model.provider} 接口，只有 openai_responses 支持原生绘图工具")
-        model = model.model_copy(deep=True)
-        # 追加到模型已配置的原生工具之后，避免覆盖联网搜索等已有工具。
-        native_tools = model.extra_body.get("tools") or []
-        if not isinstance(native_tools, list):
-            raise ValueError(f"模型 {model.name} 的 extra_body.tools 必须为工具数组")
-        model.extra_body["tools"] = [*native_tools, _native_image_tool(native_image_model)]
-        model.extra_body["tool_choice"] = {"type": "image_generation"}
+    # 原生绘图只能从图片任务发起，避免绕过显式授权、选定连接和图片请求预算。
+    if model.provider == ProviderName.OPENAI_RESPONSES:
+        native_tools = model.extra_body.get("tools")
+        configured_choice = model.extra_body.get("tool_choice")
+        is_image_tool = _is_native_image_tool
+        if (isinstance(native_tools, list) and any(map(is_image_tool, native_tools))) or is_image_tool(
+            configured_choice
+        ):
+            model = model.model_copy(deep=True)
+            if isinstance(native_tools, list):
+                model.extra_body["tools"] = [tool for tool in native_tools if not is_image_tool(tool)]
+            if is_image_tool(configured_choice):
+                model.extra_body.pop("tool_choice", None)
     provider = get_provider(model.provider)(model, session_affinity=session_affinity)
     tools = registry.to_params(tool_names) if tool_names else None
     return await provider.chat(messages, tools, tool_choice=tool_choice)
@@ -213,12 +168,20 @@ async def execute_tool_calls(
     calls: list[ToolCall],
     context: list[Message],
     tool_context: ToolContext,
+    *,
+    allowed_tool_names: Collection[str],
 ) -> list[ImageContent]:
     """并行执行模型请求的工具调用，并按原顺序把结果加入上下文
 
     返回工具生成的图片，由调用方在回复时直接发送给用户。
     """
-    results = await asyncio.gather(*(registry.execute(call, tool_context) for call in calls))
+
+    async def execute(call: ToolCall) -> str | ToolResult:
+        if call.name not in allowed_tool_names:
+            return f"错误：当前模式未启用工具 {call.name}"
+        return await registry.execute(call, tool_context)
+
+    results = await asyncio.gather(*(execute(call) for call in calls))
     images: list[ImageContent] = []
     for call, result in zip(calls, results, strict=True):
         if isinstance(result, ToolResult):
@@ -242,33 +205,22 @@ class LLMHandler:
         session_affinity: str | None = None,
         system_prompt: str | None = None,
         enable_tools: bool = True,
-        generate_image: bool = False,
         allow_image: bool = False,
-        image_model_name: str = "",
+        image_model: ModelConfig | None = None,
+        image_requirements: ImageRequirements = ImageRequirements(),
         session_id: str = "",
     ) -> None:
-        if (generate_image or allow_image) and not image_model_name:
+        if allow_image and image_model is None:
             raise ValueError("本群未设置生图模型，请先启用并设置生图模型")
         self.model = plugin_config.resolve(model_name)
-        image_model = plugin_config.resolve(image_model_name) if image_model_name else None
+        self.image_model = image_model
+        self.image_requirements = image_requirements
         self.max_requests = plugin_config.max_requests
         self.notice_delay = plugin_config.request_notice_delay
         self.notice_interval = plugin_config.request_notice_interval
         self.session_affinity = session_affinity or uuid4().hex
-        self.tool_context = ToolContext(session_id=session_id, image_model=image_model)
-
-        # 绘图模式：对话模型能用原生工具时直接用，否则强制它调用本地 generate_image 工具。
-        native_draw = generate_image and image_model is not None and _uses_native_draw(self.model, image_model)
-        self.draw_local = generate_image and not native_draw
-        self.native_image_model = image_model if native_draw else None
-        self.tool_names = _select_tool_names(
-            enable_tools=enable_tools,
-            allow_image=allow_image,
-            generate_image=generate_image,
-            draw_local=self.draw_local,
-        )
-        # 只有第一轮强制调用工具；之后仍强制会让模型反复生图直到请求上限。
-        self.first_tool_choice: ToolChoice = ForceTool(IMAGE_TOOL_NAME) if self.draw_local else "auto"
+        self.session_id = session_id
+        self.tool_names = _select_tool_names(enable_tools=enable_tools, allow_image=allow_image)
 
         self.context: list[Message] = []
         prompt = self.model.prompt if system_prompt is None else system_prompt
@@ -318,13 +270,33 @@ class LLMHandler:
             "、".join(sorted(self.tool_names)) or "无",
         )
         turn = _TurnState()
+        image_turn = (
+            ImageToolTurn(
+                ImageTask(self.image_model, self.session_affinity, requirements=self.image_requirements), images
+            )
+            if self.image_model is not None and IMAGE_TOOL_NAME in self.tool_names
+            else None
+        )
+        tool_context = ImageToolContext(
+            session_id=self.session_id, image_model=self.image_model if image_turn else None, image_turn=image_turn
+        )
         notice_task = (
             asyncio.create_task(self._send_request_wait_notices(on_request_wait, turn))
-            if on_request_wait and (self.tool_names or self.native_image_model)
+            if on_request_wait and self.tool_names
             else None
         )
         try:
-            completion = await self._run_turn(context_start, turn)
+            completion = await self._run_turn(context_start, turn, tool_context)
+        except Exception as e:
+            if image_turn is None or (image_turn.result is None and not image_turn.error):
+                raise
+            logger.opt(exception=e).warning("LLM 绘图请求后文字收尾失败（会话={}）", self.log_id)
+            del self.context[context_start + 1 :]
+            if image_turn.result is not None:
+                for image in image_turn.result.images:
+                    if image not in turn.images:
+                        turn.images.append(image)
+            completion = Completion(Message.assistant("文字回复失败。"))
         finally:
             if notice_task:
                 notice_task.cancel()
@@ -339,6 +311,17 @@ class LLMHandler:
         completion.model = turn.model or self.model.model
         completion.elapsed_seconds = perf_counter() - started_at
         self.context.append(completion.message)
+        if image_turn is not None and (image_turn.result is not None or image_turn.error):
+            completion = ImageChatCompletion(
+                message=completion.message,
+                usage=completion.usage,
+                model=completion.model,
+                finish_reason=completion.finish_reason,
+                elapsed_seconds=completion.elapsed_seconds,
+                images=completion.images,
+                image_result=image_turn.result,
+                image_error=image_turn.error,
+            )
         logger.info(
             "LLM 会话请求完成（会话={}，模型={}，结束原因={}，模型请求={}，工具调用={}，I={}，O={}，C={}，耗时={:.3f}s）",
             self.log_id,
@@ -353,20 +336,22 @@ class LLMHandler:
         )
         return completion
 
-    async def _request(self, tool_choice: ToolChoice) -> Completion:
-        """用当前上下文请求一次模型"""
+    async def _request(self, tool_choice: ToolChoice, *, transient_prompt: str = "") -> Completion:
+        """用当前上下文快照请求一次模型，不持久化控制提示。"""
+        messages = list(self.context)
+        if transient_prompt:
+            messages.append(Message.user(transient_prompt))
         return await chat(
             self.model,
-            list(self.context),
+            messages,
             session_affinity=self.session_affinity,
             tool_names=self.tool_names,
             tool_choice=tool_choice,
-            native_image_model=self.native_image_model,
         )
 
-    async def _run_turn(self, context_start: int, turn: _TurnState) -> Completion:
+    async def _run_turn(self, context_start: int, turn: _TurnState, tool_context: ToolContext) -> Completion:
         """请求模型并循环执行工具，返回最后一次请求的结果"""
-        completion = await self._request(self.first_tool_choice)
+        completion = await self._request("auto")
         if completion.tool_calls and not self.tool_names:
             del self.context[context_start:]
             logger.warning("LLM 会话拒绝工具调用（会话={}，调用数量={}）", self.log_id, len(completion.tool_calls))
@@ -382,7 +367,11 @@ class LLMHandler:
                 len(completion.tool_calls),
             )
             self.context.append(completion.message)
-            turn.images.extend(await execute_tool_calls(completion.tool_calls, self.context, self.tool_context))
+            turn.images.extend(
+                await execute_tool_calls(
+                    completion.tool_calls, self.context, tool_context, allowed_tool_names=self.tool_names
+                )
+            )
             turn.request_count += 1
             completion = await self._request_after_tools(context_start, turn)
             turn.record(completion)
@@ -400,14 +389,11 @@ class LLMHandler:
                 self.max_requests,
                 turn.tool_call_count,
             )
-            self.context.append(Message.user(REQUEST_LIMIT_PROMPT))
-        elif turn.request_count == self.max_requests - 1:
-            self.context.append(Message.user(LAST_TOOL_REQUEST_PROMPT))
-
         if not turn.reached_limit:
-            return await self._request("auto")
+            transient_prompt = LAST_TOOL_REQUEST_PROMPT if turn.request_count == self.max_requests - 1 else ""
+            return await self._request("auto", transient_prompt=transient_prompt)
         try:
-            return await self._request("none")
+            return await self._request("none", transient_prompt=REQUEST_LIMIT_PROMPT)
         except ProviderError:
             logger.warning(
                 "LLM 会话禁止工具收尾请求失败，改用已有结果（会话={}，上限={}，工具调用={}）",
