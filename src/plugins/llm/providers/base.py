@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
     from ..config import ModelConfig
-    from ..schemas import Completion, Message, ToolChoice, ToolParam
+    from ..schemas import Completion, Message, ToolChoice, ToolParam, Usage
 
 
 def _get_bot_version() -> str:
@@ -35,6 +35,14 @@ USER_AGENT = f"CoolQBot/{_get_bot_version()}"
 
 class ProviderError(Exception):
     """调用大模型失败"""
+
+
+class ImageResponseError(ProviderError):
+    """上游回包带有实际用量，但没有能交付的图片。"""
+
+    def __init__(self, message: str, usage: Usage | None) -> None:
+        super().__init__(message)
+        self.usage = usage
 
 
 def _decode_json_response(response: httpx.Response) -> dict[str, Any]:

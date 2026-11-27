@@ -1,9 +1,10 @@
 """对话命令
 
-/chat（含 /agent、/draw 快捷命令）与群聊 @ 机器人对话，以及多轮对话的等待与回滚。
+/chat、/agent、/draw 与群聊 @ 机器人，以及多轮对话的等待与回滚。
 """
 
 from dataclasses import dataclass
+from uuid import uuid4
 
 from arclet.alconna import AllParam, store_true
 from nonebot.adapters import Bot, Event
@@ -33,22 +34,54 @@ from src.utils.permission import SuperUserShortcutExtension
 
 from .config import ModelCapability, plugin_config
 from .content import extract_dialogue_content, fetch_message_images
-from .data_source import get_available_model_names, get_image_model_name, get_model_name, get_tts_model
+from .data_source import get_available_model_names, get_model_name, get_tts_model
 from .handler import LLMHandler
+from .image_service import HD_SIZE, ImageRequirements, ImageTask, select_image_model
 from .providers import ProviderError
-from .reply import ReplySender, send_reaction
+from .reply import ReplySender, send_image_result, send_reaction
 from .rules import MENTION_RULE, NON_PRIVATE_RULE
 from .schemas import ImageContent
+
+
+def _image_options() -> tuple[Option, ...]:
+    return (
+        Option("--image-model", Args["name#生图配置名", str], dest="image_model", help_text="本次使用指定生图模型"),
+        Option("--format", Args["type#输出格式", str], help_text="实际输出格式：gif、png、jpeg、webp"),
+        Option("--size", Args["size#输出尺寸", str], help_text="实际像素尺寸，如 1024x1024"),
+        Option("--hd", default=False, action=store_true, help_text=f"高清档：{HD_SIZE}"),
+    )
+
+
+@dataclass(frozen=True)
+class ImageOptions:
+    name: str = ""
+    output_format: str = ""
+    size: str = ""
+    hd: bool = False
+
+    def requirements(self) -> ImageRequirements:
+        return ImageRequirements.from_options(self.output_format, self.size, hd=self.hd)
+
+    def selected_name(self, legacy_name: str) -> str:
+        if self.name and legacy_name and self.name != legacy_name:
+            raise ProviderError("--image-model 与绘图别名 --model 指定的模型冲突")
+        return self.name or legacy_name
+
+    @property
+    def supplied(self) -> bool:
+        return bool(self.name or self.output_format or self.size or self.hd)
+
 
 chat_command = Alconna(
     "chat",
     Args["content?#内容", AllParam],
-    Option("--model", Args["model#模型名称", str], help_text="本次使用指定模型"),
+    Option("--model", Args["model#模型名称", str], help_text="指定聊天模型；-d 时是已改义的 --image-model 别名"),
+    *_image_options(),
     Option("-c|--context", default=False, action=store_true, help_text="启用多轮对话"),
     Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
     Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
     Option("-a|--agent", default=False, action=store_true, help_text="启用工具增强模式"),
-    Option("-d|--draw", default=False, action=store_true, help_text="使用当前模型生成图片"),
+    Option("-d|--draw", default=False, action=store_true, help_text="直接使用本群生图模型绘图"),
     Option("-i|--image", default=False, action=store_true, help_text="允许模型按需调用本群生图模型"),
     meta=CommandMeta(
         description="与大模型对话，可按次启用工具增强模式",
@@ -69,7 +102,26 @@ chat_cmd = on_alconna(
     ],
 )
 chat_cmd.shortcut("agent", command="chat -a", prefix=True, fuzzy=True, humanized="agent [选项] <内容>")
-chat_cmd.shortcut("draw", command="chat --draw", prefix=True, fuzzy=True, humanized="draw [选项] <描述>")
+draw_command = Alconna(
+    "draw",
+    Args["content?#描述", AllParam],
+    Option("-c|--context", default=False, action=store_true, help_text="使用同一 Responses 生图模型续画"),
+    Option("--model", Args["model#生图配置名", str], help_text="旧选项已改义，现为 --image-model 的别名"),
+    *_image_options(),
+    meta=CommandMeta(
+        description="直接使用本群生图模型，识别描述中的格式、尺寸和宽高比",
+        example="/draw 画一张 1024 像素见方的动态贴纸",
+    ),
+)
+
+draw_cmd = on_alconna(
+    draw_command,
+    use_cmd_start=True,
+    block=True,
+    rule=NON_PRIVATE_RULE,
+    permission=MESSAGE,
+    extensions=[ReplyRecordExtension(), TelegramSlashExtension(), SuperUserShortcutExtension()],
+)
 
 
 class MentionChatExtension(Extension):
@@ -142,8 +194,9 @@ async def _create_dialogue(
     render: bool = False,
     use_tts: bool = False,
     enable_tools: bool = False,
-    generate_image: bool = False,
     allow_image: bool = False,
+    image_options: ImageOptions = ImageOptions(),
+    has_references: bool = False,
 ) -> Dialogue:
     """按当前会话设置创建请求处理器与回复发送器。"""
     if not plugin_config.get_model_names():
@@ -170,17 +223,27 @@ async def _create_dialogue(
             at_sender=True,
         )
 
-    # 生图会产生额外费用，只有 -d/--draw 或 -i/--image 显式要求时才开放，-a 不会自动带上。
-    image_model_name = await get_image_model_name(user.session_id) if (generate_image or allow_image) else ""
-    if (generate_image or allow_image) and not image_model_name:
-        raise LLMSetupError("本群未启用生图模型，请联系超级管理员启用并设置", at_sender=True)
+    # 聊天中只在 -i/--image 时开放生图，-a 不会自动带上。
+    image_model = None
+    image_requirements = ImageRequirements()
+    if allow_image:
+        try:
+            image_requirements = image_options.requirements()
+            image_model = await select_image_model(
+                user.session_id,
+                selected_name=image_options.name,
+                requirements=image_requirements,
+                references=has_references,
+            )
+        except ProviderError as e:
+            raise LLMSetupError(str(e), at_sender=True) from e
 
     handler = LLMHandler(
         name,
         enable_tools=enable_tools,
-        generate_image=generate_image,
         allow_image=allow_image,
-        image_model_name=image_model_name,
+        image_model=image_model,
+        image_requirements=image_requirements,
         session_id=user.session_id,
     )
     sender = ReplySender(
@@ -208,17 +271,19 @@ async def _handle_dialogue_command(
     use_tts: Query[bool],
     *,
     enable_tools: bool,
-    generate_image: bool = False,
     allow_image: bool = False,
+    image_options: ImageOptions = ImageOptions(),
 ) -> None:
     """执行共享的纯对话或工具增强命令流程。"""
+    if image_options.supplied and not allow_image:
+        await matcher.finish("图片参数仅可用于 /draw、/chat -d 或 /chat -i", at_sender=True)
     try:
         text, images = await extract_dialogue_content(content, msg_id, ext, bot, event, state)
     except ValueError as e:
         await matcher.finish(str(e), at_sender=True)
 
     if not text and not images:
-        command_name = "draw" if generate_image else "agent" if enable_tools else "chat"
+        command_name = "agent" if enable_tools else "chat"
         await matcher.finish(f"你想问什么呢？输入 /{command_name} -h 查看用法", at_sender=True)
 
     try:
@@ -228,8 +293,9 @@ async def _handle_dialogue_command(
             render=render.result,
             use_tts=use_tts.result,
             enable_tools=enable_tools,
-            generate_image=generate_image,
             allow_image=allow_image,
+            image_options=image_options,
+            has_references=bool(images),
         )
     except LLMSetupError as e:
         if e.at_sender:
@@ -242,6 +308,120 @@ async def _handle_dialogue_command(
 
     completion = await _ask(dialogue.handler, text, images, finish_matcher=matcher)
     await dialogue.sender.send(completion)
+
+
+async def _handle_draw(
+    matcher: type[Matcher],
+    bot: Bot,
+    event: Event,
+    state: T_State,
+    msg_id: MsgId,
+    ext: ReplyRecordExtension,
+    user: UserSession,
+    content: Match[UniMessage],
+    *,
+    use_context: bool,
+    legacy_name: str,
+    image_options: ImageOptions,
+) -> None:
+    try:
+        requirements = image_options.requirements()
+        selected_name = image_options.selected_name(legacy_name)
+    except ProviderError as e:
+        await matcher.finish(str(e), at_sender=True)
+    try:
+        text, images = await extract_dialogue_content(content, msg_id, ext, bot, event, state)
+    except ValueError as e:
+        await matcher.finish(str(e), at_sender=True)
+    if not text and not images:
+        await matcher.finish("请提供绘图描述，输入 /draw -h 查看用法", at_sender=True)
+    try:
+        # 引用消息保留在模型提示词中，不替本次命令指定输出参数。
+        instruction = content.result.extract_plain_text() if content.available else ""
+        requirements = requirements.with_prompt(instruction)
+        model = await select_image_model(
+            user.session_id,
+            selected_name=selected_name,
+            requirements=requirements,
+            use_context=use_context,
+            references=bool(images),
+        )
+    except ProviderError as e:
+        await matcher.finish(str(e), at_sender=True)
+    task = ImageTask(model, uuid4().hex, use_context=use_context, requirements=requirements)
+
+    async def draw_turn(prompt: str, references: list[ImageContent] | None, message_id: str) -> None:
+        await send_reaction("thinking", message_id=message_id)
+        try:
+            result = await task.run(prompt, references)
+        except (ValueError, ProviderError) as e:
+            await send_reaction("fail", message_id=message_id)
+            await matcher.finish(f"绘图失败：{e}", at_sender=True)
+        await send_reaction("done", message_id=message_id)
+        await send_image_result(result)
+
+    await draw_turn(text, images, msg_id)
+    if not use_context:
+        return
+    if not task.can_continue:
+        await matcher.finish("生图服务没有返回可续画的图片记录；已停止多轮绘图")
+
+    from nonebot_plugin_waiter import prompt
+
+    while True:
+        received = await prompt(
+            "继续绘图吧（发送「结束」结束绘图，「回滚」撤销上一轮）",
+            handler=_extract_reply,
+            timeout=plugin_config.context_timeout,
+        )
+        if received is None:
+            await matcher.finish("等待超时，已结束绘图")
+        reply, reply_message_id, reply_event, reply_bot, reply_state = received
+        text = reply.extract_plain_text().strip()
+        if text in ("结束", "取消"):
+            await matcher.finish("已结束绘图")
+        if text in ("回滚", "撤销"):
+            await UniMessage.text("已回滚上一轮绘图" if task.rollback() else "当前没有可回滚的绘图").send()
+            continue
+        try:
+            images = await fetch_message_images(reply.get(Image), reply_event, reply_bot, reply_state)
+        except ValueError as e:
+            await matcher.finish(str(e), at_sender=True)
+        if text or images:
+            await draw_turn(text, images, reply_message_id)
+            if not task.can_continue:
+                await matcher.finish("生图服务没有返回可续画的图片记录；已停止多轮绘图")
+
+
+@draw_cmd.handle()
+async def draw_handle(
+    bot: Bot,
+    event: Event,
+    state: T_State,
+    msg_id: MsgId,
+    ext: ReplyRecordExtension,
+    user: UserSession,
+    content: Match[UniMessage],
+    use_context: Query[bool] = Query("context.value", False),
+    model_name: Query[str] = Query("model.model", ""),
+    image_name: Query[str] = Query("image_model.name", ""),
+    image_format: Query[str] = Query("format.type", ""),
+    image_size: Query[str] = Query("size.size", ""),
+    image_hd: Query[bool] = Query("hd.value", False),
+) -> None:
+    await _handle_draw(
+        draw_cmd,
+        bot,
+        event,
+        state,
+        msg_id,
+        ext,
+        user,
+        content,
+        use_context=use_context.result,
+        legacy_name=model_name.result,
+        image_options=ImageOptions(image_name.result, image_format.result, image_size.result, image_hd.result),
+    )
 
 
 @chat_cmd.handle()
@@ -260,7 +440,27 @@ async def chat_handle(
     use_agent: Query[bool] = Query("agent.value", False),
     use_draw: Query[bool] = Query("draw.value", False),
     use_image: Query[bool] = Query("image.value", False),
+    image_name: Query[str] = Query("image_model.name", ""),
+    image_format: Query[str] = Query("format.type", ""),
+    image_size: Query[str] = Query("size.size", ""),
+    image_hd: Query[bool] = Query("hd.value", False),
 ) -> None:
+    image_options = ImageOptions(image_name.result, image_format.result, image_size.result, image_hd.result)
+    if use_draw.result:
+        await _handle_draw(
+            chat_cmd,
+            bot,
+            event,
+            state,
+            msg_id,
+            ext,
+            user,
+            content,
+            use_context=use_context.result,
+            legacy_name=model_name.result if model_name.available else "",
+            image_options=image_options,
+        )
+        return
     await _handle_dialogue_command(
         chat_cmd,
         bot,
@@ -275,8 +475,8 @@ async def chat_handle(
         render,
         use_tts,
         enable_tools=use_agent.result,
-        generate_image=use_draw.result,
         allow_image=use_image.result,
+        image_options=image_options,
     )
 
 
@@ -296,8 +496,30 @@ async def llm_mention_handle(
     use_agent: Query[bool] = Query("agent.value", False),
     use_draw: Query[bool] = Query("draw.value", False),
     use_image: Query[bool] = Query("image.value", False),
+    image_name: Query[str] = Query("image_model.name", ""),
+    image_format: Query[str] = Query("format.type", ""),
+    image_size: Query[str] = Query("size.size", ""),
+    image_hd: Query[bool] = Query("hd.value", False),
 ) -> None:
     """把群聊中 @ 机器人的 Alconna 解析结果交给对话流程。"""
+    image_options = ImageOptions(image_name.result, image_format.result, image_size.result, image_hd.result)
+    if use_draw.result:
+        await _handle_draw(
+            llm_mention,
+            bot,
+            event,
+            state,
+            msg_id,
+            ext,
+            user,
+            content,
+            use_context=use_context.result,
+            legacy_name=model_name.result if model_name.available else "",
+            image_options=image_options,
+        )
+        return
+    if image_options.supplied and not use_image.result:
+        await UniMessage.text("图片参数仅可用于 /draw、/chat -d 或 /chat -i").finish(reply_to=msg_id)
     try:
         text, images = await extract_dialogue_content(content, msg_id, ext, bot, event, state)
     except ValueError as e:
@@ -313,8 +535,9 @@ async def llm_mention_handle(
             render=render.result,
             use_tts=use_tts.result,
             enable_tools=use_agent.result,
-            generate_image=use_draw.result,
             allow_image=use_image.result,
+            image_options=image_options,
+            has_references=bool(images),
         )
     except LLMSetupError as e:
         await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=msg_id)

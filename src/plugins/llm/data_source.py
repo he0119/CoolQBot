@@ -309,6 +309,18 @@ async def get_image_model_name(session_id: str) -> str:
     return _resolve_image_model_name(config, _available_names(config))
 
 
+async def get_image_model_candidates(session_id: str) -> tuple[list[str], list[str]]:
+    """返回一次群准入快照及按默认优先级排序的生图候选。"""
+    config = await _get_config(session_id)
+    names = _available_names(config)
+    preferred = _resolve_image_model_name(config, names)
+    images = [name for name in names if _is_image_model(name)]
+    if preferred:
+        images.remove(preferred)
+        images.insert(0, preferred)
+    return names, images
+
+
 async def set_image_model_name(session_id: str, model_name: str) -> None:
     """设置本群生图模型。"""
     async with get_session() as session:

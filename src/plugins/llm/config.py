@@ -10,10 +10,19 @@ LLM__MODELS='[{"name":"model-a","provider":"openai_chat_completions"}]'
 """
 
 from enum import StrEnum
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from nonebot import get_plugin_config, logger
-from pydantic import AliasChoices, BaseModel, Field, model_validator
+from pydantic import (
+    AliasChoices,
+    BaseModel,
+    ConfigDict,
+    Field,
+    ModelWrapValidatorHandler,
+    ValidationError,
+    field_validator,
+    model_validator,
+)
 
 from .providers import LEGACY_PROVIDER_NAMES, ProviderName
 from .quota import QuotaConfig
@@ -32,6 +41,10 @@ class ModelCapability(StrEnum):
 
 IMAGE_GENERATION_PROVIDERS = frozenset({ProviderName.OPENAI_IMAGES, ProviderName.OPENAI_RESPONSES})
 """能生成图片的接口：openai_images 调用 Image API，openai_responses 使用原生 image_generation 工具"""
+
+
+ImageFormat = Literal["gif", "png", "jpeg", "webp"]
+ImageSize = Annotated[str, Field(pattern=r"^[1-9][0-9]{0,4}x[1-9][0-9]{0,4}$")]
 
 
 class ModelConfig(BaseModel):
@@ -66,27 +79,14 @@ class ModelConfig(BaseModel):
 
     默认为 text；openai_images 接口只能生图，省略时默认为 image_generation。
     """
+    image_output_formats: set[ImageFormat] = Field(default_factory=set)
+    """该模型的网关接受的可变输出格式；gif 声明必须代表支持多帧。"""
+    image_sizes: set[ImageSize] = Field(default_factory=set)
+    """该模型的网关接受的可变像素尺寸，例：2048x2048。"""
+    image_sizes_by_format: dict[ImageFormat, set[ImageSize]] = Field(default_factory=dict)
+    """按格式覆盖 image_sizes，例如为 GIF 单独声明已验证的帧尺寸。"""
     quota: QuotaConfig | None = None
     """该模型的额度查询配置，留空时不支持额度查询"""
-
-    @model_validator(mode="before")
-    @classmethod
-    def migrate_legacy_provider(cls, data: Any) -> Any:
-        """临时兼容旧 Provider 名称，并提示迁移。"""
-        if not isinstance(data, dict):
-            return data
-        legacy_name = data.get("provider")
-        if not isinstance(legacy_name, str) or legacy_name not in LEGACY_PROVIDER_NAMES:
-            return data
-
-        provider = LEGACY_PROVIDER_NAMES[legacy_name]
-        logger.warning(
-            "模型 Provider 配置已弃用（模型={}，旧值={}，新值={}，将在下个版本移除）",
-            data.get("name", "未命名"),
-            legacy_name,
-            provider.value,
-        )
-        return {**data, "provider": provider}
 
     @model_validator(mode="after")
     def fill_defaults(self) -> "ModelConfig":
@@ -110,11 +110,35 @@ class ModelConfig(BaseModel):
                 f"模型 {self.name} 使用 {self.provider} 接口，暂不支持生图；"
                 "生图模型请使用 openai_images 或 openai_responses 接口"
             )
+        if ("gif" in self.image_output_formats or "gif" in self.image_sizes_by_format) and (
+            self.provider != ProviderName.OPENAI_IMAGES
+        ):
+            raise ValueError(f"模型 {self.name} 的接口不支持动态 GIF 扩展")
         return self
+
+    @model_validator(mode="wrap")
+    @classmethod
+    def migrate_legacy_provider(cls, data: Any, handler: ModelWrapValidatorHandler["ModelConfig"]) -> "ModelConfig":
+        """临时兼容旧 Provider 名称，仅对通过校验的模型提示迁移。"""
+        legacy_name = data.get("provider") if isinstance(data, dict) else None
+        if not isinstance(legacy_name, str) or legacy_name not in LEGACY_PROVIDER_NAMES:
+            return handler(data)
+
+        provider = LEGACY_PROVIDER_NAMES[legacy_name]
+        model = handler({**data, "provider": provider})
+        logger.warning(
+            "模型 Provider 配置已弃用（模型={}，旧值={}，新值={}，将在下个版本移除）",
+            model.name,
+            legacy_name,
+            provider.value,
+        )
+        return model
 
 
 class ScopedConfig(BaseModel):
     """大模型插件配置"""
+
+    model_config = ConfigDict(hide_input_in_errors=True)
 
     base_url: str = ""
     """全局服务地址，未单独配置服务地址的模型都使用它"""
@@ -201,6 +225,32 @@ class ScopedConfig(BaseModel):
     tts_timeout: int = 60
     """TTS 请求超时时间（秒）"""
 
+    @field_validator("models", mode="before")
+    @classmethod
+    def validate_model_entries(cls, value: Any) -> Any:
+        if not isinstance(value, list) or not value:
+            return value
+
+        valid: list[ModelConfig] = []
+        invalid: list[str] = []
+        for index, entry in enumerate(value):
+            try:
+                valid.append(ModelConfig.model_validate(entry))
+            except ValidationError as exc:
+                issues = []
+                for error in exc.errors(include_input=False, include_context=False, include_url=False):
+                    location = error["loc"]
+                    # 深层位置可能包含输入字典的键；只输出已声明的顶层字段和错误码。
+                    field = f"{location[0]}:" if location and location[0] in ModelConfig.model_fields else ""
+                    issues.append(f"{field}{error['type']}")
+                invalid.append(f"models[{index}] ({', '.join(dict.fromkeys(issues))})")
+
+        if not valid:
+            raise ValueError(f"没有通过校验的 LLM 模型配置：{'; '.join(invalid)}")
+        for rejection in invalid:
+            logger.warning("忽略无效模型配置 {}", rejection)
+        return valid
+
     def get_model_names(self) -> list[str]:
         """获取所有可用模型名"""
         return [model.name for model in self.models]
@@ -236,6 +286,8 @@ class ScopedConfig(BaseModel):
 
 class Config(BaseModel):
     """插件配置入口"""
+
+    model_config = ConfigDict(hide_input_in_errors=True)
 
     llm: ScopedConfig = Field(default_factory=ScopedConfig)
     """大模型插件配置"""

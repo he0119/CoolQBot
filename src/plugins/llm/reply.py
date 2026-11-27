@@ -13,10 +13,12 @@ from typing import TYPE_CHECKING, Literal
 from nonebot.log import logger
 from nonebot_plugin_alconna import SupportAdapter, UniMessage, get_target, message_reaction
 
+from .image_service import ImageChatCompletion
 from .tts import TTSError, text_to_speech
 
 if TYPE_CHECKING:
-    from .schemas import Completion
+    from .image_service import ImageResult
+    from .schemas import Completion, ImageContent
 
 THINK_PATTERN = re.compile(r"<think>(.*?)</think>", re.DOTALL)
 """部分服务商把推理内容混在正文的 think 标签里"""
@@ -108,6 +110,16 @@ async def send_reaction(
         logger.opt(exception=e).debug("发送大模型响应状态失败，已忽略")
 
 
+async def _send_images(images: list[ImageContent], *, reply_to: str | bool) -> None:
+    for image in images:
+        await UniMessage.image(raw=image.data).send(reply_to=reply_to)
+
+
+async def send_image_result(result: ImageResult, *, reply_to: str | bool = False) -> None:
+    await _send_images(result.images, reply_to=reply_to)
+    await UniMessage.text(result.summary()).send(reply_to=reply_to)
+
+
 @dataclass
 class ReplySender:
     """按配置把模型回复发送给用户"""
@@ -125,8 +137,12 @@ class ReplySender:
 
     async def send(self, completion: Completion, *, reply_to: str | bool = False) -> None:
         """按配置发送模型回复"""
-        for image in completion.images:
-            await UniMessage.image(raw=image.data).send(reply_to=reply_to)
+        await _send_images(completion.images, reply_to=reply_to)
+        if isinstance(completion, ImageChatCompletion):
+            if completion.image_result is not None:
+                await UniMessage.text(completion.image_result.summary()).send(reply_to=reply_to)
+            elif completion.image_error:
+                await UniMessage.text(f"绘图失败：{completion.image_error}").send(reply_to=reply_to)
         text = format_output(completion, with_thinking=self.show_thinking)
         if not text:
             if completion.images:

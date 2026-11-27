@@ -349,6 +349,7 @@ async def test_chat_and_agent_share_structured_reply_context(
     from nonebot.adapters.onebot.v11.event import Reply, Sender
 
     from src.plugins.llm import chat_cmd
+    from src.plugins.llm.dialogue import ImageOptions
 
     png = b"\x89PNG\r\n\x1a\n" + b"test"
     reply = Reply(
@@ -387,8 +388,9 @@ async def test_chat_and_agent_share_structured_reply_context(
         render=False,
         use_tts=False,
         enable_tools=enable_tools,
-        generate_image=False,
         allow_image=False,
+        image_options=ImageOptions(),
+        has_references=True,
     )
     ask.assert_awaited_once()
     assert ask.await_args.args[0] is handler
@@ -449,6 +451,7 @@ async def test_chat_reply_without_supplement_uses_replied_message_as_request(
     from nonebot.adapters.onebot.v11.event import Reply, Sender
 
     from src.plugins.llm import chat_cmd
+    from src.plugins.llm.dialogue import ImageOptions
 
     reply = Reply(
         time=1,
@@ -485,8 +488,9 @@ async def test_chat_reply_without_supplement_uses_replied_message_as_request(
         render=False,
         use_tts=False,
         enable_tools=enable_tools,
-        generate_image=False,
         allow_image=False,
+        image_options=ImageOptions(),
+        has_references=False,
     )
     ask.assert_awaited_once_with(handler, "测试协议啊", None, finish_matcher=chat_cmd)
     handler.send.assert_awaited_once_with(completion)
@@ -495,6 +499,7 @@ async def test_chat_reply_without_supplement_uses_replied_message_as_request(
 async def test_llm_group_mention_uses_default_chat_flow(app: App, mock_models, mocker):
     """群聊明确 @ 机器人时复用默认模型与标准问答流程。"""
     from src.plugins.llm import llm_mention
+    from src.plugins.llm.dialogue import ImageOptions
 
     handler = mocker.Mock()
     handler.send = mocker.AsyncMock()
@@ -522,8 +527,9 @@ async def test_llm_group_mention_uses_default_chat_flow(app: App, mock_models, m
         "render": False,
         "use_tts": False,
         "enable_tools": False,
-        "generate_image": False,
         "allow_image": False,
+        "image_options": ImageOptions(),
+        "has_references": False,
     }
     ask.assert_awaited_once_with(handler, "你好", None, message_id="42")
     handler.send.assert_awaited_once_with(completion, reply_to="42")
@@ -532,6 +538,7 @@ async def test_llm_group_mention_uses_default_chat_flow(app: App, mock_models, m
 async def test_llm_group_mention_supports_chat_options(app: App, mock_models, mocker):
     """@ 对话支持按次启用 agent 及常用对话选项。"""
     from src.plugins.llm import llm_mention
+    from src.plugins.llm.dialogue import ImageOptions
 
     handler = mocker.Mock()
     create_handler = mocker.patch(
@@ -557,8 +564,9 @@ async def test_llm_group_mention_supports_chat_options(app: App, mock_models, mo
         render=True,
         use_tts=True,
         enable_tools=True,
-        generate_image=False,
         allow_image=False,
+        image_options=ImageOptions(),
+        has_references=False,
     )
     handle_with_context.assert_awaited_once_with(create_handler.return_value, "你好", None, message_id="42")
 
@@ -1187,7 +1195,7 @@ async def test_request_wait_notice_repeats_until_final_completion(app: App, mock
         await second_notice_sent.wait()
         return final_completion
 
-    async def execute(calls, context, tool_context):
+    async def execute(calls, context, tool_context, *, allowed_tool_names):
         context.append(Message.tool(calls[0].id, "搜索结果"))
         return []
 
@@ -1260,6 +1268,100 @@ async def test_request_wait_notice_is_cancelled_when_initial_request_fails(app: 
     assert notice_cancelled.is_set()
 
 
+def _chat_wire_reply(*, content: str = "", tools: tuple[str, ...] = ()) -> httpx.Response:
+    message: dict[str, Any] = {"role": "assistant", "content": content}
+    if tools:
+        message["tool_calls"] = [
+            {"id": f"call_{index}", "type": "function", "function": {"name": name, "arguments": "{}"}}
+            for index, name in enumerate(tools)
+        ]
+    return httpx.Response(200, json={"choices": [{"message": message}]})
+
+
+@pytest.mark.parametrize("image_only", [True, False], ids=["image-only", "business-only"])
+async def test_chat_executes_only_authorized_tools(app: App, mocker, respx_mock: MockRouter, image_only: bool):
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.handler import LLMHandler
+    from src.plugins.llm.tools import ToolRegistry
+
+    endpoint = "https://chat.example.com/v1"
+    chat_model = ModelConfig(name="text", base_url=endpoint)
+    image_model = ModelConfig(name="painter", base_url="https://images.example.com/v1", provider="openai_images")
+    mocker.patch.object(plugin_config, "models", [chat_model, image_model])
+    registry = ToolRegistry()
+    executed: list[str] = []
+
+    @registry.register("business_probe", "Business probe")
+    async def business_probe() -> str:
+        executed.append("business_probe")
+        return "business executed"
+
+    @registry.register("generate_image", "Image probe")
+    async def image_probe() -> str:
+        executed.append("generate_image")
+        return "image executed"
+
+    mocker.patch("src.plugins.llm.handler.registry", registry)
+    route = respx_mock.post(f"{endpoint}/chat/completions").mock(
+        side_effect=[
+            _chat_wire_reply(tools=("business_probe", "generate_image")),
+            _chat_wire_reply(content="完成"),
+        ]
+    )
+    completion = await LLMHandler(
+        "text",
+        enable_tools=not image_only,
+        allow_image=image_only,
+        image_model=image_model if image_only else None,
+    ).ask("试用本次启用的工具")
+
+    expected = "generate_image" if image_only else "business_probe"
+    assert completion.content == "完成"
+    assert executed == [expected]
+    assert [s["function"]["name"] for s in json.loads(route.calls[0].request.content)["tools"]] == [expected]
+    outputs = [m for m in json.loads(route.calls[1].request.content)["messages"] if m["role"] == "tool"]
+    assert [m["tool_call_id"] for m in outputs] == ["call_0", "call_1"]
+    allowed, denied = (outputs[1], outputs[0]) if image_only else (outputs[0], outputs[1])
+    assert "executed" in allowed["content"]
+    assert "当前模式未启用工具" in denied["content"]
+
+
+async def test_budget_guidance_does_not_change_rollback_history(app: App, mocker, respx_mock: MockRouter):
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.handler import LAST_TOOL_REQUEST_PROMPT, REQUEST_LIMIT_PROMPT, LLMHandler
+    from src.plugins.llm.tools import ToolRegistry
+
+    endpoint = "https://chat.example.com/v1"
+    mocker.patch.object(plugin_config, "models", [ModelConfig(name="text", base_url=endpoint)])
+    mocker.patch.object(plugin_config, "max_requests", 3)
+    registry = ToolRegistry()
+
+    @registry.register("probe", "Local tool with no side effects")
+    async def probe() -> str:
+        return "旧工具结果"
+
+    mocker.patch("src.plugins.llm.handler.registry", registry)
+    route = respx_mock.post(f"{endpoint}/chat/completions").mock(
+        side_effect=[
+            _chat_wire_reply(tools=("probe",)),
+            _chat_wire_reply(tools=("probe",)),
+            _chat_wire_reply(content="旧收尾"),
+            _chat_wire_reply(content="新回答"),
+        ]
+    )
+    dialogue = LLMHandler("text", system_prompt="保留人设")
+    assert (await dialogue.ask("旧问题")).content == "旧收尾"
+    assert dialogue.rollback()
+    assert (await dialogue.ask("新问题")).content == "新回答"
+    payloads = [json.loads(call.request.content) for call in route.calls]
+    assert payloads[1]["messages"][-1]["content"] == LAST_TOOL_REQUEST_PROMPT
+    assert payloads[2]["messages"][-1]["content"] == REQUEST_LIMIT_PROMPT
+    assert LAST_TOOL_REQUEST_PROMPT not in [m.get("content") for m in payloads[2]["messages"]]
+    assert payloads[3]["messages"][-1] == {"role": "user", "content": "新问题"}
+    assert {m["role"] for m in payloads[3]["messages"]} == {"system", "user"}
+    assert "旧问题" not in [m.get("content") for m in payloads[3]["messages"]]
+
+
 async def test_request_limit_generates_final_response_with_tool_choice_none(app: App, mock_models, mocker):
     """最后一次请求保留缓存前缀，并以显式 none 生成收尾回复。"""
     from src.plugins.llm.config import plugin_config
@@ -1289,7 +1391,7 @@ async def test_request_limit_generates_final_response_with_tool_choice_none(app:
         side_effect=[first_tool_completion, final_completion],
     )
 
-    async def execute(calls, context, tool_context):
+    async def execute(calls, context, tool_context, *, allowed_tool_names):
         context.append(Message.tool(calls[0].id, "晴"))
         return []
 
@@ -1307,7 +1409,6 @@ async def test_request_limit_generates_final_response_with_tool_choice_none(app:
         "user",
         "assistant",
         "tool",
-        "user",
         "assistant",
     ]
     assert handler.context[-1] is completion.message
@@ -1326,9 +1427,8 @@ async def test_request_limit_generates_final_response_with_tool_choice_none(app:
         "session_affinity": handler.session_affinity,
         "tool_names": handler.tool_names,
         "tool_choice": "none",
-        "native_image_model": None,
     }
-    assert final_call.args[1] == handler.context[:-1]
+    assert final_call.args[1][:-1] == handler.context[:-1]
     assert [message.role for message in final_call.args[1]] == [
         "system",
         "system",
@@ -1361,7 +1461,7 @@ async def test_request_limit_uses_completed_results_when_final_response_still_ca
         side_effect=[tool_completion, tool_completion],
     )
 
-    async def execute(calls, context, tool_context):
+    async def execute(calls, context, tool_context, *, allowed_tool_names):
         context.append(Message.tool(calls[0].id, "晴"))
         return []
 
@@ -1373,13 +1473,12 @@ async def test_request_limit_uses_completed_results_when_final_response_still_ca
     assert "get_weather" in completion.content
     assert "晴" in completion.content
     assert not completion.tool_calls
-    assert [message.role for message in handler.context] == ["system", "user", "assistant", "tool", "user", "assistant"]
+    assert [message.role for message in handler.context] == ["system", "user", "assistant", "tool", "assistant"]
     execute_calls.assert_awaited_once()
     assert chat.await_args_list[-1].kwargs == {
         "session_affinity": handler.session_affinity,
         "tool_names": handler.tool_names,
         "tool_choice": "none",
-        "native_image_model": None,
     }
 
 
@@ -1400,7 +1499,7 @@ async def test_request_limit_uses_completed_results_when_final_request_fails(app
         side_effect=[tool_completion, ProviderError("收尾请求失败")],
     )
 
-    async def execute(calls, context, tool_context):
+    async def execute(calls, context, tool_context, *, allowed_tool_names):
         context.append(Message.tool(calls[0].id, "晴"))
         return []
 
@@ -1411,7 +1510,7 @@ async def test_request_limit_uses_completed_results_when_final_request_fails(app
 
     assert "get_weather" in completion.content
     assert "晴" in completion.content
-    assert [message.role for message in handler.context] == ["system", "user", "assistant", "tool", "user", "assistant"]
+    assert [message.role for message in handler.context] == ["system", "user", "assistant", "tool", "assistant"]
 
 
 async def test_request_limit_rejects_dsml_content_and_uses_completed_results(app: App, mock_models, mocker):
@@ -1438,7 +1537,7 @@ async def test_request_limit_rejects_dsml_content_and_uses_completed_results(app
     mocker.patch.object(plugin_config, "max_requests", 2)
     mocker.patch("src.plugins.llm.handler.chat", side_effect=[tool_completion, dsml_completion])
 
-    async def execute(calls, context, tool_context):
+    async def execute(calls, context, tool_context, *, allowed_tool_names):
         context.append(Message.tool(calls[0].id, "角色排名：95"))
         return []
 
@@ -1465,7 +1564,7 @@ async def test_penultimate_request_warns_model_to_finish_tool_calls(app: App, mo
     mocker.patch.object(plugin_config, "max_requests", 3)
     chat = mocker.patch("src.plugins.llm.handler.chat", side_effect=[tool_completion, final_completion])
 
-    async def execute(calls, context, tool_context):
+    async def execute(calls, context, tool_context, *, allowed_tool_names):
         context.append(Message.tool(calls[0].id, "晴"))
         return []
 
@@ -1477,9 +1576,9 @@ async def test_penultimate_request_warns_model_to_finish_tool_calls(app: App, mo
     assert completion.content == "天气是晴。"
     assert chat.await_count == 2
     second_context = chat.await_args_list[1].args[1]
-    assert second_context == handler.context[:-1]
+    assert second_context[:-1] == handler.context[:-1]
     assert second_context[-1] == Message.user(LAST_TOOL_REQUEST_PROMPT)
-    assert LAST_TOOL_REQUEST_PROMPT in [message.content for message in handler.context]
+    assert LAST_TOOL_REQUEST_PROMPT not in [message.content for message in handler.context]
 
 
 async def test_disabled_tools_are_not_executed(app: App, mock_models, mocker):
@@ -1508,7 +1607,6 @@ async def test_disabled_tools_are_not_executed(app: App, mock_models, mocker):
         "session_affinity": handler.session_affinity,
         "tool_names": frozenset(),
         "tool_choice": "auto",
-        "native_image_model": None,
     }
 
 
@@ -2250,198 +2348,6 @@ async def test_try_send_markdown_falls_back_after_send_error(app: App, mocker):
     assert await try_send_markdown("**加粗**") is False
 
 
-async def test_native_draw_uses_group_image_model(app: App, mocker):
-    """Responses 对话模型使用原生 image_generation 工具，并指定本群生图模型。"""
-    from src.plugins.llm.config import ModelConfig
-    from src.plugins.llm.handler import chat
-    from src.plugins.llm.providers import ProviderName
-    from src.plugins.llm.schemas import Completion, Message, Usage
-
-    chat_model = ModelConfig(
-        name="gpt",
-        provider=ProviderName.OPENAI_RESPONSES,
-        base_url="https://api.example.com",
-        api_key="sk-test",
-    )
-    image_model = ModelConfig(
-        name="painter",
-        provider=ProviderName.OPENAI_IMAGES,
-        model="gpt-image-2.5-sunburst",
-        base_url="https://api.example.com",
-        api_key="sk-test",
-        extra_body={"size": "1024x1024", "quality": "high", "n": 1},
-    )
-    captured: dict[str, Any] = {}
-
-    class FakeProvider:
-        def __init__(self, model_config, *, session_affinity=""):
-            captured["model_config"] = model_config
-
-        async def chat(self, messages, tools=None, tool_choice="auto"):
-            captured["tools"] = tools
-            captured["tool_choice"] = tool_choice
-            return Completion(message=Message.assistant(content="ok"), usage=Usage())
-
-    mocker.patch("src.plugins.llm.handler.get_provider", return_value=FakeProvider)
-    await chat(chat_model, [Message.user("画一只猫")], native_image_model=image_model)
-
-    request_config: Any = captured["model_config"]
-    # n 不在原生工具支持的字段里，不应透传；其余图片参数保留
-    assert request_config.extra_body["tools"] == [
-        {
-            "type": "image_generation",
-            "model": "gpt-image-2.5-sunburst",
-            "size": "1024x1024",
-            "quality": "high",
-        }
-    ]
-    assert request_config.extra_body["tool_choice"] == {"type": "image_generation"}
-    assert captured["tools"] is None
-    assert image_model.extra_body == {"size": "1024x1024", "quality": "high", "n": 1}
-
-
-async def test_native_draw_keeps_configured_native_tools(app: App, mocker):
-    """原生绘图工具追加到模型已配置的原生工具之后，不覆盖，也不改动原配置。"""
-    from src.plugins.llm.config import ModelConfig
-    from src.plugins.llm.handler import chat
-    from src.plugins.llm.providers import ProviderName
-    from src.plugins.llm.schemas import Completion, Message, Usage
-
-    chat_model = ModelConfig(
-        name="gpt",
-        provider=ProviderName.OPENAI_RESPONSES,
-        base_url="https://api.example.com",
-        api_key="sk-test",
-        extra_body={"tools": [{"type": "web_search"}]},
-    )
-    image_model = ModelConfig(
-        name="painter",
-        provider=ProviderName.OPENAI_IMAGES,
-        model="gpt-image-2.5-sunburst",
-        base_url="https://api.example.com",
-        api_key="sk-test",
-    )
-    captured: dict[str, Any] = {}
-
-    class FakeProvider:
-        def __init__(self, model_config, *, session_affinity=""):
-            captured["model_config"] = model_config
-
-        async def chat(self, messages, tools=None, tool_choice="auto"):
-            return Completion(message=Message.assistant(content="ok"), usage=Usage())
-
-    mocker.patch("src.plugins.llm.handler.get_provider", return_value=FakeProvider)
-    await chat(chat_model, [Message.user("画一只猫")], native_image_model=image_model)
-
-    request_config: Any = captured["model_config"]
-    assert request_config.extra_body["tools"] == [
-        {"type": "web_search"},
-        {"type": "image_generation", "model": "gpt-image-2.5-sunburst"},
-    ]
-    assert chat_model.extra_body == {"tools": [{"type": "web_search"}]}
-
-
-async def test_local_draw_uses_generate_image_tool(app: App, mocker):
-    """非 Responses 对话模型通过本地 generate_image 工具调用生图模型。"""
-    from src.plugins.llm.config import ModelConfig
-    from src.plugins.llm.handler import LLMHandler
-    from src.plugins.llm.providers import ProviderName
-    from src.plugins.llm.providers.images import GeneratedImages
-    from src.plugins.llm.schemas import Completion, ForceTool, ImageContent, Message, ToolCall, Usage
-
-    png = b"\x89PNG\r\n\x1a\n" + b"0" * 16
-    chat_model = ModelConfig(
-        name="chat-model",
-        provider=ProviderName.OPENAI_CHAT_COMPLETIONS,
-        base_url="https://api.example.com",
-        api_key="sk-test",
-    )
-    image_model = ModelConfig(
-        name="painter",
-        provider=ProviderName.OPENAI_IMAGES,
-        model="gpt-image-2.5-sunburst",
-        base_url="https://api.example.com",
-        api_key="sk-test",
-    )
-    models = {"chat-model": chat_model, "painter": image_model}
-    config = mocker.Mock(
-        send_thinking=False,
-        max_requests=10,
-        resolve=lambda name: models[name],
-        get_model=lambda name: models[name],
-    )
-    mocker.patch("src.plugins.llm.handler.plugin_config", config)
-    generate = mocker.patch(
-        "src.plugins.llm.providers.images.ImagesClient.generate",
-        new=mocker.AsyncMock(return_value=GeneratedImages(images=[ImageContent.from_bytes(png)])),
-    )
-
-    calls: list[dict[str, Any]] = []
-
-    async def fake_chat(model_name, messages, **kwargs):
-        calls.append(kwargs)
-        # 与真实接口一致：被强制调用工具时，模型每次都会再调用一次。
-        if isinstance(kwargs.get("tool_choice"), ForceTool):
-            return Completion(
-                message=Message.assistant(
-                    tool_calls=[ToolCall(id="call_1", name="generate_image", arguments={"prompt": "一只猫"})]
-                ),
-                model="chat-model",
-                finish_reason="tool_calls",
-            )
-        return Completion(
-            message=Message.assistant(content="画好了"),
-            usage=Usage(input_tokens=1, output_tokens=1),
-            model="chat-model",
-        )
-
-    mocker.patch("src.plugins.llm.handler.chat", side_effect=fake_chat)
-    handler = LLMHandler(
-        "chat-model",
-        enable_tools=False,
-        generate_image=True,
-        session_id="QQClient_10000",
-        image_model_name="painter",
-    )
-    completion = await handler.ask("画一只猫")
-
-    assert calls[0]["tool_names"] == {"generate_image"}
-    assert calls[0]["tool_choice"] == ForceTool("generate_image")
-    # 只有第一轮强制生图，后续请求交给模型自行收尾，否则会一直生图到请求上限。
-    assert len(calls) == 2
-    assert calls[1]["tool_choice"] == "auto"
-    assert completion.content == "画好了"
-    assert [image.data for image in completion.images] == [png]
-    # 生成的图片不放回上下文，续聊时 Chat Completions 不接受助手消息带图片。
-    assert all(not message.images for message in handler.context)
-    assert any(message.role == "tool" and "已生成 1 张图片" in message.content for message in handler.context)
-    generate.assert_awaited_once()
-    assert generate.await_args.args[0] == "一只猫"
-
-
-async def test_chat_native_draw_errors(app: App, mocker):
-    """原生绘图只支持 Responses 对话模型；开启生图却没有生图模型时直接报错。"""
-    from src.plugins.llm.config import ModelConfig
-    from src.plugins.llm.handler import LLMHandler, chat
-    from src.plugins.llm.providers import ProviderName
-    from src.plugins.llm.schemas import Message
-
-    chat_model = ModelConfig(
-        name="deepseek",
-        provider=ProviderName.OPENAI_CHAT_COMPLETIONS,
-        base_url="https://api.example.com",
-        api_key="sk-test",
-    )
-    image_model = ModelConfig(name="painter", provider=ProviderName.OPENAI_IMAGES, model="gpt-image-2.5-sunburst")
-
-    with pytest.raises(ValueError, match="只有 openai_responses"):
-        await chat(chat_model, [Message.user("画猫")], native_image_model=image_model)
-    with pytest.raises(ValueError, match="未设置生图模型"):
-        LLMHandler("gpt", generate_image=True)
-    with pytest.raises(ValueError, match="未设置生图模型"):
-        LLMHandler("gpt", allow_image=True)
-
-
 async def test_chat_sends_no_tools_by_default(app: App, mocker):
     """没有指定工具名时不下发任何函数工具。"""
     from src.plugins.llm.config import ModelConfig
@@ -2471,51 +2377,6 @@ async def test_chat_sends_no_tools_by_default(app: App, mocker):
     assert captured["tools"] == []
 
 
-async def test_native_draw_handler_passes_image_model(app: App, mocker):
-    """Responses 对话模型的原生绘图请求会带上生图模型配置。"""
-    from src.plugins.llm.config import ModelConfig
-    from src.plugins.llm.handler import LLMHandler
-    from src.plugins.llm.providers import ProviderName
-    from src.plugins.llm.schemas import Completion, Message, Usage
-
-    chat_model = ModelConfig(
-        name="gpt",
-        provider=ProviderName.OPENAI_RESPONSES,
-        base_url="https://api.example.com",
-        api_key="sk-test",
-    )
-    image_model = ModelConfig(
-        name="painter",
-        provider=ProviderName.OPENAI_IMAGES,
-        model="gpt-image-2.5-sunburst",
-    )
-    config = mocker.Mock(
-        send_thinking=False,
-        max_requests=10,
-        resolve=lambda name: {"gpt": chat_model, "painter": image_model}[name],
-    )
-    mocker.patch("src.plugins.llm.handler.plugin_config", config)
-    captured: dict[str, Any] = {}
-
-    async def fake_chat(model_name, messages, **kwargs):
-        captured.update(kwargs)
-        return Completion(message=Message.assistant(content="画好了"), usage=Usage())
-
-    mocker.patch("src.plugins.llm.handler.chat", side_effect=fake_chat)
-    handler = LLMHandler(
-        "gpt",
-        enable_tools=False,
-        generate_image=True,
-        image_model_name="painter",
-    )
-    completion = await handler.ask("画一只猫")
-
-    assert completion.content == "画好了"
-    assert captured["native_image_model"] is image_model
-    assert captured["tool_names"] == frozenset()
-    assert captured["tool_choice"] == "auto"
-
-
 async def test_send_image_only_sends_statistics(app: App, mock_models, mocker):
     """只有图片时，先发原图再补一条统计信息。"""
     from nonebot_plugin_alconna import UniMessage
@@ -2539,7 +2400,7 @@ async def test_send_image_only_sends_statistics(app: App, mock_models, mocker):
 
 async def test_draw_command_requires_image_model(app: App, mock_models):
     """本群没有生图模型时 /draw 直接提示，不去请求对话模型。"""
-    from src.plugins.llm import chat_cmd
+    from src.plugins.llm.dialogue import draw_cmd
 
     async with app.test_matcher() as ctx:
         adapter = get_adapter(Adapter)
@@ -2553,7 +2414,7 @@ async def test_draw_command_requires_image_model(app: App, mock_models):
             True,
             at_sender=True,
         )
-        ctx.should_finished(chat_cmd)
+        ctx.should_finished(draw_cmd)
 
 
 async def test_generate_image_tool_errors(app: App, mocker):
@@ -2655,22 +2516,22 @@ async def test_image_tool_requires_explicit_option(app: App, mocker):
     from src.plugins.llm.providers import ProviderName
 
     chat_model = ModelConfig(name="test-model")
-    painter = ModelConfig(name="painter", provider=ProviderName.OPENAI_IMAGES)
+    painter = ModelConfig(name="painter", provider=ProviderName.OPENAI_IMAGES, base_url="https://images.example.com")
     mocker.patch.object(plugin_config, "models", [chat_model, painter])
     await set_available_model_names("QQClient_10000", ["test-model", "painter"])
     user: Any = mocker.Mock(session_id="QQClient_10000")
 
     agent = (await _create_dialogue(user, enable_tools=True)).handler
-    assert agent.tool_context.image_model is None
+    assert agent.image_model is None
     assert "web_search" in agent.tool_names
     assert "generate_image" not in agent.tool_names
 
     image_only = (await _create_dialogue(user, allow_image=True)).handler
-    assert image_only.tool_context.image_model.name == "painter"
+    assert image_only.image_model.name == "painter"
     assert image_only.tool_names == {"generate_image"}
 
     agent_with_image = (await _create_dialogue(user, enable_tools=True, allow_image=True)).handler
-    assert agent_with_image.tool_context.image_model.name == "painter"
+    assert agent_with_image.image_model.name == "painter"
     assert {"web_search", "generate_image"} <= agent_with_image.tool_names
 
 
@@ -2691,21 +2552,3 @@ async def test_image_option_requires_image_model(app: App, mock_models):
             at_sender=True,
         )
         ctx.should_finished(chat_cmd)
-
-
-async def test_draw_path_follows_image_model(app: App, mocker):
-    """Responses 对话模型：生图模型是自己时走原生工具，是另一个 Responses 模型时走本地工具。"""
-    from src.plugins.llm.config import ModelConfig
-    from src.plugins.llm.handler import LLMHandler, _native_image_tool
-    from src.plugins.llm.providers import ProviderName
-
-    gpt = ModelConfig(name="gpt", provider=ProviderName.OPENAI_RESPONSES, capabilities={"text", "image_generation"})
-    other = ModelConfig(name="other", provider=ProviderName.OPENAI_RESPONSES, capabilities={"text", "image_generation"})
-    models = {"gpt": gpt, "other": other}
-    config = mocker.Mock(send_thinking=False, resolve=lambda name: models[name], get_model=lambda name: models[name])
-    mocker.patch("src.plugins.llm.handler.plugin_config", config)
-
-    assert LLMHandler("gpt", enable_tools=False, generate_image=True, image_model_name="gpt").draw_local is False
-    assert LLMHandler("gpt", enable_tools=False, generate_image=True, image_model_name="other").draw_local is True
-    # 生图模型就是对话模型本身时，不往原生工具里写模型名
-    assert _native_image_tool(gpt) == {"type": "image_generation"}
