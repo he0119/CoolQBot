@@ -11,8 +11,6 @@ from urllib.parse import parse_qs, urljoin, urlparse
 import httpx
 from nonebot.log import logger
 
-from src.plugins.llm.tools import registry
-
 FASHION_REPORT_URL = "https://www.youwanc.com/"
 FASHION_REPORT_DOC_URL = "https://docs.qq.com/sheet/DY2lCeEpwemZESm5q?tab=BB08J2&c=A1A0A0"
 FASHION_REPORT_DETAIL_URL = "https://docs.qq.com/sheet/DY2lCeEpwemZESm5q?tab=dewveu&c=A1A0A0"
@@ -282,10 +280,6 @@ async def get_latest_nuannuan() -> str:
         return _fallback_report()
 
 
-@registry.register(
-    "query_ff14_fashion_report",
-    "查询最终幻想 XIV 国服本周时尚品鉴的最新满分攻略",
-)
 async def query_ff14_fashion_report() -> str:
     """查询最新时尚品鉴满分攻略。"""
     latest = await get_latest_nuannuan()

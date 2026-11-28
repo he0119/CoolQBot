@@ -4,7 +4,6 @@ from typing import TypedDict
 from dateutil import parser
 from nonebot_plugin_localstore import get_plugin_cache_dir
 
-from src.plugins.llm.tools import registry
 from src.utils.helpers import render_expression
 from src.utils.remote_data import RemoteJsonData
 
@@ -113,7 +112,6 @@ def process_workday(date: date, data: dict) -> list[HolidayInfo]:
     return workdays
 
 
-@registry.register("query_holiday_status", "查询今天、周末、最近节假日及调休安排")
 async def get_holiday_message() -> str:
     """获得问候语
 

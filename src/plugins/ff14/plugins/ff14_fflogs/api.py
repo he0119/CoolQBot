@@ -21,8 +21,6 @@ from nonebot_plugin_orm import get_session
 from pydantic import TypeAdapter, ValidationError
 from sqlalchemy import select
 
-from src.plugins.llm.tools import registry
-
 from .config import plugin_config
 from .data import FFLOGS_DATA, FFlogsDataModel, get_boss_info_by_nickname, get_job_info_by_nickname
 from .models import CharacterRanking, Class, FFLogsRanking, Ranking, User, Zones
@@ -375,10 +373,6 @@ class FFLogs:
 fflogs = FFLogs()
 
 
-@registry.register(
-    "query_fflogs_character_ranking",
-    "查询最终幻想 XIV 国服角色在指定副本中的 FFLogs 排名、百分位和输出",
-)
 async def query_fflogs_character_ranking(
     boss: str,
     character_name: str,
