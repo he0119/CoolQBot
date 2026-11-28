@@ -7,6 +7,10 @@ MAX_PIXELS = 8_294_400
 ALIGNMENT = 16
 
 
+def uses_official_image_api(base_url: str, model_id: str) -> bool:
+    return base_url.rstrip("/") == "https://api.openai.com/v1" and model_id in MODELS
+
+
 def size_error(width: int, height: int, *, animated: bool = False) -> str:
     if max(width, height) > MAX_EDGE:
         return f"官方 Images 单边最多 {MAX_EDGE} 像素"

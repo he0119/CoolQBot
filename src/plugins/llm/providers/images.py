@@ -1,7 +1,7 @@
 """OpenAI Image API 客户端
 
 只给使用 `openai_images` 接口的生图模型用。这个接口不能对话，所以不继承对话用的 `Provider`，
-也不注册到对话接口表里。请求 `POST {base_url}/images/generations`，返回的 `b64_json` 解码后交给调用方。
+也不注册到对话接口表里。生成使用 `/images/generations`，官方接入可使用 `/images/edits` 上传参考图。
 """
 
 from __future__ import annotations
@@ -18,6 +18,8 @@ from ..schemas import ImageContent, Usage
 from .base import USER_AGENT, ImageResponseError, ProviderError, _decode_json_response, raise_for_error
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ..config import ModelConfig
     from ..schemas import Message
 
@@ -34,8 +36,25 @@ class GeneratedImages:
     """可在同一 Responses 接入内回放的原生图片记录"""
 
 
+_EDIT_INPUTS = {"image/png": "png", "image/jpeg": "jpg", "image/webp": "webp"}
+_EDIT_FIELDS = frozenset(
+    {
+        "background",
+        "complexity",
+        "frame_count",
+        "frame_duration_ms",
+        "input_fidelity",
+        "n",
+        "output_compression",
+        "output_format",
+        "quality",
+        "size",
+    }
+)
+
+
 class ImagesClient:
-    """OpenAI Image API 客户端，只能生图"""
+    """OpenAI Image API 客户端。"""
 
     def __init__(self, config: ModelConfig, *, session_affinity: str = "") -> None:
         self.config = config
@@ -72,6 +91,39 @@ class ImagesClient:
             raise ProviderError("图片生成请求超时，请稍后重试") from e
         except httpx.HTTPError as e:
             raise ProviderError(f"图片生成请求失败：{e}") from e
+        data = _decode_json_response(response)
+        raise_for_error(data, response.status_code)
+        return self._parse_images(data)
+
+    async def edit(self, prompt: str, references: Sequence[ImageContent]) -> GeneratedImages:
+        """用 multipart 提交本轮参考图；不传兼容网关专用字段。"""
+        if not 1 <= len(references) <= 16:
+            raise ProviderError("官方改图请求须包含 1 至 16 张参考图")
+        files = []
+        for index, reference in enumerate(references, 1):
+            extension = _EDIT_INPUTS.get(reference.mimetype)
+            if not extension:
+                raise ProviderError(f"第 {index} 张参考图格式不受支持；请使用 PNG、JPEG 或 WebP 静态图片")
+            if len(reference.data) >= 50_000_000:
+                raise ProviderError(f"第 {index} 张参考图须小于 50 MB")
+            files.append(("image[]", (f"reference-{index}.{extension}", reference.data, reference.mimetype)))
+        form = {k: v for k, v in self.config.extra_body.items() if k in _EDIT_FIELDS and v is not None}
+        form.update(model=self.config.model, prompt=prompt)
+        headers = self.build_headers()
+        headers.pop("Content-Type")  # HTTPX supplies the multipart boundary.
+        try:
+            async with httpx.AsyncClient(proxy=self.config.proxy) as client:
+                response = await client.post(
+                    f"{self.config.base_url.rstrip('/')}/images/edits",
+                    headers=headers,
+                    data=form,
+                    files=files,
+                    timeout=self.config.timeout,
+                )
+        except httpx.TimeoutException as e:
+            raise ProviderError("图片编辑请求超时，请稍后重试") from e
+        except httpx.HTTPError as e:
+            raise ProviderError(f"图片编辑请求失败：{e}") from e
         data = _decode_json_response(response)
         raise_for_error(data, response.status_code)
         return self._parse_images(data)

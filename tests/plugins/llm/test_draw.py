@@ -57,7 +57,7 @@ async def test_image_only_group_can_draw(app: App, mocker, respx_mock: MockRoute
 
 def make_image(output_format: str, *, frames: int = 1, size: tuple[int, int] = (16, 12)) -> bytes:
     file = BytesIO()
-    images = [PILImage.new("RGB", size, (index * 20, 0, 0)) for index in range(frames)]
+    images = [PILImage.new("RGB", size, (index * 16, 0, 0)) for index in range(frames)]
     images[0].save(file, format=output_format, save_all=frames > 1, append_images=images[1:], duration=100)
     return file.getvalue()
 
@@ -526,6 +526,20 @@ async def test_hd_requests_and_verifies_fixed_pixels(app: App, mocker, respx_moc
         ("/draw --hd --format png 画一个圆", "png", (2880, 2880), {}, set(), {}),
         ("/chat -d 画一张16:9的PNG横幅", "png", (1824, 1024), {}, set(), {}),
         ("/draw 画一张16:9的高清PNG横幅", "png", (3840, 2160), {}, set(), {}),
+        *[
+            (
+                command,
+                "gif",
+                size,
+                {"size": "auto", "output_format": "png", "frame_count": 2, "frame_duration_ms": 500},
+                {"gif", "png"},
+                {"gif": {"960x960", "1024x576"}},
+            )
+            for command, size in (
+                ("/chat -d 画一张 16:9 的动图", (1024, 576)),
+                ("/draw 生成一个 GIF 头像", (960, 960)),
+            )
+        ],
         (
             "/draw 画一张256像素见方的GIF贴纸",
             "gif",
@@ -592,6 +606,136 @@ async def test_official_image_dimensions_send_the_calibrated_request(
 
 
 @pytest.mark.parametrize(
+    ("command", "requested", "returned", "expected_error"),
+    [
+        (
+            "/draw --format gif --size 3200x1440 画个动画",
+            "3200x1440",
+            None,
+            "frame sheet exceeds current request pixel budget",
+        ),
+        ("/draw 画一张128像素见方的GIF", "128x128", (128, 128), ""),
+        ("/draw --format gif --size auto 画个动画", "auto", (256, 256), ""),
+        ("/draw 画一张16:9的动态壁纸", "1024x576", (1024, 576), ""),
+        ("/draw 画一张 GIF 头像", "960x960", (960, 960), ""),
+    ],
+)
+async def test_official_gif_presets_do_not_limit_explicit_sizes(
+    app: App,
+    mocker,
+    respx_mock: MockRouter,
+    command,
+    requested,
+    returned,
+    expected_error,
+):
+    from nonebot_plugin_alconna import Image, UniMessage
+
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names
+
+    model = ModelConfig(
+        name="official",
+        model="gpt-image-2.6-sunburst",
+        provider="openai_images",
+        base_url="https://api.openai.com/v1",
+        image_output_formats={"gif"},
+        image_gif_size_presets={"960x960", "1024x576"},
+        extra_body={"size": "auto", "frame_count": 2, "frame_duration_ms": 500},
+    )
+    mocker.patch.object(plugin_config, "models", [model])
+    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    await set_available_model_names(SESSION, [model.name])
+    gif = make_image("GIF", size=returned, frames=2) if returned else None
+    if gif:
+        send = mocker.patch.object(UniMessage, "send", autospec=True)
+    reply = image_response(gif) if gif else httpx.Response(400, json={"error": {"message": expected_error}})
+    route = respx_mock.post("https://api.openai.com/v1/images/generations").mock(return_value=reply)
+
+    async with app.test_matcher() as ctx:
+        bot = ctx.create_bot(base=Bot, adapter=get_adapter(Adapter))
+        event = fake_group_message_event_v11(message=Message(command), user_id=10)
+        ctx.receive_event(bot, event)
+        if expected_error:
+            ctx.should_call_send(event, f"绘图失败：{expected_error}", True, at_sender=True)
+
+    assert route.call_count == 1
+    payload = json.loads(route.calls.last.request.content)
+    assert (payload["size"], payload["output_format"], payload["frame_count"]) == (requested, "gif", 2)
+    if gif:
+        assert send.await_args_list[0].args[0].get(Image)[0].raw == gif
+        assert f"GIF {returned[0]}x{returned[1]}" in send.await_args_list[1].args[0].extract_plain_text()
+
+
+@pytest.mark.parametrize(
+    ("command", "request_size", "requested_frames", "response_size", "response_frames", "error"),
+    [
+        ("/draw 画一张高清 GIF 头像", "auto", None, (1152, 1152), 9, ""),
+        ("/draw --format gif --hd --frames 12 画头像", "auto", 12, (1152, 1152), 12, ""),
+        ("/chat -d 画一张12帧的16:9高清GIF", "auto", 12, (1024, 576), 12, ""),
+        ("/draw --frames 16 --size 320x320 画动图", "320x320", 16, (320, 320), 16, ""),
+        ("/draw 画一张16:9的高清动图", "auto", None, (960, 960), 9, "第 1 张图片要求宽高比 16:9，服务返回 960x960"),
+        ("/draw --frames 12 --size auto 画动图", "auto", 12, (512, 512), 9, "第 1 张图片要求 12 帧 GIF，服务返回 9 帧"),
+        ("/draw 画一张17帧的GIF", None, None, None, 0, "官方 GIF 帧数必须是 2 至 16 之间的整数"),
+        ("/draw --frames 1 画动图", None, None, None, 0, "官方 GIF 帧数必须是 2 至 16 之间的整数"),
+        ("/draw --frames 8 --format png 画头像", None, None, None, 0, "--frames 仅适用于 GIF"),
+    ],
+)
+async def test_official_gif_hd_and_frame_count_are_independent(
+    app: App,
+    mocker,
+    respx_mock: MockRouter,
+    command,
+    request_size,
+    requested_frames,
+    response_size,
+    response_frames,
+    error,
+):
+    from nonebot_plugin_alconna import Image, UniMessage
+
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names
+
+    model = ModelConfig(
+        name="official",
+        model="gpt-image-2.6-sunburst",
+        provider="openai_images",
+        base_url="https://api.openai.com/v1",
+        image_output_formats={"gif", "png"},
+        image_gif_size_presets={"960x960", "1024x576"},
+        extra_body={"size": "auto", "output_format": "png"},
+    )
+    mocker.patch.object(plugin_config, "models", [model])
+    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    await set_available_model_names(SESSION, [model.name])
+    route = None
+    if response_size:
+        image = make_image("GIF", size=response_size, frames=response_frames)
+        route = respx_mock.post("https://api.openai.com/v1/images/generations").mock(return_value=image_response(image))
+    if not error:
+        send = mocker.patch.object(UniMessage, "send", autospec=True)
+
+    async with app.test_matcher() as ctx:
+        bot = ctx.create_bot(base=Bot, adapter=get_adapter(Adapter))
+        event = fake_group_message_event_v11(message=Message(command), user_id=10)
+        ctx.receive_event(bot, event)
+        if error:
+            ctx.should_call_send(event, ("绘图失败：" if route else "") + error, True, at_sender=True)
+    if route is None:
+        assert not respx_mock.calls
+        return
+    assert route.call_count == 1
+    payload = json.loads(route.calls.last.request.content)
+    assert payload["size"] == request_size
+    assert payload["output_format"] == "gif"
+    assert payload.get("frame_count") == requested_frames
+    if not error:
+        assert send.await_args_list[0].args[0].get(Image)[0].raw == image
+        assert f"/ {response_frames} 帧" in send.await_args_list[1].args[0].extract_plain_text()
+
+
+@pytest.mark.parametrize(
     ("description", "formats", "sizes_by_format", "error"),
     [
         ("画一张4096x4096 PNG", set(), {}, "要求 PNG / 4096x4096；official：官方 Images 单边最多 3840 像素"),
@@ -641,6 +785,72 @@ async def test_official_invalid_image_requirements_are_rejected_before_network(
         ctx.should_call_send(event, f"本群没有满足绘图要求的模型（{error}）", True, at_sender=True)
 
     assert not respx_mock.calls
+
+
+@pytest.mark.parametrize("command", ["/draw", "/chat -d"])
+async def test_official_draw_edits_a_replied_image(app: App, mocker, respx_mock: MockRouter, command: str):
+    from nonebot.adapters.onebot.v11.event import Reply, Sender
+    from nonebot_plugin_alconna import Image, UniMessage
+
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names
+
+    model = ModelConfig(
+        name="official",
+        model="gpt-image-2.6-sunburst",
+        provider="openai_images",
+        base_url="https://api.openai.com/v1",
+        api_key="edit-test",
+        extra_body={"quality": "low", "n": 1},
+    )
+    mocker.patch.object(plugin_config, "models", [model])
+    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    send = mocker.patch.object(UniMessage, "send", autospec=True)
+    reference = make_image("JPEG")
+    output = make_image("PNG", size=(1024, 1024))
+    mocker.patch("src.plugins.llm.content.image_fetch", return_value=reference)
+    await set_available_model_names(SESSION, [model.name])
+    edit = respx_mock.post("https://api.openai.com/v1/images/edits").mock(return_value=image_response(output))
+    generate = respx_mock.post("https://api.openai.com/v1/images/generations").mock(return_value=image_response(output))
+    previous = Reply(
+        time=1,
+        message_type="group",
+        message_id=9211,
+        real_id=9211,
+        sender=Sender(user_id=20, nickname="群友"),
+        message=Message("保留构图[CQ:image,file=ref.jpg]"),
+    )
+    async with app.test_matcher() as ctx:
+        bot = ctx.create_bot(base=Bot, adapter=get_adapter(Adapter), self_id="123456")
+        ctx.receive_event(
+            bot,
+            fake_group_message_event_v11(
+                self_id=123456,
+                message_id=2711 if command == "/draw" else 2712,
+                user_id=10,
+                reply=previous,
+                message=Message(f"{command} --format png --size 1024x1024 把主角改成红色"),
+            ),
+        )
+
+    assert edit.call_count == 1
+    assert generate.call_count == 0
+    request = edit.calls.last.request
+    assert request.headers["authorization"] == "Bearer edit-test"
+    assert request.headers["content-type"].startswith("multipart/form-data; boundary=")
+    from email import policy
+    from email.parser import BytesParser
+
+    parts = BytesParser(policy=policy.default).parsebytes(
+        f"Content-Type: {request.headers['content-type']}\r\n\r\n".encode() + request.content
+    )
+    fields = {part.get_param("name", header="content-disposition"): part for part in parts.iter_parts()}
+    assert fields["image[]"].get_payload(decode=True) == reference
+    assert fields["image[]"].get_content_type() == "image/jpeg"
+    assert b"1024x1024" in fields["size"].get_payload(decode=True)
+    assert b"png" in fields["output_format"].get_payload(decode=True)
+    assert "把主角改成红色".encode() in fields["prompt"].get_payload(decode=True)
+    assert send.await_args_list[0].args[0].get(Image)[0].raw == output
 
 
 async def test_deliver_before_disclosing_no_responses_continuation(app: App, mocker, respx_mock: MockRouter):

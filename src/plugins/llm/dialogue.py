@@ -47,8 +47,9 @@ def _image_options() -> tuple[Option, ...]:
     return (
         Option("--image-model", Args["name#生图配置名", str], dest="image_model", help_text="本次使用指定生图模型"),
         Option("--format", Args["type#输出格式", str], help_text="实际输出格式：gif、png、jpeg、webp"),
-        Option("--size", Args["size#输出尺寸", str], help_text="实际像素尺寸，如 1024x1024"),
-        Option("--hd", default=False, action=store_true, help_text=f"高清档：{HD_SIZE}"),
+        Option("--size", Args["size#输出尺寸", str], help_text="实际像素尺寸，如 1024x1024；官方 Images 也支持 auto"),
+        Option("--hd", default=False, action=store_true, help_text=f"高清：静态方图 {HD_SIZE}，官方 GIF 自选尺寸"),
+        Option("--frames", Args["count#GIF帧数", str], help_text="官方 GIF 帧数（2–16）"),
     )
 
 
@@ -58,9 +59,10 @@ class ImageOptions:
     output_format: str = ""
     size: str = ""
     hd: bool = False
+    frames: str = ""
 
     def requirements(self) -> ImageRequirements:
-        return ImageRequirements.from_options(self.output_format, self.size, hd=self.hd)
+        return ImageRequirements.from_options(self.output_format, self.size, hd=self.hd, frames=self.frames)
 
     def selected_name(self, legacy_name: str) -> str:
         if self.name and legacy_name and self.name != legacy_name:
@@ -69,7 +71,7 @@ class ImageOptions:
 
     @property
     def supplied(self) -> bool:
-        return bool(self.name or self.output_format or self.size or self.hd)
+        return bool(self.name or self.output_format or self.size or self.hd or self.frames)
 
 
 chat_command = Alconna(
@@ -408,6 +410,7 @@ async def draw_handle(
     image_format: Query[str] = Query("format.type", ""),
     image_size: Query[str] = Query("size.size", ""),
     image_hd: Query[bool] = Query("hd.value", False),
+    image_frames: Query[str] = Query("frames.count", ""),
 ) -> None:
     await _handle_draw(
         draw_cmd,
@@ -420,7 +423,9 @@ async def draw_handle(
         content,
         use_context=use_context.result,
         legacy_name=model_name.result,
-        image_options=ImageOptions(image_name.result, image_format.result, image_size.result, image_hd.result),
+        image_options=ImageOptions(
+            image_name.result, image_format.result, image_size.result, image_hd.result, image_frames.result
+        ),
     )
 
 
@@ -444,8 +449,11 @@ async def chat_handle(
     image_format: Query[str] = Query("format.type", ""),
     image_size: Query[str] = Query("size.size", ""),
     image_hd: Query[bool] = Query("hd.value", False),
+    image_frames: Query[str] = Query("frames.count", ""),
 ) -> None:
-    image_options = ImageOptions(image_name.result, image_format.result, image_size.result, image_hd.result)
+    image_options = ImageOptions(
+        image_name.result, image_format.result, image_size.result, image_hd.result, image_frames.result
+    )
     if use_draw.result:
         await _handle_draw(
             chat_cmd,
@@ -500,9 +508,12 @@ async def llm_mention_handle(
     image_format: Query[str] = Query("format.type", ""),
     image_size: Query[str] = Query("size.size", ""),
     image_hd: Query[bool] = Query("hd.value", False),
+    image_frames: Query[str] = Query("frames.count", ""),
 ) -> None:
     """把群聊中 @ 机器人的 Alconna 解析结果交给对话流程。"""
-    image_options = ImageOptions(image_name.result, image_format.result, image_size.result, image_hd.result)
+    image_options = ImageOptions(
+        image_name.result, image_format.result, image_size.result, image_hd.result, image_frames.result
+    )
     if use_draw.result:
         await _handle_draw(
             llm_mention,

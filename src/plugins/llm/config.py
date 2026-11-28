@@ -84,7 +84,9 @@ class ModelConfig(BaseModel):
     image_sizes: set[ImageSize] = Field(default_factory=set)
     """该模型的网关接受的可变像素尺寸，例：2048x2048。"""
     image_sizes_by_format: dict[ImageFormat, set[ImageSize]] = Field(default_factory=dict)
-    """按格式覆盖 image_sizes，例如为 GIF 单独声明已验证的帧尺寸。"""
+    """按格式覆盖 image_sizes，作为管理员主动设置的尺寸限制。"""
+    image_gif_size_presets: set[ImageSize] = Field(default_factory=set)
+    """官方 GIF 未指定具体尺寸时优先用的预设，不限制显式尺寸。"""
     quota: QuotaConfig | None = None
     """该模型的额度查询配置，留空时不支持额度查询"""
 

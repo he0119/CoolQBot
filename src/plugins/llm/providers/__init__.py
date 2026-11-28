@@ -5,7 +5,7 @@
 - `openai_chat_completions`：OpenAI Chat Completions，`POST {base_url}/chat/completions`
 - `openai_responses`：OpenAI Responses，`POST {base_url}/responses`，也可用原生工具生图
 - `anthropic_messages`：Anthropic Messages，`POST {base_url}/v1/messages`
-- `openai_images`：OpenAI Image API，`POST {base_url}/images/generations`，只能生图，不能对话
+- `openai_images`：OpenAI Image API，支持图片生成、官方参考图编辑，不支持对话
 """
 
 from __future__ import annotations
@@ -18,6 +18,7 @@ from .anthropic import AnthropicProvider
 from .base import ImageResponseError, Provider, ProviderError, iter_sse
 from .chat import ChatProvider
 from .images import GeneratedImages, ImagesClient
+from .openai_image_limits import uses_official_image_api
 from .responses import ResponsesCompletion, ResponsesProvider
 
 if TYPE_CHECKING:
@@ -93,15 +94,18 @@ async def generate_images(
     if not model.base_url:
         raise ProviderError(f"生图模型 {model.name} 未配置 base_url，且未设置 LLM__BASE_URL")
     if model.provider == ProviderName.OPENAI_IMAGES:
-        if images or history:
-            raise ProviderError("此生图模型只能生成图片，不能使用参考图或续画")
+        if history:
+            raise ProviderError("此生图模型不支持多轮续画，请回复具体图片改图")
+        if images and not uses_official_image_api(model.base_url, model.model):
+            raise ProviderError("此生图模型仅支持生成，不能使用参考图")
         if model.extra_body.get("output_format") != "gif":
             model = model.model_copy(
                 update={
                     "extra_body": {key: value for key, value in model.extra_body.items() if key not in ANIMATION_KEYS}
                 }
             )
-        return await ImagesClient(model, session_affinity=session_affinity).generate(prompt)
+        client = ImagesClient(model, session_affinity=session_affinity)
+        return await client.edit(prompt, images) if images else await client.generate(prompt)
     if model.provider != ProviderName.OPENAI_RESPONSES:
         raise ProviderError(f"模型 {model.name} 使用 {model.provider} 接口，暂不支持生图")
 
