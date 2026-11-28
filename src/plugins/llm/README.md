@@ -177,7 +177,8 @@
 
 ```text
 /draw 画一只猫
-/draw --image-model painter --format webp --size 1536x1024 画一张横幅
+/draw --image-model painter 画一张白底贴纸
+/draw --format webp --size 1536x1024 画一张横幅
 /draw --format gif --frames 12 --size auto 画一个循环挥手的角色
 ```
 
@@ -190,19 +191,20 @@
 `9:16`、`4:3` 等宽高比。只指定比例时按模型默认尺寸的短边换算，默认是 `auto` 或没设置时取 1024 像素。
 
 静态方图的「高清 / HD」目标是 2880×2880。描述同时有「高清」和宽高比时，以 2880 为短边目标。
-OpenAI 官方 GPT-Image 直连接口会把换算结果对齐到 16 像素，并按接口尺寸上限调整高清图。
+OpenAI 官方 GPT-Image-2.6 Sunburst 或 Flare 直连时，插件会把换算结果对齐到 16 像素，并按接口尺寸上限调整高清图。
 例如普通 `16:9` 在短边目标为 1024 时请求 `1824x1024`，高清 `16:9` 请求 `3840x2160`。
 
 明确写出的像素尺寸会原样提交。描述同时指定宽高和比例时，两者须一致。`--format`、`--size`、`--hd` 等
 选项优先于描述里的对应要求。描述中的明确像素尺寸优先于「高清」。引号里的文字和「动态光影」等风格词不作为输出要求。
 要求冲突或没有满足条件的模型时，机器人会在请求图片前提示。返回的图片不符合要求时，机器人会提示原因，且不会自动重画。
 
-官方直连的 GIF 支持用 `--frames` 或描述里的「12 帧 GIF」指定帧数，范围是 2–16 帧。
+用 OpenAI 官方 GPT-Image-2.6 Sunburst 或 Flare 直连生成 GIF 时，可用 `--frames` 或描述里的「12 帧 GIF」指定帧数，范围是 2–16 帧。
 指定帧数时会核验实际返回的帧数。官方高清 GIF 未指定像素尺寸时使用 `size=auto`，由服务决定像素尺寸。
 若指定了宽高比，机器人仍会检查返回图片的比例。动图能否播放取决于聊天平台。
 
-回复或附上静态 PNG、JPEG 或 WebP 后发送 `/draw 把背景改成蓝色`，OpenAI 官方 Images 直连会带上参考图请求改图。
-官方 Images 可逐次回复要改的图片。`/draw -c` 用于同一个 Responses 生图模型的多轮续画。
+使用 OpenAI 官方 GPT-Image-2.6 Sunburst 或 Flare 直连时，可以回复或附上静态 PNG、JPEG 或 WebP，
+再发送 `/draw 把背景改成蓝色` 来用参考图改图。每次改图时回复要改的图片即可。
+`/draw -c` 用于同一个 Responses 生图模型的多轮续画。
 
 管理员配置见下文的[生图模型配置](#生图模型配置)。
 
@@ -409,12 +411,13 @@ LLM__TTS_MODEL=default
 
 使用 `image_output_formats` 和 `image_sizes` 声明服务支持的格式和尺寸，用 `image_sizes_by_format`
 单独限制某个格式。`extra_body.output_format` 和 `extra_body.size` 中的默认值也可作为支持声明。
-直连 `https://api.openai.com/v1` 的 GPT-Image Sunburst 或 Flare 可按[官方像素限制](https://developers.openai.com/api/docs/guides/image-generation#customize-image-output)
+直连 `https://api.openai.com/v1` 的 GPT-Image-2.6 Sunburst 或 Flare 可按[官方像素限制](https://developers.openai.com/api/docs/guides/image-generation#customize-image-output)
 使用 PNG、JPEG 和 WebP，无需逐个列出静态图尺寸。管理员显式配置的格式和尺寸范围仍然有效。
 
 #### 官方 GIF 配置
 
-管理员需确认项目已取得官方 GIF 预览权限，并启用 `gif` 格式。可由服务选择默认尺寸和帧数。
+官方 GPT-Image-2.6 Sunburst 或 Flare 直连时，管理员需确认项目已取得 GIF 预览权限，并启用 `gif` 格式。
+可由服务选择默认尺寸和帧数。
 
 ```json
 {
