@@ -87,18 +87,21 @@ async def _(
     at: At | None = None,
     content: str | None = None,
 ):
+    group_id = user.group_session_id
     if at:
         if content:
             state["content"] = UniMessage(content)
         at_user = await get_user(user.platform, at.target)
-        patient = await hospital_service.get_admitted_patient(at_user.id)
+        patient = await hospital_service.get_admitted_patient(at_user.id, group_id)
         if not patient:
             await rounds_cmd.finish(at + Text(" 未入院"))
 
         matcher.set_path_arg("at_uid", at_user.id)
         matcher.set_path_arg("at_pid", at.target)
+        matcher.set_path_arg("origin_group_id", group_id)
+        matcher.set_path_arg("admission_id", patient.id)
     else:
-        patients = await hospital_service.get_admitted_patients(user.group_session_id)
+        patients = await hospital_service.get_admitted_patients(group_id)
         if not patients:
             await rounds_cmd.finish("当前没有住院病人")
 
@@ -119,12 +122,15 @@ async def _(
 
 
 @rounds_cmd.got("content", prompt=UniMessage.template("{at}请问你现在有什么不适吗？"))
-async def _(at_uid: int, at_pid: str, content: str = ArgPlainText()):
+async def _(at_uid: int, at_pid: str, origin_group_id: str, admission_id: int, content: str = ArgPlainText()):
     at = At("user", at_pid)
     if not content.strip():
         await rounds_cmd.reject(at + Text("症状不能为空，请重新输入"))
 
-    await hospital_service.add_record(at_uid, content)
+    try:
+        await hospital_service.add_record(at_uid, origin_group_id, admission_id, content)
+    except ValueError:
+        await rounds_cmd.finish(at + Text(" 未入院"))
     await rounds_cmd.finish(at + Text("记录成功"))
 
 
