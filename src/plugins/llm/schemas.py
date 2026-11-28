@@ -9,7 +9,10 @@ from __future__ import annotations
 import base64
 import json
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
+
+if TYPE_CHECKING:
+    from .providers.base import ProviderError
 
 Role = Literal["system", "user", "assistant", "tool"]
 
@@ -170,6 +173,20 @@ class Usage:
         return "，".join(parts)
 
 
+@dataclass(frozen=True)
+class ImageResult:
+    model_name: str
+    images: list[ImageContent]
+    usage: Usage | None
+    elapsed_seconds: float
+    details: str = ""
+
+    def summary(self) -> str:
+        usage = self.usage.to_chinese() if self.usage is not None else "服务未返回用量"
+        details = f" · {self.details}" if self.details else ""
+        return f"生图模型：{self.model_name} · {len(self.images)} 张{details} · {self.elapsed_seconds:.1f}s · {usage}"
+
+
 @dataclass
 class Completion:
     """一次模型调用的结果"""
@@ -186,6 +203,8 @@ class Completion:
     """完成本次提问的耗时（秒）"""
     images: list[ImageContent] = field(default_factory=list)
     """模型或工具生成的图片，只发送给用户，不放回对话上下文"""
+    image_result: ImageResult | None = None
+    image_error: ProviderError | None = None
 
     @property
     def content(self) -> str:

@@ -1,14 +1,37 @@
-"""Published pixel limits of GPT-Image-2.6 on the official OpenAI Images API."""
+"""官方 GPT Image 型号的改图、动画与像素限制。"""
 
-MODELS = frozenset({"gpt-image-2.6-sunburst", "gpt-image-2.6-flare"})
+_OFFICIAL_URL = "https://api.openai.com/v1"
+_GIF_MODELS = frozenset({"gpt-image-2.6-sunburst", "gpt-image-2.6-flare"})
+_VARIABLE_SIZE_MODELS = _GIF_MODELS | {
+    "gpt-image-2",
+    "gpt-image-2-2026-04-21",
+    "gpt-image-2.5-sunburst",
+    "gpt-image-2.5-sunburst-2026-09-08",
+    "gpt-image-2.5-flare",
+    "gpt-image-2.5-flare-2026-09-08",
+}
+_EDIT_MODELS = _VARIABLE_SIZE_MODELS | {"gpt-image-1.5", "gpt-image-1-mini"}
 MAX_EDGE = 3840
 MIN_PIXELS = 655_360
 MAX_PIXELS = 8_294_400
 ALIGNMENT = 16
 
 
+def is_official_endpoint(base_url: str) -> bool:
+    return base_url.rstrip("/") == _OFFICIAL_URL
+
+
+def supports_official_image_edits(base_url: str, model_id: str) -> bool:
+    return is_official_endpoint(base_url) and model_id in _EDIT_MODELS
+
+
 def uses_official_image_api(base_url: str, model_id: str) -> bool:
-    return base_url.rstrip("/") == "https://api.openai.com/v1" and model_id in MODELS
+    """该直连接入适用可变像素规则。"""
+    return is_official_endpoint(base_url) and model_id in _VARIABLE_SIZE_MODELS
+
+
+def supports_official_gif(base_url: str, model_id: str) -> bool:
+    return is_official_endpoint(base_url) and model_id in _GIF_MODELS
 
 
 def size_error(width: int, height: int, *, animated: bool = False) -> str:

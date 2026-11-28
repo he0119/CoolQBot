@@ -32,7 +32,7 @@ async def test_image_only_group_can_draw(app: App, mocker, respx_mock: MockRoute
     mocker.patch.object(plugin_config, "models", [painter])
     mocker.patch.object(plugin_config, "base_url", "https://images.example.com/v1")
     mocker.patch.object(plugin_config, "api_key", "image-token")
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     send = mocker.patch.object(UniMessage, "send", autospec=True)
     await set_available_model_names(SESSION, [painter.name])
     route = respx_mock.post("https://images.example.com/v1/images/generations").mock(
@@ -82,7 +82,7 @@ async def test_draw_does_not_infer_output_from_quoted_caption(app: App, mocker, 
         image_output_formats={"png"},
     )
     mocker.patch.object(plugin_config, "models", [model])
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     send = mocker.patch.object(UniMessage, "send", autospec=True)
     await set_available_model_names(SESSION, [model.name])
     png = make_image("PNG")
@@ -146,7 +146,7 @@ async def test_explicit_gif_and_size_choose_capable_gateway(
         extra_body={"output_format": "png", "size": "8x8", "frames": 2, "frame_duration_ms": 100},
     )
     mocker.patch.object(plugin_config, "models", [text, still, animator])
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     send = mocker.patch.object(UniMessage, "send", autospec=True)
     await set_available_model_names(SESSION, ["chat", "still", "animator"])
     await set_image_model_name(SESSION, "still")
@@ -202,7 +202,7 @@ async def test_draw_understands_natural_output_requirements(
         image_sizes={pixels},
     )
     mocker.patch.object(plugin_config, "models", [model])
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     send = mocker.patch.object(UniMessage, "send", autospec=True)
     await set_available_model_names(SESSION, ["painter"])
     image = make_image(image_format.upper(), size=size, frames=2 if image_format == "gif" else 1)
@@ -259,7 +259,7 @@ async def test_draw_preserves_default_short_edge_for_aspect_ratio(
     )
     models = [painter] if selected_name == "painter" else [painter, alternative]
     mocker.patch.object(plugin_config, "models", models)
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     send = mocker.patch.object(UniMessage, "send", autospec=True)
     await set_available_model_names(SESSION, [model.name for model in models])
     await set_image_model_name(SESSION, "painter")
@@ -318,7 +318,10 @@ async def test_draw_rejects_unusable_natural_output_before_network(
         ("--image-model painter --model other", "--image-model 与绘图别名 --model 指定的模型冲突"),
         ("--hd --size 16x12", "--hd 固定为 2880x2880，与 --size 16x12 冲突"),
         ("--image-model painter --format gif", "本群没有满足绘图要求的模型（要求 GIF；painter：未声明支持 gif 格式）"),
-        ("--image-model painter -c", "本群没有满足绘图要求的模型（painter：只支持生成，不支持参考图或多轮续画）"),
+        (
+            "--image-model painter -c",
+            "本群没有满足绘图要求的模型（painter：不支持 -c 多轮续画，请用支持续画的模型，或回复具体图片改图）",
+        ),
     ],
 )
 async def test_reject_unsupported_explicit_request_before_network(
@@ -356,8 +359,9 @@ async def test_bad_output_does_not_retry_and_records_returned_usage(
     error,
 ):
     from src.plugins.llm.config import ModelConfig
-    from src.plugins.llm.image_service import ImageRequirements, ImageTask
-    from src.plugins.llm.providers import ProviderError
+    from src.plugins.llm.image_requirements import ImageRequirements
+    from src.plugins.llm.image_service import format_image_failure, prepare_image
+    from src.plugins.llm.providers import ImageResponseError
 
     model = ModelConfig(
         name="painter",
@@ -368,15 +372,16 @@ async def test_bad_output_does_not_retry_and_records_returned_usage(
     )
     route = respx_mock.post("https://image.example.com/v1/images/generations").mock(return_value=image_response(image))
     log = mocker.patch("src.plugins.llm.image_service.logger.info")
-    task = ImageTask(model, "session", requirements=ImageRequirements.from_options(requested_format, requested_size))
-    with pytest.raises(ProviderError, match=error):
-        await task.run("画猫")
+    task = prepare_image(model, ImageRequirements.from_options(requested_format, requested_size))
+    with pytest.raises(ImageResponseError, match=error) as caught:
+        await task.run("画猫", session_affinity="session")
+    assert "生图用量：输入 7" in format_image_failure(caught.value)
     assert route.call_count == 1
     log.assert_called_once()
     assert "输入 7" in log.call_args.args[1]
 
 
-async def test_draw_context_replays_native_image_at_same_responses_connection(app: App, mocker, respx_mock: MockRouter):
+async def test_draw_context_reuses_connection_and_allows_size_change_and_rollback(app: App, mocker, respx_mock):
     from nonebot_plugin_alconna import UniMessage
 
     from src.plugins.llm.config import ModelConfig, plugin_config
@@ -390,45 +395,88 @@ async def test_draw_context_replays_native_image_at_same_responses_connection(ap
         base_url="https://painter.example.com/v1",
         api_key="painter-token",
         capabilities={"image_generation"},
+        image_sizes={"16x12", "32x24"},
         extra_body={"size": "16x12", "frames": 2, "frame_duration_ms": 100},
     )
     mocker.patch.object(plugin_config, "models", [still, response_model])
     await set_available_model_names(SESSION, ["still", "context-painter"])
     await set_image_model_name(SESSION, "still")
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     mocker.patch.object(UniMessage, "send", autospec=True)
-    native_item = {
+    first_item = {
         "type": "image_generation_call",
         "id": "ig_1",
         "status": "completed",
-        "result": base64.b64encode(PNG).decode(),
+        "result": base64.b64encode(make_image("PNG", size=(16, 12))).decode(),
     }
+    second_item = {**first_item, "id": "ig_2", "result": base64.b64encode(make_image("PNG", size=(32, 24))).decode()}
     route = respx_mock.post("https://painter.example.com/v1/responses").mock(
-        return_value=httpx.Response(200, json={"status": "completed", "output": [native_item]})
+        side_effect=[
+            httpx.Response(200, json={"status": "completed", "output": [item]})
+            for item in (first_item, second_item, {**first_item, "id": "ig_3"})
+        ],
     )
     async with app.test_matcher() as ctx:
         bot = ctx.create_bot(base=Bot, adapter=get_adapter(Adapter))
-        event = fake_group_message_event_v11(message=Message("/draw -c 画猫"), user_id=10)
-        reply = (UniMessage.text("改成蓝色"), "43", event, bot, {})
-        end = (UniMessage.text("结束"), "44", event, bot, {})
-        mocker.patch("nonebot_plugin_waiter.prompt", side_effect=[reply, end])
+        event = fake_group_message_event_v11(message=Message("/draw -c --size 16x12 画猫"), user_id=10)
+        mocker.patch(
+            "nonebot_plugin_waiter.prompt",
+            side_effect=[
+                (UniMessage.text(text), str(message_id), event, bot, {})
+                for message_id, text in enumerate(("尺寸改成 32x24", "回滚", "改成蓝色", "结束"), start=43)
+            ],
+        )
         ctx.receive_event(bot, event)
         ctx.should_call_send(event, "已结束绘图", True)
 
-    assert route.call_count == 2
-    first, second = [json.loads(call.request.content) for call in route.calls]
-    assert first["model"] == second["model"] == "gpt-picture"
-    for call in route.calls:
-        assert call.request.headers["Authorization"] == "Bearer painter-token"
-    assert route.calls[0].request.headers["X-Session-Affinity"] == route.calls[1].request.headers["X-Session-Affinity"]
-    assert first["tools"] == [{"type": "image_generation", "size": "16x12"}]
+    assert route.call_count == 3
+    first, second, third = [json.loads(call.request.content) for call in route.calls]
+    assert first["model"] == second["model"] == third["model"] == "gpt-picture"
+    assert all(call.request.headers["Authorization"] == "Bearer painter-token" for call in route.calls)
+    assert len({call.request.headers["X-Session-Affinity"] for call in route.calls}) == 1
+    assert first["tools"] == third["tools"] == [{"type": "image_generation", "size": "16x12"}]
+    assert second["tools"] == [{"type": "image_generation", "size": "32x24"}]
     assert "frames" not in first
     assert "frame_duration_ms" not in first
-    assert second["input"][1] == native_item
-    assert second["input"][2]["content"] == [{"type": "input_text", "text": "改成蓝色"}]
+    assert second["input"][1] == third["input"][1] == first_item
+    assert len(third["input"]) == 3
+    assert third["input"][2]["content"] == [{"type": "input_text", "text": "改成蓝色"}]
 
 
-async def test_chat_image_limit_and_failed_summary_still_deliver_image(app: App, mocker, respx_mock: MockRouter):
+async def test_chat_can_read_attachment_with_generate_only_image_model(app: App, mocker, respx_mock):
+    from nonebot.adapters.onebot.v11 import MessageSegment
+    from nonebot_plugin_alconna import UniMessage
+
+    from src.plugins.llm.config import ModelConfig, plugin_config
+    from src.plugins.llm.data_source import set_available_model_names
+
+    text = ModelConfig(name="vision-chat", base_url="https://chat.example.com/v1", capabilities={"text", "vision"})
+    image = ModelConfig(name="painter", provider="openai_images", base_url="https://gateway.example.com/v1")
+    mocker.patch.object(plugin_config, "models", [text, image])
+    await set_available_model_names(SESSION, [text.name, image.name])
+    get_images = mocker.patch("src.plugins.llm.content.image_fetch", return_value=PNG)
+    select_image = mocker.patch("src.plugins.llm.image_service.get_image_model_candidates")
+    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    send = mocker.patch.object(UniMessage, "send", autospec=True)
+    chat = respx_mock.post("https://chat.example.com/v1/chat/completions").mock(
+        return_value=httpx.Response(
+            200, json={"model": "vision-chat", "choices": [{"message": {"content": "这是一只猫"}}]}
+        ),
+    )
+    async with app.test_matcher() as ctx:
+        bot = ctx.create_bot(base=Bot, adapter=get_adapter(Adapter))
+        message = Message("/chat -i 这张图是什么？") + MessageSegment.image("https://files.example.com/cat.png")
+        ctx.receive_event(bot, fake_group_message_event_v11(message=message, user_id=10))
+
+    get_images.assert_awaited_once()
+    select_image.assert_not_awaited()
+    assert chat.call_count == 1
+    assert "这是一只猫" in send.await_args.args[0].extract_plain_text()
+    content = json.loads(chat.calls.last.request.content)["messages"][-1]["content"]
+    assert any(item["type"] == "image_url" for item in content)
+
+
+async def test_chat_image_limit_and_failed_summary_preserve_image_and_history(app: App, mocker, respx_mock: MockRouter):
     from nonebot_plugin_alconna import Image, UniMessage
 
     from src.plugins.llm.config import ModelConfig, plugin_config
@@ -461,23 +509,28 @@ async def test_chat_image_limit_and_failed_summary_still_deliver_image(app: App,
                 },
             ),
             httpx.Response(500, json={"error": {"message": "summary unavailable"}}),
+            httpx.Response(200, json={"model": "chat", "choices": [{"message": {"content": "刚才生成了一张猫图。"}}]}),
         ]
     )
     painter = respx_mock.post("https://image.example.com/v1/images/generations").mock(return_value=image_response(PNG))
 
     async with app.test_matcher() as ctx:
         bot = ctx.create_bot(base=Bot, adapter=get_adapter(Adapter))
-        ctx.receive_event(
-            bot, fake_group_message_event_v11(message=Message("/chat -i --image-model painter 画猫"), user_id=10)
+        event = fake_group_message_event_v11(message=Message("/chat -i -c --image-model painter 画猫"), user_id=10)
+        mocker.patch(
+            "nonebot_plugin_waiter.prompt",
+            side_effect=[
+                (UniMessage.text("刚才画了什么？"), "43", event, bot, {}),
+                (UniMessage.text("结束"), "44", event, bot, {}),
+            ],
         )
+        ctx.receive_event(bot, event)
 
     assert painter.call_count == 1
     assert painter.calls.last.request.headers["Authorization"] == "Bearer image-token"
-    assert chat.call_count == 2
+    assert chat.call_count == 3
     assert chat.calls.last.request.headers["Authorization"] == "Bearer chat-token"
-    tool_outputs = [
-        m["content"] for m in json.loads(chat.calls.last.request.content)["messages"] if m["role"] == "tool"
-    ]
+    tool_outputs = [m["content"] for m in json.loads(chat.calls[1].request.content)["messages"] if m["role"] == "tool"]
     assert len(tool_outputs) == 2
     assert "本轮绘图次数已用完" in tool_outputs[1]
     assert send.await_args_list[0].args[0].get(Image)[0].raw == PNG
@@ -487,6 +540,9 @@ async def test_chat_image_limit_and_failed_summary_still_deliver_image(app: App,
     assert "文字回复失败" in summary
     assert "输入 2" in summary
     assert "输入 9" not in summary
+    follow_up = json.loads(chat.calls[2].request.content)["messages"]
+    assert follow_up[-2]["role"] == "assistant"
+    assert "使用生图模型 painter 生成了 1 张图片" in follow_up[-2]["content"]
 
 
 @pytest.mark.parametrize("command", ["/draw --hd --format png 画猫", "/draw 给你自己画一张高清魔理沙简笔头像"])
@@ -504,7 +560,7 @@ async def test_hd_requests_and_verifies_fixed_pixels(app: App, mocker, respx_moc
         extra_body={"output_format": "png", "quality": "high"},
     )
     mocker.patch.object(plugin_config, "models", [model])
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     send = mocker.patch.object(UniMessage, "send", autospec=True)
     await set_available_model_names(SESSION, ["painter"])
     png = make_image("PNG", size=(2880, 2880))
@@ -584,7 +640,7 @@ async def test_official_image_dimensions_send_the_calibrated_request(
         image_sizes_by_format=sizes_by_format,
     )
     mocker.patch.object(plugin_config, "models", [model])
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     send = mocker.patch.object(UniMessage, "send", autospec=True)
     await set_available_model_names(SESSION, [model.name])
     image = make_image(output_format.upper(), size=size, frames=2 if output_format == "gif" else 1)
@@ -644,7 +700,7 @@ async def test_official_gif_presets_do_not_limit_explicit_sizes(
         extra_body={"size": "auto", "frame_count": 2, "frame_duration_ms": 500},
     )
     mocker.patch.object(plugin_config, "models", [model])
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     await set_available_model_names(SESSION, [model.name])
     gif = make_image("GIF", size=returned, frames=2) if returned else None
     if gif:
@@ -676,6 +732,15 @@ async def test_official_gif_presets_do_not_limit_explicit_sizes(
         ("/draw --frames 16 --size 320x320 画动图", "320x320", 16, (320, 320), 16, ""),
         ("/draw 画一张16:9的高清动图", "auto", None, (960, 960), 9, "第 1 张图片要求宽高比 16:9，服务返回 960x960"),
         ("/draw --frames 12 --size auto 画动图", "auto", 12, (512, 512), 9, "第 1 张图片要求 12 帧 GIF，服务返回 9 帧"),
+        (
+            "/draw --format gif --hd --size auto 画一张 16:9 的动图",
+            "auto",
+            None,
+            (960, 960),
+            9,
+            "第 1 张图片要求宽高比 16:9，服务返回 960x960",
+        ),
+        ("/draw --hd --size 960x960 画一张 12 帧的 GIF 动图", "960x960", 12, (960, 960), 12, ""),
         ("/draw 画一张17帧的GIF", None, None, None, 0, "官方 GIF 帧数必须是 2 至 16 之间的整数"),
         ("/draw --frames 1 画动图", None, None, None, 0, "官方 GIF 帧数必须是 2 至 16 之间的整数"),
         ("/draw --frames 8 --format png 画头像", None, None, None, 0, "--frames 仅适用于 GIF"),
@@ -707,7 +772,7 @@ async def test_official_gif_hd_and_frame_count_are_independent(
         extra_body={"size": "auto", "output_format": "png"},
     )
     mocker.patch.object(plugin_config, "models", [model])
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     await set_available_model_names(SESSION, [model.name])
     route = None
     if response_size:
@@ -721,7 +786,8 @@ async def test_official_gif_hd_and_frame_count_are_independent(
         event = fake_group_message_event_v11(message=Message(command), user_id=10)
         ctx.receive_event(bot, event)
         if error:
-            ctx.should_call_send(event, ("绘图失败：" if route else "") + error, True, at_sender=True)
+            text = f"绘图失败：{error}\n生图用量：输入 7，输出 0" if route else error
+            ctx.should_call_send(event, text, True, at_sender=True)
     if route is None:
         assert not respx_mock.calls
         return
@@ -804,7 +870,7 @@ async def test_official_draw_edits_a_replied_image(app: App, mocker, respx_mock:
         extra_body={"quality": "low", "n": 1},
     )
     mocker.patch.object(plugin_config, "models", [model])
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     send = mocker.patch.object(UniMessage, "send", autospec=True)
     reference = make_image("JPEG")
     output = make_image("PNG", size=(1024, 1024))
@@ -866,7 +932,7 @@ async def test_deliver_before_disclosing_no_responses_continuation(app: App, moc
         capabilities={"image_generation"},
     )
     mocker.patch.object(plugin_config, "models", [model])
-    mocker.patch("src.plugins.llm.dialogue.send_reaction")
+    mocker.patch("src.plugins.llm.draw.send_reaction")
     send = mocker.patch.object(UniMessage, "send", autospec=True)
     wait = mocker.patch("nonebot_plugin_waiter.prompt")
     await set_available_model_names(SESSION, ["painter"])

@@ -19,11 +19,10 @@ from uuid import uuid4
 from nonebot.log import logger
 
 from .config import ModelCapability, plugin_config
-from .image_service import ImageChatCompletion, ImageRequirements, ImageTask
-from .providers import ProviderError, ProviderName, get_provider
+from .providers import ProviderError, get_provider, prepare_chat_model
 from .schemas import Completion, ImageContent, Message, Usage
 from .tools import ToolContext, ToolResult, registry
-from .tools.image import IMAGE_TOOL_NAME, ImageToolContext, ImageToolTurn
+from .tools.image import IMAGE_TOOL_NAME, ImageToolContext, ImageToolOptions, ImageToolTurn
 
 if TYPE_CHECKING:
     from .config import ModelConfig
@@ -88,10 +87,6 @@ def _select_tool_names(*, enable_tools: bool, allow_image: bool) -> frozenset[st
     return frozenset(names)
 
 
-def _is_native_image_tool(tool: object) -> bool:
-    return isinstance(tool, dict) and tool.get("type") == "image_generation"
-
-
 async def chat(
     model: ModelConfig,
     messages: list[Message],
@@ -107,20 +102,7 @@ async def chat(
     """
     if not model.base_url:
         raise ValueError(f"模型 {model.name} 未配置 base_url，且未设置 LLM__BASE_URL")
-    # 原生绘图只能从图片任务发起，避免绕过显式授权、选定连接和图片请求预算。
-    if model.provider == ProviderName.OPENAI_RESPONSES:
-        native_tools = model.extra_body.get("tools")
-        configured_choice = model.extra_body.get("tool_choice")
-        is_image_tool = _is_native_image_tool
-        if (isinstance(native_tools, list) and any(map(is_image_tool, native_tools))) or is_image_tool(
-            configured_choice
-        ):
-            model = model.model_copy(deep=True)
-            if isinstance(native_tools, list):
-                model.extra_body["tools"] = [tool for tool in native_tools if not is_image_tool(tool)]
-            if is_image_tool(configured_choice):
-                model.extra_body.pop("tool_choice", None)
-    provider = get_provider(model.provider)(model, session_affinity=session_affinity)
+    provider = get_provider(model.provider)(prepare_chat_model(model), session_affinity=session_affinity)
     tools = registry.to_params(tool_names) if tool_names else None
     return await provider.chat(messages, tools, tool_choice=tool_choice)
 
@@ -205,22 +187,17 @@ class LLMHandler:
         session_affinity: str | None = None,
         system_prompt: str | None = None,
         enable_tools: bool = True,
-        allow_image: bool = False,
-        image_model: ModelConfig | None = None,
-        image_requirements: ImageRequirements = ImageRequirements(),
+        image_tool: ImageToolOptions | None = None,
         session_id: str = "",
     ) -> None:
-        if allow_image and image_model is None:
-            raise ValueError("本群未设置生图模型，请先启用并设置生图模型")
         self.model = plugin_config.resolve(model_name)
-        self.image_model = image_model
-        self.image_requirements = image_requirements
+        self.image_tool = image_tool
         self.max_requests = plugin_config.max_requests
         self.notice_delay = plugin_config.request_notice_delay
         self.notice_interval = plugin_config.request_notice_interval
         self.session_affinity = session_affinity or uuid4().hex
         self.session_id = session_id
-        self.tool_names = _select_tool_names(enable_tools=enable_tools, allow_image=allow_image)
+        self.tool_names = _select_tool_names(enable_tools=enable_tools, allow_image=image_tool is not None)
 
         self.context: list[Message] = []
         prompt = self.model.prompt if system_prompt is None else system_prompt
@@ -270,16 +247,12 @@ class LLMHandler:
             "、".join(sorted(self.tool_names)) or "无",
         )
         turn = _TurnState()
-        image_turn = (
-            ImageToolTurn(
-                ImageTask(self.image_model, self.session_affinity, requirements=self.image_requirements), images
-            )
-            if self.image_model is not None and IMAGE_TOOL_NAME in self.tool_names
-            else None
-        )
-        tool_context = ImageToolContext(
-            session_id=self.session_id, image_model=self.image_model if image_turn else None, image_turn=image_turn
-        )
+        image_turn = None
+        tool_context = ToolContext(session_id=self.session_id)
+        if self.image_tool is not None and IMAGE_TOOL_NAME in self.tool_names:
+            image_turn = ImageToolTurn(self.session_id, self.session_affinity, self.image_tool, images)
+            tool_context = ImageToolContext(session_id=self.session_id, image_turn=image_turn)
+        history_reply: Message | None = None
         notice_task = (
             asyncio.create_task(self._send_request_wait_notices(on_request_wait, turn))
             if on_request_wait and self.tool_names
@@ -292,10 +265,13 @@ class LLMHandler:
                 raise
             logger.opt(exception=e).warning("LLM 绘图请求后文字收尾失败（会话={}）", self.log_id)
             del self.context[context_start + 1 :]
-            if image_turn.result is not None:
-                for image in image_turn.result.images:
+            if result := image_turn.result:
+                for image in result.images:
                     if image not in turn.images:
                         turn.images.append(image)
+                history_reply = Message.assistant(
+                    f"使用生图模型 {result.model_name} 生成了 {len(result.images)} 张图片。文字回复失败。"
+                )
             completion = Completion(Message.assistant("文字回复失败。"))
         finally:
             if notice_task:
@@ -310,18 +286,10 @@ class LLMHandler:
         completion.images = turn.images
         completion.model = turn.model or self.model.model
         completion.elapsed_seconds = perf_counter() - started_at
-        self.context.append(completion.message)
-        if image_turn is not None and (image_turn.result is not None or image_turn.error):
-            completion = ImageChatCompletion(
-                message=completion.message,
-                usage=completion.usage,
-                model=completion.model,
-                finish_reason=completion.finish_reason,
-                elapsed_seconds=completion.elapsed_seconds,
-                images=completion.images,
-                image_result=image_turn.result,
-                image_error=image_turn.error,
-            )
+        self.context.append(history_reply or completion.message)
+        if image_turn is not None:
+            completion.image_result = image_turn.result
+            completion.image_error = image_turn.error
         logger.info(
             "LLM 会话请求完成（会话={}，模型={}，结束原因={}，模型请求={}，工具调用={}，I={}，O={}，C={}，耗时={:.3f}s）",
             self.log_id,

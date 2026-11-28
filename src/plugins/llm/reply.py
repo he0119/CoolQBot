@@ -13,12 +13,11 @@ from typing import TYPE_CHECKING, Literal
 from nonebot.log import logger
 from nonebot_plugin_alconna import SupportAdapter, UniMessage, get_target, message_reaction
 
-from .image_service import ImageChatCompletion
+from .image_service import format_image_failure
 from .tts import TTSError, text_to_speech
 
 if TYPE_CHECKING:
-    from .image_service import ImageResult
-    from .schemas import Completion, ImageContent
+    from .schemas import Completion, ImageContent, ImageResult
 
 THINK_PATTERN = re.compile(r"<think>(.*?)</think>", re.DOTALL)
 """部分服务商把推理内容混在正文的 think 标签里"""
@@ -138,11 +137,10 @@ class ReplySender:
     async def send(self, completion: Completion, *, reply_to: str | bool = False) -> None:
         """按配置发送模型回复"""
         await _send_images(completion.images, reply_to=reply_to)
-        if isinstance(completion, ImageChatCompletion):
-            if completion.image_result is not None:
-                await UniMessage.text(completion.image_result.summary()).send(reply_to=reply_to)
-            elif completion.image_error:
-                await UniMessage.text(f"绘图失败：{completion.image_error}").send(reply_to=reply_to)
+        if completion.image_result is not None:
+            await UniMessage.text(completion.image_result.summary()).send(reply_to=reply_to)
+        elif completion.image_error is not None:
+            await UniMessage.text(format_image_failure(completion.image_error)).send(reply_to=reply_to)
         text = format_output(completion, with_thinking=self.show_thinking)
         if not text:
             if completion.images:

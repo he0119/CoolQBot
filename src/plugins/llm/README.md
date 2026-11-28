@@ -173,7 +173,8 @@
 ### 绘图与改图
 
 本群启用至少一个生图模型后，即可用 `/draw` 或 `/chat -d` 画图，无需启用聊天模型。
-`/chat -i` 允许聊天模型按需调用生图，单轮最多一次。生图会产生额外费用，`/chat -a` 只有同时使用 `-i` 才开放生图。
+`/chat -i` 允许聊天模型按需调用生图，单轮最多一次。它只在实际画图时选择生图模型。附图也可以直接用于看图问答。
+生图会产生额外费用，`/chat -a` 只有同时使用 `-i` 才开放生图。
 
 ```text
 /draw 画一只猫
@@ -191,7 +192,7 @@
 `9:16`、`4:3` 等宽高比。只指定比例时按模型默认尺寸的短边换算，默认是 `auto` 或没设置时取 1024 像素。
 
 静态方图的「高清 / HD」目标是 2880×2880。描述同时有「高清」和宽高比时，以 2880 为短边目标。
-OpenAI 官方 GPT-Image-2.6 Sunburst 或 Flare 直连时，插件会把换算结果对齐到 16 像素，并按接口尺寸上限调整高清图。
+OpenAI 官方 GPT-Image 2.5 和 2.6 的 Sunburst 或 Flare 直连时，插件会把换算结果对齐到 16 像素，并按接口尺寸上限调整高清图。
 例如普通 `16:9` 在短边目标为 1024 时请求 `1824x1024`，高清 `16:9` 请求 `3840x2160`。
 
 明确写出的像素尺寸会原样提交。描述同时指定宽高和比例时，两者须一致。`--format`、`--size`、`--hd` 等
@@ -202,9 +203,9 @@ OpenAI 官方 GPT-Image-2.6 Sunburst 或 Flare 直连时，插件会把换算结
 指定帧数时会核验实际返回的帧数。官方高清 GIF 未指定像素尺寸时使用 `size=auto`，由服务决定像素尺寸。
 若指定了宽高比，机器人仍会检查返回图片的比例。动图能否播放取决于聊天平台。
 
-使用 OpenAI 官方 GPT-Image-2.6 Sunburst 或 Flare 直连时，可以回复或附上静态 PNG、JPEG 或 WebP，
+使用 OpenAI 官方 GPT-Image 2.5 和 2.6 的 Sunburst 或 Flare 直连时，可以回复或附上静态 PNG、JPEG 或 WebP，
 再发送 `/draw 把背景改成蓝色` 来用参考图改图。每次改图时回复要改的图片即可。
-`/draw -c` 用于同一个 Responses 生图模型的多轮续画。
+`/draw -c` 用于同一个 Responses 生图模型的多轮续画。每轮可用文字调整尺寸、比例等要求。回滚会一并恢复上一轮的图片记录和规格。
 
 管理员配置见下文的[生图模型配置](#生图模型配置)。
 
@@ -411,7 +412,7 @@ LLM__TTS_MODEL=default
 
 使用 `image_output_formats` 和 `image_sizes` 声明服务支持的格式和尺寸，用 `image_sizes_by_format`
 单独限制某个格式。`extra_body.output_format` 和 `extra_body.size` 中的默认值也可作为支持声明。
-直连 `https://api.openai.com/v1` 的 GPT-Image-2.6 Sunburst 或 Flare 可按[官方像素限制](https://developers.openai.com/api/docs/guides/image-generation#customize-image-output)
+直连 `https://api.openai.com/v1` 的 GPT-Image 2.5 和 2.6 的 Sunburst 或 Flare 可按[官方像素限制](https://developers.openai.com/api/docs/guides/image-generation#customize-image-output)
 使用 PNG、JPEG 和 WebP，无需逐个列出静态图尺寸。管理员显式配置的格式和尺寸范围仍然有效。
 
 #### 官方 GIF 配置
@@ -434,8 +435,9 @@ LLM__TTS_MODEL=default
 
 #### Responses 图片工具
 
-Responses 生图保留图片工具已配置的标准参数 `size`、`quality`、`background`、`output_format`、
-`output_compression`、`moderation` 和 `action`。GIF 动画参数不发送到标准 Responses。
+Responses 生图会保留 `extra_body.tools` 里图片工具的 `model`、`size`、`quality` 等参数。
+请求顶层的布尔值 `background` 控制是否后台运行，图片工具中的 `background` 用来指定图片背景。
+GIF 动画参数不发送到标准 Responses。
 普通聊天请求会移除原生图片生成工具。启用 `/chat -i` 时，聊天通过所选生图模型自身的连接请求图片。
 
 PNG、JPEG、WebP 和 GIF 会作为原图发送，只有图片时也会附带统计。流式请求等待最终图片，不发送中间预览。
