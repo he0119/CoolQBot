@@ -25,11 +25,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  # Collect the website and upload it as the Pages artifact. This job is kept separate from
+  # the deployment so the artifact lookup in the deploy job runs a few seconds later:
+  # deploy-pages resolves the artifact name through the Actions results service, which can
+  # lag behind the upload and is then only retried by a whole new run (actions/deploy-pages#451).
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -44,6 +44,27 @@ jobs:
           # Keep the website and its public JSON data under one Pages origin.
           path: "public/"
 
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url || steps.retry.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
+        uses: actions/deploy-pages@v5
+        # The artifact can still be missing from the listing right after upload; retry below
+        # instead of failing the run. Retrying deploy-pages does not upload a second artifact.
+        continue-on-error: true
+
+      - name: Wait for the artifact listing to catch up
+        if: steps.deployment.outcome == 'failure'
+        run: |
+          echo "Pages artifact not listed yet; retrying the deployment after a delay."
+          sleep 60
+
+      - name: Retry deploying to GitHub Pages
+        id: retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v5
