@@ -5,23 +5,26 @@
 - `openai_chat_completions`：OpenAI Chat Completions，`POST {base_url}/chat/completions`
 - `openai_responses`：OpenAI Responses，`POST {base_url}/responses`，也可用原生工具生图
 - `anthropic_messages`：Anthropic Messages，`POST {base_url}/v1/messages`
-- `openai_images`：OpenAI Image API，`POST {base_url}/images/generations`，只能生图，不能对话
+- `openai_images`：OpenAI Image API，支持图片生成、官方参考图编辑，不支持对话
 """
 
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from ..schemas import Message
 from .anthropic import AnthropicProvider
-from .base import Provider, ProviderError, iter_sse
+from .base import ImageResponseError, Provider, ProviderError, iter_sse
 from .chat import ChatProvider
-from .images import GeneratedImages, ImagesClient
-from .responses import ResponsesProvider
+from .image_options import GeneratedImages, ImageCapabilities, ImageRequestOptions
+from .images import ImagesClient
+from .responses import ResponsesProvider, prepare_responses_chat_model
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ..config import ModelConfig
+    from ..schemas import ImageContent, Message
 
 
 class ProviderName(StrEnum):
@@ -61,27 +64,67 @@ def get_provider(name: ProviderName | str) -> type[Provider]:
     return PROVIDERS[provider_name]
 
 
-async def generate_images(model: ModelConfig, prompt: str, *, session_affinity: str = "") -> GeneratedImages:
-    """用生图模型按提示词生成图片
+IMAGE_PROVIDERS: dict[ProviderName, type[ImagesClient | ResponsesProvider]] = {
+    ProviderName.OPENAI_IMAGES: ImagesClient,
+    ProviderName.OPENAI_RESPONSES: ResponsesProvider,
+}
+_NO_IMAGE_CAPABILITIES = ImageCapabilities(
+    references=False,
+    continuation=False,
+    gif=False,
+    explicit_frames=False,
+    auto_size=False,
+    official_geometry=False,
+    defaults=ImageRequestOptions(),
+)
 
-    - `openai_images`：调用 Image API
-    - `openai_responses`：强制调用 Responses 原生 image_generation 工具，适合既能对话又能生图的模型
-    """
-    if model.provider == ProviderName.OPENAI_IMAGES:
-        return await ImagesClient(model, session_affinity=session_affinity).generate(prompt)
-    if model.provider != ProviderName.OPENAI_RESPONSES:
-        raise ProviderError(f"模型 {model.name} 使用 {model.provider} 接口，暂不支持生图")
 
-    model = model.model_copy(deep=True)
-    native_tools: Any = model.extra_body.get("tools") or []
-    if not isinstance(native_tools, list):
-        raise ProviderError(f"模型 {model.name} 的 extra_body.tools 必须为工具数组")
-    model.extra_body["tools"] = [*native_tools, {"type": "image_generation"}]
-    model.extra_body["tool_choice"] = {"type": "image_generation"}
-    completion = await ResponsesProvider(model, session_affinity=session_affinity).chat([Message.user(prompt)])
-    if not completion.images:
-        raise ProviderError(f"模型 {model.name} 没有生成图片")
-    return GeneratedImages(images=completion.images, usage=completion.usage)
+def _image_model_error(model: ModelConfig) -> str:
+    if model.provider not in IMAGE_PROVIDERS:
+        return f"使用 {model.provider} 接口，暂不支持生图"
+    if "image_generation" not in model.capabilities:
+        return "未声明 image_generation 能力，不能生成图片"
+    if not model.base_url:
+        return "未配置 base_url，且未设置 LLM__BASE_URL"
+    return ""
+
+
+def get_image_capabilities(model: ModelConfig) -> ImageCapabilities:
+    """查询所选模型的绘图能力和默认参数。"""
+    provider = IMAGE_PROVIDERS.get(model.provider)
+    if provider is None or "image_generation" not in model.capabilities:
+        return _NO_IMAGE_CAPABILITIES
+    return provider(model).image_capabilities()
+
+
+def image_options_error(model: ModelConfig, options: ImageRequestOptions) -> str:
+    """检查本轮覆盖与模型默认值合并后的参数，返回可读的错误原因。"""
+    if error := _image_model_error(model):
+        return error
+    return IMAGE_PROVIDERS[model.provider](model).image_options_error(options)
+
+
+def prepare_chat_model(model: ModelConfig) -> ModelConfig:
+    """为普通聊天清理 Responses 的原生绘图设置。"""
+    if model.provider == ProviderName.OPENAI_RESPONSES:
+        return prepare_responses_chat_model(model)
+    return model
+
+
+async def generate_images(
+    model: ModelConfig,
+    prompt: str,
+    *,
+    options: ImageRequestOptions = ImageRequestOptions(),
+    session_affinity: str = "",
+    images: list[ImageContent] | None = None,
+    history: Sequence[Message] = (),
+) -> GeneratedImages:
+    """使用所选模型的绘图接口完成一次生成或编辑。"""
+    if error := _image_model_error(model):
+        raise ProviderError(f"生图模型 {model.name} {error}")
+    provider = IMAGE_PROVIDERS[model.provider](model, session_affinity=session_affinity)
+    return await provider.generate_images(prompt, options=options, images=images, history=history)
 
 
 __all__ = [
@@ -90,12 +133,18 @@ __all__ = [
     "AnthropicProvider",
     "ChatProvider",
     "GeneratedImages",
+    "ImageCapabilities",
+    "ImageRequestOptions",
+    "ImageResponseError",
     "ImagesClient",
     "Provider",
     "ProviderError",
     "ProviderName",
     "ResponsesProvider",
     "generate_images",
+    "get_image_capabilities",
     "get_provider",
+    "image_options_error",
     "iter_sse",
+    "prepare_chat_model",
 ]

@@ -5,10 +5,15 @@
 
 from nonebot.adapters import Bot, Event
 from nonebot.typing import T_State
-from nonebot_plugin_alconna import Image, Match, MsgId, UniMessage, image_fetch
+from nonebot_plugin_alconna import Image, Match, MsgId, UniMessage, get_message_id, image_fetch
 from nonebot_plugin_alconna.builtins.extensions.reply import ReplyRecordExtension
 
 from .schemas import ImageContent
+
+
+def extract_follow_up(event: Event, bot: Bot, state: T_State) -> tuple[UniMessage, str, Event, Bot, T_State]:
+    """提取续聊消息及下载其中媒体所需的事件上下文。"""
+    return UniMessage.of(event.get_message(), bot=bot), get_message_id(event), event, bot, state
 
 
 async def extract_dialogue_content(

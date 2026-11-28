@@ -1,43 +1,84 @@
-"""图片生成工具
-
-模型通过函数调用触发，插件再用本群配置的生图模型生成图片，
-生成的图片直接发送给用户，只把一句结果文本交回模型继续作答。
-"""
+"""聊天模型按需调用绘图时的一轮状态。"""
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
 from nonebot.log import logger
 
-from ..config import ModelCapability
-from ..providers import ProviderError, generate_images
+from ..image_requirements import ImageRequirements
+from ..image_service import select_image_task
+from ..providers import ProviderError
 from . import ToolContext, ToolResult, registry
 
+if TYPE_CHECKING:
+    from ..schemas import ImageContent, ImageResult
+
 IMAGE_TOOL_NAME = "generate_image"
-"""生图工具名；生图会产生费用，只在用户显式要求时下发"""
+
+
+@dataclass(frozen=True)
+class ImageToolOptions:
+    model_name: str = ""
+    requirements: ImageRequirements = field(default_factory=ImageRequirements)
+
+
+@dataclass
+class ImageToolTurn:
+    session_id: str
+    session_affinity: str
+    options: ImageToolOptions
+    attachments: list[ImageContent] | None = None
+    attempted: bool = False
+    result: ImageResult | None = None
+    error: ProviderError | None = None
+
+    async def run(self, prompt: str, *, use_reference: bool) -> ImageResult:
+        if self.attempted:
+            raise ProviderError("本轮绘图次数已用完，不会再次生成")
+        # 在等待群配置或外部接口前占用本轮次数，防止并行重复出图。
+        self.attempted = True
+        try:
+            references = self.attachments if use_reference else None
+            if use_reference and not references:
+                raise ProviderError("本轮没有可用于改图的参考图")
+            requirements = self.options.requirements.with_prompt(prompt)
+            task = await select_image_task(
+                self.session_id, requirements, selected_name=self.options.model_name, references=bool(references)
+            )
+            self.result, _ = await task.run(prompt, session_affinity=self.session_affinity, images=references)
+        except ProviderError as error:
+            self.error = error
+            raise
+        return self.result
+
+
+@dataclass(frozen=True, kw_only=True)
+class ImageToolContext(ToolContext):
+    image_turn: ImageToolTurn
 
 
 @registry.register(
     IMAGE_TOOL_NAME,
-    "根据文字描述生成图片。用户要求画图、生成图片或修改图片时调用；生成结果会直接发送给用户。",
+    "按文字描述生成图片，或按用户要求编辑附件。每轮最多调用一次，成功图片会随回复发送给用户。",
     needs_context=True,
 )
-async def generate_image(prompt: str, *, context: ToolContext) -> ToolResult:
-    """生成图片
+async def generate_image(prompt: str, use_reference: bool = False, *, context: ToolContext) -> ToolResult:
+    """生成或编辑图片。
 
     Args:
         prompt: 图片描述，尽量写清主体、风格和构图
+        use_reference: 仅在用户要求以本轮附件为参考或编辑附件时设为 true
     """
-    model = context.image_model
-    if model is None:
-        return ToolResult(text="错误：本群未启用生图模型，请联系管理员配置")
-    if ModelCapability.IMAGE_GENERATION not in model.capabilities:
-        return ToolResult(text=f"错误：模型 {model.name} 未声明 image_generation 能力，不能生成图片")
+    if not isinstance(context, ImageToolContext):
+        return ToolResult(text="错误：本轮未启用生图工具")
     try:
-        generated = await generate_images(model, prompt, session_affinity=context.session_id)
-    except ProviderError as e:
-        logger.warning("LLM 图片生成失败（模型={}，错误={}）", model.name, e)
-        return ToolResult(text=f"错误：生成图片失败：{e}")
+        result = await context.image_turn.run(prompt, use_reference=use_reference)
+    except ProviderError as error:
+        logger.warning("LLM 图片生成失败（错误={}）", error)
+        return ToolResult(text=f"错误：生成图片失败：{error}")
     return ToolResult(
-        text=f"已生成 {len(generated.images)} 张图片，图片已直接发送给用户。",
-        images=generated.images,
+        text=f"使用生图模型 {result.model_name} 生成了 {len(result.images)} 张图片，将随回复发送给用户。",
+        images=result.images,
     )

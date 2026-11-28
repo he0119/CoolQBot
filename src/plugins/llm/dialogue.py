@@ -1,9 +1,10 @@
 """对话命令
 
-/chat（含 /agent、/draw 快捷命令）与群聊 @ 机器人对话，以及多轮对话的等待与回滚。
+/chat、/agent 与群聊 @ 机器人，以及多轮对话的等待与回滚。
 """
 
 from dataclasses import dataclass
+from typing import Never
 
 from arclet.alconna import AllParam, store_true
 from nonebot.adapters import Bot, Event
@@ -22,7 +23,6 @@ from nonebot_plugin_alconna import (
     Option,
     Query,
     UniMessage,
-    get_message_id,
     on_alconna,
 )
 from nonebot_plugin_alconna.builtins.extensions.reply import ReplyRecordExtension
@@ -32,23 +32,27 @@ from nonebot_plugin_user import UserSession
 from src.utils.permission import SuperUserShortcutExtension
 
 from .config import ModelCapability, plugin_config
-from .content import extract_dialogue_content, fetch_message_images
-from .data_source import get_available_model_names, get_image_model_name, get_model_name, get_tts_model
+from .content import extract_dialogue_content, extract_follow_up, fetch_message_images
+from .data_source import get_available_model_names, get_model_name, get_tts_model
+from .draw import ImageOptions, draw_options, handle_draw
+from .draw import draw_cmd as draw_cmd
 from .handler import LLMHandler
 from .providers import ProviderError
 from .reply import ReplySender, send_reaction
 from .rules import MENTION_RULE, NON_PRIVATE_RULE
 from .schemas import ImageContent
+from .tools.image import ImageToolOptions
 
 chat_command = Alconna(
     "chat",
     Args["content?#内容", AllParam],
-    Option("--model", Args["model#模型名称", str], help_text="本次使用指定模型"),
+    Option("--model", Args["model#模型名称", str], help_text="指定聊天模型；-d 时是已改义的 --image-model 别名"),
+    *draw_options(),
     Option("-c|--context", default=False, action=store_true, help_text="启用多轮对话"),
     Option("-r|--render", default=False, action=store_true, help_text="渲染 Markdown 为图片"),
     Option("-t|--tts", default=False, action=store_true, help_text="使用语音回复"),
     Option("-a|--agent", default=False, action=store_true, help_text="启用工具增强模式"),
-    Option("-d|--draw", default=False, action=store_true, help_text="使用当前模型生成图片"),
+    Option("-d|--draw", default=False, action=store_true, help_text="直接使用本群生图模型绘图"),
     Option("-i|--image", default=False, action=store_true, help_text="允许模型按需调用本群生图模型"),
     meta=CommandMeta(
         description="与大模型对话，可按次启用工具增强模式",
@@ -69,7 +73,6 @@ chat_cmd = on_alconna(
     ],
 )
 chat_cmd.shortcut("agent", command="chat -a", prefix=True, fuzzy=True, humanized="agent [选项] <内容>")
-chat_cmd.shortcut("draw", command="chat --draw", prefix=True, fuzzy=True, humanized="draw [选项] <描述>")
 
 
 class MentionChatExtension(Extension):
@@ -142,8 +145,8 @@ async def _create_dialogue(
     render: bool = False,
     use_tts: bool = False,
     enable_tools: bool = False,
-    generate_image: bool = False,
     allow_image: bool = False,
+    image_options: ImageOptions = ImageOptions(),
 ) -> Dialogue:
     """按当前会话设置创建请求处理器与回复发送器。"""
     if not plugin_config.get_model_names():
@@ -170,17 +173,17 @@ async def _create_dialogue(
             at_sender=True,
         )
 
-    # 生图会产生额外费用，只有 -d/--draw 或 -i/--image 显式要求时才开放，-a 不会自动带上。
-    image_model_name = await get_image_model_name(user.session_id) if (generate_image or allow_image) else ""
-    if (generate_image or allow_image) and not image_model_name:
-        raise LLMSetupError("本群未启用生图模型，请联系超级管理员启用并设置", at_sender=True)
+    image_tool = None
+    if allow_image:
+        try:
+            image_tool = ImageToolOptions(image_options.name, image_options.requirements())
+        except ProviderError as error:
+            raise LLMSetupError(str(error), at_sender=True) from error
 
     handler = LLMHandler(
         name,
         enable_tools=enable_tools,
-        generate_image=generate_image,
-        allow_image=allow_image,
-        image_model_name=image_model_name,
+        image_tool=image_tool,
         session_id=user.session_id,
     )
     sender = ReplySender(
@@ -208,18 +211,31 @@ async def _handle_dialogue_command(
     use_tts: Query[bool],
     *,
     enable_tools: bool,
-    generate_image: bool = False,
-    allow_image: bool = False,
+    allow_image: bool,
+    image_options: ImageOptions,
+    quote_reply: bool,
 ) -> None:
-    """执行共享的纯对话或工具增强命令流程。"""
+    """执行对话，群聊提及使用引用回复。"""
+
+    async def finish(message: str, *, at_sender: bool = False) -> Never:
+        if quote_reply:
+            await UniMessage.text(message).finish(at_sender=at_sender, reply_to=msg_id)
+        if at_sender:
+            await matcher.finish(message, at_sender=True)
+        await matcher.finish(message)
+
+    if image_options.supplied and not allow_image:
+        await finish("图片参数仅可用于 /draw、/chat -d 或 /chat -i", at_sender=not quote_reply)
     try:
         text, images = await extract_dialogue_content(content, msg_id, ext, bot, event, state)
-    except ValueError as e:
-        await matcher.finish(str(e), at_sender=True)
+    except ValueError as error:
+        await finish(str(error), at_sender=not quote_reply)
 
     if not text and not images:
-        command_name = "draw" if generate_image else "agent" if enable_tools else "chat"
-        await matcher.finish(f"你想问什么呢？输入 /{command_name} -h 查看用法", at_sender=True)
+        if quote_reply:
+            await finish("你想问什么呢？")
+        command = "agent" if enable_tools else "chat"
+        await finish(f"你想问什么呢？输入 /{command} -h 查看用法", at_sender=True)
 
     try:
         dialogue = await _create_dialogue(
@@ -228,101 +244,88 @@ async def _handle_dialogue_command(
             render=render.result,
             use_tts=use_tts.result,
             enable_tools=enable_tools,
-            generate_image=generate_image,
             allow_image=allow_image,
+            image_options=image_options,
         )
-    except LLMSetupError as e:
-        if e.at_sender:
-            await matcher.finish(str(e), at_sender=True)
-        await matcher.finish(str(e))
+    except LLMSetupError as error:
+        await finish(str(error), at_sender=error.at_sender)
 
     if use_context.result:
-        await _handle_with_context(dialogue, text, images, finish_matcher=matcher)
-        return
-
-    completion = await _ask(dialogue.handler, text, images, finish_matcher=matcher)
-    await dialogue.sender.send(completion)
-
-
-@chat_cmd.handle()
-async def chat_handle(
-    bot: Bot,
-    event: Event,
-    state: T_State,
-    msg_id: MsgId,
-    ext: ReplyRecordExtension,
-    user: UserSession,
-    content: Match[UniMessage],
-    model_name: Query[str] = Query("model.model"),
-    use_context: Query[bool] = Query("context.value", False),
-    render: Query[bool] = Query("render.value", False),
-    use_tts: Query[bool] = Query("tts.value", False),
-    use_agent: Query[bool] = Query("agent.value", False),
-    use_draw: Query[bool] = Query("draw.value", False),
-    use_image: Query[bool] = Query("image.value", False),
-) -> None:
-    await _handle_dialogue_command(
-        chat_cmd,
-        bot,
-        event,
-        state,
-        msg_id,
-        ext,
-        user,
-        content,
-        model_name,
-        use_context,
-        render,
-        use_tts,
-        enable_tools=use_agent.result,
-        generate_image=use_draw.result,
-        allow_image=use_image.result,
-    )
+        if quote_reply:
+            await _handle_with_context(dialogue, text, images, message_id=msg_id)
+        else:
+            await _handle_with_context(dialogue, text, images, finish_matcher=matcher)
+    elif quote_reply:
+        completion = await _ask(dialogue.handler, text, images, message_id=msg_id)
+        await dialogue.sender.send(completion, reply_to=msg_id)
+    else:
+        completion = await _ask(dialogue.handler, text, images, finish_matcher=matcher)
+        await dialogue.sender.send(completion)
 
 
-@llm_mention.handle()
-async def llm_mention_handle(
-    bot: Bot,
-    event: Event,
-    state: T_State,
-    msg_id: MsgId,
-    ext: ReplyRecordExtension,
-    user: UserSession,
-    content: Match[UniMessage],
-    model_name: Query[str] = Query("model.model"),
-    use_context: Query[bool] = Query("context.value", False),
-    render: Query[bool] = Query("render.value", False),
-    use_tts: Query[bool] = Query("tts.value", False),
-    use_agent: Query[bool] = Query("agent.value", False),
-    use_draw: Query[bool] = Query("draw.value", False),
-    use_image: Query[bool] = Query("image.value", False),
-) -> None:
-    """把群聊中 @ 机器人的 Alconna 解析结果交给对话流程。"""
-    try:
-        text, images = await extract_dialogue_content(content, msg_id, ext, bot, event, state)
-    except ValueError as e:
-        await UniMessage.text(str(e)).finish(reply_to=msg_id)
-
-    if not text and not images:
-        await UniMessage.text("你想问什么呢？").finish(reply_to=msg_id)
-
-    try:
-        dialogue = await _create_dialogue(
+def _register_chat_handler(matcher: type[Matcher], *, quote_reply: bool = False) -> None:
+    @matcher.handle()
+    async def handle(
+        bot: Bot,
+        event: Event,
+        state: T_State,
+        msg_id: MsgId,
+        ext: ReplyRecordExtension,
+        user: UserSession,
+        content: Match[UniMessage],
+        model_name: Query[str] = Query("model.model"),
+        use_context: Query[bool] = Query("context.value", False),
+        render: Query[bool] = Query("render.value", False),
+        use_tts: Query[bool] = Query("tts.value", False),
+        use_agent: Query[bool] = Query("agent.value", False),
+        use_draw: Query[bool] = Query("draw.value", False),
+        use_image: Query[bool] = Query("image.value", False),
+        image_name: Query[str] = Query("image_model.name", ""),
+        image_format: Query[str] = Query("format.type", ""),
+        image_size: Query[str] = Query("size.size", ""),
+        image_hd: Query[bool] = Query("hd.value", False),
+        image_frames: Query[str] = Query("frames.count", ""),
+    ) -> None:
+        image_options = ImageOptions(
+            image_name.result, image_format.result, image_size.result, image_hd.result, image_frames.result
+        )
+        if use_draw.result:
+            await handle_draw(
+                matcher,
+                bot,
+                event,
+                state,
+                msg_id,
+                ext,
+                user,
+                content,
+                use_context=use_context.result,
+                legacy_name=model_name.result if model_name.available else "",
+                image_options=image_options,
+            )
+            return
+        await _handle_dialogue_command(
+            matcher,
+            bot,
+            event,
+            state,
+            msg_id,
+            ext,
             user,
-            selected_model=model_name.result if model_name.available else "",
-            render=render.result,
-            use_tts=use_tts.result,
+            content,
+            model_name,
+            use_context,
+            render,
+            use_tts,
             enable_tools=use_agent.result,
-            generate_image=use_draw.result,
             allow_image=use_image.result,
+            image_options=image_options,
+            quote_reply=quote_reply,
         )
-    except LLMSetupError as e:
-        await UniMessage.text(str(e)).finish(at_sender=e.at_sender, reply_to=msg_id)
-    if use_context.result:
-        await _handle_with_context(dialogue, text, images, message_id=msg_id)
-        return
-    completion = await _ask(dialogue.handler, text, images, message_id=msg_id)
-    await dialogue.sender.send(completion, reply_to=msg_id)
+
+
+_register_chat_handler(chat_cmd)
+_register_chat_handler(llm_mention, quote_reply=True)
 
 
 async def _handle_with_context(
@@ -346,7 +349,7 @@ async def _handle_with_context(
     while True:
         received = await prompt(
             "继续对话吧（发送「结束」结束对话，「回滚」撤销上一轮）",
-            handler=_extract_reply,
+            handler=extract_follow_up,
             timeout=plugin_config.context_timeout,
         )
         if received is None:
@@ -377,12 +380,6 @@ async def _handle_with_context(
             finish_matcher=finish_matcher,
         )
         await sender.send(completion)
-
-
-def _extract_reply(reply_event: Event, bot: Bot, state: T_State):
-    """提取续聊消息及下载其中媒体所需的事件上下文。"""
-    message = UniMessage.of(reply_event.get_message(), bot=bot)
-    return message, get_message_id(reply_event), reply_event, bot, state
 
 
 async def _send_request_wait_notice(

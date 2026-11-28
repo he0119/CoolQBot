@@ -13,15 +13,110 @@ import base64
 import binascii
 import copy
 import json
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from ..schemas import Completion, ForceTool, ImageContent, Message, ToolCall, Usage
-from .base import Provider, ProviderError, iter_sse
+from .base import ImageResponseError, Provider, ProviderError, iter_sse
+from .image_options import (
+    ANIMATION_FIELDS,
+    GeneratedImages,
+    ImageCapabilities,
+    ImageRequestOptions,
+    configured_image_defaults,
+    declared_options_error,
+)
+from .openai_image_limits import supports_official_image_edits, uses_official_image_api
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import httpx
 
+    from ..config import ModelConfig
     from ..schemas import ToolChoice, ToolParam
+
+
+_IMAGE_TOOL_TYPE = "image_generation"
+_LEGACY_IMAGE_FIELDS = frozenset(
+    {
+        "action",
+        "background",
+        "complexity",
+        "input_fidelity",
+        "input_image_mask",
+        "moderation",
+        "output_compression",
+        "output_format",
+        "partial_images",
+        "quality",
+        "size",
+    }
+)
+_NATIVE_IMAGE_FIELDS = _LEGACY_IMAGE_FIELDS | {"model"}
+
+
+def _is_image_tool(tool: object) -> bool:
+    return isinstance(tool, dict) and tool.get("type") == _IMAGE_TOOL_TYPE
+
+
+def _legacy_image_options(body: dict[str, Any]) -> dict[str, Any]:
+    # Responses 顶层的 background 是后台执行开关，旧配置用字符串表示图片背景。
+    return {
+        key: value
+        for key, value in body.items()
+        if key in _LEGACY_IMAGE_FIELDS and (key != "background" or isinstance(value, str))
+    }
+
+
+def _image_tool_options(model: ModelConfig) -> dict[str, Any]:
+    """读取图片工具参数，并兼容优先级更高的旧顶层图片参数。"""
+    body = model.extra_body
+    options: dict[str, Any] = {}
+    tools = body.get("tools", [])
+    if isinstance(tools, list):
+        for tool in tools:
+            if _is_image_tool(tool):
+                options.update({key: value for key, value in tool.items() if key in _NATIVE_IMAGE_FIELDS})
+    options.update(_legacy_image_options(body))
+    return options
+
+
+def prepare_responses_chat_model(model: ModelConfig) -> ModelConfig:
+    """从一次普通对话的配置副本中移除原生绘图设置。"""
+    model = model.model_copy(deep=True)
+    body = model.extra_body
+    for key in _legacy_image_options(body).keys() | ANIMATION_FIELDS:
+        body.pop(key, None)
+
+    native_tools = body.get("tools")
+    only_image_tools = False
+    if isinstance(native_tools, list) and native_tools:
+        remaining = [tool for tool in native_tools if not _is_image_tool(tool)]
+        body["tools"] = remaining
+        only_image_tools = not remaining
+
+    choice = body.get("tool_choice")
+    if _is_image_tool(choice) or (choice == "required" and only_image_tools):
+        body.pop("tool_choice")
+    elif isinstance(choice, dict) and choice.get("type") == "allowed_tools":
+        allowed = choice.get("tools")
+        if isinstance(allowed, list):
+            remaining = [tool for tool in allowed if not _is_image_tool(tool)]
+            if remaining:
+                choice["tools"] = remaining
+            else:
+                body.pop("tool_choice")
+    return model
+
+
+@dataclass
+class ResponsesCompletion(Completion):
+    usage_reported: bool = False
+
+
+def _has_usage(raw: dict[str, Any] | None) -> bool:
+    return bool(raw and raw.keys() & {"input_tokens", "output_tokens"})
 
 
 class ResponsesProvider(Provider):
@@ -93,6 +188,76 @@ class ResponsesProvider(Provider):
             payload["tool_choice"] = {"type": "function", "name": tool_choice.name}
         return payload
 
+    def image_capabilities(self) -> ImageCapabilities:
+        return self._image_capabilities(_image_tool_options(self.config))
+
+    def _image_capabilities(self, parameters: dict[str, Any]) -> ImageCapabilities:
+        model_id = parameters.get("model")
+        model_id = model_id if isinstance(model_id, str) else ""
+        return ImageCapabilities(
+            references="vision" in self.config.capabilities,
+            continuation=True,
+            gif=False,
+            explicit_frames=False,
+            auto_size=supports_official_image_edits(self.config.base_url, model_id),
+            official_geometry=uses_official_image_api(self.config.base_url, model_id),
+            defaults=configured_image_defaults(parameters),
+        )
+
+    def image_options_error(self, options: ImageRequestOptions) -> str:
+        return self._image_options_error(options, _image_tool_options(self.config))
+
+    def _image_options_error(self, options: ImageRequestOptions, parameters: dict[str, Any]) -> str:
+        if not isinstance(self.config.extra_body.get("tools", []), list):
+            return "extra_body.tools 必须为工具数组"
+        effective = options.apply(parameters)
+        if effective.get("output_format") == "gif":
+            return "此接口不支持动态 GIF"
+        if options.frame_count is not None:
+            return "--frames 仅适用于 GIF"
+        capabilities = self._image_capabilities(parameters)
+        return declared_options_error(
+            self.config, options, effective, capabilities, native_static=capabilities.auto_size
+        )
+
+    async def generate_images(
+        self,
+        prompt: str,
+        *,
+        options: ImageRequestOptions,
+        images: list[ImageContent] | None = None,
+        history: Sequence[Message] = (),
+    ) -> GeneratedImages:
+        if images and "vision" not in self.config.capabilities:
+            raise ProviderError("未声明 vision 能力，不能使用参考图")
+        parameters = _image_tool_options(self.config)
+        if error := self._image_options_error(options, parameters):
+            raise ProviderError(error)
+        body = copy.deepcopy(self.config.extra_body)
+        native_tools = body.pop("tools", [])
+        for key in _legacy_image_options(body).keys() | ANIMATION_FIELDS | {"model", "input", "stream"}:
+            body.pop(key, None)
+        body["tools"] = [
+            *(tool for tool in native_tools if not _is_image_tool(tool)),
+            {"type": _IMAGE_TOOL_TYPE, **options.apply(parameters)},
+        ]
+        body["tool_choice"] = {"type": _IMAGE_TOOL_TYPE}
+        model = self.config.model_copy(update={"extra_body": body})
+        completion = await ResponsesProvider(model, session_affinity=self.session_affinity).chat(
+            [*history, Message.user(prompt, images)]
+        )
+        usage = completion.usage if isinstance(completion, ResponsesCompletion) and completion.usage_reported else None
+        if not completion.images:
+            raise ImageResponseError(f"模型 {model.name} 没有生成图片", usage)
+        # 只回放产生图片的原生记录，避免重放这次请求中无关的工具输出。
+        reusable = [
+            item
+            for item in completion.message.provider_data.get("responses_output", [])
+            if item.get("type") == "image_generation_call" and item.get("id") and item.get("result")
+        ]
+        continuation = Message.assistant(provider_data={"responses_output": reusable}) if reusable else None
+        return GeneratedImages(images=completion.images, usage=usage, continuation=continuation)
+
     def _dump_items(self, message: Message) -> list[dict[str, Any]]:
         if message.role == "tool":
             return [{"type": "function_call_output", "call_id": message.tool_call_id, "output": message.content}]
@@ -136,12 +301,15 @@ class ResponsesProvider(Provider):
         if data.get("status") == "incomplete" and any(item.get("type") == "function_call" for item in output_items):
             raise ProviderError("工具调用尚未完成，请增加 max_tokens 或重试")
         message = self._extract_message(output_items)
-        return Completion(
+        usage = self._parse_usage(data.get("usage"))
+        usage_reported = _has_usage(data.get("usage"))
+        return ResponsesCompletion(
             message=message,
-            usage=self._parse_usage(data.get("usage")),
+            usage=usage,
+            usage_reported=usage_reported,
             model=data.get("model", ""),
             finish_reason="tool_calls" if message.tool_calls else _finish_reason(data),
-            images=_extract_images(output_items),
+            images=_extract_images(output_items, usage if usage_reported else None),
         )
 
     async def parse_stream(self, response: httpx.Response) -> Completion:
@@ -155,6 +323,7 @@ class ResponsesProvider(Provider):
         order: list[str] = []
         raw_output: dict[int, dict[str, Any]] = {}
         usage = Usage()
+        usage_reported = False
         model = ""
         finish_reason = ""
         terminal_response: dict[str, Any] | None = None
@@ -177,6 +346,7 @@ class ResponsesProvider(Provider):
                 finish_reason = _finish_reason(response_data) or finish_reason
                 if raw_usage := response_data.get("usage"):
                     usage = self._parse_usage(raw_usage)
+                    usage_reported = _has_usage(raw_usage)
                 if event != "response.created":
                     terminal_response = dict(response_data)
                     terminal_response.setdefault("status", event.removeprefix("response."))
@@ -244,12 +414,13 @@ class ResponsesProvider(Provider):
         message.content = message.content or "".join(content)
         message.reasoning = message.reasoning or "".join(reasoning)
         message.tool_calls = tool_calls or message.tool_calls
-        return Completion(
+        return ResponsesCompletion(
             message=message,
             usage=usage,
+            usage_reported=usage_reported,
             model=model,
             finish_reason="tool_calls" if tool_calls else finish_reason,
-            images=_extract_images(output_items),
+            images=_extract_images(output_items, usage if usage_reported else None),
         )
 
     def _extract_message(self, output_items: list[dict[str, Any]]) -> Message:
@@ -306,7 +477,7 @@ def _finish_reason(data: dict[str, Any]) -> str:
     return "stop" if data.get("status") == "completed" else ""
 
 
-def _extract_images(output_items: list[dict[str, Any]]) -> list[ImageContent]:
+def _extract_images(output_items: list[dict[str, Any]], usage: Usage | None) -> list[ImageContent]:
     """解码原生 image_generation 工具生成的图片"""
     images: list[ImageContent] = []
     for item in output_items:
@@ -315,7 +486,7 @@ def _extract_images(output_items: list[dict[str, Any]]) -> list[ImageContent]:
         try:
             images.append(ImageContent.from_bytes(base64.b64decode(result, validate=True)))
         except (binascii.Error, TypeError, ValueError) as e:
-            raise ProviderError("生成图片的数据无效或格式不受支持") from e
+            raise ImageResponseError("生成图片的数据无效或格式不受支持", usage) from e
     return images
 
 
